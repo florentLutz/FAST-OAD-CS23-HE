@@ -13,7 +13,7 @@
       <has_T_tail is_input="True">1.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
       <wing_configuration is_input="True">3.0<!--1=low wing configuration / 2=mid wing configuration / 3=high wing configuration--></wing_configuration>
       <aircraft>
-        <wet_area units="m**2" is_input="False">44.07451732657882<!--aircraft total wet area--></wet_area>
+        <wet_area units="m**2" is_input="False">44.07451732906606<!--aircraft total wet area--></wet_area>
       </aircraft>
       <cabin>
         <length units="m" is_input="False">1.5<!--cabin length--></length>
@@ -49,33 +49,33 @@
         <wet_area units="m**2" is_input="False">20.71259260024953<!--fuselage wet area--></wet_area>
       </fuselage>
       <horizontal_tail>
-        <area units="m**2" is_input="False">1.0135437605993485<!--horizontal tail area--></area>
+        <area units="m**2" is_input="False">1.0135437607313713<!--horizontal tail area--></area>
         <aspect_ratio is_input="True">4.65<!--horizontal tail aspect ratio--></aspect_ratio>
         <elevator_chord_ratio is_input="True">0.4<!--elevator chord ratio--></elevator_chord_ratio>
-        <span units="m" is_input="False">2.1709467211144564<!--horizontal tail span--></span>
+        <span units="m" is_input="False">2.1709467214324665<!--horizontal tail span--></span>
         <sweep_0 units="rad" is_input="False">0.12306519010644479<!--sweep angle at leading edge of horizontal tail--></sweep_0>
         <sweep_100 units="rad" is_input="False">3.0504820899086256<!--sweep angle at trailing edge of horizontal tail--></sweep_100>
         <sweep_25 units="rad" is_input="True">0.06981317007977318<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
         <sweep_50 units="rad" is_input="False">0.01616196371907111</sweep_50>
         <taper_ratio is_input="True">0.6<!--taper ratio of horizontal tail--></taper_ratio>
         <thickness_ratio is_input="True">0.125<!--thickness ratio of horizontal tail--></thickness_ratio>
-        <volume_coefficient is_input="False">0.4663380879741606</volume_coefficient>
-        <wet_area units="m**2" is_input="False">1.7027647825250714<!--wet area of horizontal tail--></wet_area>
+        <volume_coefficient is_input="False">0.4663380880165303</volume_coefficient>
+        <wet_area units="m**2" is_input="False">1.7027647830239292<!--wet area of horizontal tail--></wet_area>
         <MAC>
-          <length units="m" is_input="False">0.4765967264095356<!--mean aerodynamic chord length of horizontal tail--></length>
-          <y units="m" is_input="False">0.49750862358872955<!--Y-position of mean aerodynamic chord of horizontal tail--></y>
+          <length units="m" is_input="False">0.47659672647934964<!--mean aerodynamic chord length of horizontal tail--></length>
+          <y units="m" is_input="False">0.497508623661607<!--Y-position of mean aerodynamic chord of horizontal tail--></y>
           <at25percent>
             <x>
               <from_wingMAC25 units="m" is_input="True">4.1<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></from_wingMAC25>
-              <local units="m" is_input="False">0.06153696742372346<!--X-position of the 25% of mean aerodynamic chord of horizontal tail w.r.t. leading edge of root chord--></local>
+              <local units="m" is_input="False">0.06153696743273767<!--X-position of the 25% of mean aerodynamic chord of horizontal tail w.r.t. leading edge of root chord--></local>
             </x>
           </at25percent>
         </MAC>
         <root>
-          <chord units="m" is_input="False">0.5835878282565741<!--chord length at root of horizontal tail--></chord>
+          <chord units="m" is_input="False">0.5835878283420608<!--chord length at root of horizontal tail--></chord>
         </root>
         <tip>
-          <chord units="m" is_input="False">0.3501526969539444<!--chord length at tip of horizontal tail--></chord>
+          <chord units="m" is_input="False">0.3501526970052365<!--chord length at tip of horizontal tail--></chord>
         </tip>
         <z>
           <from_wingMAC25 units="m" is_input="False">1.1089634800118533<!--Z-position of the horizontal tail w.r.t. 25% MAC of wing Z-position--></from_wingMAC25>
@@ -93,15 +93,15 @@
         <area units="ft**2" is_input="True">9.25696295837036<!--vertical tail area--></area>
         <aspect_ratio is_input="True">1.43<!--vertical tail aspect ratio--></aspect_ratio>
         <span units="m" is_input="False">1.1089634800118533<!--vertical tail span--></span>
-        <sweep_0 units="deg" is_input="False">33.39954108015487<!--sweep angle at leading edge of vertical tail--></sweep_0>
-        <sweep_100 units="deg" is_input="False">18.330034860018078<!--sweep angle at trailing edge of vertical tail--></sweep_100>
+        <sweep_0 units="rad" is_input="False">0.5829319605038058<!--sweep angle at leading edge of vertical tail--></sweep_0>
+        <sweep_100 units="rad" is_input="False">0.3199194603126534<!--sweep angle at trailing edge of vertical tail--></sweep_100>
         <sweep_25 units="rad" is_input="True">0.5235987755982988<!--sweep angle at 25% chord of vertical tail--></sweep_25>
-        <sweep_50 units="rad" is_input="False">0.3199194603126532</sweep_50>
+        <sweep_50 units="rad" is_input="False">0.31991946031265317</sweep_50>
         <taper_ratio is_input="True">0.62<!--taper ratio of vertical tail--></taper_ratio>
         <thickness_ratio is_input="True">0.125<!--thickness ratio of vertical tail--></thickness_ratio>
         <wet_area units="m**2" is_input="False">1.806<!--wet area of vertical tail--></wet_area>
         <MAC>
-          <length units="m" is_input="False">0.7897221305012271<!--mean aerodynamic chord length of vertical tail--></length>
+          <length units="m" is_input="False">0.789722130501227<!--mean aerodynamic chord length of vertical tail--></length>
           <z units="m" is_input="False">0.5111272006638995<!--Z-position of mean aerodynamic chord of vertical tail--></z>
           <at25percent>
             <x>
@@ -125,12 +125,12 @@
         </tip>
       </vertical_tail>
       <wing>
-        <area units="m**2" is_input="False">9.851284571760878<!--wing area--></area>
+        <area units="m**2" is_input="False">9.85128457228896<!--wing area--></area>
         <aspect_ratio is_input="True">12.04<!--wing aspect ratio--></aspect_ratio>
-        <b_50 units="m" is_input="False">10.890808252276265<!--actual length between root and tip along 50% of chord--></b_50>
+        <b_50 units="m" is_input="False">10.89080825281975<!--actual length between root and tip along 50% of chord--></b_50>
         <dihedral units="rad" is_input="True">0.0</dihedral>
-        <outer_area units="m**2" is_input="False">8.767831749441223<!--wing area outside of fuselage--></outer_area>
-        <span units="m" is_input="False">10.890808252276265<!--wing span--></span>
+        <outer_area units="m**2" is_input="False">8.767831750370375<!--wing area outside of fuselage--></outer_area>
+        <span units="m" is_input="False">10.89080825281975<!--wing span--></span>
         <sweep_0 units="rad" is_input="False">0.0<!--sweep angle at leading edge of wing--></sweep_0>
         <sweep_100_inner units="rad" is_input="False">0.0<!--sweep angle at trailing edge of wing (inner side of the kink)--></sweep_100_inner>
         <sweep_100_outer units="rad" is_input="False">0.0<!--sweep angle at trailing edge of wing (outer side of the kink)--></sweep_100_outer>
@@ -139,16 +139,16 @@
         <taper_ratio is_input="True">1.0<!--taper ratio of wing--></taper_ratio>
         <thickness_ratio is_input="True">0.15<!--mean thickness ratio of wing--></thickness_ratio>
         <twist units="rad" is_input="True">0.0<!--Negative twist means tip AOA is smaller than root--></twist>
-        <wet_area units="m**2" is_input="False">18.76315994380422<!--wet area of wing--></wet_area>
+        <wet_area units="m**2" is_input="False">18.763159945792605<!--wet area of wing--></wet_area>
         <MAC>
-          <length units="m" is_input="False">0.9045521804216168<!--length of mean aerodynamic chord of wing--></length>
-          <y units="m" is_input="False">2.722702063069066<!--Y-position of mean aerodynamic chord of wing--></y>
+          <length units="m" is_input="False">0.9045521804667567<!--length of mean aerodynamic chord of wing--></length>
+          <y units="m" is_input="False">2.7227020632049377<!--Y-position of mean aerodynamic chord of wing--></y>
           <at25percent>
-            <x units="m" is_input="False">2.024037711053657<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+            <x units="m" is_input="False">2.0240377110499614<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
           </at25percent>
           <leading_edge>
             <x>
-              <absolute units="m" is_input="False">1.7978980182855635</absolute>
+              <absolute units="m" is_input="False">1.797898018287639</absolute>
               <local units="m" is_input="False">0.0<!--X-position of leading edge of mean aerodynamic chord w.r.t. leading edge of root chord--></local>
             </x>
           </leading_edge>
@@ -159,7 +159,7 @@
           <span_ratio is_input="True">0.2</span_ratio>
         </aileron>
         <kink>
-          <chord units="m" is_input="False">0.9045521804216169<!--chord length at wing kink--></chord>
+          <chord units="m" is_input="False">0.9045521804667567<!--chord length at wing kink--></chord>
           <span_ratio is_input="True">0.0<!--ratio (Y-position of kink)/(semi-span)--></span_ratio>
           <thickness_ratio is_input="False">0.141<!--thickness ratio at wing kink--></thickness_ratio>
           <y units="m" is_input="False">0.0<!--Y-position of wing kink--></y>
@@ -170,20 +170,20 @@
           </leading_edge>
         </kink>
         <root>
-          <chord units="m" is_input="False">0.9045521804216169<!--chord length at wing root--></chord>
+          <chord units="m" is_input="False">0.9045521804667567<!--chord length at wing root--></chord>
           <thickness_ratio is_input="False">0.186<!--thickness ratio at wing root--></thickness_ratio>
-          <virtual_chord units="m" is_input="False">0.9045521804216169<!--virtual chord length at wing root if sweep angle of trailing edge of outer wing part was on the whole wing (no kink)--></virtual_chord>
+          <virtual_chord units="m" is_input="False">0.9045521804667567<!--virtual chord length at wing root if sweep angle of trailing edge of outer wing part was on the whole wing (no kink)--></virtual_chord>
           <y units="m" is_input="False">0.5989<!--Y-position of wing root--></y>
-          <z units="m" is_input="False">-0.5847766472207897<!--Distance between the wing aerodynamic center at the root and the fuselage centerline, taken positive when wing is below the fuselage centerline--></z>
+          <z units="m" is_input="False">-0.5847766472165917<!--Distance between the wing aerodynamic center at the root and the fuselage centerline, taken positive when wing is below the fuselage centerline--></z>
         </root>
         <tip>
-          <chord units="m" is_input="False">0.9045521804216169<!--chord length at wing tip--></chord>
+          <chord units="m" is_input="False">0.9045521804667567<!--chord length at wing tip--></chord>
           <thickness_ratio is_input="False">0.129<!--thickness ratio at wing tip--></thickness_ratio>
-          <y units="m" is_input="False">5.445404126138133<!--Y-position of wing tip--></y>
-          <z units="m" is_input="False">-0.6105563843628058<!--Distance between the wing aerodynamic center at the tip and the fuselage centerline, taken positive when wing is below the fuselage centerline--></z>
+          <y units="m" is_input="False">5.445404126409875<!--Y-position of wing tip--></y>
+          <z units="m" is_input="False">-0.6105563843598942<!--Distance between the wing aerodynamic center at the tip and the fuselage centerline, taken positive when wing is below the fuselage centerline--></z>
           <leading_edge>
             <x>
-              <absolute units="m" is_input="False">1.7978980182855635</absolute>
+              <absolute units="m" is_input="False">1.797898018287639</absolute>
               <local units="m" is_input="False">0.0<!--X-position of leading edge at wing tip w.r.t. leading edge of root chord--></local>
             </x>
           </leading_edge>
@@ -196,7 +196,7 @@
           <y_ratio is_input="True">0.34<!--engine position along wing span (if layout=1-2)--></y_ratio>
         </engine>
         <nacelle>
-          <from_LE units="m" is_input="False">1.7978980182855635</from_LE>
+          <from_LE units="m" is_input="False">1.797898018287639</from_LE>
           <height units="m" is_input="True">0.6230628899061188<!--height of the nacelle--></height>
           <length units="m" is_input="True">0.35<!--length of the nacelle--></length>
           <master_cross_section units="m**2" is_input="True">0.5789057194060345</master_cross_section>
@@ -208,8 +208,8 @@
       </propulsion>
     </geometry>
     <handling_qualities>
-      <stick_fixed_static_margin is_input="False">0.19999817847690243<!--stick fixed static margin--></stick_fixed_static_margin>
-      <stick_free_static_margin is_input="False">0.1232831597968907<!--stick free static margin--></stick_free_static_margin>
+      <stick_fixed_static_margin is_input="False">0.19999817849575885<!--stick fixed static margin--></stick_fixed_static_margin>
+      <stick_free_static_margin is_input="False">0.12328315980604171<!--stick free static margin--></stick_free_static_margin>
       <static_margin>
         <target is_input="True">0.2<!--static margin we want to achieve--></target>
       </static_margin>
@@ -221,10 +221,10 @@
         <strokes_nb is_input="True">4.0<!--number of strokes on the engine--></strokes_nb>
       </IC_engine>
       <he_power_train>
-        <mass units="kg" is_input="False">198.64924648073185</mass>
+        <mass units="kg" is_input="False">198.64924648306334</mass>
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <CG>
-          <x units="m" is_input="False">1.4242657090506992</x>
+          <x units="m" is_input="False">1.424265709041824</x>
         </CG>
         <cruise>
           <CD0 is_input="False">0.0</CD0>
@@ -234,14 +234,14 @@
         </low_speed>
         <DC_SSPC>
           <dc_sspc_1>
-            <current_caliber units="A" is_input="False">80.61983443703491<!--Current caliber of the SSPC--></current_caliber>
-            <current_max units="A" is_input="False">80.61983443703491<!--Maximum current flowing through the SSPC--></current_max>
-            <efficiency is_input="False">0.990563426819972<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <current_caliber units="A" is_input="False">80.61983444315015<!--Current caliber of the SSPC--></current_caliber>
+            <current_max units="A" is_input="False">80.61983444315015<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="False">0.9905634268199767<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
             <front_length_ratio is_input="True">0.9<!--Location of the DC SSPC CG as a ratio of the aircraft front length--></front_length_ratio>
-            <mass units="kg" is_input="False">1.0511153545190257<!--Mass of the SSPC--></mass>
+            <mass units="kg" is_input="False">1.0511153545992753<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
-            <voltage_caliber units="V" is_input="False">391.1377498573108<!--Voltage caliber of the SSPC--></voltage_caliber>
-            <voltage_max units="V" is_input="False">391.1377498573108<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <voltage_caliber units="V" is_input="False">391.1377498575041<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_max units="V" is_input="False">391.1377498575041<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">0.9<!--X position of the DC SSPC center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
@@ -251,28 +251,28 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.010437878046713454</resistance>
+              <resistance units="ohm" is_input="False">0.010437878045921712</resistance>
             </diode>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.008428446978896961</resistance>
+              <resistance units="ohm" is_input="False">0.008428446978257639</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">5.581752966156928</resistance>
+              <resistance is_input="False">5.581752965733536</resistance>
             </scaling>
           </dc_sspc_1>
           <dc_sspc_2>
-            <current_caliber units="A" is_input="False">80.61983443703491<!--Current caliber of the SSPC--></current_caliber>
-            <current_max units="A" is_input="False">80.61983443703491<!--Maximum current flowing through the SSPC--></current_max>
-            <efficiency is_input="False">0.990563426819972<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <mass units="kg" is_input="False">1.0511153545190257<!--Mass of the SSPC--></mass>
+            <current_caliber units="A" is_input="False">80.61983444315015<!--Current caliber of the SSPC--></current_caliber>
+            <current_max units="A" is_input="False">80.61983444315015<!--Maximum current flowing through the SSPC--></current_max>
+            <efficiency is_input="False">0.9905634268199767<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
+            <mass units="kg" is_input="False">1.0511153545992753<!--Mass of the SSPC--></mass>
             <power_density units="W/kg" is_input="True">30000.0<!--Power density of the SSPC--></power_density>
             <rear_length_ratio is_input="True">0.1<!--Location of the DC SSPC CG as a ratio of the aircraft rear length--></rear_length_ratio>
-            <voltage_caliber units="V" is_input="False">391.1377498573108<!--Voltage caliber of the SSPC--></voltage_caliber>
-            <voltage_max units="V" is_input="False">391.1377498573108<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <voltage_caliber units="V" is_input="False">391.1377498575041<!--Voltage caliber of the SSPC--></voltage_caliber>
+            <voltage_max units="V" is_input="False">391.1377498575041<!--Maximum voltage at the terminals SSPC--></voltage_max>
             <CG>
               <x units="m" is_input="False">2.9<!--X position of the DC SSPC center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
@@ -282,52 +282,52 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.010437878046713454</resistance>
+              <resistance units="ohm" is_input="False">0.010437878045921712</resistance>
             </diode>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.008428446978896961</resistance>
+              <resistance units="ohm" is_input="False">0.008428446978257639</resistance>
             </igbt>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <resistance is_input="False">5.581752966156928</resistance>
+              <resistance is_input="False">5.581752965733536</resistance>
             </scaling>
           </dc_sspc_2>
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
-            <current_caliber units="A" is_input="False">161.23966887406982</current_caliber>
-            <current_max units="A" is_input="False">161.23966887406982</current_max>
+            <current_caliber units="A" is_input="False">161.2396688863003</current_caliber>
+            <current_max units="A" is_input="False">161.2396688863003</current_max>
             <front_length_ratio is_input="True">0.9<!--Location of the DC bus CG as a ratio of the aircraft front length--></front_length_ratio>
-            <height units="m" is_input="False">0.005790743881041713</height>
-            <length units="m" is_input="False">0.3021565387969224</length>
-            <mass units="kg" is_input="False">0.21750162289932592<!--Weight of the bus bar--></mass>
-            <voltage_caliber units="V" is_input="False">387.42742855684503</voltage_caliber>
-            <voltage_max units="V" is_input="False">387.42742855684503</voltage_max>
-            <width units="m" is_input="False">0.02771589565350311</width>
+            <height units="m" is_input="False">0.005790743881138509</height>
+            <length units="m" is_input="False">0.30215653879692234</length>
+            <mass units="kg" is_input="False">0.21750162291412478<!--Weight of the bus bar--></mass>
+            <voltage_caliber units="V" is_input="False">387.4274285570452</voltage_caliber>
+            <voltage_max units="V" is_input="False">387.4274285570452</voltage_max>
+            <width units="m" is_input="False">0.027715895654472394</width>
             <CG>
               <x units="m" is_input="False">0.9<!--X position of the DC bus center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <conductor>
-              <mutual_inductance units="H" is_input="False">1.2780391943642707e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
-              <self_inductance units="H" is_input="False">2.176613826819403e-07<!--Self inductance of the bus bar conductor--></self_inductance>
+              <mutual_inductance units="H" is_input="False">1.278039194364281e-06<!--Self inductance of the bus bar conductor--></mutual_inductance>
+              <self_inductance units="H" is_input="False">2.176613826797098e-07<!--Self inductance of the bus bar conductor--></self_inductance>
             </conductor>
             <cross_section>
-              <area units="cm**2" is_input="False">0.32664036146101894</area>
+              <area units="cm**2" is_input="False">0.3266403614857955</area>
               <density units="kg/m**3" is_input="True">8960.0<!--Density of the conductor, copper is assumed--></density>
               <length units="m" is_input="True">0.3<!--Length of the bus bar conductor--></length>
-              <thickness units="cm" is_input="False">0.12779678428290342</thickness>
+              <thickness units="cm" is_input="False">0.12779678428775026</thickness>
               <w_t_ratio is_input="True">20.0</w_t_ratio>
-              <width units="cm" is_input="False">2.555935685658068</width>
+              <width units="cm" is_input="False">2.5559356857550055</width>
             </cross_section>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
-              <thickness units="m" is_input="False">0.001078269398461215</thickness>
+              <thickness units="m" is_input="False">0.0010782693984611677</thickness>
             </insulation>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
@@ -336,44 +336,44 @@
         </DC_bus>
         <DC_cable_harness>
           <harness_1>
-            <current_caliber units="A" is_input="False">161.23966887411657</current_caliber>
-            <current_max units="A" is_input="False">161.23966887411657<!--Maximum current flowing through the harness, all cables included--></current_max>
+            <current_caliber units="A" is_input="False">161.23966888637187</current_caliber>
+            <current_max units="A" is_input="False">161.23966888637187<!--Maximum current flowing through the harness, all cables included--></current_max>
             <length units="m" is_input="False">1.5<!--Length of the harness--></length>
-            <losses_max units="W" is_input="False">15.84215554617297<!--Maximum losses in one cable of the harness--></losses_max>
-            <mass units="kg" is_input="False">2.721572815687243</mass>
+            <losses_max units="W" is_input="False">15.84215554375674<!--Maximum losses in one cable of the harness--></losses_max>
+            <mass units="kg" is_input="False">2.721572815893547</mass>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
-            <temperature_max units="degK" is_input="False">293.6772410284741</temperature_max>
-            <voltage_caliber units="V" is_input="False">387.446749841347</voltage_caliber>
-            <voltage_max units="V" is_input="False">387.446749841347</voltage_max>
+            <temperature_max units="degK" is_input="False">293.67724102557855</temperature_max>
+            <voltage_caliber units="V" is_input="False">387.4467498415405</voltage_caliber>
+            <voltage_max units="V" is_input="False">387.4467498415405</voltage_max>
             <CG>
               <x units="m" is_input="False">1.75<!--X position of the DC cable center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <cable>
-              <current_caliber units="A" is_input="False">161.23966887411657<!--Maximum current flowing in one cable of the harness--></current_caliber>
-              <heat_capacity units="J/degK" is_input="False">718.688220954503</heat_capacity>
-              <heat_capacity_per_length units="J/degK/m" is_input="False">399.2712338636128</heat_capacity_per_length>
+              <current_caliber units="A" is_input="False">161.23966888637187<!--Maximum current flowing in one cable of the harness--></current_caliber>
+              <heat_capacity units="J/degK" is_input="False">718.6882210179414</heat_capacity>
+              <heat_capacity_per_length units="J/degK/m" is_input="False">399.27123389885634</heat_capacity_per_length>
               <initial_temperature units="degK" is_input="True">288.15</initial_temperature>
-              <mass_per_length units="kg/m" is_input="False">0.6071228297235027</mass_per_length>
-              <radius units="m" is_input="False">0.00666769463178064</radius>
-              <resistance units="ohm" is_input="False">0.0006128618303464054</resistance>
-              <resistance_per_length units="ohm/km" is_input="False">0.3404787946368919</resistance_per_length>
+              <mass_per_length units="kg/m" is_input="False">0.6071228297903718</mass_per_length>
+              <radius units="m" is_input="False">0.006667694632057566</radius>
+              <resistance units="ohm" is_input="False">0.0006128618302674939</resistance>
+              <resistance_per_length units="ohm/km" is_input="False">0.34047879459305225</resistance_per_length>
             </cable>
             <conductor>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the conducting core--></k_factor_radius>
-              <radius units="mm" is_input="False">4.020218576058765</radius>
-              <section units="mm**2" is_input="False">50.77491495176498</section>
+              <radius units="mm" is_input="False">4.020218576317584</radius>
+              <section units="mm**2" is_input="False">50.774914958302695</section>
             </conductor>
             <contactor>
-              <mass units="kg" is_input="False">1.6287517221849384<!--Mass of all the contactors in the harness--></mass>
+              <mass units="kg" is_input="False">1.6287517222708778<!--Mass of all the contactors in the harness--></mass>
             </contactor>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
-              <thickness units="m" is_input="False">0.0010766922947642627</thickness>
+              <thickness units="m" is_input="False">0.0010766922947642546</thickness>
             </insulation>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
@@ -384,39 +384,39 @@
               <specific_heat units="J/degK/kg" is_input="False">386.0<!--1.0 for copper, 0.0 for aluminium--></specific_heat>
             </properties>
             <sheath>
-              <thickness units="m" is_input="False">0.001370783760957612</thickness>
+              <thickness units="m" is_input="False">0.0013707837609757286</thickness>
             </sheath>
           </harness_1>
         </DC_cable_harness>
         <DC_splitter>
           <dc_splitter_1>
-            <current_caliber units="A" is_input="False">80.61983443703491</current_caliber>
-            <current_max units="A" is_input="False">80.61983443703491</current_max>
-            <height units="m" is_input="False">0.005045083610394723</height>
-            <length units="m" is_input="False">0.3021585094365261</length>
-            <mass units="kg" is_input="False">0.11831226569622177<!--Weight of the splitter--></mass>
+            <current_caliber units="A" is_input="False">80.61983444315015</current_caliber>
+            <current_max units="A" is_input="False">80.61983444315015</current_max>
+            <height units="m" is_input="False">0.005045083610463007</height>
+            <length units="m" is_input="False">0.30215850943652595</length>
+            <mass units="kg" is_input="False">0.11831226570392392<!--Weight of the splitter--></mass>
             <power_split is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
             <rear_length_ratio is_input="True">0.1<!--Location of the DC splitter CG as a ratio of the aircraft rear length--></rear_length_ratio>
-            <voltage_caliber units="V" is_input="False">387.446749841347</voltage_caliber>
-            <voltage_max units="V" is_input="False">387.446749841347</voltage_max>
-            <width units="m" is_input="False">0.020231703992581222</width>
+            <voltage_caliber units="V" is_input="False">387.4467498415405</voltage_caliber>
+            <voltage_max units="V" is_input="False">387.4467498415405</voltage_max>
+            <width units="m" is_input="False">0.0202317039932665</width>
             <CG>
               <x units="m" is_input="False">2.9<!--X position of the DC splitter center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <cross_section>
-              <area units="cm**2" is_input="False">0.16332018073050947</area>
+              <area units="cm**2" is_input="False">0.16332018074289775</area>
               <density units="kg/m**3" is_input="True">8960.0<!--Density of the conductor, copper is assumed--></density>
               <length units="m" is_input="True">0.3<!--Length of the splitter conductor--></length>
-              <thickness units="cm" is_input="False">0.0903659727802754</thickness>
+              <thickness units="cm" is_input="False">0.09036597278370265</thickness>
               <w_t_ratio is_input="True">20.0</w_t_ratio>
-              <width units="cm" is_input="False">1.8073194556055079</width>
+              <width units="cm" is_input="False">1.807319455674053</width>
             </cross_section>
             <cruise>
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <insulation>
-              <thickness units="m" is_input="False">0.0010792547182630716</thickness>
+              <thickness units="m" is_input="False">0.0010792547182629847</thickness>
             </insulation>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
@@ -425,21 +425,21 @@
         </DC_splitter>
         <PMSM>
           <motor_1>
-            <current_ac_max units="A" is_input="False">45.169793138956386<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
+            <current_ac_max units="A" is_input="False">45.169793149541135<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
             <diameter units="m" is_input="False">0.268</diameter>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
-            <length units="m" is_input="False">0.0932874327976047</length>
-            <losses_max units="W" is_input="False">3085.545998772659</losses_max>
-            <mass units="kg" is_input="False">20.39726906801662</mass>
-            <phase_resistance units="ohm" is_input="False">0.014165569463590124</phase_resistance>
+            <length units="m" is_input="False">0.09328743280568738</length>
+            <losses_max units="W" is_input="False">3085.545997955807</losses_max>
+            <mass units="kg" is_input="False">20.397269069347697</mass>
+            <phase_resistance units="ohm" is_input="False">0.01416556946037448</phase_resistance>
             <rpm_max units="1/min" is_input="False">2350.0<!--Maximum value of the motor rpm--></rpm_max>
             <rpm_rating units="1/min" is_input="True">4500.0<!--Max continuous rpm of the motor--></rpm_rating>
-            <shaft_power_max units="W" is_input="False">50455.46643521136</shaft_power_max>
-            <shaft_power_rating units="kW" is_input="False">50.45546643521136<!--Value of the maximum power the PMSM can provide, used for sizing--></shaft_power_rating>
-            <torque_constant units="N*m/A" is_input="False">1.5130168113140956</torque_constant>
-            <torque_max units="N*m" is_input="False">205.0273248299004<!--Maximum value of the torque the motor has to provide--></torque_max>
-            <torque_rating units="N*m" is_input="False">205.0273248299004<!--Max continuous torque of the motor--></torque_rating>
-            <voltage_ac_max units="V" is_input="False">516.8032298652669<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
+            <shaft_power_max units="W" is_input="False">50455.46643958297</shaft_power_max>
+            <shaft_power_rating units="kW" is_input="False">50.45546643958297<!--Value of the maximum power the PMSM can provide, used for sizing--></shaft_power_rating>
+            <torque_constant units="N*m/A" is_input="False">1.5130168112079112</torque_constant>
+            <torque_max units="N*m" is_input="False">205.02732484766457<!--Maximum value of the torque the motor has to provide--></torque_max>
+            <torque_rating units="N*m" is_input="False">205.02732484766457<!--Max continuous torque of the motor--></torque_rating>
+            <voltage_ac_max units="V" is_input="False">516.8032297783124<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <CG>
               <x units="m" is_input="False">0.25<!--X position of the PMSM center of gravity--></x>
@@ -449,32 +449,33 @@
               <CD0 is_input="False">0.0</CD0>
             </cruise>
             <loss_coefficient>
-              <alpha units="W/N**2/m**2" is_input="False">0.015607675721540332</alpha>
-              <beta units="W*s/rad" is_input="False">6.324640583075732</beta>
-              <gamma units="W*s**2/rad**2" is_input="False">0.01441585681146537</gamma>
+              <alpha units="W/N**2/m**2" is_input="False">0.015607675720188037</alpha>
+              <beta units="W*s/rad" is_input="False">6.324640582001682</beta>
+              <gamma units="W*s**2/rad**2" is_input="False">0.014415856809466922</gamma>
             </loss_coefficient>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
             <scaling>
-              <alpha is_input="False">0.9754797325962707</alpha>
-              <beta is_input="False">0.9525061119089958</beta>
+              <alpha is_input="False">0.9754797325117524</alpha>
+              <beta is_input="False">0.9525061117472413</beta>
               <diameter is_input="False">1.0</diameter>
-              <gamma is_input="False">0.961057120764358</gamma>
-              <length is_input="False">1.0251366241495021</length>
-              <phase_resistance is_input="False">0.6185838193707478<!--Scaling factor for the phase resistance of the motor--></phase_resistance>
-              <torque_constant is_input="False">0.7963246375337346</torque_constant>
+              <gamma is_input="False">0.9610571206311281</gamma>
+              <length is_input="False">1.0251366242383229</length>
+              <phase_resistance is_input="False">0.6185838192303266<!--Scaling factor for the phase resistance of the motor--></phase_resistance>
+              <torque_constant is_input="False">0.796324637477848</torque_constant>
             </scaling>
           </motor_1>
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">8.133916323847615<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">2.005468518334202<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <SOC_min units="percent" is_input="False">8.13391632056981<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">2.0054685184863223<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <energy_consumed_mission units="W*h" is_input="False">12525.117791732684<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
+            <energy_consumed_main_route units="W*h" is_input="False">6470.440844194927<!--Energy drawn from the battery for the mission--></energy_consumed_main_route>
+            <energy_consumed_mission units="W*h" is_input="False">12525.117792060168<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
             <mass units="kg" is_input="False">75.00000000000001<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">1152.0<!--Total number of cells in the battery pack--></number_cells>
@@ -487,10 +488,10 @@
             <cell>
               <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">2.0345582719029243<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">2.0345582722164037<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <voltage_max units="V" is_input="False">4.074351561013654<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.1883843208181744<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_max units="V" is_input="False">4.074351561015668<!--Maximum voltage needed by the cells during the mission--></voltage_max>
+              <voltage_min units="V" is_input="False">3.1883843208202403<!--Minimum voltage provided by the cells during the mission--></voltage_min>
               <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
             <cruise>
@@ -513,12 +514,13 @@
             </module>
           </battery_pack_1>
           <battery_pack_2>
-            <SOC_min units="percent" is_input="False">8.133916323847615<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
-            <c_rate_max units="1/h" is_input="False">2.005468518334202<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <SOC_min units="percent" is_input="False">8.133916320569824<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <c_rate_max units="1/h" is_input="False">2.0054685184863223<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <energy_consumed_mission units="W*h" is_input="False">12525.117791732684<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
+            <energy_consumed_main_route units="W*h" is_input="False">6470.440844194926<!--Energy drawn from the battery for the mission--></energy_consumed_main_route>
+            <energy_consumed_mission units="W*h" is_input="False">12525.117792060168<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
             <mass units="kg" is_input="False">75.00000000000001<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">1152.0<!--Total number of cells in the battery pack--></number_cells>
@@ -531,10 +533,10 @@
             <cell>
               <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">2.0345582719029243<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <losses_max units="W" is_input="False">2.0345582722164037<!--Minimum state-of-charge of the battery during the mission--></losses_max>
               <mass units="g" is_input="False">0.05<!--Mass of the cell used for the assembly of the battery pack--></mass>
-              <voltage_max units="V" is_input="False">4.074351561013654<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.1883843208181744<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <voltage_max units="V" is_input="False">4.074351561015668<!--Maximum voltage needed by the cells during the mission--></voltage_max>
+              <voltage_min units="V" is_input="False">3.1883843208202403<!--Minimum voltage provided by the cells during the mission--></voltage_min>
               <volume units="L" is_input="False">0.01763<!--Volume of the cell used for the assembly of the battery pack--></volume>
             </cell>
             <cruise>
@@ -559,23 +561,25 @@
         </battery_pack>
         <inverter>
           <inverter_1>
-            <current_ac_max units="A" is_input="False">45.169793138956386<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
-            <current_caliber units="A" is_input="False">45.169793138956386<!--Current caliber of one arm of the inverter--></current_caliber>
-            <current_dc_max units="A" is_input="False">161.23966887406982<!--Maximum value of the current at the input of the inverter--></current_dc_max>
-            <dissipable_heat units="W" is_input="False">1020.3721643375568<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
+            <ac_power_out_max units="kW" is_input="False">57.140888407191845<!--Maximum value of the output side--></ac_power_out_max>
+            <ac_power_out_rating units="kW" is_input="False">57.140888407191845<!--Power rating of the inverter--></ac_power_out_rating>
+            <current_ac_max units="A" is_input="False">45.169793149541135<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
+            <current_caliber units="A" is_input="False">45.169793149541135<!--Current caliber of one arm of the inverter--></current_caliber>
+            <current_dc_max units="A" is_input="False">161.2396688863003<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <dissipable_heat units="W" is_input="False">1020.3721645701113<!--Maximum power losses of the inverter (all modules)--></dissipable_heat>
             <front_length_ratio is_input="True">0.9<!--Location of the inverter CG as a ratio of the aircraft front length--></front_length_ratio>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
-            <losses_max units="W" is_input="False">1020.3721643375568</losses_max>
-            <mass units="kg" is_input="False">4.110404811561852<!--Mass of the inverter--></mass>
-            <modulation_idx_max is_input="False">1.5157890140411532<!--Maximum modulation index during the mission--></modulation_idx_max>
-            <power_density units="kW/kg" is_input="False">17.037661293770622<!--Power density of the inverter--></power_density>
+            <losses_max units="W" is_input="False">1020.3721645701113</losses_max>
+            <mass units="kg" is_input="False">4.110404812138491<!--Mass of the inverter--></mass>
+            <modulation_idx_max is_input="False">1.5157890137869958<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <power_density units="kW/kg" is_input="False">17.037661292506264<!--Power density of the inverter--></power_density>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency units="Hz" is_input="False">12000.0<!--Maximum switching frequency of the IGBT modules in the inverter, used for sizing--></switching_frequency>
             <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum switching frequency seen by the IGBT modules in the inverter during the mission--></switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
-            <voltage_ac_max units="V" is_input="False">516.8032298652669<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
-            <voltage_caliber units="V" is_input="False">516.8032298652669<!--Voltage caliber of the inverter--></voltage_caliber>
-            <voltage_dc_max units="V" is_input="False">387.42742855684503<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
+            <voltage_ac_max units="V" is_input="False">516.8032297783124<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
+            <voltage_caliber units="V" is_input="False">516.8032297783124<!--Voltage caliber of the inverter--></voltage_caliber>
+            <voltage_dc_max units="V" is_input="False">387.4274285570452<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <CG>
               <x units="m" is_input="False">0.9<!--X position of the inverter center of gravity--></x>
@@ -583,30 +587,30 @@
             </CG>
             <capacitor>
               <aspect_ratio is_input="True">2.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
-              <capacity units="F" is_input="False">0.00025536039894472615<!--Capacity required to dampen the design voltage ripple--></capacity>
-              <current_caliber units="A" is_input="False">20.75284346477639<!--Current caliber of the capacitor of the inverter--></current_caliber>
-              <diameter units="mm" is_input="False">79.93331932661492<!--Diameter of the capacitor--></diameter>
-              <height units="mm" is_input="False">159.86663865322984<!--Diameter of the capacitor--></height>
-              <mass units="kg" is_input="False">0.9884918668828109<!--Capacitor's mass--></mass>
-              <resistance units="ohm" is_input="False">0.005008345516810809<!--Capacitor's resistance--></resistance>
-              <thermal_resistance units="degK/W" is_input="False">3.4474182333922094<!--Capacitor's thermal resistance--></thermal_resistance>
+              <capacity units="F" is_input="False">0.00025536039904753096<!--Capacity required to dampen the design voltage ripple--></capacity>
+              <current_caliber units="A" is_input="False">20.752843469639455<!--Current caliber of the capacitor of the inverter--></current_caliber>
+              <diameter units="mm" is_input="False">79.93331933734163<!--Diameter of the capacitor--></diameter>
+              <height units="mm" is_input="False">159.86663867468326<!--Diameter of the capacitor--></height>
+              <mass units="kg" is_input="False">0.9884918672807648<!--Capacitor's mass--></mass>
+              <resistance units="ohm" is_input="False">0.005008345515466613<!--Capacitor's resistance--></resistance>
+              <thermal_resistance units="degK/W" is_input="False">3.447418232929581<!--Capacitor's thermal resistance--></thermal_resistance>
               <scaling>
-                <capacity is_input="False">0.2553603989447261<!--Scaling factor for the capacitor capacity--></capacity>
-                <diameter is_input="False">0.7993331932661493<!--Scaling factor for the capacitor diameter--></diameter>
-                <height is_input="False">1.031397668730515<!--Scaling factor for the capacitor height--></height>
-                <mass is_input="False">0.6589945779218739<!--Scaling factor for the capacitor mass--></mass>
-                <resistance is_input="False">1.565107974003378<!--Scaling factor for the capacitor resistance--></resistance>
-                <thermal_resistance is_input="False">1.1491394111307365<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
+                <capacity is_input="False">0.25536039904753094<!--Scaling factor for the capacitor capacity--></capacity>
+                <diameter is_input="False">0.7993331933734164<!--Scaling factor for the capacitor diameter--></diameter>
+                <height is_input="False">1.0313976688689241<!--Scaling factor for the capacitor height--></height>
+                <mass is_input="False">0.6589945781871765<!--Scaling factor for the capacitor mass--></mass>
+                <resistance is_input="False">1.5651079735833164<!--Scaling factor for the capacitor resistance--></resistance>
+                <thermal_resistance is_input="False">1.149139410976527<!--Scaling factor for the capacitor thermal resistance--></thermal_resistance>
               </scaling>
             </capacitor>
             <casing>
-              <heat_capacity units="J/degK" is_input="False">115.84075035334952<!--Heat capacity of one casing--></heat_capacity>
-              <mass units="kg" is_input="False">0.5792037517667477<!--Weight of the casings (3 of them in the inverter)--></mass>
-              <temperature_max units="degK" is_input="False">291.55124054779185</temperature_max>
+              <heat_capacity units="J/degK" is_input="False">115.84075035588988<!--Heat capacity of one casing--></heat_capacity>
+              <mass units="kg" is_input="False">0.5792037517794494<!--Weight of the casings (3 of them in the inverter)--></mass>
+              <temperature_max units="degK" is_input="False">291.551240548567</temperature_max>
               <thermal_resistance units="degK/W" is_input="False">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </casing>
             <contactor>
-              <mass units="kg" is_input="False">1.009984497725225<!--Mass of the 3 contactors--></mass>
+              <mass units="kg" is_input="False">1.009984497889523<!--Mass of the 3 contactors--></mass>
             </contactor>
             <control_card>
               <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
@@ -616,37 +620,37 @@
             </cruise>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
-              <resistance units="ohm" is_input="False">0.01862970674696878</resistance>
-              <temperature_max units="degK" is_input="False">339.41387858445137</temperature_max>
-              <thermal_resistance units="degK/W" is_input="False">1.0659778726875186<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
+              <resistance units="ohm" is_input="False">0.01862970674260324</resistance>
+              <temperature_max units="degK" is_input="False">339.4138785821051</temperature_max>
+              <thermal_resistance units="degK/W" is_input="False">1.0659778724377253<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </diode>
             <energy_off>
-              <a is_input="False">0.0004264188785963705</a>
+              <a is_input="False">0.0004264188786962943</a>
               <b is_input="False">0.00034030311012866587</b>
-              <c is_input="False">-4.4946945433187724e-07</c>
+              <c is_input="False">-4.494694542265519e-07</c>
             </energy_off>
             <energy_on>
-              <a is_input="False">0.0015922710274718394</a>
+              <a is_input="False">0.0015922710278449604</a>
               <b is_input="False">3.3256504177779456e-05</b>
-              <c is_input="False">5.115376714059502e-06</c>
+              <c is_input="False">5.115376712860803e-06</c>
             </energy_on>
             <energy_rr>
-              <a is_input="False">0.0015130503680396872</a>
+              <a is_input="False">0.001513050368394244</a>
               <b is_input="False">0.0002539092853205021</b>
-              <c is_input="False">-1.7325207684634775e-06</c>
+              <c is_input="False">-1.7325207680574914e-06</c>
             </energy_rr>
             <heat_sink>
               <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
-              <height units="m" is_input="False">0.007508616644459126<!--Height of the heat sink--></height>
+              <height units="m" is_input="False">0.0075086166442449665<!--Height of the heat sink--></height>
               <length units="m" is_input="False">0.21450000000000002<!--Length of the heat sink--></length>
-              <mass units="kg" is_input="False">0.5045381690717097<!--Mass of the heat sink, includes tubes and core--></mass>
+              <mass units="kg" is_input="False">0.5045381690660118<!--Mass of the heat sink, includes tubes and core--></mass>
               <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
-              <width units="m" is_input="False">0.09769581163434342<!--Width of the heat sink--></width>
+              <width units="m" is_input="False">0.09769581163635768<!--Width of the heat sink--></width>
               <coolant>
                 <Prandtl_number is_input="False">39.493034825870645<!--Prandtl number of the coolant--></Prandtl_number>
                 <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
                 <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
-                <max_mass_flow units="m**3/s" is_input="False">9.642563044441264e-06<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
+                <max_mass_flow units="m**3/s" is_input="False">9.642563046638915e-06<!--Maximum mass flow necessary to cool the inverter--></max_mass_flow>
                 <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
                 <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
                 <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
@@ -654,41 +658,41 @@
               </coolant>
               <tube>
                 <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
-                <inner_diameter units="m" is_input="False">0.002505744429639417<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
+                <inner_diameter units="m" is_input="False">0.0025057444294966447<!--Inner diameter of the tube for the cooling of the inverter--></inner_diameter>
                 <length units="m" is_input="False">0.8580000000000001<!--Length of the tube which is useful for the cooling of the inverter--></length>
-                <mass units="kg" is_input="False">0.12528757684901487<!--Wieght of the tube for the cooling of the inverter--></mass>
-                <outer_diameter units="m" is_input="False">0.005005744429639417<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
+                <mass units="kg" is_input="False">0.12528757684407427<!--Wieght of the tube for the cooling of the inverter--></mass>
+                <outer_diameter units="m" is_input="False">0.005005744429496644<!--Outer diameter of the tube for the cooling of the inverter--></outer_diameter>
                 <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
               </tube>
             </heat_sink>
             <igbt>
               <gate_voltage units="V" is_input="True">0.87</gate_voltage>
-              <resistance units="ohm" is_input="False">0.015043239137926665</resistance>
-              <temperature_max units="degK" is_input="False">395.04464916187413</temperature_max>
-              <thermal_resistance units="degK/W" is_input="False">0.8268800320847107<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
+              <resistance units="ohm" is_input="False">0.015043239134401545</resistance>
+              <temperature_max units="degK" is_input="False">395.04464914832926</temperature_max>
+              <thermal_resistance units="degK/W" is_input="False">0.8268800318909459<!--Thermal resistance between the casing and the IGBT--></thermal_resistance>
             </igbt>
             <inductor>
-              <air_gap units="m" is_input="False">0.00039703183937601563<!--Air gap in the inductor--></air_gap>
-              <copper_mass units="kg" is_input="False">0.006430449974524745<!--Mass of the copper in the inductor--></copper_mass>
-              <core_mass units="kg" is_input="False">0.0014825293652974874<!--Mass of the E-core in the inductor--></core_mass>
-              <current_caliber units="A" is_input="False">45.169793138956386<!--Current caliber of one of the inductor of the inverter--></current_caliber>
+              <air_gap units="m" is_input="False">0.0003970318397401542<!--Air gap in the inductor--></air_gap>
+              <copper_mass units="kg" is_input="False">0.006430449978980458<!--Mass of the copper in the inductor--></copper_mass>
+              <core_mass units="kg" is_input="False">0.001482529364300144<!--Mass of the E-core in the inductor--></core_mass>
+              <current_caliber units="A" is_input="False">45.169793149541135<!--Current caliber of one of the inductor of the inverter--></current_caliber>
               <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
-              <iron_surface units="m**2" is_input="False">1.5375430526225738e-05<!--Iron surface of the E-core inductor--></iron_surface>
-              <magnetic_energy_rating units="J" is_input="False">0.0013886568387228263<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
+              <iron_surface units="m**2" is_input="False">1.5375430519330053e-05<!--Iron surface of the E-core inductor--></iron_surface>
+              <magnetic_energy_rating units="J" is_input="False">0.001388656839373641<!--Maximum magnetic energy that can be stored in the inductors--></magnetic_energy_rating>
               <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
-              <mass units="kg" is_input="False">0.00939550870511972<!--Mass of the inductor--></mass>
-              <reluctance units="1/H" is_input="False">11748173.790469756<!--Reluctance of the inductor--></reluctance>
-              <resistance units="ohm" is_input="False">0.00017879848435328456<!--Resistance of the inductor--></resistance>
-              <turn_number is_input="False">3.9989828903955704<!--Number of turns in the inductor--></turn_number>
+              <mass units="kg" is_input="False">0.009395508707580746<!--Mass of the inductor--></mass>
+              <reluctance units="1/H" is_input="False">11748173.806513524<!--Reluctance of the inductor--></reluctance>
+              <resistance units="ohm" is_input="False">0.000178798484393379<!--Resistance of the inductor--></resistance>
+              <turn_number is_input="False">3.9989828931261546<!--Number of turns in the inductor--></turn_number>
               <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
-              <wire_section_area units="m**2" is_input="False">9.033958627791278e-06<!--Section area of the copper wire inside the inductor--></wire_section_area>
+              <wire_section_area units="m**2" is_input="False">9.033958629908227e-06<!--Section area of the copper wire inside the inductor--></wire_section_area>
               <core_dimension>
-                <B units="m" is_input="False">0.010558440871877973<!--B dimension of the E-core in the inductor--></B>
-                <C units="m" is_input="False">0.003969338673638335<!--C dimension of the E-core in the inductor--></C>
+                <B units="m" is_input="False">0.010558440869510312<!--B dimension of the E-core in the inductor--></B>
+                <C units="m" is_input="False">0.003969338672748237<!--C dimension of the E-core in the inductor--></C>
               </core_dimension>
               <scaling>
-                <core_dimension is_input="False">0.1443395881323031<!--Scaling factor for the dimensions of the E-core--></core_dimension>
-                <core_mass is_input="False">0.0030071589559786762<!--Scaling factor for the mass of the E-core--></core_mass>
+                <core_dimension is_input="False">0.14433958809993588<!--Scaling factor for the dimensions of the E-core--></core_dimension>
+                <core_mass is_input="False">0.0030071589539556677<!--Scaling factor for the mass of the E-core--></core_mass>
               </scaling>
             </inductor>
             <low_speed>
@@ -696,13 +700,13 @@
             </low_speed>
             <module>
               <height units="m" is_input="False">0.021<!--Height of one module--></height>
-              <length units="m" is_input="False">0.08881437421303946<!--Length of one module--></length>
+              <length units="m" is_input="False">0.08881437421487061<!--Length of one module--></length>
               <width units="m" is_input="False">0.065<!--Width of one module--></width>
             </module>
             <scaling>
-              <a is_input="False">0.10037731808656974</a>
-              <c is_input="False">9.962410025116997</c>
-              <resistance is_input="False">9.962410025116997</resistance>
+              <a is_input="False">0.10037731811009142</a>
+              <c is_input="False">9.96241002278248</c>
+              <resistance is_input="False">9.96241002278248</resistance>
             </scaling>
             <tube>
               <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
@@ -728,22 +732,23 @@
             <depth units="cm" is_input="False">24.599999999999998<!--Depth of the propeller--></depth>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="cm" is_input="True">164.0<!--Diameter of the propeller--></diameter>
-            <diameter_to_chord_ratio is_input="False">1.8130518454287368<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
-            <diameter_to_span_ratio is_input="False">0.30117140289513905<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
+            <diameter_to_chord_ratio is_input="False">1.81305184533826<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_span_ratio is_input="False">0.30117140288010963<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
             <flapped_ratio is_input="False">0.0<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
-            <from_wing_AC units="m" is_input="False">2.0240360633909678<!--Distance between the propeller and the wing aerodynamic center--></from_wing_AC>
-            <from_wing_LE_ratio is_input="False">2.2376111706983592<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
+            <from_wing_AC units="m" is_input="False">2.024036063404328<!--Distance between the propeller and the wing aerodynamic center--></from_wing_AC>
+            <from_wing_LE_ratio is_input="False">2.237611170601466<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
-            <mass units="kg" is_input="False">18.98195518783249</mass>
+            <mass units="kg" is_input="False">18.981955187866973</mass>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">3.0<!--Number of blades on the propeller--></number_blades>
             <rpm_max units="1/min" is_input="False">2350.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">[1780.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2350.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 2300.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0, 1780.0]<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_rating units="1/min" is_input="False">2350.0<!--The propeller RPM rating used for the sizing--></rpm_rating>
             <solidity is_input="True">0.135<!--Solidity of the propeller--></solidity>
             <tip_mach_max is_input="False">0.36996258443048696<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
-            <torque_max units="N*m" is_input="False">205.0273248299004<!--Maximum value of the propeller torque--></torque_max>
-            <torque_rating units="N*m" is_input="False">205.0273248299004<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
-            <wing_chord_ref units="m" is_input="False">0.9045521804216169<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+            <torque_max units="N*m" is_input="False">205.02732484766457<!--Maximum value of the propeller torque--></torque_max>
+            <torque_rating units="N*m" is_input="False">205.02732484766457<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
+            <wing_chord_ref units="m" is_input="False">0.9045521804667568<!--Value of the wing chord behind the propeller--></wing_chord_ref>
             <CG>
               <x units="m" is_input="False">0.123<!--X position of the propeller center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
@@ -765,22 +770,22 @@
         <neutral_point>
           <free_elevator_factor is_input="False">0.6775112317296506<!--free elevator factor for computation of stick free static margin in high speed--></free_elevator_factor>
           <stick_fixed>
-            <x is_input="False">0.5603357687989898<!--distance between the leading edge of the wing at the MAC and the stick fixed aerodynamic center--></x>
+            <x is_input="False">0.5603357688230857<!--distance between the leading edge of the wing at the MAC and the stick fixed aerodynamic center--></x>
           </stick_fixed>
           <stick_free>
-            <x is_input="False">0.4836207501189781<!--distance between the leading edge of the wing at the MAC and the stick free aerodynamic center--></x>
+            <x is_input="False">0.4836207501333685<!--distance between the leading edge of the wing at the MAC and the stick free aerodynamic center--></x>
           </stick_free>
         </neutral_point>
       </cruise>
       <fuselage>
-        <Cn_beta units="1/rad" is_input="False">-0.06768736651793432<!--derivative of yawing moment against sideslip angle for fuselage in cruise conditions--></Cn_beta>
-        <Cy_beta units="1/rad" is_input="False">-0.4561626316869436</Cy_beta>
-        <cm_alpha units="1/rad" is_input="False">-0.32588135669970586<!--derivative of fuselage pitching moment coefficient with respect to angle of attack--></cm_alpha>
+        <Cn_beta units="1/rad" is_input="False">-0.06768736650780091<!--derivative of yawing moment against sideslip angle for fuselage in cruise conditions--></Cn_beta>
+        <Cy_beta units="1/rad" is_input="False">-0.4561626316399753</Cy_beta>
+        <cm_alpha units="1/rad" is_input="False">-0.3258813566530696<!--derivative of fuselage pitching moment coefficient with respect to angle of attack--></cm_alpha>
         <cruise>
-          <CD0 is_input="False">0.008904280705083634<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
+          <CD0 is_input="False">0.008904280704194932<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="False">0.009661012364091878<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
+          <CD0 is_input="False">0.00966101236312765<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
         </low_speed>
       </fuselage>
       <horizontal_tail>
@@ -789,15 +794,15 @@
           <CL_alpha units="1/rad" is_input="False">6.582467611360911<!--horizontal tail airfoil lift curve slope--></CL_alpha>
         </airfoil>
         <cruise>
-          <CD0 is_input="False">0.0007173084372225466<!--profile drag coefficient for horizontal tail in cruise conditions--></CD0>
+          <CD0 is_input="False">0.0007173084373340155<!--profile drag coefficient for horizontal tail in cruise conditions--></CD0>
           <CDp is_input="False">[0.0009582780901884187, 0.000941812851461971, 0.0009582780901884187, 0.0010018128514619712, 0.001081812851461971, 0.0011953476127355234, 0.0013388823740090757, 0.001522417135282628, 0.001762417135282628, 0.0020394866578297326, 0.0023330214191032853, 0.002673625702923942, 0.003051299509291704, 0.003468369031838809, 0.003935438554385913, 0.004463112360753675, 0.005037251405847885, 0.005649577599480123, 0.006889577599480123, 0.008269759482780902, 0.010069337082261026, 0.012104080411175892, 0.014375470862117986, 0.017621786525275726, 0.02184870647225412, 0.029927770729563978, 0.044323942798698834, 0.06977730763976325, 0.10698533923118675, 0.14434708148563874, 0.006211994734762751, 0.007609759482780903, 0.009225529496036304, 0.010925802320987473, 0.013174866578297329, 0.015879518965561803, 0.01944085078258558, 0.025609642214944266, 0.03589756252007695, 0.05556766542481899, 0.08723558572995166, 0.12656421562365, 0.025623781260038475, 0.021865775994801225, 0.019437316021312025, 0.017611786525275726, 0.015879518965561803, 0.014375470862117986, 0.013174866578297329, 0.012100545649902341, 0.010925802320987473, 0.010069337082261026, 0.009225529496036304, 0.007609759482780903, 0.006899577599480123, 0.006211994734762751, 0.005649577599480123, 0.004463112360753675, 0.003468369031838809, 0.002673625702923942, 0.0020394866578297326, 0.1442064772018181, 0.10693292209590412, 0.1265330070560087, 0.08731842526575417, 0.06981186908537734, 0.05560878305080992, 0.04436333851487817, 0.0359440277588034, 0.029961305490837527, 0.008273294244054454, 0.0011953476127355234, 0.0010018128514619712, 0.005040786167121437, 0.003935438554385913, 0.003051299509291704, 0.0023330214191032853, 0.001762417135282628, 0.0013388823740090757, 0.001081812851461971, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--pressure drag coefficient of the horizontal tail profile for various angle of attack in cruise conditions--></CDp>
           <CL is_input="False">[-0.05535860954905791, 0.0, 0.05535860954905791, 0.11034652387264478, 0.16546978580896715, 0.22013443819623163, 0.27485165729434746, 0.3288809620688764, 0.38193352877972775, 0.43433352877972775, 0.48762839535802505, 0.5443897331565947, 0.6062226755971392, 0.6739175421754365, 0.7402417135282628, 0.8080244944301471, 0.8752658848810891, 0.9306963623339846, 1.0152619241377527, 1.1038135814321004, 1.1935531530500345, 1.2812875912462662, 1.3633020820948702, 1.4204809022534182, 1.463114431033146, 1.4774585497336, 1.4630905229421822, 1.3905904631267239, 1.259126456894101, 1.145628335542567, 0.9731549718830423, 1.0586954529174806, 1.1475972717504885, 1.239259195888241, 1.3238262534476966, 1.3962770013255401, 1.4445911690968236, 1.4696552351449048, 1.4766470503963698, 1.434885652782342, 1.3295983247979382, 1.194861541244974, -1.4684491923066982, -1.4620083881949393, -1.443855821484088, -1.4198455546406827, -1.3958063061000692, -1.3629020820948703, -1.3234909058349609, -1.2810875912462665, -1.239159195888241, -1.1933531530500348, -1.1475619241377528, -1.0586954529174806, -1.0152619241377527, -0.9732549718830424, -0.9307963623339844, -0.8078891468174115, -0.6738175421754365, -0.5442897331565947, -0.4342981811669922, -1.1438636831553022, -1.257109237795985, -1.192632236470445, -1.326887148538029, -1.3883206773177568, -1.4327623908460196, -1.4611258705549177, -1.4748823980091053, -1.4758878545081286, -1.1038135814321004, -0.22013443819623163, -0.11034652387264478, -0.8751658848810892, -0.7402063659155274, -0.6061580232098748, -0.48759304774528955, -0.38193352877972775, -0.27485165729434746, -0.16546978580896715, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the horizontal tail profile for various angle of attack in cruise conditions--></CL>
-          <CL0 is_input="False">-0.0020986134870872725<!--lift coefficient of the horizontal tail when aircraft AOA is null in cruise conditions--></CL0>
-          <CL_alpha units="1/rad" is_input="False">0.3029451125030779<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
-          <CL_alpha_isolated units="1/rad" is_input="False">0.4165908933291644<!--derivative of lift coefficient of horizontal tail with respect to local angle of attack in cruise conditions--></CL_alpha_isolated>
+          <CL0 is_input="False">-0.002098613487492647<!--lift coefficient of the horizontal tail when aircraft AOA is null in cruise conditions--></CL0>
+          <CL_alpha units="1/rad" is_input="False">0.30294511256159573<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in cruise conditions--></CL_alpha>
+          <CL_alpha_isolated units="1/rad" is_input="False">0.4165908934096344<!--derivative of lift coefficient of horizontal tail with respect to local angle of attack in cruise conditions--></CL_alpha_isolated>
           <downwash_gradient is_input="False">0.27346269777927085</downwash_gradient>
-          <induced_drag_coefficient is_input="False">0.048719278574552834<!--coefficient to multiply by the lift coefficient squared to get induced drag in cruise conditions--></induced_drag_coefficient>
-          <reynolds is_input="False">1487599.6177309693<!--reynolds number on the horizontal tail in cruise conditions--></reynolds>
+          <induced_drag_coefficient is_input="False">0.048719278583963604<!--coefficient to multiply by the lift coefficient squared to get induced drag in cruise conditions--></induced_drag_coefficient>
+          <reynolds is_input="False">1487599.6179488797<!--reynolds number on the horizontal tail in cruise conditions--></reynolds>
           <hinge_moment>
             <CH_alpha units="1/rad" is_input="False">-0.3270006579347163<!--derivative of 3D hinge moment coefficient with respect to the local angle of attack in cruise conditions--></CH_alpha>
             <CH_alpha_2D units="1/rad" is_input="False">-0.46844460448686537<!--derivative of 2D hinge moment coefficient with respect to the local angle of attack in cruise conditions--></CH_alpha_2D>
@@ -806,23 +811,23 @@
           </hinge_moment>
         </cruise>
         <low_speed>
-          <CD0 is_input="False">0.0007996396985666145<!--profile drag coefficient for horizontal tail in low speed conditions--></CD0>
+          <CD0 is_input="False">0.0007996396986899853<!--profile drag coefficient for horizontal tail in low speed conditions--></CD0>
           <CDp is_input="False">[0.0011951620180627245, 0.0011829555373402156, 0.0011951620180627245, 0.0012551620180627247, 0.0013495749795077428, 0.0014817814602302516, 0.0018528138638427966, 0.002107226825287815, 0.0024094333060103237, 0.0027582592289003595, 0.0031648786710678865, 0.003605911074680432, 0.004086943478292976, 0.004604736997570467, 0.005223562920460504, 0.005806660131298137, 0.006452247169853121, 0.0071952027071933355, 0.008030789745748317, 0.009998158244533551, 0.012063360951726887, 0.0148191303529099, 0.018451660869757858, 0.02300445512749507, 0.03130206776106397, 0.04567170451272735, 0.06781862838491474, 0.09809773765479962, 0.00887655914693133, 0.010907733224041295, 0.002107226825287815, 0.013533644298721725, 0.01636945438903535, 0.02040376636611356, 0.026478747498467695, 0.038103464889932576, 0.009998158244533551, 0.0014817814602302516, 0.0012551620180627247, 0.05552887104277897, 0.008030789745748317, 0.08221966078852729, 0.0071952027071933355, 0.006452247169853121, 0.11486706997644314, 0.005806660131298137, 0.005223562920460504, 0.004606943478292977, 0.004086943478292976, 0.003605911074680432, 0.0031648786710678865, 0.0013495749795077428, 0.0027582592289003595, 0.0024094333060103237, 0.11487148293788815, 0.08225200894274722, 0.05557783863916642, 0.06786200894274722, 0.09813670525118706, 0.04573170451272735, 0.03819243248632003, 0.03132206776106397, 0.026480953979190206, 0.00887655914693133, 0.02299445512749507, 0.020405972846836068, 0.018451660869757858, 0.01637166086975786, 0.014814717391464883, 0.013533644298721725, 0.012063360951726887, 0.010907733224041295, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--pressure drag coefficient of the horizontal tail profile for various angle of attack in low speed conditions--></CDp>
           <CL is_input="False">[-0.05425728712052401, 0.0, 0.05425728712052401, 0.10802489827717346, 0.16190425020492255, 0.21588360213267166, 0.3227277317471218, 0.37670890730115125, 0.43335061033695915, 0.49539373010774124, 0.5628265258423979, 0.6333955537340216, 0.7021105348663758, 0.7698068876138151, 0.8322831952413656, 0.8738846119763397, 0.9158611304341404, 0.9575301583257642, 0.99962874159079, 1.0839860287113139, 1.171036835109329, 1.2483538359290192, 1.3033501886764587, 1.3443738662797138, 1.3595078679190942, 1.3476394429798328, 1.2992770918717738, 1.2110234520038106, 1.042493112386185, 1.1288916956512107, -0.37670890730115125, 1.209223677603255, 1.2814722534836838, 1.3267615225562521, 1.35630645118412, 1.3528858031118693, -1.0839639639040888, -0.21590566693989677, -0.10802489827717346, 1.3300639343657001, -0.99962874159079, 1.2578465266547036, -0.9576301583257641, -0.9159611304341404, 1.1631647481483123, -0.8739846119763396, -0.8323052600485907, -0.7697510172282652, -0.7020105348663757, -0.6333734889267965, -0.562748590649623, -0.16190425020492255, -0.49537166530051613, -0.43335061033695915, -1.160842683341087, -1.2556347858836039, -1.3280301287873753, -1.2970991566789989, -1.2086675816182606, -1.3456953133653826, -1.3508299327263193, -1.3582416734974192, -1.3553402567624449, -1.0424710475789598, -1.3435738662797139, -1.325939457749027, -1.3026281238692334, -1.2810839942547831, -1.2480759007362443, -1.209023677603255, -1.1708368351093288, -1.1287916956512107, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the horizontal tail profile for various angle of attack in low speed conditions--></CL>
-          <CL0 is_input="False">-0.002072345286633333<!--lift coefficient of the horizontal tail when aircraft AOA is null in low speed conditions--></CL0>
-          <CL_alpha units="1/rad" is_input="False">0.3017521790949527<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in low speed conditions--></CL_alpha>
-          <CL_alpha_isolated units="1/rad" is_input="False">0.4139754635109797<!--derivative of lift coefficient of horizontal tail with respect to local angle of attack in low speed conditions--></CL_alpha_isolated>
-          <CL_max_clean is_input="False">0.03137630404348458<!--maximum horizontal tail lift coefficient in low speed altitude--></CL_max_clean>
-          <CL_min_clean is_input="False">-0.03135530680165445<!--minimum horizontal tail lift coefficient in low speed altitude--></CL_min_clean>
-          <CL_ref is_input="False">0.05059334521611194<!--reference horizontal tail lift coefficient corresponding to the lift repartition in CL_vector--></CL_ref>
+          <CL0 is_input="False">-0.0020723452870336336<!--lift coefficient of the horizontal tail when aircraft AOA is null in low speed conditions--></CL0>
+          <CL_alpha units="1/rad" is_input="False">0.3017521791532401<!--derivative of lift coefficient of horizontal tail with respect to aircraft angle of attack in low speed conditions--></CL_alpha>
+          <CL_alpha_isolated units="1/rad" is_input="False">0.4139754635909445<!--derivative of lift coefficient of horizontal tail with respect to local angle of attack in low speed conditions--></CL_alpha_isolated>
+          <CL_max_clean is_input="False">0.03137630405597111<!--maximum horizontal tail lift coefficient in low speed altitude--></CL_max_clean>
+          <CL_min_clean is_input="False">-0.03135530681413263<!--minimum horizontal tail lift coefficient in low speed altitude--></CL_min_clean>
+          <CL_ref is_input="False">0.050593345225884705<!--reference horizontal tail lift coefficient corresponding to the lift repartition in CL_vector--></CL_ref>
           <CL_vector is_input="False">[0.20020159716769356, 0.2038181819798207, 0.20680636036678118, 0.20923091090407098, 0.21109726703741338, 0.21237908680973436, 0.21302230329213978, 0.21294132830052576, 0.21200955072444103, 0.2100428651737612, 0.2067725882251378, 0.2017996002169388, 0.19451224705907744, 0.18392753503940376, 0.1683453107426943, 0.1444341826366905, 0.10377939342589147, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--horizontal tail lift coefficient repartition along the span corresponding to the lift coefficient in CL_ref--></CL_vector>
           <Y_vector units="m" is_input="False">[0.06342311368484654, 0.19026934105453963, 0.3171155684242327, 0.4439617957939258, 0.570808023163619, 0.6976542505333121, 0.8245004779030052, 0.9513467052726983, 1.0781929326423914, 1.2050391600120847, 1.3318853873817775, 1.4587316147514708, 1.5855778421211637, 1.712424069490857, 1.8392702968605499, 1.966116524230243, 2.092962751599936, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--point along the span at which the lift repartition on the horizontal tail is sampled--></Y_vector>
           <downwash_gradient is_input="False">0.27174585157503084</downwash_gradient>
-          <induced_drag_coefficient is_input="False">0.049454923724830846<!--coefficient to multiply by the lift coefficient squared to get induced drag in low speed conditions--></induced_drag_coefficient>
-          <reynolds is_input="False">981908.0211275473<!--reynolds number on the horizontal tail in low speed conditions--></reynolds>
+          <induced_drag_coefficient is_input="False">0.04945492373438371<!--coefficient to multiply by the lift coefficient squared to get induced drag in low speed conditions--></induced_drag_coefficient>
+          <reynolds is_input="False">981908.0212713815<!--reynolds number on the horizontal tail in low speed conditions--></reynolds>
           <clean>
-            <alpha_aircraft_max units="deg" is_input="False">5.957636507556858<!--positive aircraft angle of attack that gives a stalled horizontal tail--></alpha_aircraft_max>
-            <alpha_aircraft_min units="deg" is_input="False">-5.953649615591769<!--negative aircraft angle of attack that gives a stalled horizontal tail--></alpha_aircraft_min>
+            <alpha_aircraft_max units="deg" is_input="False">5.957636508776967<!--positive aircraft angle of attack that gives a stalled horizontal tail--></alpha_aircraft_max>
+            <alpha_aircraft_min units="deg" is_input="False">-5.953649616811062<!--negative aircraft angle of attack that gives a stalled horizontal tail--></alpha_aircraft_min>
           </clean>
           <root>
             <CL_max_2D is_input="False">1.4221912602969358<!--maximum lift coefficient at the root section of the horizontal tail given with respect to the horizontal tail surface--></CL_max_2D>
@@ -835,17 +840,17 @@
         </low_speed>
         <MAC>
           <low_speed>
-            <reynolds is_input="False">981908.0211275473<!--reynolds number at the horizontal tail mean aerodynamic chord in low speed conditions--></reynolds>
+            <reynolds is_input="False">981908.0212713815<!--reynolds number at the horizontal tail mean aerodynamic chord in low speed conditions--></reynolds>
           </low_speed>
         </MAC>
         <root>
           <low_speed>
-            <reynolds is_input="False">1202336.352401078<!--reynolds number at the horizontal tail root section in low speed conditions--></reynolds>
+            <reynolds is_input="False">1202336.352577202<!--reynolds number at the horizontal tail root section in low speed conditions--></reynolds>
           </low_speed>
         </root>
         <tip>
           <low_speed>
-            <reynolds is_input="False">721401.8114406468<!--reynolds number at the horizontal tail tip section in low speed conditions--></reynolds>
+            <reynolds is_input="False">721401.8115463211<!--reynolds number at the horizontal tail tip section in low speed conditions--></reynolds>
           </low_speed>
         </tip>
       </horizontal_tail>
@@ -855,25 +860,25 @@
       </low_speed>
       <vertical_tail>
         <efficiency is_input="True">0.95</efficiency>
-        <k_ar_effective is_input="False">1.7384314282412145<!--coefficient to multiply the vertical tail aspect ratio to get the effective aspect ratio which includes fuselage and horizontal tail end-plate effect--></k_ar_effective>
+        <k_ar_effective is_input="False">1.7384314283284223<!--coefficient to multiply the vertical tail aspect ratio to get the effective aspect ratio which includes fuselage and horizontal tail end-plate effect--></k_ar_effective>
         <airfoil>
           <CL_alpha units="1/rad" is_input="False">6.582467611360911<!--vertical tail airfoil lift curve slope--></CL_alpha>
         </airfoil>
         <cruise>
-          <CD0 is_input="False">0.000672848268144256<!--profile drag coefficient for vertical tail in cruise conditions--></CD0>
-          <CL_alpha units="1/rad" is_input="False">2.9176098883327413<!--derivative of the vertical tail side force coefficient with respect to the local sideslip angle in cruise conditions--></CL_alpha>
-          <Cn_beta units="1/rad" is_input="False">0.06548157977968137</Cn_beta>
-          <Cy_beta units="1/rad" is_input="False">-0.1914147037761189</Cy_beta>
+          <CD0 is_input="False">0.0006728482680771016<!--profile drag coefficient for vertical tail in cruise conditions--></CD0>
+          <CL_alpha units="1/rad" is_input="False">2.9176098884200274<!--derivative of the vertical tail side force coefficient with respect to the local sideslip angle in cruise conditions--></CL_alpha>
+          <Cn_beta units="1/rad" is_input="False">0.06548157977083892</Cn_beta>
+          <Cy_beta units="1/rad" is_input="False">-0.19141470375981923</Cy_beta>
         </cruise>
         <low_speed>
-          <CD0 is_input="False">0.000747308576614578<!--profile drag coefficient for vertical tail in low speed conditions--></CD0>
-          <CL_alpha units="1/rad" is_input="False">2.900165353859611<!--derivative of the vertical tail side force coefficient with respect to the local sideslip angle in low speed conditions--></CL_alpha>
-          <Cn_beta units="1/rad" is_input="False">0.06557779186398242</Cn_beta>
-          <Cy_beta units="1/rad" is_input="False">-0.19027022575250122</Cy_beta>
+          <CD0 is_input="False">0.0007473085765399921<!--profile drag coefficient for vertical tail in low speed conditions--></CD0>
+          <CL_alpha units="1/rad" is_input="False">2.90016535394555<!--derivative of the vertical tail side force coefficient with respect to the local sideslip angle in low speed conditions--></CL_alpha>
+          <Cn_beta units="1/rad" is_input="False">0.06557779185511341</Cn_beta>
+          <Cy_beta units="1/rad" is_input="False">-0.19027022573624483</Cy_beta>
         </low_speed>
         <MAC>
           <low_speed>
-            <reynolds is_input="False">1627024.3823176539<!--reynolds number at the horizontal tail in cruise conditions--></reynolds>
+            <reynolds is_input="False">1627024.3823176536<!--reynolds number at the horizontal tail in cruise conditions--></reynolds>
           </low_speed>
         </MAC>
       </vertical_tail>
@@ -883,7 +888,7 @@
           <CL_alpha units="1/rad" is_input="False">6.260788520110827<!--wing tail airfoil lift curve slope--></CL_alpha>
         </airfoil>
         <cruise>
-          <CD0 is_input="False">0.006352592429458071<!--profile drag coefficient for wing in cruise conditions--></CD0>
+          <CD0 is_input="False">0.0063525924294191615<!--profile drag coefficient for wing in cruise conditions--></CD0>
           <CDp is_input="False">[0.0013542138513401249, 0.0014405030406191269, 0.0015984277026802496, 0.0015586792229898127, 0.0016684277026802496, 0.0017955346283503118, 0.002162641554020374, 0.0023939623310305614, 0.0026410692567006237, 0.0029010692567006235, 0.0031710692567006237, 0.0034781761823706858, 0.0038294969593808733, 0.004195283108040748, 0.004598176182370685, 0.005033962331030562, 0.005499748479690436, 0.005976855405360498, 0.006543962331030562, 0.007958176182370685, 0.009665346283503119, 0.011417170101132433, 0.01390691858082287, 0.01503861722906736, 0.01869119560762536, 0.02523924662061123, 0.03738993918761746, 0.05976981638131247, 0.09496981638131247, 0.13043409104503512, 0.0072023900337108105, 0.008743459290411435, 0.01045849087814262, 0.012558993918761746, 0.014840315877311848, 0.016346667060513305, 0.02165710810720998, 0.030316919762362785, 0.04693736199059937, 0.07618264746171996, 0.11368950050400062, 0.0343581773639106, 0.028935472634427854, 0.02508490641834636, 0.022069120269686486, 0.019492013344016422, 0.017322013344016424, 0.015524654898036797, 0.013575094763193555, 0.011994780067421622, 0.010695534628350312, 0.009562641554020375, 0.007569245439071309, 0.006672138513401248, 0.005895031587731185, 0.005220817736391061, 0.004158176182370686, 0.0032655346283503115, 0.0025797484796904364, 0.0022952831080407486, 0.19516062702846404, 0.20573874121691227, 0.16519729527051724, 0.18533396114949066, 0.0016584277026802494, 0.17587062821000393, 0.1531181761823707, 0.058200381415854055, 0.04269780067421622, 0.008559496959380873, 0.0014155346283503119, 0.0013342138513401248, 0.00465239003371081, 0.0036968554053604993, 0.002891320777010187, 0.002046855405360499, 0.0018610692567006233, 0.0015055346283503119, 0.0013471069256700626, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--pressure drag coefficient of the wing profile for various angle of attack in cruise conditions--></CDp>
           <CL is_input="False">[0.07979748479690436, 0.13534780067421623, 0.18998930743299378, 0.24246540709588565, 0.2970232685824844, 0.35151006081238256, 0.4604968530422807, 0.5152150912185738, 0.5698440219618732, 0.623933329394867, 0.6781572297319751, 0.7366635236474137, 0.8016301942525467, 0.8672459172257442, 0.9328276790494512, 0.996235224658738, 1.0434861604752745, 1.0893547145288793, 1.1362679222989813, 1.232438991555682, 1.3265672905443575, 1.4173937060845612, 1.4943301824371475, 1.5758729408897734, 1.6176503040619126, 1.6400308023763723, 1.6323408631887546, 1.5692288952971019, 1.4327427348218273, 1.3096565861619522, 1.1842679222989814, 1.2802861604752742, 1.3732937060845614, 1.4581622601381663, 1.5306131841393036, 1.602195589533033, 1.629662248322767, 1.6414282871732764, 1.61041255238468, 1.5070068784084656, 1.3630081537331122, -1.3007100489969834, -1.3126471571041933, -1.313973572644397, -1.301716342912422, -1.2746113125062308, -1.2406509358165365, -1.2017641435866384, -1.1626069138546633, -1.1203993682453763, -1.0774811300690832, -1.0360125760154781, -0.9376434020226486, -0.8742169864824448, -0.8097956013484324, -0.7483899391876174, -0.6362886756783701, -0.5307150912185737, -0.422894337839185, -0.3678521993257837, -0.8072773631721393, -0.8101635236474136, -0.8019553462835031, -0.8033874239845218, -0.19963396114949064, -0.7997635236474138, -0.8107918226360894, -1.2159496604918898, -1.2740936942691623, -0.9947842770268025, -0.08824716891959253, 0.02368176182370686, -0.6901968530422806, -0.5833018834484719, -0.4774100608123826, -0.31212075337938877, -0.2559207533793888, -0.14394968412268816, -0.032047168919592514, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing profile for various angle of attack in cruise conditions--></CL>
           <CL0_clean is_input="False">0.0955044483944932<!--wing lift coefficient at zero aircraft angle of attack in cruise conditions and with no flaps deployed--></CL0_clean>
@@ -891,23 +896,23 @@
           <CL_ref is_input="False">0.9981595176237757</CL_ref>
           <CM0_clean is_input="False">-0.01568095659178606<!--wing pitching moment coefficient in cruise conditions and with no flaps deployed--></CM0_clean>
           <induced_drag_coefficient is_input="False">0.03555261747035265<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in cruise conditions--></induced_drag_coefficient>
-          <reynolds is_input="False">2823375.4099616692<!--reynolds number on the wing in cruise conditions--></reynolds>
+          <reynolds is_input="False">2823375.410102564<!--reynolds number on the wing in cruise conditions--></reynolds>
         </cruise>
         <low_speed>
-          <CD0 is_input="False">0.007046279540205277<!--profile drag coefficient for wing in low speed conditions--></CD0>
+          <CD0 is_input="False">0.00704627954015986<!--profile drag coefficient for wing in low speed conditions--></CD0>
           <CDp is_input="False">[0.0014, 0.0013, 0.0012710420662319399, 0.0014831261986958189, 0.0017189579337680604, 0.00188, 0.0021489579337680602, 0.002368957933768061, 0.00258895793376806, 0.00282, 0.00308, 0.00340895793376806, 0.00372, 0.0040789579337680605, 0.00482895793376806, 0.0052089579337680604, 0.00562895793376806, 0.006098957933768061, 0.00662791586753612, 0.00792895793376806, 0.00972, 0.01211, 0.014665831735072243, 0.01779687380130418, 0.021241242807825085, 0.02708374760260836, 0.04188270553637642, 0.06820062140391255, 0.10282166347014449, 0.1351247896688403, 0.00722, 0.00875, 0.010831042066231939, 0.013604789668840302, 0.01600583173507224, 0.020724168264927758, 0.02282374760260836, 0.033223747602608364, 0.05349166347014448, 0.08520957933768061, 0.11987166347014448, 0.027646252397391637, 0.0240152103311597, 0.02105416826492776, 0.01849312619869582, 0.01631312619869582, 0.014451042066231939, 0.01284, 0.01146104206623194, 0.01027, 0.00925, 0.008368957933768061, 0.0075889579337680615, 0.00682895793376806, 0.0054879158675361205, 0.00433895793376806, 0.00358895793376806, 0.0028789579337680604, 0.0025689579337680605, 0.19425853727144865, 0.2044629062779696, 0.16306895793376805, 0.1842516634701445, 0.0017989579337680604, 0.1744247896688403, 0.051239177854494306, 0.03960563099347909, 0.03253833652985552, 0.00149, 0.00137, 0.00610895793376806, 0.0049089579337680605, 0.00395895793376806, 0.0032189579337680604, 0.00226, 0.00198, 0.00162, 0.00143, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--pressure drag coefficient of the wing profile for various angle of attack in low speed conditions--></CDp>
           <CL is_input="False">[0.0809895793376806, 0.1328, 0.1857, 0.2373687380130418, 0.2896104206623194, 0.3431104206623194, 0.39571042066231943, 0.4490312619869582, 0.5028312619869582, 0.5572208413246388, 0.6143208413246388, 0.681547896688403, 0.750847896688403, 0.817047896688403, 0.9399208413246388, 0.9845312619869582, 1.0304208413246387, 1.0771208413246387, 1.125020841324639, 1.2216104206623195, 1.3138104206623196, 1.3967104206623193, 1.4703625239739164, 1.5197416826492776, 1.5719396752333463, 1.6058729446362356, 1.5822625239739163, 1.4981729446362357, 1.3717625239739162, 1.272731261986958, 1.1735104206623195, 1.2686104206623194, 1.3568104206623195, 1.4322833652985552, 1.4980729446362357, 1.5289583173507224, 1.6010625239739165, 1.600452103311597, 1.5489625239739164, 1.435372944636236, 1.3154521033115967, -1.310747896688403, -1.3093583173507224, -1.2952791586753611, -1.2679895793376805, -1.2342895793376805, -1.1962, -1.1553, -1.1123104206623196, -1.0687104206623192, -1.0259104206623193, -0.9838208413246388, -0.9431208413246388, -0.890447896688403, -0.7581583173507225, -0.6288687380130418, -0.5173208413246387, -0.4131208413246388, -0.35961042066231935, -0.8052416826492775, -0.8089729446362357, -0.8046, -0.8021312619869583, -0.19531042066231938, -0.7998208413246388, -1.2468124280782509, -1.2851749520521674, -1.3035062140391256, -0.0841, 0.026789579337680603, -0.8251583173507224, -0.6928687380130418, -0.5714, -0.46573126198695824, -0.30571042066231946, -0.2509, -0.1394104206623194, -0.029210420662319395, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing profile for various angle of attack in low speed conditions--></CL>
           <CL0_clean is_input="False">0.09490485491777531<!--wing lift coefficient at zero aircraft angle of attack in low speed conditions and with no flaps deployed--></CL0_clean>
           <CL_alpha units="1/rad" is_input="False">5.139362921128748<!--wing lift coefficient slope with respect to aircraft angle of attack in low speed conditions--></CL_alpha>
-          <CL_max_clean is_input="False">1.4480663184260674<!--wing maximum lift coefficient for positive angle of attack--></CL_max_clean>
-          <CL_min_clean is_input="False">-1.1819427480125058<!--wing maximum lift coefficient for negative angle of attack--></CL_min_clean>
+          <CL_max_clean is_input="False">1.4480663184258702<!--wing maximum lift coefficient for positive angle of attack--></CL_max_clean>
+          <CL_min_clean is_input="False">-1.181942748012345<!--wing maximum lift coefficient for negative angle of attack--></CL_min_clean>
           <CL_ref is_input="False">0.9918928992038782</CL_ref>
           <CL_vector is_input="False">[1.1018515843548133, 1.1014272647583108, 1.1005050606660898, 1.098483308593358, 1.091584069973923, 1.0795815867694867, 1.0603102884530502, 1.029401375352439, 0.9777910244240782, 0.8855825242148064, 0.7988074544349941, 0.7399811935140542, 0.6810282180442894, 0.6154397333116115, 0.5377261873518291, 0.4393440257632157, 0.29960149766790656, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--lift coefficient of the wing at the station along the wing span in Y_vector, the total corresponding wing lift coefficient is equal to CL0_clean--></CL_vector>
           <CM0_clean is_input="False">-0.015582508828993959<!--wing pitching moment coefficient in low speed conditions and with no flaps deployed--></CM0_clean>
-          <Y_vector units="m" is_input="False">[0.0990717720301358, 0.2972153160904074, 0.495358860150679, 0.8993489660867033, 1.5091856338984806, 2.1190223017102574, 2.7288589695220344, 3.338695637333812, 3.948532305145589, 4.558368972957366, 4.904867079668604, 4.988026625279301, 5.071186170889998, 5.1543457165006945, 5.237505262111391, 5.320664807722088, 5.403824353332785, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
-          <chord_vector units="m" is_input="False">[0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.9045521804216169, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
+          <Y_vector units="m" is_input="False">[0.09907177203507977, 0.2972153161052393, 0.49535886017539893, 0.8993489661315835, 1.5091856339737935, 2.119022301816003, 2.7288589696582126, 3.338695637500423, 3.9485323053426327, 4.558368973184842, 4.9048670799133705, 4.988026625528218, 5.071186171143065, 5.154345716757912, 5.237505262372758, 5.3206648079876055, 5.403824353602452, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing station along the wing span at which chord_vector and Cl_vector are sampled--></Y_vector>
+          <chord_vector units="m" is_input="False">[0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.9045521804667568, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--wing chord length at the station along the wing span in Y_vector--></chord_vector>
           <induced_drag_coefficient is_input="False">0.0353993327613879<!--coefficient to multiply by the lift coefficient squared to get wing induced drag in low speed conditions--></induced_drag_coefficient>
-          <reynolds is_input="False">1863602.9000358388<!--reynolds number on the wing in low speed conditions--></reynolds>
+          <reynolds is_input="False">1863602.9001288384<!--reynolds number on the wing in low speed conditions--></reynolds>
           <root>
             <CL_max_2D is_input="False">1.6058729446362356<!--wing root chord airfoil maximum lift coefficient for positive angle of attack--></CL_max_2D>
             <CL_min_2D is_input="False">-1.310747896688403<!--wing root chord airfoil maximum lift coefficient for negative angle of attack--></CL_min_2D>
@@ -919,44 +924,44 @@
         </low_speed>
         <MAC>
           <low_speed>
-            <reynolds is_input="False">1863602.9000358388<!--wing reynolds number in low speed conditions at the mean aerodynamic chord--></reynolds>
+            <reynolds is_input="False">1863602.9001288384<!--wing reynolds number in low speed conditions at the mean aerodynamic chord--></reynolds>
           </low_speed>
         </MAC>
         <root>
           <low_speed>
-            <reynolds is_input="False">1863602.900035839<!--wing root chord reynolds in low speed conditions--></reynolds>
+            <reynolds is_input="False">1863602.9001288384<!--wing root chord reynolds in low speed conditions--></reynolds>
           </low_speed>
         </root>
         <tip>
           <low_speed>
-            <reynolds is_input="False">1863602.900035839<!--wing tip chord reynolds in low speed conditions--></reynolds>
+            <reynolds is_input="False">1863602.9001288384<!--wing tip chord reynolds in low speed conditions--></reynolds>
           </low_speed>
         </tip>
       </wing>
       <aircraft>
         <cruise>
-          <CD0 is_input="False">0.03305018983592977<!--profile drag coefficient for the complete aircraft in cruise conditions--></CD0>
-          <Cn_beta units="1/rad" is_input="False">-0.002205786738252946</Cn_beta>
-          <Cy_beta units="1/rad" is_input="False">-0.6475773354630625</Cy_beta>
-          <L_D_max is_input="False">14.586370315098373<!--profile drag coefficient for the complete aircraft in low speed conditions--></L_D_max>
-          <optimal_CD is_input="False">0.06610037967185954<!--drag coefficient at maximum lift/drag ratio in cruise conditions--></optimal_CD>
-          <optimal_CL is_input="False">0.9641646158623439<!--lift coefficient at maximum lift/drag ratio in cruise conditions--></optimal_CL>
-          <optimal_alpha units="deg" is_input="False">9.623389898087451<!--wing angle of attack at maximum lift/drag ratio in cruise conditions--></optimal_alpha>
+          <CD0 is_input="False">0.03305018983367281<!--profile drag coefficient for the complete aircraft in cruise conditions--></CD0>
+          <Cn_beta units="1/rad" is_input="False">-0.0022057867369619927</Cn_beta>
+          <Cy_beta units="1/rad" is_input="False">-0.6475773353997945</Cy_beta>
+          <L_D_max is_input="False">14.586370315596417<!--profile drag coefficient for the complete aircraft in low speed conditions--></L_D_max>
+          <optimal_CD is_input="False">0.06610037966734561<!--drag coefficient at maximum lift/drag ratio in cruise conditions--></optimal_CD>
+          <optimal_CL is_input="False">0.964164615829423<!--lift coefficient at maximum lift/drag ratio in cruise conditions--></optimal_CL>
+          <optimal_alpha units="deg" is_input="False">9.62338989772274<!--wing angle of attack at maximum lift/drag ratio in cruise conditions--></optimal_alpha>
         </cruise>
         <landing>
-          <CL_max is_input="False">1.8218815144460685<!--maximum lift coefficient at landing--></CL_max>
+          <CL_max is_input="False">1.8218815144481766<!--maximum lift coefficient at landing--></CL_max>
         </landing>
         <low_speed>
-          <CD0 is_input="False">0.03505920276039207<!--profile drag coefficient for the complete aircraft in low speed conditions--></CD0>
-          <Cn_beta units="1/rad" is_input="False">-0.0021095746539518956</Cn_beta>
-          <Cy_beta units="1/rad" is_input="False">-0.6464328574394448</Cy_beta>
+          <CD0 is_input="False">0.03505920275803816<!--profile drag coefficient for the complete aircraft in low speed conditions--></CD0>
+          <Cn_beta units="1/rad" is_input="False">-0.002109574652687504</Cn_beta>
+          <Cy_beta units="1/rad" is_input="False">-0.6464328573762201</Cy_beta>
         </low_speed>
         <mach_interpolation>
-          <CL_alpha_vector units="1/rad" is_input="False">[5.4545903972396514, 5.4632084420960245, 5.4892248589733255, 5.533134082288475, 5.595786117509637, 5.678427850975973]<!--lift curve slope coefficients of the aircraft at the mach number given in mach_vector--></CL_alpha_vector>
+          <CL_alpha_vector units="1/rad" is_input="False">[5.4545903973026855, 5.463208442159109, 5.489224859036564, 5.5331340823519675, 5.595786117573489, 5.678427851040286]<!--lift curve slope coefficients of the aircraft at the mach number given in mach_vector--></CL_alpha_vector>
           <mach_vector is_input="False">[0.0, 0.04388680538365498, 0.08777361076730995, 0.13166041615096494, 0.1755472215346199, 0.21943402691827488]<!--mach numbers at which the aircraft lift curve slope in CL_alpha_vector was computed--></mach_vector>
         </mach_interpolation>
         <takeoff>
-          <CL_max is_input="False">1.5698922055925804<!--maximum lift coefficient during take-off--></CL_max>
+          <CL_max is_input="False">1.5698922055931344<!--maximum lift coefficient during take-off--></CL_max>
         </takeoff>
       </aircraft>
       <cooling>
@@ -969,36 +974,36 @@
       </cooling>
       <elevator>
         <low_speed>
-          <CD_delta units="1/rad**2" is_input="False">0.02458465506991531<!--derivative of horizontal tail drag coefficient with respect to elevator command--></CD_delta>
-          <CL_delta units="1/rad" is_input="False">0.28205944325106774<!--derivative of horizontal tail lift coefficient with respect to elevator command--></CL_delta>
+          <CD_delta units="1/rad**2" is_input="False">0.02458465507466416<!--derivative of horizontal tail drag coefficient with respect to elevator command--></CD_delta>
+          <CL_delta units="1/rad" is_input="False">0.28205944330555127<!--derivative of horizontal tail lift coefficient with respect to elevator command--></CL_delta>
         </low_speed>
       </elevator>
       <flaps>
         <landing>
-          <CD is_input="False">0.005287406896148415<!--additional drag coefficient due to flaps deployment in landing configuration--></CD>
+          <CD is_input="False">0.005287406896181021<!--additional drag coefficient due to flaps deployment in landing configuration--></CD>
           <CD_2D is_input="False">0.006750898684227176<!--airfoil additional drag coefficient due to flaps deployment in landing configuration--></CD_2D>
-          <CL is_input="False">0.6133348136609713<!--lift coefficient increment due to flaps deployment in landing configuration--></CL>
+          <CL is_input="False">0.6133348136659659<!--lift coefficient increment due to flaps deployment in landing configuration--></CL>
           <CL_2D is_input="False">0.8989947516345369<!--airfoil additional lift coefficient due to flaps deployment in landing configuration--></CL_2D>
-          <CL_max is_input="False">0.37381519602000113<!--maximum lift coefficient increment due to flaps deployment in landing configuration--></CL_max>
-          <CM is_input="False">-0.1531139017990798<!--additional pitching moment coefficient ue to the deployment of flaps in landing configuration--></CM>
+          <CL_max is_input="False">0.37381519602230634<!--maximum lift coefficient increment due to flaps deployment in landing configuration--></CL_max>
+          <CM is_input="False">-0.15311390180018286<!--additional pitching moment coefficient ue to the deployment of flaps in landing configuration--></CM>
           <CM_2D is_input="False">-0.1797989503269074<!--airfoil additional pitching moment coefficient due to flaps deployment in landing configuration--></CM_2D>
         </landing>
         <takeoff>
-          <CD is_input="False">0.0011044110693961193<!--additional drag coefficient due to flaps deployment in takeoff configuration--></CD>
+          <CD is_input="False">0.00110441106940293<!--additional drag coefficient due to flaps deployment in takeoff configuration--></CD>
           <CD_2D is_input="False">0.0014100990110413683<!--airfoil additional drag coefficient due to flaps deployment in takeoff configuration--></CD_2D>
-          <CL is_input="False">0.3026445339507152<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
+          <CL is_input="False">0.30264453395317975<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
           <CL_2D is_input="False">0.44360085482277356<!--airfoil additional lift coefficient due to flaps deployment in takeoff configuration--></CL_2D>
-          <CL_max is_input="False">0.12182588716651298<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>
-          <CM is_input="False">-0.07555267436192298<!--additional pitching moment coefficient due to the deployment of flaps in takeoff configuration--></CM>
+          <CL_max is_input="False">0.12182588716726425<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>
+          <CM is_input="False">-0.07555267436246728<!--additional pitching moment coefficient due to the deployment of flaps in takeoff configuration--></CM>
           <CM_2D is_input="False">-0.08872017096455471<!--airfoil additional pitching moment coefficient due to flaps deployment in takeoff configuration--></CM_2D>
         </takeoff>
       </flaps>
       <landing_gear>
         <cruise>
-          <CD0 is_input="False">0.003962133196650514<!--profile drag coefficient for landing gears in cruise conditions--></CD0>
+          <CD0 is_input="False">0.003962133196255069<!--profile drag coefficient for landing gears in cruise conditions--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="False">0.003962133196650514<!--profile drag coefficient for landing gears in low speed conditions--></CD0>
+          <CD0 is_input="False">0.003962133196255069<!--profile drag coefficient for landing gears in low speed conditions--></CD0>
         </low_speed>
       </landing_gear>
       <nacelles>
@@ -1011,10 +1016,10 @@
       </nacelles>
       <other>
         <cruise>
-          <CD0 is_input="False">0.0058309888321847955<!--profile drag coefficient for other systems in cruise conditions--></CD0>
+          <CD0 is_input="False">0.00583098883165797<!--profile drag coefficient for other systems in cruise conditions--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="False">0.0058309888321847955<!--profile drag coefficient for other systems in low speed conditions--></CD0>
+          <CD0 is_input="False">0.00583098883165797<!--profile drag coefficient for other systems in low speed conditions--></CD0>
         </low_speed>
       </other>
       <propeller>
@@ -1041,10 +1046,10 @@
       </propeller>
       <rudder>
         <cruise>
-          <Cy_delta_r units="1/rad" is_input="False">2.0833128082043886<!--derivative of the side force coefficient with respect to the rudder command in cruise conditions--></Cy_delta_r>
+          <Cy_delta_r units="1/rad" is_input="False">2.0833128082616192<!--derivative of the side force coefficient with respect to the rudder command in cruise conditions--></Cy_delta_r>
         </cruise>
         <low_speed>
-          <Cy_delta_r units="1/rad" is_input="False">2.070856577422348<!--derivative of the side force coefficient with respect to the rudder command in low speed conditions--></Cy_delta_r>
+          <Cy_delta_r units="1/rad" is_input="False">2.0708565774786476<!--derivative of the side force coefficient with respect to the rudder command in low speed conditions--></Cy_delta_r>
         </low_speed>
       </rudder>
       <slipstream>
@@ -1063,18 +1068,18 @@
     </aerodynamics>
     <constraints>
       <horizontal_tail>
-        <landing units="m**2" is_input="False">0.3338940446010872<!--margin on the horizontal tail area with respect to the landing constraint--></landing>
+        <landing units="m**2" is_input="False">0.3338940446435702<!--margin on the horizontal tail area with respect to the landing constraint--></landing>
         <takeoff_rotation units="m**2" is_input="False">0.0<!--margin on the horizontal tail area with respect to the takeoff rotation constraint--></takeoff_rotation>
       </horizontal_tail>
       <wing>
-        <additional_CL_capacity is_input="False">-2.220446049250313e-16<!--margin with respect to the conditions of maximum lift required--></additional_CL_capacity>
-        <additional_fuel_capacity units="kg" is_input="False">211.8827972947707<!--margin with respect to the conditions of maximum fuel stored in the wing required--></additional_fuel_capacity>
+        <additional_CL_capacity is_input="False">2.220446049250313e-16<!--margin with respect to the conditions of maximum lift required--></additional_CL_capacity>
+        <additional_fuel_capacity units="kg" is_input="False">211.88279732649147<!--margin with respect to the conditions of maximum fuel stored in the wing required--></additional_fuel_capacity>
       </wing>
     </constraints>
     <mission>
       <sizing>
         <duration units="s" is_input="False">3494.343859355023</duration>
-        <energy units="W*h" is_input="False">25050.235583465368</energy>
+        <energy units="W*h" is_input="False">25050.23558412034</energy>
         <fuel units="kg" is_input="False">0.0</fuel>
         <cs23>
           <safety_factor is_input="True">1.5</safety_factor>
@@ -1112,14 +1117,14 @@
         </takeoff>
         <taxi_in>
           <duration units="s" is_input="True">150.0<!--duration of taxi in phase--></duration>
-          <energy units="W*h" is_input="False">524.1167617083435</energy>
+          <energy units="W*h" is_input="False">524.1167616854827</energy>
           <fuel units="kg" is_input="False">0.0</fuel>
           <speed units="m/s" is_input="True">10.28888888888889<!--ground velocity during taxi in phase--></speed>
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_in>
         <taxi_out>
           <duration units="s" is_input="True">150.0<!--duration of taxi out phase--></duration>
-          <energy units="W*h" is_input="False">524.0996833549398</energy>
+          <energy units="W*h" is_input="False">524.0996833320863</energy>
           <fuel units="kg" is_input="False">0.0</fuel>
           <speed units="m/s" is_input="True">10.28888888888889<!--ground velocity during taxi out phase--></speed>
           <thrust units="N" is_input="False">485.96112311015116</thrust>
@@ -1128,7 +1133,7 @@
           <climb>
             <distance units="m" is_input="False">8492.316454382377</distance>
             <duration units="s" is_input="False">214.96391679117636</duration>
-            <energy units="W*h" is_input="False">3186.657895463793</energy>
+            <energy units="W*h" is_input="False">3186.6578956816657</energy>
             <fuel units="kg" is_input="False">0.0</fuel>
             <v_eas units="m/s" is_input="True">38.0</v_eas>
             <climb_rate>
@@ -1140,102 +1145,102 @@
             <altitude units="ft" is_input="True">2000.0<!--main route cruise phase altitude--></altitude>
             <distance units="m" is_input="False">35055.44549650741</distance>
             <duration units="s" is_input="False">732.71327589718</duration>
-            <energy units="W*h" is_input="False">8126.177181881373</energy>
+            <energy units="W*h" is_input="False">8126.177182029742</energy>
             <fuel units="kg" is_input="False">0.0</fuel>
           </cruise>
           <descent>
             <descent_rate units="m/s" is_input="True">-2.286<!--target descent rate for the aircraft--></descent_rate>
-            <distance units="m" is_input="False">15997.787506897184</distance>
+            <distance units="m" is_input="False">15997.787506905399</distance>
             <duration units="s" is_input="False">446.66666666666674</duration>
-            <energy units="W*h" is_input="False">579.8301657041649</energy>
+            <energy units="W*h" is_input="False">579.83016566088</energy>
             <fuel units="kg" is_input="False">0.0</fuel>
             <v_eas units="m/s" is_input="True">35.0</v_eas>
           </descent>
           <reserve>
             <altitude units="m" is_input="True">304.8</altitude>
             <duration units="s" is_input="True">1800.0<!--duration of the reserve segment--></duration>
-            <energy units="W*h" is_input="False">12109.353895352753</energy>
+            <energy units="W*h" is_input="False">12109.353895730483</energy>
             <fuel units="kg" is_input="False">0.0</fuel>
-            <v_tas units="m/s" is_input="False">36.36416365437209</v_tas>
+            <v_tas units="m/s" is_input="False">36.3641636544177</v_tas>
           </reserve>
         </main_route>
       </sizing>
     </mission>
     <weight>
       <aircraft>
-        <MFW units="kg" is_input="False">211.8827972947707<!--maximum fuel weight--></MFW>
-        <MLW units="kg" is_input="False">600.7591610239019<!--maximum landing weight--></MLW>
-        <MTOW units="kg" is_input="False">600.7584571690879<!--maximum takeoff weight of the aircraft--></MTOW>
-        <MZFW units="kg" is_input="False">600.7584571690879<!--maximum zero fuel weight--></MZFW>
-        <OWE units="kg" is_input="False">428.758457169088<!--Mass of aircraft--></OWE>
-        <ZFW units="kg" is_input="False">600.7584571690879<!--aircraft mass with payload, without fuel--></ZFW>
+        <MFW units="kg" is_input="False">211.88279732649147<!--maximum fuel weight--></MFW>
+        <MLW units="kg" is_input="False">600.7591610568008<!--maximum landing weight--></MLW>
+        <MTOW units="kg" is_input="False">600.7584571855473<!--maximum takeoff weight of the aircraft--></MTOW>
+        <MZFW units="kg" is_input="False">600.7584571855473<!--maximum zero fuel weight--></MZFW>
+        <OWE units="kg" is_input="False">428.7584571855473<!--Mass of aircraft--></OWE>
+        <ZFW units="kg" is_input="False">600.7584571855473<!--aircraft mass with payload, without fuel--></ZFW>
         <max_payload units="kg" is_input="True">172.0<!--max payload weight--></max_payload>
         <payload units="kg" is_input="True">172.0<!--design payload weight--></payload>
         <CG>
           <aft>
-            <MAC_position is_input="False">0.3603375903220874<!--most aft X-position of center of gravity as ratio of mean aerodynamic chord--></MAC_position>
-            <x units="m" is_input="False">2.123842171299279<!--most aft X-position of aircraft center of gravity--></x>
+            <MAC_position is_input="False">0.3603375903273268<!--most aft X-position of center of gravity as ratio of mean aerodynamic chord--></MAC_position>
+            <x units="m" is_input="False">2.123842171322359<!--most aft X-position of aircraft center of gravity--></x>
           </aft>
           <fwd>
-            <MAC_position is_input="False">0.20928073526377575<!--most fwd X-position of center of gravity as ratio of mean aerodynamic chord--></MAC_position>
-            <x units="m" is_input="False">1.987203363688651<!--most fwd X-position of center of gravity--></x>
+            <MAC_position is_input="False">0.20928073526901886<!--most fwd X-position of center of gravity as ratio of mean aerodynamic chord--></MAC_position>
+            <x units="m" is_input="False">1.987203363704916<!--most fwd X-position of center of gravity--></x>
           </fwd>
           <flight_condition>
             <max>
-              <MAC_position is_input="False">0.3103375903220874<!--most aft position of the CG with respect to the mean aerodynamic chord based on all possible flight loading case--></MAC_position>
+              <MAC_position is_input="False">0.31033759032732683<!--most aft position of the CG with respect to the mean aerodynamic chord based on all possible flight loading case--></MAC_position>
             </max>
             <min>
-              <MAC_position is_input="False">0.25244359136052397<!--most fwd position of the CG with respect to the mean aerodynamic chord based on all possible flight loading case--></MAC_position>
+              <MAC_position is_input="False">0.2524435913602793<!--most fwd position of the CG with respect to the mean aerodynamic chord based on all possible flight loading case--></MAC_position>
             </min>
           </flight_condition>
           <ground_condition>
             <max>
-              <MAC_position is_input="False">0.26536802289381184<!--most aft X-position of center of gravity as ratio of mean aerodynamic chord for ground conditions--></MAC_position>
+              <MAC_position is_input="False">0.26536802289218187<!--most aft X-position of center of gravity as ratio of mean aerodynamic chord for ground conditions--></MAC_position>
             </max>
             <min>
-              <MAC_position is_input="False">0.23928073526377575<!--most fwd X-position of center of gravity as ratio of mean aerodynamic chord for ground conditions--></MAC_position>
+              <MAC_position is_input="False">0.23928073526901886<!--most fwd X-position of center of gravity as ratio of mean aerodynamic chord for ground conditions--></MAC_position>
             </min>
           </ground_condition>
         </CG>
         <empty>
           <CG>
-            <MAC_position is_input="False">0.20421567687773576<!--X-position of center of gravity as ratio of mean aerodynamic chord for empty aircraft--></MAC_position>
+            <MAC_position is_input="False">0.20421567688502995<!--X-position of center of gravity as ratio of mean aerodynamic chord for empty aircraft--></MAC_position>
           </CG>
         </empty>
         <in_flight_variation>
           <fixed_mass_comp>
-            <equivalent_moment units="kg*m" is_input="False">1264.0671446845279</equivalent_moment>
-            <mass units="kg" is_input="False">600.7591610239019</mass>
+            <equivalent_moment units="kg*m" is_input="False">1264.067144773587</equivalent_moment>
+            <mass units="kg" is_input="False">600.7591610568008</mass>
           </fixed_mass_comp>
         </in_flight_variation>
       </aircraft>
       <aircraft_empty>
-        <mass units="kg" is_input="False">428.758457169088<!--mass of empty aircraft--></mass>
+        <mass units="kg" is_input="False">428.7584571855473<!--mass of empty aircraft--></mass>
         <CG>
-          <x units="m" is_input="False">1.9826217540815958<!--X-position center of gravity of empty aircraft--></x>
-          <z units="m" is_input="False">0.8277571095121162<!--Z-position center of gravity of empty aircraft--></z>
+          <x units="m" is_input="False">1.9826217540994875<!--X-position center of gravity of empty aircraft--></x>
+          <z units="m" is_input="False">0.8277571095098422<!--Z-position center of gravity of empty aircraft--></z>
         </CG>
       </aircraft_empty>
       <airframe>
-        <mass units="kg" is_input="False">186.21233248843276<!--Mass of the airframe--></mass>
+        <mass units="kg" is_input="False">186.2123325021884<!--Mass of the airframe--></mass>
         <flight_controls>
-          <mass units="lbm" is_input="False">18.272260687014608<!--Mass of the airframe_inp_data:weight:airframe:flight_controls:mass--></mass>
+          <mass units="lbm" is_input="False">18.272260688153402<!--Mass of the airframe_inp_data:weight:airframe:flight_controls:mass--></mass>
           <CG>
-            <x units="m" is_input="False">3.9779970088350214<!--X-position of center of gravity of the flight controls--></x>
+            <x units="m" is_input="False">3.977997008848382<!--X-position of center of gravity of the flight controls--></x>
           </CG>
         </flight_controls>
         <fuselage>
           <k_factor is_input="True">0.85<!--proportional corrective factor for fuselage mass--></k_factor>
-          <mass units="lbm" is_input="False">132.42260056888406<!--Mass of the airframe_inp_data:weight:airframe:fuselage:mass--></mass>
+          <mass units="lbm" is_input="False">132.4226005711655<!--Mass of the airframe_inp_data:weight:airframe:fuselage:mass--></mass>
           <CG>
             <x units="m" is_input="False">2.925<!--X-position of center of gravity of the fuselage--></x>
           </CG>
         </fuselage>
         <horizontal_tail>
           <k_factor is_input="True">0.85<!--proportional corrective factor for horizontal tail mass--></k_factor>
-          <mass units="lbm" is_input="False">6.632206692999609<!--Mass of the airframe_inp_data:weight:airframe:horizontal_tail:mass--></mass>
+          <mass units="lbm" is_input="False">6.632206694890929<!--Mass of the airframe_inp_data:weight:airframe:horizontal_tail:mass--></mass>
           <CG>
-            <x units="m" is_input="False">6.208887360857287<!--X-position of center of gravity of the horizontal tail--></x>
+            <x units="m" is_input="False">6.208887360883076<!--X-position of center of gravity of the horizontal tail--></x>
           </CG>
         </horizontal_tail>
         <paint>
@@ -1243,16 +1248,16 @@
         </paint>
         <vertical_tail>
           <k_factor is_input="True">0.85<!--proportional corrective factor for vertical tail mass--></k_factor>
-          <mass units="lbm" is_input="False">7.617051969944356<!--Mass of the airframe_inp_data:weight:airframe:vertical_tail:mass--></mass>
+          <mass units="lbm" is_input="False">7.617051970101194<!--Mass of the airframe_inp_data:weight:airframe:vertical_tail:mass--></mass>
           <CG>
-            <x units="m" is_input="False">5.875641547455414<!--X-position of center of gravity of the vertical tail--></x>
+            <x units="m" is_input="False">5.875641547468775<!--X-position of center of gravity of the vertical tail--></x>
           </CG>
         </vertical_tail>
         <wing>
           <k_factor is_input="True">0.85<!--proportional corrective factor for wing mass--></k_factor>
-          <mass units="kg" is_input="False">91.13687351953338<!--Mass of the airframe_inp_data:weight:airframe:wing:mass--></mass>
+          <mass units="kg" is_input="False">91.13687352993884<!--Mass of the airframe_inp_data:weight:airframe:wing:mass--></mass>
           <CG>
-            <x units="m" is_input="False">2.1778099340626427<!--X-position of center of gravity of the wing--></x>
+            <x units="m" is_input="False">2.177809934083677<!--X-position of center of gravity of the wing--></x>
           </CG>
           <distributed_mass>
             <chord_slope is_input="False">[]<!--Array containing the value of the chord slope for the distributed mass. Mass is assumed to vary with chord only (not thickness)--></chord_slope>
@@ -1269,10 +1274,10 @@
             <y_ratio_start is_input="False">[]<!--Array containing the starting positions of all distributed tanks on the wing--></y_ratio_start>
           </distributed_tanks>
           <misc>
-            <mass units="kg" is_input="False">13.6911516982761</mass>
+            <mass units="kg" is_input="False">13.691151699915855</mass>
           </misc>
           <primary_structure>
-            <mass units="kg" is_input="False">80.41488839958828</mass>
+            <mass units="kg" is_input="False">80.41488840876957</mass>
           </primary_structure>
           <punctual_mass>
             <mass units="kg" is_input="False">[]<!--mass of the punctual masses on the wing used for wing load computation--></mass>
@@ -1283,61 +1288,61 @@
             <y_ratio is_input="False">[]</y_ratio>
           </punctual_tanks>
           <ribs>
-            <mass units="kg" is_input="False">8.671766115882948</mass>
+            <mass units="kg" is_input="False">8.67176611674844</mass>
           </ribs>
           <secondary_structure>
-            <mass units="kg" is_input="False">26.80496279986276</mass>
+            <mass units="kg" is_input="False">26.80496280292319</mass>
           </secondary_structure>
           <skin>
-            <mass units="kg" is_input="False">36.20951202716589</mass>
+            <mass units="kg" is_input="False">36.20951203180621</mass>
           </skin>
           <lower_flange>
             <mass>
-              <max_fuel_in_wing units="kg" is_input="False">8.790330143027417</max_fuel_in_wing>
-              <min_fuel_in_wing units="kg" is_input="False">8.790317727164336</min_fuel_in_wing>
+              <max_fuel_in_wing units="kg" is_input="False">8.790330143846132</max_fuel_in_wing>
+              <min_fuel_in_wing units="kg" is_input="False">8.790317727693061</min_fuel_in_wing>
             </mass>
           </lower_flange>
           <upper_flange>
             <mass>
-              <max_fuel_in_wing units="kg" is_input="False">11.744165778133794</max_fuel_in_wing>
-              <min_fuel_in_wing units="kg" is_input="False">11.744149190138586</min_fuel_in_wing>
+              <max_fuel_in_wing units="kg" is_input="False">11.744165779227629</max_fuel_in_wing>
+              <min_fuel_in_wing units="kg" is_input="False">11.74414919084498</min_fuel_in_wing>
             </mass>
           </upper_flange>
           <web>
             <mass>
-              <max_fuel_in_wing units="kg" is_input="False">1.3079626371021238</max_fuel_in_wing>
-              <min_fuel_in_wing units="kg" is_input="False">1.3079607993402906</min_fuel_in_wing>
+              <max_fuel_in_wing units="kg" is_input="False">1.3079626372253113</max_fuel_in_wing>
+              <min_fuel_in_wing units="kg" is_input="False">1.307960799420554</min_fuel_in_wing>
             </mass>
           </web>
         </wing>
         <landing_gear>
           <front>
-            <mass units="lbm" is_input="False">15.812834086813446<!--Mass of the airframe_inp_data:weight:airframe:landing_gear:front:mass--></mass>
+            <mass units="lbm" is_input="False">15.812834087335723<!--Mass of the airframe_inp_data:weight:airframe:landing_gear:front:mass--></mass>
             <CG>
               <x units="m" is_input="False">0.75<!--X-position of center of gravity of the front landing gear--></x>
             </CG>
           </front>
           <main>
-            <mass units="lbm" is_input="False">28.848553619834586<!--Mass of the airframe_inp_data:weight:airframe:landing_gear:main:mass--></mass>
+            <mass units="lbm" is_input="False">28.84855362122977<!--Mass of the airframe_inp_data:weight:airframe:landing_gear:main:mass--></mass>
             <CG>
-              <x units="m" is_input="False">2.5817895617331215<!--X-position of center of gravity of the main landing gear--></x>
+              <x units="m" is_input="False">2.581789561763895<!--X-position of center of gravity of the main landing gear--></x>
             </CG>
           </main>
         </landing_gear>
       </airframe>
       <furniture>
-        <mass units="kg" is_input="False">13.896878199923368<!--Mass of aircraft furniture--></mass>
+        <mass units="kg" is_input="False">13.896878200295506<!--Mass of aircraft furniture--></mass>
         <passenger_seats>
-          <mass units="lbm" is_input="False">30.637372052628148<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
+          <mass units="lbm" is_input="False">30.637372053448573<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
           <CG>
             <x units="m" is_input="False">2.4<!--X-position of center of gravity of the passenger/pilot seats--></x>
           </CG>
         </passenger_seats>
       </furniture>
       <propulsion>
-        <mass units="kg" is_input="False">198.64924648073185<!--Mass of aircraft_inp_data:weight:propulsion:mass--></mass>
+        <mass units="kg" is_input="False">198.64924648306334<!--Mass of aircraft_inp_data:weight:propulsion:mass--></mass>
         <CG>
-          <x units="m" is_input="False">1.4242657090506992</x>
+          <x units="m" is_input="False">1.424265709041824</x>
         </CG>
         <engine>
           <mass units="kg" is_input="True">351.8461784929393<!--total engine mass--></mass>
@@ -1353,7 +1358,7 @@
         </unusable_fuel>
         <tank>
           <CG>
-            <x units="m" is_input="False">2.250174108496372<!--X-position of center of gravity of the tank--></x>
+            <x units="m" is_input="False">2.2501741085210174<!--X-position of center of gravity of the tank--></x>
           </CG>
         </tank>
       </propulsion>
@@ -1444,18 +1449,30 @@
               <battery_pack_1>
                 <CO units="g" is_input="False">0.0</CO>
                 <CO2 units="g" is_input="False">0.0</CO2>
+                <CO2_main_route units="g" is_input="False">0.0<!--Emission of CO2 excluding reserve, quantity of interest for the LCA--></CO2_main_route>
+                <CO_main_route units="g" is_input="False">0.0<!--Emission of CO excluding reserve, quantity of interest for the LCA--></CO_main_route>
                 <H2O units="g" is_input="False">0.0</H2O>
+                <H2O_main_route units="g" is_input="False">0.0<!--Emission of H2O excluding reserve, quantity of interest for the LCA--></H2O_main_route>
                 <HC units="g" is_input="False">0.0</HC>
+                <HC_main_route units="g" is_input="False">0.0<!--Emission of HC excluding reserve, quantity of interest for the LCA--></HC_main_route>
                 <NOx units="g" is_input="False">0.0</NOx>
+                <NOx_main_route units="g" is_input="False">0.0<!--Emission of NOx excluding reserve, quantity of interest for the LCA--></NOx_main_route>
                 <SOx units="g" is_input="False">0.0</SOx>
+                <SOx_main_route units="g" is_input="False">0.0<!--Emission of SOx excluding reserve, quantity of interest for the LCA--></SOx_main_route>
               </battery_pack_1>
               <battery_pack_2>
                 <CO units="g" is_input="False">0.0</CO>
                 <CO2 units="g" is_input="False">0.0</CO2>
+                <CO2_main_route units="g" is_input="False">0.0<!--Emission of CO2 excluding reserve, quantity of interest for the LCA--></CO2_main_route>
+                <CO_main_route units="g" is_input="False">0.0<!--Emission of CO excluding reserve, quantity of interest for the LCA--></CO_main_route>
                 <H2O units="g" is_input="False">0.0</H2O>
+                <H2O_main_route units="g" is_input="False">0.0<!--Emission of H2O excluding reserve, quantity of interest for the LCA--></H2O_main_route>
                 <HC units="g" is_input="False">0.0</HC>
+                <HC_main_route units="g" is_input="False">0.0<!--Emission of HC excluding reserve, quantity of interest for the LCA--></HC_main_route>
                 <NOx units="g" is_input="False">0.0</NOx>
+                <NOx_main_route units="g" is_input="False">0.0<!--Emission of NOx excluding reserve, quantity of interest for the LCA--></NOx_main_route>
                 <SOx units="g" is_input="False">0.0</SOx>
+                <SOx_main_route units="g" is_input="False">0.0<!--Emission of SOx excluding reserve, quantity of interest for the LCA--></SOx_main_route>
               </battery_pack_2>
             </battery_pack>
           </he_power_train>
@@ -1648,20 +1665,20 @@
         <PMSM>
           <motor_1>
             <rpm_rating units="1/min" is_input="False">-2150.0<!--Respected if <0--></rpm_rating>
-            <voltage_caliber units="V" is_input="False">-133.19677013473313<!--Respected if <0--></voltage_caliber>
+            <voltage_caliber units="V" is_input="False">-133.19677022168764<!--Respected if <0--></voltage_caliber>
           </motor_1>
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <min_safe_SOC units="percent" is_input="False">-8.133916323847615<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="False">-8.13391632056981<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
             <cell>
-              <max_c_rate units="percent" is_input="False">-0.3945314816657981<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
+              <max_c_rate units="percent" is_input="False">-0.39453148151367756<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
             </cell>
           </battery_pack_1>
           <battery_pack_2>
-            <min_safe_SOC units="percent" is_input="False">-8.133916323847615<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="False">-8.133916320569824<!--Constraints on minimum battery SOC, respected if <0--></min_safe_SOC>
             <cell>
-              <max_c_rate units="percent" is_input="False">-0.3945314816657981<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
+              <max_c_rate units="percent" is_input="False">-0.39453148151367756<!--Constraints on the maximum cell c_rate, respected if <0--></max_c_rate>
             </cell>
           </battery_pack_2>
         </battery_pack>

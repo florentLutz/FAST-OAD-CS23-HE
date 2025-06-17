@@ -837,13 +837,13 @@ def test_electricity_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1" ":energy_consumed_mission",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route",
         units="W*h",
         val=12525.12,
     )
 
     ivc.add_output(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2" ":energy_consumed_mission",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_main_route",
         units="W*h",
         val=12525.12,
     )

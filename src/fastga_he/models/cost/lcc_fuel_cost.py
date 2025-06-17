@@ -35,7 +35,7 @@ class LCCFuelCost(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_id
-                + ":fuel_consumed_mission",
+                + ":fuel_consumed_main_route",
                 units="kg",
                 val=np.nan,
                 desc="Amount of fuel from that tank which will be consumed during mission",
@@ -52,7 +52,7 @@ class LCCFuelCost(om.ExplicitComponent):
                 + fuel_type,
                 val=DEFAULT_FUEL_UNIT_COST[fuel_type],
                 units="USD/kg",
-                desc="Amount of fuel from that tank which will be consumed during mission",
+                desc="Amount of fuel from that tank which will be consumed during main route",
             )
 
             self.declare_partials(
@@ -62,7 +62,7 @@ class LCCFuelCost(om.ExplicitComponent):
                     + tank_type
                     + ":"
                     + tank_id
-                    + ":fuel_consumed_mission",
+                    + ":fuel_consumed_main_route",
                     "data:propulsion:he_power_train:"
                     + tank_type
                     + ":"
@@ -100,7 +100,7 @@ class LCCFuelCost(om.ExplicitComponent):
                     + tank_type
                     + ":"
                     + tank_id
-                    + ":fuel_consumed_mission"
+                    + ":fuel_consumed_main_route"
                 ]
             )
 
@@ -116,7 +116,7 @@ class LCCFuelCost(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_id
-                + ":fuel_consumed_mission",
+                + ":fuel_consumed_main_route",
             ] = inputs[
                 "data:propulsion:he_power_train:"
                 + tank_type
@@ -139,5 +139,5 @@ class LCCFuelCost(om.ExplicitComponent):
                 + tank_type
                 + ":"
                 + tank_id
-                + ":fuel_consumed_mission"
+                + ":fuel_consumed_main_route"
             ]

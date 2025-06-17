@@ -76,7 +76,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission"
+                + ":energy_consumed_main_route"
             )
             self.add_input(input_name, units="W*h", val=np.nan)
 
@@ -94,7 +94,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission"
+                + ":energy_consumed_main_route"
             ]
 
         outputs["data:LCA:operation:he_power_train:electricity:energy_per_fu"] = (
@@ -124,7 +124,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission",
+                + ":energy_consumed_main_route",
             ] = inputs["data:environmental_impact:flight_per_fu"]
 
             partials[
@@ -133,7 +133,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission",
+                + ":energy_consumed_main_route",
             ] = (
                 inputs["data:environmental_impact:line_test:mission_ratio"]
                 * inputs["data:environmental_impact:aircraft_per_fu"]
@@ -145,7 +145,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission",
+                + ":energy_consumed_main_route",
             ] = (
                 inputs["data:environmental_impact:delivery:mission_ratio"]
                 * inputs["data:environmental_impact:aircraft_per_fu"]
@@ -156,7 +156,7 @@ class LCAElectricityPerFU(om.ExplicitComponent):
                 + batteries_type
                 + ":"
                 + batteries_name
-                + ":energy_consumed_mission"
+                + ":energy_consumed_main_route"
             ]
 
         partials[

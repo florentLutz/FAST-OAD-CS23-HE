@@ -77,6 +77,12 @@ class MissionCore(om.Group):
             + number_of_points_reserve
         )
 
+        # This enables the components in the tanks and batteries that compute the energy/fuel
+        # EXCLUDING reserve, which is what we need for the LCA.
+        self.model_options["*.compute_dep_equilibrium.*"] = {
+            "number_of_points_reserve": number_of_points_reserve
+        }
+
         self.add_subsystem(
             "compute_taxi_thrust",
             ThrustTaxi(),

@@ -673,8 +673,8 @@ def test_electricity_per_fu_velis():
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
         "data:environmental_impact:delivery:mission_ratio",
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_main_route",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "data.xml")
@@ -972,8 +972,8 @@ def test_kerosene_per_fu_tbm900():
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
         "data:environmental_impact:delivery:mission_ratio",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_main_route",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "tbm900.xml")
@@ -1183,8 +1183,8 @@ def test_gasoline_per_fu_sr22():
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:delivery:mission_ratio",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_main_route",
         "data:environmental_impact:line_test:mission_ratio",
     ]
 

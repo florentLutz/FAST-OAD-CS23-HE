@@ -26,7 +26,8 @@ from ..components.lcc_fuel_tank_cost import LCCFuelTankCost
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
 
-from ..components.perf_fuel_mission_consumed import PerformancesFuelConsumedMission
+from ..components.perf_fuel_consumed_mission import PerformancesFuelConsumedMission
+from ..components.perf_fuel_consumed_main_route import PerformancesFuelConsumedMainRoute
 from ..components.perf_fuel_remaining import PerformancesFuelRemainingMission
 
 from ..components.sizing_tank import SizingFuelTank
@@ -392,6 +393,26 @@ def test_fuel_consumed_mission():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission", units="kg"
     ) == pytest.approx(276.85, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fuel_consumed_main_route():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesFuelConsumedMainRoute(
+            fuel_tank_id="fuel_tank_1", number_of_points=NB_POINTS_TEST, number_of_points_reserve=2
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route", units="kg"
+    ) == pytest.approx(202.39, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

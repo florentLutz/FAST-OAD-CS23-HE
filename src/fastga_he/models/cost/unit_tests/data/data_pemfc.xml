@@ -185,6 +185,7 @@
                             <x units="m">1.238</x>
                         </CG>
                         <fuel_consumed_mission units="kg">14</fuel_consumed_mission>
+                        <fuel_consumed_main_route units="kg">14</fuel_consumed_main_route>
                         <unusable_fuel_mission units="kg">0.14</unusable_fuel_mission>
                         <fuel_total_mission units="kg">14.14</fuel_total_mission>
                         <capacity units="kg">15.087</capacity>
