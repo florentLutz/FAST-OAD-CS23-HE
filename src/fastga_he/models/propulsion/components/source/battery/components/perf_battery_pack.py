@@ -28,6 +28,7 @@ from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
 from ..components.perf_battery_energy_consumed_main_route import PerformancesEnergyConsumedMainRoute
+from ..components.perf_soc_end_main_route import PerformancesSOCEndMainRoute
 from ..components.perf_inflight_emissions import PerformancesBatteryPackInFlightEmissions
 
 
@@ -104,7 +105,9 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "update_soc",
-            PerformancesUpdateSOC(number_of_points=number_of_points),
+            PerformancesUpdateSOC(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
             promotes=["*"],
         )
         # Though these variable depends on variables that are looped on, they don't affect the
@@ -199,6 +202,15 @@ class PerformancesBatteryPack(om.Group):
             self.add_subsystem(
                 "energy_consumed_main_route",
                 PerformancesEnergyConsumedMainRoute(
+                    number_of_points=number_of_points,
+                    battery_pack_id=battery_pack_id,
+                    number_of_points_reserve=number_of_points_reserve,
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                "soc_end_route",
+                PerformancesSOCEndMainRoute(
                     number_of_points=number_of_points,
                     battery_pack_id=battery_pack_id,
                     number_of_points_reserve=number_of_points_reserve,
