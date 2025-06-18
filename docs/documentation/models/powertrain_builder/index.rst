@@ -1,6 +1,6 @@
-===================
-Powertrain building
-===================
+==================
+Powertrain builder
+==================
 
 FAST-OAD-CS23-HE allows to configure powertrain architectures of hybrid-electric aircraft via a powertrain builder
 module. This module can be integrated to the analysis by defining the ``power_train_configuration_file path`` option to
@@ -26,4 +26,5 @@ file, lists of the component constraints available, and simple powertrain templa
 
     Powertrain configuration (PT) file <pt_file>
     Component Constraints and ID <constraints>
+    PT file visualization <pt_visual>
     PT file templates <templates>

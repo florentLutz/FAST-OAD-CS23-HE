@@ -3,6 +3,28 @@
 =====================================
 Powertrain Component Constraints & ID
 =====================================
+This section lists all component's `id` and their corresponding constraints. Each component `id` is used to configure the
+:ref:`PT file <pt-file>`. Constraints for the components defined in the powertrain are specified using service and submodel
+naming strings in the `submodels` section of the `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
+
+.. code:: yaml
+
+    submodels:
+      service naming string: submodel naming string
+
+- The **service naming string**:  identifies the component and the specific variable being constrained.
+- The **submodel naming string**: defines the strictness level of the constraint.
+
+Each component constraint has two levels of strictness:
+
+- **Ensure**: A soft constraint that guides the variable toward a target value.
+- **Enforce**: A hard constraint that fixes the variable to a value determined by the model.
+
+To facilitate switching between constraint levels, the submodel naming strings are identical except for the last contributes:
+use ``ensure`` for ensure constraints and ``enforce`` for enforce constraints. By default, constraints are set to
+``enforce`` for all components, except for the `voltage` constraint of the PMSM and generator. Since `voltage` is closely
+coupled with `RPM` and `torque` constraints, it is recommended to keep it as a soft constraint (``ensure``) to avoid
+computational errors.
 
 **********
 Connectors
@@ -232,6 +254,13 @@ ID
 
     fastga_he.pt_component.dc_load
 
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.aux_load.power: fastga_he.submodel.propulsion.constraints.aux_load.power.enforce
+
 Permanent magnet synchronous motor (PMSM)
 ==========================================
 
@@ -241,6 +270,15 @@ ID
 .. code:: yaml
 
     fastga_he.pt_component.pmsm
+
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+    submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce
+    submodel.propulsion.constraints.pmsm.voltage: fastga_he.submodel.propulsion.constraints.pmsm.voltage.ensure
 
 *********
 Propulsor
@@ -263,6 +301,7 @@ Constraints
 
     submodel.propulsion.constraints.propeller.torque: fastga_he.submodel.propulsion.constraints.propeller.torque.enforce
     submodel.propulsion.constraints.propeller.rpm: fastga_he.submodel.propulsion.constraints.propeller.rpm.enforce
+
 *******
 Sources
 *******
@@ -277,6 +316,13 @@ ID
 
     fastga_he.pt_component.battery_pack
 
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+
 Generator
 =========
 
@@ -286,6 +332,15 @@ ID
 .. code:: yaml
 
     fastga_he.pt_component.generator
+
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.generator.torque: fastga_he.submodel.propulsion.constraints.generator.torque.enforce
+    submodel.propulsion.constraints.generator.rpm: fastga_he.submodel.propulsion.constraints.generator.rpm.enforce
+    submodel.propulsion.constraints.generator.voltage: fastga_he.submodel.propulsion.constraints.generator.voltage.ensure
 
 Internal combustion Engine (ICE)
 ================================
@@ -297,6 +352,13 @@ ID
 
     fastga_he.pt_component.internal_combustion_engine
 
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.enforce
+
 High RPM ICE
 ============
 
@@ -306,6 +368,13 @@ ID
 .. code:: yaml
 
     fastga_he.pt_component.internal_combustion_engine_high_rpm
+
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.high_rpm.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.high_rpm_ice.sea_level_power.enforce
 
 Proton-exchange membrane fuel cell (PEMFC)
 ==========================================
@@ -317,6 +386,14 @@ ID
 
     fastga_he.pt_component.pemfc_stack
 
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.pemfc.effective_area: fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.enforce
+    submodel.propulsion.constraints.pemfc.power: fastga_he.submodel.propulsion.constraints.pemfc_stack.power.enforce
+
 Simple turbo generator
 ======================
 
@@ -327,6 +404,13 @@ ID
 
     fastga_he.pt_component.turbo_generator_simple
 
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.turbo_generator.power: fastga_he.submodel.propulsion.constraints.turbo_generator.power.enforce
+
 Turboshaft
 ==========
 
@@ -336,6 +420,13 @@ ID
 .. code:: yaml
 
     fastga_he.pt_component.turboshaft
+
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
 
 *****
 Tanks
@@ -351,6 +442,13 @@ ID
 
     fastga_he.pt_component.fuel_tank
 
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.enforce
+
 Gaseous hydrogen tank
 =====================
 
@@ -360,3 +458,10 @@ ID
 .. code:: yaml
 
     fastga_he.pt_component.gaseous_hydrogen_tank
+
+Constraints
+***********
+
+.. code:: yaml
+
+    submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity: fastga_he.submodel.propulsion.constraints.gaseous_hydrogen_tank.capacity.enforce
