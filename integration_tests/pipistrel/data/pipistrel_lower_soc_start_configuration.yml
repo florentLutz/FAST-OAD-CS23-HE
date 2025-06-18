@@ -1,0 +1,101 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/pipistrel_lower_soc_start_in.xml
+output_file: ../results/pipistrel_lower_soc_start_out.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
+
+model:
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=20, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True)
+  linear_solver: om.LinearBlockGS()
+  geometry:
+    id: fastga.geometry.legacy
+    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    cabin_sizing: 0.0 # Manually input the front, rear and cabin length
+  aerodynamics_lowspeed:
+    id: fastga.aerodynamics.lowspeed.legacy
+    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    result_folder_path : ../workdir
+    compute_slipstream : false
+  aerodynamics_highspeed:
+    id: fastga.aerodynamics.highspeed.legacy
+    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    result_folder_path: ../workdir
+    compute_mach_interpolation: false
+    compute_slipstream: false
+  performances:
+    id: fastga_he.performances.mission_vector
+    number_of_points_climb: 30
+    number_of_points_cruise: 30
+    number_of_points_descent: 20
+    number_of_points_reserve: 10
+    power_train_file_path: ./pipistrel_assembly_lower_soc_start.yml
+    out_file: ../results/mission_data_lower_soc_start.csv
+    use_linesearch: False
+    pre_condition_pt: True
+    use_apply_nonlinear: True
+  power_train_sizing:
+    id: fastga_he.power_train.sizing
+    power_train_file_path: ./pipistrel_assembly_lower_soc_start.yml
+  weight:
+    id: fastga.weight.legacy
+    propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+  mtow:
+    id: fastga.loop.mtow
+  hq:
+    tail_sizing:
+      id: fastga.handling_qualities.tail_sizing
+      propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    static_margin:
+      id: fastga.handling_qualities.static_margin
+  wing_position:
+    id: fastga.loop.wing_position
+  wing_area:
+    id: fastga.loop.wing_area
+#    power_train_file_path: ./pipistrel_assembly.yml
+
+submodels:
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
+  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+  submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+  service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
+  submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
+  submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
+  submodel.performances.mission_vector.climb_speed: null 
+  submodel.performances.mission_vector.descent_speed: null
+  service.weight.mass.system.power_system: null
+  service.weight.mass.system.avionics_system: null
+  service.weight.mass.system.life_support_system: null
+  service.weight.mass.system.recording_system: null
+  service.weight.mass.systems: fastga_he.submodel.weight.mass.systems.weight_nan
+  service.weight.mass.payload: null
+  service.geometry.nacelle.dimension: null
+  submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
+  submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
+  submodel.propulsion.dc_dc_converter.inductor.inductance: null
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  service.weight.mass.airframe.wing: fastga_he.submodel.weight.mass.airframe.wing.analytical_he # No real use for this submodel as there are no electric components in the wing
+  submodel.handling_qualities.vertical_tail.area: null
+
+optimization: # This section is needed only if optimization process is run
+  design_variables:
+    - name: data:propulsion:he_power_train:propeller:propeller_1:solidity
+      lower: 0.1
+      upper: 0.4
+    - name: data:propulsion:he_power_train:propeller:propeller_1:activity_factor
+      lower: 50
+      upper: 250
+    - name: data:propulsion:he_power_train:propeller:propeller_1:blade_twist
+      lower: 10
+      upper: 35
+  objective:
+    - name: data:mission:sizing:energy
+      scaler: 1.e-4

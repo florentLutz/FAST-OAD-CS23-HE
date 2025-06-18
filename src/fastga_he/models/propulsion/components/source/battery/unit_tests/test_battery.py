@@ -732,11 +732,26 @@ def test_update_soc():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesUpdateSOC(number_of_points=NB_POINTS_TEST),
+        PerformancesUpdateSOC(number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"),
         ivc,
     )
     assert problem.get_val("state_of_charge", units="percent") == pytest.approx(
         [100.0, 93.06, 86.09, 79.1, 72.1, 65.08, 58.04, 50.98, 43.9, 36.8],
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+        units="percent",
+        val=80.0,
+    )
+
+    problem.run_model()
+
+    assert problem.get_val("state_of_charge", units="percent") == pytest.approx(
+        [80.0, 73.06, 66.09, 59.1, 52.1, 45.08, 38.04, 30.98, 23.9, 16.8],
         rel=1e-2,
     )
 

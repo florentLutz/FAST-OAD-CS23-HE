@@ -104,7 +104,9 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "update_soc",
-            PerformancesUpdateSOC(number_of_points=number_of_points),
+            PerformancesUpdateSOC(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
             promotes=["*"],
         )
         # Though these variable depends on variables that are looped on, they don't affect the
