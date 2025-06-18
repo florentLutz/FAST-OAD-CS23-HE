@@ -1,8 +1,8 @@
 .. _templates:
 
-=======================
-Life Cycle Cost options
-=======================
+=================
+PT file templates
+=================
 
 The Life Cycle Cost (LCC) module can be parametrized according to several criterion which are implemented under
 the form of group options. A description of those options is available here.
