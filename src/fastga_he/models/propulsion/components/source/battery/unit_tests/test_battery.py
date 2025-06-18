@@ -41,6 +41,7 @@ from ..components.perf_battery_power import PerformancesBatteryPower
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
 from ..components.perf_battery_energy_consumed_main_route import PerformancesEnergyConsumedMainRoute
+from ..components.perf_soc_end_main_route import PerformancesSOCEndMainRoute
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
@@ -1071,6 +1072,27 @@ def test_energy_consumed_main_route():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route",
         units="kW*h",
     ) == pytest.approx(339.86, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_soc_end_main_route():
+    ivc = om.IndepVarComp()
+    ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesSOCEndMainRoute(
+            number_of_points=NB_POINTS_TEST,
+            battery_pack_id="battery_pack_1",
+            number_of_points_reserve=2,
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_end_main_route",
+        units="percent",
+    ) == pytest.approx(60.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

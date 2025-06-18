@@ -48,7 +48,7 @@ class PerformancesEnergyConsumedMainRoute(om.ExplicitComponent):
             + ":energy_consumed_main_route",
             units="W*h",
             val=50e3,
-            desc="Energy drawn from the battery for the mission",
+            desc="Energy drawn from the battery for the main route of the missions (excludes reserve)",
         )
 
         val_partial = np.ones(number_of_points)
