@@ -20,7 +20,7 @@ Each component constraint has two levels of strictness:
 - **Ensure**: A soft constraint that guides the variable toward a target value.
 - **Enforce**: A hard constraint that fixes the variable to a value determined by the model.
 
-To facilitate switching between constraint levels, the submodel naming strings are identical except for the last contributes:
+To facilitate switching between constraint levels, the submodel naming strings are identical except for the ending:
 use ``ensure`` for ensure constraints and ``enforce`` for enforce constraints. By default, constraints are set to
 ``enforce`` for all components, except for the `voltage` constraint of the PMSM and generator. Since `voltage` is closely
 coupled with `RPM` and `torque` constraints, it is recommended to keep it as a soft constraint (``ensure``) to avoid
