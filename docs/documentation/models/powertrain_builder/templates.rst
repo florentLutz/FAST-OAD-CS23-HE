@@ -59,11 +59,11 @@ Dual turboshaft architecture
       propeller_1:
         id: fastga_he.pt_component.propeller
         position: on_the_wing
-      turboshaft_1:
-        id: fastga_he.pt_component.turboshaft
-        position: on_the_wing
       propeller_2:
         id: fastga_he.pt_component.propeller
+        position: on_the_wing
+      turboshaft_1:
+        id: fastga_he.pt_component.turboshaft
         position: on_the_wing
       turboshaft_2:
         id: fastga_he.pt_component.turboshaft

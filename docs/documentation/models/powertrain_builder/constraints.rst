@@ -3,8 +3,8 @@
 =====================================
 Powertrain Component Constraints & ID
 =====================================
-This section lists all component's `id` and their corresponding constraints. Each component `id` is used to configure the
-:ref:`PT file <pt-file>`. Constraints for the components defined in the powertrain are specified using service and submodel
+This section lists all component's `id` and their corresponding constraints. While building a powertrain, the components'
+`id` corresponding to the propulsive systems architecture have to be listed in the :ref:`PT file <pt-file>`. Constraints for the components defined in the powertrain are specified using service and submodel
 naming strings in the `submodels` section of the `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
 
 .. code:: yaml
