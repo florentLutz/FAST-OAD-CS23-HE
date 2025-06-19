@@ -8,6 +8,8 @@ This section presents several powertrain designs using the powertrain configurat
 Single ICE architecture
 ***********************
 
+This template demonstrates the PT file of a powertrain with one piston engine powering one propeller.
+
 .. code:: yaml
 
     title: Single ICE powertrain
@@ -50,6 +52,8 @@ Single ICE architecture
 
 Dual turboshaft architecture
 ****************************
+
+This template demonstrates the PT file of a powertrain with two turboshafts powering two propellers separately.
 
 .. code:: yaml
 
@@ -105,6 +109,8 @@ Dual turboshaft architecture
 
 Single PMSM electric architecture
 *********************************
+
+This template demonstrates the PT file of a powertrain with one electric motor powering one propeller.
 
 .. code:: yaml
 
@@ -181,6 +187,8 @@ Single PMSM electric architecture
 
 Dual PMSM single propeller architecture
 ***************************************
+
+This template demonstrates the PT file of a powertrain with two electric motors powering one propeller simultaneously.
 
 .. code:: yaml
 
@@ -259,6 +267,99 @@ Dual PMSM single propeller architecture
         target: [dc_bus_5, 2]
 
       - source: [dc_bus_5, 1]
+        target: dc_dc_converter_1
+
+      - source: dc_dc_converter_1
+        target: battery_pack_1
+
+    watcher_file_path: ../results/pt_watcher.csv
+
+Turboshaft-PMSM hybrid single propeller architecture
+****************************************************
+
+This template demonstrates the PT file of a powertrain with one electric motor and one turboshaft powering one propeller
+simultaneously.
+
+.. code:: yaml
+
+    title: Turboshaft-PMSM hybrid powertrain
+
+    power_train_components:
+      propeller_1:
+        id: fastga_he.pt_component.propeller
+        position: in_the_nose
+      planetary_gear_1:
+        id: fastga_he.pt_component.planetary_gear
+        position: in_the_front
+        options:
+          gear_mode: power_share
+      motor_1:
+        id: fastga_he.pt_component.pmsm
+        position: in_the_nose
+      inverter_1:
+        id: fastga_he.pt_component.inverter
+        position: in_the_front
+      dc_bus_1:
+        id: fastga_he.pt_component.dc_bus
+        options:
+          number_of_inputs: 1
+          number_of_outputs: 1
+        position: in_the_front
+      dc_dc_converter_1:
+        id: fastga_he.pt_component.dc_dc_converter
+        position: in_the_front
+      battery_pack_1:
+        id: fastga_he.pt_component.battery_pack
+        position: underbelly
+      gearbox_1:
+        id: fastga_he.pt_component.speed_reducer
+        position: in_the_front
+      turboshaft_1:
+        id: fastga_he.pt_component.turboshaft
+        position: in_the_front
+      fuel_system_1:
+        id: fastga_he.pt_component.fuel_system
+        options:
+          number_of_engines: 1
+          number_of_tanks: 2
+        position: in_the_front
+      fuel_tank_1:
+        id: fastga_he.pt_component.fuel_tank
+        position: inside_the_wing
+      fuel_tank_2:
+        id: fastga_he.pt_component.fuel_tank
+        position: inside_the_wing
+        symmetrical: fuel_tank_1
+
+    component_connections:
+      - source: propeller_1
+        target: [planetary_gear_1, 1]
+
+      - source: [planetary_gear_1, 1]
+        target: gearbox_1
+
+      - source: gearbox_1
+        target: turboshaft_1
+
+      - source: turboshaft_1
+        target: [fuel_system_1, 1]
+
+      - source: [fuel_system_1, 1]
+        target: fuel_tank_1
+
+      - source: [fuel_system_1, 2]
+        target: fuel_tank_2
+
+      - source: [planetary_gear_1, 2]
+        target: motor_1
+
+      - source: motor_1
+        target: inverter_1
+
+      - source: inverter_1
+        target: [dc_bus_1, 1]
+
+      - source: [dc_bus_1, 1]
         target: dc_dc_converter_1
 
       - source: dc_dc_converter_1
