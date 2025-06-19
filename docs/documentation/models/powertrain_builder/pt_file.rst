@@ -19,19 +19,18 @@ four sections:
     # Describes how components are connected.
 
     watcher_file_path:
-    # Specifies the path to the CSV file that contains powertrain performance at each time step.
+    # Specifies the path to the CSV file that contains powertrain performances at each time step.
 
 *********************
 Powertrain components
 *********************
 
-All the components required for the powertrain need to be specified at this section with the following format.
-The `id` of all existed component can be found in :ref:`Component Constraints and ID <constraint-id>`.
+This section contains the specification of the components inside the propulsive system architecture.
+The `id` of all existing component that can be added is available in :ref:`Component Constraints and ID <constraint-id>`.
 
 Typical component
 =================
-This format is mostly applied to all the powertrain components exist in FAST-GA-HE, except several connection
-components allowing multiple inputs or outputs connections.
+Except for the components allowing multiple inputs or outputs connections, most components available in FAST-OAD-GA-he have the same definition format. It is presented here:
 
 .. code:: yaml
 
@@ -43,7 +42,7 @@ components allowing multiple inputs or outputs connections.
 
 Multiple connection component
 =============================
-Here demonstrates how the multiple connection components are defined in the PT files.
+Some components like splitter, buses fuel systems or gearboxes, can have multiple connections. Here is demonstrated how those components should be defined in the PT file.
 
 .. code:: yaml
 
@@ -68,8 +67,7 @@ Here demonstrates how the multiple connection components are defined in the PT f
       number_of_outputs: # Number of outputs to connect
     position:  # Installation position
 
-For the DC splitter and the planetary gear component, the working logic of allowed connection options are explained with
-this diagram :cite:`lutz:2025`.
+Additionally, for DC splitter and planetary gear component, a working logic must be defined. The two modes are explained in the following diagram from :cite:`lutz:2025`.
 
 .. image:: ../../../img/splitter.svg
     :width: 800
@@ -99,7 +97,7 @@ connection is receiver of those values.
 
 One-to-one connection
 =====================
-This format is applied to all typical powertrain components with an one-to-one relation.
+This format is applied when the source or target is a component with a single input or output.
 
 .. code:: yaml
 
@@ -109,7 +107,7 @@ This format is applied to all typical powertrain components with an one-to-one r
 
 Multiple input / output connection
 ==================================
-When having connection with multiple components, the connection index must be specified. The number of connections
+When the component can have multiple inputs/outputs, the connection index must be specified. The number of connections
 must match the number defined in the ``power_train_components`` section. The ``<index of connection>`` should be an
 integer starting from 1 up to the number specified in ``power_train_components``.
 

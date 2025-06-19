@@ -17,7 +17,7 @@ file. The example below demonstrates how to import and use this function with th
     # pt_file_path: path to the PT configuration file
     # network_file_path: path to save the generated powertrain network visualization
 
-And the generated network is shown in this link
+The generated network should look like this:
 
 .. raw:: html
 
