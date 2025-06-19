@@ -69,7 +69,7 @@ Some components like splitter, buses fuel systems or gearboxes, can have multipl
 
 Additionally, for DC splitter and planetary gear component, a working logic must be defined. The two modes are explained in the following diagram from :cite:`lutz:2025`.
 
-.. image:: ../../../img/splitter.svg
+.. image:: ../../img/splitter.svg
     :width: 800
     :align: center
 

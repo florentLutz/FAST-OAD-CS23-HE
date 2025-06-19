@@ -1,3 +1,5 @@
+.. _powertrain-builder-index:
+
 ==================
 Powertrain builder
 ==================

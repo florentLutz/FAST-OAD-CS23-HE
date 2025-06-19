@@ -11,6 +11,8 @@ For a description of models used in FAST-OAD-CS23-HE, you may look at
 
     Models in FAST-OAD-CS23-HE are still a work in progress.
 
+Powertrain builder is a noval feature exclusively in FAST-OAD-CS23-HE for aircraft powertrain architecture configuration.
+For a description of powertrain builder, you may look at :ref:`powertrain-builder-index`.
 
 
 Contents
