@@ -19,7 +19,7 @@ module. This module can be integrated to the analysis by defining the ``power_tr
     sort_component: true
 
 A description of the powertrain customization is available here. It includes a description of powertrain configuation
-file, lists of the component constraints available, and simple powertrain templates.
+file, lists of the components available, their constraints and simple powertrain templates.
 
 .. toctree::
    :maxdepth: 2
