@@ -20,6 +20,7 @@ from ..components.sizing_battery_dimensions import SizingBatteryDimensions
 from ..components.sizing_battery_drag import SizingBatteryDrag
 from ..components.sizing_battery_prep_for_loads import SizingBatteryPreparationForLoads
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
+from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
@@ -47,6 +48,7 @@ from ..components.cstr_enforce import ConstraintsSOCEnforce
 from ..components.pre_lca_calendar_aging_soc_effect import PreLCABatteryCalendarAgingSOCEffect
 from ..components.pre_lca_depth_of_discharge import PreLCABatteryDepthOfDischarge
 from ..components.pre_lca_cyclic_aging_dod_effect import PreLCABatteryCyclicAgingDODEffect
+from ..components.pre_lca_life_cycle_cyclic import PreLCABatteryCyclicAging
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
 from ..components.lcc_battery_cost import LCCBatteryPackCost
@@ -556,6 +558,30 @@ def test_internal_resistance():
     assert problem.get_val("internal_resistance", units="ohm") * 1e3 == pytest.approx(
         [46.59, 56.13, 58.11, 56.15, 52.7, 49.3, 46.76, 45.32, 44.82, 44.73], rel=1e-2
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_average_cell_temperature():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "cell_temperature",
+        units="degK",
+        val=np.linspace(288.15, 298.15, NB_POINTS_TEST),
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesAverageCellTemperature(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        units="degK",
+    ) == pytest.approx(293.15, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1202,6 +1228,30 @@ def test_dod_effect_cyclic_aging():
 
     problem.check_partials(compact_print=True)
 
+
+def test_cyclic_aging():
+    # First test with what I called reference conditions
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:cyclic_effect_DOD",
+        val=14119.0,
+        units="unitless",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        val=296.15,
+        units="degK",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryCyclicAging(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan",
+        units="unitless",
+    ) == pytest.approx(500.0, abs=1)
+
+    problem.check_partials(compact_print=True)
 
 def test_weight_per_fu():
     inputs_list = [

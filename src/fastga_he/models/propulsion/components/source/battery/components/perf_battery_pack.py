@@ -6,6 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
+from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_direct_bus_connection import PerformancesBatteryDirectBusConnection
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
@@ -66,6 +67,13 @@ class PerformancesBatteryPack(om.Group):
         self.add_subsystem(
             "cell_temperature",
             PerformancesCellTemperatureMission(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "average_cell_temperature",
+            PerformancesAverageCellTemperature(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
             promotes=["*"],
