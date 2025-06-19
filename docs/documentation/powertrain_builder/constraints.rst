@@ -3,9 +3,11 @@
 =====================================
 Powertrain Component Constraints & ID
 =====================================
-This section lists all component's `id` and their corresponding constraints. While building a powertrain, the components'
-`id` corresponding to the propulsive systems architecture have to be listed in the :ref:`PT file <pt-file>`. Constraints for the components defined in the powertrain are specified using service and submodel
-naming strings in the `submodels` section of the `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
+This section lists all component's `id` and their corresponding constraints. While building a powertrain, all the `id`
+corresponding to the components of the architecture have to be listed in the :ref:`PT file <pt-file>`. Constraints for
+the components defined in the powertrain are specified using service and submodel naming strings in the
+`submodels <https://fast-oad.readthedocs.io/en/stable/documentation/custom_modules/add_submodels.html>`_ section of the
+`configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
 
 .. code:: yaml
 
@@ -30,8 +32,11 @@ computational errors.
 Connectors
 **********
 
-Harness (DC cable)
-==================
+DC cable harness
+================
+
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to connect DC buses and splitters.
+Detailed documentation is still in working process.
 
 ID
 **
@@ -51,6 +56,9 @@ Constraints
 DC bus
 ======
 
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -69,6 +77,9 @@ Constraints
 DC splitter
 ===========
 
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -86,6 +97,9 @@ Constraints
 
 DC-DC converter
 ===============
+
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+Detailed documentation is still in working process.
 
 ID
 **
@@ -112,6 +126,9 @@ Constraints
 Inverter
 ========
 
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -133,6 +150,9 @@ Constraints
 Rectifier
 =========
 
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -153,6 +173,9 @@ Constraints
 Solid state power controller (SSPC)
 ===================================
 
+The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -171,6 +194,9 @@ Constraints
 Fuel system
 ===========
 
+The fuel system is a connector option in FAST-OAD-CS23-HE, designed for fuel distribution with multiple inlets and outlets.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -181,6 +207,9 @@ ID
 
 Hydrogen fuel system
 ====================
+
+The hydrogen fuel system is a connector option in FAST-OAD-CS23-HE, designed for hydrogen distribution with multiple
+inlets and outlets. Detailed documentation can be found at :ref:`h2-fuel-system`.
 
 ID
 **
@@ -209,6 +238,9 @@ Constraints
 Planetary gear
 ==============
 
+The planetary gear is a connector option in FAST-OAD-CS23-HE, designed to transmit torque from multiple torque source.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -225,6 +257,9 @@ Constraints
 
 Speed reducer
 =============
+
+The speed reducer is a connector option in FAST-OAD-CS23-HE, designed to reduce RPM with increasing torque output.
+Detailed documentation is still in working process.
 
 ID
 **
@@ -247,6 +282,9 @@ Loads
 DC_loads
 ========
 
+The dc loads is a load option in FAST-OAD-CS23-HE, designed to consume electricity with DC current.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -263,6 +301,9 @@ Constraints
 
 Permanent magnet synchronous motor (PMSM)
 ==========================================
+
+The PMSM is a load option in FAST-OAD-CS23-HE, designed to provide mechanical power with consuming electricity.
+Detailed documentation is still in working process.
 
 ID
 **
@@ -287,6 +328,9 @@ Propulsor
 Propeller
 =========
 
+The propeller is a propulsor option in FAST-OAD-CS23-HE, designed to provide thrust for the aircraft.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -309,6 +353,9 @@ Sources
 Battery
 =======
 
+The battery is a power source option in FAST-OAD-CS23-HE, designed to provide electricity.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -325,6 +372,9 @@ Constraints
 
 Generator
 =========
+
+The generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from a mechanical power source.
+Detailed documentation is still in working process.
 
 ID
 **
@@ -345,6 +395,9 @@ Constraints
 Internal combustion Engine (ICE)
 ================================
 
+The IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power with consuming Avgas or diesel.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -362,6 +415,9 @@ Constraints
 High RPM ICE
 ============
 
+The high RPM IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power with consuming Avgas or diesel.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -378,6 +434,10 @@ Constraints
 
 Proton-exchange membrane fuel cell (PEMFC)
 ==========================================
+
+The proton-exchange membrane fuel cell  is a power source option in FAST-OAD-CS23-HE, designed to provide electricity with consuming hydrogen.
+Detailed documentation can be found at :ref:`pemfc`.
+
 
 ID
 **
@@ -397,6 +457,9 @@ Constraints
 Simple turbo generator
 ======================
 
+The simple turbo generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from turboshaft engine.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -413,6 +476,9 @@ Constraints
 
 Turboshaft
 ==========
+
+The turboshaft engine is a power source option in FAST-OAD-CS23-HE, designed to provide power with consuming Jet-A1.
+Detailed documentation is still in working process.
 
 ID
 **
@@ -435,6 +501,9 @@ Tanks
 Fuel tank
 =========
 
+The fuel tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry fuel for the flight mission.
+Detailed documentation is still in working process.
+
 ID
 **
 
@@ -451,6 +520,9 @@ Constraints
 
 Gaseous hydrogen tank
 =====================
+
+The gaseous hydrogen tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry gaseous hydrogen for the flight mission.
+Detailed documentation can be found at :ref:`gh2-tank`.
 
 ID
 **
