@@ -295,7 +295,8 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
-            <cell_temperature_mission units="degK" is_input="True">296.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <end_of_life_relative_capacity_loss units="unitless">0.2</end_of_life_relative_capacity_loss>
+            <cell_temperature_mission units="degK" is_input="True">306.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
@@ -308,7 +309,8 @@
             </CG>
           </battery_pack_1>
           <battery_pack_2>
-            <cell_temperature_mission units="degK" is_input="True">296.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <end_of_life_relative_capacity_loss units="unitless">0.2</end_of_life_relative_capacity_loss>
+            <cell_temperature_mission units="degK" is_input="True">306.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
