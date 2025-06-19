@@ -9,6 +9,10 @@ import openmdao.api as om
 import pytest
 import numpy as np
 
+import fastoad.api as oad
+
+from ..constants import SERVICE_BATTERY_LIFESPAN
+
 from ..components.sizing_module_weight import SizingBatteryModuleWeight
 from ..components.sizing_battery_weight import SizingBatteryWeight
 from ..components.sizing_number_cells import SizingBatteryNumberCells
@@ -51,6 +55,7 @@ from ..components.pre_lca_cyclic_aging_dod_effect import PreLCABatteryCyclicAgin
 from ..components.pre_lca_life_cycle_cyclic import PreLCABatteryCyclicAging
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
+from ..components.pre_lca_battery_pack import PreLCABatteryPack
 from ..components.lcc_battery_cost import LCCBatteryPackCost
 from ..components.lcc_battery_operational_cost import LCCBatteryPackOperationalCost
 
@@ -1355,6 +1360,62 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
     ) == pytest.approx(0.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pre_lca_group():
+    system = PreLCABatteryPack(battery_pack_id="battery_pack_1")
+    inputs_list = list_inputs(system)
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(system, ivc)
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:CO2_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.033, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    # Now we check with the submodel
+
+    oad.RegisterSubmodel.active_models[SERVICE_BATTERY_LIFESPAN] = (
+        "fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model"
+    )
+
+    system_2 = PreLCABatteryPack(battery_pack_id="battery_pack_1")
+    inputs_list = list_inputs(system_2)
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+    # These condition should prolong lifespan of the cells, so the mass per FU should be lower
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        val=296.15,
+        units="degK",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_end_main_route",
+        val=40.0,
+        units="percent",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(system_2, ivc)
+
+    # And we check that the battery lifespan is now computed at a value higher than 500
+    # (the default)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", units="unitless"
+    ) == pytest.approx(963.0, rel=1e-3)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.018, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
