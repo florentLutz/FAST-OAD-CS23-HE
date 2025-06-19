@@ -9,6 +9,7 @@ import pandas as pd
 
 import plotly.graph_objects as go
 import plotly.express as px
+from plotly.subplots import make_subplots
 
 import fastoad.api as oad
 import openmdao.api as om
@@ -29,6 +30,7 @@ from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
+RESULTS_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity")
 
 
 COLORS = px.colors.qualitative.Prism
@@ -145,6 +147,178 @@ def test_pipistrel_velis_electro_lower_soc_start_mission():
     assert sizing_energy == pytest.approx(25.94, abs=1e-2)
     # vs 25 kWh with the classic aircraft, so the increase is due to the increased weight and not
     # the decreased SOC start
+
+
+def test_pipistrel_velis_electro_with_lca_default_battery_lifespan():
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_source_with_lca.xml"
+    process_file_name = "pipistrel_configuration_with_lca.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Give good initial guess on a few key value to reduce the time it takes to converge
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:OWE", units="kg", val=400.0)
+    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
+
+    # Run the problem
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        600.00, rel=1e-2
+    )
+    sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
+    assert sizing_energy == pytest.approx(25.05, abs=1e-2)
+
+
+def test_pipistrel_velis_electro_with_lca_varying_start_soc():
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_source_with_lca.xml"
+    process_file_name = "pipistrel_configuration_with_lca.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Give good initial guess on a few key value to reduce the time it takes to converge
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:OWE", units="kg", val=400.0)
+    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
+    problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
+
+    # Run the problem
+    problem.run_model()
+
+    # Now we change the SOC start a little
+    soc_start_array = np.linspace(100.0, 80.0, 10)
+    for soc_start in soc_start_array:
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+            units="percent",
+            val=soc_start,
+        )
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_2:SOC_mission_start",
+            units="percent",
+            val=soc_start,
+        )
+
+        problem.run_model()
+
+        problem.output_file_path = pth.join(
+            RESULTS_SENSITIVITY_FOLDER_PATH, str(int(soc_start)) + "_soc_start_out.xml"
+        )
+        problem.write_outputs()
+
+
+def test_post_process_results():
+    fig = go.Figure()
+
+    socs_start_mission = []
+    single_scores = []
+    battery_mass_per_fu = []
+    battery_mass = []
+
+    generic_list = []
+
+    for file in os.listdir(RESULTS_SENSITIVITY_FOLDER_PATH):
+        datafile = oad.DataFile(pth.join(RESULTS_SENSITIVITY_FOLDER_PATH, file))
+        socs_start_mission.append(
+            datafile[
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start"
+            ].value[0]
+        )
+        single_scores.append(datafile["data:environmental_impact:single_score"].value[0])
+        battery_mass_per_fu.append(
+            datafile[
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu"
+            ].value[0]
+        )
+        battery_mass.append(
+            datafile["data:propulsion:he_power_train:battery_pack:battery_pack_1:mass"].value[0]
+        )
+        generic_list.append(
+            datafile["data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan"].value[0]
+        )
+
+    sorted_single_scores = [single_scores[i] for i in np.argsort(socs_start_mission)]
+    sorted_battery_mass_per_fu = [battery_mass_per_fu[i] for i in np.argsort(socs_start_mission)]
+    sorted_socs_start = np.sort(socs_start_mission)
+
+    sorted_generic_list = [generic_list[i] for i in np.argsort(socs_start_mission)]
+    sorted_battery_mass = [battery_mass[i] for i in np.argsort(socs_start_mission)]
+
+    scatter = go.Scatter(
+        x=sorted_socs_start,
+        y=np.array(sorted_single_scores) / sorted_single_scores[-1],
+        mode="lines+markers",
+        name="Single score variation",
+    )
+    fig.add_trace(scatter)
+    scatter_2 = go.Scatter(
+        x=sorted_socs_start,
+        y=np.array(sorted_battery_mass_per_fu) / sorted_battery_mass_per_fu[-1],
+        mode="lines+markers",
+        name="Battery mass per FU variation",
+    )
+    fig.add_trace(scatter_2)
+    scatter_3 = go.Scatter(
+        x=sorted_socs_start,
+        y=np.array(sorted_generic_list) / sorted_generic_list[-1],
+        mode="lines+markers",
+        name="Battery lifespan variation",
+    )
+    fig.add_trace(scatter_3)
+
+    fig.update_layout(
+        title_text="Evolution of single score",
+        title_x=0.5,
+        xaxis_title="Initial SoC [%]",
+        height=800,
+        width=1600,
+        font_size=18,
+    )
+    fig.update_yaxes(title="Variation with respect to 100% SOC case")
+
+    fig.show()
 
 
 def test_pipistrel_heavy_velis_electro():
