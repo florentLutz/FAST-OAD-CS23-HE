@@ -41,6 +41,9 @@ class PreLCABatteryCalendarAgingSOCEffect(om.ExplicitComponent):
             desc="Multiplicative factor for the effect of storage SOC on calendar aging",
         )
 
+    def setup_partials(self):
+        battery_pack_id = self.options["battery_pack_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id

@@ -58,6 +58,7 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             "number of cycle required for the reference cell to reach 60% nominal capacity",
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

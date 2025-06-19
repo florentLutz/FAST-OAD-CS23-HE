@@ -45,6 +45,9 @@ class PreLCABatteryDepthOfDischarge(om.ExplicitComponent):
             desc="Depth of battery discharge on one cycle",
         )
 
+    def setup_partials(self):
+        battery_pack_id = self.options["battery_pack_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":DOD_main_route",
             wrt="data:propulsion:he_power_train:battery_pack:"

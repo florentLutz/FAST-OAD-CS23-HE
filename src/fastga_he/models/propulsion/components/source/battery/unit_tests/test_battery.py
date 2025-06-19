@@ -1253,6 +1253,7 @@ def test_cyclic_aging():
 
     problem.check_partials(compact_print=True)
 
+
 def test_weight_per_fu():
     inputs_list = [
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass",

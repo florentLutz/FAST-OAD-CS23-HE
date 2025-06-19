@@ -38,6 +38,9 @@ class PerformancesAverageCellTemperature(om.ExplicitComponent):
             desc="Time step averaged temperature of the cell during the mission",
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="*",
