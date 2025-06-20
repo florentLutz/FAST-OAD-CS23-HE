@@ -56,8 +56,8 @@ Constraints
 DC bus
 ======
 
-The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to connect DC cable harness to electric
-components. Detailed documentation is still in working process.
+The DC bus is a connector option in FAST-OAD-CS23-HE, designed to connect DC cable harness to an electric component.
+Detailed documentation is still in working process.
 
 ID
 **
@@ -77,7 +77,7 @@ Constraints
 DC splitter
 ===========
 
-The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to connect DC cable harness to multiple electric
+The DC splitter is a connector option in FAST-OAD-CS23-HE, designed to connect DC cable harness to multiple electric
 components. Detailed documentation is still in working process.
 
 ID
@@ -98,7 +98,7 @@ Constraints
 DC-DC converter
 ===============
 
-The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+The DC-DC converter is a connector option in FAST-OAD-CS23-HE, designed to convert voltage for connected electric components.
 Detailed documentation is still in working process.
 
 ID
@@ -126,7 +126,7 @@ Constraints
 Inverter
 ========
 
-The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+The inverter is a connector option in FAST-OAD-CS23-HE, designed to convert DC to AC current.
 Detailed documentation is still in working process.
 
 ID
@@ -150,7 +150,7 @@ Constraints
 Rectifier
 =========
 
-The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+The rectifier is a connector option in FAST-OAD-CS23-HE, designed to convert Ac current to DC current.
 Detailed documentation is still in working process.
 
 ID
@@ -173,7 +173,7 @@ Constraints
 Solid state power controller (SSPC)
 ===================================
 
-The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to
+The SSPC is a connector option in FAST-OAD-CS23-HE, designed for electric power distribution for connected components.
 Detailed documentation is still in working process.
 
 ID
