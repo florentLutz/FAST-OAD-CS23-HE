@@ -101,9 +101,9 @@ in the following diagram from :cite:`lutz:2025`.
 *********************
 Component connections
 *********************
-This section defines the component sequence and the connections of the powertrain architecture. For each connection, the
-component placed at the source of the connection is the input value provider and the component placed at target for a
-connection is receiver of those values.
+This section defines the component connections of the powertrain architecture. For each connection, the
+component placed at the source of the connection is the physical output and the component placed at target for a
+connection is the physical input to simulate the real connections.
 
 One-to-one connection
 =====================
