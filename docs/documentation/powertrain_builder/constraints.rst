@@ -19,8 +19,8 @@ the components defined in the powertrain are specified using service and submode
 
 Each component constraint has two levels of strictness:
 
-- **Ensure**: A soft constraint that guides the variable toward a target value.
-- **Enforce**: A hard constraint that fixes the variable to a value determined by the model.
+- **Ensure**: A soft constraint that keeps the variable rating as a user-defined input, relaxing strict maximum or minimum limits.
+- **Enforce**: A hard constraint that sets the variable rating based on the maximum or minimum value observed during the mission, to avoid unreasonable sizing result.
 
 To facilitate switching between constraint levels, the submodel naming strings are identical except for the ending:
 use ``ensure`` for ensure constraints and ``enforce`` for enforce constraints. By default, constraints are set to
