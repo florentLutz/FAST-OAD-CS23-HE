@@ -12,6 +12,9 @@ file. The example below demonstrates how to import and use this function with th
 
     from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
+    pt_file_path = "/path/to/powertrain/configurations/PT_config.yml"
+    network_file_path = "/path/to/network/topology/component_connections.html"
+
     power_train_network_viewer(pt_file_path, network_file_path)
 
     # pt_file_path: path to the PT configuration file
