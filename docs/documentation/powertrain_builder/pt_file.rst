@@ -42,9 +42,18 @@ Except for the components allowing multiple inputs or outputs connections, most 
 
 Multiple connection component
 =============================
-Some components like splitter, buses fuel systems or gearboxes, can have multiple connections. Here is demonstrated how those components should be defined in the PT file.
+Some components like splitter, buses fuel systems or gearboxes, can have multiple connections. Here is demonstrated how
+those components should be defined in the PT file. For the `gearbox` and `speed_reducer` components, the number of input
+and output connections does not need to be specified — this is automatically handled by the powertrain builder.
 
 .. code:: yaml
+    gearbox_1:
+    id: fastga_he.pt_component.gearbox
+    position:  # Installation position
+
+    speed_reducer_1:
+    id: fastga_he.pt_component.speed_reducer
+    position:  # Installation position
 
     fuel_system_1:
     id: fastga_he.pt_component.fuel_system
@@ -67,7 +76,8 @@ Some components like splitter, buses fuel systems or gearboxes, can have multipl
       number_of_outputs: # Number of outputs to connect
     position:  # Installation position
 
-Additionally, for DC splitter and planetary gear component, a working logic must be defined. The two modes are explained in the following diagram from :cite:`lutz:2025`.
+Additionally, for DC splitter and planetary gear component, a working logic must be defined. The two modes are explained
+in the following diagram from :cite:`lutz:2025`.
 
 .. image:: ../../img/splitter.svg
     :width: 800
