@@ -1,0 +1,46 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/pipistrel_op_mission_in.xml
+output_file: ../results/pipistrel_op_mission_out.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
+
+model:
+  performances:
+    id: fastga_he.performances.mission_vector
+    number_of_points_climb: 30
+    number_of_points_cruise: 30
+    number_of_points_descent: 20
+    number_of_points_reserve: 10
+    power_train_file_path: ./pipistrel_assembly_mission.yml
+    out_file: ../workdir/op_mission_data.csv
+    use_linesearch: False
+    pre_condition_pt: True
+    use_apply_nonlinear: True
+
+submodels:
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+  submodel.performances.mission_vector.climb_speed: null
+  submodel.performances.mission_vector.descent_speed: null
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+
+optimization: # This section is needed only if optimization process is run
+  design_variables:
+    - name: data:propulsion:he_power_train:propeller:propeller_1:solidity
+      lower: 0.1
+      upper: 0.4
+    - name: data:propulsion:he_power_train:propeller:propeller_1:activity_factor
+      lower: 50
+      upper: 250
+    - name: data:propulsion:he_power_train:propeller:propeller_1:blade_twist
+      lower: 10
+      upper: 35
+  objective:
+    - name: data:mission:sizing:energy
+      scaler: 1.e-4
