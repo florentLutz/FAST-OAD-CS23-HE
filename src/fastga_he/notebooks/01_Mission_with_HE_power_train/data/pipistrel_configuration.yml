@@ -35,7 +35,7 @@ model:
     number_of_points_descent: 20
     number_of_points_reserve: 10
     power_train_file_path: ./pipistrel_assembly.yml
-    out_file: ../results/mission_data.csv
+    out_file: ../workdir/pipistrel_mission_data.csv
     use_linesearch: False
     pre_condition_pt: True
     use_apply_nonlinear: True

@@ -70,4 +70,4 @@ component_connections:
   - source: dc_sspc_2
     target: battery_pack_2
 
-watcher_file_path: ../results/pipistrel_power_train_data.csv
+watcher_file_path: ../workdir/pipistrel_power_train_data.csv
