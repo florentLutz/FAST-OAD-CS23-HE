@@ -285,9 +285,7 @@ def test_post_process_results():
         generic_list.append(
             datafile["data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan"].value[0]
         )
-        flights_per_fu.append(
-            datafile["data:environmental_impact:flight_per_fu"].value[0]
-        )
+        flights_per_fu.append(datafile["data:environmental_impact:flight_per_fu"].value[0])
 
     sorted_single_scores = [single_scores[i] for i in np.argsort(socs_start_mission)]
     sorted_battery_mass_per_fu = [battery_mass_per_fu[i] for i in np.argsort(socs_start_mission)]
@@ -349,6 +347,58 @@ def test_post_process_results():
     fig.update_yaxes(title="Variation with respect to 100% SOC case")
 
     fig.show()
+
+
+def test_full_sizing_hybrid_kodiak_100():
+    """Test the overall aircraft design process with wing positioning on the hybrid K100."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_full_sizing_hybrid_kodiak.xml"
+    process_file_name = "full_sizing_hybrid_kodiak.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # Change battery pack characteristics so that they match those of a high power,
+    # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
+    # Pipistrel battery. Assumes same polarization curve
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=30.0
+    )
+    problem.set_val("data:weight:aircraft:MTOW", val=3000.0, units="kg")
+    problem.set_val("data:geometry:wing:area", val=22.5, units="m**2")
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
 
 
 def test_retrofit_hybrid_kodiak_european_mix():
