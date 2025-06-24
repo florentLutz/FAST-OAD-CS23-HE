@@ -305,8 +305,7 @@ Permanent magnet synchronous motor (PMSM)
 ==========================================
 
 The PMSM is a load option in FAST-OAD-CS23-HE, designed to convert electrical power in mechanical power. 
-Detailed
-documentation is still a work in progress.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -331,8 +330,8 @@ Propulsor
 Propeller
 =========
 
-The propeller is a propulsor option in FAST-OAD-CS23-HE, designed to provide thrust for the aircraft. Detailed
-documentation is still a work in progress.
+The propeller is a propulsor option in FAST-OAD-CS23-HE, designed to provide thrust for the aircraft.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -356,8 +355,8 @@ Sources
 Battery
 =======
 
-The battery is a power source option in FAST-OAD-CS23-HE, designed to provide electricity. Detailed documentation is
-still a work in progress.
+The battery is a power source option in FAST-OAD-CS23-HE, designed to provide electricity.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -376,8 +375,8 @@ Constraints
 Generator
 =========
 
-The generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from a mechanical power
-source. Detailed documentation is still a work in progress.
+The generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from a mechanical power source.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -418,8 +417,8 @@ Constraints
 High RPM ICE
 ============
 
-The high RPM IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming AvGas or
-Diesel. Detailed documentation is still a work in progress.
+The high RPM IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming AvGas or Diesel.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -438,8 +437,8 @@ Constraints
 Proton-exchange membrane fuel cell (PEMFC)
 ==========================================
 
-The proton-exchange membrane fuel cell is a power source option in FAST-OAD-CS23-HE, designed to provide electricity
-by consuming hydrogen. Detailed documentation can be found at :ref:`pemfc`.
+The proton-exchange membrane fuel cell is a power source option in FAST-OAD-CS23-HE, designed to provide electricity by consuming hydrogen.
+Detailed documentation can be found at :ref:`pemfc`.
 
 ID
 **
@@ -459,8 +458,8 @@ Constraints
 Simple turbo generator
 ======================
 
-The simple turbo generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from turboshaft
-engine. Detailed documentation is still a work in progress.
+The simple turbo generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from turboshaft engine.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -503,8 +502,8 @@ Tanks
 Fuel tank
 =========
 
-The fuel tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry AvGas or kerosene for the flight mission. Detailed
-documentation is still a work in progress.
+The fuel tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry AvGas or kerosene for the flight mission.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -523,8 +522,8 @@ Constraints
 Gaseous hydrogen tank
 =====================
 
-The gaseous hydrogen tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry gaseous hydrogen for the
-flight mission. Detailed documentation can be found at :ref:`gh2-tank`.
+The gaseous hydrogen tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry gaseous hydrogen for the flight mission.
+Detailed documentation can be found at :ref:`gh2-tank`.
 
 ID
 **
