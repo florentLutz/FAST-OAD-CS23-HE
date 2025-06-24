@@ -1,3 +1,5 @@
+.. _h2-fuel-system:
+
 ==========================
 Hydrogen fuel system model
 ==========================
