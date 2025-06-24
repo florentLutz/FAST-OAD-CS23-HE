@@ -3,7 +3,7 @@
 =====================
 PT file visualization
 =====================
-The ``power_train_network_viewer`` function generates a visual representation of a powertrain architecture based on a PT
+The ``power_train_network_viewer`` function generates a visual representation of a powertrain architecture based on the PT
 file. The example below demonstrates how to import and use this function with the single ICE architecture from the
 :ref:`PT file templates <templates>`.
 

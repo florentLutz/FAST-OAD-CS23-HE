@@ -30,7 +30,7 @@ The `id` of all existing component that can be added is available in :ref:`Compo
 
 Typical component
 =================
-Except for the components allowing multiple inputs or outputs connections, most components available in FAST-OAD-GA-he have the same definition format. It is presented here:
+Except for the components allowing multiple inputs or outputs connections, most components available in FAST-OAD-CS23-HE have the same definition format. It is presented here:
 
 .. code:: yaml
 
@@ -72,7 +72,7 @@ those components should be defined in the PT file.
       number_of_outputs: # Number of outputs to connect
     position:  # Installation position
 
-Additionally, for DC splitter and planetary gear component, a working logic must be defined. The two modes are explained
+Additionally, for DC splitter and planetary gear components, a working logic must be defined. The two modes are explained
 in the following diagram from :cite:`lutz:2025`.
 
 .. image:: ../../img/splitter.svg
@@ -97,7 +97,7 @@ in the following diagram from :cite:`lutz:2025`.
 *********************
 Component connections
 *********************
-This section defines the component connections of the powertrain architecture. For each connection, the
+This section defines the connections between the components of the powertrain architecture. For each connection, the
 component placed at the source of the connection is the physical output and the component placed at target for a
 connection is the physical input to simulate the real connections.
 

@@ -3,7 +3,7 @@
 =====================================
 Powertrain Component Constraints & ID
 =====================================
-This section lists all component's `id` and their corresponding constraints. While building a powertrain, any components can be used by adding its `id` to the :ref:`PT file <pt-file>`.. Constraints for
+This section lists all component's `id` and their corresponding constraints. While building a powertrain, any components can be used by adding its `id` to the :ref:`PT file <pt-file>`. Constraints for
 the components defined in the powertrain are specified using service and submodel naming strings in the
 `submodels <https://fast-oad.readthedocs.io/en/stable/documentation/custom_modules/add_submodels.html>`_ section of the
 `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
@@ -240,7 +240,7 @@ Constraints
 Planetary gear
 ==============
 
-The planetary gear is a connector option in FAST-OAD-CS23-HE, designed to distribute mechanical power between multiple components.
+The planetary gear is a connector option in FAST-OAD-CS23-HE, designed to distribute mechanical power between multiple sources.
 Detailed documentation is still a work in progress.
 
 ID
