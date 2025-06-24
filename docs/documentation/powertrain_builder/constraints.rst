@@ -3,8 +3,7 @@
 =====================================
 Powertrain Component Constraints & ID
 =====================================
-This section lists all component's `id` and their corresponding constraints. While building a powertrain, all the `id`
-corresponding to the components of the architecture have to be listed in the :ref:`PT file <pt-file>`. Constraints for
+This section lists all component's `id` and their corresponding constraints. While building a powertrain, any components can be used by adding its `id` to the :ref:`PT file <pt-file>`.. Constraints for
 the components defined in the powertrain are specified using service and submodel naming strings in the
 `submodels <https://fast-oad.readthedocs.io/en/stable/documentation/custom_modules/add_submodels.html>`_ section of the
 `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
@@ -19,14 +18,14 @@ the components defined in the powertrain are specified using service and submode
 
 Each component constraint has two levels of strictness:
 
-- **Ensure**: A soft constraint that keeps the variable rating as a user-defined input, relaxing strict maximum or minimum limits.
-- **Enforce**: A hard constraint that sets the variable rating based on the maximum or minimum value observed during the mission, to avoid unreasonable sizing result.
+- **Ensure**: A soft constraint that keeps the rating condition as an user-defined input, relaxing strict maximum or minimum limits and computing the difference as output.
+- **Enforce**: A hard constraint that sets the variable rating based on the maximum or minimum value observed during the mission.
 
 To facilitate switching between constraint levels, the submodel naming strings are identical except for the ending:
 use ``ensure`` for ensure constraints and ``enforce`` for enforce constraints. By default, constraints are set to
 ``enforce`` for all components, except for the `voltage` constraint of the PMSM and generator. Since `voltage` is closely
 coupled with `RPM` and `torque` constraints, it is recommended to keep it as a soft constraint (``ensure``) to avoid
-computational errors.
+computational errors with the current model.
 
 **********
 Connectors
@@ -36,7 +35,7 @@ DC cable harness
 ================
 
 The DC cable harness is a connector option in FAST-OAD-CS23-HE, designed to connect DC buses and splitters.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -98,7 +97,7 @@ Constraints
 DC-DC converter
 ===============
 
-The DC-DC converter is a connector option in FAST-OAD-CS23-HE, designed to convert voltage for connected electric components.
+The DC-DC converter is a connector option in FAST-OAD-CS23-HE, designed to rectify voltage for connected electric components.
 Detailed documentation is still in working process.
 
 ID
@@ -126,7 +125,7 @@ Constraints
 Inverter
 ========
 
-The inverter is a connector option in FAST-OAD-CS23-HE, designed to convert DC to AC current.
+The inverter is a connector option in FAST-OAD-CS23-HE, designed to convert DC current to AC current.
 Detailed documentation is still in working process.
 
 ID
@@ -150,7 +149,7 @@ Constraints
 Rectifier
 =========
 
-The rectifier is a connector option in FAST-OAD-CS23-HE, designed to convert Ac current to DC current.
+The rectifier is a connector option in FAST-OAD-CS23-HE, designed to convert AC current to DC current.
 Detailed documentation is still in working process.
 
 ID
@@ -173,7 +172,7 @@ Constraints
 Solid state power controller (SSPC)
 ===================================
 
-The SSPC is a connector option in FAST-OAD-CS23-HE, designed for electric power distribution for connected components.
+The SSPC is a connector option in FAST-OAD-CS23-HE, designed for electric power distribution. It can be opened as an option to disconnect a branch.
 Detailed documentation is still in working process.
 
 ID
@@ -285,8 +284,8 @@ Loads
 DC_loads
 ========
 
-The dc loads is a load option in FAST-OAD-CS23-HE, designed to consume electricity with DC current. Detailed
-documentation is still in working process.
+The DC load is a constant power load option in FAST-OAD-CS23-HE. 
+Detailed documentation is still in working process.
 
 ID
 **
@@ -305,7 +304,8 @@ Constraints
 Permanent magnet synchronous motor (PMSM)
 ==========================================
 
-The PMSM is a load option in FAST-OAD-CS23-HE, designed to provide mechanical power with consuming electricity. Detailed
+The PMSM is a load option in FAST-OAD-CS23-HE, designed to convert electrical power in mechanical power. 
+Detailed
 documentation is still in working process.
 
 ID
@@ -398,7 +398,7 @@ Constraints
 Internal combustion Engine (ICE)
 ================================
 
-The IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power with consuming Avgas or diesel.
+The IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming AvGas or Diesel.
 Detailed documentation is still in working process.
 
 ID
@@ -418,8 +418,8 @@ Constraints
 High RPM ICE
 ============
 
-The high RPM IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power with consuming Avgas or
-diesel. Detailed documentation is still in working process.
+The high RPM IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming AvGas or
+Diesel. Detailed documentation is still in working process.
 
 ID
 **
@@ -438,8 +438,8 @@ Constraints
 Proton-exchange membrane fuel cell (PEMFC)
 ==========================================
 
-The proton-exchange membrane fuel cell  is a power source option in FAST-OAD-CS23-HE, designed to provide electricity
-with consuming hydrogen. Detailed documentation can be found at :ref:`pemfc`.
+The proton-exchange membrane fuel cell is a power source option in FAST-OAD-CS23-HE, designed to provide electricity
+by consuming hydrogen. Detailed documentation can be found at :ref:`pemfc`.
 
 ID
 **
@@ -479,7 +479,7 @@ Constraints
 Turboshaft
 ==========
 
-The turboshaft engine is a power source option in FAST-OAD-CS23-HE, designed to provide power with consuming Jet-A1.
+The turboshaft engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming Jet-A1.
 Detailed documentation is still in working process.
 
 ID
@@ -503,7 +503,7 @@ Tanks
 Fuel tank
 =========
 
-The fuel tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry fuel for the flight mission. Detailed
+The fuel tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry AvGas or kerosene for the flight mission. Detailed
 documentation is still in working process.
 
 ID
