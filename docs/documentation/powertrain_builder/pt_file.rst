@@ -46,6 +46,7 @@ Some components like splitter, buses, fuel systems or gearboxes, can have multip
 those components should be defined in the PT file.
 
 .. code:: yaml
+
     gearbox_1:
     id: fastga_he.pt_component.gearbox
     position:  # Installation position
