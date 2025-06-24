@@ -43,13 +43,16 @@ Except for the components allowing multiple inputs or outputs connections, most 
 Multiple connection component
 =============================
 Some components like splitter, buses, fuel systems or gearboxes, can have multiple connections. Here is demonstrated how
-those components should be defined in the PT file.
+those components should be defined in the PT file. Unlike other components in this section, the gearbox component is
+currently limited to one input and two outputs. This will be addressed in future updates by adding configurable options
+for the number of inputs and outputs.
 
 .. code:: yaml
 
     gearbox_1:
     id: fastga_he.pt_component.gearbox
     position:  # Installation position
+    # Currently supports one input and two outputs; will be made configurable in future updates.
 
     fuel_system_1:
     id: fastga_he.pt_component.fuel_system
