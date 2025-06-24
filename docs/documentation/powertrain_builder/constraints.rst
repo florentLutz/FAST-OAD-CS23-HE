@@ -56,7 +56,7 @@ DC bus
 ======
 
 The DC bus is a connector option in FAST-OAD-CS23-HE, designed to connect DC cable harness to an electric component.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -76,8 +76,8 @@ Constraints
 DC splitter
 ===========
 
-The DC splitter is a connector option in FAST-OAD-CS23-HE, designed to connect DC cable harness to multiple electric
-components. Detailed documentation is still in working process.
+The DC splitter is a connector option in FAST-OAD-CS23-HE, designed to connect to multiple electricity sources.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -98,7 +98,7 @@ DC-DC converter
 ===============
 
 The DC-DC converter is a connector option in FAST-OAD-CS23-HE, designed to rectify voltage for connected electric components.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -126,7 +126,7 @@ Inverter
 ========
 
 The inverter is a connector option in FAST-OAD-CS23-HE, designed to convert DC current to AC current.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -150,7 +150,7 @@ Rectifier
 =========
 
 The rectifier is a connector option in FAST-OAD-CS23-HE, designed to convert AC current to DC current.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -173,7 +173,7 @@ Solid state power controller (SSPC)
 ===================================
 
 The SSPC is a connector option in FAST-OAD-CS23-HE, designed for electric power distribution. It can be opened as an option to disconnect a branch.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -193,8 +193,8 @@ Constraints
 Fuel system
 ===========
 
-The fuel system is a connector option in FAST-OAD-CS23-HE, designed for fuel distribution with multiple inlets and
-outlets. Detailed documentation is still in working process.
+The fuel system is a connector option in FAST-OAD-CS23-HE, designed for fuel distribution with multiple inlets and outlets.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -207,8 +207,8 @@ ID
 Hydrogen fuel system
 ====================
 
-The hydrogen fuel system is a connector option in FAST-OAD-CS23-HE, designed for hydrogen distribution with multiple
-inlets and outlets. Detailed documentation can be found at :ref:`h2-fuel-system`.
+The hydrogen fuel system is a connector option in FAST-OAD-CS23-HE, designed for hydrogen distribution with multiple inlets and outlets.
+Detailed documentation can be found at :ref:`h2-fuel-system`.
 
 ID
 **
@@ -221,7 +221,7 @@ Gearbox
 =======
 
 The gearbox is a connector option in FAST-OAD-CS23-HE, designed to transmit mechanical power between multiple components.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -240,8 +240,8 @@ Constraints
 Planetary gear
 ==============
 
-The planetary gear is a connector option in FAST-OAD-CS23-HE, designed to mechanical power between multiple components.
-Detailed documentation is still in working process.
+The planetary gear is a connector option in FAST-OAD-CS23-HE, designed to distribute mechanical power between multiple components.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -261,7 +261,7 @@ Speed reducer
 =============
 
 The speed reducer is a connector option in FAST-OAD-CS23-HE, designed to reduce RPM with increasing torque output.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -285,7 +285,7 @@ DC_loads
 ========
 
 The DC load is a constant power load option in FAST-OAD-CS23-HE. 
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -306,7 +306,7 @@ Permanent magnet synchronous motor (PMSM)
 
 The PMSM is a load option in FAST-OAD-CS23-HE, designed to convert electrical power in mechanical power. 
 Detailed
-documentation is still in working process.
+documentation is still a work in progress.
 
 ID
 **
@@ -332,7 +332,7 @@ Propeller
 =========
 
 The propeller is a propulsor option in FAST-OAD-CS23-HE, designed to provide thrust for the aircraft. Detailed
-documentation is still in working process.
+documentation is still a work in progress.
 
 ID
 **
@@ -357,7 +357,7 @@ Battery
 =======
 
 The battery is a power source option in FAST-OAD-CS23-HE, designed to provide electricity. Detailed documentation is
-still in working process.
+still a work in progress.
 
 ID
 **
@@ -377,7 +377,7 @@ Generator
 =========
 
 The generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from a mechanical power
-source. Detailed documentation is still in working process.
+source. Detailed documentation is still a work in progress.
 
 ID
 **
@@ -399,7 +399,7 @@ Internal combustion Engine (ICE)
 ================================
 
 The IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming AvGas or Diesel.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -419,7 +419,7 @@ High RPM ICE
 ============
 
 The high RPM IC engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming AvGas or
-Diesel. Detailed documentation is still in working process.
+Diesel. Detailed documentation is still a work in progress.
 
 ID
 **
@@ -460,7 +460,7 @@ Simple turbo generator
 ======================
 
 The simple turbo generator is a power source option in FAST-OAD-CS23-HE, designed to provide electricity from turboshaft
-engine. Detailed documentation is still in working process.
+engine. Detailed documentation is still a work in progress.
 
 ID
 **
@@ -480,7 +480,7 @@ Turboshaft
 ==========
 
 The turboshaft engine is a power source option in FAST-OAD-CS23-HE, designed to provide power by consuming Jet-A1.
-Detailed documentation is still in working process.
+Detailed documentation is still a work in progress.
 
 ID
 **
@@ -504,7 +504,7 @@ Fuel tank
 =========
 
 The fuel tank is a storage tank option in FAST-OAD-CS23-HE, designed to carry AvGas or kerosene for the flight mission. Detailed
-documentation is still in working process.
+documentation is still a work in progress.
 
 ID
 **
