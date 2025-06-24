@@ -43,8 +43,7 @@ Except for the components allowing multiple inputs or outputs connections, most 
 Multiple connection component
 =============================
 Some components like splitter, buses, fuel systems or gearboxes, can have multiple connections. Here is demonstrated how
-those components should be defined in the PT file. For the `gearbox` and `speed_reducer` components, the number of input
-and output connections does not need to be specified — this is automatically handled by the powertrain builder.
+those components should be defined in the PT file.
 
 .. code:: yaml
     gearbox_1:
