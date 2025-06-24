@@ -50,10 +50,6 @@ those components should be defined in the PT file.
     id: fastga_he.pt_component.gearbox
     position:  # Installation position
 
-    speed_reducer_1:
-    id: fastga_he.pt_component.speed_reducer
-    position:  # Installation position
-
     fuel_system_1:
     id: fastga_he.pt_component.fuel_system
     options:
