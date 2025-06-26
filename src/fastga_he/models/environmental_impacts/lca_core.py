@@ -851,8 +851,12 @@ class LCACore(om.ExplicitComponent):
         methods = self.options["impact_assessment_method"]
 
         power_train_file_path = self.options["power_train_file_path"]
+
+        # For the rest of the operations to work, power_train_file_path must be a pathlib Path.
+        # By default, FAST-OAD will return file path in option as posix
         if type(power_train_file_path) is str:
             power_train_file_path = pathlib.Path(power_train_file_path)
+
         parent_folder = power_train_file_path.parents[0]
         power_train_file_name = power_train_file_path.name
         project_name = power_train_file_name.replace(".yml", "")
