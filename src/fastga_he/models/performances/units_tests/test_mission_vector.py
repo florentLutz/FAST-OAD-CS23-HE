@@ -3163,3 +3163,37 @@ def test_payload_range_inner_with_builtin_sampling():
         ],
         abs=1.0,
     )
+
+
+def test_mission_vector_atr_42():
+    # Define used files depending on options
+    xml_file_name = "atr42_retrofit.xml"
+    process_file_name = "atr42_retrofit.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Create problems with inputs
+    problem = configurator.get_problem()
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.setup()
+
+    #problem.set_val("data:weight:aircraft:MTOW", units="kg", val=15000.0)
+    # problem.set_val("data:weight:aircraft:OWE", units="kg", val=10000.0)
+    problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=10855.697082198)
+    problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.114459353773869)
+    #problem.set_val("data:weight:aircraft:MZFW", units="kg", val=13000.0)
+    #problem.set_val("data:weight:aircraft:MLW", units="kg", val=14000.0)
+
+    # om.n2(problem, show_browser=True)
+
+    problem.run_model()
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)

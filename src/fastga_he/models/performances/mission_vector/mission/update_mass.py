@@ -77,6 +77,7 @@ class UpdateMass(om.ExplicitComponent):
         # point of the mass vector is gonna be a t the very start of climb which means the first
         # kg of fuel will not have been consumed. Only the fuel for taxi out, takeoff and initial
         # climb is considered
+        a = inputs["fuel_consumed_t"][:-1]
         outputs["mass"] = (
             np.full(number_of_points, mtow)
             - fuel_taxi_out
@@ -84,3 +85,4 @@ class UpdateMass(om.ExplicitComponent):
             - fuel_initial_climb
             - np.cumsum(np.concatenate((np.zeros(1), inputs["fuel_consumed_t"][:-1])))
         )
+

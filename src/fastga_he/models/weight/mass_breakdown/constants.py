@@ -3,3 +3,4 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 SUBMODEL_MZFW_MLW = "submodel.weight.mass.mzfw_and_mlw"
+SERVICE_PROPULSION_MASS = "service.mass.propulsion"

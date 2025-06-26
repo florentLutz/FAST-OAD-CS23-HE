@@ -36,8 +36,8 @@ class PerformancesDCSSPCCurrent(om.ExplicitComponent):
             "dc_current_in",
             val=np.full(number_of_points, 400.0),
             units="A",
-            lower=-1000.0,
-            upper=1000.0,
+            lower=-2000.0,
+            upper=2000.0,
         )
 
         if self.options["closed"]:

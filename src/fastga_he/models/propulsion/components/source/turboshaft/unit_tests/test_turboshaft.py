@@ -71,22 +71,22 @@ NB_POINTS_TEST = 10
 def test_fuel_consumption_pw206b():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating", units="kW", val=308
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating", units="kW", val=1350
     )
     ivc.add_output(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:T41t",
         units="degK",
-        val=1400.0,
+        val=1526.0,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR", val=8.0
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR", val=14.7
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:power_ratio", val=1.56
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:power_ratio", val=1.2
     )
     ivc.add_output("density_ratio", val=1.0)
     ivc.add_output("mach", val=0.01)
-    ivc.add_output("power_required", val=308, units="kW")
+    ivc.add_output("power_required", val=1350, units="kW")
 
     problem = run_system(
         PerformancesTurboshaftFuelConsumption(turboshaft_id="turboshaft_1", number_of_points=1),
@@ -97,7 +97,7 @@ def test_fuel_consumption_pw206b():
         problem.get_val("fuel_consumption", units="lb/h")[0]
         / problem.get_val("power_required", units="hp")[0]
     )
-    print("k_sfc:", 0.548 / sfc)
+    print("k_sfc:", 0.470/ sfc)
     # Should be 0.548
 
 

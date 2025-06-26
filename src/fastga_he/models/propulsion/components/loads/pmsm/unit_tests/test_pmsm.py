@@ -704,7 +704,7 @@ def test_performance_pmsm():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesPMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
 
-    # om.n2(problem)
+    om.n2(problem)
 
     assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
         [56.1, 62.4, 68.3, 73.9, 79.2, 84.2, 89.0, 93.4, 97.7, 101.7], rel=1e-2

@@ -1,0 +1,125 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2022 ISAE-SUPAERO
+
+import openmdao.api as om
+
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_diameter_scaling import (
+    SizingMotorDiameterScaling,
+)
+from .sizing_diameter import SizingMotorDiameter
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_length_scaling import (
+    SizingMotorLengthScaling,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_length import (
+    SizingMotorLength,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_weight import (
+    SizingMotorWeight,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_resistance_scaling import (
+    SizingMotorPhaseResistanceScaling,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_resistance import (
+    SizingMotorPhaseResistance,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_torque_constant_scaling import (
+    SizingMotorTorqueConstantScaling,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_torque_constant import (
+    SizingMotorTorqueConstant,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_loss_coefficient_scaling import (
+    SizingMotorLossCoefficientScaling,
+)
+from fastga_he.models.propulsion.components.loads.pmsm.pmsm_new_model.unused_modules.sizing_loss_coefficient import (
+    SizingMotorLossCoefficient,
+)
+from .sizing_pmsm_cg_x import SizingPMSMCGX
+from .sizing_pmsm_cg_y import SizingPMSMCGY
+from .sizing_pmsm_drag import SizingPMSMDrag
+from .cstr_pmsm import ConstraintsPMSM
+
+from ..constants import POSSIBLE_POSITION
+
+
+class SizingPMSM(om.Group):
+    def initialize(self):
+        self.options.declare(
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+        )
+
+        self.options.declare(
+            name="position",
+            default="on_the_wing",
+            values=POSSIBLE_POSITION,
+            desc="Option to give the position of the pmsm, possible position include "
+            + ", ".join(POSSIBLE_POSITION),
+            allow_none=False,
+        )
+
+    def setup(self):
+        motor_id = self.options["motor_id"]
+        position = self.options["position"]
+
+        self.add_subsystem(
+            name="constraints_pmsm",
+            subsys=ConstraintsPMSM(motor_id=motor_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "diameter_scaling", SizingMotorDiameterScaling(motor_id=motor_id), promotes=["data:*"]
+        )
+        self.add_subsystem("diameter", SizingMotorDiameter(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem(
+            "length_scaling", SizingMotorLengthScaling(motor_id=motor_id), promotes=["data:*"]
+        )
+        self.add_subsystem("length", SizingMotorLength(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem("weight", SizingMotorWeight(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem(
+            "resistance_scaling",
+            SizingMotorPhaseResistanceScaling(motor_id=motor_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "resistance", SizingMotorPhaseResistance(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "torque_constant_scaling",
+            SizingMotorTorqueConstantScaling(motor_id=motor_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "torque_constant", SizingMotorTorqueConstant(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "loss_coefficients_scaling",
+            SizingMotorLossCoefficientScaling(motor_id=motor_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "loss_coefficients", SizingMotorLossCoefficient(motor_id=motor_id), promotes=["data:*"]
+        )
+        self.add_subsystem(
+            "pmsm_cg_x", SizingPMSMCGX(motor_id=motor_id, position=position), promotes=["data:*"]
+        )
+        self.add_subsystem(
+            "pmsm_cg_y", SizingPMSMCGY(motor_id=motor_id, position=position), promotes=["data:*"]
+        )
+        for low_speed_aero in [True, False]:
+            system_name = "pmsm_drag_ls" if low_speed_aero else "pmsm_drag_cruise"
+            self.add_subsystem(
+                name=system_name,
+                subsys=SizingPMSMDrag(
+                    motor_id=motor_id,
+                    position=position,
+                    low_speed_aero=low_speed_aero,
+                ),
+                promotes=["*"],
+            )

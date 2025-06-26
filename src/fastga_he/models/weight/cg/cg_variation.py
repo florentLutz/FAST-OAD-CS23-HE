@@ -40,7 +40,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         self.add_input("data:geometry:cabin:seats:passenger:length", val=np.nan, units="m")
         self.add_input("data:geometry:cabin:seats:passenger:count_by_row", val=np.nan)
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
-        self.add_input("data:weight:aircraft_empty:mass", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
         self.add_input(
             "settings:weight:aircraft:payload:design_mass_per_passenger",
@@ -57,13 +57,13 @@ class InFlightCGVariation(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-            wrt=["data:weight:aircraft:payload", "data:weight:aircraft_empty:mass"],
+            wrt=["data:weight:aircraft:payload", "data:weight:aircraft:OWE"],
             val=1.0,
         )
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             wrt=[
-                "data:weight:aircraft_empty:mass",
+                "data:weight:aircraft:OWE",
                 "data:weight:aircraft_empty:CG:x",
                 "data:weight:aircraft:payload",
             ],
@@ -93,7 +93,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         l_pass_seat = inputs["data:geometry:cabin:seats:passenger:length"]
         design_mass_p_pax = inputs["settings:weight:aircraft:payload:design_mass_per_passenger"]
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
-        m_empty = inputs["data:weight:aircraft_empty:mass"]
+        m_empty = inputs["data:weight:aircraft:OWE"]
         lav = inputs["data:geometry:fuselage:front_length"]
         payload = inputs["data:weight:aircraft:payload"]
 
@@ -121,12 +121,12 @@ class InFlightCGVariation(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-            "data:weight:aircraft_empty:mass",
+            "data:weight:aircraft:OWE",
         ] = inputs["data:weight:aircraft_empty:CG:x"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft_empty:CG:x",
-        ] = inputs["data:weight:aircraft_empty:mass"]
+        ] = inputs["data:weight:aircraft:OWE"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft:payload",
@@ -142,7 +142,7 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
 
     def setup(self):
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
-        self.add_input("data:weight:aircraft_empty:mass", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:payload:CG:x", val=np.nan, units="m")
 
@@ -154,13 +154,13 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-            wrt=["data:weight:aircraft:payload", "data:weight:aircraft_empty:mass"],
+            wrt=["data:weight:aircraft:payload", "data:weight:aircraft:OWE"],
             val=1.0,
         )
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             wrt=[
-                "data:weight:aircraft_empty:mass",
+                "data:weight:aircraft:OWE",
                 "data:weight:aircraft_empty:CG:x",
                 "data:weight:aircraft:payload",
                 "data:mission:sizing:payload:CG:x",
@@ -169,7 +169,7 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        m_empty = inputs["data:weight:aircraft_empty:mass"]
+        m_empty = inputs["data:weight:aircraft:OWE"]
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
 
         payload = inputs["data:weight:aircraft:payload"]
@@ -186,7 +186,7 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-            "data:weight:aircraft_empty:mass",
+            "data:weight:aircraft:OWE",
         ] = inputs["data:weight:aircraft_empty:CG:x"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",

@@ -22,12 +22,12 @@ model:
         aerodynamics_lowspeed:
             id: fastga.aerodynamics.lowspeed.legacy
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            result_folder_path: D:/tmp
+            result_folder_path: ../workdir
             use_openvsp: false
         aerodynamics_highspeed:
             id: fastga.aerodynamics.highspeed.legacy
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            result_folder_path: D:/tmp
+            result_folder_path: ../workdir
             compute_mach_interpolation: false
             use_openvsp: false
         power_train_sizing:
@@ -59,6 +59,11 @@ model:
             id: fastga.loop.wing_position
         wing_area:
             id: fastga.loop.wing_area
+
+    environmental_impact:
+        id: fastga_he.environmental.energy_simple
+        mission: design
+        electricity_mix: europe
 
 submodels:
     submodel.weight.mass.payload: null

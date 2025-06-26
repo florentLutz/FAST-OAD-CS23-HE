@@ -39,7 +39,7 @@ class PerformancesModuleCRate(om.ExplicitComponent):
 
         self.add_input("current_one_module", units="A", val=np.full(number_of_points, np.nan))
 
-        # Weirdly enough, this will be a output of a performance module, it does not really make
+        # Weirdly enough, this will be an output of a performance module, it does not really make
         # sense to create a component in sizing that just outputs this value based on an option
         self.add_output(
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity",

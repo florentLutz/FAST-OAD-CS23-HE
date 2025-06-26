@@ -1,0 +1,119 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/problem_inputs.xml
+output_file: ../results/problem_outputs.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+# Definition of OpenMDAO model
+# Although "model" is a mandatory name for the top level of the model, its
+# sub-components can be freely named by user
+model:
+
+  #  Solvers are defined assuming the OpenMDAO convention "import openmdao.api as om"
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=300, rtol=1e-2)
+  linear_solver: om.DirectSolver()
+
+
+  # Components can be put in sub-groups
+  subgroup:
+
+    # A group can be set with its own solvers.
+    # Uncomment the 2 next lines for using the performance module with "mission_file_path: ::sizing_mission"
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=300, rtol=1e-2, iprint=2)
+    linear_solver: om.DirectSolver()
+
+    geometry:
+      id: fastoad.geometry.legacy
+    propeller:
+      id: rta.propulsion.propeller_sizing
+    weight:
+      id: fastoad.weight.legacy
+      payload_from_npax: false
+    mtow:
+      id: fastoad.mass_performances.compute_MTOW
+    aerodynamics_highspeed:
+      id: fastoad.aerodynamics.highspeed.legacy
+    aerodynamics_lowspeed:
+      id: fastoad.aerodynamics.lowspeed.legacy
+    aerodynamics_takeoff:
+      id: rta.aerodynamics.takeoff
+    hq_tail_sizing:
+      id: fastoad.handling_qualities.tail_sizing
+    hq_static_margin:
+      id: fastoad.handling_qualities.static_margin
+    wing_position:
+      id: fastoad.loop.wing_position
+    wing_area:
+      id: fastoad.loop.wing_area
+
+    change_input:
+      id: fastga_he.correct_input2
+
+#    pt_mass:
+#      id: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+    performances:
+      id: fastga_he.performances.mission_vector
+      number_of_points_climb: 30
+      number_of_points_cruise: 30
+      number_of_points_descent: 20
+      number_of_points_reserve: 10
+      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\ATR42_assembly_hybridPT.yml
+      out_file: ../results/fuel_propulsion.csv
+      use_linesearch: False
+      pre_condition_pt: True
+      use_apply_nonlinear: True
+    power_train_sizing:
+      id: fastga_he.power_train.sizing
+      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\ATR42_assembly_hybridPT.yml
+#  engine_size:
+#    id: rta.loop.engine_size
+
+submodels:
+  service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.as_float
+  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.as_float
+  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.as_float
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+  service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.new
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.fixed
+  submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
+  submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed
+  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
+#  service.performances.delta_m: fastga_he.submodel.performances.delta_m.tanh
+  submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
+  submodel.propulsion.dc_dc_converter.inductor.inductance: null
+#  submodel.performances.mission_vector.climb_speed: null
+#  submodel.performances.mission_vector.descent_speed: null
+  submodel.propulsion.dc_dc_converter.weight: null
+#  service.aerodynamics.CD0.fuselage: rta.submodel.aerodynamics.CD0.fuselage
+#  service.aerodynamics.CD0.wing: rta.submodel.aerodynamics.CD0.wing
+#  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.as_float"
+#  service.aerodynamics.CD0.nacelles_pylons: rta.submodel.aerodynamics.CD0.nacelles
+#  service.aerodynamics.CD0.sum: rta.submodel.aerodynamics.CD0.sum
+#  service.aerodynamics.induced_drag_coefficient: fastoad.submodel.aerodynamics.induced_drag_coefficient.legacy
+#  service.geometry.fuselage.basic: rta.submodel.geometry.fuselage.basic
+#  service.geometry.fuselage.with_cabin_sizing: rta.submodel.geometry.fuselage.with_cabin_sizing
+#  service.geometry.wing: rta.submodel.geometry.wing
+#  service.geometry.nacelle_and_pylon: rta.submodel.geometry.nacelles
+#  service.cg.wing.control_surfaces: rta.submodel.cg.wing.control_surfaces.legacy
+
+#optimization: # This section is needed only if optimization process is run
+ # design_variables:
+ #   - name: data:geometry:wing:aspect_ratio
+  #    lower: 9.0
+  #    upper: 18.0
+ # constraints:
+ #   - name: data:geometry:wing:span
+ #     upper: 60.0
+ # objective:
+ #   - name: data:mission:sizing:needed_block_fuel
+  #    scaler: 1.e-4
