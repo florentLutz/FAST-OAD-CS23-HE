@@ -17,6 +17,7 @@ from fastga_he.models.propulsion.assemblers.constants import (
 from fastga_he.models.propulsion.assemblers.fuel_cg_from_pt_file import FuelCGFromPTFile
 
 ENERGY_CONSUMPTION_FROM_PT_FILE = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = ENERGY_CONSUMPTION_FROM_PT_FILE
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_ENERGY_CONSUMPTION, ENERGY_CONSUMPTION_FROM_PT_FILE)

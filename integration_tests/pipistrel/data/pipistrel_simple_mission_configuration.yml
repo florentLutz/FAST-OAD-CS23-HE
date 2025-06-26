@@ -24,7 +24,6 @@ model:
     use_apply_nonlinear: True
 
 submodels:
-  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
   submodel.performances.mission_vector.climb_speed: null
   submodel.performances.mission_vector.descent_speed: null

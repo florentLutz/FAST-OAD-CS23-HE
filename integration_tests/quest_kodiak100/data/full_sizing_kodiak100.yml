@@ -75,7 +75,6 @@ submodels:
     service.geometry.vertical_tail.distance.fd: null
     submodel.performances.mission_vector.descent_speed: null
     submodel.performances.mission_vector.climb_speed: null
-    submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
     submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
     submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
     service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
