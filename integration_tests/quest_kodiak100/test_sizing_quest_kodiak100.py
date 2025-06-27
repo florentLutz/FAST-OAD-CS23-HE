@@ -7,6 +7,8 @@ import os.path as pth
 from shutil import rmtree
 import logging
 
+import copy
+
 import pytest
 
 import numpy as np
@@ -21,7 +23,12 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
 RESULTS_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity")
-RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity_full_sizing")
+RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH = pth.join(
+    pth.dirname(__file__), "results_sensitivity_full_sizing"
+)
+RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_2 = pth.join(
+    pth.dirname(__file__), "results_sensitivity_full_sizing_2"
+)
 
 
 @pytest.fixture(scope="module")
@@ -417,6 +424,74 @@ def test_full_sizing_hybrid_kodiak_100():
         problem.write_outputs()
 
 
+def test_full_sizing_hybrid_kodiak_100_20_pecent_renewal():
+    """Test the overall aircraft design process with wing positioning on the hybrid K100."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_full_sizing_hybrid_kodiak.xml"
+    process_file_name = "full_sizing_hybrid_kodiak.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # Change battery pack characteristics so that they match those of a high power,
+    # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
+    # Pipistrel battery. Assumes same polarization curve. And we'll take the same aging model
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=30.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:end_of_life_relative_capacity_loss",
+        val=0.2,
+        units="unitless",
+    )
+    problem.set_val("data:weight:aircraft:MTOW", val=3000.0, units="kg")
+    problem.set_val("data:geometry:wing:area", val=22.5, units="m**2")
+
+    soc_start_array = np.linspace(100.0, 60.0, 20)
+    for soc_start in soc_start_array:
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+            units="percent",
+            val=soc_start,
+        )
+
+        problem.run_model()
+
+        problem.output_file_path = pth.join(
+            RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_2,
+            str(int(soc_start)) + "_soc_start_out.xml",
+        )
+        problem.write_outputs()
+
+
 def test_post_process_results_full_sizing():
     fig = go.Figure()
 
@@ -426,8 +501,11 @@ def test_post_process_results_full_sizing():
 
     generic_list = []
 
-    for file in os.listdir(RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH):
-        datafile = oad.DataFile(pth.join(RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH, file))
+    sensitivity_study = RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_2
+    # or RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH
+
+    for file in os.listdir(sensitivity_study):
+        datafile = oad.DataFile(pth.join(sensitivity_study, file))
         socs_start_mission.append(
             datafile[
                 "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start"
