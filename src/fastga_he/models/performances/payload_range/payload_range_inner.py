@@ -1,25 +1,17 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
 
-import fastoad.api as oad
-
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,
 )
-from fastga_he.models.performances.mission_vector.constants import (
-    HE_SUBMODEL_ENERGY_CONSUMPTION,
-    HE_SUBMODEL_DEP_EFFECT,
-)
-
 from .payload_range import zip_op_mission_input
 
-# Need to fill the vector with an specific value in case the requested payload range point is
+# Need to fill the vector with a specific value in case the requested payload range point is
 # outside the bound (Can happen when we use the sampling from a different aircraft). Can't  use
 # nan or else it will be detected by OpenMDAO
 INVALID_COMPUTATION_RESULT = -1.0
@@ -47,15 +39,6 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
         )
 
     def setup(self):
-        # I'm not really happy with doing it here, but for that model to work we need to ensure
-        # those submodels are active
-        oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
-            "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-        )
-        oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
-            "fastga_he.submodel.performances.dep_effect.from_pt_file"
-        )
-
         self.configurator.load(self.options["power_train_file_path"])
 
         self._input_zip = zip_op_mission_input(self.options["power_train_file_path"])

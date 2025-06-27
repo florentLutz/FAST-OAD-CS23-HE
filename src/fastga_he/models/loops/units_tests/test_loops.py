@@ -2,7 +2,7 @@
 test module for wing area computation.
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +24,7 @@ import fastoad.api as oad
 from numpy.testing import assert_allclose
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
-from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
+from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION, HE_SUBMODEL_DEP_EFFECT
 
 from ..wing_area_component.wing_area_cl_dep_equilibrium import (
     UpdateWingAreaLiftDEPEquilibrium,
@@ -45,6 +45,9 @@ def test_advanced_cl():
 
     oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
         "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+        "fastga_he.submodel.performances.dep_effect.none"
     )
 
     inputs_list = list_inputs(
@@ -95,13 +98,6 @@ def test_advanced_cl_with_proper_submodels_turboshaft():
     xml_file = "kodiak_100.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "turboshaft_propulsion.yml")
 
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
-
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
@@ -128,13 +124,6 @@ def test_advanced_cl_with_proper_submodels_turboshaft():
 def test_advanced_cl_with_proper_submodels():
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
-
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
 
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
@@ -201,13 +190,6 @@ def test_advanced_cl_octo_propulsion():
     xml_file = "octo_assembly.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "octo_assembly.yml")
 
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
-
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
@@ -263,13 +245,6 @@ def test_advanced_cl_octo_propulsion():
 def test_advanced_cl_group():
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
-
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
 
     inputs_list = list_inputs(
         UpdateWingAreaGroupDEP(

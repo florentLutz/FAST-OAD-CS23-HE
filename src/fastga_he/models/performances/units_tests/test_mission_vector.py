@@ -2,7 +2,7 @@
 Test mission vector module.
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -2151,9 +2151,6 @@ def test_recording():
     )
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.generator.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
     )
 
     # Define used files depending on options
