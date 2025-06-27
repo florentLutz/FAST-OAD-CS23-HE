@@ -49,6 +49,7 @@ submodels:
   submodel.performances.mission_vector.climb_speed: null
   service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.analytical
   service.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
