@@ -50,7 +50,8 @@ model:
     wing_position:
       id: fastoad.loop.wing_position
     wing_area:
-      id: fastoad.loop.wing_area
+      id: fastga_he.loop.wing_area
+      power_train_file_path: ecopulse_powertrain_new_wing.yml
 
     change_input:
       id: fastga_he.correct_input2

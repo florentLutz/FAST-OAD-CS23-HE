@@ -89,7 +89,7 @@ class SetValue2(om.ExplicitComponent):
 
         outputs["data:mission:sizing:main_route:climb:climb_rate:sea_level"] = 9.0
 
-        outputs["data:mission:sizing:main_route:descent:descent_rate"] = -7.62 #* 1. / 3.
+        outputs["data:mission:sizing:main_route:descent:descent_rate"] = -7.62 * 2. / 3.
 
         outputs["data:geometry:horizontal_tail:elevator_chord_ratio"] = 0.384
 

@@ -69,10 +69,10 @@ power_train_components:
 
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
-    position: in_the_front  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
   battery_pack_2:
     id: fastga_he.pt_component.battery_pack
-    position: in_the_front  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
 
 
 
@@ -157,4 +157,4 @@ component_connections:
   - source: dc_dc_converter_2
     target: battery_pack_2
 
-watcher_file_path: ../results/pipistrel_power_train_data.csv
+watcher_file_path: ../results/atr42_power_train_data.csv

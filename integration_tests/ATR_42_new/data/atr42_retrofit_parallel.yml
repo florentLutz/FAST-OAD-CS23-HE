@@ -15,7 +15,7 @@ model:
   linear_solver: om.LinearBlockGS()
   power_train_sizing:
     id: fastga_he.power_train.sizing
-    power_train_file_path: ATR42_assembly_hybridPT_otherpositiongearbox.yml
+    power_train_file_path: ATR42_assembly_hybridPT.yml
 
   performances:
     id: fastga_he.performances.mission_vector
@@ -23,7 +23,7 @@ model:
     number_of_points_cruise: 30
     number_of_points_descent: 20
     number_of_points_reserve: 10
-    power_train_file_path: ATR42_assembly_hybridPT_otherpositiongearbox.yml
+    power_train_file_path: ATR42_assembly_hybridPT.yml
     use_linesearch: False
     pre_condition_pt: True
     out_file: ../results/hybrid_atr42_retrofit.csv
@@ -79,4 +79,3 @@ submodels:
   submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
   submodel.weight.mass.mzfw_and_mlw: null
 #  submodel.performances.cg_variation: fastga_he.submodel.performances.cg_variation.simple
-  submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.ensure
