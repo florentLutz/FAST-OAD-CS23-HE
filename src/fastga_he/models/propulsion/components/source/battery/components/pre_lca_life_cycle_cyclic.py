@@ -25,6 +25,12 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input(
+            name="number_of_cycles",
+            val=np.nan,
+            units="unitless",
+            desc="Number of cycle at which to evaluate capacity loss",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":aging:cyclic_effect_DOD",
@@ -49,21 +55,12 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             units="degK",
             desc="Time step averaged temperature of the cell during the mission",
         )
-        self.add_input(
-            name="data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":end_of_life_relative_capacity_loss",
-            val=0.4,
-            units="unitless",
-            desc="Relative capacity loss criteria for deciding of battery end of life",
-        )
 
         self.add_output(
-            name="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
-            val=500.0,
+            name="capacity_loss_cyclic",
+            val=0.2,
             units="unitless",
-            desc="Expected lifetime of the battery pack, expressed in cycles. Default value is the "
-            "number of cycle required for the reference cell to reach 60% nominal capacity",
+            desc="Capacity lost due to cyclic aging",
         )
 
     def setup_partials(self):
@@ -87,19 +84,11 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:cyclic_effect_k_factor"
         ]
-        relative_capacity_loss_eol = inputs[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":end_of_life_relative_capacity_loss"
-        ]
+        n_cycles = inputs["number_of_cycles"]
 
-        life_cycle = (
-            relative_capacity_loss_eol / f_dod / np.exp(-4345 / avg_temperature) / k_factor
-        ) ** 2.0
+        relative_capacity_loss = k_factor * f_dod * np.exp(-4345 / avg_temperature) * n_cycles**0.5
 
-        outputs["data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan"] = (
-            life_cycle
-        )
+        outputs["capacity_loss_cyclic"] = relative_capacity_loss
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
@@ -119,52 +108,33 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:cyclic_effect_k_factor"
         ]
-        relative_capacity_loss_eol = inputs[
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":end_of_life_relative_capacity_loss"
-        ]
+        n_cycles = inputs["number_of_cycles"]
 
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
+            "capacity_loss_cyclic",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":aging:cyclic_effect_DOD",
-        ] = (
-            -2.0
-            * (relative_capacity_loss_eol / np.exp(-4345 / avg_temperature) / k_factor) ** 2.0
-            / f_dod**3.0
-        )
+        ] = k_factor * np.exp(-4345 / avg_temperature) * n_cycles**0.5
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
-            "data:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":aging:cyclic_effect_k_factor",
-        ] = (
-            -2.0
-            * (relative_capacity_loss_eol / np.exp(-4345 / avg_temperature) / f_dod) ** 2.0
-            / k_factor**3.0
-        )
-        partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
+            "capacity_loss_cyclic",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":average_cell_temperature",
         ] = (
-            -2.0
-            * (relative_capacity_loss_eol / k_factor / f_dod) ** 2.0
-            / np.exp(-4345 / avg_temperature) ** 3.0
+            k_factor
+            * f_dod
             * np.exp(-4345 / avg_temperature)
-            * 4345.0
+            * n_cycles**0.5
+            * 4345
             / avg_temperature**2.0
         )
         partials[
-            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
+            "capacity_loss_cyclic",
             "data:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
-            + ":end_of_life_relative_capacity_loss",
-        ] = (
-            2.0
-            * (1.0 / f_dod / np.exp(-4345 / avg_temperature) / k_factor) ** 2.0
-            * relative_capacity_loss_eol
+            + ":aging:cyclic_effect_k_factor",
+        ] = f_dod * np.exp(-4345 / avg_temperature) * n_cycles**0.5
+        partials["capacity_loss_cyclic", "number_of_cycles"] = (
+            0.5 * k_factor * f_dod * np.exp(-4345 / avg_temperature) * n_cycles**-0.5
         )

@@ -6,9 +6,8 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
-from .pre_lca_depth_of_discharge import PreLCABatteryDepthOfDischarge
-from .pre_lca_cyclic_aging_dod_effect import PreLCABatteryCyclicAgingDODEffect
-from .pre_lca_life_cycle_cyclic import PreLCABatteryCyclicAging
+from .pre_lca_capacity_loss import PreLCABatteryCapacityLoss
+from .pre_lca_distance_to_target_loss import PreLCABatteryDistanceToTargetCapacityLoss
 
 from ..constants import SERVICE_BATTERY_LIFESPAN
 
@@ -24,6 +23,16 @@ class PreLCABatteryAging(om.Group):
     Group that contain all the model pertaining to the battery aging model
     """
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Solvers setup
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.options["iprint"] = 2
+        self.nonlinear_solver.options["maxiter"] = 200
+        self.nonlinear_solver.options["rtol"] = 1e-3
+        self.linear_solver = om.DirectSolver()
+
     def initialize(self):
         self.options.declare(
             name="battery_pack_id",
@@ -36,17 +45,19 @@ class PreLCABatteryAging(om.Group):
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_subsystem(
-            name="depth_of_discharge",
-            subsys=PreLCABatteryDepthOfDischarge(battery_pack_id=battery_pack_id),
-            promotes=["*"],
+            name="capacity_loss",
+            subsys=PreLCABatteryCapacityLoss(battery_pack_id=battery_pack_id),
+            promotes=[
+                "data:*",
+                "capacity_loss_total",
+                (
+                    "number_of_cycles",
+                    "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
+                ),
+            ],
         )
         self.add_subsystem(
-            name="dod_effect",
-            subsys=PreLCABatteryCyclicAgingDODEffect(battery_pack_id=battery_pack_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="cyclic_aging",
-            subsys=PreLCABatteryCyclicAging(battery_pack_id=battery_pack_id),
+            name="distance_to_target",
+            subsys=PreLCABatteryDistanceToTargetCapacityLoss(battery_pack_id=battery_pack_id),
             promotes=["*"],
         )

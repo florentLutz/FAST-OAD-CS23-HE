@@ -29,14 +29,15 @@ class PreLCABatteryPack(om.Group):
     def setup(self):
         battery_pack_id = self.options["battery_pack_id"]
 
-        options_dict = {"battery_pack_id": battery_pack_id}
-        self.add_subsystem(
-            name="battery_life_cycle",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SERVICE_BATTERY_LIFESPAN, options=options_dict
-            ),
-            promotes=["*"],
-        )
+        if oad.RegisterSubmodel.active_models[SERVICE_BATTERY_LIFESPAN]:
+            options_dict = {"battery_pack_id": battery_pack_id}
+            self.add_subsystem(
+                name="battery_life_cycle",
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SERVICE_BATTERY_LIFESPAN, options=options_dict
+                ),
+                promotes=["data:*"],
+            )
 
         self.add_subsystem(
             name="weight_per_fu",
