@@ -30,8 +30,9 @@ class PreLCABatteryAging(om.Group):
         # Solvers setup
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
         self.nonlinear_solver.options["iprint"] = 2
-        self.nonlinear_solver.options["maxiter"] = 200
+        self.nonlinear_solver.options["maxiter"] = 10
         self.nonlinear_solver.options["rtol"] = 1e-3
+        self.nonlinear_solver.options["atol"] = 1e-3
         self.linear_solver = om.DirectSolver()
 
     def initialize(self):
@@ -46,11 +47,11 @@ class PreLCABatteryAging(om.Group):
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_subsystem(
-            name="capacity_loss",
+            # Because of promotions shenanigans I'm too lazy to solve, I kinda need to do this.
+            name=battery_pack_id + "_capacity_loss",
             subsys=PreLCABatteryCapacityLoss(battery_pack_id=battery_pack_id),
             promotes=[
                 "data:*",
-                "capacity_loss_total",
                 (
                     "number_of_cycles",
                     "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":lifespan",
@@ -60,5 +61,10 @@ class PreLCABatteryAging(om.Group):
         self.add_subsystem(
             name="distance_to_target",
             subsys=PreLCABatteryDistanceToTargetCapacityLoss(battery_pack_id=battery_pack_id),
-            promotes=["*"],
+            promotes=["data:*"],
+        )
+
+        self.connect(
+            battery_pack_id + "_capacity_loss.capacity_loss_total",
+            "distance_to_target.capacity_loss_total",
         )

@@ -90,7 +90,8 @@ class PreLCABatteryCalendarAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:calendar_effect_k_factor"
         ]
-        n_cycles = inputs["number_of_cycles"]
+        # Safeguard
+        n_cycles = np.maximum(inputs["number_of_cycles"], 100)
         time_btw_cycle = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":time_between_cycle"
         ]
@@ -122,7 +123,7 @@ class PreLCABatteryCalendarAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:calendar_effect_k_factor"
         ]
-        n_cycles = inputs["number_of_cycles"]
+        n_cycles = np.maximum(inputs["number_of_cycles"], 100)
         time_btw_cycle = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":time_between_cycle"
         ]
@@ -152,12 +153,14 @@ class PreLCABatteryCalendarAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:calendar_effect_k_factor",
         ] = f_soc * np.exp(-3053 / storage_temperature) * (n_cycles * time_btw_cycle) ** 0.5
-        partials["capacity_loss_calendar", "number_of_cycles"] = (
+        partials["capacity_loss_calendar", "number_of_cycles"] = np.where(
+            n_cycles == inputs["number_of_cycles"],
             0.5
             * k_factor
             * f_soc
             * np.exp(-3053 / storage_temperature)
-            * (time_btw_cycle / n_cycles) ** 0.5
+            * (time_btw_cycle / n_cycles) ** 0.5,
+            1e-6
         )
         partials[
             "capacity_loss_calendar",

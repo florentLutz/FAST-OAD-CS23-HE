@@ -296,7 +296,7 @@
         <battery_pack>
           <battery_pack_1>
             <end_of_life_relative_capacity_loss units="unitless">0.2</end_of_life_relative_capacity_loss>
-            <cell_temperature_mission units="degK" is_input="True">306.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_temperature_mission units="degK" is_input="True">296.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
@@ -304,13 +304,16 @@
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
+            <aging>
+              <cyclic_effect_k_factor units="unitless" is_input="True">1.0<!--Corrective factor to adjust model to manufacturer's data. Default value leads to a loss of 40% of capacity after 500 cycle, a DOD of 100% under 23 degC--></cyclic_effect_k_factor>
+            </aging>
             <CG>
               <y_ratio>0.5</y_ratio>
             </CG>
           </battery_pack_1>
           <battery_pack_2>
             <end_of_life_relative_capacity_loss units="unitless">0.2</end_of_life_relative_capacity_loss>
-            <cell_temperature_mission units="degK" is_input="True">306.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_temperature_mission units="degK" is_input="True">296.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
@@ -318,6 +321,9 @@
             <module>
               <number_cells is_input="True">96.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
+            <aging>
+              <cyclic_effect_k_factor units="unitless" is_input="True">1.0<!--Corrective factor to adjust model to manufacturer's data. Default value leads to a loss of 40% of capacity after 500 cycle, a DOD of 100% under 23 degC--></cyclic_effect_k_factor>
+            </aging>
             <CG>
               <y_ratio>0.5</y_ratio>
             </CG>

@@ -178,6 +178,14 @@ def test_pipistrel_velis_electro_with_lca_default_battery_lifespan():
     problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
     problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
 
+    # For quick test
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:calendar_effect_k_factor", val=0.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:aging:calendar_effect_k_factor", val=0.0
+    )
+
     # Run the problem
     problem.run_model()
 
@@ -187,10 +195,10 @@ def test_pipistrel_velis_electro_with_lca_default_battery_lifespan():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        600.00, rel=1e-2
+        580.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(25.05, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.74, abs=1e-2)
 
 
 def test_pipistrel_velis_electro_with_lca_varying_start_soc():

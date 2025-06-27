@@ -83,7 +83,8 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:cyclic_effect_k_factor"
         ]
-        n_cycles = inputs["number_of_cycles"]
+        # Safeguard
+        n_cycles = np.maximum(inputs["number_of_cycles"], 100)
 
         relative_capacity_loss = k_factor * f_dod * np.exp(-4345 / avg_temperature) * n_cycles**0.5
 
@@ -107,7 +108,8 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:cyclic_effect_k_factor"
         ]
-        n_cycles = inputs["number_of_cycles"]
+        # Safeguard
+        n_cycles = np.maximum(inputs["number_of_cycles"], 100)
 
         partials[
             "capacity_loss_cyclic",
@@ -134,6 +136,8 @@ class PreLCABatteryCyclicAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:cyclic_effect_k_factor",
         ] = f_dod * np.exp(-4345 / avg_temperature) * n_cycles**0.5
-        partials["capacity_loss_cyclic", "number_of_cycles"] = (
-            0.5 * k_factor * f_dod * np.exp(-4345 / avg_temperature) * n_cycles**-0.5
+        partials["capacity_loss_cyclic", "number_of_cycles"] = np.where(
+            n_cycles == inputs["number_of_cycles"],
+            0.5 * k_factor * f_dod * np.exp(-4345 / avg_temperature) * n_cycles**-0.5,
+            1e-6,
         )
