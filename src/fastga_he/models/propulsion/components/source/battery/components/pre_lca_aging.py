@@ -20,7 +20,8 @@ oad.RegisterSubmodel.active_models[SERVICE_BATTERY_LIFESPAN] = None
 )
 class PreLCABatteryAging(om.Group):
     """
-    Group that contain all the model pertaining to the battery aging model
+    Group that contain all the model pertaining to the battery aging model. Adaptation of the
+    model from :cite:`chen:2019`.
     """
 
     def __init__(self, **kwargs):

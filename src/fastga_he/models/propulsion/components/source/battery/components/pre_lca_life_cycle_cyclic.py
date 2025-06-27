@@ -8,9 +8,8 @@ import openmdao.api as om
 
 class PreLCABatteryCyclicAging(om.ExplicitComponent):
     """
-    Computation of the number of cycle necessary to reach a nominal capacity loss of 40% (which
-    seems to be the standard for the reference cell). This will be treated as the lifespan of the
-    cell.
+    Computation of the capacity lost to cyclic aging a certain number of cycles. Adaptation of
+    the model from :cite:`chen:2019`.
     """
 
     def initialize(self):

@@ -8,6 +8,9 @@ from .pre_lca_depth_of_discharge import PreLCABatteryDepthOfDischarge
 from .pre_lca_cyclic_aging_dod_effect import PreLCABatteryCyclicAgingDODEffect
 from .pre_lca_life_cycle_cyclic import PreLCABatteryCyclicAging
 from .pre_lca_total_aging import PreLCABatteryTotalAging
+from .pre_lca_time_between_cycles import PreLCABatteryTimeBetweenCycles
+from .pre_lca_calendar_aging_soc_effect import PreLCABatteryCalendarAgingSOCEffect
+from .pre_lca_life_cycle_calendar import PreLCABatteryCalendarAging
 
 
 class PreLCABatteryCapacityLoss(om.Group):
@@ -39,6 +42,21 @@ class PreLCABatteryCapacityLoss(om.Group):
         self.add_subsystem(
             name="cyclic_aging",
             subsys=PreLCABatteryCyclicAging(battery_pack_id=battery_pack_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="time_between_cycles",
+            subsys=PreLCABatteryTimeBetweenCycles(battery_pack_id=battery_pack_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="soc_effect",
+            subsys=PreLCABatteryCalendarAgingSOCEffect(battery_pack_id=battery_pack_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="calendar_aging",
+            subsys=PreLCABatteryCalendarAging(battery_pack_id=battery_pack_id),
             promotes=["*"],
         )
         self.add_subsystem(
