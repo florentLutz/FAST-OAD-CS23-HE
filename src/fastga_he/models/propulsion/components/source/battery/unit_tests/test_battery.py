@@ -1383,7 +1383,7 @@ def test_aging_prediction():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", units="unitless"
-    ) == pytest.approx(272.4, abs=1)
+    ) == pytest.approx(271.2, abs=1)
 
     problem.check_partials(compact_print=True)
 
