@@ -7,7 +7,6 @@ import os.path as pth
 from shutil import rmtree
 import logging
 
-import copy
 
 import pytest
 

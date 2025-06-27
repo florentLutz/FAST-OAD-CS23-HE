@@ -9,7 +9,6 @@ import pandas as pd
 
 import plotly.graph_objects as go
 import plotly.express as px
-from plotly.subplots import make_subplots
 
 import fastoad.api as oad
 import openmdao.api as om
@@ -284,7 +283,7 @@ def test_post_process_results():
     sorted_socs_start = np.sort(socs_start_mission)
 
     sorted_generic_list = [generic_list[i] for i in np.argsort(socs_start_mission)]
-    sorted_battery_mass = [battery_mass[i] for i in np.argsort(socs_start_mission)]
+    # sorted_battery_mass = [battery_mass[i] for i in np.argsort(socs_start_mission)]
 
     scatter = go.Scatter(
         x=sorted_socs_start,
