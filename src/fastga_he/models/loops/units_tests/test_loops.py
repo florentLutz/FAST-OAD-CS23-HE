@@ -24,6 +24,7 @@ import fastoad.api as oad
 from numpy.testing import assert_allclose
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
 
 from ..wing_area_component.wing_area_cl_dep_equilibrium import (
     UpdateWingAreaLiftDEPEquilibrium,
@@ -41,6 +42,10 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 def test_advanced_cl():
     xml_file = "pipistrel_like.xml"
+
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+        "fastga_he.submodel.performances.energy_consumption.basic"
+    )
 
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(propulsion_id="fastga.wrapper.propulsion.basicIC_engine")

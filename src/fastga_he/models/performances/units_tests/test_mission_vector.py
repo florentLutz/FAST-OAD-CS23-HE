@@ -70,6 +70,7 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
     PerformancePerPhase,
 )
 from fastga_he.models.performances.mission_vector.mission.sizing_time import SizingDuration
+from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
@@ -1590,7 +1591,7 @@ def test_sizing_duration():
 
 def test_mission_vector():
     # Research independent input value in .xml file
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
         "fastga_he.submodel.performances.energy_consumption.basic"
     )
 
@@ -2133,9 +2134,6 @@ def test_mission_vector_from_yml_fuel_and_battery_gear():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_recording():
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
