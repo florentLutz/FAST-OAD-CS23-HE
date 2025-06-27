@@ -70,7 +70,10 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
     PerformancePerPhase,
 )
 from fastga_he.models.performances.mission_vector.mission.sizing_time import SizingDuration
-from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
@@ -107,6 +110,17 @@ def catch_warnings():
 
         for warning in w:
             print(warning)
+
+
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
 
 
 def test_initialize_altitude():
@@ -1589,10 +1603,13 @@ def test_sizing_duration():
     problem.check_partials(compact_print=True)
 
 
-def test_mission_vector():
+def test_mission_vector(restore_submodels):
     # Research independent input value in .xml file
     oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
         "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+        "fastga_he.submodel.performances.dep_effect.none"
     )
 
     ivc = get_indep_var_comp(
