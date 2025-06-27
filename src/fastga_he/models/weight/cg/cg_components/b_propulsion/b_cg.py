@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -9,8 +9,11 @@ import fastoad.api as oad
 
 from fastga.models.weight.cg.cg_components.constants import SUBMODEL_PROPULSION_CG
 
+POWERTRAIN_CG = "fastga_he.submodel.weight.cg.propulsion.power_train"
+oad.RegisterSubmodel.active_models[SUBMODEL_PROPULSION_CG] = POWERTRAIN_CG
 
-@oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga_he.submodel.weight.cg.propulsion.power_train")
+
+@oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, POWERTRAIN_CG)
 class PowerTrainCG(om.ExplicitComponent):
     """
     The propulsion CG is computed during the sizing, this is just the interfacing with the OAD

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,10 +8,11 @@ import fastoad.api as oad
 
 from fastga.models.aerodynamics.constants import SUBMODEL_CD0_NACELLE
 
+CD0_FROM_PT = "fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_CD0_NACELLE] = CD0_FROM_PT
 
-@oad.RegisterSubmodel(
-    SUBMODEL_CD0_NACELLE, "fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file"
-)
+
+@oad.RegisterSubmodel(SUBMODEL_CD0_NACELLE, CD0_FROM_PT)
 class Cd0PowerTrain(om.ExplicitComponent):
     """
     This is a component to do the interfacing of the computation of the CD0 in the power train
