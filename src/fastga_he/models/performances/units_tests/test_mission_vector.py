@@ -1590,6 +1590,10 @@ def test_sizing_duration():
 
 def test_mission_vector():
     # Research independent input value in .xml file
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(
             MissionVector(
