@@ -16,22 +16,21 @@ test module for wing area computation.
 
 import os
 import os.path as pth
-
+import copy
 import pytest
-
 import fastoad.api as oad
 
 from numpy.testing import assert_allclose
-
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
-from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_ENERGY_CONSUMPTION, HE_SUBMODEL_DEP_EFFECT
-
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 from ..wing_area_component.wing_area_cl_dep_equilibrium import (
     UpdateWingAreaLiftDEPEquilibrium,
     ConstraintWingAreaLiftDEPEquilibrium,
 )
 from ..update_wing_area_group import UpdateWingAreaGroupDEP
-
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -40,7 +39,18 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-def test_advanced_cl():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_advanced_cl(restore_submodels):
     xml_file = "pipistrel_like.xml"
 
     oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
