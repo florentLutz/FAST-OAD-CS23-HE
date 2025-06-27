@@ -21,6 +21,7 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
 RESULTS_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity")
+RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity_full_sizing")
 
 
 @pytest.fixture(scope="module")
@@ -354,6 +355,8 @@ def test_full_sizing_hybrid_kodiak_100():
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
 
     # Define used files depending on options
     xml_file_name = "input_full_sizing_hybrid_kodiak.xml"
@@ -371,7 +374,7 @@ def test_full_sizing_hybrid_kodiak_100():
 
     # Change battery pack characteristics so that they match those of a high power,
     # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
-    # Pipistrel battery. Assumes same polarization curve
+    # Pipistrel battery. Assumes same polarization curve. And we'll take the same aging model
     problem.model_options["*"] = {
         "cell_capacity_ref": 2.5,
         "cell_weight_ref": 45.0e-3,
@@ -395,10 +398,91 @@ def test_full_sizing_hybrid_kodiak_100():
 
     problem.run_model()
 
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
+    # Register the baseline case
     problem.write_outputs()
+
+    soc_start_array = np.linspace(100.0, 60.0, 20)
+    for soc_start in soc_start_array:
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+            units="percent",
+            val=soc_start,
+        )
+
+        problem.run_model()
+
+        problem.output_file_path = pth.join(
+            RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH, str(int(soc_start)) + "_soc_start_out.xml"
+        )
+        problem.write_outputs()
+
+
+def test_post_process_results_full_sizing():
+    fig = go.Figure()
+
+    socs_start_mission = []
+    single_scores = []
+    battery_mass = []
+
+    generic_list = []
+
+    for file in os.listdir(RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH):
+        datafile = oad.DataFile(pth.join(RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH, file))
+        socs_start_mission.append(
+            datafile[
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start"
+            ].value[0]
+        )
+        single_scores.append(datafile["data:environmental_impact:single_score"].value[0])
+        battery_mass.append(
+            datafile["data:propulsion:he_power_train:battery_pack:battery_pack_1:mass"].value[0]
+        )
+        generic_list.append(
+            datafile["data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan"].value[0]
+        )
+
+    sorted_single_scores = [single_scores[i] for i in np.argsort(socs_start_mission)]
+    sorted_socs_start = np.sort(socs_start_mission)
+
+    sorted_generic_list = [generic_list[i] for i in np.argsort(socs_start_mission)]
+    sorted_battery_mass = [battery_mass[i] for i in np.argsort(socs_start_mission)]
+
+    scatter = go.Scatter(
+        x=sorted_socs_start,
+        y=np.array(sorted_single_scores) / sorted_single_scores[-1],
+        mode="lines+markers",
+        name="Single score variation",
+        marker=dict(symbol="circle", size=10),
+    )
+    fig.add_trace(scatter)
+    scatter_3 = go.Scatter(
+        x=sorted_socs_start,
+        y=np.array(sorted_generic_list) / sorted_generic_list[-1],
+        mode="lines+markers",
+        name="Battery lifespan variation",
+        marker=dict(symbol="diamond", size=10),
+    )
+    fig.add_trace(scatter_3)
+    scatter_4 = go.Scatter(
+        x=sorted_socs_start,
+        y=np.array(sorted_battery_mass) / sorted_battery_mass[-1],
+        mode="lines+markers",
+        name="Battery mass variation",
+        marker=dict(symbol="cross", size=10),
+    )
+    fig.add_trace(scatter_4)
+
+    fig.update_layout(
+        title_text="Evolution of quantity of interest for the fully sized hybrid Kodiak case",
+        title_x=0.5,
+        xaxis_title="Initial SoC [%]",
+        height=800,
+        width=1600,
+        font_size=18,
+    )
+    fig.update_yaxes(title="Variation with respect to 100% SOC case")
+
+    fig.show()
 
 
 def test_retrofit_hybrid_kodiak_european_mix():

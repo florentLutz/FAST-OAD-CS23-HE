@@ -8,6 +8,14 @@
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
+    <environmental_impact>
+      <line_test>
+        <duration units="h">10.0</duration>
+      </line_test>
+      <delivery>
+        <distance units="km">8000.0</distance>
+      </delivery>
+    </environmental_impact>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
       <wing_configuration is_input="True">3.0<!--1=low wing configuration / 2=mid wing configuration / 3=high wing configuration--></wing_configuration>

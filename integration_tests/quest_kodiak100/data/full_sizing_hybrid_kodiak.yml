@@ -59,6 +59,16 @@ model:
             id: fastga.loop.wing_position
         wing_area:
             id: fastga.loop.wing_area
+    lca:
+        id: fastga_he.lca.legacy
+        power_train_file_path: hybrid_propulsion_with_lca.yml
+        component_level_breakdown: true
+        airframe_material: aluminium
+        delivery_method: flight
+        impact_assessment_method: EF v3.1
+        normalization: true
+        weighting: true
+        aircraft_lifespan_in_hours: true
 
 submodels:
     service.weight.mass.payload: null
@@ -97,3 +107,4 @@ submodels:
     submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.ensure
     submodel.propulsion.dc_dc_converter.inductor.inductance: null
     submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.ensure
+    service.propulsion.battery.lifespan: fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model
