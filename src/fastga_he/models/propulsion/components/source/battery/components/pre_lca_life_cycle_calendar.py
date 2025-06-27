@@ -160,7 +160,7 @@ class PreLCABatteryCalendarAging(om.ExplicitComponent):
             * f_soc
             * np.exp(-3053 / storage_temperature)
             * (time_btw_cycle / n_cycles) ** 0.5,
-            1e-6
+            1e-6,
         )
         partials[
             "capacity_loss_calendar",

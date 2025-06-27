@@ -180,10 +180,12 @@ def test_pipistrel_velis_electro_with_lca_default_battery_lifespan():
 
     # For quick test
     problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:calendar_effect_k_factor", val=0.0
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:calendar_effect_k_factor",
+        val=0.0,
     )
     problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:aging:calendar_effect_k_factor", val=0.0
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:aging:calendar_effect_k_factor",
+        val=0.0,
     )
 
     # Run the problem
