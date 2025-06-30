@@ -63,6 +63,8 @@ submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+  submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
+  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics

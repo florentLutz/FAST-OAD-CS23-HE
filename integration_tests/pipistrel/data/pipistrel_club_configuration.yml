@@ -20,12 +20,12 @@ model:
   aerodynamics_lowspeed:
     id: fastga.aerodynamics.lowspeed.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
-    result_folder_path : D:/tmp
+    result_folder_path : ../workdir
     compute_slipstream : false
   aerodynamics_highspeed:
     id: fastga.aerodynamics.highspeed.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
-    result_folder_path: D:/tmp
+    result_folder_path: ../workdir
     compute_mach_interpolation: false
     compute_slipstream: false
   performances:
@@ -64,6 +64,8 @@ submodels:
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+  submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
+  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
   service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
