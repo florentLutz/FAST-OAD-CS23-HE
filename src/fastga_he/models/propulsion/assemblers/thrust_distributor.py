@@ -13,11 +13,11 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from .constants import SUBMODEL_THRUST_DISTRIBUTOR
 
 _LOGGER = logging.getLogger(__name__)
+THRUST_DISTRIBUTOR = "fastga_he.submodel.propulsion.thrust_distributor.legacy"
+oad.RegisterSubmodel.active_models[SUBMODEL_THRUST_DISTRIBUTOR] = THRUST_DISTRIBUTOR
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_THRUST_DISTRIBUTOR, "fastga_he.submodel.propulsion.thrust_distributor.legacy"
-)
+@oad.RegisterSubmodel(SUBMODEL_THRUST_DISTRIBUTOR, THRUST_DISTRIBUTOR)
 class ThrustDistributor(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
