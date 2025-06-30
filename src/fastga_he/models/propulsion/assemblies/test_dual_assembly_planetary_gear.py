@@ -26,7 +26,6 @@ from ..components.connectors.dc_cable import PerformancesHarness
 from ..components.connectors.dc_bus import PerformancesDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 from ..components.source.battery import PerformancesBatteryPack
-
 from ..components.connectors.dc_cable.constants import (
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
 )
@@ -239,15 +238,15 @@ class PerformancesAssembly(om.Group):
 
 
 def test_assembly(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
         XML_FILE,
     )
     altitude = np.full(NB_POINTS_TEST, 0.0)
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
 
     ivc.add_output("altitude", val=altitude, units="m")
     ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")

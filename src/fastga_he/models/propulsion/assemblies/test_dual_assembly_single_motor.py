@@ -3,9 +3,10 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import os.path as pth
-
+import fastoad.api as oad
 import numpy as np
 import pytest
+import copy
 from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -15,6 +16,10 @@ from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
 )
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
+from ..components.connectors.dc_cable.constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
+
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 OUT_FOLDER_PATH = pth.join(pth.dirname(__file__), "outputs")
 
@@ -23,10 +28,23 @@ NB_POINTS_TEST = 50
 COEFF_DIFF = 0.0
 
 
-def test_assembly_from_pt_file():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_assembly_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "dual_assembly_single_motor.yml")
     network_file_path = pth.join(OUT_FOLDER_PATH, "dual_assembly.html")
-
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
     power_train_network_viewer(pt_file_path, network_file_path)
 
     ivc = get_indep_var_comp(
