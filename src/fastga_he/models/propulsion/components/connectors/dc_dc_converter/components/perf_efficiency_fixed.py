@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -11,11 +11,11 @@ from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
+FIXED_EFFICIENCY = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed"
+oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = FIXED_EFFICIENCY
 
-@oad.RegisterSubmodel(
-    SUBMODEL_DC_DC_CONVERTER_EFFICIENCY,
-    "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed",
-)
+
+@oad.RegisterSubmodel(SUBMODEL_DC_DC_CONVERTER_EFFICIENCY, FIXED_EFFICIENCY)
 class PerformancesEfficiencyMission(om.ExplicitComponent):
     """
     Component which takes the desired efficiency for converter operation from the data

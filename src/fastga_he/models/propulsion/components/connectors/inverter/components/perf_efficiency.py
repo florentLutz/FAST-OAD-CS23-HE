@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,10 +8,6 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from ..constants import SUBMODEL_INVERTER_EFFICIENCY
-
-oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-    "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-)
 
 
 @oad.RegisterSubmodel(

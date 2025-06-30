@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import scipy as sp
@@ -14,6 +14,9 @@ from ..constants import SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE
 
 SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE_FIXED = (
     "fastga_he.submodel.propulsion.rectifier.junction_temperature.fixed"
+)
+oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
+    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE_FIXED
 )
 
 
