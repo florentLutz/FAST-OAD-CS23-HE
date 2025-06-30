@@ -1,4 +1,4 @@
-project: pipistrel_assembly
+project: pipistrel_assembly_with_lca
 
 ecoinvent:
     version: 3.9.1

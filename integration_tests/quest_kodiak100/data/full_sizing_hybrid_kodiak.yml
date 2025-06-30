@@ -1,0 +1,110 @@
+title: Sample weight computation applied to TBM 900
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ../results/oad_process_inputs_full_sizing_hybrid.xml
+output_file: ../results/oad_process_outputs_full_sizing_hybrid.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+    aircraft_sizing:
+        nonlinear_solver: om.NonlinearBlockGS(maxiter=100, iprint=2, rtol=1e-8, atol=1e2, debug_print=True, reraise_child_analysiserror=True)
+        linear_solver: om.DirectSolver()
+        geometry:
+            id: fastga.geometry.legacy
+            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            cabin_sizing: 0.0
+        aerodynamics_lowspeed:
+            id: fastga.aerodynamics.lowspeed.legacy
+            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            result_folder_path: ../workdir
+            use_openvsp: false
+        aerodynamics_highspeed:
+            id: fastga.aerodynamics.highspeed.legacy
+            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            result_folder_path: ../workdir
+            compute_mach_interpolation: false
+            use_openvsp: false
+        performances:
+            id: fastga_he.performances.mission_vector
+            number_of_points_climb: 30
+            number_of_points_cruise: 30
+            number_of_points_descent: 20
+            number_of_points_reserve: 10
+            power_train_file_path: ./hybrid_propulsion_full_sizing.yml
+            out_file: ../results/full_sizing_hybrid_propulsion.csv
+            use_linesearch: False
+            pre_condition_pt: False
+            use_apply_nonlinear: False
+        power_train_sizing:
+            id: fastga_he.power_train.sizing
+            power_train_file_path: ./hybrid_propulsion_full_sizing.yml
+        weight:
+            id: fastga.weight.legacy
+            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+        mtow:
+            id: fastga.loop.mtow
+        hq:
+            tail_sizing:
+                id: fastga.handling_qualities.tail_sizing
+                propulsion_id: fastga.wrapper.propulsion.basicTurboprop
+            static_margin:
+                id: fastga.handling_qualities.static_margin
+        wing_position:
+            id: fastga.loop.wing_position
+        wing_area:
+            id: fastga.loop.wing_area
+    lca:
+        id: fastga_he.lca.legacy
+        power_train_file_path: hybrid_propulsion_with_lca.yml
+        component_level_breakdown: true
+        airframe_material: aluminium
+        delivery_method: flight
+        impact_assessment_method: EF v3.1
+        normalization: true
+        weighting: true
+        aircraft_lifespan_in_hours: true
+
+submodels:
+    service.weight.mass.payload: null
+    service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.roskam
+    service.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
+    service.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
+    service.weight.mass.system.life_support_system: null
+    service.weight.mass.system.recording_system: null
+    submodel.loop.wing_area.update.geom: fastga_he.submodel.loop.wing_area.update.geom.advanced
+    submodel.loop.wing_area.constraint.geom: fastga_he.submodel.loop.wing_area.constraint.geom.advanced
+    service.geometry.wing.thickness_ratio: null
+    submodel.aerodynamics.high_lift.delta: null
+    service.geometry.mfw: fastga.submodel.geometry.mfw.advanced
+    service.geometry.vertical_tail.distance.fd: null
+    submodel.performances.mission_vector.descent_speed: null
+    submodel.performances.mission_vector.climb_speed: null
+    submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+    submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+    submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
+    service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
+    submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
+    submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
+    service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+    service.weight.mass.system.power_system: null
+    service.geometry.nacelle.dimension: null
+    submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
+    submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
+    submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
+    submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
+    service.weight.mass.furniture.seats: null
+    submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
+    submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+    submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state
+    submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+    submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+    submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.ensure
+    submodel.propulsion.dc_dc_converter.inductor.inductance: null
+    submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.ensure
+    service.propulsion.battery.lifespan: fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model
