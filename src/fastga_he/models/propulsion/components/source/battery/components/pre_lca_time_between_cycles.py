@@ -8,10 +8,9 @@ import openmdao.api as om
 
 class PreLCABatteryTimeBetweenCycles(om.ExplicitComponent):
     """
-    Since the battery life was chosen to be expressed in terms of cycles but for calendar aging we
-    need time, we need to express how much time is spent between cycle and for 1 cycle. This will
-    be based on the average usage of the aircraft. It will be expressed in days. Also, we'll assume
-    that one flight is one cycle
+    Since battery life is defined in cycles but calendar aging depends on time, this class estimates 
+    the time between cycles and the duration of a single cycle based on average aircraft usage. 
+    Time is expressed in days, with the assumption that each flight corresponds to a single cycle.
     """
 
     def initialize(self):
