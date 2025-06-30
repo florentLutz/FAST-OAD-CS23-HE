@@ -8,8 +8,8 @@ import openmdao.api as om
 
 class PreLCABatteryTimeBetweenCycles(om.ExplicitComponent):
     """
-    Since battery life is defined in cycles but calendar aging depends on time, this class estimates 
-    the time between cycles and the duration of a single cycle based on average aircraft usage. 
+    Since battery life is defined in cycles but calendar aging depends on time, this class estimates
+    the time between cycles and the duration of a single cycle based on average aircraft usage.
     Time is expressed in days, with the assumption that each flight corresponds to a single cycle.
     """
 
