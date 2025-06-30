@@ -31,7 +31,10 @@ from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature_from_increase import PerformancesTemperatureFromIncrease
-from ..components.perf_temperature import PerformancesTemperature, SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
+from ..components.perf_temperature import (
+    PerformancesTemperature,
+    SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE,
+)
 from ..components.perf_temperature_constant import PerformancesTemperatureConstant
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
