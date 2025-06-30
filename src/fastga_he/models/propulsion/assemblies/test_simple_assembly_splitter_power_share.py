@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import copy
 import os
@@ -26,6 +26,10 @@ from .simple_assembly.performances_simple_assembly_splitter_power_share import (
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 
+from ..components.connectors.dc_cable.constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
+
 from . import outputs
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
@@ -37,7 +41,22 @@ XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
 
 
-def test_assembly_performances_splitter_150_kw():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_assembly_performances_splitter_150_kw(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -136,9 +155,12 @@ def test_assembly_performances_splitter_150_kw():
     # problem.check_partials(compact_print=True)
 
 
-def test_assembly_performances_splitter_150_kw_low_requirement():
+def test_assembly_performances_splitter_150_kw_low_requirement(restore_submodels):
     # Same test as above except the thrust required will be much lower to check if it indeed
     # output zero current in the secondary branch and primary branch is equal to the output
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
@@ -252,7 +274,11 @@ def test_assembly_performances_splitter_150_kw_low_requirement():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
+def test_assembly_performances_splitter_150_kw_low_to_high_requirement(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -378,8 +404,11 @@ def test_case_reader():
     fig.show()
 
 
-def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
+def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter_power_share.yml")
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -478,11 +507,14 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     problem.check_partials(compact_print=True)
 
 
-def test_incoherent_voltage():
+def test_incoherent_voltage(restore_submodels):
     # Small test to see if the check that prevent the problem from running with incoherent value
     # works
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter_power_share.yml")
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     input_list = list_inputs(
         PowerTrainPerformancesFromFile(

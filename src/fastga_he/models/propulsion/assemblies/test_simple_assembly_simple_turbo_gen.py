@@ -1,9 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
+import copy
 import numpy as np
 import pytest
 
@@ -19,6 +19,10 @@ from utils.filter_residuals import filter_residuals
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 
+from ..components.connectors.dc_cable.constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
+
 from . import outputs
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -27,8 +31,22 @@ XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
 
 
-def test_performances_from_pt_file():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_performances_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_simple_generator.yml")
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -226,9 +244,12 @@ def test_assembly_sizing_from_pt_file():
     )
 
 
-def test_full_high_rpm_ice():
+def test_full_high_rpm_ice(restore_submodels):
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
     )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_high_rpm_ice.yml")

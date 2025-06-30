@@ -1,9 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
+import copy
 import numpy as np
 import pytest
 
@@ -30,6 +30,9 @@ from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 from ..assemblers.delta_cl_from_pt_file import PowerTrainDeltaClFromFile
 from ..assemblers.delta_cd_from_pt_file import PowerTrainDeltaCdFromFile
 from ..assemblers.delta_cm_from_pt_file import PowerTrainDeltaCmFromFile
+from ..components.connectors.dc_cable.constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
 
 from . import outputs
 
@@ -39,7 +42,22 @@ XML_FILE = "simple_assembly.xml"
 NB_POINTS_TEST = 10
 
 
-def test_assembly_performances():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_assembly_performances(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -147,7 +165,10 @@ def test_assembly_performances():
     )
 
 
-def test_assembly_sizing():
+def test_assembly_sizing(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
     ivc = get_indep_var_comp(list_inputs(SizingAssembly()), __file__, XML_FILE)
 
     problem = oad.FASTOADProblem(reports=False)
@@ -204,13 +225,16 @@ def test_assembly_sizing():
     )
 
 
-def test_performances_sizing_assembly_battery_enforce():
+def test_performances_sizing_assembly_battery_enforce(restore_submodels):
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -257,13 +281,16 @@ def test_performances_sizing_assembly_battery_enforce():
     ) == pytest.approx(2483.0, rel=1e-2)
 
 
-def test_performances_sizing_assembly_battery_ensure():
+def test_performances_sizing_assembly_battery_ensure(restore_submodels):
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -382,8 +409,11 @@ def test_assembly_sizing_from_pt_file():
     )
 
 
-def test_performances_from_pt_file():
+def test_performances_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -449,8 +479,11 @@ def test_performances_from_pt_file():
     )
 
 
-def test_performances_from_pt_file_aux_load():
+def test_performances_from_pt_file_aux_load(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(

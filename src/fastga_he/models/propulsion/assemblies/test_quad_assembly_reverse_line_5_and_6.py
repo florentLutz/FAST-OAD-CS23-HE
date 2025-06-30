@@ -1,10 +1,12 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
 import pytest
+import copy
+import fastoad.api as oad
 from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -15,10 +17,24 @@ from ..components.connectors.inverter import PerformancesInverter
 from ..components.connectors.dc_cable import PerformancesHarness
 from ..components.connectors.dc_bus import PerformancesDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
+from ..components.connectors.dc_cable.constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 25
 COEFF_DIFF = 0.0
+
+
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
 
 
 class PerformancesAssembly(om.Group):
@@ -339,7 +355,10 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.dc_voltage_in")
 
 
-def test_assembly():
+def test_assembly(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,

@@ -1,9 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
+import copy
 import numpy as np
 import pytest
 
@@ -20,6 +20,9 @@ from .simple_assembly.performances_simple_assembly_splitter import PerformancesA
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
+from ..components.connectors.dc_cable.constants import (
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
 
 from . import outputs
 
@@ -29,7 +32,22 @@ XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
 
 
-def test_assembly_performances_splitter_50_50():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_assembly_performances_splitter_50_50(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -151,7 +169,11 @@ def test_assembly_performances_splitter_50_50():
     )
 
 
-def test_assembly_performances_splitter_60_40():
+def test_assembly_performances_splitter_60_40(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -278,7 +300,11 @@ def test_assembly_performances_splitter_60_40():
     )
 
 
-def test_assembly_performances_splitter_100_0():
+def test_assembly_performances_splitter_100_0(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     input_list = list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST))
     input_list.remove("data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split")
 
@@ -351,7 +377,11 @@ def test_assembly_performances_splitter_100_0():
     ) == pytest.approx(np.zeros(NB_POINTS_TEST), abs=1e-2)
 
 
-def test_assembly_performances_splitter_100_0_only_part():
+def test_assembly_performances_splitter_100_0_only_part(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     input_list = list_inputs(PerformancesAssemblySplitter(number_of_points=NB_POINTS_TEST))
     input_list.remove("data:propulsion:he_power_train:DC_splitter:dc_splitter_1:power_split")
 
@@ -439,7 +469,11 @@ def test_assembly_performances_splitter_100_0_only_part():
     )
 
 
-def test_performances_from_pt_file():
+def test_performances_from_pt_file(restore_submodels):
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter.yml")
 
     ivc = get_indep_var_comp(
