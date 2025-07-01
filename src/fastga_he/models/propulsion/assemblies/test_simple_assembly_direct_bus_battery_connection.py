@@ -28,6 +28,10 @@ from .simple_assembly.performances_simple_assembly_direct_sspc_battery_connectio
 from ..components.connectors.dc_cable.constants import (
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
 )
+from ..components.connectors.inverter.constants import (
+    SUBMODEL_INVERTER_EFFICIENCY,
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
+)
 
 from . import outputs
 
@@ -53,6 +57,13 @@ def test_assembly_performances(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
     )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAssemblyDirectBusBatteryConnection(number_of_points=NB_POINTS_TEST)
@@ -152,6 +163,12 @@ def test_assembly_performances_constant_demand(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
     )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -232,6 +249,12 @@ def test_performances_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_bus_battery_connection.yml")
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
     )
 
     ivc = get_indep_var_comp(
@@ -333,6 +356,12 @@ def test_read_recording():
 def test_assembly_performances_with_direct_sspc_battery_connection(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
     )
 
     ivc = get_indep_var_comp(
@@ -450,6 +479,12 @@ def test_direct_sspc_battery_connection_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_sspc_battery_connection.yml")
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
     )
 
     ivc = get_indep_var_comp(

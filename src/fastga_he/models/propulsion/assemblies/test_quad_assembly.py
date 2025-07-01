@@ -28,6 +28,11 @@ from ..components.source.battery import PerformancesBatteryPack
 from ..components.connectors.dc_cable.constants import (
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
 )
+from ..components.connectors.inverter.constants import (
+    SUBMODEL_INVERTER_EFFICIENCY,
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
+)
+from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 from ..assemblers.thrust_distributor import ThrustDistributor
 from ..assemblers.power_rate import PowerRate
@@ -348,6 +353,16 @@ def test_assembly(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
     )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -561,6 +576,16 @@ def test_assembly_from_pt_file(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
     )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(
             PowerTrainPerformancesFromFile(
@@ -667,6 +692,16 @@ def test_assembly_no_cross_from_pt_file(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
     )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(
             PowerTrainPerformancesFromFile(

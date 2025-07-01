@@ -22,6 +22,15 @@ from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
 from ..components.connectors.dc_cable.constants import (
     SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
 )
+from ..components.connectors.inverter.constants import (
+    SUBMODEL_INVERTER_EFFICIENCY,
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
+)
+from ..components.connectors.rectifier.constants import (
+    SUBMODEL_RECTIFIER_EFFICIENCY,
+    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE,
+)
+from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 from . import outputs
 
@@ -46,6 +55,21 @@ def test_performances_from_pt_file(restore_submodels):
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_simple_generator.yml")
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
     )
 
     ivc = get_indep_var_comp(
@@ -250,6 +274,21 @@ def test_full_high_rpm_ice(restore_submodels):
     )
     oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
         "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
     )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_high_rpm_ice.yml")

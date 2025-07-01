@@ -61,7 +61,10 @@ def test_advanced_cl(restore_submodels):
     )
 
     inputs_list = list_inputs(
-        UpdateWingAreaLiftDEPEquilibrium(propulsion_id="fastga.wrapper.propulsion.basicIC_engine")
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            produce_simplified_pt_file=True,
+        )
     )
     # Research independent input value in .xml file
     ivc_loop = get_indep_var_comp(
@@ -71,7 +74,10 @@ def test_advanced_cl(restore_submodels):
     )
 
     problem_loop = run_system(
-        UpdateWingAreaLiftDEPEquilibrium(propulsion_id="fastga.wrapper.propulsion.basicIC_engine"),
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            produce_simplified_pt_file=True,
+        ),
         ivc_loop,
     )
     assert_allclose(problem_loop["wing_area"], 9.97, atol=1e-2)
@@ -112,6 +118,7 @@ def test_advanced_cl_with_proper_submodels_turboshaft():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         )
     )
     # Research independent input value in .xml file
@@ -125,6 +132,7 @@ def test_advanced_cl_with_proper_submodels_turboshaft():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         ),
         ivc_loop,
     )
@@ -139,6 +147,7 @@ def test_advanced_cl_with_proper_submodels():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         )
     )
     # Research independent input value in .xml file
@@ -152,6 +161,7 @@ def test_advanced_cl_with_proper_submodels():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         ),
         ivc_loop,
     )
@@ -204,6 +214,7 @@ def test_advanced_cl_octo_propulsion():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         )
     )
     # Research independent input value in .xml file
@@ -217,6 +228,7 @@ def test_advanced_cl_octo_propulsion():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         ),
         ivc_loop,
     )
@@ -258,8 +270,7 @@ def test_advanced_cl_group():
 
     inputs_list = list_inputs(
         UpdateWingAreaGroupDEP(
-            propulsion_id="",
-            power_train_file_path=propulsion_file,
+            propulsion_id="", power_train_file_path=propulsion_file, produce_simplified_pt_file=True
         )
     )
     # Research independent input value in .xml file
@@ -270,7 +281,9 @@ def test_advanced_cl_group():
     )
 
     problem = run_system(
-        UpdateWingAreaGroupDEP(propulsion_id="", power_train_file_path=propulsion_file),
+        UpdateWingAreaGroupDEP(
+            propulsion_id="", power_train_file_path=propulsion_file, produce_simplified_pt_file=True
+        ),
         ivc_loop,
     )
     assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 9.97, atol=1e-2)
