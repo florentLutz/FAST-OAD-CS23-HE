@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -10,11 +10,11 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .constants import SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS
 
+PUNCTUAL_TANK_FROM_PT = "fastga_he.submodel.propulsion.wing.punctual_tanks.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS] = PUNCTUAL_TANK_FROM_PT
 
-@oad.RegisterSubmodel(
-    SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS,
-    "fastga_he.submodel.propulsion.wing.punctual_tanks.from_pt_file",
-)
+
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS, PUNCTUAL_TANK_FROM_PT)
 class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

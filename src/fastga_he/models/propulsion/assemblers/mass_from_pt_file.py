@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -9,6 +9,9 @@ import fastoad.api as oad
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from .constants import SUBMODEL_POWER_TRAIN_MASS
+
+MASS_FROM_PT = "fastga_he.submodel.propulsion.mass.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_MASS] = MASS_FROM_PT
 
 
 @oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_MASS, "fastga_he.submodel.propulsion.mass.from_pt_file")
