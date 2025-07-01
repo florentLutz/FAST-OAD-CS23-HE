@@ -167,6 +167,7 @@ class ComputePayloadRange(om.ExplicitComponent):
                     pre_condition_pt=True,
                     use_linesearch=False,
                     use_apply_nonlinear=False,
+                    variable_name_threshold_fuel="data:mission:payload_range:target_fuel",
                 ),
                 promotes=["*"],
             )
@@ -183,19 +184,10 @@ class ComputePayloadRange(om.ExplicitComponent):
                     use_linesearch=False,
                     use_apply_nonlinear=False,
                     variable_name_target_SoC="data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min",
+                    variable_name_threshold_SoC="data:mission:payload_range:threshold_SoC",
                 ),
                 promotes=["*"],
             )
-
-        # Replace the old solver with a NewtonSolver to handle the ImplicitComponent
-        model.op_mission.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        model.op_mission.nonlinear_solver.options["iprint"] = 0
-        model.op_mission.nonlinear_solver.options["maxiter"] = 100
-        model.op_mission.nonlinear_solver.options["rtol"] = 1e-5
-        model.op_mission.nonlinear_solver.options["atol"] = 1e-5
-        model.op_mission.nonlinear_solver.options["stall_limit"] = 2
-        model.op_mission.nonlinear_solver.options["stall_tol"] = 1e-5
-        model.op_mission.linear_solver = om.DirectSolver()
 
         self.cached_problem.setup()
 
