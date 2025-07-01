@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -10,10 +10,11 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .constants import SUBMODEL_POWER_TRAIN_DELTA_CD
 
+DELTA_CD_FROM_PT = "fastga_he.submodel.propulsion.delta_cd.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_DELTA_CD] = DELTA_CD_FROM_PT
 
-@oad.RegisterSubmodel(
-    SUBMODEL_POWER_TRAIN_DELTA_CD, "fastga_he.submodel.propulsion.delta_cd.from_pt_file"
-)
+
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_DELTA_CD, DELTA_CD_FROM_PT)
 class PowerTrainDeltaCdFromFile(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
