@@ -57,7 +57,6 @@ class OperationalMissionVectorWithTargetFuel(OperationalMissionVector):
 
 class DistanceToTargetFuel(om.ImplicitComponent):
     def initialize(self):
-
         self.options.declare(
             "variable_name_threshold_fuel",
             types=str,
