@@ -16,7 +16,10 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,
 )
-
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 from .mission_range_from_soc import OperationalMissionVectorWithTargetSoC
 from .mission_range_from_fuel import OperationalMissionVectorWithTargetFuel
 
@@ -44,6 +47,15 @@ class ComputePayloadRange(om.ExplicitComponent):
         )
 
     def setup(self):
+        # I'm not really happy with doing it here, but for that model to work we need to ensure
+        # those submodels are active
+        oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+            "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+        )
+        oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+            "fastga_he.submodel.performances.dep_effect.from_pt_file"
+        )
+
         self.configurator.load(self.options["power_train_file_path"])
 
         self._input_zip = zip_op_mission_input(self.options["power_train_file_path"])

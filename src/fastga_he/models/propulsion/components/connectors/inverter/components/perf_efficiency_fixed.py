@@ -13,10 +13,10 @@ from fastga_he.exceptions import ControlParameterInconsistentShapeError
 from ..constants import SUBMODEL_INVERTER_EFFICIENCY
 
 FIXED_INVERTER_EFFICIENCY = "fastga_he.submodel.propulsion.inverter.efficiency.fixed"
-oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = FIXED_EFFICIENCY
+oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = FIXED_INVERTER_EFFICIENCY
 
 
-@oad.RegisterSubmodel(SUBMODEL_INVERTER_EFFICIENCY, FIXED_EFFICIENCY)
+@oad.RegisterSubmodel(SUBMODEL_INVERTER_EFFICIENCY, FIXED_INVERTER_EFFICIENCY)
 class PerformancesEfficiencyMission(om.ExplicitComponent):
     """
     Component which takes the desired efficiency for inverter operation from the data and gives
