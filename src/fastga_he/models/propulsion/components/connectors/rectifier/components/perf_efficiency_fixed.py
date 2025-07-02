@@ -12,11 +12,11 @@ from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
 from ..constants import SUBMODEL_RECTIFIER_EFFICIENCY
 
-FIXED_EFFICIENCY = "fastga_he.submodel.propulsion.rectifier.efficiency.fixed"
-oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = FIXED_EFFICIENCY
+FIXED_RECTIFIER_EFFICIENCY = "fastga_he.submodel.propulsion.rectifier.efficiency.fixed"
+oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = FIXED_RECTIFIER_EFFICIENCY
 
 
-@oad.RegisterSubmodel(SUBMODEL_RECTIFIER_EFFICIENCY, FIXED_EFFICIENCY)
+@oad.RegisterSubmodel(SUBMODEL_RECTIFIER_EFFICIENCY, FIXED_RECTIFIER_EFFICIENCY)
 class PerformancesEfficiencyMission(om.ExplicitComponent):
     """
     Component which takes the desired efficiency for rectifier operation from the data and gives
