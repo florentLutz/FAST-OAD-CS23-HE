@@ -4,8 +4,12 @@
 
 import openmdao.api as om
 
+import fastoad.api as oad
+
 from .pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 from .pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU, SPECIES_LIST
+
+from ..constants import SERVICE_BATTERY_LIFESPAN
 
 
 class PreLCABatteryPack(om.Group):
@@ -24,6 +28,16 @@ class PreLCABatteryPack(om.Group):
 
     def setup(self):
         battery_pack_id = self.options["battery_pack_id"]
+
+        if oad.RegisterSubmodel.active_models[SERVICE_BATTERY_LIFESPAN]:
+            options_dict = {"battery_pack_id": battery_pack_id}
+            self.add_subsystem(
+                name="battery_life_cycle",
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SERVICE_BATTERY_LIFESPAN, options=options_dict
+                ),
+                promotes=["data:*"],
+            )
 
         self.add_subsystem(
             name="weight_per_fu",

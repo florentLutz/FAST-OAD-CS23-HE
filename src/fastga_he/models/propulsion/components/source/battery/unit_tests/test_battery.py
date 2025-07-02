@@ -9,6 +9,10 @@ import openmdao.api as om
 import pytest
 import numpy as np
 
+import fastoad.api as oad
+
+from ..constants import SERVICE_BATTERY_LIFESPAN
+
 from ..components.sizing_module_weight import SizingBatteryModuleWeight
 from ..components.sizing_battery_weight import SizingBatteryWeight
 from ..components.sizing_number_cells import SizingBatteryNumberCells
@@ -20,6 +24,7 @@ from ..components.sizing_battery_dimensions import SizingBatteryDimensions
 from ..components.sizing_battery_drag import SizingBatteryDrag
 from ..components.sizing_battery_prep_for_loads import SizingBatteryPreparationForLoads
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
+from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_module_current import PerformancesModuleCurrent
 from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
@@ -44,8 +49,18 @@ from ..components.perf_battery_energy_consumed_main_route import PerformancesEne
 from ..components.perf_soc_end_main_route import PerformancesSOCEndMainRoute
 from ..components.cstr_ensure import ConstraintsSOCEnsure
 from ..components.cstr_enforce import ConstraintsSOCEnforce
+from ..components.pre_lca_time_between_cycles import PreLCABatteryTimeBetweenCycles
+from ..components.pre_lca_calendar_aging_soc_effect import PreLCABatteryCalendarAgingSOCEffect
+from ..components.pre_lca_life_cycle_calendar import PreLCABatteryCalendarAging
+from ..components.pre_lca_depth_of_discharge import PreLCABatteryDepthOfDischarge
+from ..components.pre_lca_cyclic_aging_dod_effect import PreLCABatteryCyclicAgingDODEffect
+from ..components.pre_lca_life_cycle_cyclic import PreLCABatteryCyclicAging
+from ..components.pre_lca_total_aging import PreLCABatteryTotalAging
+from ..components.pre_lca_capacity_loss import PreLCABatteryCapacityLoss
+from ..components.pre_lca_aging import PreLCABatteryAging
 from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
 from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
+from ..components.pre_lca_battery_pack import PreLCABatteryPack
 from ..components.lcc_battery_cost import LCCBatteryPackCost
 from ..components.lcc_battery_operational_cost import LCCBatteryPackOperationalCost
 
@@ -553,6 +568,30 @@ def test_internal_resistance():
     assert problem.get_val("internal_resistance", units="ohm") * 1e3 == pytest.approx(
         [46.59, 56.13, 58.11, 56.15, 52.7, 49.3, 46.76, 45.32, 44.82, 44.73], rel=1e-2
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_average_cell_temperature():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "cell_temperature",
+        units="degK",
+        val=np.linspace(288.15, 298.15, NB_POINTS_TEST),
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesAverageCellTemperature(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        units="degK",
+    ) == pytest.approx(293.15, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1138,6 +1177,217 @@ def test_performances_battery_pack():
     problem.check_partials(compact_print=True)
 
 
+def test_time_between_cycles():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:TLAR:flight_per_year", val=280.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryTimeBetweenCycles(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:time_between_cycle",
+        units="d",
+    ) == pytest.approx(1.3035, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_soc_effect_calendar_aging():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:storage_SOC",
+        val=50.0,
+        units="percent",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryCalendarAgingSOCEffect(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:calendar_effect_SOC",
+        units="unitless",
+    ) == pytest.approx(155.9875, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_calendar_aging():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:calendar_effect_SOC",
+        val=155.9875,
+        units="unitless",
+    )
+    ivc.add_output("number_of_cycles", val=500.0, units="unitless")
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:time_between_cycle",
+        val=1.3035,
+        units="d",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryCalendarAging(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "capacity_loss_calendar",
+        units="unitless",
+    ) == pytest.approx(0.142, abs=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_depth_of_discharge():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+        val=80.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_end_main_route",
+        val=60.0,
+        units="percent",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryDepthOfDischarge(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:DOD_main_route",
+        units="percent",
+    ) == pytest.approx(20.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_dod_effect_cyclic_aging():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:DOD_main_route",
+        val=20.0,
+        units="percent",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryCyclicAgingDODEffect(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:cyclic_effect_DOD",
+        units="unitless",
+    ) == pytest.approx(8333.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cyclic_aging():
+    # First test with what I called reference conditions
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:cyclic_effect_DOD",
+        val=14119.0,
+        units="unitless",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        val=296.15,
+        units="degK",
+    )
+    ivc.add_output("number_of_cycles", val=500.0, units="unitless")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryCyclicAging(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "capacity_loss_cyclic",
+        units="unitless",
+    ) == pytest.approx(0.4, abs=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_total_aging():
+    ivc = om.IndepVarComp()
+    ivc.add_output("capacity_loss_cyclic", val=0.35, units="unitless")
+    ivc.add_output("capacity_loss_calendar", val=0.05, units="unitless")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryTotalAging(), ivc)
+
+    assert problem.get_val("capacity_loss_total", units="unitless") == pytest.approx(0.4, abs=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_capacity_loss():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:storage_SOC",
+        val=50.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+        val=100.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_end_main_route",
+        val=0.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        val=296.15,
+        units="degK",
+    )
+    ivc.add_output("data:TLAR:flight_per_year", val=280.0)
+
+    ivc.add_output("number_of_cycles", val=500.0, units="unitless")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryCapacityLoss(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val("capacity_loss_total", units="unitless") == pytest.approx(
+        0.5419, abs=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_aging_prediction():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:aging:storage_SOC",
+        val=50.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
+        val=100.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_end_main_route",
+        val=0.0,
+        units="percent",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        val=296.15,
+        units="degK",
+    )
+    ivc.add_output("data:TLAR:flight_per_year", val=280.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCABatteryAging(battery_pack_id="battery_pack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", units="unitless"
+    ) == pytest.approx(271.2, abs=1)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_weight_per_fu():
     inputs_list = [
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass",
@@ -1239,6 +1489,62 @@ def test_emissions_per_fu():
     assert problem.get_val(
         "data:LCA:distribution:he_power_train:battery_pack:battery_pack_1:HC_per_fu", units="kg"
     ) == pytest.approx(0.0, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pre_lca_group():
+    system = PreLCABatteryPack(battery_pack_id="battery_pack_1")
+    inputs_list = list_inputs(system)
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(system, ivc)
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:battery_pack:battery_pack_1:CO2_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.033, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    # Now we check with the submodel
+
+    oad.RegisterSubmodel.active_models[SERVICE_BATTERY_LIFESPAN] = (
+        "fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model"
+    )
+
+    system_2 = PreLCABatteryPack(battery_pack_id="battery_pack_1")
+    inputs_list = list_inputs(system_2)
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+    # These condition should prolong lifespan of the cells, so the mass per FU should be lower
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:average_cell_temperature",
+        val=296.15,
+        units="degK",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_end_main_route",
+        val=40.0,
+        units="percent",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(system_2, ivc)
+
+    # And we check that the battery lifespan is now computed at a value higher than 500
+    # (the default)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", units="unitless"
+    ) == pytest.approx(592.0, rel=1e-3)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.03, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

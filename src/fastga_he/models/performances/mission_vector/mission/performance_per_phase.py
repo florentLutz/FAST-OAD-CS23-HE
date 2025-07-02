@@ -2,8 +2,12 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO.
 
+import logging
+
 import numpy as np
 import openmdao.api as om
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PerformancePerPhase(om.ExplicitComponent):
@@ -379,10 +383,19 @@ class PerformancePerPhase(om.ExplicitComponent):
                 number_of_points_climb + 1 : number_of_points_climb + number_of_points_cruise + 1
             ]
         )
-        outputs["data:mission:sizing:main_route:cruise:distance"] = (
+
+        cruise_range = (
             position[number_of_points_climb + number_of_points_cruise]
             - position[number_of_points_climb]
         )
+        outputs["data:mission:sizing:main_route:cruise:distance"] = cruise_range
+
+        if cruise_range < 0.0:
+            _LOGGER.warning(
+                "Negative cruise range, consider adjusting range in the TLARs or climb and "
+                "descent parameters"
+            )
+
         outputs["data:mission:sizing:main_route:cruise:duration"] = (
             time[number_of_points_climb + number_of_points_cruise] - time[number_of_points_climb]
         )
