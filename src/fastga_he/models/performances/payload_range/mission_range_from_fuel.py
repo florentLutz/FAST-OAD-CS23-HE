@@ -77,6 +77,9 @@ class DistanceToTargetFuel(om.ImplicitComponent):
 
         self.add_output("data:mission:operational:range", units="NM", val=30.0)
 
+    def setup_partials(self):
+        variable_name_threshold_fuel = self.options["variable_name_threshold_fuel"]
+
         self.declare_partials(
             of="data:mission:operational:range", wrt="data:mission:operational:fuel", val=1.0
         )

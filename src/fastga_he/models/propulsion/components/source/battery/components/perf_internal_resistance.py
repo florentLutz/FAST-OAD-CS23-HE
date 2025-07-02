@@ -42,8 +42,27 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             val=293.15,
             units="degK",
         )
+        self.add_input(
+            name="settings:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":internal_resistance_soh_effect",
+            val=0.0,
+            units="unitless",
+            desc="Effect of the state of health of the battery on its internal resistance. Default "
+            "value leads to a doubling of R int when battery SOH reaches O",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health",
+            val=100.0,
+            units="percent",
+            desc="State of Health of the battery, i.e. capacity with respect to nominal capacity",
+        )
 
         self.add_output("internal_resistance", units="ohm", val=np.full(number_of_points, 1e-3))
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        battery_pack_id = self.options["battery_pack_id"]
 
         self.declare_partials(
             of="internal_resistance",
@@ -54,9 +73,17 @@ class PerformancesInternalResistance(om.ExplicitComponent):
         )
         self.declare_partials(
             of="internal_resistance",
-            wrt="settings:propulsion:he_power_train:battery_pack:"
-            + battery_pack_id
-            + ":reference_temperature",
+            wrt=[
+                "settings:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":reference_temperature",
+                "data:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":state_of_health",
+                "settings:propulsion:he_power_train:battery_pack:"
+                + battery_pack_id
+                + ":internal_resistance_soh_effect",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -70,6 +97,15 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             + battery_pack_id
             + ":reference_temperature"
         ]
+        alpha_soh = inputs[
+            "settings:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":internal_resistance_soh_effect"
+        ]
+        soh = inputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health"
+        ]
+
         cell_temperature = inputs["cell_temperature"]
         soc = np.clip(
             inputs["state_of_charge"],
@@ -90,7 +126,9 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             / ((cell_temperature - 254.33) * (temperature_ref - 254.33))
         )
 
-        outputs["internal_resistance"] = internal_resistance
+        outputs["internal_resistance"] = internal_resistance * (
+            1.0 + alpha_soh * (1.0 - soh / 100.0)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         battery_pack_id = self.options["battery_pack_id"]
@@ -99,6 +137,14 @@ class PerformancesInternalResistance(om.ExplicitComponent):
             "settings:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":reference_temperature"
+        ]
+        alpha_soh = inputs[
+            "settings:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":internal_resistance_soh_effect"
+        ]
+        soh = inputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health"
         ]
         cell_temperature = inputs["cell_temperature"]
         soc = np.clip(
@@ -130,13 +176,34 @@ class PerformancesInternalResistance(om.ExplicitComponent):
                 + 2.13818712e-03
             )
             * temperature_effect
+            * (1.0 + alpha_soh * (1.0 - soh / 100.0))
         )
         partials["internal_resistance", "cell_temperature"] = -(
-            soc_effect * temperature_effect * 46.39 / (cell_temperature - 254.33) ** 2.0
+            soc_effect
+            * temperature_effect
+            * 46.39
+            / (cell_temperature - 254.33) ** 2.0
+            * (1.0 + alpha_soh * (1.0 - soh / 100.0))
         )
         partials[
             "internal_resistance",
             "settings:propulsion:he_power_train:battery_pack:"
             + battery_pack_id
             + ":reference_temperature",
-        ] = soc_effect * temperature_effect * 46.39 / (temperature_ref - 254.33) ** 2.0
+        ] = (
+            soc_effect
+            * temperature_effect
+            * 46.39
+            / (temperature_ref - 254.33) ** 2.0
+            * (1.0 + alpha_soh * (1.0 - soh / 100.0))
+        )
+        partials[
+            "internal_resistance",
+            "settings:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":internal_resistance_soh_effect",
+        ] = soc_effect * temperature_effect * (1.0 - soh / 100.0)
+        partials[
+            "internal_resistance",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health",
+        ] = soc_effect * temperature_effect * (1.0 - alpha_soh / 100.0)

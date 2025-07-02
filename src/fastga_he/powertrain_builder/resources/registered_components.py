@@ -362,7 +362,7 @@ BATTERY_PACK = {
     CN_ID: "battery_pack_id",
     CT: "battery_pack",
     ATT: None,
-    PT: ["time_step"],
+    PT: ["time_step", "settings:*",],
     SPT: [],
     PTS: [],
     IN: None,

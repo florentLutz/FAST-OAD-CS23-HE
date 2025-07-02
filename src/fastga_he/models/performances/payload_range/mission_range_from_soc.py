@@ -95,6 +95,10 @@ class DistanceToTargetSoc(om.ImplicitComponent):
 
         self.add_output("data:mission:operational:range", units="NM", val=30.0)
 
+    def setup_partials(self):
+        variable_name_target_soc = self.options["variable_name_target_SoC"]
+        variable_name_threshold_soc = self.options["variable_name_threshold_SoC"]
+
         self.declare_partials(
             of="data:mission:operational:range", wrt=variable_name_target_soc, val=1.0
         )

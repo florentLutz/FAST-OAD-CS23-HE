@@ -55,6 +55,10 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         )
         self.add_output("c_rate", units="h**-1", val=np.full(number_of_points, 1.0))
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        battery_pack_id = self.options["battery_pack_id"]
+
         self.declare_partials(
             of="c_rate",
             wrt="current_one_module",
