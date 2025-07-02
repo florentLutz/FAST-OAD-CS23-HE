@@ -5,6 +5,7 @@
 import openmdao.api as om
 import pytest
 import numpy as np
+import fastoad.api as oad
 
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
@@ -62,7 +63,11 @@ from .....sub_components import SizingHeatSink, SizingInductor, SizingCapacitor
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_RECTIFIER_EFFICIENCY,
+    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE,
+)
 
 XML_FILE = "sample_rectifier.xml"
 NB_POINTS_TEST = 10
@@ -1233,6 +1238,12 @@ def test_sizing_rectifier():
 
 
 def test_performances_rectifier():
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+    )
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)

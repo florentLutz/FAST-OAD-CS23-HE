@@ -5,6 +5,7 @@
 import numpy as np
 import openmdao.api as om
 import pytest
+import fastoad.api as oad
 
 from ..components.sizing_energy_coefficient_scaling import SizingInverterEnergyCoefficientScaling
 from ..components.sizing_energy_coefficients import SizingInverterEnergyCoefficients
@@ -70,7 +71,11 @@ from ..components.cstr_ensure import (
 
 from .....sub_components import SizingHeatSink, SizingCapacitor, SizingInductor
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_INVERTER_EFFICIENCY,
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
+)
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -1472,6 +1477,12 @@ def test_maximum():
 
 
 def test_performances_inverter_tot():
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)
