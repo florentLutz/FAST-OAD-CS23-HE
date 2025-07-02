@@ -30,14 +30,6 @@ from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 from ..assemblers.delta_cl_from_pt_file import PowerTrainDeltaClFromFile
 from ..assemblers.delta_cd_from_pt_file import PowerTrainDeltaCdFromFile
 from ..assemblers.delta_cm_from_pt_file import PowerTrainDeltaCmFromFile
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 from . import outputs
 
@@ -47,30 +39,7 @@ XML_FILE = "simple_assembly.xml"
 NB_POINTS_TEST = 10
 
 
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
-
-
-def test_assembly_performances(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+def test_assembly_performances():
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
@@ -158,16 +127,16 @@ def test_assembly_performances(restore_submodels):
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                197132.0,
-                198194.0,
-                199230.0,
-                200250.0,
-                201257.0,
-                202253.0,
-                203240.0,
-                204212.0,
-                205167.0,
-                206103.0,
+                203180.5,
+                204238.1,
+                205277.0,
+                206296.7,
+                207297.5,
+                208279.4,
+                209242.6,
+                210187.0,
+                211112.0,
+                212014.7,
             ]
         ),
         abs=1,
@@ -236,25 +205,14 @@ def test_assembly_sizing():
     )
 
 
-def test_performances_sizing_assembly_battery_enforce(restore_submodels):
+def test_performances_sizing_assembly_battery_enforce():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -295,31 +253,20 @@ def test_performances_sizing_assembly_battery_enforce(restore_submodels):
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(19.40, rel=1e-2)
+    ) == pytest.approx(19.61, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(2483.0, rel=1e-2)
+    ) == pytest.approx(2400.9, rel=1e-2)
 
 
-def test_performances_sizing_assembly_battery_ensure(restore_submodels):
+def test_performances_sizing_assembly_battery_ensure():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -359,7 +306,7 @@ def test_performances_sizing_assembly_battery_ensure(restore_submodels):
 
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
-    ) == pytest.approx(35.11, rel=1e-2)
+    ) == pytest.approx(37.67, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
     ) == pytest.approx(3000.0, rel=1e-2)
@@ -438,20 +385,8 @@ def test_assembly_sizing_from_pt_file():
     )
 
 
-def test_performances_from_pt_file(restore_submodels):
+def test_performances_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -496,16 +431,16 @@ def test_performances_from_pt_file(restore_submodels):
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                197132.0,
-                198193.0,
-                199229.0,
-                200247.0,
-                201251.0,
-                202246.0,
-                203236.0,
-                204218.0,
-                205181.0,
-                206076.0,
+                203180.5,
+                204238.1,
+                205277.0,
+                206296.7,
+                207297.5,
+                208279.4,
+                209242.6,
+                210187.0,
+                211112.0,
+                212014.7,
             ]
         ),
         abs=1,
@@ -517,20 +452,9 @@ def test_performances_from_pt_file(restore_submodels):
     )
 
 
-def test_performances_from_pt_file_aux_load(restore_submodels):
+def test_performances_from_pt_file_aux_load():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -575,16 +499,16 @@ def test_performances_from_pt_file_aux_load(restore_submodels):
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                202403.0,
-                203468.0,
-                204508.0,
-                205528.0,
-                206537.0,
-                207538.0,
-                208533.0,
-                209519.0,
-                210483.0,
-                211377.0,
+                208405.9,
+                209463.6,
+                210502.5,
+                211522.3,
+                212523.2,
+                213505.2,
+                214468.4,
+                215412.8,
+                216337.5,
+                217239.7,
             ]
         ),
         abs=1,

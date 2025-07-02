@@ -25,14 +25,6 @@ from ..components.connectors.dc_cable import PerformancesHarness
 from ..components.connectors.dc_bus import PerformancesDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
 from ..components.source.battery import PerformancesBatteryPack
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 from ..assemblers.thrust_distributor import ThrustDistributor
 from ..assemblers.power_rate import PowerRate
@@ -44,16 +36,6 @@ XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 50
 COEFF_DIFF = 0.0
 
-
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
 
 
 class PerformancesAssembly(om.Group):
@@ -349,19 +331,7 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_dc_converter_1.dc_current_in", "battery_pack_1.dc_current_out")
 
 
-def test_assembly(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+def test_assembly():
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
@@ -513,56 +483,56 @@ def test_assembly(restore_submodels):
     ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                298875.0,
-                300022.0,
-                301172.0,
-                302325.0,
-                303481.0,
-                304640.0,
-                305801.0,
-                306966.0,
-                308133.0,
-                309303.0,
-                310476.0,
-                311652.0,
-                312830.0,
-                314011.0,
-                315194.0,
-                316380.0,
-                317569.0,
-                318760.0,
-                319954.0,
-                321150.0,
-                322349.0,
-                323551.0,
-                324755.0,
-                325962.0,
-                327172.0,
-                328385.0,
-                329600.0,
-                330818.0,
-                332039.0,
-                333263.0,
-                334490.0,
-                335720.0,
-                336952.0,
-                338189.0,
-                339428.0,
-                340670.0,
-                341916.0,
-                343166.0,
-                344418.0,
-                345675.0,
-                346935.0,
-                348199.0,
-                349466.0,
-                350738.0,
-                352013.0,
-                353292.0,
-                354576.0,
-                355863.0,
-                357155.0,
-                358451.0,
+                303709.5,
+                304887.2,
+                306068.2,
+                307252.3,
+                308439.5,
+                309629.7,
+                310822.9,
+                312019.0,
+                313218.0,
+                314419.8,
+                315624.4,
+                316831.7,
+                318041.7,
+                319254.4,
+                320469.7,
+                321687.5,
+                322907.9,
+                324130.9,
+                325356.3,
+                326584.3,
+                327814.7,
+                329047.6,
+                330283.1,
+                331521.0,
+                332761.4,
+                334004.3,
+                335249.8,
+                336497.8,
+                337748.4,
+                339001.7,
+                340257.6,
+                341516.2,
+                342777.5,
+                344041.7,
+                345308.7,
+                346578.6,
+                347851.5,
+                349127.4,
+                350406.4,
+                351688.5,
+                352973.9,
+                354262.6,
+                355554.6,
+                356850.1,
+                358149.1,
+                359451.6,
+                360757.8,
+                362067.6,
+                363381.1,
+                364698.4,
             ]
         ),
         abs=1,
@@ -571,20 +541,8 @@ def test_assembly(restore_submodels):
     # om.n2(problem)
 
 
-def test_assembly_from_pt_file(restore_submodels):
+def test_assembly_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -625,56 +583,56 @@ def test_assembly_from_pt_file(restore_submodels):
     assert problem.get_val("non_consumable_energy_t_econ", units="W*h") == pytest.approx(
         np.array(
             [
-                4151.09408018,
-                4167.02475981,
-                4182.99750931,
-                4199.01173489,
-                4215.06684463,
-                4231.16225592,
-                4247.29740252,
-                4263.47174137,
-                4279.68475894,
-                4295.93597708,
-                4312.22495842,
-                4328.55131117,
-                4344.91469335,
-                4361.31481644,
-                4377.75144853,
-                4394.22441676,
-                4410.73360941,
-                4427.27897731,
-                4443.86053492,
-                4460.47836083,
-                4477.13259801,
-                4493.82345352,
-                4510.5511981,
-                4527.31616524,
-                4544.1187502,
-                4560.95940866,
-                4577.83865519,
-                4594.75706156,
-                4611.71525479,
-                4628.71391509,
-                4645.75377353,
-                4662.83560954,
-                4679.96024814,
-                4697.1285569,
-                4714.34144255,
-                4731.59984721,
-                4748.90474418,
-                4766.25713309,
-                4783.65803451,
-                4801.10848367,
-                4818.60952337,
-                4836.16219574,
-                4853.76753289,
-                4871.42654604,
-                4889.14021315,
-                4906.9094646,
-                4924.73516695,
-                4942.61810422,
-                4960.55895673,
-                4978.55827699,
+                4218.2,
+                4234.6,
+                4251.0,
+                4267.4,
+                4283.9,
+                4300.5,
+                4317.0,
+                4333.7,
+                4350.3,
+                4367.0,
+                4383.7,
+                4400.5,
+                4417.3,
+                4434.1,
+                4451.0,
+                4467.9,
+                4484.9,
+                4501.9,
+                4518.9,
+                4536.0,
+                4553.0,
+                4570.2,
+                4587.3,
+                4604.5,
+                4621.7,
+                4639.0,
+                4656.3,
+                4673.6,
+                4691.0,
+                4708.4,
+                4725.9,
+                4743.3,
+                4760.9,
+                4778.4,
+                4796.0,
+                4813.7,
+                4831.3,
+                4849.1,
+                4866.8,
+                4884.6,
+                4902.5,
+                4920.4,
+                4938.3,
+                4956.3,
+                4974.4,
+                4992.5,
+                5010.6,
+                5028.8,
+                5047.0,
+                5065.3,
             ]
         ),
         abs=1e-1,
@@ -687,20 +645,8 @@ def test_assembly_from_pt_file(restore_submodels):
     # om.n2(problem)
 
 
-def test_assembly_no_cross_from_pt_file(restore_submodels):
+def test_assembly_no_cross_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "quad_assembly_no_cross.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -741,56 +687,56 @@ def test_assembly_no_cross_from_pt_file(restore_submodels):
     assert problem.get_val("non_consumable_energy_t_econ", units="W*h") == pytest.approx(
         np.array(
             [
-                4151.09408018,
-                4167.02475981,
-                4182.99750931,
-                4199.01173489,
-                4215.06684463,
-                4231.16225592,
-                4247.29740252,
-                4263.47174137,
-                4279.68475894,
-                4295.93597708,
-                4312.22495842,
-                4328.55131117,
-                4344.91469335,
-                4361.31481644,
-                4377.75144853,
-                4394.22441676,
-                4410.73360941,
-                4427.27897731,
-                4443.86053492,
-                4460.47836083,
-                4477.13259801,
-                4493.82345352,
-                4510.5511981,
-                4527.31616524,
-                4544.1187502,
-                4560.95940866,
-                4577.83865519,
-                4594.75706156,
-                4611.71525479,
-                4628.71391509,
-                4645.75377353,
-                4662.83560954,
-                4679.96024814,
-                4697.1285569,
-                4714.34144255,
-                4731.59984721,
-                4748.90474418,
-                4766.25713309,
-                4783.65803451,
-                4801.10848367,
-                4818.60952337,
-                4836.16219574,
-                4853.76753289,
-                4871.42654604,
-                4889.14021315,
-                4906.9094646,
-                4924.73516695,
-                4942.61810422,
-                4960.55895673,
-                4978.55827699,
+                4218.2,
+                4234.6,
+                4251.0,
+                4267.4,
+                4283.9,
+                4300.5,
+                4317.0,
+                4333.7,
+                4350.3,
+                4367.0,
+                4383.7,
+                4400.5,
+                4417.3,
+                4434.1,
+                4451.0,
+                4467.9,
+                4484.9,
+                4501.9,
+                4518.9,
+                4536.0,
+                4553.0,
+                4570.2,
+                4587.3,
+                4604.5,
+                4621.7,
+                4639.0,
+                4656.3,
+                4673.6,
+                4691.0,
+                4708.4,
+                4725.9,
+                4743.3,
+                4760.9,
+                4778.4,
+                4796.0,
+                4813.7,
+                4831.3,
+                4849.1,
+                4866.8,
+                4884.6,
+                4902.5,
+                4920.4,
+                4938.3,
+                4956.3,
+                4974.4,
+                4992.5,
+                5010.6,
+                5028.8,
+                5047.0,
+                5065.3,
             ]
         ),
         abs=1e-1,

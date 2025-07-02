@@ -163,6 +163,7 @@
                     <dc_dc_converter_1>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <inductor>
                             <resistance units="ohm">1.4e-3</resistance>
                         </inductor>
@@ -200,6 +201,7 @@
                 <DC_cable_harness>
                     <harness_1>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_max units="A">800.0</current_max>
                         <voltage_max units="V">1000.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -236,6 +238,7 @@
                     </harness_1>
                     <harness_2>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_max units="A">800.0</current_max>
                         <voltage_max units="V">1000.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -272,6 +275,7 @@
                     </harness_2>
                     <harness_3>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_max units="A">800.0</current_max>
                         <voltage_max units="V">1000.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -308,6 +312,7 @@
                     </harness_3>
                     <harness_4>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_max units="A">800.0</current_max>
                         <voltage_max units="V">1000.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -344,6 +349,7 @@
                     </harness_4>
                     <harness_5>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_max units="A">800.0</current_max>
                         <voltage_max units="V">1000.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -380,6 +386,7 @@
                     </harness_5>
                     <harness_6>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_max units="A">800.0</current_max>
                         <voltage_max units="V">1000.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -419,6 +426,8 @@
                     <inverter_1>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -500,6 +509,8 @@
                     <inverter_2>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -581,6 +592,8 @@
                     <inverter_3>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -662,6 +675,8 @@
                     <inverter_4>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>

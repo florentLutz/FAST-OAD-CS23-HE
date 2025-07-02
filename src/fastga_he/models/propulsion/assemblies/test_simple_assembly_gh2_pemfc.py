@@ -4,7 +4,6 @@
 
 import os.path as pth
 import pytest
-import copy
 import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
@@ -34,14 +33,6 @@ from ..components.source.pemfc.constants import SUBMODEL_CONSTRAINTS_PEMFC_EFFEC
 from ..components.tanks.gaseous_hydrogen_tank.constants import (
     SUBMODEL_CONSTRAINTS_GASEOUS_HYDROGEN_TANK_CAPACITY,
 )
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 from . import outputs
 
@@ -51,30 +42,8 @@ XML_FILE = "simple_assembly_gh2_pemfc.xml"
 NB_POINTS_TEST = 10
 
 
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
 
-
-def test_assembly_performances(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+def test_assembly_performances():
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
@@ -253,21 +222,9 @@ def test_assembly_sizing():
     )
 
 
-def test_performances_sizing_assembly_pemfc_gh2_enforce(restore_submodels):
+def test_performances_sizing_assembly_pemfc_gh2_enforce():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
     )
 
     ivc = get_indep_var_comp(
@@ -319,21 +276,9 @@ def test_performances_sizing_assembly_pemfc_gh2_enforce(restore_submodels):
     ) == pytest.approx(969.82, rel=1e-2)
 
 
-def test_performances_sizing_assembly_pemfc_gh2_enforce_from_pt(restore_submodels):
+def test_performances_sizing_assembly_pemfc_gh2_enforce_from_pt():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
     )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
@@ -480,7 +425,7 @@ def test_assembly_sizing_from_pt_file():
     )
 
 
-def test_performances_sizing_assembly_pemfc_gh2_ensure(restore_submodels):
+def test_performances_sizing_assembly_pemfc_gh2_ensure():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
@@ -490,18 +435,7 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
         "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
     )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -551,20 +485,8 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure(restore_submodels):
     ) == pytest.approx(2000.0, rel=1e-2)
 
 
-def test_performances_from_pt_file(restore_submodels):
+def test_performances_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -650,7 +572,7 @@ def test_mass_from_pt_file():
     problem.check_partials(compact_print=True)
 
 
-def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt(restore_submodels):
+def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
@@ -660,18 +582,7 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt(restore_submodels
     oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
         "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
     )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_gh2_pemfc.yml")
 
@@ -741,7 +652,7 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt(restore_submodels
     ) == pytest.approx(-1189.284, rel=1e-2)
 
 
-def test_performances_sizing_from_pt_with_sizing_options(restore_submodels):
+def test_performances_sizing_from_pt_with_sizing_options():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
@@ -751,18 +662,7 @@ def test_performances_sizing_from_pt_with_sizing_options(restore_submodels):
     oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA] = (
         "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
     )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_sizing_option_test.yml")
 

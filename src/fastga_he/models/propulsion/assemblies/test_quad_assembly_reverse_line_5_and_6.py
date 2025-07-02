@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 import pytest
-import copy
-import fastoad.api as oad
 from stdatm import Atmosphere
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -17,29 +15,12 @@ from ..components.connectors.inverter import PerformancesInverter
 from ..components.connectors.dc_cable import PerformancesHarness
 from ..components.connectors.dc_bus import PerformancesDCBus
 from ..components.connectors.dc_dc_converter import PerformancesDCDCConverter
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 25
 COEFF_DIFF = 0.0
 
 
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
 
 
 class PerformancesAssembly(om.Group):
@@ -360,19 +341,7 @@ class PerformancesAssembly(om.Group):
         self.connect("dc_dc_converter_voltage_in.voltage_in", "dc_dc_converter_1.dc_voltage_in")
 
 
-def test_assembly(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
+def test_assembly():
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
@@ -524,31 +493,31 @@ def test_assembly(restore_submodels):
     ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                298683.0,
-                301013.0,
-                303355.0,
-                305708.0,
-                308072.0,
-                310447.0,
-                312833.0,
-                315231.0,
-                317640.0,
-                320060.0,
-                322491.0,
-                324934.0,
-                327389.0,
-                329854.0,
-                332331.0,
-                334820.0,
-                337320.0,
-                339832.0,
-                342355.0,
-                344890.0,
-                347437.0,
-                349995.0,
-                352565.0,
-                355146.0,
-                357740.0,
+                303711.0,
+                306123.0,
+                308546.2,
+                310980.7,
+                313426.5,
+                315883.6,
+                318352.0,
+                320831.8,
+                323323.0,
+                325825.6,
+                328339.6,
+                330865.1,
+                333402.0,
+                335950.5,
+                338510.5,
+                341082.1,
+                343665.3,
+                346260.1,
+                348866.5,
+                351484.6,
+                354114.4,
+                356755.9,
+                359409.2,
+                362074.2,
+                364751.0,
             ]
         ),
         abs=1,
