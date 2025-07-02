@@ -31,16 +31,20 @@ class OperationalMissionVectorWithTargetFuel(OperationalMissionVector):
             types=str,
             default="data:mission:operational:threshold_fuel",
             allow_none=False,
-            desc="Name of the variable that contains the target fuel",
+            desc="Name of the variable that contains the target fuel, ':' should be replaced by "
+            "'__'",
         )
 
     def setup(self):
         super().setup()
+
+        variable_name_threshold_fuel = self.options["variable_name_threshold_fuel"].replace(
+            "__", ":"
+        )
+
         self.add_subsystem(
             name="distance_to_target",
-            subsys=DistanceToTargetFuel(
-                variable_name_threshold_fuel=self.options["variable_name_threshold_fuel"]
-            ),
+            subsys=DistanceToTargetFuel(variable_name_threshold_fuel=variable_name_threshold_fuel),
             promotes=["*"],
         )
 

@@ -31,23 +31,29 @@ class OperationalMissionVectorWithTargetSoC(OperationalMissionVector):
             types=str,
             default=None,
             allow_none=False,
-            desc="Name of the variable that will be used to evaluate if target SOC is reached",
+            desc="Name of the variable that will be used to evaluate if target SOC is reached, "
+            "':' should be replaced by '__'",
         )
         self.options.declare(
             "variable_name_threshold_SoC",
             types=str,
             default="data:mission:operational:threshold_SoC",
             allow_none=False,
-            desc="Name of the variable that contains the target SOC",
+            desc="Name of the variable that contains the target SOC, ':' should be replaced by "
+            "'__'",
         )
 
     def setup(self):
         super().setup()
+
+        variable_name_target_soc = self.options["variable_name_target_SoC"].replace("__", ":")
+        variable_name_threshold_soc = self.options["variable_name_threshold_SoC"].replace("__", ":")
+
         self.add_subsystem(
             name="distance_to_target",
             subsys=DistanceToTargetSoc(
-                variable_name_target_SoC=self.options["variable_name_target_SoC"],
-                variable_name_threshold_SoC=self.options["variable_name_threshold_SoC"],
+                variable_name_target_SoC=variable_name_target_soc,
+                variable_name_threshold_SoC=variable_name_threshold_soc,
             ),
             promotes=["*"],
         )

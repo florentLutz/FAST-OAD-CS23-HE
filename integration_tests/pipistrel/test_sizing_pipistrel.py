@@ -90,6 +90,57 @@ def test_pipistrel_velis_electro():
     assert sizing_energy == pytest.approx(25.05, abs=1e-2)
 
 
+def test_pipistrel_performances_with_lower_soh():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_inputs_performances_lower_SOH.xml"
+    process_file_name = "pipistrel_performances_lower_soh.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    state_of_health = 62.5
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:state_of_health",
+        val=state_of_health,
+        units="percent",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:state_of_health",
+        val=state_of_health,
+        units="percent",
+    )
+
+    problem.model.performances.nonlinear_solver.options["rtol"] = 1e-8
+    problem.model.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver.options[
+        "iprint"
+    ] = 2
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+    duration_main_route = (
+        problem.get_val("data:mission:operational:duration", units="min")
+        - problem.get_val("data:mission:operational:reserve:duration", units="min")
+        - problem.get_val("data:mission:operational:taxi_in:duration", units="min")
+        - problem.get_val("data:mission:operational:taxi_out:duration", units="min")
+    )
+    assert duration_main_route == pytest.approx(22.0, abs=1.0)
+
+
 def test_pipistrel_velis_electro_lower_soc_start_mission():
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
