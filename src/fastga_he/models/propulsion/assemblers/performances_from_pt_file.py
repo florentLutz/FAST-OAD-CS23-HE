@@ -16,11 +16,11 @@ import fastga_he.models.propulsion.components as he_comp
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
 
-PERFORMANCE_FROM_PT = "fastga_he.submodel.propulsion.performances.from_pt_file"
-oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_PERF] = PERFORMANCE_FROM_PT
+PERFORMANCE_FROM_PT_FILE = "fastga_he.submodel.propulsion.performances.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_PERF] = PERFORMANCE_FROM_PT_FILE
 
 
-@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_PERF, PERFORMANCE_FROM_PT)
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_PERF, PERFORMANCE_FROM_PT_FILE)
 class PowerTrainPerformancesFromFile(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

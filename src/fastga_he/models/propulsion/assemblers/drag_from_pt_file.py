@@ -10,11 +10,11 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .constants import SUBMODEL_POWER_TRAIN_DRAG
 
-DRAG_FROM_PT = "fastga_he.submodel.propulsion.drag.from_pt_file"
-oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_DRAG] = DRAG_FROM_PT
+DRAG_FROM_PT_FILE = "fastga_he.submodel.propulsion.drag.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_DRAG] = DRAG_FROM_PT_FILE
 
 
-@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_DRAG, DRAG_FROM_PT)
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_DRAG, DRAG_FROM_PT_FILE)
 class PowerTrainDragFromFile(om.ExplicitComponent):
     """
     Computes the profile drag of the power train by summing the contribution of all its components.

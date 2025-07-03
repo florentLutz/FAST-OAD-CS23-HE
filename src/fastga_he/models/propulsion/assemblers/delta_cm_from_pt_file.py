@@ -10,11 +10,11 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .constants import SUBMODEL_POWER_TRAIN_DELTA_CM
 
-DELTA_CM_FROM_PT = "fastga_he.submodel.propulsion.delta_cm.from_pt_file"
-oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_DELTA_CM] = DELTA_CM_FROM_PT
+DELTA_CM_FROM_PT_FILE = "fastga_he.submodel.propulsion.delta_cm.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_DELTA_CM] = DELTA_CM_FROM_PT_FILE
 
 
-@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_DELTA_CM, DELTA_CM_FROM_PT)
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_DELTA_CM, DELTA_CM_FROM_PT_FILE)
 class PowerTrainDeltaCmFromFile(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
