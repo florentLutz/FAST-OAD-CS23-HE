@@ -753,6 +753,7 @@
           </sizing_factor>
         </cs23>
         <main_route>
+          <duration units="s" is_input="False">9421.869478911876</duration>
           <climb>
             <distance units="m" is_input="False">92123.1876051973</distance>
             <duration units="s" is_input="False">1536.8073268760352</duration>

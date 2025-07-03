@@ -828,6 +828,7 @@
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
         <main_route>
+          <duration units="s" is_input="False">16588.350196741827</duration>
           <climb>
             <distance units="m" is_input="False">143348.2604881261</distance>
             <duration units="s" is_input="False">1404.019044512355</duration>

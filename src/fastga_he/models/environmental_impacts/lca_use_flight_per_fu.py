@@ -82,10 +82,10 @@ class LCAUseFlightPerFUFlightHours(om.ExplicitComponent):
 
     def setup(self):
         if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
+            duration_mission_name = "data:mission:sizing:main_route:duration"
 
         else:
-            duration_mission_name = "data:mission:operational:duration"
+            duration_mission_name = "data:mission:operational:main_route:duration"
 
         self.add_input(
             name=duration_mission_name,
@@ -104,19 +104,19 @@ class LCAUseFlightPerFUFlightHours(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
+            duration_mission_name = "data:mission:sizing:main_route:duration"
 
         else:
-            duration_mission_name = "data:mission:operational:duration"
+            duration_mission_name = "data:mission:operational:main_route:duration"
 
         outputs["data:environmental_impact:flight_per_fu"] = 1.0 / inputs[duration_mission_name]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
+            duration_mission_name = "data:mission:sizing:main_route:duration"
 
         else:
-            duration_mission_name = "data:mission:operational:duration"
+            duration_mission_name = "data:mission:operational:main_route:duration"
 
         partials["data:environmental_impact:flight_per_fu", duration_mission_name] = -1.0 / (
             inputs[duration_mission_name] ** 2.0

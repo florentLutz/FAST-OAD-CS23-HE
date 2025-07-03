@@ -173,8 +173,8 @@ def test_aircraft_equivalent_year_of_life():
 def test_aircraft_equivalent_flight_per_year():
     inputs_list = [
         "data:TLAR:max_airframe_hours",
-        "data:mission:sizing:duration",
-        "data:mission:operational:duration",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
     ]
 
     ivc = get_indep_var_comp(
@@ -247,8 +247,8 @@ def test_aircraft_per_fu_flight_hours():
     inputs_list = [
         "data:TLAR:aircraft_lifespan",
         "data:TLAR:flight_per_year",
-        "data:mission:sizing:duration",
-        "data:mission:operational:duration",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
     ]
 
     ivc = get_indep_var_comp(
@@ -322,8 +322,8 @@ def test_use_flight_per_fu_pax_km():
 
 def test_use_flight_per_fu_flight_hours():
     inputs_list = [
-        "data:mission:sizing:duration",
-        "data:mission:operational:duration",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
     ]
 
     ivc = get_indep_var_comp(
@@ -567,8 +567,8 @@ def test_empty_aircraft_weight_per_fu():
 
 def test_line_tests_sizing_ratio():
     inputs_list = [
-        "data:mission:sizing:duration",
-        "data:mission:operational:duration",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
         "data:environmental_impact:line_test:duration",
     ]
 
@@ -1056,7 +1056,7 @@ def test_lca_tbm900():
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
         problem.get_val("data:environmental_impact:line_test:duration", units="h")
-        / problem.get_val("data:mission:sizing:duration", units="h")
+        / problem.get_val("data:mission:sizing:main_route:duration", units="h")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),
@@ -1260,7 +1260,7 @@ def test_lca_cirrus_sr22():
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
         problem.get_val("data:environmental_impact:line_test:duration", units="h")
-        / problem.get_val("data:mission:sizing:duration", units="h")
+        / problem.get_val("data:mission:sizing:main_route:duration", units="h")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),

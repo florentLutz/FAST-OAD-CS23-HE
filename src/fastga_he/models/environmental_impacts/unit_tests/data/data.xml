@@ -1092,6 +1092,9 @@
     <mission>
       <operational>
         <range units="km">250.0</range>
+        <main_route>
+          <duration units="s" is_input="False">13977.0</duration>
+        </main_route>
         <duration units="s" is_input="False">13977.0</duration>
         <energy units="kW*h" is_input="False">160.0</energy>
         <fuel units="kg" is_input="False">224.62529117214783</fuel>
@@ -1152,6 +1155,7 @@
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
         <main_route>
+          <duration units="s" is_input="False">3494.343859355023</duration>
           <climb>
             <distance units="m" is_input="False">8492.316454382377</distance>
             <duration units="s" is_input="False">214.96391679117636</duration>

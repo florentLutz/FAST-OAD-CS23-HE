@@ -16,6 +16,9 @@
     <mission>
       <sizing>
         <duration units="h">1.0</duration>
+        <main_route>
+          <duration units="h">1.0</duration>
+        </main_route>
       </sizing>
     </mission>
     <propulsion>
