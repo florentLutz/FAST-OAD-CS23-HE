@@ -18,6 +18,7 @@ from fastga_he.models.performances.mission_vector.constants import (
 
 INVALID_COMPUTATION_RESULT = -1.0
 
+
 class ComputePayloadRangeInner(om.ExplicitComponent):
     """
     Computation of the performances of the aircraft on some points inside the payload range diagram.
