@@ -10,11 +10,12 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,
 )
-from .payload_range import zip_op_mission_input
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
 )
+
+from .payload_range import zip_op_mission_input
 
 INVALID_COMPUTATION_RESULT = -1.0
 
