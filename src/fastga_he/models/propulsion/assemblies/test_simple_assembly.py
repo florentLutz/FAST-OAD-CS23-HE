@@ -3,7 +3,6 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-import copy
 import numpy as np
 import pytest
 
@@ -40,7 +39,6 @@ NB_POINTS_TEST = 10
 
 
 def test_assembly_performances():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -213,7 +211,6 @@ def test_performances_sizing_assembly_battery_enforce():
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce"
 
-
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -266,7 +263,6 @@ def test_performances_sizing_assembly_battery_ensure():
     oad.RegisterSubmodel.active_models[
         "submodel.propulsion.constraints.battery.state_of_charge"
     ] = "fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure"
-
 
     ivc = get_indep_var_comp(
         list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
@@ -454,7 +450,6 @@ def test_performances_from_pt_file():
 
 def test_performances_from_pt_file_aux_load():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")
-
 
     ivc = get_indep_var_comp(
         list_inputs(

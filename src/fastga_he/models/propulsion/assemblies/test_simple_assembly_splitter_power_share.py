@@ -26,19 +26,6 @@ from .simple_assembly.performances_simple_assembly_splitter_power_share import (
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
 
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.rectifier.constants import (
-    SUBMODEL_RECTIFIER_EFFICIENCY,
-    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
-
 from . import outputs
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
@@ -50,37 +37,7 @@ XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
 
 
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
-
-
-def test_assembly_performances_splitter_150_kw(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
-
+def test_assembly_performances_splitter_150_kw():
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -139,7 +96,7 @@ def test_assembly_performances_splitter_150_kw(restore_submodels):
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.full(NB_POINTS_TEST, 5.53),
+        np.full(NB_POINTS_TEST, 5.82),
         abs=1e-2,
     )
 
@@ -154,20 +111,7 @@ def test_assembly_performances_splitter_150_kw(restore_submodels):
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
     ) == pytest.approx(
-        np.array(
-            [
-                55.31,
-                49.78,
-                44.25,
-                38.72,
-                33.18,
-                27.65,
-                22.12,
-                16.59,
-                11.06,
-                5.531,
-            ]
-        ),
+        np.array([58.18, 52.37, 46.55, 40.73, 34.91, 29.09, 23.27, 17.46, 11.64, 5.82]),
         abs=1e-2,
     )
 
@@ -179,27 +123,9 @@ def test_assembly_performances_splitter_150_kw(restore_submodels):
     # problem.check_partials(compact_print=True)
 
 
-def test_assembly_performances_splitter_150_kw_low_requirement(restore_submodels):
+def test_assembly_performances_splitter_150_kw_low_requirement():
     # Same test as above except the thrust required will be much lower to check if it indeed
     # output zero current in the secondary branch and primary branch is equal to the output
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
@@ -259,20 +185,7 @@ def test_assembly_performances_splitter_150_kw_low_requirement(restore_submodels
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array(
-            [
-                3.53345024,
-                3.55747546,
-                3.5812576,
-                3.60479619,
-                3.62809081,
-                3.65114111,
-                3.67394681,
-                3.69650769,
-                3.71057751,
-                3.72215259,
-            ]
-        ),
+        np.array([3.74, 3.76, 3.77, 3.78, 3.80, 3.81, 3.82, 3.84, 3.85, 3.86]),
         abs=1e-2,
     )
 
@@ -287,20 +200,7 @@ def test_assembly_performances_splitter_150_kw_low_requirement(restore_submodels
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
     ) == pytest.approx(
-        np.array(
-            [
-                36.35939602,
-                32.82594578,
-                29.26847032,
-                25.68721271,
-                22.08241652,
-                18.45432571,
-                14.8031846,
-                11.12923779,
-                7.43273011,
-                3.72215259,
-            ]
-        ),
+        np.array([38.03, 34.29, 30.53, 26.76, 22.98, 19.18, 15.37, 11.55, 7.71, 3.86]),
         abs=1e-2,
     )
 
@@ -313,26 +213,7 @@ def test_assembly_performances_splitter_150_kw_low_requirement(restore_submodels
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
-def test_assembly_performances_splitter_150_kw_low_to_high_requirement(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
-
+def test_assembly_performances_splitter_150_kw_low_to_high_requirement():
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssemblySplitterPowerShare(number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -391,20 +272,7 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement(restore_s
     )
 
     assert problem.get_val("performances.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array(
-            [
-                3.31960595,
-                3.78038653,
-                4.0761746,
-                4.40550377,
-                4.79189658,
-                5.25861361,
-                5.53154804,
-                5.53154804,
-                5.53154804,
-                5.53154804,
-            ]
-        ),
+        np.array([3.54, 3.93, 4.26, 4.64, 5.11, 5.68, 5.82, 5.82, 5.82, 5.82]),
         abs=1e-2,
     )
 
@@ -419,28 +287,13 @@ def test_assembly_performances_splitter_150_kw_low_to_high_requirement(restore_s
     assert problem.get_val(
         "performances.fuel_tank_1.fuel_remaining_t", units="kg"
     ) == pytest.approx(
-        np.array(
-            [
-                47.75837319,
-                44.43876724,
-                40.65838071,
-                36.58220611,
-                32.17670234,
-                27.38480576,
-                22.12619215,
-                16.59464411,
-                11.06309608,
-                5.53154804,
-            ]
-        ),
+        np.array([50.44, 46.89, 42.97, 38.71, 34.06, 28.96, 23.27, 17.46, 11.64, 5.82]),
         abs=1e-2,
     )
     assert problem.get_val(
         "performances.battery_pack_1.state_of_charge", units="percent"
     ) == pytest.approx(
-        np.array(
-            [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.46394211, 97.84550426, 95.07976344]
-        ),
+        np.array([100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.14, 97.15, 93.94]),
         abs=1e-2,
     )
 
@@ -458,26 +311,8 @@ def test_case_reader():
     fig.show()
 
 
-def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file(restore_submodels):
+def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter_power_share.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -530,75 +365,29 @@ def test_assembly_performances_splitter_low_to_high_requirement_from_pt_file(res
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array(
-            [
-                3.31960595,
-                3.78038653,
-                4.0761746,
-                4.40550373,
-                4.79189658,
-                5.25861361,
-                5.53154804,
-                5.53154804,
-                5.53154804,
-                5.53154804,
-            ]
-        ),
+        np.array([3.54, 3.93, 4.26, 4.64, 5.11, 5.68, 5.82, 5.82, 5.82, 5.82]),
         abs=1e-2,
     )
     assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
-        np.array(
-            [
-                47.75837314,
-                44.43876719,
-                40.65838066,
-                36.58220606,
-                32.17670233,
-                27.38480576,
-                22.12619215,
-                16.59464411,
-                11.06309608,
-                5.53154804,
-            ]
-        ),
+        np.array([50.44, 46.89, 42.97, 38.71, 34.06, 28.96, 23.27, 17.46, 11.64, 5.82]),
         abs=1e-2,
     )
 
     assert problem.get_val(
         "component.battery_pack_1.state_of_charge", units="percent"
     ) == pytest.approx(
-        np.array(
-            [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.46394211, 97.84550426, 95.07976345]
-        ),
+        np.array([100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.15, 97.15, 93.94]),
         rel=1e-3,
     )
 
     problem.check_partials(compact_print=True)
 
 
-def test_incoherent_voltage(restore_submodels):
+def test_incoherent_voltage():
     # Small test to see if the check that prevent the problem from running with incoherent value
     # works
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_splitter_power_share.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     input_list = list_inputs(
         PowerTrainPerformancesFromFile(

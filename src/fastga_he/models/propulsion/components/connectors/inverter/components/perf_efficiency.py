@@ -6,7 +6,6 @@ import numpy as np
 import openmdao.api as om
 
 import fastoad.api as oad
-from networkx.algorithms.efficiency_measures import efficiency
 
 from ..constants import SUBMODEL_INVERTER_EFFICIENCY
 

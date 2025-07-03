@@ -135,6 +135,8 @@
                         <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <casing>
                             <thermal_resistance units="K/W">0.01</thermal_resistance>
                         </casing>
@@ -302,6 +304,7 @@
                         <mass units="kg">86.0</mass>
                         <losses_max units="W" is_input="False">1958.0316619368884</losses_max>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
@@ -380,6 +383,7 @@
                         </cruise>
                         <mass units="kg">86.0</mass>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
@@ -616,6 +620,7 @@
                         <material>1.0</material>
                         <current_caliber units="A">800.0</current_caliber>
                         <current_max units="A">750.0</current_max>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <voltage_caliber units="V">1000.0</voltage_caliber>
                         <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -664,6 +669,8 @@
                             <CD0>0.0</CD0>
                         </cruise>
                         <mass units="kg">40.69</mass>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
                         <casing>

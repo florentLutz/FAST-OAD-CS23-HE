@@ -3,7 +3,6 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-import copy
 import numpy as np
 import pytest
 
@@ -18,20 +17,6 @@ from utils.filter_residuals import filter_residuals
 
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
-
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.rectifier.constants import (
-    SUBMODEL_RECTIFIER_EFFICIENCY,
-    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE,
-)
-from ..components.connectors.dc_dc_converter.constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
-
 from . import outputs
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -40,37 +25,8 @@ XML_FILE = "simple_assembly_splitter.xml"
 NB_POINTS_TEST = 10
 
 
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
-
-
-def test_performances_from_pt_file(restore_submodels):
+def test_performances_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_simple_generator.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -128,36 +84,23 @@ def test_performances_from_pt_file(restore_submodels):
     assert torque_generator * omega_generator == pytest.approx(
         np.array(
             [
-                108181.60732714,
-                108737.3269776,
-                109283.1398736,
-                109819.02208511,
-                110344.94944601,
-                110860.89757604,
-                111366.841902,
-                111862.7576782,
-                112348.6200063,
-                112824.40385453,
+                117204.1,
+                117814.2,
+                118413.4,
+                119001.7,
+                119579.1,
+                120145.6,
+                120701.0,
+                121245.4,
+                121778.8,
+                122301.2,
             ]
         ),
         rel=1e-3,
     )
 
     assert problem.get_val("component.ice_1.fuel_consumed_t", units="kg") == pytest.approx(
-        np.array(
-            [
-                4.09026344,
-                4.10237559,
-                4.11429648,
-                4.1260253,
-                4.13756115,
-                4.148903,
-                4.16004973,
-                4.17100016,
-                4.18175298,
-                4.19230684,
-            ]
-        ),
+        np.array([4.291, 4.305, 4.318, 4.332, 4.345, 4.358, 4.371, 4.384, 4.396, 4.408]),
         abs=1e-2,
     )
     # Only one input and one output to the system so input and output should be equal
@@ -168,21 +111,8 @@ def test_performances_from_pt_file(restore_submodels):
         abs=1e-2,
     )
     assert problem.get_val("component.fuel_tank_1.fuel_remaining_t", units="kg") == pytest.approx(
-        np.array(
-            [
-                41.42453467,
-                37.33427122,
-                33.23189563,
-                29.11759916,
-                24.99157385,
-                20.85401271,
-                16.70510971,
-                12.54505998,
-                8.37405982,
-                4.19230684,
-            ]
-        ),
-        abs=1e-2,
+        np.array([43.5, 39.2, 34.9, 30.6, 26.3, 21.9, 17.6, 13.2, 8.8, 4.4]),
+        abs=1e-1,
     )
 
 
@@ -268,27 +198,9 @@ def test_assembly_sizing_from_pt_file():
     )
 
 
-def test_full_high_rpm_ice(restore_submodels):
+def test_full_high_rpm_ice():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.enforce"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses"
     )
 
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_high_rpm_ice.yml")
@@ -338,7 +250,7 @@ def test_full_high_rpm_ice(restore_submodels):
 
     assert problem.get_val(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:power_rating_SL", units="kW"
-    ) == pytest.approx(93.0, rel=1e-2)
+    ) == pytest.approx(103.7, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:high_rpm_ICE:ice_1:mass", units="kg"
-    ) == pytest.approx(71.08, rel=1e-2)
+    ) == pytest.approx(72.46, rel=1e-2)

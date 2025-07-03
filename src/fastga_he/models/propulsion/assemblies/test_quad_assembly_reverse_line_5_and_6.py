@@ -21,8 +21,6 @@ NB_POINTS_TEST = 25
 COEFF_DIFF = 0.0
 
 
-
-
 class PerformancesAssembly(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -342,7 +340,6 @@ class PerformancesAssembly(om.Group):
 
 
 def test_assembly():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,

@@ -33,8 +33,6 @@ NB_POINTS_TEST = 50
 COEFF_DIFF = 0.0
 
 
-
-
 class PerformancesAssembly(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -308,8 +306,7 @@ def test_assembly():
                 91204.1,
                 91522.6,
                 91841.7,
-                92161.4
-
+                92161.4,
             ]
         ),
         abs=1,

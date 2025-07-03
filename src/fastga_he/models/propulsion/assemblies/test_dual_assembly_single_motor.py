@@ -122,7 +122,6 @@ def test_assembly_from_pt_file():
                 115739.0,
                 116200.6,
                 116663.2,
-
             ]
         ),
         abs=1,

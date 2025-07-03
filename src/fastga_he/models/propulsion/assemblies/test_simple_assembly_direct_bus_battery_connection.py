@@ -3,7 +3,6 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-import copy
 import numpy as np
 import pytest
 
@@ -25,13 +24,6 @@ from .simple_assembly.performances_simple_assembly_direct_bus_battery_connection
 from .simple_assembly.performances_simple_assembly_direct_sspc_battery_connection import (
     PerformancesAssemblyDirectSSPCBatteryConnection,
 )
-from ..components.connectors.dc_cable.constants import (
-    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
-)
-from ..components.connectors.inverter.constants import (
-    SUBMODEL_INVERTER_EFFICIENCY,
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
-)
 
 from . import outputs
 
@@ -42,28 +34,7 @@ XML_FILE = "simple_assembly_direct_bus_battery_connection.xml"
 NB_POINTS_TEST = 10
 
 
-@pytest.fixture()
-def restore_submodels():
-    """
-    Since the submodels in the configuration file differ from the defaults, this restore process
-    ensures subsequent assembly tests run under default conditions.
-    """
-    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
-    yield
-    oad.RegisterSubmodel.active_models = old_submodels
-
-
-def test_assembly_performances(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-
+def test_assembly_performances():
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAssemblyDirectBusBatteryConnection(number_of_points=NB_POINTS_TEST)
@@ -122,16 +93,16 @@ def test_assembly_performances(restore_submodels):
     ) * problem.get_val("performances.battery_pack_1.voltage_out", units="V") == pytest.approx(
         np.array(
             [
-                192255.0,
-                193250.0,
-                194227.0,
-                195186.0,
-                196127.0,
-                197051.0,
-                197958.0,
-                198847.0,
-                199720.0,
-                200575.0,
+                198713.5,
+                199751.8,
+                200771.0,
+                201771.7,
+                202754.1,
+                203718.4,
+                204664.6,
+                205592.9,
+                206503.2,
+                207395.2,
             ]
         ),
         abs=1,
@@ -141,35 +112,25 @@ def test_assembly_performances(restore_submodels):
     assert problem.get_val("performances.battery_pack_1.voltage_out", units="V") == pytest.approx(
         np.array(
             [
-                895.39620638,
-                885.38155954,
-                877.0304345,
-                869.32945753,
-                861.51687284,
-                853.09235584,
-                843.80317964,
-                833.61692948,
-                822.68562866,
-                811.30075336,
+                895.0,
+                884.6,
+                875.98,
+                868.0,
+                859.9,
+                851.0,
+                841.2,
+                830.5,
+                819.1,
+                807.2,
             ]
         ),
         abs=1,
     )
 
 
-def test_assembly_performances_constant_demand(restore_submodels):
+def test_assembly_performances_constant_demand():
     # We now check with a constant power demand, this way we will see that the dc bus 2 voltage
     # still drops and that the efficiency of the inverter varies.
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAssemblyDirectBusBatteryConnection(number_of_points=NB_POINTS_TEST)
@@ -212,50 +173,23 @@ def test_assembly_performances_constant_demand(restore_submodels):
                 896.0,
                 886.0,
                 879.0,
-                872.0,
-                865.0,
-                857.0,
-                849.0,
-                840.0,
-                831.0,
-                821.0,
+                871.0,
+                863.7,
+                855.9,
+                847.5,
+                838.2,
+                828.3,
+                817.9,
             ]
         ),
         abs=1,
-    )
-    # Almost imperceptible
-    assert problem.get_val("performances.inverter_1.efficiency") == pytest.approx(
-        np.array(
-            [
-                0.97301568,
-                0.97301703,
-                0.97301817,
-                0.97301923,
-                0.97302031,
-                0.97302147,
-                0.97302275,
-                0.97302417,
-                0.97302574,
-                0.97302743,
-            ]
-        ),
-        abs=1e-5,
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2_direct.html"))
 
 
-def test_performances_from_pt_file(restore_submodels):
+def test_performances_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_bus_battery_connection.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -299,16 +233,16 @@ def test_performances_from_pt_file(restore_submodels):
     ) == pytest.approx(
         np.array(
             [
-                192255.21282562,
-                193249.9663507,
-                194226.77293674,
-                195185.56587769,
-                196126.51139977,
-                197049.94417756,
-                197956.38133897,
-                198846.43060304,
-                199720.24266326,
-                200576.28667607,
+                198713.5,
+                199751.8,
+                200771.0,
+                201771.7,
+                202754.1,
+                203718.4,
+                204664.6,
+                205592.9,
+                206503.2,
+                207395.2,
             ]
         ),
         rel=1e-4,
@@ -318,16 +252,16 @@ def test_performances_from_pt_file(restore_submodels):
     assert problem.get_val("component.battery_pack_1.voltage_out", units="V") == pytest.approx(
         np.array(
             [
-                895.39621349,
-                885.38160954,
-                877.03048832,
-                869.32956305,
-                861.51712019,
-                853.09282268,
-                843.80388163,
-                833.61776084,
-                822.68632196,
-                811.30097904,
+                895.0,
+                884.6,
+                875.98,
+                868.0,
+                859.9,
+                851.0,
+                841.2,
+                830.5,
+                819.1,
+                807.2,
             ]
         ),
         abs=1,
@@ -353,17 +287,7 @@ def test_read_recording():
     fig.show()
 
 
-def test_assembly_performances_with_direct_sspc_battery_connection(restore_submodels):
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
-
+def test_assembly_performances_with_direct_sspc_battery_connection():
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesAssemblyDirectSSPCBatteryConnection(number_of_points=NB_POINTS_TEST)
@@ -417,16 +341,16 @@ def test_assembly_performances_with_direct_sspc_battery_connection(restore_submo
     ) == pytest.approx(
         np.array(
             [
-                192258.0,
-                193253.0,
-                194230.0,
-                195189.0,
-                196131.0,
-                197055.0,
-                197962.0,
-                198852.0,
-                199724.0,
-                200580.0,
+                198716.9,
+                199755.3,
+                200774.7,
+                201775.5,
+                202758.0,
+                203722.5,
+                204669.0,
+                205597.5,
+                206508.0,
+                207400.4,
             ]
         ),
         abs=1,
@@ -437,16 +361,16 @@ def test_assembly_performances_with_direct_sspc_battery_connection(restore_submo
     ) * problem.get_val("performances.battery_pack_1.voltage_out", units="V") == pytest.approx(
         np.array(
             [
-                194200.49888407,
-                195205.61889228,
-                196192.45014373,
-                197161.29475812,
-                198112.41214235,
-                199045.9949277,
-                199962.1590302,
-                200860.93954574,
-                201742.28824555,
-                202606.07385605,
+                200724.1,
+                201773.0,
+                202802.7,
+                203813.6,
+                204806.1,
+                205780.3,
+                206736.3,
+                207674.3,
+                208594.0,
+                209495.3,
             ]
         ),
         abs=1,
@@ -459,33 +383,24 @@ def test_assembly_performances_with_direct_sspc_battery_connection(restore_submo
     assert problem.get_val("performances.battery_pack_1.voltage_out", units="V") == pytest.approx(
         np.array(
             [
-                895.28347477,
-                885.15148112,
-                876.71570352,
-                868.93271137,
-                861.02173362,
-                852.47445054,
-                843.03983939,
-                832.69492961,
-                821.60649911,
-                810.08291774,
+                895.3,
+                885.2,
+                875.7,
+                867.6,
+                859.3,
+                850.4,
+                840.4,
+                829.6,
+                817.9,
+                806.0,
             ]
         ),
         abs=1,
     )
 
 
-def test_direct_sspc_battery_connection_from_pt_file(restore_submodels):
+def test_direct_sspc_battery_connection_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_direct_sspc_battery_connection.yml")
-    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-        "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
-        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
-    )
-    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-    )
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -529,16 +444,16 @@ def test_direct_sspc_battery_connection_from_pt_file(restore_submodels):
     ) == pytest.approx(
         np.array(
             [
-                192258.37459708,
-                193253.29806419,
-                194230.25143033,
-                195189.19351206,
-                196130.3109528,
-                197053.95347946,
-                197960.64717498,
-                198850.98275428,
-                199725.03824276,
-                200581.1924893,
+                198716.9,
+                199755.3,
+                200774.7,
+                201775.5,
+                202758.0,
+                203722.5,
+                204669.0,
+                205597.5,
+                206508.0,
+                207400.4,
             ]
         ),
         rel=1e-4,
@@ -549,16 +464,16 @@ def test_direct_sspc_battery_connection_from_pt_file(restore_submodels):
     ) == pytest.approx(
         np.array(
             [
-                194200.37838089,
-                195205.35157999,
-                196192.17316195,
-                197160.80152733,
-                198111.42520484,
-                199044.397454,
-                199960.24967169,
-                200859.57853967,
-                201742.46287148,
-                202607.26514071,
+                200724.1,
+                201773.0,
+                202802.7,
+                203813.6,
+                204806.1,
+                205780.3,
+                206736.3,
+                207674.3,
+                208594.0,
+                209495.3,
             ]
         ),
         rel=1e-4,
@@ -571,16 +486,16 @@ def test_direct_sspc_battery_connection_from_pt_file(restore_submodels):
     assert problem.get_val("component.battery_pack_1.voltage_out", units="V") == pytest.approx(
         np.array(
             [
-                895.28348175,
-                885.15152969,
-                876.7157557,
-                868.93281485,
-                861.02197634,
-                852.47490646,
-                843.04051915,
-                832.6957218,
-                821.6071355,
-                810.08308563,
+                894.9,
+                884.4,
+                875.7,
+                867.6,
+                859.3,
+                850.4,
+                840.4,
+                829.6,
+                817.9,
+                806.0,
             ]
         ),
         rel=1e-4,

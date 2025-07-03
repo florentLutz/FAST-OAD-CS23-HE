@@ -3,9 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-import fastoad.api as oad
 import numpy as np
-import copy
 import openmdao.api as om
 import pytest
 from stdatm import Atmosphere
@@ -35,7 +33,6 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 XML_FILE = "quad_assembly.xml"
 NB_POINTS_TEST = 50
 COEFF_DIFF = 0.0
-
 
 
 class PerformancesAssembly(om.Group):
@@ -332,7 +329,6 @@ class PerformancesAssembly(om.Group):
 
 
 def test_assembly():
-
     ivc = get_indep_var_comp(
         list_inputs(PerformancesAssembly(number_of_points=NB_POINTS_TEST)),
         __file__,
