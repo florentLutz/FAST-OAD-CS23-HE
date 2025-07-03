@@ -38,7 +38,6 @@ submodels:
   submodel.weight.mass.airframe.tail: null
   service.weight.mass.airframe.flight_controls: null
   submodel.weight.mass.airframe.landing_gear: null
-  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
@@ -48,9 +47,6 @@ submodels:
   submodel.propulsion.rectifier.efficiency: fastga_he.submodel.propulsion.rectifier.efficiency.from_losses
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.ensure
-  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
-  submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
   service.weight.mass.system.power_system: null
   service.weight.mass.system.life_support_system: fastga.submodel.weight.mass.system.life_support_system.flops
@@ -58,7 +54,6 @@ submodels:
   service.weight.mass.systems: null
   submodel.weight.mass.furniture: null
   service.geometry.nacelle.dimension: null
-  submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
   service.weight.mass.furniture.seats: null

@@ -60,7 +60,6 @@ model:
     produce_simplified_pt_file: True
 
 submodels:
-  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
   submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
@@ -72,8 +71,6 @@ submodels:
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.ensure
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state
   submodel.propulsion.constraints.generator.rpm: fastga_he.submodel.propulsion.constraints.generator.rpm.ensure
-  service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
-  submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
 #  submodel.performances.mission_vector.climb_speed: null
 #  submodel.performances.mission_vector.descent_speed: null
@@ -84,10 +81,8 @@ submodels:
   service.weight.mass.systems: fastga_he.submodel.weight.mass.systems.weight_nan
   service.weight.mass.payload: null
   service.geometry.nacelle.dimension: null
-  submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
-  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
