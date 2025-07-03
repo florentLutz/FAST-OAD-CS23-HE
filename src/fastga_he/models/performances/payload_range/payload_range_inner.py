@@ -17,6 +17,9 @@ from fastga_he.models.performances.mission_vector.constants import (
 
 from .payload_range import zip_op_mission_input
 
+# Need to fill the vector with an specific value in case the requested payload range point is
+# outside the bound (Can happen when we use the sampling from a different aircraft). Can't  use
+# nan or else it will be detected by OpenMDAO
 INVALID_COMPUTATION_RESULT = -1.0
 
 
