@@ -11,7 +11,7 @@ from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
 from ..constants import SUBMODEL_DC_DC_CONVERTER_EFFICIENCY
 
-FIXED_CONVERTER_EFFICIENCY = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed"
+FIXED_DC_DC_CONVERTER_EFFICIENCY = "fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed"
 oad.RegisterSubmodel.active_models[SUBMODEL_DC_DC_CONVERTER_EFFICIENCY] = FIXED_DC_DC_CONVERTER_EFFICIENCY
 
 

@@ -4,8 +4,8 @@
 Registered submodels
 ====================
 
-Default submodels registered for each FAST-OAD-CS23-HE execution, excluding the propulsion component constraint registry.
-Propulsion components are documented separately under :ref:`propulsion components <propulsion-index>`.
+To ensure compatibility between the aircraft design model from FAST-GA and the powertrain file mechanic introduced by FAST-OAD-CS23-HE, a certain number of submodel are enabled by default. They are listed here.
+Submodels related to propulsion components are documented separately under :ref:`propulsion components <propulsion-index>`.
 
 
 .. raw:: html
