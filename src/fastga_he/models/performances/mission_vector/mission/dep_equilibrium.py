@@ -185,6 +185,7 @@ class DEPEquilibrium(om.Group):
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
                 "power_train_file_path": self.options["power_train_file_path"],
+                "low_speed_aero": self.options["low_speed_aero"],
             }
             self.add_subsystem(
                 "preparation_for_energy_consumption",

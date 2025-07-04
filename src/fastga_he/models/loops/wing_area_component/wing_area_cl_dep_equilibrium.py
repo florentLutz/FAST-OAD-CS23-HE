@@ -343,6 +343,7 @@ def compute_wing_area(
             "power_train_file_path": pt_file_path,
             "flaps_position": "landing",
             "sort_component": sort_component,
+            "low_speed_aero": low_speed_aero,
         }
         model.add_subsystem(
             "equilibrium",

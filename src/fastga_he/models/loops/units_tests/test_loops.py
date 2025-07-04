@@ -328,7 +328,7 @@ def test_advanced_cl_group_from_yml():
     )
 
 
-def test_low_speed(restore_submodels):
+def test_low_speed_option(restore_submodels):
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
@@ -356,7 +356,7 @@ def test_low_speed(restore_submodels):
         ),
         ivc_loop,
     )
-    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 10.03, atol=1e-2)
+    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 9.97, atol=1e-2)
 
     oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
         "fastga_he.submodel.performances.energy_consumption.basic"
@@ -387,4 +387,4 @@ def test_low_speed(restore_submodels):
         ),
         ivc_loop,
     )
-    assert_allclose(problem_loop["wing_area"], 10.03, atol=1e-2)
+    assert_allclose(problem_loop["wing_area"], 9.97, atol=1e-2)
