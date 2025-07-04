@@ -1,14 +1,12 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
-
 import fastoad.api as oad
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,
 )

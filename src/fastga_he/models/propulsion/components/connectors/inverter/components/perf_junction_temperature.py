@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -11,10 +11,6 @@ from ..constants import SUBMODEL_INVERTER_JUNCTION_TEMPERATURE
 
 SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FROM_LOSSES = (
     "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
-)
-
-oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
-    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE_FROM_LOSSES
 )
 
 

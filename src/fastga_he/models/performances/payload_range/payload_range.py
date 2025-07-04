@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2024 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 
 import openmdao.api as om
@@ -20,7 +20,6 @@ from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
 )
-
 from .mission_range_from_soc import OperationalMissionVectorWithTargetSoC
 from .mission_range_from_fuel import OperationalMissionVectorWithTargetFuel
 

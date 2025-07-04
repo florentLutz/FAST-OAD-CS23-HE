@@ -2,7 +2,7 @@
 Test mission vector module.
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -70,6 +70,10 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
     PerformancePerPhase,
 )
 from fastga_he.models.performances.mission_vector.mission.sizing_time import SizingDuration
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
@@ -106,6 +110,17 @@ def catch_warnings():
 
         for warning in w:
             print(warning)
+
+
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
 
 
 def test_initialize_altitude():
@@ -1588,8 +1603,15 @@ def test_sizing_duration():
     problem.check_partials(compact_print=True)
 
 
-def test_mission_vector():
+def test_mission_vector(restore_submodels):
     # Research independent input value in .xml file
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+        "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+        "fastga_he.submodel.performances.dep_effect.none"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(
             MissionVector(
@@ -1825,7 +1847,7 @@ def test_mission_vector_from_yml_simplified_models():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(157.14, abs=1e-2)
+    assert sizing_energy == pytest.approx(157.22, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
@@ -2129,9 +2151,6 @@ def test_mission_vector_from_yml_fuel_and_battery_gear():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_recording():
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
@@ -2149,9 +2168,6 @@ def test_recording():
     )
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.generator.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
     )
 
     # Define used files depending on options

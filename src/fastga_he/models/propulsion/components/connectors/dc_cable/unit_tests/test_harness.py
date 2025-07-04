@@ -1,9 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
+import fastoad.api as oad
 import numpy as np
 import pytest
 import openmdao.api as om
@@ -31,7 +31,10 @@ from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature_from_increase import PerformancesTemperatureFromIncrease
-from ..components.perf_temperature import PerformancesTemperature
+from ..components.perf_temperature import (
+    PerformancesTemperature,
+    SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE,
+)
 from ..components.perf_temperature_constant import PerformancesTemperatureConstant
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
@@ -48,7 +51,7 @@ from ..components.sizing_harness import SizingHarness
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import POSSIBLE_POSITION, SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 
 XML_FILE = "sample_cable.xml"
 NB_POINTS_TEST = 10
@@ -755,6 +758,9 @@ def test_constraints_voltage_ensure():
 
 def test_performances_harness():
     # Research independent input value in .xml file
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
+    )
     ivc = get_indep_var_comp(
         list_inputs(PerformancesHarness(harness_id="harness_1", number_of_points=NB_POINTS_TEST)),
         __file__,

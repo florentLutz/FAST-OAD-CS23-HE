@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -19,6 +19,7 @@ from .constants import (
 from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_DEP_EFFECT
 
 DEP_EFFECT_FROM_PT_FILE = "fastga_he.submodel.performances.dep_effect.from_pt_file"
+oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = DEP_EFFECT_FROM_PT_FILE
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_DEP_EFFECT, DEP_EFFECT_FROM_PT_FILE)

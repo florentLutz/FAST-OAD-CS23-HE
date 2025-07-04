@@ -1,9 +1,8 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
 import numpy as np
 import pytest
 
@@ -14,6 +13,7 @@ from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from utils.filter_residuals import filter_residuals
 
 from ..assemblers.delta_from_pt_file import AerodynamicDeltasFromPTFile
+
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 

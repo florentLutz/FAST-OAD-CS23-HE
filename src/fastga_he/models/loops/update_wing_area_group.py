@@ -55,6 +55,12 @@ class UpdateWingAreaGroupDEP(om.Group):
             desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
+        self.options.declare(
+            name="produce_simplified_pt_file",
+            default=False,
+            desc="Boolean to split powertrain architecture into smaller branches",
+            allow_none=False,
+        )
 
     def setup(self):
         """Adding the update groups, the selection of the maximum and the constraints."""
@@ -70,6 +76,7 @@ class UpdateWingAreaGroupDEP(om.Group):
                 propulsion_id=self.options["propulsion_id"],
                 power_train_file_path=self.options["power_train_file_path"],
                 sort_component=self.options["sort_component"],
+                produce_simplified_pt_file=self.options["produce_simplified_pt_file"],
             ),
             promotes_inputs=["*"],
             promotes_outputs=[],

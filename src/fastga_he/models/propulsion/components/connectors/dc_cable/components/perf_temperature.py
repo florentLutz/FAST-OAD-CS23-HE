@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -10,10 +10,6 @@ from ..constants import SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 
 SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE = (
     "fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state"
-)
-
-oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
-    SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
 )
 
 

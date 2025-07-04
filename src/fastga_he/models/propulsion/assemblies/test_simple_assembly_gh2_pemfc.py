@@ -135,16 +135,16 @@ def test_assembly_performances():
     ) * problem.get_val("performances.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                198896.7,
-                199938.3,
-                200961.5,
-                201966.2,
-                202952.5,
-                203920.3,
-                204869.5,
-                205800.0,
-                206711.8,
-                207605.0,
+                203180.4,
+                204238.1,
+                205276.9,
+                206296.8,
+                207297.8,
+                208279.7,
+                209242.6,
+                210186.4,
+                211111.1,
+                212016.6,
             ]
         ),
         abs=1,
@@ -265,13 +265,13 @@ def test_performances_sizing_assembly_pemfc_gh2_enforce():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
-    ) == pytest.approx(32.07, rel=1e-2)
+    ) == pytest.approx(30.85, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
-    ) == pytest.approx(121.8, rel=1e-2)
+    ) == pytest.approx(117.5, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
-    ) == pytest.approx(969.82, rel=1e-2)
+    ) == pytest.approx(932.32, rel=1e-2)
 
 
 def test_performances_sizing_assembly_pemfc_gh2_enforce_from_pt():
@@ -334,13 +334,13 @@ def test_performances_sizing_assembly_pemfc_gh2_enforce_from_pt():
     assert problem.get_val(
         "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
         units="kg",
-    ) == pytest.approx(32.07, rel=1e-2)
+    ) == pytest.approx(30.85, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
-    ) == pytest.approx(121.8, rel=1e-2)
+    ) == pytest.approx(117.5, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
-    ) == pytest.approx(969.82, rel=1e-2)
+    ) == pytest.approx(932.32, rel=1e-2)
 
 
 def test_assembly_sizing_from_pt_file():
@@ -528,16 +528,16 @@ def test_performances_from_pt_file():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                198895.0,
-                199936.5,
-                200960.0,
-                201964.4,
-                202950.7,
-                203918.4,
-                204867.5,
-                205798.0,
-                206709.8,
-                207602.8,
+                203180.4,
+                204238.1,
+                205276.9,
+                206296.8,
+                207297.8,
+                208279.7,
+                209242.6,
+                210186.4,
+                211111.1,
+                212016.6,
             ]
         ),
         abs=1,
@@ -645,7 +645,7 @@ def test_performances_sizing_assembly_pemfc_gh2_ensure_from_pt():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
-    ) == pytest.approx(-1189.284, rel=1e-2)
+    ) == pytest.approx(-1225.8, rel=1e-2)
 
 
 def test_performances_sizing_from_pt_with_sizing_options():

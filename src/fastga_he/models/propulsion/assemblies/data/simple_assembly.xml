@@ -105,6 +105,7 @@
                 </battery_pack>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
                         <dc_power_in_max units="kW" is_input="False">206.09751659509152</dc_power_in_max>
                         <CG>
@@ -308,6 +309,7 @@
                         </cruise>
                         <mass units="kg">8.86</mass>
                         <material>1.0</material>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <current_caliber units="A">800.0</current_caliber>
                         <current_max units="A">750.0</current_max>
                         <voltage_caliber units="V">1000.0</voltage_caliber>
@@ -348,6 +350,8 @@
                 <inverter>
                     <inverter_1>
                         <ac_power_out_max units="kW">189.365</ac_power_out_max>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>

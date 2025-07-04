@@ -169,6 +169,7 @@
                 </gaseous_hydrogen_tank>
                 <DC_DC_converter>
                     <dc_dc_converter_1>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <losses_max units="W" is_input="True">1958.0316619368884</losses_max>
                         <dc_power_in_max units="kW" is_input="False">207.60491737644728</dc_power_in_max>
                         <CG>
@@ -360,6 +361,7 @@
                 </DC_SSPC>
                 <DC_cable_harness>
                     <harness_1>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>
@@ -411,6 +413,8 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <ac_power_out_max units="kW" is_input="False">189.36477486953362<!--Maximum value of the output side--></ac_power_out_max>
                         <CG>
                             <x units="m">2.69</x>

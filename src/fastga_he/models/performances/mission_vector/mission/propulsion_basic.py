@@ -9,10 +9,6 @@ import fastoad.api as oad
 
 from ..constants import HE_SUBMODEL_ENERGY_CONSUMPTION
 
-oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
-    "fastga_he.submodel.performances.energy_consumption.basic"
-)
-
 
 @oad.RegisterSubmodel(
     HE_SUBMODEL_ENERGY_CONSUMPTION, "fastga_he.submodel.performances.energy_consumption.basic"

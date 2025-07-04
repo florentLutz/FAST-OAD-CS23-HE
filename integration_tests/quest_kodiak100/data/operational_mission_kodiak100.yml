@@ -50,16 +50,11 @@ submodels:
     service.geometry.vertical_tail.distance.fd: null
     submodel.performances.mission_vector.descent_speed: null
     submodel.performances.mission_vector.climb_speed: null
-    submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
-    submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
     submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
-    service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
-    submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
     service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
     service.weight.mass.system.power_system: null
     service.geometry.nacelle.dimension: null
-    submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
     submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
     submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
     submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
