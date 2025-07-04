@@ -326,3 +326,65 @@ def test_advanced_cl_group_from_yml():
         218.45,
         atol=1e-2,
     )
+
+
+def test_low_speed(restore_submodels):
+    xml_file = "pipistrel_like.xml"
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    inputs_list = list_inputs(
+        UpdateWingAreaGroupDEP(
+            propulsion_id="",
+            power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
+            low_speed_aero=True,
+        )
+    )
+    # Research independent input value in .xml file
+    ivc_loop = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(
+        UpdateWingAreaGroupDEP(
+            propulsion_id="",
+            power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
+            low_speed_aero=True,
+        ),
+        ivc_loop,
+    )
+    assert_allclose(problem.get_val("data:geometry:wing:area", units="m**2"), 10.03, atol=1e-2)
+
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+        "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+        "fastga_he.submodel.performances.dep_effect.none"
+    )
+
+    inputs_list = list_inputs(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            produce_simplified_pt_file=True,
+            low_speed_aero=True,
+        )
+    )
+    # Research independent input value in .xml file
+    ivc_loop = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+
+    problem_loop = run_system(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            produce_simplified_pt_file=True,
+            low_speed_aero=True,
+        ),
+        ivc_loop,
+    )
+    assert_allclose(problem_loop["wing_area"], 10.03, atol=1e-2)

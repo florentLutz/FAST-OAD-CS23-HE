@@ -70,6 +70,12 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
+            name="low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            allow_none=False,
+        )
+        self.options.declare(
             name="produce_simplified_pt_file",
             default=False,
             desc="Boolean to split powertrain architecture into smaller branches",
@@ -95,6 +101,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             self.options["propulsion_id"],
             self.simplified_file_path,
             self.options["sort_component"],
+            self.options["low_speed_aero"],
             self.control_parameter_list,
         )[0]
         for (
@@ -169,6 +176,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             self.simplified_file_path,
             self.control_parameter_list,
             self.options["sort_component"],
+            self.options["low_speed_aero"],
         )
 
         # Again with the damned optimizer. It can sometimes happen that he simply does not care
@@ -256,8 +264,10 @@ class _IDThrustRate(om.ExplicitComponent):
 
 
 def compute_wing_area(
-    inputs, propulsion_id, pt_file_path, control_parameter_list, sort_component
+    inputs, propulsion_id, pt_file_path, control_parameter_list, sort_component, low_speed_aero
 ) -> float:
+    ls_tag = "low_speed" if low_speed_aero else "cruise"
+
     # To deactivate all the logging messages from matplotlib
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.pyplot").disabled = True
@@ -275,8 +285,8 @@ def compute_wing_area(
 
     # To compute the maximum AOA possible, should be done in its own component but oh well
     delta_cl_flaps = inputs["data:aerodynamics:flaps:landing:CL"]
-    cl_alpha = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
-    cl_0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
+    cl_alpha = inputs["data:aerodynamics:wing:" + ls_tag + ":CL_alpha"]
+    cl_0_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"]
     max_cl = inputs["data:aerodynamics:aircraft:landing:CL_max"]
 
     alpha_max = (max_cl - delta_cl_flaps - cl_0_wing) / cl_alpha * 180.0 / np.pi
@@ -295,7 +305,7 @@ def compute_wing_area(
 
     try:
         input_zip, inputs_name_for_promotion = zip_equilibrium_input(
-            propulsion_id, pt_file_path, sort_component, control_parameter_list
+            propulsion_id, pt_file_path, sort_component, low_speed_aero, control_parameter_list
         )
 
         ivc = om.IndepVarComp()
@@ -410,7 +420,9 @@ def compute_wing_area(
     return wing_area_approach
 
 
-def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_parameter_list=None):
+def zip_equilibrium_input(
+    propulsion_id, pt_file_path, sort_component, low_speed_aero, control_parameter_list=None
+):
     """
     Returns a list of the variables needed for the computation of the equilibrium. Based on
     the submodel currently registered and the propulsion_id required.
@@ -418,6 +430,7 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_p
     :param propulsion_id: ID of propulsion wrapped to be used for computation of equilibrium.
     :param pt_file_path: Path to the powertrain file.
     :param sort_component: Option for powertrain component sorting.
+    :param low_speed_aero: Option to consider low-speed aerodynamics
     :param control_parameter_list: a list of control parameters to rename.
     :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
     a list of shape_by_conn boolean and a list of copy_shape str.
@@ -430,6 +443,7 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_p
         "power_train_file_path": pt_file_path,
         "flaps_position": "landing",
         "sort_component": sort_component,
+        "low_speed_aero": low_speed_aero,
     }
     new_component.add_subsystem(
         "system",

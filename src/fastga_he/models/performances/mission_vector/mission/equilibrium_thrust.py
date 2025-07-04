@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO.
+# Copyright (C) 2025 ISAE-SUPAERO.
 
 import numpy as np
 import openmdao.api as om
@@ -19,9 +19,16 @@ class EquilibriumThrust(om.ImplicitComponent):
             default="cruise",
             desc="position of the flaps for the computation of the equilibrium",
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input("d_vx_dt", val=np.full(number_of_points, 0.0), units="m/s**2")
         self.add_input("mass", val=np.full(number_of_points, 1500.0), units="kg")
@@ -31,15 +38,19 @@ class EquilibriumThrust(om.ImplicitComponent):
 
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
-        self.add_input("data:aerodynamics:aircraft:cruise:CD0", np.nan)
-        self.add_input("data:aerodynamics:wing:cruise:CL_alpha", val=np.nan, units="rad**-1")
-        self.add_input("data:aerodynamics:wing:cruise:CL0_clean", val=np.nan)
-        self.add_input("data:aerodynamics:wing:cruise:induced_drag_coefficient", np.nan)
-        self.add_input("data:aerodynamics:horizontal_tail:cruise:CL0", val=np.nan)
+        self.add_input("data:aerodynamics:aircraft:" + ls_tag + ":CD0", np.nan)
         self.add_input(
-            "data:aerodynamics:horizontal_tail:cruise:CL_alpha", val=np.nan, units="rad**-1"
+            "data:aerodynamics:wing:" + ls_tag + ":CL_alpha", val=np.nan, units="rad**-1"
         )
-        self.add_input("data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient", np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CL0_clean", val=np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient", np.nan)
+        self.add_input("data:aerodynamics:horizontal_tail:" + ls_tag + ":CL0", val=np.nan)
+        self.add_input(
+            "data:aerodynamics:horizontal_tail:" + ls_tag + ":CL_alpha", val=np.nan, units="rad**-1"
+        )
+        self.add_input(
+            "data:aerodynamics:horizontal_tail:" + ls_tag + ":induced_drag_coefficient", np.nan
+        )
         self.add_input("data:aerodynamics:elevator:low_speed:CL_delta", val=np.nan, units="rad**-1")
         self.add_input("data:aerodynamics:elevator:low_speed:CD_delta", val=np.nan, units="rad**-2")
         if self.options["flaps_position"] == "takeoff":
@@ -77,13 +88,13 @@ class EquilibriumThrust(om.ImplicitComponent):
             of="thrust",
             wrt=[
                 "data:geometry:wing:area",
-                "data:aerodynamics:aircraft:cruise:CD0",
-                "data:aerodynamics:wing:cruise:CL0_clean",
-                "data:aerodynamics:wing:cruise:CL_alpha",
-                "data:aerodynamics:wing:cruise:induced_drag_coefficient",
-                "data:aerodynamics:horizontal_tail:cruise:CL0",
-                "data:aerodynamics:horizontal_tail:cruise:CL_alpha",
-                "data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient",
+                "data:aerodynamics:aircraft:" + ls_tag + ":CD0",
+                "data:aerodynamics:wing:" + ls_tag + ":CL0_clean",
+                "data:aerodynamics:wing:" + ls_tag + ":CL_alpha",
+                "data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient",
+                "data:aerodynamics:horizontal_tail:" + ls_tag + ":CL0",
+                "data:aerodynamics:horizontal_tail:" + ls_tag + ":CL_alpha",
+                "data:aerodynamics:horizontal_tail:" + ls_tag + ":induced_drag_coefficient",
                 "data:aerodynamics:elevator:low_speed:CD_delta",
                 "data:aerodynamics:elevator:low_speed:CL_delta",
             ],
@@ -113,16 +124,19 @@ class EquilibriumThrust(om.ImplicitComponent):
         d_vx_dt = inputs["d_vx_dt"]
         true_airspeed = inputs["true_airspeed"]
         gamma = inputs["gamma"] * np.pi / 180.0
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         wing_area = inputs["data:geometry:wing:area"]
 
-        cd0 = inputs["data:aerodynamics:aircraft:cruise:CD0"]
-        cl0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
-        cl_alpha_wing = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
-        coeff_k_wing = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
-        cl0_htp = inputs["data:aerodynamics:horizontal_tail:cruise:CL0"]
-        cl_alpha_htp = inputs["data:aerodynamics:horizontal_tail:cruise:CL_alpha"]
-        coeff_k_htp = inputs["data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient"]
+        cd0 = inputs["data:aerodynamics:aircraft:" + ls_tag + ":CD0"]
+        cl0_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"]
+        cl_alpha_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL_alpha"]
+        coeff_k_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient"]
+        cl0_htp = inputs["data:aerodynamics:horizontal_tail:" + ls_tag + ":CL0"]
+        cl_alpha_htp = inputs["data:aerodynamics:horizontal_tail:" + ls_tag + ":CL_alpha"]
+        coeff_k_htp = inputs[
+            "data:aerodynamics:horizontal_tail:" + ls_tag + ":induced_drag_coefficient"
+        ]
         cl_delta_m = inputs["data:aerodynamics:elevator:low_speed:CL_delta"]
         cd_delta_m = inputs["data:aerodynamics:elevator:low_speed:CD_delta"]
 
@@ -169,11 +183,13 @@ class EquilibriumThrust(om.ImplicitComponent):
         jacobian["thrust", "mass"] = -d_vx_dt - g * np.sin(gamma)
         jacobian["thrust", "true_airspeed"] = -wing_area * cd_tot * rho * true_airspeed
         jacobian["thrust", "data:geometry:wing:area"] = -dynamic_pressure * cd_tot
-        jacobian["thrust", "data:aerodynamics:aircraft:cruise:CD0"] = -dynamic_pressure * wing_area
-        jacobian["thrust", "data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient"] = (
-            -dynamic_pressure * wing_area * cl_htp**2.0
+        jacobian["thrust", "data:aerodynamics:aircraft:" + ls_tag + ":CD0"] = (
+            -dynamic_pressure * wing_area
         )
-        jacobian["thrust", "data:aerodynamics:wing:cruise:induced_drag_coefficient"] = (
+        jacobian[
+            "thrust", "data:aerodynamics:horizontal_tail:" + ls_tag + ":induced_drag_coefficient"
+        ] = -dynamic_pressure * wing_area * cl_htp**2.0
+        jacobian["thrust", "data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient"] = (
             -dynamic_pressure * wing_area * cl_wing**2.0
         )
         jacobian["thrust", "delta_Cd"] = -dynamic_pressure * wing_area
@@ -183,10 +199,12 @@ class EquilibriumThrust(om.ImplicitComponent):
         jacobian["thrust", "data:aerodynamics:elevator:low_speed:CL_delta"] = (
             d_thrust_d_cl_h * delta_m
         )
-        jacobian["thrust", "data:aerodynamics:wing:cruise:CL0_clean"] = d_thrust_d_cl_w
-        jacobian["thrust", "data:aerodynamics:wing:cruise:CL_alpha"] = d_thrust_d_cl_w * alpha
-        jacobian["thrust", "data:aerodynamics:horizontal_tail:cruise:CL0"] = d_thrust_d_cl_h
-        jacobian["thrust", "data:aerodynamics:horizontal_tail:cruise:CL_alpha"] = (
+        jacobian["thrust", "data:aerodynamics:wing:" + ls_tag + ":CL0_clean"] = d_thrust_d_cl_w
+        jacobian["thrust", "data:aerodynamics:wing:" + ls_tag + ":CL_alpha"] = (
+            d_thrust_d_cl_w * alpha
+        )
+        jacobian["thrust", "data:aerodynamics:horizontal_tail:" + ls_tag + ":CL0"] = d_thrust_d_cl_h
+        jacobian["thrust", "data:aerodynamics:horizontal_tail:" + ls_tag + ":CL_alpha"] = (
             d_thrust_d_cl_h * alpha
         )
         jacobian["thrust", "thrust"] = np.cos(alpha)
@@ -221,16 +239,19 @@ class EquilibriumThrust(om.ImplicitComponent):
         mass = inputs["mass"]
         gamma = inputs["gamma"] * np.pi / 180.0
         true_airspeed = inputs["true_airspeed"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         wing_area = inputs["data:geometry:wing:area"]
 
-        cd0 = inputs["data:aerodynamics:aircraft:cruise:CD0"]
-        cl0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
-        cl_alpha_wing = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
-        coeff_k_wing = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
-        cl0_htp = inputs["data:aerodynamics:horizontal_tail:cruise:CL0"]
-        cl_alpha_htp = inputs["data:aerodynamics:horizontal_tail:cruise:CL_alpha"]
-        coeff_k_htp = inputs["data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient"]
+        cd0 = inputs["data:aerodynamics:aircraft:" + ls_tag + ":CD0"]
+        cl0_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"]
+        cl_alpha_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL_alpha"]
+        coeff_k_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient"]
+        cl0_htp = inputs["data:aerodynamics:horizontal_tail:" + ls_tag + ":CL0"]
+        cl_alpha_htp = inputs["data:aerodynamics:horizontal_tail:" + ls_tag + ":CL_alpha"]
+        coeff_k_htp = inputs[
+            "data:aerodynamics:horizontal_tail:" + ls_tag + ":induced_drag_coefficient"
+        ]
         cl_delta_m = inputs["data:aerodynamics:elevator:low_speed:CL_delta"]
         cd_delta_m = inputs["data:aerodynamics:elevator:low_speed:CD_delta"]
 
