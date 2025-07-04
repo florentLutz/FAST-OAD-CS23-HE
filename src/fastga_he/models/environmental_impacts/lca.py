@@ -14,6 +14,7 @@ import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from .lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
+from .lca_max_airframe_hours import LCAEquivalentMaxAirframeHours
 from .lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
@@ -170,6 +171,14 @@ class LCA(om.Group):
             self.add_subsystem(
                 name="equivalent_flights_per_year",
                 subsys=LCAEquivalentFlightsPerYear(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                name="equivalent_max_airframe_hours",
+                subsys=LCAEquivalentMaxAirframeHours(
                     use_operational_mission=self.options["use_operational_mission"]
                 ),
                 promotes=["*"],

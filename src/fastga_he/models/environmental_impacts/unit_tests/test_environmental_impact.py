@@ -15,6 +15,7 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
 from ..lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from ..lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
+from ..lca_max_airframe_hours import LCAEquivalentMaxAirframeHours
 from ..lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
@@ -199,6 +200,44 @@ def test_aircraft_equivalent_flight_per_year():
     )
 
     assert problem.get_val("data:TLAR:flight_per_year") == pytest.approx(72.94, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_equivalent_max_airframe_hours():
+    inputs_list = [
+        "data:TLAR:aircraft_lifespan",
+        "data:TLAR:flight_per_year",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAEquivalentMaxAirframeHours(),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:max_airframe_hours", units="h") == pytest.approx(
+        5314.34, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(
+        LCAEquivalentMaxAirframeHours(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:max_airframe_hours", units="h") == pytest.approx(
+        21256.68, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
 
