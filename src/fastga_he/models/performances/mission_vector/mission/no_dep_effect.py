@@ -32,9 +32,16 @@ class NoDEPEffect(om.ExplicitComponent):
             default="cruise",
             desc="position of the flaps for the computation of the equilibrium",
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input("data:geometry:propeller:diameter", val=np.nan, units="m")
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
@@ -70,10 +77,12 @@ class NoDEPEffect(om.ExplicitComponent):
         self.add_input("data:geometry:propulsion:engine:count", val=np.nan)
         self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
 
-        self.add_input("data:aerodynamics:wing:cruise:CL0_clean", val=np.nan)
-        self.add_input("data:aerodynamics:wing:cruise:CL_alpha", val=np.nan, units="rad**-1")
-        self.add_input("data:aerodynamics:wing:cruise:CM0_clean", val=np.nan)
-        self.add_input("data:aerodynamics:wing:cruise:CD0", val=np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CL0_clean", val=np.nan)
+        self.add_input(
+            "data:aerodynamics:wing:" + ls_tag + ":CL_alpha", val=np.nan, units="rad**-1"
+        )
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CM0_clean", val=np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CD0", val=np.nan)
 
         self.add_input("density", val=np.full(number_of_points, np.nan), units="kg/m**3")
         self.add_input("true_airspeed", val=np.full(number_of_points, np.nan), units="m/s")

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -26,11 +26,18 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
             desc="position of the flaps for the computation of the equilibrium",
             values=["cruise", "takeoff", "landing"],
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_output(
             "delta_Cd",
@@ -41,7 +48,7 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
 
         self.add_input("data:geometry:wing:wet_area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
-        self.add_input("data:aerodynamics:wing:cruise:CD0", val=np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CD0", val=np.nan)
         self.add_input(
             "axial_induction_factor_wing_ac",
             val=np.nan,
@@ -68,7 +75,7 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
             wrt=[
                 "data:geometry:wing:wet_area",
                 "data:geometry:wing:area",
-                "data:aerodynamics:wing:cruise:CD0",
+                "data:aerodynamics:wing:" + ls_tag + ":CD0",
                 "data:propulsion:he_power_train:propeller:"
                 + propeller_id
                 + ":diameter_to_span_ratio",
@@ -117,6 +124,7 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if flaps_position == "takeoff":
             flapped_ratio = inputs[
@@ -134,7 +142,7 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
 
         wing_wet_area = inputs["data:geometry:wing:wet_area"]
         wing_dry_area = inputs["data:geometry:wing:area"]  # LOL
-        cd0 = inputs["data:aerodynamics:wing:cruise:CD0"]
+        cd0 = inputs["data:aerodynamics:wing:" + ls_tag + ":CD0"]
         cf = cd0 * wing_dry_area / wing_wet_area
 
         delta_y = inputs[
@@ -149,10 +157,11 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         wing_wet_area = inputs["data:geometry:wing:wet_area"]
         wing_dry_area = inputs["data:geometry:wing:area"]  # LOL
-        cd0 = inputs["data:aerodynamics:wing:cruise:CD0"]
+        cd0 = inputs["data:aerodynamics:wing:" + ls_tag + ":CD0"]
 
         delta_y = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio"
@@ -196,7 +205,7 @@ class SlipstreamPropellerDeltaCD0(om.ExplicitComponent):
             -delta_y * a_w**2.0 * cd0 * wing_dry_area / wing_wet_area**2.0
         )
         partials["delta_Cd", "data:geometry:wing:area"] = delta_y * a_w**2.0 * cd0 / wing_wet_area
-        partials["delta_Cd", "data:aerodynamics:wing:cruise:CD0"] = (
+        partials["delta_Cd", "data:aerodynamics:wing:" + ls_tag + ":CD0"] = (
             delta_y * a_w**2.0 * wing_dry_area / wing_wet_area
         )
         partials[

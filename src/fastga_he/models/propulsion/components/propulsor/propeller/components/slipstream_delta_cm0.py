@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -25,11 +25,18 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
             desc="position of the flaps for the computation of the equilibrium",
             values=["cruise", "takeoff", "landing"],
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_output(
             "delta_Cm0",
@@ -38,7 +45,7 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
             desc="Increase in the profile pitching moment coefficient downstream of the propeller",
         )
 
-        self.add_input("data:aerodynamics:wing:cruise:CM0_clean", val=np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CM0_clean", val=np.nan)
         self.add_input(
             "axial_induction_factor_wing_ac",
             val=np.nan,
@@ -63,7 +70,7 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
         self.declare_partials(
             of="delta_Cm0",
             wrt=[
-                "data:aerodynamics:wing:cruise:CM0_clean",
+                "data:aerodynamics:wing:" + ls_tag + ":CM0_clean",
                 "data:propulsion:he_power_train:propeller:"
                 + propeller_id
                 + ":diameter_to_span_ratio",
@@ -114,6 +121,7 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         if flaps_position == "takeoff":
             flapped_ratio = inputs[
@@ -129,7 +137,7 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
         else:
             delta_cm0_flaps = 0.0
 
-        cm0_clean = inputs["data:aerodynamics:wing:cruise:CM0_clean"]
+        cm0_clean = inputs["data:aerodynamics:wing:" + ls_tag + ":CM0_clean"]
 
         delta_y = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio"
@@ -143,8 +151,9 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
-        cm0_clean = inputs["data:aerodynamics:wing:cruise:CM0_clean"]
+        cm0_clean = inputs["data:aerodynamics:wing:" + ls_tag + ":CM0_clean"]
 
         delta_y = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio"
@@ -184,7 +193,9 @@ class SlipstreamPropellerDeltaCM0(om.ExplicitComponent):
         else:
             delta_cm0_flaps = 0.0
 
-        partials["delta_Cm0", "data:aerodynamics:wing:cruise:CM0_clean"] = delta_y * a_w**2.0
+        partials["delta_Cm0", "data:aerodynamics:wing:" + ls_tag + ":CM0_clean"] = (
+            delta_y * a_w**2.0
+        )
         partials[
             "delta_Cm0",
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":diameter_to_span_ratio",

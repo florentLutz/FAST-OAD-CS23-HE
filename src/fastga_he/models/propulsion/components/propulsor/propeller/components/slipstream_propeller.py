@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 
@@ -32,11 +32,18 @@ class SlipstreamPropeller(om.Group):
             desc="position of the flaps for the computation of the equilibrium",
             values=["cruise", "takeoff", "landing"],
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
+        low_speed_aero = self.options["low_speed_aero"]
 
         self.add_subsystem(
             name="delta_cl_at_AoA",
@@ -44,6 +51,7 @@ class SlipstreamPropeller(om.Group):
                 propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
+                low_speed_aero=low_speed_aero,
             ),
             promotes=["*"],
         )
@@ -53,6 +61,7 @@ class SlipstreamPropeller(om.Group):
                 propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
+                low_speed_aero=low_speed_aero,
             ),
             promotes=["*"],
         )
@@ -62,6 +71,7 @@ class SlipstreamPropeller(om.Group):
                 propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
+                low_speed_aero=low_speed_aero,
             ),
             promotes=["*"],
         )

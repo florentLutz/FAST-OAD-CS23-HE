@@ -46,6 +46,12 @@ class SlipstreamPropellerDeltaClGroup(om.Group):
             desc="position of the flaps for the computation of the equilibrium",
             values=["cruise", "takeoff", "landing"],
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         propeller_id = self.options["propeller_id"]
@@ -113,6 +119,7 @@ class SlipstreamPropellerDeltaClGroup(om.Group):
                 propeller_id=propeller_id,
                 number_of_points=number_of_points,
                 flaps_position=flaps_position,
+                low_speed_aero=self.options["low_speed_aero"],
             ),
             promotes=["*"],
         )

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -26,14 +26,21 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             desc="position of the flaps for the computation of the equilibrium",
             values=["cruise", "takeoff", "landing"],
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input(name="cl_wing_clean", val=np.nan, shape=number_of_points)
-        self.add_input(name="data:aerodynamics:wing:cruise:CL0_clean", val=np.nan)
+        self.add_input(name="data:aerodynamics:wing:" + ls_tag + ":CL0_clean", val=np.nan)
 
         self.add_input(name="data:aerodynamics:wing:low_speed:CL_ref", val=np.nan)
         self.add_input(
@@ -90,7 +97,7 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
 
         self.declare_partials(
             of="unblown_section_lift_AOA_0",
-            wrt=shared_inputs + ["data:aerodynamics:wing:cruise:CL0_clean"],
+            wrt=shared_inputs + ["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -99,6 +106,7 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         propeller_id = self.options["propeller_id"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         cl_wing_clean = inputs["cl_wing_clean"]
         cl_wing_ref = inputs["data:aerodynamics:wing:low_speed:CL_ref"]
@@ -106,7 +114,7 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref"
         ]
 
-        cl0 = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
+        cl0 = inputs["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"]
 
         flapped_ratio = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"
@@ -129,6 +137,7 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         propeller_id = self.options["propeller_id"]
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         cl_wing_clean = inputs["cl_wing_clean"]
         cl_wing_ref = inputs["data:aerodynamics:wing:low_speed:CL_ref"]
@@ -136,7 +145,7 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":cl_clean_ref"
         ]
 
-        cl0 = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
+        cl0 = inputs["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"]
 
         flapped_ratio = inputs[
             "data:propulsion:he_power_train:propeller:" + propeller_id + ":flapped_ratio"
@@ -145,9 +154,9 @@ class SlipstreamPropellerSectionLift(om.ExplicitComponent):
         partials["unblown_section_lift", "cl_wing_clean"] = np.full(
             number_of_points, cl_section_ref / cl_wing_ref
         )
-        partials["unblown_section_lift_AOA_0", "data:aerodynamics:wing:cruise:CL0_clean"] = np.full(
-            number_of_points, cl_section_ref / cl_wing_ref
-        )
+        partials[
+            "unblown_section_lift_AOA_0", "data:aerodynamics:wing:" + ls_tag + ":CL0_clean"
+        ] = np.full(number_of_points, cl_section_ref / cl_wing_ref)
 
         partials["unblown_section_lift", "data:aerodynamics:wing:low_speed:CL_ref"] = (
             -cl_wing_clean * cl_section_ref / cl_wing_ref**2.0
