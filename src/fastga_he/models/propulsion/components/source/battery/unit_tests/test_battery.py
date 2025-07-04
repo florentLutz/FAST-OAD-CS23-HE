@@ -58,7 +58,10 @@ from ..components.pre_lca_life_cycle_cyclic import PreLCABatteryCyclicAging
 from ..components.pre_lca_total_aging import PreLCABatteryTotalAging
 from ..components.pre_lca_capacity_loss import PreLCABatteryCapacityLoss
 from ..components.pre_lca_aging import PreLCABatteryAging
-from ..components.pre_lca_prod_weight_per_fu import PreLCABatteryProdWeightPerFU
+from ..components.pre_lca_prod_weight_per_fu import (
+    PreLCABatteryProdWeightPerFU,
+    PreLCABatteryProdWeightPerFUFromHours,
+)
 from ..components.pre_lca_use_emission_per_fu import PreLCABatteryUseEmissionPerFU
 from ..components.pre_lca_battery_pack import PreLCABatteryPack
 from ..components.lcc_battery_cost import LCCBatteryPackCost
@@ -1404,6 +1407,27 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
     ) == pytest.approx(0.033, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu_from_hours():
+    inputs_list = [
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:TLAR:max_airframe_hours",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PreLCABatteryProdWeightPerFUFromHours(battery_pack_id="battery_pack_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(0.045, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
