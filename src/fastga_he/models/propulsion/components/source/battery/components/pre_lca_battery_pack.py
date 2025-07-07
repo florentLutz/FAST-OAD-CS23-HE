@@ -42,7 +42,7 @@ class PreLCABatteryPack(om.Group):
         self.add_subsystem(
             name="weight_per_fu",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SERVICE_BATTERY_LIFESPAN, options=options_dict
+                SERVICE_BATTERY_MASS_PER_FU, options=options_dict
             ),
             promotes=["*"],
         )

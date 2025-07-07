@@ -10,10 +10,10 @@ import fastoad.api as oad
 from ..constants import SERVICE_BATTERY_MASS_PER_FU
 
 SUBMODEL_BATTERY_MASS_PER_FU_FROM_LIFESPAN = (
-    "fastga_he_.submodel.propulsion.battery.mass_per_fu.from_battery_lifespan"
+    "fastga_he.submodel.propulsion.battery.mass_per_fu.from_battery_lifespan"
 )
 SUBMODEL_BATTERY_MASS_PER_FU_FROM_HOURS_FLOWN = (
-    "fastga_he_.submodel.propulsion.battery.mass_per_fu.from_hours_flown"
+    "fastga_he.submodel.propulsion.battery.mass_per_fu.from_hours_flown"
 )
 
 oad.RegisterSubmodel.active_models[SERVICE_BATTERY_MASS_PER_FU] = (
@@ -155,6 +155,7 @@ class PreLCABatteryProdWeightPerFUFromHours(om.ExplicitComponent):
             + battery_pack_id
             + ":hours_per_battery",
             val=250.0,
+            units="h",
             desc="Expected number of hours that can be flown before the battery needs to be replace.",
         )
         self.add_input(
