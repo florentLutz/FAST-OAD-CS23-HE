@@ -35,9 +35,7 @@ class EquilibriumThrust(om.ImplicitComponent):
         self.add_input("gamma", val=np.full(number_of_points, 0.0), units="deg")
         self.add_input("density", val=np.full(number_of_points, 1.225), units="kg/m**3")
         self.add_input("true_airspeed", val=np.full(number_of_points, 50.0), units="m/s")
-
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
-
         self.add_input("data:aerodynamics:aircraft:" + ls_tag + ":CD0", np.nan)
         self.add_input(
             "data:aerodynamics:wing:" + ls_tag + ":CL_alpha", val=np.nan, units="rad**-1"
@@ -53,19 +51,24 @@ class EquilibriumThrust(om.ImplicitComponent):
         )
         self.add_input("data:aerodynamics:elevator:low_speed:CL_delta", val=np.nan, units="rad**-1")
         self.add_input("data:aerodynamics:elevator:low_speed:CD_delta", val=np.nan, units="rad**-2")
+
         if self.options["flaps_position"] == "takeoff":
             self.add_input("data:aerodynamics:flaps:takeoff:CL", val=np.nan)
             self.add_input("data:aerodynamics:flaps:takeoff:CD", val=np.nan)
+
         if self.options["flaps_position"] == "landing":
             self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
             self.add_input("data:aerodynamics:flaps:landing:CD", val=np.nan)
 
         self.add_input("delta_Cd", val=np.full(number_of_points, 0.0))
-
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
         self.add_input("delta_m", val=np.full(number_of_points, np.nan), units="deg")
 
         self.add_output("thrust", val=np.full(number_of_points, 1000.0), units="N")
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.declare_partials(
             of="thrust",
@@ -102,6 +105,7 @@ class EquilibriumThrust(om.ImplicitComponent):
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
+
         if self.options["flaps_position"] == "takeoff":
             self.declare_partials(
                 of="thrust",
@@ -110,6 +114,7 @@ class EquilibriumThrust(om.ImplicitComponent):
                 rows=np.arange(number_of_points),
                 cols=np.zeros(number_of_points),
             )
+
         if self.options["flaps_position"] == "landing":
             self.declare_partials(
                 of="thrust",

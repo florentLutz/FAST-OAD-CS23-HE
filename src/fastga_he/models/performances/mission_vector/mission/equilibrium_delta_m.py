@@ -30,13 +30,11 @@ class EquilibriumDeltaM(om.ImplicitComponent):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
-
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
         self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
         self.add_input(
             "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25", val=np.nan, units="m"
         )
-
         self.add_input(
             "data:aerodynamics:wing:" + ls_tag + ":CL_alpha", val=np.nan, units="rad**-1"
         )
@@ -51,14 +49,19 @@ class EquilibriumDeltaM(om.ImplicitComponent):
 
         if self.options["flaps_position"] == "takeoff":
             self.add_input("data:aerodynamics:flaps:takeoff:CM", val=np.nan)
+
         if self.options["flaps_position"] == "landing":
             self.add_input("data:aerodynamics:flaps:landing:CM", val=np.nan)
 
         self.add_input("delta_Cl", val=np.full(number_of_points, 0.0))
         self.add_input("delta_Cm", val=np.full(number_of_points, 0.0))
-
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
+
         self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.declare_partials(
             of="delta_m",
@@ -85,6 +88,7 @@ class EquilibriumDeltaM(om.ImplicitComponent):
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
+
         if self.options["flaps_position"] == "takeoff":
             self.declare_partials(
                 of="delta_m",
@@ -93,6 +97,7 @@ class EquilibriumDeltaM(om.ImplicitComponent):
                 rows=np.arange(number_of_points),
                 cols=np.zeros(number_of_points),
             )
+
         if self.options["flaps_position"] == "landing":
             self.declare_partials(
                 of="delta_m",

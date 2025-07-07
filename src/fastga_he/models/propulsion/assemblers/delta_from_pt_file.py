@@ -123,6 +123,7 @@ class AerodynamicDeltasFromPTFile(om.Group):
             local_sub_sys.options["number_of_points"] = number_of_points
             if component_slipstream_flap:
                 local_sub_sys.options["flaps_position"] = flaps_position
+            # The low-speed option only applied to propeller aerodynamics deltas in PT components
             if component_name in propulsor_names:
                 local_sub_sys.options["low_speed_aero"] = low_speed_aero
 
@@ -219,6 +220,10 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
 
         self.add_output(name="cl_wing_clean", val=0.5, shape=number_of_points)
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+
         self.declare_partials(
             of="cl_wing_clean",
             wrt="data:aerodynamics:wing:" + ls_tag + ":CL0_clean",
@@ -288,7 +293,17 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
 
         self.add_input(name="cl_wing_clean", val=np.nan, shape=number_of_points)
 
+        if flaps_position == "takeoff":
+            self.add_input("data:aerodynamics:flaps:takeoff:CL", val=np.nan)
+
+        elif flaps_position == "landing":
+            self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
+
         self.add_output(name="cl_airframe", val=0.5, shape=number_of_points)
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        flaps_position = self.options["flaps_position"]
 
         self.declare_partials(
             of="cl_airframe",
@@ -300,7 +315,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
         )
 
         if flaps_position == "takeoff":
-            self.add_input("data:aerodynamics:flaps:takeoff:CL", val=np.nan)
             self.declare_partials(
                 of="cl_airframe",
                 wrt="data:aerodynamics:flaps:takeoff:CL",
@@ -311,7 +325,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
             )
 
         elif flaps_position == "landing":
-            self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
             self.declare_partials(
                 of="cl_airframe",
                 wrt="data:aerodynamics:flaps:landing:CL",
@@ -367,6 +380,10 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
         )
 
         self.add_output(name="delta_Cdi", val=0.0, shape=number_of_points)
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.declare_partials(
             of="delta_Cdi",

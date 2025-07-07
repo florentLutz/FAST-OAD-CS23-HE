@@ -326,4 +326,3 @@ def test_advanced_cl_group_from_yml():
         218.45,
         atol=1e-2,
     )
-
