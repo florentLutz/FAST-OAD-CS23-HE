@@ -275,8 +275,8 @@ def compute_wing_area(
 
     # To compute the maximum AOA possible, should be done in its own component but oh well
     delta_cl_flaps = inputs["data:aerodynamics:flaps:landing:CL"]
-    cl_alpha = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
-    cl_0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
+    cl_alpha = inputs["data:aerodynamics:wing:low_speed:CL_alpha"]
+    cl_0_wing = inputs["data:aerodynamics:wing:low_speed:CL0_clean"]
     max_cl = inputs["data:aerodynamics:aircraft:landing:CL_max"]
 
     alpha_max = (max_cl - delta_cl_flaps - cl_0_wing) / cl_alpha * 180.0 / np.pi
@@ -333,6 +333,7 @@ def compute_wing_area(
             "power_train_file_path": pt_file_path,
             "flaps_position": "landing",
             "sort_component": sort_component,
+            "low_speed_aero": True,
         }
         model.add_subsystem(
             "equilibrium",
@@ -430,6 +431,7 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_p
         "power_train_file_path": pt_file_path,
         "flaps_position": "landing",
         "sort_component": sort_component,
+        "low_speed_aero": True,
     }
     new_component.add_subsystem(
         "system",

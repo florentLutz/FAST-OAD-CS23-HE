@@ -79,6 +79,12 @@ class DEPEquilibrium(om.Group):
             desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -90,29 +96,30 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_thrust",
                 EquilibriumThrust(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
                 EquilibriumDeltaM(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
-            options_dep = {
-                "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"],
-                "power_train_file_path": self.options["power_train_file_path"],
-            }
             self.add_subsystem(
                 "preparation_for_energy_consumption",
                 PrepareForEnergyConsumption(number_of_points=number_of_points),
@@ -134,6 +141,12 @@ class DEPEquilibrium(om.Group):
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
             )
+            options_dep = {
+                "number_of_points": number_of_points,
+                "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
+                "low_speed_aero": self.options["low_speed_aero"],
+            }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
@@ -144,29 +157,30 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_thrust",
                 EquilibriumThrust(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
                 EquilibriumDeltaM(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
-            options_dep = {
-                "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"],
-                "power_train_file_path": self.options["power_train_file_path"],
-            }
             self.add_subsystem(
                 "preparation_for_energy_consumption",
                 PrepareForEnergyConsumption(number_of_points=number_of_points),
@@ -202,6 +216,12 @@ class DEPEquilibrium(om.Group):
                     "fuel_mass_t_econ",
                 ],
             )
+            options_dep = {
+                "number_of_points": number_of_points,
+                "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
+                "low_speed_aero": self.options["low_speed_aero"],
+            }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),

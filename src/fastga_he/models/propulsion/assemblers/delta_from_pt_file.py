@@ -28,7 +28,7 @@ class AerodynamicDeltasFromPTFile(om.Group):
     Groups that regroups the different computation of aerodynamic deltas and sums them. Also
     contains a subroutine that adds all the deltas that contribute to the wing lift so that the
     lift induced drag increase can be compute afterwards. This means that any lift induced drag
-    formula can only be computed here. Also it means we will need a component that computes the
+    formula can only be computed here. Also, it means we will need a component that computes the
     "clean" aircraft lift regardless of the powertrain.
     """
 
@@ -53,16 +53,25 @@ class AerodynamicDeltasFromPTFile(om.Group):
             desc="position of the flaps for the computation of the equilibrium",
             values=["cruise", "takeoff", "landing"],
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
 
         number_of_points = self.options["number_of_points"]
         flaps_position = self.options["flaps_position"]
+        low_speed_aero = self.options["low_speed_aero"]
 
         self.add_subsystem(
             name="wing_cl_clean",
-            subsys=SlipstreamAirframeLiftClean(number_of_points=number_of_points),
+            subsys=SlipstreamAirframeLiftClean(
+                number_of_points=number_of_points, low_speed_aero=low_speed_aero
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -114,6 +123,9 @@ class AerodynamicDeltasFromPTFile(om.Group):
             local_sub_sys.options["number_of_points"] = number_of_points
             if component_slipstream_flap:
                 local_sub_sys.options["flaps_position"] = flaps_position
+            # The low-speed option is assumed to be only applicable to the computation of deltas due to propulsors.
+            if component_name in propulsor_names:
+                local_sub_sys.options["low_speed_aero"] = low_speed_aero
 
             # Because it was more convenient at the time, the "data:*" was chosen to not be
             # universal and thus comes from the SPT field
@@ -145,7 +157,9 @@ class AerodynamicDeltasFromPTFile(om.Group):
         )
         self.add_subsystem(
             name="delta_cdi",
-            subsys=SlipstreamDeltaCdi(number_of_points=number_of_points),
+            subsys=SlipstreamDeltaCdi(
+                number_of_points=number_of_points, low_speed_aero=low_speed_aero
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -182,9 +196,16 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         # Need some mock-up interface because the slipstream of some components requires data
         # that other don't. That makes it so that when we need them we need to promote them,
@@ -192,14 +213,20 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         self.add_input("altitude", val=np.full(number_of_points, np.nan), units="ft")
 
         self.add_input(name="alpha", val=np.full(number_of_points, np.nan), units="rad")
-        self.add_input(name="data:aerodynamics:wing:cruise:CL_alpha", val=np.nan, units="rad**-1")
-        self.add_input(name="data:aerodynamics:wing:cruise:CL0_clean", val=np.nan)
+        self.add_input(
+            name="data:aerodynamics:wing:" + ls_tag + ":CL_alpha", val=np.nan, units="rad**-1"
+        )
+        self.add_input(name="data:aerodynamics:wing:" + ls_tag + ":CL0_clean", val=np.nan)
 
         self.add_output(name="cl_wing_clean", val=0.5, shape=number_of_points)
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+
         self.declare_partials(
             of="cl_wing_clean",
-            wrt="data:aerodynamics:wing:cruise:CL0_clean",
+            wrt="data:aerodynamics:wing:" + ls_tag + ":CL0_clean",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -207,7 +234,7 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         )
         self.declare_partials(
             of="cl_wing_clean",
-            wrt="data:aerodynamics:wing:cruise:CL_alpha",
+            wrt="data:aerodynamics:wing:" + ls_tag + ":CL_alpha",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -221,8 +248,10 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        cl0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
-        cl_alpha_wing = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+
+        cl0_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL0_clean"]
+        cl_alpha_wing = inputs["data:aerodynamics:wing:" + ls_tag + ":CL_alpha"]
         alpha = inputs["alpha"]
 
         cl_wing = cl0_wing + cl_alpha_wing * alpha
@@ -231,10 +260,13 @@ class SlipstreamAirframeLiftClean(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
-        partials["cl_wing_clean", "data:aerodynamics:wing:cruise:CL_alpha"] = inputs["alpha"]
+        partials["cl_wing_clean", "data:aerodynamics:wing:" + ls_tag + ":CL_alpha"] = inputs[
+            "alpha"
+        ]
         partials["cl_wing_clean", "alpha"] = np.full(
-            number_of_points, inputs["data:aerodynamics:wing:cruise:CL_alpha"]
+            number_of_points, inputs["data:aerodynamics:wing:" + ls_tag + ":CL_alpha"]
         )
 
 
@@ -261,7 +293,17 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
 
         self.add_input(name="cl_wing_clean", val=np.nan, shape=number_of_points)
 
+        if flaps_position == "takeoff":
+            self.add_input("data:aerodynamics:flaps:takeoff:CL", val=np.nan)
+
+        elif flaps_position == "landing":
+            self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
+
         self.add_output(name="cl_airframe", val=0.5, shape=number_of_points)
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        flaps_position = self.options["flaps_position"]
 
         self.declare_partials(
             of="cl_airframe",
@@ -273,7 +315,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
         )
 
         if flaps_position == "takeoff":
-            self.add_input("data:aerodynamics:flaps:takeoff:CL", val=np.nan)
             self.declare_partials(
                 of="cl_airframe",
                 wrt="data:aerodynamics:flaps:takeoff:CL",
@@ -284,7 +325,6 @@ class SlipstreamAirframeLift(om.ExplicitComponent):
             )
 
         elif flaps_position == "landing":
-            self.add_input("data:aerodynamics:flaps:landing:CL", val=np.nan)
             self.declare_partials(
                 of="cl_airframe",
                 wrt="data:aerodynamics:flaps:landing:CL",
@@ -322,15 +362,28 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input(name="cl_airframe", val=np.full(number_of_points, np.nan))
         self.add_input(name="delta_Cl_wing", val=np.full(number_of_points, np.nan))
-        self.add_input(name="data:aerodynamics:wing:cruise:induced_drag_coefficient", val=np.nan)
+        self.add_input(
+            name="data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient", val=np.nan
+        )
 
         self.add_output(name="delta_Cdi", val=0.0, shape=number_of_points)
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.declare_partials(
             of="delta_Cdi",
@@ -341,28 +394,32 @@ class SlipstreamDeltaCdi(om.ExplicitComponent):
         )
         self.declare_partials(
             of="delta_Cdi",
-            wrt="data:aerodynamics:wing:cruise:induced_drag_coefficient",
+            wrt="data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+
         cl_airframe = inputs["cl_airframe"]
         delta_cl_wing = inputs["delta_Cl_wing"]
-        k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
+        k = inputs["data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient"]
 
         delta_cdi = k * (delta_cl_wing**2.0 + 2.0 * cl_airframe * delta_cl_wing)
 
         outputs["delta_Cdi"] = delta_cdi
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+
         cl_airframe = inputs["cl_airframe"]
         delta_cl_wing = inputs["delta_Cl_wing"]
-        k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
+        k = inputs["data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient"]
 
         partials["delta_Cdi", "cl_airframe"] = 2.0 * k * delta_cl_wing
         partials["delta_Cdi", "delta_Cl_wing"] = 2.0 * k * (delta_cl_wing + cl_airframe)
-        partials["delta_Cdi", "data:aerodynamics:wing:cruise:induced_drag_coefficient"] = (
+        partials["delta_Cdi", "data:aerodynamics:wing:" + ls_tag + ":induced_drag_coefficient"] = (
             delta_cl_wing**2.0 + 2.0 * cl_airframe * delta_cl_wing
         )
