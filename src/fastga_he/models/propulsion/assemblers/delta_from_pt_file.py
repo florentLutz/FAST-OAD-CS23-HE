@@ -123,7 +123,7 @@ class AerodynamicDeltasFromPTFile(om.Group):
             local_sub_sys.options["number_of_points"] = number_of_points
             if component_slipstream_flap:
                 local_sub_sys.options["flaps_position"] = flaps_position
-            # The low-speed option only applied to propeller aerodynamics deltas in PT components
+            # The low-speed option is assumed to be only applicable to the computation of deltas due to propulsors.
             if component_name in propulsor_names:
                 local_sub_sys.options["low_speed_aero"] = low_speed_aero
 
