@@ -542,6 +542,7 @@ def lca_score_sensitivity_advanced_components_and_phase(
     prefix: str,
     cutoff_criteria: float,
     name: str = None,
+    force_order: list = None,
 ) -> go.Figure:
     """
     Displays the evolution of the contribution to the single score of each component of the
@@ -559,6 +560,8 @@ def lca_score_sensitivity_advanced_components_and_phase(
     :param name: name of the aircraft, to be displayed on the figure.
     :param cutoff_criteria: cutoff criteria, in % of the single score on the last year (e.g. enter
     5 for 5% percent not 0.05)
+    :param force_order: for values that aren't cutoff, forces an order of display from bottom to
+    top.
 
     :return: plotly figure with the evolution of all the components contributing ot the single score
     as a function of the lifespan.
@@ -632,7 +635,7 @@ def lca_score_sensitivity_advanced_components_and_phase(
 
     # To get them sorted and cut off
     new_component_variation = _sort_and_cut_off(
-        components_contribution_total, aircraft_lifespan_list, cutoff_criteria
+        components_contribution_total, aircraft_lifespan_list, cutoff_criteria, force_order
     )
 
     fig = go.Figure()
@@ -770,7 +773,10 @@ def _prep_lasagna_plot(
 
 
 def _sort_and_cut_off(
-    untreated_dict: Dict[str, list], lifespan_list: List[float], cutoff_criteria: float
+    untreated_dict: Dict[str, list],
+    lifespan_list: List[float],
+    cutoff_criteria: float,
+    force_order: list = None,
 ) -> Dict[str, list]:
     """
     For a lot of figures, we will only plot the most significant contributors. This function sorts
@@ -783,6 +789,8 @@ def _sort_and_cut_off(
     :param lifespan_list: list containing the untreated list containing the value of the aircraft
     lifespan at which the analysis was conducted.
     :param cutoff_criteria: value of the cutoff criteria, in percent.
+    :param force_order: for values that aren't cutoff, forces an order of display from bottom to
+    top.
     """
 
     for contributor_name, contributor_value in untreated_dict.items():
@@ -804,8 +812,15 @@ def _sort_and_cut_off(
     )
 
     # This way they should be inserted starting from the biggest down to the smallest up plus the
-    # other
-    biggest_to_smallest = list(reversed(list(last_output_name)))
+    # other, after the order forcing is done
+    if force_order:
+        biggest_to_smallest_pre_force_order = list(reversed(list(last_output_name)))
+        biggest_to_smallest = force_order.copy()
+        for component in biggest_to_smallest_pre_force_order:
+            if component not in force_order:
+                biggest_to_smallest.append(component)
+    else:
+        biggest_to_smallest = list(reversed(list(last_output_name)))
 
     treated_dict = OrderedDict()
     other = np.zeros_like(lifespan_list)

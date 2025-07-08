@@ -15,7 +15,7 @@ import fastoad.api as oad
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_lca"
-SENSITIVITY_RESULTS_FOLDER_PATH =  pathlib.Path(__file__).parent / "results_sensitivity_2"
+SENSITIVITY_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_sensitivity_2"
 
 
 def test_lca_pipistrel_reference():
@@ -487,14 +487,13 @@ def test_lca_pipistrel_full_aging_effect_including_econ_degradation_sensitivity(
 
     # Create inputs
     ref_inputs = DATA_FOLDER_PATH / xml_file_name
-    datafile = oad.DataFile(ref_inputs)
 
     # Setup the problem
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
 
-    for airframe_hours in np.linspace(3000.0, 5000.0, 41):
+    for airframe_hours in np.linspace(3000.0, 5000.0, 81):
         problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
 
         # Check that the right input has been set, that is  the number of hours flown before a
@@ -580,7 +579,7 @@ def test_lca_pipistrel_full_aging_effect_sensitivity():
         units="h",
         val=428.34,
     )
-    for airframe_hours in np.linspace(3000.0, 5000.0, 41):
+    for airframe_hours in np.linspace(3000.0, 5000.0, 81):
         problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
 
         # Run the problem
