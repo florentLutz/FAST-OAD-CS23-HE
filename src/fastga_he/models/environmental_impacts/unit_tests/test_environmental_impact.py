@@ -19,7 +19,7 @@ from ..lca_max_airframe_hours import LCAEquivalentMaxAirframeHours
 from ..lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-from ..lca_electricty_per_fu import LCAElectricityPerFU
+from ..lca_electricty_per_fu import LCAElectricityPerFU, LCAElectricityPerFUFromUsePhaseValue
 from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
@@ -730,6 +730,37 @@ def test_electricity_per_fu_velis():
     assert problem.get_val(
         "data:LCA:operation:he_power_train:electricity:energy_per_fu", units="W*h"
     ) == pytest.approx(233.23046823, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu", units="W*h"
+    ) == pytest.approx(0.25769592, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:electricity:energy_per_fu", units="W*h"
+    ) == pytest.approx(1.25066409, rel=1e-5)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_electricity_per_fu_velis_from_use_phase_value():
+    inputs_list = [
+        "data:environmental_impact:flight_per_fu",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "data.xml")
+    ivc.add_output(
+        "data:LCA:operation:he_power_train:electricity:energy_per_fu", val=233.23046823, units="W*h"
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAElectricityPerFUFromUsePhaseValue(
+            batteries_name_list=["battery_pack_1", "battery_pack_2"],
+            batteries_type_list=["battery_pack", "battery_pack"],
+        ),
+        ivc,
+    )
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu", units="W*h"
     ) == pytest.approx(0.25769592, rel=1e-5)

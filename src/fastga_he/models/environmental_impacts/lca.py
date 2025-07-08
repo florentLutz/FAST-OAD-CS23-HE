@@ -22,7 +22,6 @@ from .lca_core_weighting import LCACoreWeighting
 from .lca_core_aggregation import LCACoreAggregation
 from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-from .lca_electricty_per_fu import LCAElectricityPerFU
 from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
@@ -34,6 +33,7 @@ from .lca_line_test_mission_ratio import LCARatioTestFlightMission
 from .lca_use_flight_per_fu import LCAUseFlightPerFU, LCAUseFlightPerFUFlightHours
 from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from .lca_wing_weight_per_fu import LCAWingWeightPerFU
+from .constants import SERVICE_ELECTRICITY_PER_FU
 from .resources.constants import (
     METHODS_TO_FILE,
     METHODS_TO_NORMALIZATION,
@@ -338,10 +338,14 @@ class LCA(om.Group):
         battery_names, battery_types = self.configurator.get_battery_list()
 
         if battery_names:
+            options_electricity_per_fu = {
+                "batteries_name_list": battery_names,
+                "batteries_type_list": battery_types,
+            }
             self.add_subsystem(
                 name="pre_lca_electricity",
-                subsys=LCAElectricityPerFU(
-                    batteries_name_list=battery_names, batteries_type_list=battery_types
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SERVICE_ELECTRICITY_PER_FU, options=options_electricity_per_fu
                 ),
                 promotes=["*"],
             )
