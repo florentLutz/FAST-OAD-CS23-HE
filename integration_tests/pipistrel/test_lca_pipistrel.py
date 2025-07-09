@@ -26,7 +26,7 @@ def test_lca_pipistrel_reference():
     - A LCA evaluation of the sized configuration without considering the effect of the SOH on the
         functional unit. The effect of the performances on the battery aging will however be
         considered without any tuning.
-    - The LCA conf file will be automatically generated.
+    - The LCA configuration file will be automatically generated.
     """
 
     logging.basicConfig(level=logging.WARNING)
@@ -75,8 +75,11 @@ def test_lca_pipistrel_full_aging_effect():
         ages, its capacity decreases leading to a reduced number of FU. A separate code has been
         used to estimate how many flight hour can be carried out with one battery, the number of
         battery will thus be equal to the max airframe hour divided by that value.
-    - The LCA configuration file will no longer be generated automatically. Instead, it will reuse the previous configuration, the battery mass, and energy per FU. The two later inputs are based on the results from the previously mentioned code.
-  - Similarly, aside from the updated two inputs, all other parameters will remain unchanged. The output file from the preceding sizing process will serve as the input file for this step.
+    - The LCA configuration file will no longer be generated automatically. Instead, it will reuse
+        the previous configuration file. The battery mass and energy per FU are inputs based on the
+        results from the previously mentioned code.
+    - Similarly, aside from the two updated inputs, all other parameters will remain unchanged. The
+        output file from the preceding sizing process will serve as the input file for this step.
     """
 
     logging.basicConfig(level=logging.WARNING)
