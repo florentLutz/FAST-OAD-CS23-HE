@@ -926,7 +926,7 @@ class LCACore(om.ExplicitComponent):
                 )
 
         elif self.options["lca_conf_file_path"]:
-            lca_conf_file_path = self.options["lca_conf_file_path"]
+            lca_conf_file_path = pathlib.Path(self.options["lca_conf_file_path"])
 
         return lca_conf_file_path
 

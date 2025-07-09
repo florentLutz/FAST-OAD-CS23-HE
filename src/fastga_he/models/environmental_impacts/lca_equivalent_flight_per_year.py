@@ -34,9 +34,9 @@ class LCAEquivalentFlightsPerYear(om.ExplicitComponent):
             desc="Expected number of hours flown per year",
         )
         if not self.options["use_operational_mission"]:
-            self.add_input("data:mission:sizing:duration", units="h", val=np.nan)
+            self.add_input("data:mission:sizing:main_route:duration", units="h", val=np.nan)
         else:
-            self.add_input("data:mission:operational:duration", units="h", val=np.nan)
+            self.add_input("data:mission:operational:main_route:duration", units="h", val=np.nan)
 
         self.add_output(
             name="data:TLAR:flight_per_year",
@@ -48,9 +48,9 @@ class LCAEquivalentFlightsPerYear(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if not self.options["use_operational_mission"]:
-            mission_duration = inputs["data:mission:sizing:duration"]
+            mission_duration = inputs["data:mission:sizing:main_route:duration"]
         else:
-            mission_duration = inputs["data:mission:operational:duration"]
+            mission_duration = inputs["data:mission:operational:main_route:duration"]
 
         outputs["data:TLAR:flight_per_year"] = (
             inputs["data:TLAR:flight_hours_per_year"] / mission_duration
@@ -58,9 +58,9 @@ class LCAEquivalentFlightsPerYear(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         if not self.options["use_operational_mission"]:
-            mission_duration_name = "data:mission:sizing:duration"
+            mission_duration_name = "data:mission:sizing:main_route:duration"
         else:
-            mission_duration_name = "data:mission:operational:duration"
+            mission_duration_name = "data:mission:operational:main_route:duration"
 
         partials[
             "data:TLAR:flight_per_year",

@@ -14,6 +14,7 @@ import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from .lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
+from .lca_max_airframe_hours import LCAEquivalentMaxAirframeHours
 from .lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
@@ -21,7 +22,6 @@ from .lca_core_weighting import LCACoreWeighting
 from .lca_core_aggregation import LCACoreAggregation
 from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-from .lca_electricty_per_fu import LCAElectricityPerFU
 from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
@@ -33,6 +33,7 @@ from .lca_line_test_mission_ratio import LCARatioTestFlightMission
 from .lca_use_flight_per_fu import LCAUseFlightPerFU, LCAUseFlightPerFUFlightHours
 from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from .lca_wing_weight_per_fu import LCAWingWeightPerFU
+from .constants import SERVICE_ELECTRICITY_PER_FU
 from .resources.constants import (
     METHODS_TO_FILE,
     METHODS_TO_NORMALIZATION,
@@ -170,6 +171,14 @@ class LCA(om.Group):
             self.add_subsystem(
                 name="equivalent_flights_per_year",
                 subsys=LCAEquivalentFlightsPerYear(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                name="equivalent_max_airframe_hours",
+                subsys=LCAEquivalentMaxAirframeHours(
                     use_operational_mission=self.options["use_operational_mission"]
                 ),
                 promotes=["*"],
@@ -329,10 +338,14 @@ class LCA(om.Group):
         battery_names, battery_types = self.configurator.get_battery_list()
 
         if battery_names:
+            options_electricity_per_fu = {
+                "batteries_name_list": battery_names,
+                "batteries_type_list": battery_types,
+            }
             self.add_subsystem(
                 name="pre_lca_electricity",
-                subsys=LCAElectricityPerFU(
-                    batteries_name_list=battery_names, batteries_type_list=battery_types
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SERVICE_ELECTRICITY_PER_FU, options=options_electricity_per_fu
                 ),
                 promotes=["*"],
             )

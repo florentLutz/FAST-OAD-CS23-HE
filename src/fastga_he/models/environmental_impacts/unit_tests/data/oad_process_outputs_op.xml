@@ -135,6 +135,9 @@
         <energy units="W*h" is_input="False">0.0</energy>
         <fuel units="kg" is_input="False">246.16578793271555</fuel>
         <range units="nmi" is_input="True">200.0</range>
+        <main_route>
+          <duration units="s" is_input="False">9421.869478911876</duration>
+        </main_route>
         <climb>
           <distance units="m" is_input="False">35995.664907714294</distance>
           <duration units="s" is_input="False">627.6141946273906</duration>

@@ -84,6 +84,7 @@
         </payload>
         <TOW units="kg" is_input="True">900.0</TOW>
         <range units="km" is_input="True">200.0<!--design range--></range>
+        <threshold_SoC units="percent" is_input="True">20.0<!--design range--></threshold_SoC>
         <cruise>
           <altitude units="ft" is_input="True">8000.0<!--main route cruise phase altitude--></altitude>
           <v_tas units="knot" is_input="True">120.0<!--cruise speed--></v_tas>

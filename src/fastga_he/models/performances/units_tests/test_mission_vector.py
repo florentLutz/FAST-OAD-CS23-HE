@@ -81,6 +81,9 @@ from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrai
 from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
 from fastga_he.models.performances.payload_range.payload_range import ComputePayloadRange
+from fastga_he.models.performances.payload_range.mission_range_from_soc import (
+    OperationalMissionVectorWithTargetSoC,
+)
 
 from fastga_he.models.performances.payload_range.payload_range_inner_sampling import (
     ComputePayloadRangeInnerSampling,
@@ -2448,6 +2451,47 @@ def test_residuals_viewer():
                 "compute_energy_consumed.power_train_performances.motor_4.ac_current_rms_in"
             ],
         )
+
+
+def test_op_mission_with_target_soc():
+    xml_file = "op_mission_inputs.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
+
+    system = OperationalMissionVectorWithTargetSoC(
+        number_of_points_climb=30,
+        number_of_points_cruise=30,
+        number_of_points_descent=20,
+        number_of_points_reserve=10,
+        power_train_file_path=pt_file_path,
+        pre_condition_pt=True,
+        use_linesearch=False,
+        use_apply_nonlinear=False,
+        variable_name_target_SoC="data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min",
+    )
+    system.nonlinear_solver.options["iprint"] = 2
+
+    ivc = get_indep_var_comp(
+        list_inputs(system),
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(system, ivc)
+
+    # In test_op_mission_vector_from_yml, the mission end with an SoC of 37% so here, since we will
+    # have it end at a smaller SoC the range should be greater than the 200 km
+    range_array = problem.get_val("data:mission:operational:range", units="km")
+    assert range_array == pytest.approx(273, abs=1.0)
+
+    problem.output_file_path = pth.join(RESULTS_FOLDER_PATH, "mission_with_target_SOC.xml")
+    problem.write_outputs()
 
 
 def test_payload_range_elec():

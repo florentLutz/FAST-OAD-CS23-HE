@@ -1,0 +1,215 @@
+<FASTOAD_model>
+  <data>
+    <TLAR>
+      <flight_hours_per_year units="h" is_input="True">283.2<!--Expected number of hours flown per year--></flight_hours_per_year>
+      <max_airframe_hours units="h" is_input="True">4000.0<!--Expected lifetime of the aircraft expressed in airframe hours--></max_airframe_hours>
+      <range units="km" is_input="True">53.0<!--design range--></range>
+    </TLAR>
+    <LCA>
+      <operation>
+        <he_power_train>
+          <electricity>
+            <energy_per_fu units="W*h" is_input="False">27485.94101625837</energy_per_fu>
+          </electricity>
+        </he_power_train>
+      </operation>
+    </LCA>
+    <environmental_impact>
+      <acidification_terrestrial>
+        <normalization_factor is_input="True">41.0</normalization_factor>
+      </acidification_terrestrial>
+      <buy_to_fly>
+        <composite is_input="True">1.0<!--Ratio of the amount of material purchased to to what is really put into the manufactured parts. Typical value for composite material is between 1 and 2--></composite>
+        <metallic is_input="True">1.0<!--Ratio of the amount of material purchased to to what is really put into the manufactured parts. Typical value for metallic material is between 5 and 10--></metallic>
+      </buy_to_fly>
+      <climate_change>
+        <normalization_factor is_input="True">7990.0</normalization_factor>
+      </climate_change>
+      <delivery>
+        <distance units="km" is_input="True">1100.0<!--Distance between the site of assembly of the aircraft and the site of delivery. The variable will have the same name regardless of whether the delivery is done by the air or by land.--></distance>
+      </delivery>
+      <ecotoxicity_freshwater>
+        <normalization_factor is_input="True">25.2</normalization_factor>
+      </ecotoxicity_freshwater>
+      <ecotoxicity_marine>
+        <normalization_factor is_input="True">43.4</normalization_factor>
+      </ecotoxicity_marine>
+      <ecotoxicity_terrestrial>
+        <normalization_factor is_input="True">15200.0</normalization_factor>
+      </ecotoxicity_terrestrial>
+      <energy_resources_non-renewablefossil>
+        <normalization_factor is_input="True">569.9</normalization_factor>
+      </energy_resources_non-renewablefossil>
+      <eutrophication_freshwater>
+        <normalization_factor is_input="True">0.65</normalization_factor>
+      </eutrophication_freshwater>
+      <eutrophication_marine>
+        <normalization_factor is_input="True">4.62</normalization_factor>
+      </eutrophication_marine>
+      <human_toxicity_carcinogenic>
+        <normalization_factor is_input="True">10.3</normalization_factor>
+      </human_toxicity_carcinogenic>
+      <human_toxicity_non-carcinogenic>
+        <normalization_factor is_input="True">31300.0</normalization_factor>
+      </human_toxicity_non-carcinogenic>
+      <ionising_radiation>
+        <normalization_factor is_input="True">480.0</normalization_factor>
+      </ionising_radiation>
+      <land_use>
+        <normalization_factor is_input="True">6170.0</normalization_factor>
+      </land_use>
+      <line_test>
+        <duration units="h" is_input="True">5.0<!--Duration of line tests--></duration>
+      </line_test>
+      <material_resources_metals_minerals>
+        <normalization_factor is_input="True">120000.0</normalization_factor>
+      </material_resources_metals_minerals>
+      <ozone_depletion>
+        <normalization_factor is_input="True">0.06</normalization_factor>
+      </ozone_depletion>
+      <particulate_matter_formation>
+        <normalization_factor is_input="True">25.6</normalization_factor>
+      </particulate_matter_formation>
+      <photochemical_oxidant_formation_human_health>
+        <normalization_factor is_input="True">20.6</normalization_factor>
+      </photochemical_oxidant_formation_human_health>
+      <photochemical_oxidant_formation_terrestrial_ecosystems>
+        <normalization_factor is_input="True">17.7</normalization_factor>
+      </photochemical_oxidant_formation_terrestrial_ecosystems>
+      <total_ecosystem_quality>
+        <normalization_factor is_input="True">0.00148</normalization_factor>
+        <weighting_factor is_input="True">0.4</weighting_factor>
+      </total_ecosystem_quality>
+      <total_human_health>
+        <normalization_factor is_input="True">0.024</normalization_factor>
+        <weighting_factor is_input="True">0.4</weighting_factor>
+      </total_human_health>
+      <total_natural_resources>
+        <normalization_factor is_input="True">28000.0</normalization_factor>
+        <weighting_factor is_input="True">0.2</weighting_factor>
+      </total_natural_resources>
+      <water_use>
+        <normalization_factor is_input="True">267.0</normalization_factor>
+      </water_use>
+      <operation>
+        <sizing>
+          <he_power_train>
+            <battery_pack>
+              <battery_pack_1>
+                <CO2_main_route units="g" is_input="True">0.0<!--Emission of CO2 excluding reserve, quantity of interest for the LCA--></CO2_main_route>
+                <CO_main_route units="g" is_input="True">0.0<!--Emission of CO excluding reserve, quantity of interest for the LCA--></CO_main_route>
+                <H2O_main_route units="g" is_input="True">0.0<!--Emission of H2O excluding reserve, quantity of interest for the LCA--></H2O_main_route>
+                <HC_main_route units="g" is_input="True">0.0<!--Emission of HC excluding reserve, quantity of interest for the LCA--></HC_main_route>
+                <NOx_main_route units="g" is_input="True">0.0<!--Emission of NOx excluding reserve, quantity of interest for the LCA--></NOx_main_route>
+                <SOx_main_route units="g" is_input="True">0.0<!--Emission of SOx excluding reserve, quantity of interest for the LCA--></SOx_main_route>
+              </battery_pack_1>
+              <battery_pack_2>
+                <CO2_main_route units="g" is_input="True">0.0<!--Emission of CO2 excluding reserve, quantity of interest for the LCA--></CO2_main_route>
+                <CO_main_route units="g" is_input="True">0.0<!--Emission of CO excluding reserve, quantity of interest for the LCA--></CO_main_route>
+                <H2O_main_route units="g" is_input="True">0.0<!--Emission of H2O excluding reserve, quantity of interest for the LCA--></H2O_main_route>
+                <HC_main_route units="g" is_input="True">0.0<!--Emission of HC excluding reserve, quantity of interest for the LCA--></HC_main_route>
+                <NOx_main_route units="g" is_input="True">0.0<!--Emission of NOx excluding reserve, quantity of interest for the LCA--></NOx_main_route>
+                <SOx_main_route units="g" is_input="True">0.0<!--Emission of SOx excluding reserve, quantity of interest for the LCA--></SOx_main_route>
+              </battery_pack_2>
+            </battery_pack>
+          </he_power_train>
+        </sizing>
+      </operation>
+    </environmental_impact>
+    <weight>
+      <aircraft>
+        <OWE units="kg" is_input="True">428.1688881083577<!--Mass of aircraft--></OWE>
+      </aircraft>
+      <airframe>
+        <flight_controls>
+          <mass units="lbm" is_input="True">18.262683589278623<!--Mass of the airframe_inp_data:weight:airframe:flight_controls:mass--></mass>
+        </flight_controls>
+        <fuselage>
+          <mass units="lbm" is_input="True">132.39501221183747<!--Mass of the airframe_inp_data:weight:airframe:fuselage:mass--></mass>
+        </fuselage>
+        <horizontal_tail>
+          <mass units="lbm" is_input="True">6.643494699732447<!--Mass of the airframe_inp_data:weight:airframe:horizontal_tail:mass--></mass>
+        </horizontal_tail>
+        <vertical_tail>
+          <mass units="lbm" is_input="True">7.615155390929329<!--Mass of the airframe_inp_data:weight:airframe:vertical_tail:mass--></mass>
+        </vertical_tail>
+        <wing>
+          <mass units="kg" is_input="True">91.1258373157251<!--Mass of the airframe_inp_data:weight:airframe:wing:mass--></mass>
+        </wing>
+        <landing_gear>
+          <front>
+            <mass units="lbm" is_input="True">15.80651892065039<!--Mass of the airframe_inp_data:weight:airframe:landing_gear:front:mass--></mass>
+          </front>
+          <main>
+            <mass units="lbm" is_input="True">28.831685279437306<!--Mass of the airframe_inp_data:weight:airframe:landing_gear:main:mass--></mass>
+          </main>
+        </landing_gear>
+      </airframe>
+    </weight>
+    <mission>
+      <sizing>
+        <main_route>
+          <duration units="s" is_input="True">1694.3438593550231</duration>
+        </main_route>
+      </sizing>
+    </mission>
+    <propulsion>
+      <he_power_train>
+        <DC_SSPC>
+          <dc_sspc_1>
+            <mass units="kg" is_input="True">1.0553200137543552<!--Mass of the SSPC--></mass>
+          </dc_sspc_1>
+          <dc_sspc_2>
+            <mass units="kg" is_input="True">1.0553200137543552<!--Mass of the SSPC--></mass>
+          </dc_sspc_2>
+        </DC_SSPC>
+        <DC_bus>
+          <dc_bus_1>
+            <mass units="kg" is_input="True">0.2184047524699488<!--Weight of the bus bar--></mass>
+          </dc_bus_1>
+        </DC_bus>
+        <DC_cable_harness>
+          <harness_1>
+            <length units="m" is_input="True">1.5<!--Length of the harness--></length>
+            <number_cables is_input="True">1.0</number_cables>
+          </harness_1>
+        </DC_cable_harness>
+        <DC_splitter>
+          <dc_splitter_1>
+            <mass units="kg" is_input="True">0.11878172956547481<!--Weight of the splitter--></mass>
+          </dc_splitter_1>
+        </DC_splitter>
+        <PMSM>
+          <motor_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the PMSM, typically around 15 year--></lifespan>
+            <mass units="kg" is_input="True">20.385293218952995</mass>
+          </motor_1>
+        </PMSM>
+        <battery_pack>
+          <battery_pack_1>
+            <energy_consumed_main_route units="W*h" is_input="True">6468.1438027071845<!--Energy drawn from the battery for the main route of the missions (excludes reserve)--></energy_consumed_main_route>
+            <hours_per_battery units="h" is_input="True">354.94<!--Expected number of hours that can be flown before the battery needs to be replace.--></hours_per_battery>
+            <mass units="kg" is_input="True">74.72061335641477<!--Mass of the battery pack--></mass>
+          </battery_pack_1>
+          <battery_pack_2>
+            <energy_consumed_main_route units="W*h" is_input="True">6468.143802707185<!--Energy drawn from the battery for the main route of the missions (excludes reserve)--></energy_consumed_main_route>
+            <hours_per_battery units="h" is_input="True">354.94<!--Expected number of hours that can be flown before the battery needs to be replace.--></hours_per_battery>
+            <mass units="kg" is_input="True">74.7206133564148<!--Mass of the battery pack--></mass>
+          </battery_pack_2>
+        </battery_pack>
+        <inverter>
+          <inverter_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the inverter, typically around 15 year--></lifespan>
+            <mass units="kg" is_input="True">4.108171231120181<!--Mass of the inverter--></mass>
+          </inverter_1>
+        </inverter>
+        <propeller>
+          <propeller_1>
+            <mass units="kg" is_input="True">18.98164498616869</mass>
+            <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </data>
+</FASTOAD_model>

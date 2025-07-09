@@ -139,10 +139,10 @@ class LCAAircraftPerFUFlightHours(om.ExplicitComponent):
         )
 
         if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
+            duration_mission_name = "data:mission:sizing:main_route:duration"
 
         else:
-            duration_mission_name = "data:mission:operational:duration"
+            duration_mission_name = "data:mission:operational:main_route:duration"
 
         self.add_input(
             name=duration_mission_name,
@@ -161,10 +161,10 @@ class LCAAircraftPerFUFlightHours(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
+            duration_mission_name = "data:mission:sizing:main_route:duration"
 
         else:
-            duration_mission_name = "data:mission:operational:duration"
+            duration_mission_name = "data:mission:operational:main_route:duration"
 
         outputs["data:environmental_impact:aircraft_per_fu"] = 1.0 / (
             inputs["data:TLAR:aircraft_lifespan"]
@@ -174,10 +174,10 @@ class LCAAircraftPerFUFlightHours(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         if not self.options["use_operational_mission"]:
-            duration_mission_name = "data:mission:sizing:duration"
+            duration_mission_name = "data:mission:sizing:main_route:duration"
 
         else:
-            duration_mission_name = "data:mission:operational:duration"
+            duration_mission_name = "data:mission:operational:main_route:duration"
 
         duration_mission = inputs[duration_mission_name]
 

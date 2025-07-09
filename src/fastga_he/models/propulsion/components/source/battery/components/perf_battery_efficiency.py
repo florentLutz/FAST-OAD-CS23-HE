@@ -25,7 +25,16 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
 
         self.add_output("efficiency", val=np.full(number_of_points, 1.0), lower=0.0, upper=1.0)
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         # Doing it like this instead of using where straight up allows to avoid computing the
@@ -49,7 +58,7 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
             out=partials_losses,
             where=np.abs(inputs["power_out"]) >= 200.0,
         )
-        partials["efficiency", "losses_battery"] = np.diag(partials_losses)
+        partials["efficiency", "losses_battery"] = partials_losses
 
         partials_current_out = np.full_like(inputs["power_out"], 1e-6)
         np.divide(
@@ -58,4 +67,4 @@ class PerformancesBatteryEfficiency(om.ExplicitComponent):
             out=partials_current_out,
             where=np.abs(inputs["power_out"]) >= 200.0,
         )
-        partials["efficiency", "power_out"] = np.diag(partials_current_out)
+        partials["efficiency", "power_out"] = partials_current_out

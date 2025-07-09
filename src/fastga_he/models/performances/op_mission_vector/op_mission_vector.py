@@ -480,6 +480,10 @@ class OperationalMissionVector(om.Group):
                     "data:mission:sizing:duration",
                     "data:mission:operational:duration",
                 ),
+                (
+                    "data:mission:sizing:main_route:duration",
+                    "data:mission:operational:main_route:duration",
+                ),
             ],
         )
         self.add_subsystem(

@@ -91,7 +91,7 @@ class PreLCABatteryCalendarAging(om.ExplicitComponent):
             + ":aging:calendar_effect_k_factor"
         ]
         # Safeguard
-        n_cycles = np.maximum(inputs["number_of_cycles"], 100)
+        n_cycles = np.maximum(inputs["number_of_cycles"], 2)
         time_btw_cycle = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":time_between_cycle"
         ]
@@ -123,7 +123,7 @@ class PreLCABatteryCalendarAging(om.ExplicitComponent):
             + battery_pack_id
             + ":aging:calendar_effect_k_factor"
         ]
-        n_cycles = np.maximum(inputs["number_of_cycles"], 100)
+        n_cycles = np.maximum(inputs["number_of_cycles"], 2)
         time_btw_cycle = inputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":time_between_cycle"
         ]

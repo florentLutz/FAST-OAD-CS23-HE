@@ -38,6 +38,12 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         battery_pack_id = self.options["battery_pack_id"]
 
         self.add_input("current_one_module", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health",
+            val=100.0,
+            units="percent",
+            desc="State of Health of the battery, i.e. capacity with respect to nominal capacity",
+        )
 
         # Weirdly enough, this will be a output of a performance module, it does not really make
         # sense to create a component in sizing that just outputs this value based on an option
@@ -49,11 +55,34 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         )
         self.add_output("c_rate", units="h**-1", val=np.full(number_of_points, 1.0))
 
-        self.declare_partials(of="c_rate", wrt="current_one_module", method="exact")
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        battery_pack_id = self.options["battery_pack_id"]
+
+        self.declare_partials(
+            of="c_rate",
+            wrt="current_one_module",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="c_rate",
+            wrt="data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":state_of_health",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+
         self.declare_partials(
             of="data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity",
-            wrt=[],
+            wrt="data:propulsion:he_power_train:battery_pack:"
+            + battery_pack_id
+            + ":state_of_health",
             method="exact",
+            val=self.options["cell_capacity_ref"] / 100.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -62,16 +91,32 @@ class PerformancesModuleCRate(om.ExplicitComponent):
         current = np.where(
             np.abs(inputs["current_one_module"]) < 1e-2, 0.0, inputs["current_one_module"]
         )
+        soh = inputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health"
+        ]
 
-        outputs["c_rate"] = current / self.options["cell_capacity_ref"]
+        outputs["c_rate"] = current / (self.options["cell_capacity_ref"] * soh / 100.0)
         outputs[
             "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":cell:capacity"
-        ] = self.options["cell_capacity_ref"]
+        ] = self.options["cell_capacity_ref"] * soh / 100.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        battery_pack_id = self.options["battery_pack_id"]
+
+        soh = inputs[
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health"
+        ]
+        current = np.where(
+            np.abs(inputs["current_one_module"]) < 1e-2, 0.0, inputs["current_one_module"]
+        )
+
         partials_current = np.where(
             np.abs(inputs["current_one_module"]) < 1e-2,
             1e-6,
-            1.0 / self.options["cell_capacity_ref"],
+            1.0 / (self.options["cell_capacity_ref"] * soh / 100.0),
         )
-        partials["c_rate", "current_one_module"] = np.diag(partials_current)
+        partials["c_rate", "current_one_module"] = partials_current
+        partials[
+            "c_rate",
+            "data:propulsion:he_power_train:battery_pack:" + battery_pack_id + ":state_of_health",
+        ] = -current / (self.options["cell_capacity_ref"] * soh**2.0 / 100.0)
