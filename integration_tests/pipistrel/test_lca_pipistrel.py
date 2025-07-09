@@ -75,11 +75,8 @@ def test_lca_pipistrel_full_aging_effect():
         ages, its capacity decreases leading to a reduced number of FU. A separate code has been
         used to estimate how many flight hour can be carried out with one battery, the number of
         battery will thus be equal to the max airframe hour divided by that value.
-    - The LCA conf file will not be automatically generated. Rather it will use the previous one
-        and the value for battery mass and energy per FU will be inputs as the results of the
-        previously mentioned code.
-    - Similarly save for the aforementioned inputs, the same inputs will be used so the output file
-        of the precedent sizing process will be used
+    - The LCA configuration file will no longer be generated automatically. Instead, it will reuse the previous configuration, the battery mass, and energy per FU. The two later inputs are based on the results from the previously mentioned code.
+  - Similarly, aside from the updated two inputs, all other parameters will remain unchanged. The output file from the preceding sizing process will serve as the input file for this step.
     """
 
     logging.basicConfig(level=logging.WARNING)
