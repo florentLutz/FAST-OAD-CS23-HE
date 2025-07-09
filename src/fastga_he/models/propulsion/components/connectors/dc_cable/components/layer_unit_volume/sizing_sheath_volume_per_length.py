@@ -46,13 +46,23 @@ class SizingSheathVolumePerLength(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="sheath_volume_per_length",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":sheath:unit_volume",
             units="m**3",
-            val=2.0,
+            val=0.1,
         )
 
     def setup_partials(self):
-        self.declare_partials(of="sheath_volume_per_length", wrt="*", method="exact")
+        harness_id = self.options["harness_id"]
+
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":sheath:unit_volume",
+            wrt="*",
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
@@ -72,9 +82,9 @@ class SizingSheathVolumePerLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
         ]
 
-        outputs["sheath_volume_per_length"] = np.pi * (
-            (2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath
-        )
+        outputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume"
+        ] = np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
@@ -95,20 +105,20 @@ class SizingSheathVolumePerLength(om.ExplicitComponent):
         ]
 
         partials[
-            "sheath_volume_per_length",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
         ] = 2.0 * np.pi * t_sheath
         partials[
-            "sheath_volume_per_length",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume",
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness",
         ] = 2.0 * np.pi * t_sheath
         partials[
-            "sheath_volume_per_length",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume",
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
         ] = 2.0 * np.pi * t_sheath
         partials[
-            "sheath_volume_per_length",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
         ] = 2.0 * np.pi * (r_c + t_in + t_shield + t_sheath)

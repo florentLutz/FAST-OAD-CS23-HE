@@ -6,6 +6,10 @@ import openmdao.api as om
 
 from .lcc_harness_core_unit_cost import LCCHarnessCoreUnitCost
 from .lcc_harness_unit_cost import LCCHarnessUnitCost
+from .layer_unit_volume.sizing_conductor_volume_per_length import SizingConductorVolumePerLength
+from .layer_unit_volume.sizing_insulation_volume_per_length import SizingInsulationVolumePerLength
+from .layer_unit_volume.sizing_shield_volume_per_length import SizingShieldVolumePerLength
+from .layer_unit_volume.sizing_sheath_volume_per_length import SizingSheathVolumePerLength
 
 
 class LCCHarnessCost(om.Group):
@@ -24,6 +28,26 @@ class LCCHarnessCost(om.Group):
     def setup(self):
         harness_id = self.options["harness_id"]
 
+        self.add_subsystem(
+            "conductor_layer_volume",
+            SizingConductorVolumePerLength(harness_id=harness_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "insulation_layer_volume",
+            SizingInsulationVolumePerLength(harness_id=harness_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "shield_layer_volume",
+            SizingShieldVolumePerLength(harness_id=harness_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "sheath_layer_volume",
+            SizingSheathVolumePerLength(harness_id=harness_id),
+            promotes=["*"],
+        )
         self.add_subsystem(
             name="core_material_cost",
             subsys=LCCHarnessCoreUnitCost(harness_id=harness_id),

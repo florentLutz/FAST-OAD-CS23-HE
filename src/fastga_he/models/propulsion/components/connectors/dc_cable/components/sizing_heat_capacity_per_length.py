@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -23,8 +23,8 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":conductor:radius",
-            units="m",
+            + ":conductor:unit_volume",
+            units="m**3",
             val=np.nan,
         )
         self.add_input(
@@ -43,13 +43,12 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             units="kg/m**3",
             desc="1.0 for copper, 0.0 for aluminium",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":insulation:thickness",
+            + ":insulation:unit_volume",
+            units="m**3",
             val=np.nan,
-            units="m",
         )
         self.add_input(
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:specific_heat",
@@ -61,11 +60,12 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             units="kg/m**3",
             val=1450.0,
         )
-
         self.add_input(
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-            units="m",
-            val=0.2e-3,
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":shield:unit_volume",
+            units="m**3",
+            val=np.nan,
         )
         self.add_input(
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:specific_heat",
@@ -79,11 +79,12 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             val=8960,
             desc="High density polyethylene for cable sheath",
         )
-
         self.add_input(
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
-            units="m",
-            val=0.2e-2,
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":sheath:unit_volume",
+            units="m**3",
+            val=np.nan,
         )
         self.add_input(
             "settings:propulsion:he_power_train:DC_cable_harness:sheath:specific_heat",
@@ -106,24 +107,27 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             val=7000.0,
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
 
-        r_c = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius"
-        ]
-        t_in = inputs[
+        v_c = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":insulation:thickness"
+            + ":conductor:unit_volume"
         ]
-        t_shield = inputs[
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
+        v_in = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume"
         ]
-        t_sheath = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
+        v_shield = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume"
+        ]
+        v_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume"
         ]
 
         cp_c = inputs[
@@ -150,20 +154,16 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
         ]
         rho_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:density"]
 
-        hc_conductor = np.pi * cp_c * rho_c * (r_c**2.0)
-        hc_i = np.pi * cp_in * rho_in * ((2.0 * r_c + t_in) * t_in)
-        hc_shield = np.pi * cp_shield * rho_shield * ((2.0 * (r_c + t_in) + t_shield) * t_shield)
-        hc_sheath = (
-            np.pi * cp_sheath * rho_sheath * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath)
-        )
-
-        hc_cable = hc_conductor + hc_i + hc_shield + hc_sheath
+        hc_conductor = cp_c * rho_c * v_c
+        hc_i = cp_in * rho_in * v_in
+        hc_shield = cp_shield * rho_shield * v_shield
+        hc_sheath = cp_sheath * rho_sheath * v_sheath
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":cable:heat_capacity_per_length"
-        ] = hc_cable
+        ] = hc_conductor + hc_i + hc_shield + hc_sheath
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
@@ -174,19 +174,21 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             + ":cable:heat_capacity_per_length"
         )
 
-        r_c = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius"
-        ]
-        t_in = inputs[
+        v_c = inputs[
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":insulation:thickness"
+            + ":conductor:unit_volume"
         ]
-        t_shield = inputs[
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
+        v_in = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume"
         ]
-        t_sheath = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness"
+        v_shield = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume"
+        ]
+        v_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume"
         ]
 
         cp_c = inputs[
@@ -218,73 +220,50 @@ class SizingHeatCapacityPerLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":properties:specific_heat",
-        ] = np.pi * (r_c**2.0) * rho_c
+        ] = rho_c * v_c
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:insulation:specific_heat",
-        ] = np.pi * ((2.0 * r_c + t_in) * t_in) * rho_in
+        ] = rho_in * v_in
         partials[
             output_str,
             "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:specific_heat",
-        ] = np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield) * rho_shield
+        ] = rho_shield * v_shield
         partials[
-            output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:sheath:specific_heat",
-        ] = np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath) * rho_sheath
+            output_str, "settings:propulsion:he_power_train:DC_cable_harness:sheath:specific_heat"
+        ] = rho_sheath * v_sheath
 
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":properties:density",
-        ] = np.pi * (r_c**2.0) * cp_c
+        ] = cp_c * v_c
         partials[
-            output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:insulation:density",
-        ] = np.pi * ((2.0 * r_c + t_in) * t_in) * cp_in
+            output_str, "settings:propulsion:he_power_train:DC_cable_harness:insulation:density"
+        ] = cp_in * v_in
         partials[
-            output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:density",
-        ] = np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield) * cp_shield
+            output_str, "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:density"
+        ] = cp_shield * v_shield
         partials[
-            output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:sheath:density",
-        ] = np.pi * ((2.0 * (r_c + t_in + t_shield) + t_sheath) * t_sheath) * cp_sheath
+            output_str, "settings:propulsion:he_power_train:DC_cable_harness:sheath:density"
+        ] = cp_sheath * v_sheath
 
-        partials[
-            output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
-        ] = (
-            2.0
-            * np.pi
-            * (
-                cp_c * rho_c * r_c
-                + cp_in * rho_in * t_in
-                + cp_shield * rho_shield * t_shield
-                + cp_sheath * t_sheath * rho_sheath
-            )
-        )
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":insulation:thickness",
-        ] = (
-            2.0
-            * np.pi
-            * (
-                cp_in * rho_in * (t_in + r_c)
-                + cp_shield * rho_shield * t_shield
-                + cp_sheath * rho_sheath * t_sheath
-            )
-        )
+            + ":conductor:unit_volume",
+        ] = rho_c * cp_c
         partials[
             output_str,
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-        ] = (
-            2.0
-            * np.pi
-            * (cp_shield * rho_shield * (t_shield + r_c + t_in) + cp_sheath * rho_sheath * t_sheath)
-        )
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume",
+        ] = rho_in * cp_in
         partials[
             output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:thickness",
-        ] = 2.0 * np.pi * cp_sheath * rho_sheath * (r_c + t_in + t_shield + t_sheath)
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume",
+        ] = rho_shield * cp_shield
+        partials[
+            output_str,
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume",
+        ] = rho_sheath * cp_sheath

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -21,6 +21,10 @@ from .sizing_cable_radius import SizingCableRadius
 from .sizing_harness_cg_x import SizingHarnessCGX
 from .sizing_harness_cg_y import SizingHarnessCGY
 from .sizing_harness_drag import SizingHarnessDrag
+from .layer_unit_volume.sizing_conductor_volume_per_length import SizingConductorVolumePerLength
+from .layer_unit_volume.sizing_insulation_volume_per_length import SizingInsulationVolumePerLength
+from .layer_unit_volume.sizing_shield_volume_per_length import SizingShieldVolumePerLength
+from .layer_unit_volume.sizing_sheath_volume_per_length import SizingSheathVolumePerLength
 
 from .cstr_harness import ConstraintsHarness
 
@@ -90,7 +94,26 @@ class SizingHarness(om.Group):
             SizingCableRadius(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
-
+        self.add_subsystem(
+            "conductor_layer_volume",
+            SizingConductorVolumePerLength(harness_id=harness_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "insulation_layer_volume",
+            SizingInsulationVolumePerLength(harness_id=harness_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "shield_layer_volume",
+            SizingShieldVolumePerLength(harness_id=harness_id),
+            promotes=["data:*", "settings:*"],
+        )
+        self.add_subsystem(
+            "sheath_layer_volume",
+            SizingSheathVolumePerLength(harness_id=harness_id),
+            promotes=["data:*", "settings:*"],
+        )
         self.add_subsystem(
             "resistance_per_length",
             SizingResistancePerLength(harness_id=harness_id),

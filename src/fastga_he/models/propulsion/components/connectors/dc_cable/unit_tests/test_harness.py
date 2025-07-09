@@ -26,6 +26,18 @@ from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.sizing_harness_cg_x import SizingHarnessCGX
 from ..components.sizing_harness_cg_y import SizingHarnessCGY
+from ..components.layer_unit_volume.sizing_conductor_volume_per_length import (
+    SizingConductorVolumePerLength,
+)
+from ..components.layer_unit_volume.sizing_insulation_volume_per_length import (
+    SizingInsulationVolumePerLength,
+)
+from ..components.layer_unit_volume.sizing_shield_volume_per_length import (
+    SizingShieldVolumePerLength,
+)
+from ..components.layer_unit_volume.sizing_sheath_volume_per_length import (
+    SizingSheathVolumePerLength,
+)
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
@@ -190,6 +202,27 @@ def test_mass_per_length():
         list_inputs(SizingMassPerLength(harness_id="harness_1")), __file__, XML_FILE
     )
 
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
+        units="m**3",
+        val=4.32e-05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
+        units="m**3",
+        val=3.25e-05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
+        units="m**3",
+        val=6.3e-06,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
+        units="m**3",
+        val=4.95e-05,
+    )
+
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingMassPerLength(harness_id="harness_1"), ivc)
     assert problem.get_val(
@@ -236,6 +269,27 @@ def test_heat_capacity_per_length():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHeatCapacityPerLength(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
+        units="m**3",
+        val=4.32e-05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
+        units="m**3",
+        val=3.25e-05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
+        units="m**3",
+        val=6.3e-06,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
+        units="m**3",
+        val=4.95e-05,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -337,6 +391,98 @@ def test_harness_cg_y():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_conductor_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+
+    problem = run_system(SizingConductorVolumePerLength(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
+        units="m**3",
+    ) == pytest.approx(4.32e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_insulation_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+
+    problem = run_system(SizingInsulationVolumePerLength(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
+        units="m**3",
+    ) == pytest.approx(3.25e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_shield_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+
+    problem = run_system(SizingShieldVolumePerLength(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
+        units="m**3",
+    ) == pytest.approx(6.3e-06, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sheath_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:thickness",
+        units="mm",
+        val=1.36,
+    )
+
+    problem = run_system(SizingSheathVolumePerLength(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
+        units="m**3",
+    ) == pytest.approx(4.95e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_perf_current():
@@ -979,6 +1125,26 @@ def test_wire_cost():
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
         units="USD/m**3",
         val=92556.8,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
+        units="m**3",
+        val=4.32e-05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
+        units="m**3",
+        val=3.25e-05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
+        units="m**3",
+        val=6.3e-06,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
+        units="m**3",
+        val=4.95e-05,
     )
 
     # Run problem and check obtained value(s) is/(are) correct

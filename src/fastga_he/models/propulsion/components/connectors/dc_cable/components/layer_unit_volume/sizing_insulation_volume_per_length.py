@@ -36,13 +36,23 @@ class SizingInsulationVolumePerLength(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="insulation_volume_per_length",
+            name="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume",
             units="m**3",
-            val=2.0,
+            val=0.1,
         )
 
     def setup_partials(self):
-        self.declare_partials(of="insulation_volume_per_length", wrt="*", method="exact")
+        harness_id = self.options["harness_id"]
+
+        self.declare_partials(
+            of="data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume",
+            wrt="*",
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
@@ -56,7 +66,11 @@ class SizingInsulationVolumePerLength(om.ExplicitComponent):
             + ":insulation:thickness"
         ]
 
-        outputs["insulation_volume_per_length"] = np.pi * ((2.0 * r_c + t_in) * t_in)
+        outputs[
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume"
+        ] = np.pi * ((2.0 * r_c + t_in) * t_in)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
@@ -71,11 +85,15 @@ class SizingInsulationVolumePerLength(om.ExplicitComponent):
         ]
 
         partials[
-            "insulation_volume_per_length",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
         ] = 2.0 * np.pi * t_in
         partials[
-            "insulation_volume_per_length",
+            "data:propulsion:he_power_train:DC_cable_harness:"
+            + harness_id
+            + ":insulation:unit_volume",
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness",
