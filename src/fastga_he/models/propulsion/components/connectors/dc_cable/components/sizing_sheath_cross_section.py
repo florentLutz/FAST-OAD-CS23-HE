@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingSheathVolumePerLength(om.ExplicitComponent):
+class SizingSheathCrossSection(om.ExplicitComponent):
     """Computation of cross-section area of sheath layer."""
 
     def initialize(self):

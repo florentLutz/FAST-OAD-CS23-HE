@@ -65,7 +65,7 @@ from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizin
     SizingShieldCrossSection,
 )
 from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_sheath_cross_section import (
-    SizingSheathVolumePerLength,
+    SizingSheathCrossSection,
 )
 from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_current import (
     PerformancesCurrent,
@@ -484,7 +484,7 @@ def test_sheath_layer_volume():
         val=1.36,
     )
 
-    problem = run_system(SizingSheathVolumePerLength(harness_id="harness_1"), ivc)
+    problem = run_system(SizingSheathCrossSection(harness_id="harness_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:section",

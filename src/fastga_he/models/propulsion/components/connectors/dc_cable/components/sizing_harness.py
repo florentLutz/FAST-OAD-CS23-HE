@@ -23,7 +23,7 @@ from .sizing_harness_cg_y import SizingHarnessCGY
 from .sizing_harness_drag import SizingHarnessDrag
 from .sizing_insulation_cross_section import SizingInsulationCrossSection
 from .sizing_shield_cross_section import SizingShieldCrossSection
-from .sizing_sheath_cross_section import SizingSheathVolumePerLength
+from .sizing_sheath_cross_section import SizingSheathCrossSection
 
 from .cstr_harness import ConstraintsHarness
 
@@ -105,7 +105,7 @@ class SizingHarness(om.Group):
         )
         self.add_subsystem(
             "sheath_layer_cross_section",
-            SizingSheathVolumePerLength(harness_id=harness_id),
+            SizingSheathCrossSection(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
