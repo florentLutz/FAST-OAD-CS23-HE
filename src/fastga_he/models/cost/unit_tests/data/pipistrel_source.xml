@@ -390,7 +390,11 @@
             <insulation>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
               <thickness units="m" is_input="False">0.001076692294764331</thickness>
+              <section units="m**2" is_input="False">3.083895113679372e-05</section>
             </insulation>
+            <shield>
+              <section units="m**2" is_input="False">6.530630805578932e-06</section>
+            </shield>
             <low_speed>
               <CD0 is_input="False">0.0</CD0>
             </low_speed>
@@ -401,6 +405,7 @@
             </properties>
             <sheath>
               <thickness units="m" is_input="False">0.0013707837608270576</thickness>
+              <section units="m**2" is_input="False">5.1524905892208134e-05</section>
             </sheath>
           </harness_1>
         </DC_cable_harness>
