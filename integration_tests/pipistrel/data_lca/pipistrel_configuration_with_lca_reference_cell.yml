@@ -100,6 +100,7 @@ submodels:
   service.propulsion.battery.lifespan: null
   submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
   submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
+  submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
