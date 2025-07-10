@@ -26,6 +26,9 @@ from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.sizing_harness_cg_x import SizingHarnessCGX
 from ..components.sizing_harness_cg_y import SizingHarnessCGY
+from ..components.sizing_insulation_cross_section import SizingInsulationCrossSection
+from ..components.sizing_shield_cross_section import SizingShieldCrossSection
+from ..components.sizing_sheath_cross_section import SizingSheathCrossSection
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
@@ -337,6 +340,80 @@ def test_harness_cg_y():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_insulation_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+
+    problem = run_system(SizingInsulationCrossSection(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:section",
+        units="m**2",
+    ) == pytest.approx(3.25e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_shield_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+
+    problem = run_system(SizingShieldCrossSection(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:section",
+        units="m**2",
+    ) == pytest.approx(6.3e-06, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sheath_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:thickness",
+        units="mm",
+        val=1.36,
+    )
+
+    problem = run_system(SizingSheathCrossSection(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:section",
+        units="m**2",
+    ) == pytest.approx(4.95e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_perf_current():

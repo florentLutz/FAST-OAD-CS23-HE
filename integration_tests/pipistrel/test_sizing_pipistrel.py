@@ -111,7 +111,7 @@ def test_pipistrel_performances_with_lower_soh():
     problem.read_inputs()
     problem.setup()
 
-    state_of_health = 62.5
+    state_of_health = 80.0
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:state_of_health",
         val=state_of_health,
@@ -138,7 +138,7 @@ def test_pipistrel_performances_with_lower_soh():
         - problem.get_val("data:mission:operational:taxi_in:duration", units="min")
         - problem.get_val("data:mission:operational:taxi_out:duration", units="min")
     )
-    assert duration_main_route == pytest.approx(23.0, abs=1.0)
+    assert duration_main_route == pytest.approx(15.86, abs=1.0)
 
 
 def test_pipistrel_velis_electro_lower_soc_start_mission():

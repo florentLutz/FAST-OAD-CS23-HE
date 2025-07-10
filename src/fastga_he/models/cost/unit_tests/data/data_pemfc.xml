@@ -403,55 +403,60 @@
                     </dc_sspc_1337>
                 </DC_SSPC>
                 <DC_cable_harness>
-                    <harness_1>
-                        <CG>
-                            <x units="m">2.69</x>
-                            <y_ratio>0.34</y_ratio>
-                        </CG>
-                        <low_speed>
-                            <CD0>0.0</CD0>
-                        </low_speed>
-                        <cruise>
-                            <CD0>0.0</CD0>
-                        </cruise>
-                        <mass units="kg">8.86</mass>
-                        <material>1.0</material>
-                        <current_caliber units="A">800.0</current_caliber>
-                        <current_max units="A">750.0</current_max>
-                        <voltage_caliber units="V">1000.0</voltage_caliber>
-                        <voltage_max units="V">800.0</voltage_max>
-                        <number_cables>1.0</number_cables>
-                        <length units="m">7.0</length>
-                        <length_span_ratio>0.17</length_span_ratio>
-                        <conductor>
-                            <radius units="m">3.71e-3</radius>
-                            <section units="mm*mm">43.44</section>
-                        </conductor>
-                        <insulation>
-                            <thickness units="m">0.0012</thickness>
-                        </insulation>
-                        <sheath>
-                            <thickness units="mm">1.36</thickness>
-                        </sheath>
-                        <contactor>
-                            <mass units="kg">4.95</mass>
-                        </contactor>
-                        <cable>
-                            <resistance units="ohm">0.00333</resistance>
-                            <initial_temperature units="degK">288.15</initial_temperature>
-                            <resistance_per_length units="ohm/km">0.397</resistance_per_length>
-                            <mass_per_length units="kg/m">0.537</mass_per_length>
-                            <current_caliber units="A">800.0</current_caliber>
-                            <radius units="mm">6.47</radius>
-                            <heat_capacity_per_length units="J/degK/m">376.0</heat_capacity_per_length>
-                            <heat_capacity units="J/degK">7000.0</heat_capacity>
-                        </cable>
-                        <properties>
-                            <resistance_temperature_scale_factor units="degK**-1">0.00393</resistance_temperature_scale_factor>
-                            <density units="kg/m**3">8960.0</density>
-                            <specific_heat units="J/kg/degK">386.0</specific_heat>
-                        </properties>
-                    </harness_1>
+                  <harness_1>
+                    <current_caliber units="A" is_input="False">750.0</current_caliber>
+                    <current_max units="A" is_input="True">750.0</current_max>
+                    <length units="m" is_input="False">1.477417183742213<!--Length of the harness--></length>
+                    <mass units="kg" is_input="False">22.311829314666696</mass>
+                    <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
+                    <number_cables is_input="True">1.0</number_cables>
+                    <voltage_caliber units="V" is_input="False">800.0</voltage_caliber>
+                    <voltage_max units="V" is_input="True">800.0</voltage_max>
+                    <CG>
+                      <x units="m" is_input="False">1.2387085918711065<!--X position of the DC cable center of gravity--></x>
+                      <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
+                    </CG>
+                    <cable>
+                      <current_caliber units="A" is_input="False">750.0<!--Maximum current flowing in one cable of the harness--></current_caliber>
+                      <heat_capacity units="J/degK" is_input="False">8227.131865349522</heat_capacity>
+                      <heat_capacity_per_length units="J/degK/m" is_input="False">4640.49240564462</heat_capacity_per_length>
+                      <mass_per_length units="kg/m" is_input="False">9.914316036648295</mass_per_length>
+                      <radius units="m" is_input="False">0.021806098943972216</radius>
+                      <resistance units="ohm" is_input="False">2.982092788910745e-05</resistance>
+                      <resistance_per_length units="ohm/km" is_input="False">0.016820417086240526</resistance_per_length>
+                    </cable>
+                    <conductor>
+                      <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the conducting core--></k_factor_radius>
+                      <radius units="mm" is_input="False">18.08740737359369</radius>
+                      <section units="mm**2" is_input="False">1027.7855627438291</section>
+                    </conductor>
+                    <contactor>
+                      <mass units="kg" is_input="False">4.734732261552477<!--Mass of all the contactors in the harness--></mass>
+                    </contactor>
+                    <cruise>
+                      <CD0 is_input="False">0.0</CD0>
+                    </cruise>
+                    <insulation>
+                      <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the insulation--></k_factor_radius>
+                      <section units="m**2" is_input="False">0.00013576041710960615</section>
+                      <thickness units="m" is_input="False">0.001157544910492495</thickness>
+                    </insulation>
+                    <low_speed>
+                      <CD0 is_input="False">0.0</CD0>
+                    </low_speed>
+                    <properties>
+                      <density units="g/cm**3" is_input="False">8.96<!--1.0 for copper, 0.0 for aluminium--></density>
+                      <resistance_temperature_scale_factor units="1/degK" is_input="False">0.00393</resistance_temperature_scale_factor>
+                      <specific_heat units="J/degK/kg" is_input="False">386.0<!--1.0 for copper, 0.0 for aluminium--></specific_heat>
+                    </properties>
+                    <sheath>
+                      <section units="m**2" is_input="False">0.00030599043903926855</section>
+                      <thickness units="m" is_input="False">0.0023611466598860327</thickness>
+                    </sheath>
+                    <shield>
+                      <section units="m**2" is_input="False">2.4309583991892097e-05</section>
+                    </shield>
+                  </harness_1>
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
