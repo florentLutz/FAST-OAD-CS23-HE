@@ -311,6 +311,10 @@
             <CG>
               <y_ratio>0.5</y_ratio>
             </CG>
+            <cell>
+              <voltage_max_SOC units="V">3.0</voltage_max_SOC>
+              <voltage_min_SOC units="V">1.0</voltage_min_SOC>
+            </cell>
           </battery_pack_1>
           <battery_pack_2>
             <end_of_life_relative_capacity_loss units="unitless">0.2</end_of_life_relative_capacity_loss>
@@ -328,6 +332,10 @@
             <CG>
               <y_ratio>0.5</y_ratio>
             </CG>
+            <cell>
+              <voltage_max_SOC units="V">3.0</voltage_max_SOC>
+              <voltage_min_SOC units="V">1.0</voltage_min_SOC>
+            </cell>
           </battery_pack_2>
         </battery_pack>
         <inverter>

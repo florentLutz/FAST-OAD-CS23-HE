@@ -8,7 +8,12 @@ import logging
 
 import pytest
 
+import numpy as np
+import plotly.graph_objects as go
+
 import fastoad.api as oad
+
+from fastga_he.gui.lca_impact import lca_impacts_bar_chart_simple
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_lca"
@@ -220,12 +225,17 @@ def test_lca_pipistrel_long_lifespan_cell():
     # . We need at least 4 "fake" points for the relative capacity effect as it assumed to be a
     # deg 3 polynomial.
     # The code seems to have a hard time converging with "big" cells, so instead of having a few
-    # "big" cells we'll have more smaller one
+    # "big" cells we'll have more smaller one.
+    # This cell actually doesn't correspond to the battery we aimed at reproducing
+    # (https://www.skeletontech.com/superbattery) for the sole reason that the mass diverges. This
+    # is actually the closest we can get without divergence so we are very optimistic on the
+    # battery energy density but even then the single is greater than the reference case.
     problem.model_options["*"] = {
         "cell_capacity_ref": 2.30,
-        "cell_weight_ref": 75.0e-3,
+        "cell_weight_ref": 53.5e-3,
         "reference_curve_current": [100.0, 10000.0, 30000.0, 46000.0],
         "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+        "cut_off_voltage": 1.0,
     }
 
     problem.setup()
@@ -257,12 +267,29 @@ def test_lca_pipistrel_long_lifespan_cell():
         units="h**-1",
     )
 
-    # To aid convergence
     problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=10.0
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:resistance",
+        val=0.3e-3,
+        units="ohm",
     )
     problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=10.0
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:resistance",
+        val=0.3e-3,
+        units="ohm",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:module:number_cells", val=150.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:module:number_cells", val=150.0
+    )
+
+    # To aid convergence
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
     )
 
     # Run the problem
@@ -284,3 +311,62 @@ def test_lca_pipistrel_long_lifespan_cell():
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
         0.00118114, rel=1e-3
     )
+
+
+def test_visualize_mass_divergence_long_lifespan_cell():
+    # Data, which are results of the previous test runs for different value of the cell weight.
+    battery_energy_density = np.array([129, 115, 103, 98.5, 97.6, 96.7])
+    mtow = np.array([961.0, 1123, 1388, 1871, 1960, 2463])
+    m_bat = np.array([195, 248, 333, 477, 506, 661])
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=battery_energy_density, y=mtow, name="MTOW [kg]", yaxis="y1", line=dict(color="blue")
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=battery_energy_density,
+            y=m_bat,
+            name="Battery mass [kg]",
+            line=dict(color="red", dash="dash"),
+        )
+    )
+    fig.add_vline(x=65.0, line_width=3, line_dash="dash", line_color="black")
+
+    fig.update_layout(
+        title="Evolution of battery mass and MTOW with battery energy density",
+        xaxis=dict(
+            title="Battery energy density [W*h/kg]",
+            range=[60, None]
+        ),
+        yaxis=dict(title="MTOW [kg] / Battery mass [kg]"),
+        template="plotly_white",
+        title_x=0.5,
+        font=dict(size=15),
+        height=800,
+        width=1600,
+    )
+
+    fig.show()
+
+
+def test_compare_impacts_three_designs():
+
+    fig = lca_impacts_bar_chart_simple(
+        [
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel with reference cell",
+            "Pipistrel with high energy density cell",
+            "Pipistrel with high lifespan cell",
+        ],
+    )
+
+    fig.show()

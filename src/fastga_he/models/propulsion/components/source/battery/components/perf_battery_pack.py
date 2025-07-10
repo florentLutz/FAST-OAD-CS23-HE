@@ -33,7 +33,7 @@ from ..components.perf_battery_energy_consumed_main_route import PerformancesEne
 from ..components.perf_soc_end_main_route import PerformancesSOCEndMainRoute
 from ..components.perf_inflight_emissions import PerformancesBatteryPackInFlightEmissions
 
-from ..constants import SERVICE_BATTERY_OCV
+from ..constants import SERVICE_BATTERY_OCV, SERVICE_BATTERY_R_INT
 
 
 class PerformancesBatteryPack(om.Group):
@@ -136,9 +136,7 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "internal_resistance",
-            PerformancesInternalResistance(
-                number_of_points=number_of_points, battery_pack_id=battery_pack_id
-            ),
+            oad.RegisterSubmodel.get_submodel(SERVICE_BATTERY_R_INT, options=options_battery_pack),
             promotes=["*"],
         )
         self.add_subsystem(

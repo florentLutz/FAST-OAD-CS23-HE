@@ -30,7 +30,10 @@ from ..components.perf_open_circuit_voltage import (
     PerformancesOpenCircuitVoltage,
     PerformancesOpenCircuitVoltageFromMinMax,
 )
-from ..components.perf_internal_resistance import PerformancesInternalResistance
+from ..components.perf_internal_resistance import (
+    PerformancesInternalResistance,
+    PerformancesInternalResistanceNoSOCEffect,
+)
 from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
 from ..components.perf_battery_voltage import PerformancesBatteryVoltage
@@ -601,6 +604,38 @@ def test_internal_resistance():
     )
     assert problem.get_val("internal_resistance", units="ohm") * 1e3 == pytest.approx(
         [46.59, 56.13, 58.11, 56.15, 52.7, 49.3, 46.76, 45.32, 44.82, 44.73], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_internal_resistance_no_soc_effect():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "cell_temperature",
+        units="degK",
+        val=np.linspace(288.15, 298.15, NB_POINTS_TEST),
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:state_of_health",
+        units="percent",
+        val=95.0,
+    )
+    ivc.add_output(
+        "settings:propulsion:he_power_train:battery_pack:battery_pack_1:internal_resistance_soh_effect",
+        units="percent",
+        val=0.1,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesInternalResistanceNoSOCEffect(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
+        ivc,
+    )
+    assert problem.get_val("internal_resistance", units="ohm") * 1e3 == pytest.approx(
+        [1.193, 1.142, 1.096, 1.055, 1.018, 0.983, 0.952, 0.923, 0.897, 0.873], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

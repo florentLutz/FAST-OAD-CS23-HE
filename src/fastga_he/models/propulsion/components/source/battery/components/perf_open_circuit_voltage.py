@@ -95,7 +95,7 @@ class PerformancesOpenCircuitVoltage(om.ExplicitComponent):
         )
 
 
-@oad.RegisterSubmodel(SERVICE_BATTERY_OCV, SUBMODEL_BATTERY_OCV_REF_CELL)
+@oad.RegisterSubmodel(SERVICE_BATTERY_OCV, SUBMODEL_BATTERY_OCV_MIN_MAX)
 class PerformancesOpenCircuitVoltageFromMinMax(om.ExplicitComponent):
     """
     Computation of the open circuit voltage of one module cell, takes into account the impact of
