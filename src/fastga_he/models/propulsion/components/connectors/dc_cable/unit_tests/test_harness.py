@@ -202,27 +202,6 @@ def test_mass_per_length():
         list_inputs(SizingMassPerLength(harness_id="harness_1")), __file__, XML_FILE
     )
 
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
-        units="m**3",
-        val=4.32e-05,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
-        units="m**3",
-        val=3.25e-05,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
-        units="m**3",
-        val=6.3e-06,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
-        units="m**3",
-        val=4.95e-05,
-    )
-
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingMassPerLength(harness_id="harness_1"), ivc)
     assert problem.get_val(
@@ -269,27 +248,6 @@ def test_heat_capacity_per_length():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(SizingHeatCapacityPerLength(harness_id="harness_1")), __file__, XML_FILE
-    )
-
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
-        units="m**3",
-        val=4.32e-05,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
-        units="m**3",
-        val=3.25e-05,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
-        units="m**3",
-        val=6.3e-06,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
-        units="m**3",
-        val=4.95e-05,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1125,26 +1083,6 @@ def test_wire_cost():
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
         units="USD/m**3",
         val=92556.8,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
-        units="m**3",
-        val=4.32e-05,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
-        units="m**3",
-        val=3.25e-05,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
-        units="m**3",
-        val=6.3e-06,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
-        units="m**3",
-        val=4.95e-05,
     )
 
     # Run problem and check obtained value(s) is/(are) correct

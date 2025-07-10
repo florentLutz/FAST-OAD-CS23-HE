@@ -34,12 +34,18 @@
                         <conductor>
                             <radius units="m">3.71e-3</radius>
                             <section units="mm*mm">43.44</section>
+                            <unit_volume units="m**3">4.32e-05</unit_volume>
                         </conductor>
                         <insulation>
                             <thickness units="m">0.0012</thickness>
+                            <unit_volume units="m**3">3.25e-05</unit_volume>
                         </insulation>
+                        <shield>
+                            <unit_volume units="m**3">6.3e-06</unit_volume>
+                        </shield>
                         <sheath>
                             <thickness units="mm">1.36</thickness>
+                            <unit_volume units="m**3">4.95e-05</unit_volume>
                         </sheath>
                         <contactor>
                             <mass units="kg">4.95</mass>
