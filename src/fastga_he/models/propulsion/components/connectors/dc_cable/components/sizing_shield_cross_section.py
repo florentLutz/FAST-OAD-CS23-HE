@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingShieldCrossSection(om.ExplicitComponent):
-    """Computation of volume per length of shield layer."""
+    """Computation of cross section of shield layer."""
 
     def initialize(self):
         self.options.declare(
