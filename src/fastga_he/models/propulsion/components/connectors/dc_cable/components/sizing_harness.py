@@ -21,10 +21,9 @@ from .sizing_cable_radius import SizingCableRadius
 from .sizing_harness_cg_x import SizingHarnessCGX
 from .sizing_harness_cg_y import SizingHarnessCGY
 from .sizing_harness_drag import SizingHarnessDrag
-from .layer_unit_volume.sizing_conductor_volume_per_length import SizingConductorVolumePerLength
-from .layer_unit_volume.sizing_insulation_volume_per_length import SizingInsulationVolumePerLength
-from .layer_unit_volume.sizing_shield_volume_per_length import SizingShieldVolumePerLength
-from .layer_unit_volume.sizing_sheath_volume_per_length import SizingSheathVolumePerLength
+from .sizing_insulation_cross_section import SizingInsulationCrossSection
+from .sizing_shield_cross_section import SizingShieldCrossSection
+from .sizing_sheath_cross_section import SizingSheathVolumePerLength
 
 from .cstr_harness import ConstraintsHarness
 
@@ -95,22 +94,17 @@ class SizingHarness(om.Group):
             promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
-            "conductor_layer_volume",
-            SizingConductorVolumePerLength(harness_id=harness_id),
+            "insulation_layer_cross_section",
+            SizingInsulationCrossSection(harness_id=harness_id),
             promotes=["data:*"],
         )
         self.add_subsystem(
-            "insulation_layer_volume",
-            SizingInsulationVolumePerLength(harness_id=harness_id),
-            promotes=["data:*"],
-        )
-        self.add_subsystem(
-            "shield_layer_volume",
-            SizingShieldVolumePerLength(harness_id=harness_id),
+            "shield_layer_cross_section",
+            SizingShieldCrossSection(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
         self.add_subsystem(
-            "sheath_layer_volume",
+            "sheath_layer_cross_section",
             SizingSheathVolumePerLength(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )

@@ -10,60 +10,129 @@ import openmdao.api as om
 
 from stdatm import Atmosphere
 
-from ..components.sizing_harness_length import SizingHarnessLength
-from ..components.sizing_material_core import SizingMaterialCore
-from ..components.sizing_current_per_cable import SizingCurrentPerCable
-from ..components.sizing_cable_gauge import SizingCableGauge
-from ..components.sizing_resistance_per_length import SizingResistancePerLength
-from ..components.sizing_insulation_thickness import SizingInsulationThickness
-from ..components.sizing_sheath_thickness import SizingCableSheathThickness
-from ..components.sizing_mass_per_length import SizingMassPerLength
-from ..components.sizing_contactor_mass import SizingHarnessContactorMass
-from ..components.sizing_harness_mass import SizingHarnessMass
-from ..components.sizing_reference_resistance import SizingReferenceResistance
-from ..components.sizing_heat_capacity_per_length import SizingHeatCapacityPerLength
-from ..components.sizing_heat_capacity import SizingHeatCapacityCable
-from ..components.sizing_cable_radius import SizingCableRadius
-from ..components.sizing_harness_cg_x import SizingHarnessCGX
-from ..components.sizing_harness_cg_y import SizingHarnessCGY
-from ..components.layer_unit_volume.sizing_conductor_volume_per_length import (
-    SizingConductorVolumePerLength,
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_harness_length import (
+    SizingHarnessLength,
 )
-from ..components.layer_unit_volume.sizing_insulation_volume_per_length import (
-    SizingInsulationVolumePerLength,
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_material_core import (
+    SizingMaterialCore,
 )
-from ..components.layer_unit_volume.sizing_shield_volume_per_length import (
-    SizingShieldVolumePerLength,
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_current_per_cable import (
+    SizingCurrentPerCable,
 )
-from ..components.layer_unit_volume.sizing_sheath_volume_per_length import (
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_cable_gauge import (
+    SizingCableGauge,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_resistance_per_length import (
+    SizingResistancePerLength,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_insulation_thickness import (
+    SizingInsulationThickness,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_sheath_thickness import (
+    SizingCableSheathThickness,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_mass_per_length import (
+    SizingMassPerLength,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_contactor_mass import (
+    SizingHarnessContactorMass,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_harness_mass import (
+    SizingHarnessMass,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_reference_resistance import (
+    SizingReferenceResistance,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_heat_capacity_per_length import (
+    SizingHeatCapacityPerLength,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_heat_capacity import (
+    SizingHeatCapacityCable,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_cable_radius import (
+    SizingCableRadius,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_harness_cg_x import (
+    SizingHarnessCGX,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_harness_cg_y import (
+    SizingHarnessCGY,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_insulation_cross_section import (
+    SizingInsulationCrossSection,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_shield_cross_section import (
+    SizingShieldCrossSection,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_sheath_cross_section import (
     SizingSheathVolumePerLength,
 )
-from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
-from ..components.perf_losses_one_cable import PerformancesLossesOneCable
-from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
-from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
-from ..components.perf_temperature_from_increase import PerformancesTemperatureFromIncrease
-from ..components.perf_temperature import (
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_current import (
+    PerformancesCurrent,
+    PerformancesHarnessCurrent,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_losses_one_cable import (
+    PerformancesLossesOneCable,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_derivative import (
+    PerformancesTemperatureDerivative,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_increase import (
+    PerformancesTemperatureIncrease,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_from_increase import (
+    PerformancesTemperatureFromIncrease,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature import (
     PerformancesTemperature,
     SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE,
 )
-from ..components.perf_temperature_constant import PerformancesTemperatureConstant
-from ..components.perf_resistance import PerformancesResistance
-from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
-from ..components.perf_maximum import PerformancesMaximum
-from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
-from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
-from ..components.pre_lca_prod_length_per_fu import PreLCAHarnessProdLengthPerFU
-from ..components.lcc_harness_core_unit_cost import LCCHarnessCoreUnitCost
-from ..components.lcc_harness_unit_cost import LCCHarnessUnitCost
-from ..components.lcc_harness_cost import LCCHarnessCost
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_temperature_constant import (
+    PerformancesTemperatureConstant,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_resistance import (
+    PerformancesResistance,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_resistance_no_loop import (
+    PerformancesResistanceNoLoop,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_maximum import (
+    PerformancesMaximum,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.cstr_enforce import (
+    ConstraintsCurrentEnforce,
+    ConstraintsVoltageEnforce,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.cstr_ensure import (
+    ConstraintsCurrentEnsure,
+    ConstraintsVoltageEnsure,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.pre_lca_prod_length_per_fu import (
+    PreLCAHarnessProdLengthPerFU,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.lcc_harness_core_unit_cost import (
+    LCCHarnessCoreUnitCost,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.lcc_harness_unit_cost import (
+    LCCHarnessUnitCost,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.lcc_harness_cost import (
+    LCCHarnessCost,
+)
 
-from ..components.perf_harness import PerformancesHarness
-from ..components.sizing_harness import SizingHarness
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.perf_harness import (
+    PerformancesHarness,
+)
+from fastga_he.models.propulsion.components.connectors.dc_cable.components.sizing_harness import (
+    SizingHarness,
+)
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..constants import POSSIBLE_POSITION, SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
+from fastga_he.models.propulsion.components.connectors.dc_cable.constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE,
+)
 
 XML_FILE = "sample_cable.xml"
 NB_POINTS_TEST = 10
@@ -351,24 +420,6 @@ def test_harness_cg_y():
         problem.check_partials(compact_print=True)
 
 
-def test_conductor_layer_volume():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
-        units="m",
-        val=3.71e-3,
-    )
-
-    problem = run_system(SizingConductorVolumePerLength(harness_id="harness_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:unit_volume",
-        units="m**3",
-    ) == pytest.approx(4.32e-05, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
 def test_insulation_layer_volume():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -382,11 +433,11 @@ def test_insulation_layer_volume():
         val=0.0012,
     )
 
-    problem = run_system(SizingInsulationVolumePerLength(harness_id="harness_1"), ivc)
+    problem = run_system(SizingInsulationCrossSection(harness_id="harness_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:unit_volume",
-        units="m**3",
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:section",
+        units="m**2",
     ) == pytest.approx(3.25e-05, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -405,11 +456,11 @@ def test_shield_layer_volume():
         val=0.0012,
     )
 
-    problem = run_system(SizingShieldVolumePerLength(harness_id="harness_1"), ivc)
+    problem = run_system(SizingShieldCrossSection(harness_id="harness_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:unit_volume",
-        units="m**3",
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:section",
+        units="m**2",
     ) == pytest.approx(6.3e-06, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -436,8 +487,8 @@ def test_sheath_layer_volume():
     problem = run_system(SizingSheathVolumePerLength(harness_id="harness_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:unit_volume",
-        units="m**3",
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:section",
+        units="m**2",
     ) == pytest.approx(4.95e-05, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -23,8 +23,8 @@ class SizingMassPerLength(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":conductor:unit_volume",
-            units="m**3",
+            + ":conductor:section",
+            units="m**2",
             val=np.nan,
         )
         self.add_input(
@@ -37,8 +37,8 @@ class SizingMassPerLength(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":insulation:unit_volume",
-            units="m**3",
+            + ":insulation:section",
+            units="m**2",
             val=np.nan,
         )
         self.add_input(
@@ -49,8 +49,8 @@ class SizingMassPerLength(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":shield:unit_volume",
-            units="m**3",
+            + ":shield:section",
+            units="m**2",
             val=np.nan,
         )
         self.add_input(
@@ -62,8 +62,8 @@ class SizingMassPerLength(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":sheath:unit_volume",
-            units="m**3",
+            + ":sheath:section",
+            units="m**2",
             val=np.nan,
         )
         self.add_input(
@@ -87,21 +87,17 @@ class SizingMassPerLength(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         harness_id = self.options["harness_id"]
 
-        v_c = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":conductor:unit_volume"
+        cs_c = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section"
         ]
-        v_in = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":insulation:unit_volume"
+        cs_in = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":insulation:section"
         ]
-        v_shield = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume"
+        cs_shield = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:section"
         ]
-        v_sheath = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume"
+        cs_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:section"
         ]
 
         rho_c = inputs[
@@ -113,7 +109,7 @@ class SizingMassPerLength(om.ExplicitComponent):
         ]
         rho_sheath = inputs["settings:propulsion:he_power_train:DC_cable_harness:sheath:density"]
 
-        m_cable = rho_c * v_c + rho_in * v_in + rho_shield * v_shield + rho_sheath * v_sheath
+        m_cable = rho_c * cs_c + rho_in * cs_in + rho_shield * cs_shield + rho_sheath * cs_sheath
 
         outputs[
             "data:propulsion:he_power_train:DC_cable_harness:"
@@ -130,21 +126,17 @@ class SizingMassPerLength(om.ExplicitComponent):
             + ":cable:mass_per_length"
         )
 
-        v_c = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":conductor:unit_volume"
+        cs_c = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section"
         ]
-        v_in = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":insulation:unit_volume"
+        cs_in = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":insulation:section"
         ]
-        v_shield = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume"
+        cs_shield = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:section"
         ]
-        v_sheath = inputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume"
+        cs_sheath = inputs[
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:section"
         ]
 
         rho_c = inputs[
@@ -159,34 +151,30 @@ class SizingMassPerLength(om.ExplicitComponent):
         partials[
             output_str,
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":properties:density",
-        ] = v_c
+        ] = cs_c
         partials[
             output_str, "settings:propulsion:he_power_train:DC_cable_harness:insulation:density"
-        ] = v_in
+        ] = cs_in
         partials[
             output_str, "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:density"
-        ] = v_shield
+        ] = cs_shield
         partials[
             output_str, "settings:propulsion:he_power_train:DC_cable_harness:sheath:density"
-        ] = v_sheath
+        ] = cs_sheath
 
         partials[
             output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":conductor:unit_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:section",
         ] = rho_c
         partials[
             output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:"
-            + harness_id
-            + ":insulation:unit_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":insulation:section",
         ] = rho_in
         partials[
             output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:section",
         ] = rho_shield
         partials[
             output_str,
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:unit_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":sheath:section",
         ] = rho_sheath

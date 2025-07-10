@@ -6,8 +6,8 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingShieldVolumePerLength(om.ExplicitComponent):
-    """Computation of volume per length of shield layer."""
+class SizingInsulationCrossSection(om.ExplicitComponent):
+    """Computation of cross-section area of insulation layer."""
 
     def initialize(self):
         self.options.declare(
@@ -34,17 +34,12 @@ class SizingShieldVolumePerLength(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
-        self.add_input(
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-            units="m",
-            val=0.2e-3,
-        )
 
         self.add_output(
             name="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":shield:unit_volume",
-            units="m**3",
+            + ":insulation:section",
+            units="m**2",
             val=0.1,
         )
 
@@ -54,7 +49,7 @@ class SizingShieldVolumePerLength(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
-            + ":shield:unit_volume",
+            + ":insulation:section",
             wrt="*",
             method="exact",
         )
@@ -70,13 +65,10 @@ class SizingShieldVolumePerLength(om.ExplicitComponent):
             + harness_id
             + ":insulation:thickness"
         ]
-        t_shield = inputs[
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
-        ]
 
         outputs[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume"
-        ] = np.pi * ((2.0 * (r_c + t_in) + t_shield) * t_shield)
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":insulation:section"
+        ] = np.pi * ((2.0 * r_c + t_in) * t_in)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         harness_id = self.options["harness_id"]
@@ -89,21 +81,14 @@ class SizingShieldVolumePerLength(om.ExplicitComponent):
             + harness_id
             + ":insulation:thickness"
         ]
-        t_shield = inputs[
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness"
-        ]
 
         partials[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":insulation:section",
             "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":conductor:radius",
-        ] = 2.0 * np.pi * t_shield
+        ] = 2.0 * np.pi * t_in
         partials[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume",
+            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":insulation:section",
             "data:propulsion:he_power_train:DC_cable_harness:"
             + harness_id
             + ":insulation:thickness",
-        ] = 2.0 * np.pi * t_shield
-        partials[
-            "data:propulsion:he_power_train:DC_cable_harness:" + harness_id + ":shield:unit_volume",
-            "settings:propulsion:he_power_train:DC_cable_harness:shielding_tape:thickness",
-        ] = 2.0 * np.pi * (r_c + t_in + t_shield)
+        ] = 2.0 * np.pi * (r_c + t_in)
