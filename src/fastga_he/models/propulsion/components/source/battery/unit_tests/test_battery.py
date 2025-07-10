@@ -26,7 +26,10 @@ from ..components.sizing_battery_prep_for_loads import SizingBatteryPreparationF
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
 from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_module_current import PerformancesModuleCurrent
-from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
+from ..components.perf_open_circuit_voltage import (
+    PerformancesOpenCircuitVoltage,
+    PerformancesOpenCircuitVoltageFromMinMax,
+)
 from ..components.perf_internal_resistance import PerformancesInternalResistance
 from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
@@ -547,6 +550,34 @@ def test_open_circuit_voltage():
     )
     assert problem.get_val("open_circuit_voltage", units="V") == pytest.approx(
         [4.12, 4.07, 4.03, 3.98, 3.92, 3.86, 3.79, 3.72, 3.66, 3.61], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_open_circuit_voltage_from_min_max():
+    ivc = om.IndepVarComp()
+    ivc.add_output("state_of_charge", val=np.linspace(100, 40, NB_POINTS_TEST), units="percent")
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:voltage_max_SOC",
+        val=3.0,
+        units="V",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:voltage_min_SOC",
+        val=1.0,
+        units="V",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesOpenCircuitVoltageFromMinMax(
+            number_of_points=NB_POINTS_TEST, battery_pack_id="battery_pack_1"
+        ),
+        ivc,
+    )
+    assert problem.get_val("open_circuit_voltage", units="V") == pytest.approx(
+        [3.0, 2.85, 2.7, 2.56, 2.41, 2.26, 2.11, 1.96, 1.81, 1.67], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

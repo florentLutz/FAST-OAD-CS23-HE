@@ -117,7 +117,7 @@ def test_lca_pipistrel_high_energy_density_cell():
     problem.model_options["*"] = {
         "cell_capacity_ref": 1.34,
         "cell_weight_ref": 11.7e-3,
-        "reference_curve_current": [100., 1000., 3000., 5100.],
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 5100.0],
         "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
     }
 
@@ -224,7 +224,7 @@ def test_lca_pipistrel_long_lifespan_cell():
     problem.model_options["*"] = {
         "cell_capacity_ref": 2.30,
         "cell_weight_ref": 75.0e-3,
-        "reference_curve_current": [100., 10000., 30000., 46000.],
+        "reference_curve_current": [100.0, 10000.0, 30000.0, 46000.0],
         "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
     }
 

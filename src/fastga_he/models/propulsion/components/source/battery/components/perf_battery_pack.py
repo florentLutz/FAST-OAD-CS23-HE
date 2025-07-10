@@ -5,11 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
+
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
 from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_direct_bus_connection import PerformancesBatteryDirectBusConnection
 from ..components.perf_module_current import PerformancesModuleCurrent
-from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
 from ..components.perf_internal_resistance import PerformancesInternalResistance
 from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
@@ -31,6 +32,8 @@ from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
 from ..components.perf_battery_energy_consumed_main_route import PerformancesEnergyConsumedMainRoute
 from ..components.perf_soc_end_main_route import PerformancesSOCEndMainRoute
 from ..components.perf_inflight_emissions import PerformancesBatteryPackInFlightEmissions
+
+from ..constants import SERVICE_BATTERY_OCV
 
 
 class PerformancesBatteryPack(om.Group):
@@ -120,9 +123,15 @@ class PerformancesBatteryPack(om.Group):
         )
         # Though these variable depends on variables that are looped on, they don't affect the
         # value that we loop on hence why they are put here to save time.
+
+        options_battery_pack = {
+            "number_of_points": number_of_points,
+            "battery_pack_id": battery_pack_id,
+        }
+
         self.add_subsystem(
             "open_circuit_voltage",
-            PerformancesOpenCircuitVoltage(number_of_points=number_of_points),
+            oad.RegisterSubmodel.get_submodel(SERVICE_BATTERY_OCV, options=options_battery_pack),
             promotes=["*"],
         )
         self.add_subsystem(
