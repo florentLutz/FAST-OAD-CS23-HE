@@ -9,18 +9,12 @@ import logging
 import pytest
 
 import numpy as np
-import plotly.graph_objects as go
 
 import fastoad.api as oad
 
-from fastga_he.gui.lca_impact import (
-    lca_impacts_bar_chart_simple,
-    lca_impacts_bar_chart_normalised,
-    lca_raw_impact_comparison_advanced,
-)
-
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_lca"
+RESULTS_SENSITIVITY_FOLDER_PATH = pathlib.Path(__file__).parent / "results_sensitivity_lca"
 
 
 def test_lca_pipistrel_reference_cell():
@@ -80,6 +74,52 @@ def test_lca_pipistrel_reference_cell():
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
         0.00374279, rel=1e-3
     )
+
+
+def test_lca_pipistrel_reference_cell_sensitivity():
+    """
+    Tests that contains:
+    - A rerun of the LCA of the reference cell but with varying airframe hours value. Nothing will
+        change the OAD process, so we will re-use the output file of the previous test as an input
+        file for this process
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    process_file_name = "pipistrel_configuration_with_lca_reference_cell_sensitivity.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml"
+
+    # Setup the problem
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Shouldn't be needed but just making sure ^^'
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=700.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=700.0
+    )
+
+    for airframe_hours in np.linspace(3000, 5000, 41):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+        # Run the problem
+        problem.run_model()
+
+        # Write the outputs
+        file_name = "reference_cell_" + str(int(airframe_hours)) + "_airframe_hours_outputs.xml"
+        problem.output_file_path = RESULTS_SENSITIVITY_FOLDER_PATH / file_name
+        problem.write_outputs()
 
 
 def test_lca_pipistrel_high_energy_density_cell():
@@ -178,6 +218,55 @@ def test_lca_pipistrel_high_energy_density_cell():
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
         0.00789594, rel=1e-3
     )
+
+
+def test_lca_pipistrel_high_energy_density_cell_sensitivity():
+    """
+    Tests that contains:
+    - A rerun of the LCA of the high energy density cell but with varying airframe hours value.
+        Nothing will change the OAD process, so we will re-use the output file of the previous test
+        as an input file for this process
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    process_file_name = "pipistrel_configuration_with_lca_high_energy_density_cell_sensitivity.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml"
+
+    # Setup the problem
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Shouldn't be needed but just making sure ^^'
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=150.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=150.0
+    )
+
+    for airframe_hours in np.linspace(3000, 5000, 41):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+
+        # Run the problem
+        problem.run_model()
+
+        # Write the outputs
+        file_name = (
+            "high_energy_density_cell_" + str(int(airframe_hours)) + "_airframe_hours_outputs.xml"
+        )
+        problem.output_file_path = RESULTS_SENSITIVITY_FOLDER_PATH / file_name
+        problem.write_outputs()
 
 
 def test_lca_pipistrel_long_lifespan_cell():
@@ -302,124 +391,62 @@ def test_lca_pipistrel_long_lifespan_cell():
     # Write the outputs
     problem.write_outputs()
 
-    # assert problem.get_val("data:weight:aircraft:MTOW") == pytest.approx(494, abs=1)
-    # assert problem.get_val("data:weight:aircraft:OWE") == pytest.approx(322, abs=1)
-    #
-    # assert problem.get_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    # ) == pytest.approx(38.8, rel=1e-2)
-    # assert problem.get_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_2:mass", units="kg"
-    # ) == pytest.approx(38.8, rel=1e-2)
+    assert problem.get_val("data:weight:aircraft:MTOW") == pytest.approx(2463, abs=1)
+    assert problem.get_val("data:weight:aircraft:OWE") == pytest.approx(2291, abs=1)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
+    ) == pytest.approx(662.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:mass", units="kg"
+    ) == pytest.approx(662.0, rel=1e-2)
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00118114, rel=1e-3
+        0.0046992541767277955, rel=1e-3
     )
 
 
-def test_visualize_mass_divergence_long_lifespan_cell():
-    # Data, which are results of the previous test runs for different value of the cell weight.
-    battery_energy_density = np.array([129, 115, 103, 98.5, 97.6, 96.7])
-    mtow = np.array([961.0, 1123, 1388, 1871, 1960, 2463])
-    m_bat = np.array([195, 248, 333, 477, 506, 661])
+def test_lca_pipistrel_long_lifespan_cell_sensitivity():
+    """
+    Tests that contains:
+    - A rerun of the LCA of the high lifespan cell but with varying airframe hours value.
+        Nothing will change the OAD process, so we will re-use the output file of the previous test
+        as an input file for this process
+    """
 
-    fig = go.Figure()
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
 
-    fig.add_trace(
-        go.Scatter(
-            x=battery_energy_density, y=mtow, name="MTOW [kg]", yaxis="y1", line=dict(color="blue")
-        )
+    process_file_name = "pipistrel_configuration_with_lca_high_lifespan_cell_sensitivity.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml"
+
+    # Setup the problem
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Shouldn't be needed but just making sure ^^'
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=50000.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=50000.0
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=battery_energy_density,
-            y=m_bat,
-            name="Battery mass [kg]",
-            line=dict(color="red", dash="dash"),
-        )
-    )
-    fig.add_vline(x=65.0, line_width=3, line_dash="dash", line_color="black")
+    for airframe_hours in np.linspace(3000, 5000, 41):
+        problem.set_val("data:TLAR:max_airframe_hours", val=airframe_hours, units="h")
+        # Run the problem
+        problem.run_model()
 
-    fig.update_layout(
-        title="Evolution of battery mass and MTOW with battery energy density",
-        xaxis=dict(title="Battery energy density [W*h/kg]", range=[60, None]),
-        yaxis=dict(title="MTOW [kg] / Battery mass [kg]"),
-        template="plotly_white",
-        title_x=0.5,
-        font=dict(size=15),
-        height=800,
-        width=1600,
-    )
-
-    fig.show()
-
-
-def test_compare_impacts_three_designs_simple_bar_chart():
-    fig = lca_impacts_bar_chart_simple(
-        [
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml",
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml",
-        ],
-        names_aircraft=[
-            "Pipistrel with reference cell",
-            "Pipistrel with high energy density cell",
-            "Pipistrel with high lifespan cell",
-        ],
-    )
-
-    fig.show()
-
-
-def test_compare_impacts_three_designs_bar_chart_normalised():
-    fig = lca_impacts_bar_chart_normalised(
-        [
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml",
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml",
-        ],
-        names_aircraft=[
-            "Pipistrel with reference cell",
-            "Pipistrel with high energy density cell",
-            "Pipistrel with high lifespan cell",
-        ],
-    )
-
-    fig.show()
-
-
-def test_compare_impacts_three_designs_with_contributor():
-    fig = lca_raw_impact_comparison_advanced(
-        [
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml",
-            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml",
-        ],
-        names_aircraft=[
-            "Pipistrel with reference cell",
-            "Pipistrel with high energy density cell",
-            "Pipistrel with high lifespan cell",
-        ],
-        impact_category="ionising radiation human health",  # "climate change", "material resources metals minerals"
-        aggregate_and_sort_contributor={
-            "Airframe": "airframe",  # Just a renaming, should work as well
-            "Battery pack": ["battery_pack_1", "battery_pack_2"],
-            "Use phase": "electricity_for_mission",  # Just a renaming, should work as well
-            "Others": [
-                "propeller_1",
-                "motor_1",
-                "inverter_1",
-                "harness_1",
-                "dc_bus_1",
-                "manufacturing",
-                "distribution",
-                "dc_sspc_1",
-                "dc_sspc_2",
-                "dc_splitter_1",
-            ],
-        },
-    )
-    fig.update_layout(width=800)
-
-    fig.show()
+        # Write the outputs
+        file_name = "high_lifespan_cell_" + str(int(airframe_hours)) + "_airframe_hours_outputs.xml"
+        problem.output_file_path = RESULTS_SENSITIVITY_FOLDER_PATH / file_name
+        problem.write_outputs()
