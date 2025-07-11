@@ -15,6 +15,9 @@
       <delivery>
         <distance units="km">1100.<!-- Distance from Ljubljana to Toulouse --></distance>
       </delivery>
+      <buy_to_fly>
+        <metallic is_input="True">7.5<!--Ratio of the amount of material purchased to to what is really put into the manufactured parts. Typical value for metallic material is between 5 and 10--></metallic>
+      </buy_to_fly>
     </environmental_impact>
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>

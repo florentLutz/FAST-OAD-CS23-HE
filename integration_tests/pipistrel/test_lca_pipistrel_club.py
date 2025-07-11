@@ -107,7 +107,7 @@ def test_lca_pipistrel_sw_121_heavy():
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00623929, rel=1e-3
+        0.00647853, rel=1e-3
     )
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         640.0, rel=1e-3
