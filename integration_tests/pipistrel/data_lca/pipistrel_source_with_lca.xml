@@ -272,6 +272,7 @@
         </DC_bus>
         <DC_cable_harness>
           <harness_1>
+            <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
             <length_span_ratio is_input="True">0.17<!--Length of the cable as a ratio of the SPAN (not half-span), used when cable is fully or partly inside the wing.--></length_span_ratio>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1.0</number_cables>
@@ -310,6 +311,10 @@
             <CG>
               <y_ratio>0.5</y_ratio>
             </CG>
+            <cell>
+              <voltage_max_SOC units="V">3.0</voltage_max_SOC>
+              <voltage_min_SOC units="V">1.0</voltage_min_SOC>
+            </cell>
           </battery_pack_1>
           <battery_pack_2>
             <end_of_life_relative_capacity_loss units="unitless">0.2</end_of_life_relative_capacity_loss>
@@ -327,6 +332,10 @@
             <CG>
               <y_ratio>0.5</y_ratio>
             </CG>
+            <cell>
+              <voltage_max_SOC units="V">3.0</voltage_max_SOC>
+              <voltage_min_SOC units="V">1.0</voltage_min_SOC>
+            </cell>
           </battery_pack_2>
         </battery_pack>
         <inverter>
@@ -408,6 +417,14 @@
       <aircraft>
         <max_payload units="kg" is_input="True">172.0<!--max payload weight--></max_payload>
         <payload units="kg" is_input="True">172.0<!--design payload weight--></payload>
+        <CG>
+          <aft>
+            <MAC_limit is_input="False">0.10575926048446792<!--most aft X-position of center of gravity as ratio of mean aerodynamic chord--></MAC_limit>
+          </aft>
+          <fwd>
+            <MAC_limit is_input="False">-0.0348976653030631<!--most fwd X-position of center of gravity as ratio of mean aerodynamic chord--></MAC_limit>
+          </fwd>
+      </CG>
       </aircraft>
       <airframe>
         <fuselage>
