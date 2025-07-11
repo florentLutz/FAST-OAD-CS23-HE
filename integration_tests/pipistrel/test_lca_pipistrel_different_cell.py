@@ -13,7 +13,11 @@ import plotly.graph_objects as go
 
 import fastoad.api as oad
 
-from fastga_he.gui.lca_impact import lca_impacts_bar_chart_simple
+from fastga_he.gui.lca_impact import (
+    lca_impacts_bar_chart_simple,
+    lca_impacts_bar_chart_normalised,
+    lca_raw_impact_comparison_advanced,
+)
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_lca"
@@ -339,10 +343,7 @@ def test_visualize_mass_divergence_long_lifespan_cell():
 
     fig.update_layout(
         title="Evolution of battery mass and MTOW with battery energy density",
-        xaxis=dict(
-            title="Battery energy density [W*h/kg]",
-            range=[60, None]
-        ),
+        xaxis=dict(title="Battery energy density [W*h/kg]", range=[60, None]),
         yaxis=dict(title="MTOW [kg] / Battery mass [kg]"),
         template="plotly_white",
         title_x=0.5,
@@ -354,8 +355,7 @@ def test_visualize_mass_divergence_long_lifespan_cell():
     fig.show()
 
 
-def test_compare_impacts_three_designs():
-
+def test_compare_impacts_three_designs_simple_bar_chart():
     fig = lca_impacts_bar_chart_simple(
         [
             RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
@@ -368,5 +368,58 @@ def test_compare_impacts_three_designs():
             "Pipistrel with high lifespan cell",
         ],
     )
+
+    fig.show()
+
+
+def test_compare_impacts_three_designs_bar_chart_normalised():
+    fig = lca_impacts_bar_chart_normalised(
+        [
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel with reference cell",
+            "Pipistrel with high energy density cell",
+            "Pipistrel with high lifespan cell",
+        ],
+    )
+
+    fig.show()
+
+
+def test_compare_impacts_three_designs_with_contributor():
+    fig = lca_raw_impact_comparison_advanced(
+        [
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_energy_density_cell.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_high_lifespan_cell.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel with reference cell",
+            "Pipistrel with high energy density cell",
+            "Pipistrel with high lifespan cell",
+        ],
+        impact_category="ionising radiation human health",  # "climate change", "material resources metals minerals"
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",  # Just a renaming, should work as well
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Use phase": "electricity_for_mission",  # Just a renaming, should work as well
+            "Others": [
+                "propeller_1",
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+            ],
+        },
+    )
+    fig.update_layout(width=800)
 
     fig.show()
