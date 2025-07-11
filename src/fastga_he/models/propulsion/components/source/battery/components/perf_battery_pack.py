@@ -11,7 +11,6 @@ from ..components.perf_cell_temperature import PerformancesCellTemperatureMissio
 from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_direct_bus_connection import PerformancesBatteryDirectBusConnection
 from ..components.perf_module_current import PerformancesModuleCurrent
-from ..components.perf_internal_resistance import PerformancesInternalResistance
 from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
 from ..components.perf_battery_voltage import PerformancesBatteryVoltage
