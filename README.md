@@ -2,6 +2,7 @@
 
 FAST-OAD-CS23-HE: An open-source framework for the design and analysis of hybrid electric General Aviation aircraft
 ======================================================================================
+[![Documentation Status](https://readthedocs.org/projects/fast-oad-cs23-he/badge/?version=stable)](https://fast-oad-cs23-he.readthedocs.io/)
 
 FAST-OAD-CS23-HE is a plugin from the [FAST-OAD framework](https://github.com/fast-aircraft-design/FAST-OAD) performing rapid Overall Aircraft Design of hybrid electric aircraft. It inherits the aircraft sizing methods from [FAST-OAD-GA](https://github.com/supaero-aircraft-design/FAST-GA) and is complemented with a library of hybrid-electric powertrain components. The aircraft powertrain is described as a graph in what is called the powertrain file which is then used to automatically build te corresponding OpenMDAO problem.
 
