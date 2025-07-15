@@ -1,0 +1,29 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results_lca/pipistrel_in_with_lca_reference_cell_sensitivity.xml
+output_file: ../results_lca/pipistrel_out_with_lca_reference_cell_sensitivity.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
+
+model:
+  lca:
+    id: fastga_he.lca.legacy
+    power_train_file_path: ./pipistrel_assembly_with_lca_reference_cell.yml
+    functional_unit: Flight hours
+    aircraft_lifespan_in_hours: true
+    component_level_breakdown: true
+    airframe_material: composite
+    delivery_method: train
+    electric_mix: french
+    normalization: true
+    weighting: true
+    ecoinvent_version: 3.9.1
+    impact_assessment_method: EF v3.1
+
+submodels:
+  service.propulsion.battery.lifespan: null
