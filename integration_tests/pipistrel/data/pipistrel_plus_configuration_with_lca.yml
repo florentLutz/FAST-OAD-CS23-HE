@@ -4,8 +4,8 @@ title: Sample OAD Process
 module_folders:
 
 # Input and output files
-input_file: ../results/pipistrel_in_with_lca.xml
-output_file: ../results/pipistrel_out_with_lca.xml
+input_file: ../results/pipistrel_plus_in_with_lca.xml
+output_file: ../results/pipistrel_plus_out_with_lca.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
@@ -35,14 +35,14 @@ model:
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: ./pipistrel_assembly_with_lca.yml
-      out_file: ../results/mission_data.csv
+      power_train_file_path: ./pipistrel_plus_assembly_with_lca.yml
+      out_file: ../results/pipistrel_plus_reference_data.csv
       use_linesearch: False
       pre_condition_pt: True
       use_apply_nonlinear: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: ./pipistrel_assembly_with_lca.yml
+      power_train_file_path: ./pipistrel_plus_assembly_with_lca.yml
     weight:
       id: fastga.weight.legacy
       propulsion_id: fastga.wrapper.propulsion.basicIC_engine
@@ -58,10 +58,9 @@ model:
       id: fastga.loop.wing_position
     wing_area:
       id: fastga.loop.wing_area
-  #    power_train_file_path: ./pipistrel_assembly_with_lca.yml
   lca:
     id: fastga_he.lca.legacy
-    power_train_file_path: ./pipistrel_assembly_with_lca.yml
+    power_train_file_path: ./pipistrel_plus_assembly_with_lca.yml
     functional_unit: Flight hours
     aircraft_lifespan_in_hours: true
     component_level_breakdown: true
@@ -74,11 +73,14 @@ model:
     impact_assessment_method: EF v3.1
 
 submodels:
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+  service.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
+  submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
   submodel.performances.mission_vector.climb_speed: null 
   submodel.performances.mission_vector.descent_speed: null
@@ -89,14 +91,16 @@ submodels:
   service.weight.mass.systems: fastga_he.submodel.weight.mass.systems.weight_nan
   service.weight.mass.payload: null
   service.geometry.nacelle.dimension: null
+  submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
   service.weight.mass.airframe.wing: fastga_he.submodel.weight.mass.airframe.wing.analytical_he # No real use for this submodel as there are no electric components in the wing
   submodel.handling_qualities.vertical_tail.area: null
-  service.propulsion.battery.lifespan: fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model
   submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
   submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
   submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
+  service.propulsion.battery.lifespan: fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
