@@ -178,7 +178,7 @@ model:
               value: battery_pack_2_production
 
           custom_battery:
-            amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass_per_fu
+            amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
             unit: kilogram
 
             ref_battery_pack:
@@ -193,7 +193,7 @@ model:
 
             new_anode_material:
               name: 'market for silicon, solar grade'
-              amount: 0.22*0.92*1.0  # The 1.0 means no production losses for silicon nano-wire which is optimistic
+              amount: 0.22*0.92*5.0  # The 5.0 means production losses for silicon nano-wire
 
             new_anode_assembly:
               name: 'market for electricity, medium voltage'
