@@ -39,7 +39,7 @@ packages = [
 # of poetry.lock file will modify docs/requirements.txt and make
 # the commit fail because "files were modified by this hook". In that case,
 # doing again the commit including changes in docs/requirements.txt will succeed.
-python = "^3.10, <3.11"
+python = "^3.10, <3.12"
 fast-oad-cs23 = { git = "https://github.com/supaero-aircraft-design/FAST-GA.git", branch = "main" }
 fast-oad-core = "^1.7.3"
 stdatm = "^0.4.2"

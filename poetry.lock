@@ -1658,10 +1658,16 @@ ipysheet = ">=0.5.0,<1"
 ipywidgets = ">=7.7.0,<9"
 jsonschema = ">=3.2.0,<5"
 jupyterlab = ">=3.3.0,<5"
-lxml = {version = ">=4.6.5,<6", markers = "python_version >= \"3.8\" and python_version < \"3.11\""}
+lxml = [
+    {version = ">=4.6.5,<6", markers = "python_version >= \"3.8\" and python_version < \"3.11\""},
+    {version = ">=4.9.3,<6", markers = "python_version >= \"3.11\" and python_version < \"4.0\""},
+]
 numpy = {version = ">=1.23.2,<3", markers = "python_version >= \"3.9\" and python_version < \"3.12\""}
 openmdao = ">=3.27,<4.0"
-pandas = {version = ">=1.3.4,<3", markers = "python_version >= \"3.8\" and python_version < \"3.11\""}
+pandas = [
+    {version = ">=1.3.4,<3", markers = "python_version >= \"3.8\" and python_version < \"3.11\""},
+    {version = ">=1.5.3,<3", markers = "python_version >= \"3.11\" and python_version < \"4.0\""},
+]
 plotly = ">=5.0.0,<6.0.0"
 pyDOE3 = ">=1.0.0,<2.0.0"
 "ruamel.yaml" = ">=0.15.78,<0.18"
@@ -3893,7 +3899,10 @@ files = [
 ]
 
 [package.dependencies]
-numpy = {version = ">=1.22.4", markers = "python_version < \"3.11\""}
+numpy = [
+    {version = ">=1.22.4", markers = "python_version < \"3.11\""},
+    {version = ">=1.23.2", markers = "python_version == \"3.11\""},
+]
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
 tzdata = ">=2022.7"
@@ -5035,7 +5044,10 @@ latex = "*"
 matplotlib = "*"
 numpy = {version = ">=1.23.2, <3", markers = "python_version >= \"3.9\" and python_version < \"3.12\""}
 openpyxl = "*"
-pandas = {version = ">=1.3.4, <3", markers = "python_version >= \"3.8\" and python_version < \"3.11\""}
+pandas = [
+    {version = ">=1.3.4,<3", markers = "python_version >= \"3.8\" and python_version < \"3.11\""},
+    {version = ">=1.5.3,<3", markers = "python_version >= \"3.11\" and python_version < \"4.0\""},
+]
 pint = "*"
 pydoe2 = "1.3.0"
 scikit-learn = "*"
@@ -7161,5 +7173,5 @@ lca = ["lca-modeller"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10, <3.11"
-content-hash = "b00a6e6bfe75b6cfe21cff6ddaad65c3c40164be0a02fbd0159b8226092d7c1a"
+python-versions = "^3.10, <3.12"
+content-hash = "1a24275d33a9ada35f53ab9915b7ddac1d8361f404df834a7d643ef3bc3903c2"
