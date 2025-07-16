@@ -108,3 +108,6 @@ submodels:
     submodel.propulsion.dc_dc_converter.inductor.inductance: null
     submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.ensure
     service.propulsion.battery.lifespan: fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model
+    submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
+    submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
+    submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
