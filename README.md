@@ -52,7 +52,15 @@ doi = {10.3390/aerospace12050377}
 Install
 -------
 
+To install the code without the optional dependencies linked with the LCA package, simply do the following:
+
 * Clone the repository locally
 * Preferably and although it is not mandatory, create a new virtual environment ([conda](https://docs.conda.io/en/latest/) is preferred).
 * Install [Poetry](https://python-poetry.org/docs/) with a version greater than 1.8.3. We recommend installing poetry using the pipx method and making use of suffixes.
 * At root of the project folder, do `poetry install`
+
+If you want to install the optional dependencies replace the last step with: 
+
+* At root of the project folder, do `poetry install --extras lca`
+
+For the LCA package to run, an ecoinvent license is required. For more details on the functioning of the LCA module, check out the [official documentation](https://fast-oad-cs23-he.readthedocs.io/en/latest/documentation/models/lca/index.html)
