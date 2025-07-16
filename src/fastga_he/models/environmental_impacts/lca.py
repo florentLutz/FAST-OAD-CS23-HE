@@ -10,6 +10,17 @@ import pathlib
 import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
+# Even though lca_modeller is not used directly here a core subcomponent of that module requires it
+# And I feel like it's better to raise the ImportError here.
+try:
+    from lca_modeller.io.configuration import LCAProblemConfigurator
+except ImportError:
+    raise ImportError(
+        "The modules with the fastga_he.lca.legacy id can only be used with lca optional "
+        "dependency group.\n Install it with poetry install --extras lca"
+    )
+
+
 import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife

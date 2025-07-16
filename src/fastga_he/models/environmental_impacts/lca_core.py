@@ -8,15 +8,23 @@ import shutil
 import logging
 from typing import Dict, List
 
-import brightway2 as bw
-import dotenv
-import lca_algebraic as agb
+# To properly handle the case where the optional dependencies are not installed
+try:
+    import brightway2 as bw
+    import dotenv
+    import lca_algebraic as agb
+    from lca_modeller.io.configuration import LCAProblemConfigurator
+except ImportError:
+    raise ImportError(
+        "This feature is only usable with the lca optional dependency group.\n"
+        "Install it with poetry install --extras lca"
+    )
+
 import numpy as np
 import openmdao.api as om
 import pandas as pd
 import sympy as sym
 import yaml
-from lca_modeller.io.configuration import LCAProblemConfigurator
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .resources.constants import METHODS_TO_FILE, LCA_PREFIX

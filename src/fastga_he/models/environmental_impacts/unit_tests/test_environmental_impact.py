@@ -9,7 +9,12 @@ import pytest
 
 import fastoad.api as oad
 
-from lca_modeller.gui.plots import process_tree
+try:
+    from lca_modeller.gui.plots import process_tree
+
+    IMPORTS_LCA = True
+except ImportError:
+    IMPORTS_LCA = False
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
@@ -873,7 +878,8 @@ def test_lca_pipistrel():
 
     lca_model = problem.model.component.lca_core.model
 
-    process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
+    if IMPORTS_LCA:
+        process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
