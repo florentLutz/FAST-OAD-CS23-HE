@@ -8,8 +8,6 @@ import logging
 
 import pytest
 
-import numpy as np
-
 import fastoad.api as oad
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
