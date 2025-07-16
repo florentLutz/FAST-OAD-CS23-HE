@@ -42,6 +42,7 @@ packages = [
 python = "^3.10, <3.12"
 fast-oad-cs23 = { git = "https://github.com/supaero-aircraft-design/FAST-GA.git", branch = "main" }
 fast-oad-core = "^1.7.3"
+openmdao = "<3.38"
 stdatm = "^0.4.2"
 networkx = "*"
 pyvis = "*"
