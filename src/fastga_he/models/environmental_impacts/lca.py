@@ -13,7 +13,8 @@ from fastoad.module_management.constants import ModelDomain
 # Even though lca_modeller is not used directly here a core subcomponent of that module requires it
 # And I feel like it's better to raise the ImportError here.
 try:
-    from lca_modeller.io.configuration import LCAProblemConfigurator
+    # Ruff, please ignore this unused import it's just to check that the opt dependencies are here
+    from lca_modeller.io.configuration import LCAProblemConfigurator  # noqa: F401
 except ImportError:
     raise ImportError(
         "The modules with the fastga_he.lca.legacy id can only be used with lca optional "
