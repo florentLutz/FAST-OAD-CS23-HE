@@ -241,3 +241,87 @@ def test_lca_pipistrel_plus_plus_high_bed_cell():
 
     # Write the outputs
     problem.write_outputs()
+
+
+def test_only_lca_pipistrel_reference_cell_pessimistic():
+    """
+    Tests that contains:
+    - An LCA evaluation of the reference Pipistrel with a buy to fly ratio of 2 for composite and
+        a European electric mix
+    - OAD results from the first test will be used.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_out_with_lca.xml"
+    process_file_name = "pipistrel_configuration_only_lca.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / xml_file_name
+
+    # Setup the problem
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=2.0)
+
+    # Run the problem
+    problem.run_model()
+
+    # Write the outputs
+    problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        0.0036902, rel=1e-3
+    )
+
+
+def test_only_lca_pipistrel_plus_plus_pessimistic():
+    """
+    Tests that contains:
+    - An LCA evaluation of the Pipistrel plus plus with a buy to fly ratio of 2 for composite and
+        a European electric mix
+    - OAD results from the test_lca_pipistrel_plus_plus_high_bed_cell will be used.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "pipistrel_plus_plus_out_with_lca.xml"
+    process_file_name = "pipistrel_plus_plus_configuration_only_lca.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / xml_file_name
+
+    # Setup the problem
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=2.0)
+
+    # Run the problem
+    problem.run_model()
+
+    # Write the outputs
+    problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        0.00352396, rel=1e-3
+    )

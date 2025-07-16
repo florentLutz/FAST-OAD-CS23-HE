@@ -136,3 +136,41 @@ def test_impact_evolution_three_designs_with_production_losses():
     )
 
     fig.show()
+
+
+def test_compare_designs_with_contributor_pessimistic_case():
+    fig = lca_raw_impact_comparison_advanced(
+        [
+            RESULTS_FOLDER_PATH / "pipistrel_out_only_lca.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_plus_plus_out_only_lca.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel Velis Electro",
+            "Pipistrel Velis Electro++",
+        ],
+        impact_category="climate change",  # "climate change", "material resources metals minerals"
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",  # Just a renaming, should work as well
+            "Battery pack 1": "battery_pack_1",
+            "Battery pack 2": "battery_pack_2",
+            "Use phase": "electricity_for_mission",  # Just a renaming, should work as well
+            "Others": [
+                "propeller_1",
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+            ],
+        },
+    )
+    fig.update_layout(
+        width=900,
+        title_text="Comparison of impact in category: climate change with pessimistic assumptions",
+    )
+
+    fig.show()
