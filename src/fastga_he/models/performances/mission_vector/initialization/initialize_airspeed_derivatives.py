@@ -4,7 +4,11 @@
 
 import numpy as np
 import openmdao.api as om
-from stdatm import Atmosphere
+from scipy.constants import atmosphere
+from stdatm import AtmosphereWithPartials
+from stdatm.state_parameters import AIR_GAS_CONSTANT
+
+RHO_SL = AtmosphereWithPartials(0.0).density
 
 
 class InitializeAirspeedDerivatives(om.ExplicitComponent):
@@ -13,9 +17,7 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Contains the index of the different flight phases
-        self.climb_idx = None
-        self.descent_idx = None
+        self.non_nul_pd = None
 
     def initialize(self):
         self.options.declare(
@@ -50,17 +52,17 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
             + number_of_points_reserve
         )
 
-        self.climb_idx = np.linspace(
+        climb_idx = np.linspace(
             0,
             number_of_points_climb - 1,
             number_of_points_climb,
         ).astype(int)
-        self.descent_idx = np.linspace(
+        descent_idx = np.linspace(
             number_of_points_climb + number_of_points_cruise,
             number_of_points_climb + number_of_points_cruise + number_of_points_descent - 1,
             number_of_points_descent,
         ).astype(int)
-        non_nul_pd = np.concatenate((self.climb_idx, self.descent_idx))
+        self.non_nul_pd = np.concatenate((climb_idx, descent_idx))
 
         self.add_input(
             "true_airspeed",
@@ -85,61 +87,39 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
             "d_vx_dt", shape=number_of_points, val=np.full(number_of_points, 0.0), units="m/s**2"
         )
 
-        # We can't really define the pd for this component because of the use of the Atmosphere
-        # class, however, since cruise and reserve are constant speed phase, we can use sparse
-        # derivative
+        # These are nil most of the time because sin(gamma) will be nil in cruise and reserve ...
         self.declare_partials(
             of="d_vx_dt",
             wrt=["altitude", "equivalent_airspeed", "true_airspeed"],
-            method="fd",
-            rows=non_nul_pd,
-            cols=non_nul_pd,
+            method="exact",
+            rows=self.non_nul_pd,
+            cols=self.non_nul_pd,
         )
+        # ... but the derivative wrt gamma won't be nil during cruise and reserve paradoxically
         self.declare_partials(
             of="d_vx_dt",
-            wrt="gamma",
+            wrt=["gamma"],
             method="exact",
-            rows=non_nul_pd,
-            cols=non_nul_pd,
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        number_of_points_cruise = self.options["number_of_points_cruise"]
-        number_of_points_reserve = self.options["number_of_points_reserve"]
-
         true_airspeed = inputs["true_airspeed"]
         equivalent_airspeed = inputs["equivalent_airspeed"]
         altitude = inputs["altitude"]
         gamma = inputs["gamma"]
 
-        altitude_climb = altitude[self.climb_idx]
-        gamma_climb = gamma[self.climb_idx]
-        equivalent_airspeed_climb = equivalent_airspeed[self.climb_idx]
-        true_airspeed_climb = true_airspeed[self.climb_idx]
+        atm = AtmosphereWithPartials(altitude, altitude_in_feet=False)
 
-        altitude_descent = altitude[self.descent_idx]
-        gamma_descent = gamma[self.descent_idx]
-        equivalent_airspeed_descent = equivalent_airspeed[self.descent_idx]
-        true_airspeed_descent = true_airspeed[self.descent_idx]
-
-        atm_climb_plus_1 = Atmosphere(altitude_climb + 1.0, altitude_in_feet=False)
-        atm_climb_plus_1.equivalent_airspeed = equivalent_airspeed_climb
-        d_v_tas_dh_climb = atm_climb_plus_1.true_airspeed - true_airspeed_climb
-        d_vx_dt_climb = d_v_tas_dh_climb * true_airspeed_climb * np.sin(gamma_climb)
-
-        atm_descent_plus_1 = Atmosphere(altitude_descent + 1.0, altitude_in_feet=False)
-        atm_descent_plus_1.equivalent_airspeed = equivalent_airspeed_descent
-        d_v_tas_dh_descent = atm_descent_plus_1.true_airspeed - true_airspeed_descent
-        d_vx_dt_descent = d_v_tas_dh_descent * true_airspeed_descent * np.sin(gamma_descent)
-
-        d_vx_dt = np.concatenate(
-            (
-                d_vx_dt_climb,
-                np.zeros(number_of_points_cruise),
-                d_vx_dt_descent,
-                np.zeros(number_of_points_reserve),
-            )
+        d_v_tas_dh = (
+            -0.5
+            * equivalent_airspeed
+            * RHO_SL**0.5
+            * atm.density**-1.5
+            * atm.partial_density_altitude
         )
+        d_vx_dt = d_v_tas_dh * true_airspeed * np.sin(gamma)
 
         outputs["d_vx_dt"] = d_vx_dt
 
@@ -149,28 +129,64 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         altitude = inputs["altitude"]
         gamma = inputs["gamma"]
 
-        altitude_climb = altitude[self.climb_idx]
-        gamma_climb = gamma[self.climb_idx]
-        equivalent_airspeed_climb = equivalent_airspeed[self.climb_idx]
-        true_airspeed_climb = true_airspeed[self.climb_idx]
+        atm = AtmosphereWithPartials(altitude, altitude_in_feet=False)
 
-        altitude_descent = altitude[self.descent_idx]
-        gamma_descent = gamma[self.descent_idx]
-        equivalent_airspeed_descent = equivalent_airspeed[self.descent_idx]
-        true_airspeed_descent = true_airspeed[self.descent_idx]
+        partials["d_vx_dt", "true_airspeed"] = (
+            -0.5
+            * equivalent_airspeed
+            * RHO_SL**0.5
+            * atm.density**-1.5
+            * atm.partial_density_altitude
+            * np.sin(gamma)
+        )[self.non_nul_pd]
+        partials["d_vx_dt", "gamma"] = (
+            -0.5
+            * equivalent_airspeed
+            * RHO_SL**0.5
+            * atm.density**-1.5
+            * atm.partial_density_altitude
+            * true_airspeed
+            * np.cos(gamma)
+        )
+        partials["d_vx_dt", "equivalent_airspeed"] = (
+            -0.5
+            * RHO_SL**0.5
+            * atm.density**-1.5
+            * atm.partial_density_altitude
+            * true_airspeed
+            * np.sin(gamma)
+        )[self.non_nul_pd]
 
-        atm_climb_plus_1 = Atmosphere(altitude_climb + 1.0, altitude_in_feet=False)
-        atm_climb_plus_1.equivalent_airspeed = equivalent_airspeed_climb
-        d_v_tas_dh_climb = atm_climb_plus_1.true_airspeed - true_airspeed_climb
-        partials_wrt_gamma_climb = d_v_tas_dh_climb * true_airspeed_climb * np.cos(gamma_climb)
+        # Terms used for the computation of the pressure in stdatm
+        coeff_b = 44330.78
+        coeff_c = 5.25587611
 
-        atm_descent_plus_1 = Atmosphere(altitude_descent + 1.0, altitude_in_feet=False)
-        atm_descent_plus_1.equivalent_airspeed = equivalent_airspeed_descent
-        d_v_tas_dh_descent = atm_descent_plus_1.true_airspeed - true_airspeed_descent
-        partials_wrt_gamma_descent = (
-            d_v_tas_dh_descent * true_airspeed_descent * np.cos(gamma_descent)
+        # This works only when we are below the tropopause
+        hessian_pressure_altitude = (
+            atmosphere
+            * coeff_c
+            * (coeff_c - 1.0)
+            / coeff_b**2.0
+            * (1 - (altitude / 44330.78)) ** 3.25587611
         )
 
-        partials_wrt_gamma = np.concatenate((partials_wrt_gamma_climb, partials_wrt_gamma_descent))
+        hessian_density_altitude = (
+            (
+                hessian_pressure_altitude * atm.temperature**3.0
+                - 2.0
+                * atm.partial_pressure_altitude
+                * atm.partial_temperature_altitude
+                * atm.temperature**2.0
+                + 2.0 * atm.temperature * atm.pressure * atm.partial_temperature_altitude**2.0
+            )
+            / atm.temperature**4.0
+            / AIR_GAS_CONSTANT
+        )
 
-        partials["d_vx_dt", "gamma"] = partials_wrt_gamma
+        partials["d_vx_dt", "altitude"] = (
+            (-0.5 * equivalent_airspeed * RHO_SL**0.5 * true_airspeed * np.sin(gamma))
+            * (
+                -1.5 * atm.density**-2.5 * atm.partial_density_altitude**2.0
+                + atm.density**-1.5 * hessian_density_altitude
+            )
+        )[self.non_nul_pd]

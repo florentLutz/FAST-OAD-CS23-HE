@@ -3,7 +3,7 @@
 FAST-OAD-CS23-HE: An open-source framework for the design and analysis of hybrid electric General Aviation aircraft
 ======================================================================================
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Documentation Status](https://readthedocs.org/projects/fast-oad-cs23-he/badge/?version=stable)](https://fast-oad-cs23-he.readthedocs.io/)
+[![Documentation Status](https://readthedocs.org/projects/fast-oad-cs23-he/badge/?version=latest)](https://fast-oad-cs23-he.readthedocs.io/)
 ![Tests](https://github.com/florentLutz/FAST-OAD-CS23-HE/workflows/Tests/badge.svg)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
