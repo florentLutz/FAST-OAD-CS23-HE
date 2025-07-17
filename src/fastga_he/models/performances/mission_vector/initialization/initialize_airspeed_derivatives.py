@@ -171,13 +171,17 @@ class InitializeAirspeedDerivatives(om.ExplicitComponent):
         )
 
         hessian_density_altitude = (
-            hessian_pressure_altitude * atm.temperature**3.0
-            - 2.0
-            * atm.partial_pressure_altitude
-            * atm.partial_temperature_altitude
-            * atm.temperature**2.0
-            + 2.0 * atm.temperature * atm.pressure * atm.partial_temperature_altitude**2.0
-        ) / atm.temperature**4.0 / AIR_GAS_CONSTANT
+            (
+                hessian_pressure_altitude * atm.temperature**3.0
+                - 2.0
+                * atm.partial_pressure_altitude
+                * atm.partial_temperature_altitude
+                * atm.temperature**2.0
+                + 2.0 * atm.temperature * atm.pressure * atm.partial_temperature_altitude**2.0
+            )
+            / atm.temperature**4.0
+            / AIR_GAS_CONSTANT
+        )
 
         partials["d_vx_dt", "altitude"] = (
             (-0.5 * equivalent_airspeed * RHO_SL**0.5 * true_airspeed * np.sin(gamma))
