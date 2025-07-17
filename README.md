@@ -2,6 +2,10 @@
 
 FAST-OAD-CS23-HE: An open-source framework for the design and analysis of hybrid electric General Aviation aircraft
 ======================================================================================
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Documentation Status](https://readthedocs.org/projects/fast-oad-cs23-he/badge/?version=stable)](https://fast-oad-cs23-he.readthedocs.io/)
+![Tests](https://github.com/florentLutz/FAST-OAD-CS23-HE/workflows/Tests/badge.svg)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 FAST-OAD-CS23-HE is a plugin from the [FAST-OAD framework](https://github.com/fast-aircraft-design/FAST-OAD) performing rapid Overall Aircraft Design of hybrid electric aircraft. It inherits the aircraft sizing methods from [FAST-OAD-GA](https://github.com/supaero-aircraft-design/FAST-GA) and is complemented with a library of hybrid-electric powertrain components. The aircraft powertrain is described as a graph in what is called the powertrain file which is then used to automatically build te corresponding OpenMDAO problem.
 
@@ -48,7 +52,15 @@ doi = {10.3390/aerospace12050377}
 Install
 -------
 
+To install the code without the optional dependencies linked with the LCA package, simply do the following:
+
 * Clone the repository locally
 * Preferably and although it is not mandatory, create a new virtual environment ([conda](https://docs.conda.io/en/latest/) is preferred).
 * Install [Poetry](https://python-poetry.org/docs/) with a version greater than 1.8.3. We recommend installing poetry using the pipx method and making use of suffixes.
 * At root of the project folder, do `poetry install`
+
+If you want to install the optional dependencies replace the last step with: 
+
+* At root of the project folder, do `poetry install --extras lca`
+
+For the LCA package to run, an ecoinvent license is required. For more details on the functioning of the LCA module, check out the [official documentation](https://fast-oad-cs23-he.readthedocs.io/en/latest/documentation/models/lca/index.html)
