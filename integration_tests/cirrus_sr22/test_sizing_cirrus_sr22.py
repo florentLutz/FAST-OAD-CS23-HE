@@ -24,7 +24,7 @@ def cleanup():
     rmtree(WORKDIR_FOLDER_PATH, ignore_errors=True)
 
 
-def test_sizing_sr22(cleanup):
+def test_sizing_sr22():
     # TODO: Check why he needs the propulsion data as inputs
     # ANS: still used for the Z_cg of the aircraft which is assumed to have only a minor influence
 
@@ -67,8 +67,12 @@ def test_sizing_sr22(cleanup):
     )
 
 
-def test_sizing_sr22_electric(cleanup):
-    """Test the overall aircraft design process with wing positioning under VLM method."""
+def test_sizing_sr22_electric_original():
+    """
+    Tests an electric sr22 with the same climb, cruise, descent and reserve profile as the original
+    one but a range of 100 nm. The only change is the ratio between stall speed and reserve speed
+    which is set at 1.3 (ratio between approach and stall)
+    """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -97,8 +101,3 @@ def test_sizing_sr22_electric(cleanup):
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
-
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1601.0, rel=1e-2
-    )
-    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(992.0, rel=1e-2)

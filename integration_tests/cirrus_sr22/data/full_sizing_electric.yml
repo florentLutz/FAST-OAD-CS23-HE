@@ -11,7 +11,7 @@ output_file: ../results/full_sizing_elec_out.xml
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
 
 model:
-  nonlinear_solver: om.NonlinearBlockGS(maxiter=20, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True)
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=20, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True, use_aitken=True, aitken_max_factor=0.8, aitken_min_factor=0.33, aitken_initial_factor=0.8)
   linear_solver: om.LinearBlockGS()
   geometry:
     id: fastga.geometry.legacy
