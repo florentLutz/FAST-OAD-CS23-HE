@@ -60,7 +60,7 @@ model:
 submodels:
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
-  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.ensure
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce

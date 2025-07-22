@@ -166,13 +166,15 @@
         <PMSM>
           <motor_1>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
-            <rpm_rating units="1/min" is_input="True">3250.0<!--Max voltage of the motor--></rpm_rating>
+            <rpm_rating units="1/min" is_input="True">4000.0<!--Max voltage of the motor--></rpm_rating>
             <voltage_caliber units="V" is_input="True">830.0<!--Max voltage of the motor--></voltage_caliber>
+            <torque_rating units="N*m" is_input="True">425.0<!--Max voltage of the motor--></torque_rating>
           </motor_1>
           <motor_2>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
-            <rpm_rating units="1/min" is_input="True">3250.0<!--Max voltage of the motor--></rpm_rating>
+            <rpm_rating units="1/min" is_input="True">4000.0<!--Max voltage of the motor--></rpm_rating>
             <voltage_caliber units="V" is_input="True">830.0<!--Max voltage of the motor--></voltage_caliber>
+            <torque_rating units="N*m" is_input="True">425.0<!--Max voltage of the motor--></torque_rating>
           </motor_2>
         </PMSM>
         <inverter>
@@ -295,7 +297,7 @@
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_modules>12.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
             <module>
-              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">120.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
             <CG>
               <y_ratio>0.5</y_ratio>
@@ -308,7 +310,7 @@
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_modules>12.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
             <module>
-              <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">120.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
             <CG>
               <y_ratio>0.5</y_ratio>

@@ -10,6 +10,7 @@ import pytest
 
 import fastoad.api as oad
 
+from fastga_he.gui.payload_range import payload_range_outer
 from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
@@ -175,8 +176,9 @@ def test_sizing_sr22_electric_two_motors_improved_range_sensitivity():
     problem.set_val("data:mission:sizing:main_route:reserve:duration", units="min", val=30.0)
 
     # Baseline
-    problem.set_val("data:TLAR:range", units="NM", val=100.0)
-    # problem.set_val("data:TLAR:range", units="NM", val=175.0)
+    # problem.set_val("data:TLAR:range", units="NM", val=100.0)
+    problem.set_val("data:TLAR:range", units="NM", val=50.0)
+    # problem.model.nonlinear_solver.options["rtol"] = 1e-8
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
@@ -189,13 +191,13 @@ def test_sizing_sr22_electric_two_motors_improved_range_sensitivity():
     problem.write_outputs()
 
     # Range tested
-    # 50, 75, 100, 125, 150, 175
+    # 50, 75, 100, 125, 150, 175, 180
 
     # Corresponding MTOW [kg]
-    # 2092.0, 2380, 2763, 3210, 3882, 5368
+    # 1891.0, 2148, 2453, 2886, 3507, 4679, 5043
 
     # Corresponding battery mass [kg]
-    # 2.0 * 382, 2.0 * 479, 2.0 * 605, 2.0 * 757, 2.0 * 981, 2.0 * 1454
+    # 2.0 * 314, 2.0 * 398, 2.0 * 513, 2.0 * 670, 2.0 * 892, 2.0 * 1300, 2.0 * 1425
 
 
 def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
@@ -245,8 +247,8 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
     )
 
     # Baseline
-    problem.set_val("data:TLAR:range", units="NM", val=100.0)
-    # problem.set_val("data:TLAR:range", units="NM", val=360.0)
+    # problem.set_val("data:TLAR:range", units="NM", val=100.0)
+    problem.set_val("data:TLAR:range", units="NM", val=375.0)
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
@@ -261,11 +263,145 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
     problem.write_outputs()
 
     # Range tested
-    # 50, 75, 100, 125, 150, 175, 200, 225, 251, 275, 280, 290, 305, 315, 323, 333, 343, 353, 360
+    # 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375
 
-    # Corresponding MTOW [kg] 1591, 1726, 1867, 2008, 2160, 2327, 2509, 2721, 2982, 3243, 3304,
-    # 3435, 3654, 3819, 3965, 4172, 4419, 4733, 4989
+    # Corresponding MTOW [kg]
+    # 1373, 1490, 1620, 1749, 1897, 2061, 2250, 2472, 2700, 2964, 3279, 3671, 4214, 5025
 
-    # Corresponding battery mass [kg] 2.0 * 209, 2.0 * 257, 2.0 * 306, 2.0 * 355, 2.0*408,
-    # 2.0 * 465, 2.0 * 527, 2.0 * 597, 681, 2.0*770, 2.0 * 790, 2.0 * 834, 2.0 * 907, 2.0 * 961,
-    # 2.0 * 1009, 2.0 * 1077, 2.0 * 1156, 2.0 * 1256, 2.0 * 1337
+    # Corresponding battery mass [kg]
+    # 2.0 * 127, 2.0 * 171, 2.0 * 218, 2.0 * 266, 2.0 * 320, 2.0 * 379, 2.0 * 445, 2.0 * 521,
+    # 2.0 * 604, 2.0 * 699, 2.0 * 812, 2.0 * 951, 2.0 * 1141, 2.0 * 1421
+
+
+def test_payload_range_comparison():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Run the payload range estimation for the thermal case
+    thermal_xml_file_name = "full_sizing_out.xml"
+    thermal_process_file_name = "payload_range_thermal.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / thermal_process_file_name)
+    problem_thermal = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs_thermal = RESULTS_FOLDER_PATH / thermal_xml_file_name
+    rename_variables_for_payload_range(ref_inputs_thermal)
+
+    problem_thermal.write_needed_inputs(ref_inputs_thermal)
+    problem_thermal.read_inputs()
+    problem_thermal.setup()
+    problem_thermal.run_model()
+    problem_thermal.write_outputs()
+
+    # Now do the same for the first electric (with reference cell)
+    ref_electric_xml_file_name = "full_sizing_elec_out_two_motors_improved.xml"
+    ref_electric_process_file_name = "payload_range_electric.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / ref_electric_process_file_name)
+    problem_electric_ref = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs_ref_electric = RESULTS_FOLDER_PATH / ref_electric_xml_file_name
+    rename_variables_for_payload_range(ref_inputs_ref_electric)
+
+    # Add a threshold SoC
+    datafile = oad.DataFile(ref_inputs_ref_electric)
+    datafile.append(
+        oad.Variable(name="data:mission:payload_range:threshold_SoC", val=0.0, units="percent")
+    )
+    datafile.save()
+
+    problem_electric_ref.write_needed_inputs(ref_inputs_ref_electric)
+    problem_electric_ref.read_inputs()
+    problem_electric_ref.setup()
+    problem_electric_ref.run_model()
+    problem_electric_ref.write_outputs()
+
+    # Now we do the same for the "plus" version, a priori we could reuse the same "problem" just
+    # change the inputs
+    problem_electric_high_bed = configurator.get_problem()
+
+    ref_inputs_high_bed_electric = (
+        RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_plus_improved.xml"
+    )
+    rename_variables_for_payload_range(ref_inputs_high_bed_electric)
+
+    # Add a threshold SoC
+    datafile = oad.DataFile(ref_inputs_high_bed_electric)
+    datafile.append(
+        oad.Variable(name="data:mission:payload_range:threshold_SoC", val=0.0, units="percent")
+    )
+    datafile.save()
+
+    problem_electric_high_bed.write_needed_inputs(ref_inputs_high_bed_electric)
+    problem_electric_high_bed.read_inputs()
+
+    problem_electric_high_bed.model_options["*"] = {
+        "cell_capacity_ref": 1.34,
+        "cell_weight_ref": 11.7e-3,
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 5100.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+    }
+
+    problem_electric_high_bed.setup()
+
+    problem_electric_high_bed.run_model()
+    problem_electric_high_bed.output_file_path = (
+        RESULTS_FOLDER_PATH / "payload_range_elec_out_plus.xml"
+    )
+    problem_electric_high_bed.write_outputs()
+
+    fig = payload_range_outer(
+        aircraft_file_path=problem_thermal.output_file_path, name="Cirrus SR22"
+    )
+    fig = payload_range_outer(
+        aircraft_file_path=problem_electric_ref.output_file_path,
+        name="Electric SR22 with reference cell",
+        fig=fig,
+    )
+    fig = payload_range_outer(
+        aircraft_file_path=problem_electric_high_bed.output_file_path,
+        name="Electric SR22 with high BED cell",
+        fig=fig,
+    )
+    fig.show()
+
+
+def rename_variables_for_payload_range(source_file_path: pathlib.Path):
+    """
+    Small helper function because payload range needs data based on the operational mission while
+    for the sizing, the sizing mission is used.
+    """
+
+    op_name_to_sizing_name = {
+        "data:mission:operational:climb:climb_rate:cruise_level": "data:mission:sizing:main_route:climb:climb_rate:cruise_level",
+        "data:mission:operational:climb:climb_rate:sea_level": "data:mission:sizing:main_route:climb:climb_rate:sea_level",
+        "data:mission:operational:cruise:altitude": "data:mission:sizing:main_route:cruise:altitude",
+        "data:mission:operational:cruise:v_tas": "data:TLAR:v_cruise",
+        "data:mission:operational:descent:descent_rate": "data:mission:sizing:main_route:descent:descent_rate",
+        "data:mission:operational:initial_climb:energy": "data:mission:sizing:initial_climb:energy",
+        "data:mission:operational:initial_climb:fuel": "data:mission:sizing:initial_climb:fuel",
+        "data:mission:operational:payload:CG:x": "data:weight:payload:PAX:CG:x",
+        "data:mission:operational:payload:mass": "data:weight:aircraft:payload",
+        "data:mission:operational:range": "data:TLAR:range",
+        "data:mission:operational:reserve:altitude": "data:mission:sizing:main_route:reserve:altitude",
+        "data:mission:operational:reserve:duration": "data:mission:sizing:main_route:reserve:duration",
+        "data:mission:operational:takeoff:energy": "data:mission:sizing:takeoff:energy",
+        "data:mission:operational:takeoff:fuel": "data:mission:sizing:takeoff:fuel",
+        "data:mission:operational:taxi_in:duration": "data:mission:sizing:taxi_in:duration",
+        "data:mission:operational:taxi_in:speed": "data:mission:sizing:taxi_in:speed",
+        "data:mission:operational:taxi_out:duration": "data:mission:sizing:taxi_out:duration",
+        "data:mission:operational:taxi_out:speed": "data:mission:sizing:taxi_out:speed",
+    }
+
+    datafile = oad.DataFile(source_file_path)
+
+    for op_name, sizing_name in op_name_to_sizing_name.items():
+        variable_to_add = oad.Variable(
+            op_name, val=datafile[sizing_name].value, units=datafile[sizing_name].units
+        )
+        datafile.append(variable_to_add)
+
+    datafile.save()
