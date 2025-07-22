@@ -176,8 +176,8 @@ def test_sizing_sr22_electric_two_motors_improved_range_sensitivity():
     problem.set_val("data:mission:sizing:main_route:reserve:duration", units="min", val=30.0)
 
     # Baseline
-    # problem.set_val("data:TLAR:range", units="NM", val=100.0)
-    problem.set_val("data:TLAR:range", units="NM", val=50.0)
+    problem.set_val("data:TLAR:range", units="NM", val=100.0)
+    # problem.set_val("data:TLAR:range", units="NM", val=50.0)
     # problem.model.nonlinear_solver.options["rtol"] = 1e-8
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
@@ -247,8 +247,8 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
     )
 
     # Baseline
-    # problem.set_val("data:TLAR:range", units="NM", val=100.0)
-    problem.set_val("data:TLAR:range", units="NM", val=375.0)
+    problem.set_val("data:TLAR:range", units="NM", val=100.0)
+    # problem.set_val("data:TLAR:range", units="NM", val=375.0)
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
@@ -271,6 +271,43 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
     # Corresponding battery mass [kg]
     # 2.0 * 127, 2.0 * 171, 2.0 * 218, 2.0 * 266, 2.0 * 320, 2.0 * 379, 2.0 * 445, 2.0 * 521,
     # 2.0 * 604, 2.0 * 699, 2.0 * 812, 2.0 * 951, 2.0 * 1141, 2.0 * 1421
+
+
+def test_op_mission_with_target_improved_plus():
+    # Now we do the same for the "plus" version, a priori we could reuse the same "problem" just
+    # change the inputs
+    # ref_electric_process_file_name = "op_mission_electric.yml"
+    ref_electric_process_file_name = "payload_range_electric.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / ref_electric_process_file_name)
+    problem_electric_high_bed = configurator.get_problem()
+
+    ref_inputs_high_bed_electric = (
+        RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_plus_improved.xml"
+    )
+    rename_variables_for_payload_range(ref_inputs_high_bed_electric)
+
+    # Add a threshold SoC
+    datafile = oad.DataFile(ref_inputs_high_bed_electric)
+    datafile.append(
+        oad.Variable(name="data:mission:operational:threshold_SoC", val=0.0, units="percent")
+    )
+    datafile.save()
+
+    problem_electric_high_bed.write_needed_inputs(ref_inputs_high_bed_electric)
+    problem_electric_high_bed.read_inputs()
+
+    problem_electric_high_bed.model_options["*"] = {
+        "cell_capacity_ref": 1.34,
+        "cell_weight_ref": 11.7e-3,
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 5100.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+    }
+
+    problem_electric_high_bed.setup()
+
+    problem_electric_high_bed.run_model()
+    problem_electric_high_bed.write_outputs()
 
 
 def test_payload_range_comparison():

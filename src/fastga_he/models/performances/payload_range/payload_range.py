@@ -188,6 +188,8 @@ class ComputePayloadRange(om.ExplicitComponent):
                 promotes=["*"],
             )
 
+        # TODO: find a way to do this that doesn't involve accessing private attribute
+        self.cached_problem.model_options = self._problem_meta["model_options"]
         self.cached_problem.setup()
 
         # There are four points in the payload range as computed by this framework. Points A, B,
