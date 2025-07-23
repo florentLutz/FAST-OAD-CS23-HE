@@ -8,6 +8,7 @@ import logging
 
 import pytest
 
+import numpy as np
 import fastoad.api as oad
 
 from fastga_he.gui.payload_range import payload_range_outer
@@ -170,11 +171,11 @@ def test_sizing_sr22_electric_two_motors():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3172.0, rel=1e-2
+        2873.0, rel=1e-2
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
-    ) == pytest.approx(745.0, abs=1e-2)
+    ) == pytest.approx(664.0, abs=1e-2)
 
 
 def test_sizing_sr22_electric_two_motors_improved_range_sensitivity():
@@ -207,28 +208,37 @@ def test_sizing_sr22_electric_two_motors_improved_range_sensitivity():
     problem.set_val("data:mission:sizing:main_route:reserve:duration", units="min", val=30.0)
 
     # Baseline
-    problem.set_val("data:TLAR:range", units="NM", val=100.0)
-    # problem.set_val("data:TLAR:range", units="NM", val=50.0)
-    # problem.model.nonlinear_solver.options["rtol"] = 1e-8
+    # design_ranges = np.array([100])
+    design_ranges = np.array([75, 100, 125, 150, 175, 180])
+
+    mtows = []
+    batt_masses = []
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
-    problem.run_model()
+    for design_range in design_ranges:
+        problem.set_val("data:TLAR:range", units="NM", val=design_range)
 
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
+        problem.run_model()
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_improved.xml"
-    problem.write_outputs()
+        _, _, residuals = problem.model.get_nonlinear_vectors()
+        residuals = filter_residuals(residuals)
 
-    # Range tested
-    # 50, 75, 100, 125, 150, 175, 180
+        problem.output_file_path = (
+            RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_improved.xml"
+        )
+        problem.write_outputs()
 
-    # Corresponding MTOW [kg]
-    # 1891.0, 2148, 2453, 2886, 3507, 4679, 5043
+        mtows.append(problem.get_val("data:weight:aircraft:MTOW", units="kg")[0])
+        batt_masses.append(
+            2.0
+            * problem.get_val(
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
+            )[0]
+        )
 
-    # Corresponding battery mass [kg]
-    # 2.0 * 314, 2.0 * 398, 2.0 * 513, 2.0 * 670, 2.0 * 892, 2.0 * 1300, 2.0 * 1425
+    print("MTOW", mtows)
+    print("Battery pack mass", batt_masses)
 
 
 def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
@@ -278,30 +288,36 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
     )
 
     # Baseline
-    problem.set_val("data:TLAR:range", units="NM", val=100.0)
-    # problem.set_val("data:TLAR:range", units="NM", val=375.0)
+    # design_ranges = np.array([100])
+    design_ranges = np.array([50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375])
+
+    mtows = []
+    batt_masses = []
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
-    problem.run_model()
+    for design_range in design_ranges:
+        problem.set_val("data:TLAR:range", units="NM", val=design_range)
+        problem.run_model()
 
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
+        _, _, residuals = problem.model.get_nonlinear_vectors()
+        residuals = filter_residuals(residuals)
 
-    problem.output_file_path = (
-        RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_plus_improved.xml"
-    )
-    problem.write_outputs()
+        problem.output_file_path = (
+            RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_plus_improved.xml"
+        )
+        problem.write_outputs()
 
-    # Range tested
-    # 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375
+        mtows.append(problem.get_val("data:weight:aircraft:MTOW", units="kg")[0])
+        batt_masses.append(
+            2.0
+            * problem.get_val(
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:mass", units="kg"
+            )[0]
+        )
 
-    # Corresponding MTOW [kg]
-    # 1373, 1490, 1620, 1749, 1897, 2061, 2250, 2472, 2700, 2964, 3279, 3671, 4214, 5025
-
-    # Corresponding battery mass [kg]
-    # 2.0 * 127, 2.0 * 171, 2.0 * 218, 2.0 * 266, 2.0 * 320, 2.0 * 379, 2.0 * 445, 2.0 * 521,
-    # 2.0 * 604, 2.0 * 699, 2.0 * 812, 2.0 * 951, 2.0 * 1141, 2.0 * 1421
+        print("MTOW", mtows)
+        print("Battery pack mass", batt_masses)
 
 
 def test_op_mission_with_target_improved_plus():
@@ -494,15 +510,73 @@ def test_optimization_sr22_hybrid():
 
     tmp_problem.write_needed_inputs(ref_inputs)
 
-    problem = oad.optimize_problem(DATA_FOLDER_PATH / process_file_name, overwrite=True)
+    _ = oad.optimize_problem(DATA_FOLDER_PATH / process_file_name, overwrite=True)
 
-    # problem.setup()
-    #
-    # # om.n2(problem, show_browser=False, outfile=n2_path)
-    #
-    # problem.run_driver()
-    #
-    # problem.write_outputs()
+
+def test_sizing_sr22_hybrid_power_share():
+    """
+    Tests a hybrid sr22 with the same climb, cruise, descent and reserve profile as the original
+    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid_power_share.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # For smooth init
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
+    )
+
+    # om.n2(problem, show_browser=False, outfile=n2_path)
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_power_share_mda.xml"
+    problem.write_outputs()
+
+
+def test_optimization_sr22_hybrid_power_share():
+    """
+    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
+    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid_power_share.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    tmp_problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    tmp_problem.write_needed_inputs(ref_inputs)
+
+    _ = oad.optimize_problem(DATA_FOLDER_PATH / process_file_name, overwrite=True)
+
 
 def rename_variables_for_payload_range(source_file_path: pathlib.Path):
     """

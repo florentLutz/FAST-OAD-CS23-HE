@@ -234,8 +234,8 @@
           </reserve>
           <climb>
             <climb_rate>
-              <cruise_level units="ft/min">790.0<!--target climb rate at the end of climb--></cruise_level>
-              <sea_level units="ft/min">1270.0<!--target climb rate at sea level--></sea_level>
+              <cruise_level units="ft/min">922.0<!--target climb rate at the end of climb--></cruise_level>
+              <sea_level units="ft/min">1398.0<!--target climb rate at sea level--></sea_level>
             </climb_rate>
           </climb>
         </main_route>
