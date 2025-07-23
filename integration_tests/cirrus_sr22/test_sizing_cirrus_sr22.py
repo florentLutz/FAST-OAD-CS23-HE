@@ -67,6 +67,35 @@ def test_sizing_sr22():
         234.00, rel=1e-2
     )
 
+def test_sizing_sr22_op_mission():
+    """Test the overall aircraft design process with wing positioning under VLM method."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "full_sizing_out.xml"
+    process_file_name = "op_mission_fuel.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / xml_file_name
+    rename_variables_for_payload_range(ref_inputs)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.set_val("data:mission:operational:range", val=200, units="NM")
+
+    # om.n2(problem, show_browser=False, outfile=n2_path)
+
+    problem.run_model()
+
+    problem.write_outputs()
+
 
 def test_sizing_sr22_electric_original():
     """
@@ -409,9 +438,7 @@ def test_payload_range_comparison():
 def test_sizing_sr22_hybrid():
     """
     Tests a hybrid sr22 with the same climb, cruise, descent and reserve profile as the original
-    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The only change is
-    the ratio between stall speed and reserve speed which is set at 1.3 (ratio between approach
-    and stall)
+    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
