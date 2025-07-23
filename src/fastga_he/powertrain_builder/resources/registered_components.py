@@ -596,6 +596,7 @@ ICE = {
     MP: [
         {"torque_out": "N*m"},
         {"specific_fuel_consumption": "kg/kW/h"},
+        {"equivalent_SL_power": "kW"},
         {"mean_effective_pressure": "bar"},
         {"fuel_consumption": "kg/h"},
         {"fuel_consumed_t": "kg"},
