@@ -23,6 +23,9 @@ model:
         use_linesearch: False
         pre_condition_pt: False
         use_apply_nonlinear: False
+    environmental_impact:
+        id: fastga_he.environmental.energy_simple
+        mission: operational
 
 submodels:
     submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.ensure

@@ -468,8 +468,41 @@ def test_sizing_sr22_hybrid():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_mda.xml"
     problem.write_outputs()
 
+
+def test_optimization_sr22_hybrid():
+    """
+    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
+    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    tmp_problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    tmp_problem.write_needed_inputs(ref_inputs)
+
+    problem = oad.optimize_problem(DATA_FOLDER_PATH / process_file_name, overwrite=True)
+
+    # problem.setup()
+    #
+    # # om.n2(problem, show_browser=False, outfile=n2_path)
+    #
+    # problem.run_driver()
+    #
+    # problem.write_outputs()
 
 def rename_variables_for_payload_range(source_file_path: pathlib.Path):
     """

@@ -57,6 +57,8 @@ model:
   wing_area:
     id: fastga.loop.wing_area
 #    power_train_file_path: ./fuel_propulsion.yml
+  environmental_impact:
+    id: fastga_he.environmental.energy_simple
 
 submodels:
   submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.enforce
@@ -75,15 +77,9 @@ submodels:
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
-    - name: data:propulsion:he_power_train:propeller:propeller_1:solidity
-      lower: 0.1
-      upper: 0.4
-    - name: data:propulsion:he_power_train:propeller:propeller_1:activity_factor
-      lower: 50
-      upper: 250
-    - name: data:propulsion:he_power_train:propeller:propeller_1:blade_twist
-      lower: 10
-      upper: 35
+    - name: data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split
+      lower: 80.0
+      upper: 95.0
   objective:
-    - name: data:mission:sizing:energy
-      scaler: 1.e-4
+    - name: data:environmental_impact:sizing:emissions
+      scaler: 1.e-5
