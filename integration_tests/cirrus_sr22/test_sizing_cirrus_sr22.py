@@ -67,6 +67,7 @@ def test_sizing_sr22():
         234.00, rel=1e-2
     )
 
+
 def test_sizing_sr22_op_mission():
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)
@@ -89,6 +90,7 @@ def test_sizing_sr22_op_mission():
     problem.setup()
 
     problem.set_val("data:mission:operational:range", val=200, units="NM")
+    problem.set_val("settings:operational:reserve:speed:k_factor", val=2.2)
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
