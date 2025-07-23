@@ -406,6 +406,42 @@ def test_payload_range_comparison():
     fig.show()
 
 
+def test_sizing_sr22_hybrid():
+    """
+    Tests a hybrid sr22 with the same climb, cruise, descent and reserve profile as the original
+    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The only change is
+    the ratio between stall speed and reserve speed which is set at 1.3 (ratio between approach
+    and stall)
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # om.n2(problem, show_browser=False, outfile=n2_path)
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+
 def rename_variables_for_payload_range(source_file_path: pathlib.Path):
     """
     Small helper function because payload range needs data based on the operational mission while
