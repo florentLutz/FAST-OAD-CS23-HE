@@ -15,11 +15,10 @@ from fastoad.module_management.constants import ModelDomain
 try:
     # Ruff, please ignore this unused import it's just to check that the opt dependencies are here
     from lca_modeller.io.configuration import LCAProblemConfigurator  # noqa: F401
+
+    LCA_AVAILABLE = True
 except ImportError:
-    raise ImportError(
-        "The modules with the fastga_he.lca.legacy id can only be used with lca optional "
-        "dependency group.\n Install it with poetry install --extras lca"
-    )
+    LCA_AVAILABLE = False
 
 
 import fastga_he.models.propulsion.components as he_comp
@@ -64,6 +63,12 @@ class LCA(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
+        if not LCA_AVAILABLE:
+            raise ImportError(
+                "The modules with the fastga_he.lca.legacy id can only be used with lca optional "
+                "dependency group.\n Install it with poetry install --extras lca"
+            )
+
         self.options.declare(
             name="power_train_file_path",
             default=None,
