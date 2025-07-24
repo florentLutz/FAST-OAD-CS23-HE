@@ -262,11 +262,14 @@ class OperationalMissionVector(om.Group):
                 "data:mission:sizing:main_route:reserve:duration",
                 "data:mission:operational:reserve:duration",
             ),
-            (
-                "settings:mission:sizing:main_route:reserve:speed:k_factor",
-                "settings:operational:reserve:speed:k_factor",
-            ),
         ]
+        if self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT):
+            initialization_input_promote_list.append(
+                (
+                    "settings:mission:sizing:main_route:reserve:speed:k_factor",
+                    "settings:operational:reserve:speed:k_factor",
+                )
+            )
         initialization_output_promote_list = []
 
         # Three case can happen when detecting which submodel is active:
@@ -1211,6 +1214,22 @@ class OperationalMissionVector(om.Group):
         # One point to be careful about is that the non_linear guessing is done before any model is
         # actually ran. Therefore it relies on initial values for other variables and problem
         # inputs. This should be kept in mind !
+
+        if self.is_service_active(SUBMODEL_CLIMB_SPEED_VECT):
+            cl_max_clean = inputs[
+                "initialization.initialize_climb_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item()
+        elif self.is_service_active(SUBMODEL_DESCENT_SPEED_VECT):
+            cl_max_clean = inputs[
+                "initialization.initialize_descent_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item()
+        elif self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT):
+            cl_max_clean = inputs[
+                "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item()
+        else:
+            cl_max_clean = 1.5
+
         dummy_tas_array = self._get_initial_guess_true_airspeed(
             mass=outputs["solve_equilibrium.update_mass.mass"],
             wing_area=inputs[
@@ -1219,9 +1238,7 @@ class OperationalMissionVector(om.Group):
             cruise_altitude=inputs[
                 "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
             ].item(),
-            cl_max_clean=inputs[
-                "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
-            ].item(),
+            cl_max_clean=cl_max_clean,
             cruise_tas=inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"].item(),
             reserve_altitude=inputs[
                 "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
