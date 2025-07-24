@@ -589,8 +589,11 @@ def test_optimization_sr22_hybrid_power_share():
     problem.model.add_design_var(
         name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share",
         units="kW",
-        lower=150.0,
+        lower=160.0,
         upper=195.0,
+    )
+    problem.model.add_objective(
+        name="data:environmental_impact:sizing:emissions", units="kg"
     )
 
     problem.setup()

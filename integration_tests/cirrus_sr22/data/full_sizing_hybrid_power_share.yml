@@ -18,7 +18,7 @@ model_options:
     reference_curve_relative_capacity: [ 1.0, 0.97, 1.0, 0.97, 0.95 ]
 
 model:
-  nonlinear_solver: om.NonlinearBlockGS(maxiter=100, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True, use_aitken=True, aitken_max_factor=0.8, aitken_min_factor=0.33, aitken_initial_factor=0.8, stall_limit=5, stall_tol=3e-6)
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=100, iprint=2, rtol=1e-5, atol=1e3, debug_print=True, reraise_child_analysiserror=True, use_aitken=True, aitken_max_factor=0.8, aitken_min_factor=0.33, aitken_initial_factor=0.8, stall_limit=5, stall_tol=3e-6)
   linear_solver: om.LinearBlockGS()
   geometry:
     id: fastga.geometry.legacy
@@ -81,12 +81,3 @@ submodels:
   service.geometry.nacelle.dimension: null
   service.geometry.vertical_tail.distance.fd: null
   service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
-
-optimization: # This section is needed only if optimization process is run
-  design_variables:
-    - name: data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share
-      lower: 150.0  # Not worth going below as it is going to be too heavy
-      upper: 195.0  # Not worth going above as it will crash because the electric branch won't receive power
-  objective:
-    - name: data:environmental_impact:sizing:emissions
-      scaler: 1.e-4
