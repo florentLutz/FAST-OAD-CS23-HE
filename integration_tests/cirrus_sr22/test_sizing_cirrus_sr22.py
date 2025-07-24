@@ -16,6 +16,7 @@ from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
+DOE_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_doe"
 WORKDIR_FOLDER_PATH = pathlib.Path(__file__).parent / "workdir"
 
 
@@ -562,6 +563,63 @@ def test_sizing_sr22_hybrid_power_share():
     problem.write_outputs()
 
 
+def test_doe_sr22_hybrid_power_share():
+    """
+    Runs the hybrid sr22 with the same climb, cruise, descent and reserve profile as the
+    original one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights) for various
+    power shares.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid_power_share.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Model options are set up straight into the configuration file
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # For smooth init
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
+    )
+
+    # For the problem to run but without touching the source file as it is shared
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=4000.0, units="min**-1"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    power_shares = np.linspace(160, 195, 20)
+
+    for power_share in power_shares:
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share",
+            power_share,
+            units="kW",
+        )
+        problem.run_model()
+
+        problem.output_file_path = DOE_RESULTS_FOLDER_PATH / (
+            str(int(power_share)) + "_kW_power_share_mda.xml"
+        )
+        problem.write_outputs()
+
+
 def test_optimization_sr22_hybrid_power_share():
     """
     Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the
@@ -592,9 +650,7 @@ def test_optimization_sr22_hybrid_power_share():
         lower=160.0,
         upper=195.0,
     )
-    problem.model.add_objective(
-        name="data:environmental_impact:sizing:emissions", units="kg"
-    )
+    problem.model.add_objective(name="data:environmental_impact:sizing:emissions", units="kg")
 
     problem.setup()
 

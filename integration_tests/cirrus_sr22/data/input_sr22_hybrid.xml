@@ -385,7 +385,7 @@
         <planetary_gear>
           <planetary_gear_1>
             <gear_ratio>1.0</gear_ratio>
-            <power_share units="kW">160.0</power_share>
+            <power_share units="kW" is_input="True">161.8421052631579<!--Share of the power going to the first (primary) input, in W--></power_share>
             <power_split units="percent">90.0</power_split>
           </planetary_gear_1>
         </planetary_gear>
