@@ -533,6 +533,7 @@ def test_sizing_sr22_hybrid_power_share():
     ref_inputs = DATA_FOLDER_PATH / xml_file_name
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
+    # Model options are set up straight into the configuration file
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
@@ -542,7 +543,15 @@ def test_sizing_sr22_hybrid_power_share():
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
     )
 
-    # om.n2(problem, show_browser=False, outfile=n2_path)
+    # For the problem to run but without touching the source file as it is shared
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=4000.0, units="min**-1"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
 
     problem.run_model()
 
@@ -555,8 +564,8 @@ def test_sizing_sr22_hybrid_power_share():
 
 def test_optimization_sr22_hybrid_power_share():
     """
-    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
-    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the
+    original one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -567,15 +576,42 @@ def test_optimization_sr22_hybrid_power_share():
     process_file_name = "full_sizing_hybrid_power_share.yml"
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
-    tmp_problem = configurator.get_problem()
+    problem = configurator.get_problem()
 
     # Create inputs
     ref_inputs = DATA_FOLDER_PATH / xml_file_name
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
-    tmp_problem.write_needed_inputs(ref_inputs)
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals()
 
-    _ = oad.optimize_problem(DATA_FOLDER_PATH / process_file_name, overwrite=True)
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share",
+        units="kW",
+        lower=150.0,
+        upper=195.0,
+    )
+
+    problem.setup()
+
+    # For smooth init
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
+    )
+
+    # For the problem to run but without touching the source file as it is shared
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=4000.0, units="min**-1"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+    problem.run_driver()
+
+    problem.write_outputs()
 
 
 def rename_variables_for_payload_range(source_file_path: pathlib.Path):
