@@ -21,9 +21,9 @@ FastoadLoader()
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
-CONFIGURATION_FILE = "oad_process_float_performance_from_he.yml"
+CONFIGURATION_FILE = "oad_process_parallel_fullsizing.yml"
 MISSION_FILE = "sizing_mission_R.yml"
-SOURCE_FILE = "problem_inputs.xml"
+SOURCE_FILE = "inputs_turboshaft.xml"
 RESULTS_FOLDER = "problem_folder"
 
 

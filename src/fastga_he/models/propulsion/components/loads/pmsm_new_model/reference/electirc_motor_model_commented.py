@@ -1,5 +1,5 @@
 import numpy as np
-
+""" PMSM model from HASTECS project, Sarah Touhami"""
 if __name__ == "__main__":
     # Physical constants
     mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
@@ -214,17 +214,11 @@ if __name__ == "__main__":
     Pele = Pem + 2 * P_loss  # + 2 * (P_j + P_iron)
     # Mechanical output power
     Pmec = Pem  # P_mec_loss
-    efficiency_true = 0.984
     print(f"Mechanical output power: {Pmec:.2f} W")
 
     # Efficiency
     efficiency = Pmec / Pele
-    P_mec_true = (efficiency_true / efficiency) * Pmec
     print(f"Efficiency: {efficiency:.4f}")
-    print(f"Pmech_true: {P_mec_true:.4f}")
-    P_rot_loss = Pmec - P_mec_true
-    print(f"Prot_loss: {P_rot_loss:.4f}")
-
     # Specific power
     Sp = Pem / W_mot
     print(f"Specific power: {Sp:.2f} W/kg")
@@ -244,14 +238,3 @@ if __name__ == "__main__":
 
     print(f"A_jeq = {A_jeq:.2f} ")
 
-    ##################################################
-    rho_cu_Twin = rho_cu_20 * (1 + alpha_th * (T_win - 20))
-    S_slot = hs * ls
-    S_cond = S_slot * k_sc * k_fill
-    I_rms = j_rms * S_cond
-    l_c = Lm * k_lc * k_tb
-    N_c = 2 * p * q * m
-    R_s = N_c * rho_cu_Twin * l_c / S_cond
-    P_j2 = R_s * I_rms**2
-    print(f"Joule losses = {P_j2:.2f} W")
-    print(f"currrent = {I_rms:.2f} A")

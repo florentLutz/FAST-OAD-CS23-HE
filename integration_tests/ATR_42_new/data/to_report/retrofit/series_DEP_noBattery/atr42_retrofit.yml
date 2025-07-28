@@ -15,7 +15,7 @@ model:
   linear_solver: om.LinearBlockGS()
   power_train_sizing:
     id: fastga_he.power_train.sizing
-    power_train_file_path: ATR42_assembly_hybridPT_series.yml
+    power_train_file_path: PT_series.yml
 
   performances:
     id: fastga_he.performances.mission_vector
@@ -23,7 +23,7 @@ model:
     number_of_points_cruise: 30
     number_of_points_descent: 20
     number_of_points_reserve: 10
-    power_train_file_path: ATR42_assembly_hybridPT_series.yml
+    power_train_file_path: PT_series.yml
     use_linesearch: False
     pre_condition_pt: True
     out_file: ../results/hybrid_atr42_retrofit.csv

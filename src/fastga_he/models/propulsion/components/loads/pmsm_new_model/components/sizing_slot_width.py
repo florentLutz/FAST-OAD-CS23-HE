@@ -7,10 +7,10 @@ import openmdao.api as om
 
 
 class SizingSlotWidth(om.ExplicitComponent):
-    """Computation of the slot height of the PMSM."""
+    """Computation of the slot width of the PMSM."""
 
     def initialize(self):
-        # Reference motor : EMRAX 268
+        # Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False

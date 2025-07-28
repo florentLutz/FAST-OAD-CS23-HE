@@ -42,7 +42,7 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="Peak line to neutral voltage at the input of the motor",
         )
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
-        self.add_input("rpm", units="s**-1", val=np.nan, shape=number_of_points)
+        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
 
@@ -90,7 +90,7 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         self.add_output(
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":rpm_max",
-            units="s**-1",
+            units="min**-1",
             val=5000.0,
             desc="Maximum value of the motor rpm",
         )

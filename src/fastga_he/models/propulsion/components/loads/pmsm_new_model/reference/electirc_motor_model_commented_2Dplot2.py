@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 
 # Carica i coefficienti salvati (matrice 4x4)
 coeffs_reshaped = np.load("coeffs_reshaped.npy")
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     # Input parameters
     Pem_PU = 1.0  # Power in PU
     S_base = 650135.779  # 1432599.9999999997  # Base power [W]
-    RPM = 15000  # Rotational speed [rpm]
+    RPM = 16000  # Rotational speed [rpm]
     rho_cu_20 = 1.68e-8  # Copper resistivity at 20°C [Ohm·m]
     alpha_th = 0.00393  # Temperature coefficient for copper [1/°C]
     T_win = 180  # Winding temperature [°C]
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     W_mot = W_stat + W_rot + W_frame
 
 
-    T_max = 356
+    T_max = 350
     Tmax_range = np.linspace(50, T_max, 150)
     RPM_range = np.linspace(600, RPM, 200)
 
@@ -154,7 +155,7 @@ if __name__ == "__main__":
     rho_cu_Twin = rho_cu_20 * (1 + alpha_th * (T_win - 20))
     Resistance = N_c * rho_cu_Twin * l_c / S_cond
 
-    # Ciclo su tutti i valori
+    # diifferent values for torque and rpm
     for i, Torque in enumerate(Tmax_range):
         for j, RPM in enumerate(RPM_range):
             # Derived quantities
@@ -228,12 +229,37 @@ if __name__ == "__main__":
 
 RPM_grid, Torque_grid = np.meshgrid(RPM_range, Tmax_range)
 
+# plt.figure(figsize=(10, 6))
+# cp2 = plt.contourf(RPM_grid, Torque_grid, efficiency_grid, levels=np.linspace(0.86, np.max(efficiency_grid), 10), cmap='viridis')
+# cbar = plt.colorbar(cp2, format="%.3f")  # <-- riduce a 2 decimali
+# cbar.set_label('Efficiency')
+# plt.xlabel('RPM [1/min]')
+# plt.ylabel('Torque [Nm]')
+# plt.title('Efficiency vs RPM and Torque')
+# plt.tight_layout()
+# plt.show()
+
 plt.figure(figsize=(10, 6))
+
+# Contour plot
 cp2 = plt.contourf(RPM_grid, Torque_grid, efficiency_grid, levels=np.linspace(0.86, np.max(efficiency_grid), 10), cmap='viridis')
-plt.colorbar(cp2, label='Efficiency')
-plt.xlabel('RPM [1/min]')      # Asse X = RPM ✅
-plt.ylabel('Torque [Nm]')      # Asse Y = Torque ✅
+cbar = plt.colorbar(cp2, format="%.3f")
+cbar.set_label('Efficiency')
+
+# Labels
+plt.xlabel('RPM [1/min]')
+plt.ylabel('Torque [Nm]')
 plt.title('Efficiency vs RPM and Torque')
+
+# Punto rosso
+plt.scatter(15000, 166, color='red', s=80, zorder=10, label='Cruise')
+
+# Linee tratteggiate troncate
+plt.plot([min(RPM_range), 15000], [166, 166], color='red', linestyle='--', linewidth=1)  # Orizzontale
+plt.plot([15000, 15000], [min(Tmax_range), 166], color='red', linestyle='--', linewidth=1)  # Verticale
+
+# Legenda e layout
+plt.legend()
 plt.tight_layout()
 plt.show()
 

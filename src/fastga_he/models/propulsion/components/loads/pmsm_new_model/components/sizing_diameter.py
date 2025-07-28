@@ -7,10 +7,10 @@ import openmdao.api as om
 
 
 class SizingStatorDiameter(om.ExplicitComponent):
-    """Computation of the stator diameter of the PMSM."""
+    """Computation of the diameter of the stator bore of the PMSM."""
 
     def initialize(self):
-        # Reference motor : EMRAX 268
+        # Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False

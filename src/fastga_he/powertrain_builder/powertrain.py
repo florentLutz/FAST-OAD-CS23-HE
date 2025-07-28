@@ -2140,10 +2140,7 @@ class FASTGAHEPowerTrainConfigurator:
             ):
                 simplified_serializer.data[KEY_PT_COMPONENTS].pop(component_name)
             else:
-                if not (component_id == "fastga_he.pt_component.turboshaft"):
-                    retained_components.append(component_name)
-                else:
-                    simplified_serializer.data[KEY_PT_COMPONENTS].pop(component_name)
+                retained_components.append(component_name)
 
         # Then we pop all the connections that don't involve the components we have
         self._get_connections()

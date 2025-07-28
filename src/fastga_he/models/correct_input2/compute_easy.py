@@ -13,6 +13,8 @@ from stdatm import AtmosphereWithPartials
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.compute_easy2", domain=ModelDomain.GEOMETRY)
 class EASY_compute2(om.ExplicitComponent):
+    """Simple computation to get HE Performances input from RTA OAD output, for instance the cruise
+         speed from the cruise mach"""
     def setup(self):
         self.add_input("data:TLAR:NPAX_design", val=np.nan)
         self.add_input("data:TLAR:cruise_mach", val=np.nan)

@@ -12,7 +12,7 @@ from .aero_approximated import Aero_compute2
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input2")
 class SizingLoopMTOW(om.Group):
     """
-    Gather all the discipline module/groups into the main problem
+    Gather all the discipline module into the main problem
     """
 
     def setup(self):

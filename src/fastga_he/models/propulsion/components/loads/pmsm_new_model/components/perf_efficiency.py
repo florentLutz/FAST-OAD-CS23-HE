@@ -16,6 +16,8 @@ class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency from shaft power and power losses."""
 
     def initialize(self):
+        # Reference motor : HASTECS project, Sarah Touhami
+
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )

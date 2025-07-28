@@ -38,7 +38,7 @@ from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_E
 
 _LOGGER = logging.getLogger(__name__)
 
-MIN_WING_AREA = 1.00
+MIN_WING_AREA = 50.00
 
 
 @oad.RegisterSubmodel(
@@ -67,7 +67,8 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
     def setup(self):
         if self.options["power_train_file_path"]:
             self.configurator.load(self.options["power_train_file_path"])
-            self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+            # self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+            self.simplified_file_path = self.options["power_train_file_path"]
             self.control_parameter_list = self.configurator.get_control_parameter_list()
 
         self.add_input("data:TLAR:v_approach", val=np.nan, units="m/s")
@@ -127,12 +128,13 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             method="fd",
         )
 
-        if self.options["power_train_file_path"]:
-            os.remove(self.simplified_file_path)
+        # if self.options["power_train_file_path"]:
+        #     os.remove(self.simplified_file_path)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if self.options["power_train_file_path"]:
-            self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+            # self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+            self.simplified_file_path = self.options["power_train_file_path"]
 
         # First, compute a failsafe value, in case the computation crashes because of the wrong
         # initial guesses of the problem
@@ -165,9 +167,9 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
 
         outputs["wing_area"] = wing_area_approach
 
-        if self.options["power_train_file_path"]:
-            # We can now delete the temp .yml we created, just to avoid over-clogging the repo
-            os.remove(self.simplified_file_path)
+        # if self.options["power_train_file_path"]:
+        #     # We can now delete the temp .yml we created, just to avoid over-clogging the repo
+        #     os.remove(self.simplified_file_path)
 
 
 @oad.RegisterSubmodel(

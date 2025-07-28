@@ -13,6 +13,7 @@ from stdatm import AtmosphereWithPartials
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.aero_approx", domain=ModelDomain.GEOMETRY)
 class Aero_compute(om.ExplicitComponent):
+    " Computation of the cl_ref based on an elliptic distribution assumption"
     def setup(self):
         self.add_input("data:geometry:horizontal_tail:aspect_ratio", val=np.nan)
         self.add_input("data:aerodynamics:aircraft:cruise:oswald_coefficient", val=np.nan)

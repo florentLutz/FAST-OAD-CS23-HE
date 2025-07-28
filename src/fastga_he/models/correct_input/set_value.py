@@ -12,6 +12,8 @@ from fastoad.module_management.constants import ModelDomain
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.set_name")
 class SetValue(om.ExplicitComponent):
+    """ Some variables with standard values are required in HE as input,
+     but they are not required as input in RTA, or some values are to complex to be computed"""
     def setup(self):
         self.add_input("data:TLAR:NPAX_design", val=np.nan)  # not used
 

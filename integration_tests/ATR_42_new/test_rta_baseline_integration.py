@@ -25,9 +25,9 @@ FastoadLoader()
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
-CONFIGURATION_FILE = "oad_process_float_performance_from_he_series.yml"
+CONFIGURATION_FILE = "oad_process_turboshaft.yml"
 MISSION_FILE = "sizing_mission_R.yml"
-SOURCE_FILE = "input_atr42_series_fromtheverylastone.xml"
+SOURCE_FILE = "inputs_turboshaft.xml"
 RESULTS_FOLDER = "problem_folder"
 
 
@@ -38,7 +38,7 @@ def cleanup():
 
 
 def test_pipistrel_network_viewer():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "ATR42_assembly_hybridPT.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):
@@ -198,76 +198,6 @@ def test_sizing_atr_42_retrofit():
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
 
-    # problem.model_options["*"] = {
-    #     "cg_names": [
-    #             "data:weight:airframe:wing:CG:x",
-    #             "data:weight:airframe:fuselage:CG:x",
-    #             "data:weight:airframe:horizontal_tail:CG:x",
-    #             "data:weight:airframe:vertical_tail:CG:x",
-    #             "data:weight:airframe:flight_controls:CG:x",
-    #             "data:weight:airframe:landing_gear:main:CG:x",
-    #             "data:weight:airframe:landing_gear:front:CG:x",
-    #             "data:weight:airframe:pylon:CG:x",
-    #             "data:weight:airframe:paint:CG:x",
-    #             "data:propulsion:he_power_train:CG:x",
-    #             "data:weight:systems:power:auxiliary_power_unit:CG:x",
-    #             "data:weight:systems:power:electric_systems:CG:x",
-    #             "data:weight:systems:power:hydraulic_systems:CG:x",
-    #             "data:weight:systems:life_support:insulation:CG:x",
-    #             "data:weight:systems:life_support:air_conditioning:CG:x",
-    #             "data:weight:systems:life_support:de-icing:CG:x",
-    #             "data:weight:systems:life_support:cabin_lighting:CG:x",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:CG:x",
-    #             "data:weight:systems:life_support:oxygen:CG:x",
-    #             "data:weight:systems:life_support:safety_equipment:CG:x",
-    #             "data:weight:systems:navigation:CG:x",
-    #             "data:weight:systems:transmission:CG:x",
-    #             "data:weight:systems:operational:radar:CG:x",
-    #             "data:weight:systems:operational:cargo_hold:CG:x",
-    #             "data:weight:systems:flight_kit:CG:x",
-    #             "data:weight:furniture:passenger_seats:CG:x",
-    #             "data:weight:furniture:food_water:CG:x",
-    #             "data:weight:furniture:security_kit:CG:x",
-    #             "data:weight:furniture:toilets:CG:x",
-    #         ],
-    #     "mass_names":  [
-    #             "data:weight:airframe:wing:mass",
-    #             "data:weight:airframe:fuselage:mass",
-    #             "data:weight:airframe:horizontal_tail:mass",
-    #             "data:weight:airframe:vertical_tail:mass",
-    #             "data:weight:airframe:flight_controls:mass",
-    #             "data:weight:airframe:landing_gear:main:mass",
-    #             "data:weight:airframe:landing_gear:front:mass",
-    #             "data:weight:airframe:pylon:mass",
-    #             "data:weight:airframe:paint:mass",
-    #             "data:propulsion:he_power_train:mass",
-    #             "data:weight:systems:power:auxiliary_power_unit:mass",
-    #             "data:weight:systems:power:electric_systems:mass",
-    #             "data:weight:systems:power:hydraulic_systems:mass",
-    #             "data:weight:systems:life_support:insulation:mass",
-    #             "data:weight:systems:life_support:air_conditioning:mass",
-    #             "data:weight:systems:life_support:de-icing:mass",
-    #             "data:weight:systems:life_support:cabin_lighting:mass",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:mass",
-    #             "data:weight:systems:life_support:oxygen:mass",
-    #             "data:weight:systems:life_support:safety_equipment:mass",
-    #             "data:weight:systems:navigation:mass",
-    #             "data:weight:systems:transmission:mass",
-    #             "data:weight:systems:operational:radar:mass",
-    #             "data:weight:systems:operational:cargo_hold:mass",
-    #             "data:weight:systems:flight_kit:mass",
-    #             "data:weight:furniture:passenger_seats:mass",
-    #             "data:weight:furniture:food_water:mass",
-    #             "data:weight:furniture:security_kit:mass",
-    #             "data:weight:furniture:toilets:mass",
-    #         ],
-    # }
-
-    # problem.model_options["*"] = {
-    #     "cell_capacity_ref": 5.0,
-    #     "cell_weight_ref": 45.0e-3,
-    # }
-
     # Change battery pack characteristics so that they match those of a high power,
     # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
     # Pipistrel battery. Assumes same polarization curve
@@ -277,19 +207,6 @@ def test_sizing_atr_42_retrofit():
         "reference_curve_current": [500, 5000, 10000, 15000, 20000],
         "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
     }
-
-    # problem.setup()
-
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
 
     problem.setup()
     model = problem.model
@@ -308,11 +225,6 @@ def test_sizing_atr_42_retrofit():
 
     # Give good initial guess on a few key value to reduce the time it takes to converge
 
-    # problem.set_val("data:geometry:wing:MAC:at25percent:x", units="m", val=10.0)
-    # problem.set_val("data:geometry:wing:area", units="m**2", val=54.0)
-    # problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=11.0)
-    # problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
-
     problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=100.0)
     problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=100.0)
 
@@ -324,12 +236,6 @@ def test_sizing_atr_42_retrofit():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=10416.282545073724)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.44326499842536)
 
-    # recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
-    # solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
-    # solver.add_recorder(recorder)
-    # solver.recording_options["record_solver_residuals"] = True
-    # solver.recording_options["record_outputs"] = True
-
     om.n2(problem, show_browser=False, outfile=n2_path)
 
     problem.run_model()
@@ -337,219 +243,15 @@ def test_sizing_atr_42_retrofit():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    # sorted_variable_residuals = residuals_analyzer(recorder, problem)
-
     # Create the folder if it doesn't exist
     os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
 
     # Construct the file path
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
 
-    # Open the file for writing
-    # with open(file_path, "w", newline="") as csvfile:
-    #     writer = csv.writer(csvfile)
-    #
-    #     # Write the header
-    #     writer.writerow(["Variable name", "Residuals"])
-    #
-    #     # Write the sum of residuals for each iteration
-    #     for name, sum_res in sorted_variable_residuals.items():
-    #         writer.writerow([name, sum_res])
-
-    # cr = om.CaseReader(recorder)
-
 
     problem.write_outputs()
 
-
-
-def test_sizing_atr_42_retrofit_series():
-
-    """Test the overall aircraft design process with wing positioning."""
-    logging.basicConfig(level=logging.WARNING)
-    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
-    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
-
-    # Define used files depending on options
-    xml_file_name = SOURCE_FILE
-    process_file_name = CONFIGURATION_FILE
-
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-    problem = configurator.get_problem()
-
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name))
-    # print(oad.RegisterSubmodel.active_models["service.mass.propulsion"])
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-
-    problem.write_needed_inputs(ref_inputs)
-    problem.read_inputs()
-
-    # problem.model_options["*"] = {
-    #     "cg_names": [
-    #             "data:weight:airframe:wing:CG:x",
-    #             "data:weight:airframe:fuselage:CG:x",
-    #             "data:weight:airframe:horizontal_tail:CG:x",
-    #             "data:weight:airframe:vertical_tail:CG:x",
-    #             "data:weight:airframe:flight_controls:CG:x",
-    #             "data:weight:airframe:landing_gear:main:CG:x",
-    #             "data:weight:airframe:landing_gear:front:CG:x",
-    #             "data:weight:airframe:pylon:CG:x",
-    #             "data:weight:airframe:paint:CG:x",
-    #             "data:propulsion:he_power_train:CG:x",
-    #             "data:weight:systems:power:auxiliary_power_unit:CG:x",
-    #             "data:weight:systems:power:electric_systems:CG:x",
-    #             "data:weight:systems:power:hydraulic_systems:CG:x",
-    #             "data:weight:systems:life_support:insulation:CG:x",
-    #             "data:weight:systems:life_support:air_conditioning:CG:x",
-    #             "data:weight:systems:life_support:de-icing:CG:x",
-    #             "data:weight:systems:life_support:cabin_lighting:CG:x",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:CG:x",
-    #             "data:weight:systems:life_support:oxygen:CG:x",
-    #             "data:weight:systems:life_support:safety_equipment:CG:x",
-    #             "data:weight:systems:navigation:CG:x",
-    #             "data:weight:systems:transmission:CG:x",
-    #             "data:weight:systems:operational:radar:CG:x",
-    #             "data:weight:systems:operational:cargo_hold:CG:x",
-    #             "data:weight:systems:flight_kit:CG:x",
-    #             "data:weight:furniture:passenger_seats:CG:x",
-    #             "data:weight:furniture:food_water:CG:x",
-    #             "data:weight:furniture:security_kit:CG:x",
-    #             "data:weight:furniture:toilets:CG:x",
-    #         ],
-    #     "mass_names":  [
-    #             "data:weight:airframe:wing:mass",
-    #             "data:weight:airframe:fuselage:mass",
-    #             "data:weight:airframe:horizontal_tail:mass",
-    #             "data:weight:airframe:vertical_tail:mass",
-    #             "data:weight:airframe:flight_controls:mass",
-    #             "data:weight:airframe:landing_gear:main:mass",
-    #             "data:weight:airframe:landing_gear:front:mass",
-    #             "data:weight:airframe:pylon:mass",
-    #             "data:weight:airframe:paint:mass",
-    #             "data:propulsion:he_power_train:mass",
-    #             "data:weight:systems:power:auxiliary_power_unit:mass",
-    #             "data:weight:systems:power:electric_systems:mass",
-    #             "data:weight:systems:power:hydraulic_systems:mass",
-    #             "data:weight:systems:life_support:insulation:mass",
-    #             "data:weight:systems:life_support:air_conditioning:mass",
-    #             "data:weight:systems:life_support:de-icing:mass",
-    #             "data:weight:systems:life_support:cabin_lighting:mass",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:mass",
-    #             "data:weight:systems:life_support:oxygen:mass",
-    #             "data:weight:systems:life_support:safety_equipment:mass",
-    #             "data:weight:systems:navigation:mass",
-    #             "data:weight:systems:transmission:mass",
-    #             "data:weight:systems:operational:radar:mass",
-    #             "data:weight:systems:operational:cargo_hold:mass",
-    #             "data:weight:systems:flight_kit:mass",
-    #             "data:weight:furniture:passenger_seats:mass",
-    #             "data:weight:furniture:food_water:mass",
-    #             "data:weight:furniture:security_kit:mass",
-    #             "data:weight:furniture:toilets:mass",
-    #         ],
-    # }
-
-    # problem.model_options["*"] = {
-    #     "cell_capacity_ref": 5.0,
-    #     "cell_weight_ref": 45.0e-3,
-    # }
-
-    # Change battery pack characteristics so that they match those of a high power,
-    # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
-    # Pipistrel battery. Assumes same polarization curve
-    # problem.model_options["*"] = {
-    #     "cell_capacity_ref": 2.5,
-    #     "cell_weight_ref": 30e-3,
-    #     "reference_curve_current": [500, 5000, 10000, 15000, 20000],
-    #     "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
-    # }
-
-    # problem.setup()
-
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-
-    problem.setup()
-    model = problem.model
-
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-    #
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-
-    # Give good initial guess on a few key value to reduce the time it takes to converge
-
-    # problem.set_val("data:geometry:wing:MAC:at25percent:x", units="m", val=10.0)
-    # problem.set_val("data:geometry:wing:area", units="m**2", val=54.0)
-    # problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=11.0)
-    # problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
-    #
-    # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=100.0)
-    # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=100.0)
-
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=17843.510991945397)
-    problem.set_val("data:weight:aircraft:OWE", units="kg", val=10661.282552661316)
-    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=16161.282552661316)
-    problem.set_val("data:weight:aircraft:MLW", units="kg", val=17130.95950582099)
-
-    problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=10416.282545073724)
-    problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.44326499842536)
-
-    # recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
-    # solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
-    # solver.add_recorder(recorder)
-    # solver.recording_options["record_solver_residuals"] = True
-    # solver.recording_options["record_outputs"] = True
-
-    om.n2(problem, show_browser=False, outfile=n2_path)
-
-    problem.run_model()
-
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    # sorted_variable_residuals = residuals_analyzer(recorder, problem)
-
-    # Create the folder if it doesn't exist
-    os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
-
-    # Construct the file path
-    file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
-
-    # Open the file for writing
-    # with open(file_path, "w", newline="") as csvfile:
-    #     writer = csv.writer(csvfile)
-    #
-    #     # Write the header
-    #     writer.writerow(["Variable name", "Residuals"])
-    #
-    #     # Write the sum of residuals for each iteration
-    #     for name, sum_res in sorted_variable_residuals.items():
-    #         writer.writerow([name, sum_res])
-
-    # cr = om.CaseReader(recorder)
-
-
-    problem.write_outputs()
 
 
 def test_sizing_atr_42_fullsizing():
@@ -576,76 +278,6 @@ def test_sizing_atr_42_fullsizing():
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
-
-    # problem.model_options["*"] = {
-    #     "cg_names": [
-    #             "data:weight:airframe:wing:CG:x",
-    #             "data:weight:airframe:fuselage:CG:x",
-    #             "data:weight:airframe:horizontal_tail:CG:x",
-    #             "data:weight:airframe:vertical_tail:CG:x",
-    #             "data:weight:airframe:flight_controls:CG:x",
-    #             "data:weight:airframe:landing_gear:main:CG:x",
-    #             "data:weight:airframe:landing_gear:front:CG:x",
-    #             "data:weight:airframe:pylon:CG:x",
-    #             "data:weight:airframe:paint:CG:x",
-    #             "data:propulsion:he_power_train:CG:x",
-    #             "data:weight:systems:power:auxiliary_power_unit:CG:x",
-    #             "data:weight:systems:power:electric_systems:CG:x",
-    #             "data:weight:systems:power:hydraulic_systems:CG:x",
-    #             "data:weight:systems:life_support:insulation:CG:x",
-    #             "data:weight:systems:life_support:air_conditioning:CG:x",
-    #             "data:weight:systems:life_support:de-icing:CG:x",
-    #             "data:weight:systems:life_support:cabin_lighting:CG:x",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:CG:x",
-    #             "data:weight:systems:life_support:oxygen:CG:x",
-    #             "data:weight:systems:life_support:safety_equipment:CG:x",
-    #             "data:weight:systems:navigation:CG:x",
-    #             "data:weight:systems:transmission:CG:x",
-    #             "data:weight:systems:operational:radar:CG:x",
-    #             "data:weight:systems:operational:cargo_hold:CG:x",
-    #             "data:weight:systems:flight_kit:CG:x",
-    #             "data:weight:furniture:passenger_seats:CG:x",
-    #             "data:weight:furniture:food_water:CG:x",
-    #             "data:weight:furniture:security_kit:CG:x",
-    #             "data:weight:furniture:toilets:CG:x",
-    #         ],
-    #     "mass_names":  [
-    #             "data:weight:airframe:wing:mass",
-    #             "data:weight:airframe:fuselage:mass",
-    #             "data:weight:airframe:horizontal_tail:mass",
-    #             "data:weight:airframe:vertical_tail:mass",
-    #             "data:weight:airframe:flight_controls:mass",
-    #             "data:weight:airframe:landing_gear:main:mass",
-    #             "data:weight:airframe:landing_gear:front:mass",
-    #             "data:weight:airframe:pylon:mass",
-    #             "data:weight:airframe:paint:mass",
-    #             "data:propulsion:he_power_train:mass",
-    #             "data:weight:systems:power:auxiliary_power_unit:mass",
-    #             "data:weight:systems:power:electric_systems:mass",
-    #             "data:weight:systems:power:hydraulic_systems:mass",
-    #             "data:weight:systems:life_support:insulation:mass",
-    #             "data:weight:systems:life_support:air_conditioning:mass",
-    #             "data:weight:systems:life_support:de-icing:mass",
-    #             "data:weight:systems:life_support:cabin_lighting:mass",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:mass",
-    #             "data:weight:systems:life_support:oxygen:mass",
-    #             "data:weight:systems:life_support:safety_equipment:mass",
-    #             "data:weight:systems:navigation:mass",
-    #             "data:weight:systems:transmission:mass",
-    #             "data:weight:systems:operational:radar:mass",
-    #             "data:weight:systems:operational:cargo_hold:mass",
-    #             "data:weight:systems:flight_kit:mass",
-    #             "data:weight:furniture:passenger_seats:mass",
-    #             "data:weight:furniture:food_water:mass",
-    #             "data:weight:furniture:security_kit:mass",
-    #             "data:weight:furniture:toilets:mass",
-    #         ],
-    # }
-
-    # problem.model_options["*"] = {
-    #     "cell_capacity_ref": 5.0,
-    #     "cell_weight_ref": 45.0e-3,
-    # }
 
     problem.model_options["*"] = {
         "cell_capacity_ref": 2.5,
@@ -675,8 +307,6 @@ def test_sizing_atr_42_fullsizing():
     problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=10.645)
     problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
     #
-    # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=3100.0)
-    # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=3100.0)
 
     problem.set_val("data:weight:aircraft:MTOW", units="kg", val=18000.0)
     problem.set_val("data:weight:aircraft:OWE", units="kg", val=11659.0)
@@ -747,19 +377,6 @@ def test_sizing_atr_42_fullsizing():
 
     # Construct the file path
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
-
-    # Open the file for writing
-    # with open(file_path, "w", newline="") as csvfile:
-    #     writer = csv.writer(csvfile)
-    #
-    #     # Write the header
-    #     writer.writerow(["Variable name", "Residuals"])
-    #
-    #     # Write the sum of residuals for each iteration
-    #     for name, sum_res in sorted_variable_residuals.items():
-    #         writer.writerow([name, sum_res])
-
-    # cr = om.CaseReader(recorder)
 
 
     problem.write_outputs()
@@ -791,106 +408,14 @@ def test_sizing_atr_42_fullsizing_series():
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
 
-    # problem.model_options["*"] = {
-    #     "cg_names": [
-    #             "data:weight:airframe:wing:CG:x",
-    #             "data:weight:airframe:fuselage:CG:x",
-    #             "data:weight:airframe:horizontal_tail:CG:x",
-    #             "data:weight:airframe:vertical_tail:CG:x",
-    #             "data:weight:airframe:flight_controls:CG:x",
-    #             "data:weight:airframe:landing_gear:main:CG:x",
-    #             "data:weight:airframe:landing_gear:front:CG:x",
-    #             "data:weight:airframe:pylon:CG:x",
-    #             "data:weight:airframe:paint:CG:x",
-    #             "data:propulsion:he_power_train:CG:x",
-    #             "data:weight:systems:power:auxiliary_power_unit:CG:x",
-    #             "data:weight:systems:power:electric_systems:CG:x",
-    #             "data:weight:systems:power:hydraulic_systems:CG:x",
-    #             "data:weight:systems:life_support:insulation:CG:x",
-    #             "data:weight:systems:life_support:air_conditioning:CG:x",
-    #             "data:weight:systems:life_support:de-icing:CG:x",
-    #             "data:weight:systems:life_support:cabin_lighting:CG:x",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:CG:x",
-    #             "data:weight:systems:life_support:oxygen:CG:x",
-    #             "data:weight:systems:life_support:safety_equipment:CG:x",
-    #             "data:weight:systems:navigation:CG:x",
-    #             "data:weight:systems:transmission:CG:x",
-    #             "data:weight:systems:operational:radar:CG:x",
-    #             "data:weight:systems:operational:cargo_hold:CG:x",
-    #             "data:weight:systems:flight_kit:CG:x",
-    #             "data:weight:furniture:passenger_seats:CG:x",
-    #             "data:weight:furniture:food_water:CG:x",
-    #             "data:weight:furniture:security_kit:CG:x",
-    #             "data:weight:furniture:toilets:CG:x",
-    #         ],
-    #     "mass_names":  [
-    #             "data:weight:airframe:wing:mass",
-    #             "data:weight:airframe:fuselage:mass",
-    #             "data:weight:airframe:horizontal_tail:mass",
-    #             "data:weight:airframe:vertical_tail:mass",
-    #             "data:weight:airframe:flight_controls:mass",
-    #             "data:weight:airframe:landing_gear:main:mass",
-    #             "data:weight:airframe:landing_gear:front:mass",
-    #             "data:weight:airframe:pylon:mass",
-    #             "data:weight:airframe:paint:mass",
-    #             "data:propulsion:he_power_train:mass",
-    #             "data:weight:systems:power:auxiliary_power_unit:mass",
-    #             "data:weight:systems:power:electric_systems:mass",
-    #             "data:weight:systems:power:hydraulic_systems:mass",
-    #             "data:weight:systems:life_support:insulation:mass",
-    #             "data:weight:systems:life_support:air_conditioning:mass",
-    #             "data:weight:systems:life_support:de-icing:mass",
-    #             "data:weight:systems:life_support:cabin_lighting:mass",
-    #             "data:weight:systems:life_support:seats_crew_accommodation:mass",
-    #             "data:weight:systems:life_support:oxygen:mass",
-    #             "data:weight:systems:life_support:safety_equipment:mass",
-    #             "data:weight:systems:navigation:mass",
-    #             "data:weight:systems:transmission:mass",
-    #             "data:weight:systems:operational:radar:mass",
-    #             "data:weight:systems:operational:cargo_hold:mass",
-    #             "data:weight:systems:flight_kit:mass",
-    #             "data:weight:furniture:passenger_seats:mass",
-    #             "data:weight:furniture:food_water:mass",
-    #             "data:weight:furniture:security_kit:mass",
-    #             "data:weight:furniture:toilets:mass",
-    #         ],
-    # }
-
-    # problem.model_options["*"] = {
-    #     "cell_capacity_ref": 5.0,
-    #     "cell_weight_ref": 45.0e-3,
-    # }
-
-    # problem.model_options["*"] = {
-    #     "cell_capacity_ref": 2.5,
-    #     "cell_weight_ref": 30e-3,
-    #     "reference_curve_current": [500, 5000, 10000, 15000, 20000],
-    #     "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
-    # }
-
     problem.setup()
     model = problem.model
-
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-    #
-    # problem.set_val(
-    #     "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
-    #     val=8.0,
-    #     units="h**-1",
-    # )
-    # Give good initial guess on a few key value to reduce the time it takes to converge
 
     problem.set_val("data:geometry:wing:MAC:at25percent:x", units="m", val=10.0)
     problem.set_val("data:geometry:wing:area", units="m**2", val=53.3)
     problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=10.645)
     problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
     #
-    # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=3100.0)
-    # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=3100.0)
 
     problem.set_val("data:weight:aircraft:MTOW", units="kg", val=18000.0)
     problem.set_val("data:weight:aircraft:OWE", units="kg", val=11659.0)
@@ -961,19 +486,6 @@ def test_sizing_atr_42_fullsizing_series():
 
     # Construct the file path
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
-
-    # Open the file for writing
-    # with open(file_path, "w", newline="") as csvfile:
-    #     writer = csv.writer(csvfile)
-    #
-    #     # Write the header
-    #     writer.writerow(["Variable name", "Residuals"])
-    #
-    #     # Write the sum of residuals for each iteration
-    #     for name, sum_res in sorted_variable_residuals.items():
-    #         writer.writerow([name, sum_res])
-
-    # cr = om.CaseReader(recorder)
 
 
     problem.write_outputs()
@@ -1055,247 +567,3 @@ def test_sizing_atr_42_turboshaft():
     problem.write_outputs()
 
 
-def test_mission_vector_atr_42():
-    # Define used files depending on options
-    xml_file_name = "atr42_retrofit.xml"
-    process_file_name = "atr42_retrofit.yml"
-
-    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-
-    # Create problems with inputs
-    problem = configurator.get_problem()
-    problem.write_needed_inputs(ref_inputs)
-    problem.read_inputs()
-
-    problem.setup()
-
-    #problem.set_val("data:weight:aircraft:MTOW", units="kg", val=15000.0)
-    # problem.set_val("data:weight:aircraft:OWE", units="kg", val=10000.0)
-    problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=10855.697082198)
-    problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.114459353773869)
-    #problem.set_val("data:weight:aircraft:MZFW", units="kg", val=13000.0)
-    #problem.set_val("data:weight:aircraft:MLW", units="kg", val=14000.0)
-
-    # om.n2(problem, show_browser=True)
-
-    problem.run_model()
-    problem.write_outputs()
-
-    _, _, residuals = problem.model.get_nonlinear_vectors()
-    residuals = filter_residuals(residuals)
-
-    def test_sizing_atr_42_fullsizing_series():
-        """Test the overall aircraft design process with wing positioning."""
-        logging.basicConfig(level=logging.WARNING)
-        logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
-        logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
-
-        # Define used files depending on options
-        xml_file_name = SOURCE_FILE
-        process_file_name = CONFIGURATION_FILE
-
-        configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-        problem = configurator.get_problem()
-
-        # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name))
-        # print(oad.RegisterSubmodel.active_models["service.mass.propulsion"])
-
-        # Create inputs
-        ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-        n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
-        # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-
-        problem.write_needed_inputs(ref_inputs)
-        problem.read_inputs()
-
-        # problem.model_options["*"] = {
-        #     "cg_names": [
-        #             "data:weight:airframe:wing:CG:x",
-        #             "data:weight:airframe:fuselage:CG:x",
-        #             "data:weight:airframe:horizontal_tail:CG:x",
-        #             "data:weight:airframe:vertical_tail:CG:x",
-        #             "data:weight:airframe:flight_controls:CG:x",
-        #             "data:weight:airframe:landing_gear:main:CG:x",
-        #             "data:weight:airframe:landing_gear:front:CG:x",
-        #             "data:weight:airframe:pylon:CG:x",
-        #             "data:weight:airframe:paint:CG:x",
-        #             "data:propulsion:he_power_train:CG:x",
-        #             "data:weight:systems:power:auxiliary_power_unit:CG:x",
-        #             "data:weight:systems:power:electric_systems:CG:x",
-        #             "data:weight:systems:power:hydraulic_systems:CG:x",
-        #             "data:weight:systems:life_support:insulation:CG:x",
-        #             "data:weight:systems:life_support:air_conditioning:CG:x",
-        #             "data:weight:systems:life_support:de-icing:CG:x",
-        #             "data:weight:systems:life_support:cabin_lighting:CG:x",
-        #             "data:weight:systems:life_support:seats_crew_accommodation:CG:x",
-        #             "data:weight:systems:life_support:oxygen:CG:x",
-        #             "data:weight:systems:life_support:safety_equipment:CG:x",
-        #             "data:weight:systems:navigation:CG:x",
-        #             "data:weight:systems:transmission:CG:x",
-        #             "data:weight:systems:operational:radar:CG:x",
-        #             "data:weight:systems:operational:cargo_hold:CG:x",
-        #             "data:weight:systems:flight_kit:CG:x",
-        #             "data:weight:furniture:passenger_seats:CG:x",
-        #             "data:weight:furniture:food_water:CG:x",
-        #             "data:weight:furniture:security_kit:CG:x",
-        #             "data:weight:furniture:toilets:CG:x",
-        #         ],
-        #     "mass_names":  [
-        #             "data:weight:airframe:wing:mass",
-        #             "data:weight:airframe:fuselage:mass",
-        #             "data:weight:airframe:horizontal_tail:mass",
-        #             "data:weight:airframe:vertical_tail:mass",
-        #             "data:weight:airframe:flight_controls:mass",
-        #             "data:weight:airframe:landing_gear:main:mass",
-        #             "data:weight:airframe:landing_gear:front:mass",
-        #             "data:weight:airframe:pylon:mass",
-        #             "data:weight:airframe:paint:mass",
-        #             "data:propulsion:he_power_train:mass",
-        #             "data:weight:systems:power:auxiliary_power_unit:mass",
-        #             "data:weight:systems:power:electric_systems:mass",
-        #             "data:weight:systems:power:hydraulic_systems:mass",
-        #             "data:weight:systems:life_support:insulation:mass",
-        #             "data:weight:systems:life_support:air_conditioning:mass",
-        #             "data:weight:systems:life_support:de-icing:mass",
-        #             "data:weight:systems:life_support:cabin_lighting:mass",
-        #             "data:weight:systems:life_support:seats_crew_accommodation:mass",
-        #             "data:weight:systems:life_support:oxygen:mass",
-        #             "data:weight:systems:life_support:safety_equipment:mass",
-        #             "data:weight:systems:navigation:mass",
-        #             "data:weight:systems:transmission:mass",
-        #             "data:weight:systems:operational:radar:mass",
-        #             "data:weight:systems:operational:cargo_hold:mass",
-        #             "data:weight:systems:flight_kit:mass",
-        #             "data:weight:furniture:passenger_seats:mass",
-        #             "data:weight:furniture:food_water:mass",
-        #             "data:weight:furniture:security_kit:mass",
-        #             "data:weight:furniture:toilets:mass",
-        #         ],
-        # }
-
-        # problem.model_options["*"] = {
-        #     "cell_capacity_ref": 5.0,
-        #     "cell_weight_ref": 45.0e-3,
-        # }
-
-        # problem.model_options["*"] = {
-        #     "cell_capacity_ref": 2.5,
-        #     "cell_weight_ref": 30e-3,
-        #     "reference_curve_current": [500, 5000, 10000, 15000, 20000],
-        #     "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
-        # }
-
-        problem.setup()
-        model = problem.model
-
-        # problem.set_val(
-        #     "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
-        #     val=8.0,
-        #     units="h**-1",
-        # )
-        #
-        # problem.set_val(
-        #     "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
-        #     val=8.0,
-        #     units="h**-1",
-        # )
-        # Give good initial guess on a few key value to reduce the time it takes to converge
-
-        problem.set_val("data:geometry:wing:MAC:at25percent:x", units="m", val=10.0)
-        problem.set_val("data:geometry:wing:area", units="m**2", val=53.3)
-        problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=10.645)
-        problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
-        #
-        # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=3100.0)
-        # problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=3100.0)
-
-        problem.set_val("data:weight:aircraft:MTOW", units="kg", val=18000.0)
-        problem.set_val("data:weight:aircraft:OWE", units="kg", val=11659.0)
-        problem.set_val("data:weight:aircraft:MZFW", units="kg", val=17159.5)
-        problem.set_val("data:weight:aircraft:MLW", units="kg", val=18189.10294470838)
-
-        problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
-        problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
-
-        problem.set_val("subgroup.performances.solve_equilibrium.update_mass.mass", units="kg",
-                        val=np.linspace(18000, 16000, 90))
-
-        datafile = oad.DataFile(
-            "C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml")
-
-        list_of_variables_to_set = [
-            "data:weight:airframe:wing:mass",
-            "data:weight:airframe:fuselage:mass",
-            "data:weight:airframe:horizontal_tail:mass",
-            "data:weight:airframe:vertical_tail:mass",
-            "data:weight:airframe:landing_gear:main:mass",
-            "data:weight:airframe:landing_gear:front:mass",
-            "data:propulsion:he_power_train:mass",
-            "data:weight:systems:auxiliary_power_unit:mass",
-            "data:weight:systems:electric_systems:electric_generation:mass",
-            "data:weight:systems:electric_systems:electric_common_installation:mass",
-            "data:weight:systems:hydraulic_systems:mass",
-            "data:weight:systems:fire_protection:mass",
-            "data:weight:systems:flight_furnishing:mass",
-            "data:weight:systems:automatic_flight_system:mass",
-            "data:weight:systems:communications:mass",
-            "data:weight:systems:ECS:mass",
-            "data:weight:systems:de-icing:mass",
-            "data:weight:systems:navigation:mass",
-            "data:weight:systems:flight_controls:mass",
-            "data:weight:furniture:furnishing:mass",
-            "data:weight:furniture:water:mass",
-            "data:weight:furniture:interior_integration:mass",
-            "data:weight:furniture:insulation:mass",
-            "data:weight:furniture:cabin_lighting:mass",
-            "data:weight:furniture:seats_crew_accommodation:mass",
-            "data:weight:furniture:oxygen:mass",
-            "data:weight:operational:items:passenger_seats:mass",
-            "data:weight:operational:items:unusable_fuel:mass",
-            "data:weight:operational:items:documents_toolkit:mass",
-            "data:weight:operational:items:galley_structure:mass",
-            "data:weight:operational:equipment:others:mass"
-        ]
-
-        for names in list_of_variables_to_set:
-            problem.set_val(names, datafile[names].value, units=datafile[names].units)
-
-        # recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
-        # solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
-        # solver.add_recorder(recorder)
-        # solver.recording_options["record_solver_residuals"] = True
-        # solver.recording_options["record_outputs"] = True
-
-        om.n2(problem, show_browser=False, outfile=n2_path)
-
-        problem.run_model()
-
-        _, _, residuals = problem.model.get_nonlinear_vectors()
-        residuals = filter_residuals(residuals)
-
-        # sorted_variable_residuals = residuals_analyzer(recorder, problem)
-
-        # Create the folder if it doesn't exist
-        os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
-
-        # Construct the file path
-        file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
-
-        # Open the file for writing
-        # with open(file_path, "w", newline="") as csvfile:
-        #     writer = csv.writer(csvfile)
-        #
-        #     # Write the header
-        #     writer.writerow(["Variable name", "Residuals"])
-        #
-        #     # Write the sum of residuals for each iteration
-        #     for name, sum_res in sorted_variable_residuals.items():
-        #         writer.writerow([name, sum_res])
-
-        # cr = om.CaseReader(recorder)
-
-        problem.write_outputs()

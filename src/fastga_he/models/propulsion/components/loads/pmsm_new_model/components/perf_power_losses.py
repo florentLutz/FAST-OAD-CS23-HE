@@ -14,6 +14,8 @@ class PerformancesPowerLosses(om.ExplicitComponent):
     """Computation of the total power losses as sum of Mechanical, Iron, Joule losses."""
 
     def initialize(self):
+        # Reference motor : HASTECS project, Sarah Touhami
+
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )

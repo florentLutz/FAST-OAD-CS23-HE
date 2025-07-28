@@ -13,6 +13,8 @@ class SizingConductorsNumber(om.ExplicitComponent):
     """
 
     def initialize(self):
+        # Reference motor : HASTECS project, Sarah Touhami
+
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )

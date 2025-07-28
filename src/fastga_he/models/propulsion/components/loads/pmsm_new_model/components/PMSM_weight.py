@@ -10,7 +10,7 @@ class SizingMotorWeight(om.ExplicitComponent):
     """Computation of the PMSM weight."""
 
     def initialize(self):
-        # Reference motor : EMRAX 268
+        # Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False

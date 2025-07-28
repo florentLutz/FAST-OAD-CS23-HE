@@ -21,6 +21,7 @@ from .perf_maximum import PerformancesMaximum
 
 class PerformancesACPMSMNEW(om.Group):
     def initialize(self):
+
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )

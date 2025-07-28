@@ -9,7 +9,7 @@ from .sizing_active_length import SizingActiveLength
 from .sizing_rotor_diameter import SizingRotorDiameter
 from .sizing_stator_yoke import SizingStatorYokeHeight
 from .sizing_slot_width import SizingSlotWidth
-from .sizing_slot_height_new import SizingSlotHeightNew
+from .sizing_slot_height import SizingSlotHeight
 from .sizing_slot_section import SizingSlotSection
 from .sizing_conductor_section import SizingConductorSection
 from .sizing_conductor_length import SizingConductorLength
@@ -32,6 +32,8 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingACPMSMNEW(om.Group):
     def initialize(self):
+        # Reference motor : HASTECS project, Sarah Touhami
+
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -67,7 +69,7 @@ class SizingACPMSMNEW(om.Group):
 
         self.add_subsystem("ls", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("hs", SizingSlotHeightNew(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("hs", SizingSlotHeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem("Ss", SizingSlotSection(pmsm_id=pmsm_id), promotes=["data:*"])
 

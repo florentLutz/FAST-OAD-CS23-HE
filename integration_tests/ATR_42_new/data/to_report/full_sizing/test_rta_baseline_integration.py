@@ -25,9 +25,9 @@ FastoadLoader()
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
-CONFIGURATION_FILE = "oad_process_float_performance_from_he.yml"
+CONFIGURATION_FILE = "oad_process_parallel_fullsizing.yml"
 MISSION_FILE = "sizing_mission_R.yml"
-SOURCE_FILE = "inputs_ATR42_hybrid.xml"
+SOURCE_FILE = "inputs_parallel_fullsizing.xml"
 RESULTS_FOLDER = "problem_folder"
 
 
@@ -38,7 +38,7 @@ def cleanup():
 
 
 def test_pipistrel_network_viewer():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "ATR42_assembly_hybridPT.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):

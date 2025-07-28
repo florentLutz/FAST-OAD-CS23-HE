@@ -12,6 +12,7 @@ from fastoad.module_management.constants import ModelDomain
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.correct_name")
 class HeNameFromRTAname(om.ExplicitComponent):
+    """Same variables but with different name in HE and RTA are renamed"""
     def setup(self):
         self.add_input("data:TLAR:NPAX", val=np.nan)
         self.add_input("data:geometry:cabin:seats:economical:count_by_row", val=np.nan)
