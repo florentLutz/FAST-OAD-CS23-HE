@@ -817,15 +817,20 @@ def test_sizing_sr22_hybrid_no_lto_improved():
     smoothing_zone_width = 17
     smoothing_zone_width_descent = min(smoothing_zone_width, 12)  # To avoid going into cruise
     smoothing_zone_width_climb = min(smoothing_zone_width, 22)  # To avoid going into cruise
-    power_split = 100.0 * np.concatenate(
-        (
-            np.zeros(12),  # Taxi out and climb
-            np.linspace(0, 1, smoothing_zone_width_climb + 2)[1:-1],  # Transition
-            np.ones(61 - smoothing_zone_width_descent - smoothing_zone_width_climb),  # End of climb, cruise and start of descent
-            np.linspace(1, 0, smoothing_zone_width_descent + 2)[1:-1],  # Transition
-            np.zeros(8),  # End of descent
-            np.ones(10),  # Reserve
-            np.zeros(1),  # Taxi in
+    power_split = (
+        100.0
+        * np.concatenate(
+            (
+                np.zeros(12),  # Taxi out and climb
+                np.linspace(0, 1, smoothing_zone_width_climb + 2)[1:-1],  # Transition
+                np.ones(
+                    61 - smoothing_zone_width_descent - smoothing_zone_width_climb
+                ),  # End of climb, cruise and start of descent
+                np.linspace(1, 0, smoothing_zone_width_descent + 2)[1:-1],  # Transition
+                np.zeros(8),  # End of descent
+                np.ones(10),  # Reserve
+                np.zeros(1),  # Taxi in
+            )
         )
     )
     datafile = oad.DataFile(problem.input_file_path)
@@ -881,8 +886,12 @@ def test_sizing_sr22_hybrid_no_lto_improved():
     mission_file = pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion.csv")
     mission_file.rename(RESULTS_FOLDER_PATH / "hybrid_propulsion_no_LTO_improved.csv")
 
-    if pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv").exists():
-        pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv").unlink()
+    if pathlib.Path(
+        RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv"
+    ).exists():
+        pathlib.Path(
+            RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv"
+        ).unlink()
     pt_watcher_file = pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher.csv")
     pt_watcher_file.rename(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv")
 

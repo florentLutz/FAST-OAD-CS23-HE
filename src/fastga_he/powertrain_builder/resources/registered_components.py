@@ -587,7 +587,7 @@ ICE = {
     CN_ID: "ice_id",
     CT: "ICE",
     ATT: None,
-    PT: ["time_step", "density", "settings:*"],
+    PT: ["time_step", "density", "settings:*", "altitude"],
     SPT: [],
     PTS: [],
     IN: [(None, "fuel_consumed_t")],

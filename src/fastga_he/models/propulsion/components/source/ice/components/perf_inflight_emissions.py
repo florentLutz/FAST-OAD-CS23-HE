@@ -12,6 +12,7 @@ from .perf_inflight_h2o_emissions import PerformancesICEInFlightH2OEmissions
 from .perf_inflight_hc_emissions import PerformancesICEInFlightHCEmissions
 from .perf_inflight_lead_emissions import PerformancesICEInFlightLeadEmissions
 from .perf_inflight_emissions_sum import PerformancesICEInFlightEmissionsSum
+from .perf_inflight_lto_emissions_sum import PerformancesICELTOEmissionsSum
 
 
 class PerformancesICEInFlightEmissions(om.Group):
@@ -86,6 +87,13 @@ class PerformancesICEInFlightEmissions(om.Group):
         self.add_subsystem(
             name="emissions_sum",
             subsys=PerformancesICEInFlightEmissionsSum(
+                ice_id=ice_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="emissions_lto_sum",
+            subsys=PerformancesICELTOEmissionsSum(
                 ice_id=ice_id, number_of_points=number_of_points
             ),
             promotes=["*"],
