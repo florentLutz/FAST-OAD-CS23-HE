@@ -12,7 +12,10 @@ def filter_residuals(residuals: DefaultTransfer):
     filtered_residuals = {}
 
     for residual in residuals._views_flat:
-        if np.isnan(residuals._views_flat[residual]).any():
+        if (
+            np.isnan(residuals._views_flat[residual]).any()
+            or np.isinf(residuals._views_flat[residual]).any()
+        ):
             filtered_residuals[residual] = residuals._views_flat[residual]
 
     return filtered_residuals

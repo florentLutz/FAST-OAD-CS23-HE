@@ -296,10 +296,7 @@
             <number_modules>20</number_modules>
             <CG>
               <y_ratio>0.5</y_ratio>
-            </CG>
-            <cell>
-              <c_rate_caliber units="min**-1">8.0</c_rate_caliber>
-            </cell>
+            </CG>>
             <module>
               <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>

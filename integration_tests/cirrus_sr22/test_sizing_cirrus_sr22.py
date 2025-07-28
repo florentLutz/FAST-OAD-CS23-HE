@@ -536,6 +536,14 @@ def test_sizing_sr22_hybrid_power_share():
     # Model options are set up straight into the configuration file
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
     problem.setup()
 
     # For smooth init
@@ -586,6 +594,14 @@ def test_doe_sr22_hybrid_power_share():
     # Model options are set up straight into the configuration file
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
     problem.setup()
 
     # For smooth init
@@ -651,6 +667,13 @@ def test_optimization_sr22_hybrid_power_share():
     )
     problem.model.add_objective(name="data:environmental_impact:sizing:emissions", units="kg")
 
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
     problem.setup()
 
     # For smooth init
@@ -670,6 +693,198 @@ def test_optimization_sr22_hybrid_power_share():
     problem.run_driver()
 
     problem.write_outputs()
+
+
+def test_sizing_sr22_hybrid_no_lto():
+    """
+    Tests a hybrid sr22 with the same climb, cruise, descent and reserve profile as the original
+    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights) and a battery sized
+    for no LTO emissions.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+    problem.input_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_in_no_LTO.xml"
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+
+    # Here we wet the power split so that it is 100% aimed towards the electric circuit when we are
+    # in the LTO cycle (<3000ft) and towards the electric motor the rest of the time. The number of
+    # points below 3000ft was counted by hand on the results of the previous hybrid run. Two points
+    # were added for taxi. It will be checked a posteriori. Here is the bearkdown:
+    # - 1 point for taxi out
+    # - 10 points for start of climb
+    # - 52 points for rest of climb, cruise and start of descent
+    # - 8 points for rest of descent
+    # - 20 points for reserve
+    # - 1 point for taxi in
+    power_split = 100.0 * np.concatenate(
+        (np.zeros(12), np.ones(61), np.zeros(8), np.ones(10), np.zeros(1))
+    )
+    datafile = oad.DataFile(problem.input_file_path)
+    datafile[
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split"
+    ].value = power_split
+    datafile.save()
+
+    problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.model.nonlinear_solver.options["use_aitken"] = True
+    problem.model.nonlinear_solver.options["aitken_max_factor"] = 0.8
+    problem.model.nonlinear_solver.options["aitken_min_factor"] = 0.33
+    problem.model.nonlinear_solver.options["aitken_initial_factor"] = 0.8
+    problem.model.nonlinear_solver.options["maxiter"] = 20
+
+    # We will need the biggest motor we can get, the EMRAX348
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:torque_max", val=1000.0, units="N*m"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=3250.0, units="min**-1"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:voltage_caliber", val=830.0, units="V"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    problem.run_model()
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_no_LTO.xml"
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+    # Also rename the .csv so they are not overwritten (because the conf file and pt watcher files
+    # are shared).
+    pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_no_LTO.csv").unlink()
+    mission_file = pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion.csv")
+    mission_file.rename(RESULTS_FOLDER_PATH / "hybrid_propulsion_no_LTO.csv")
+
+    pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO.csv").unlink()
+    pt_watcher_file = pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher.csv")
+    pt_watcher_file.rename(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO.csv")
+
+
+def test_sizing_sr22_hybrid_no_lto_improved():
+    """
+    Previous tests reveals that the battery is sized for power and still has 55% SOC at the end of
+    the mission so we effectively have a dead, unused weight. This tests smoothes the transition
+    between electric and thermal power to use that energy.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+    problem.input_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_in_no_LTO_improved.xml"
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+
+    # Starting from the repartition in the previous test, we add a smoothing zone
+    smoothing_zone_width = 17
+    smoothing_zone_width_descent = min(smoothing_zone_width, 12)  # To avoid going into cruise
+    smoothing_zone_width_climb = min(smoothing_zone_width, 22)  # To avoid going into cruise
+    power_split = 100.0 * np.concatenate(
+        (
+            np.zeros(12),  # Taxi out and climb
+            np.linspace(0, 1, smoothing_zone_width_climb + 2)[1:-1],  # Transition
+            np.ones(61 - smoothing_zone_width_descent - smoothing_zone_width_climb),  # End of climb, cruise and start of descent
+            np.linspace(1, 0, smoothing_zone_width_descent + 2)[1:-1],  # Transition
+            np.zeros(8),  # End of descent
+            np.ones(10),  # Reserve
+            np.zeros(1),  # Taxi in
+        )
+    )
+    datafile = oad.DataFile(problem.input_file_path)
+    datafile[
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split"
+    ].value = power_split
+    datafile.save()
+
+    problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.model.nonlinear_solver.options["use_aitken"] = True
+    problem.model.nonlinear_solver.options["aitken_max_factor"] = 0.8
+    problem.model.nonlinear_solver.options["aitken_min_factor"] = 0.33
+    problem.model.nonlinear_solver.options["aitken_initial_factor"] = 0.8
+    problem.model.nonlinear_solver.options["maxiter"] = 20
+
+    # We will need the biggest motor we can get, the EMRAX348
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:torque_max", val=1000.0, units="N*m"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=3250.0, units="min**-1"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:voltage_caliber", val=830.0, units="V"
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    problem.run_model()
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_no_LTO_improved.xml"
+    problem.write_outputs()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+    # Also rename the .csv so they are not overwritten (because the conf file and pt watcher files
+    # are shared).
+    if pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_no_LTO_improved.csv").exists():
+        pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_no_LTO_improved.csv").unlink()
+    mission_file = pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion.csv")
+    mission_file.rename(RESULTS_FOLDER_PATH / "hybrid_propulsion_no_LTO_improved.csv")
+
+    if pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv").exists():
+        pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv").unlink()
+    pt_watcher_file = pathlib.Path(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher.csv")
+    pt_watcher_file.rename(RESULTS_FOLDER_PATH / "hybrid_propulsion_pt_watcher_no_LTO_improved.csv")
 
 
 def rename_variables_for_payload_range(source_file_path: pathlib.Path):

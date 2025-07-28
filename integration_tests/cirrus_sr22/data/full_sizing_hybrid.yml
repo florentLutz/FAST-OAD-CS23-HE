@@ -74,6 +74,7 @@ submodels:
   service.geometry.nacelle.dimension: null
   service.geometry.vertical_tail.distance.fd: null
   service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
+  submodel.performances.mission_vector.reserve_speed: null
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
