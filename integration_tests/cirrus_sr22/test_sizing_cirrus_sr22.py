@@ -92,7 +92,6 @@ def test_sizing_sr22_op_mission():
     problem.setup()
 
     problem.set_val("data:mission:operational:range", val=200, units="NM")
-    problem.set_val("settings:operational:reserve:speed:k_factor", val=2.2)
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
@@ -604,7 +603,7 @@ def test_doe_sr22_hybrid_power_share():
         units="h**-1",
     )
 
-    power_shares = np.linspace(160, 195, 20)
+    power_shares = np.linspace(140, 160, 11)
 
     for power_share in power_shares:
         problem.set_val(
@@ -698,6 +697,7 @@ def rename_variables_for_payload_range(source_file_path: pathlib.Path):
         "data:mission:operational:taxi_in:speed": "data:mission:sizing:taxi_in:speed",
         "data:mission:operational:taxi_out:duration": "data:mission:sizing:taxi_out:duration",
         "data:mission:operational:taxi_out:speed": "data:mission:sizing:taxi_out:speed",
+        "data:mission:operational:reserve:v_tas": "data:mission:sizing:main_route:reserve:v_tas",
     }
 
     datafile = oad.DataFile(source_file_path)
