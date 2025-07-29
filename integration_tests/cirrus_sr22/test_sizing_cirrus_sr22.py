@@ -17,6 +17,7 @@ from utils.filter_residuals import filter_residuals
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 DOE_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_doe"
+DOE_RESULTS_FOLDER_PATH_SPLIT = pathlib.Path(__file__).parent / "results_doe_power_split"
 WORKDIR_FOLDER_PATH = pathlib.Path(__file__).parent / "workdir"
 
 
@@ -486,6 +487,60 @@ def test_sizing_sr22_hybrid():
 
     problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_mda.xml"
     problem.write_outputs()
+
+
+def test_doe_sr22_hybrid_power_split():
+    """
+    Tests a hybrid sr22 with the same climb, cruise, descent and reserve profile as the original
+    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights) for various power
+    split.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    power_splits = np.linspace(80, 95, 16)
+
+    for power_split in power_splits:
+        configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+        problem = configurator.get_problem()
+
+        # Create inputs
+        ref_inputs = DATA_FOLDER_PATH / xml_file_name
+        # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+        # Model options are set up straight into the configuration file
+        problem.write_needed_inputs(ref_inputs)
+        problem.read_inputs()
+        problem.setup()
+
+        # The electric motor model is very sensitive to the rated rpm of the chassis unfortunately,
+        # especially in this tests where rated power for the motor can vary between 10 and 80 kW
+        # resulting in, when looking at the reference motor family, rated rpm ranging from 6500 to
+        # 4000. So to increase confidence in the results and based on a first try, we'll set the
+        # rated rpm as a function of the hybridization ratio
+        expected_power = -3.6064 * power_split + 354.82
+        expected_rpm = np.clip(0.0864 * expected_power ** 2 - 43.22 * expected_power + 7686.8, 3250, 6500)
+
+        problem.set_val(
+            "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=expected_rpm, units="min**-1"
+        )
+
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+            power_split,
+            units="percent",
+        )
+        problem.run_model()
+
+        problem.output_file_path = DOE_RESULTS_FOLDER_PATH_SPLIT / (
+            str(int(power_split)) + "_percent_split_mda.xml"
+        )
+        problem.write_outputs()
 
 
 def test_optimization_sr22_hybrid():

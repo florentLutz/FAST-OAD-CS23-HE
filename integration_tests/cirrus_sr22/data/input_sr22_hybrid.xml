@@ -383,7 +383,7 @@
           <planetary_gear_1>
             <gear_ratio>1.0</gear_ratio>
             <power_share units="kW" is_input="True">150.<!--Share of the power going to the first (primary) input, in W--></power_share>
-            <power_split units="percent">90.0</power_split>
+            <power_split units="percent">88.0</power_split>
           </planetary_gear_1>
         </planetary_gear>
         <propeller>

@@ -93,8 +93,6 @@ class PerformancesICEInFlightEmissions(om.Group):
         )
         self.add_subsystem(
             name="emissions_lto_sum",
-            subsys=PerformancesICELTOEmissionsSum(
-                ice_id=ice_id, number_of_points=number_of_points
-            ),
+            subsys=PerformancesICELTOEmissionsSum(ice_id=ice_id, number_of_points=number_of_points),
             promotes=["*"],
         )
