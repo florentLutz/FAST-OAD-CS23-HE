@@ -29,6 +29,7 @@ CSV_DATA_LABELS = [
     "cl_htp",
     "cl_aircraft",
     "cd_aircraft",
+    "l_d_aircraft",
     "delta_Cl",
     "delta_Cd",
     "delta_Cm",
@@ -204,7 +205,7 @@ class ToCSV(om.ExplicitComponent):
         coeff_k_htp = inputs["data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient"]
         delta_cl = inputs["delta_Cl"]
         delta_cd = inputs["delta_Cd"]
-        delta_cm = inputs["delta_Cd"]
+        delta_cm = inputs["delta_Cm"]
         delta_m = inputs["delta_m"] * np.pi / 180.0
         cl_delta_m = inputs["data:aerodynamics:elevator:low_speed:CL_delta"]
         cd_delta_m = inputs["data:aerodynamics:elevator:low_speed:CD_delta"]
@@ -219,6 +220,8 @@ class ToCSV(om.ExplicitComponent):
             + coeff_k_htp * cl_htp**2.0
             + (cd_delta_m * delta_m**2.0)
         )
+
+        l_d_aircraft = cl_aircraft / cd_tot
 
         thrust = inputs["thrust"]
         thrust_rate = inputs["thrust_rate_t"]
@@ -259,6 +262,7 @@ class ToCSV(om.ExplicitComponent):
             results_df["cl_htp"] = cl_htp
             results_df["cl_aircraft"] = cl_aircraft
             results_df["cd_aircraft"] = cd_tot
+            results_df["l_d_aircraft"] = l_d_aircraft
             results_df["delta_Cl"] = delta_cl
             results_df["delta_Cd"] = delta_cd
             results_df["delta_Cm"] = delta_cm
