@@ -66,6 +66,7 @@ model:
 #    power_train_file_path: ./fuel_propulsion.yml
   environmental_impact:
     id: fastga_he.environmental.energy_simple
+    electricity_mix: france
 
 submodels:
   submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.enforce

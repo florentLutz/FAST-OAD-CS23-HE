@@ -9,6 +9,7 @@ import logging
 import pytest
 
 import numpy as np
+import openmdao.api as om
 import fastoad.api as oad
 
 from fastga_he.gui.payload_range import payload_range_outer
@@ -550,15 +551,31 @@ def test_optimization_sr22_hybrid():
     process_file_name = "full_sizing_hybrid.yml"
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
-    tmp_problem = configurator.get_problem()
+    problem = configurator.get_problem()
 
     # Create inputs
     ref_inputs = DATA_FOLDER_PATH / xml_file_name
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals()
 
-    tmp_problem.write_needed_inputs(ref_inputs)
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        lower=80.0,
+        upper=95.0,
+    )
+    problem.model.add_objective(name="data:environmental_impact:sizing:emissions", units="kg")
 
-    _ = oad.optimize_problem(DATA_FOLDER_PATH / process_file_name, overwrite=True)
+    recorder = om.SqliteRecorder("driver_cases.sql")
+    problem.driver.add_recorder(recorder)
+
+    problem.driver.recording_options['record_desvars'] = True
+    problem.driver.recording_options['record_objectives'] = True
+
+    problem.setup()
+    problem.run_driver()
+    problem.write_outputs()
 
 
 def test_sizing_sr22_hybrid_power_share():
