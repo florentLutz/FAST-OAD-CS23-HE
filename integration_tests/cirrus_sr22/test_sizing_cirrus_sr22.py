@@ -476,6 +476,9 @@ def test_sizing_sr22_hybrid():
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
+
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+
     problem.setup()
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
@@ -505,30 +508,20 @@ def test_doe_sr22_hybrid_power_split():
 
     power_splits = np.linspace(80, 95, 16)
 
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    # Model options are set up straight into the configuration file
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+    problem.setup()
+
     for power_split in power_splits:
-        configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
-        problem = configurator.get_problem()
-
-        # Create inputs
-        ref_inputs = DATA_FOLDER_PATH / xml_file_name
-        # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-
-        # Model options are set up straight into the configuration file
-        problem.write_needed_inputs(ref_inputs)
-        problem.read_inputs()
-        problem.setup()
-
-        # The electric motor model is very sensitive to the rated rpm of the chassis unfortunately,
-        # especially in this tests where rated power for the motor can vary between 10 and 80 kW
-        # resulting in, when looking at the reference motor family, rated rpm ranging from 6500 to
-        # 4000. So to increase confidence in the results and based on a first try, we'll set the
-        # rated rpm as a function of the hybridization ratio
-        expected_power = -3.6064 * power_split + 354.82
-        expected_rpm = np.clip(0.0864 * expected_power ** 2 - 43.22 * expected_power + 7686.8, 3250, 6500)
-
-        problem.set_val(
-            "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", val=expected_rpm, units="min**-1"
-        )
 
         problem.set_val(
             "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
