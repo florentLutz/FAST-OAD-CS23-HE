@@ -46,6 +46,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageEnsure,
 )
 from ..components.cstr_pmsm import ConstraintPMSMPowerRateMission
+from ..components.cstr_pmsm_adjust_rpm_rating import ConstraintsPMSMAdjustRPMRating
 
 from ..components.sizing_pmsm import SizingPMSM
 from ..components.perf_pmsm import PerformancesPMSM
@@ -387,6 +388,22 @@ def test_constraint_power_for_power_rate():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_rating", units="kW"
     ) == pytest.approx(70.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_adjust_rpm():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_rating", val=70.0, units="kW"
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsPMSMAdjustRPMRating(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", units="min**-1"
+    ) == pytest.approx(5084.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

@@ -12,6 +12,8 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_PMSM_RPM,
     SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE,
 )
+from .cstr_ensure import SERVICE_CONSTRAINTS_PMSM_RPM_ENSURE
+from .cstr_pmsm_adjust_rpm_rating import ConstraintsPMSMAdjustRPMRating
 
 
 class ConstraintsPMSM(om.Group):
@@ -23,11 +25,34 @@ class ConstraintsPMSM(om.Group):
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
+        self.options.declare(
+            name="adjust_rpm_rating",
+            default=False,
+            desc="This option can be enable to make educated guess on the rpm rating based on the"
+            " shaft power to increase confidence in the results",
+        )
 
     def setup(self):
         motor_id = self.options["motor_id"]
 
         option_motor_id = {"motor_id": motor_id}
+
+        self.add_subsystem(
+            name="power_for_power_rate",
+            subsys=ConstraintPMSMPowerRateMission(motor_id=motor_id),
+            promotes=["*"],
+        )
+
+        if (
+            self.options["adjust_rpm_rating"]
+            and oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PMSM_RPM]
+            == SERVICE_CONSTRAINTS_PMSM_RPM_ENSURE
+        ):
+            self.add_subsystem(
+                name="adjust_rpm_rating",
+                subsys=ConstraintsPMSMAdjustRPMRating(motor_id=motor_id),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="constraints_torque_pmsm",
@@ -48,11 +73,6 @@ class ConstraintsPMSM(om.Group):
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE, options=option_motor_id
             ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="power_for_power_rate",
-            subsys=ConstraintPMSMPowerRateMission(motor_id=motor_id),
             promotes=["*"],
         )
 
