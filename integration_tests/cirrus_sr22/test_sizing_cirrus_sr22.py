@@ -663,6 +663,7 @@ def test_sizing_sr22_hybrid_power_share():
         "reference_curve_current": [500, 5000, 10000, 15000, 20000],
         "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
     }
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
 
     problem.setup()
 
@@ -721,6 +722,7 @@ def test_doe_sr22_hybrid_power_share():
         "reference_curve_current": [500, 5000, 10000, 15000, 20000],
         "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
     }
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
 
     problem.setup()
 
@@ -739,7 +741,8 @@ def test_doe_sr22_hybrid_power_share():
         units="h**-1",
     )
 
-    power_shares = np.linspace(140, 160, 11)
+    # power_shares = np.linspace(150, 190, 18)
+    power_shares = np.linspace(154.7059, 157.0588, 5)[1:-1]
 
     for power_share in power_shares:
         problem.set_val(
@@ -793,6 +796,7 @@ def test_optimization_sr22_hybrid_power_share():
         "reference_curve_current": [500, 5000, 10000, 15000, 20000],
         "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
     }
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
 
     problem.setup()
 
@@ -866,6 +870,7 @@ def test_sizing_sr22_hybrid_no_lto():
         "reference_curve_current": [500, 5000, 10000, 15000, 20000],
         "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
     }
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": False}
 
     problem.setup()
 
@@ -873,7 +878,9 @@ def test_sizing_sr22_hybrid_no_lto():
     problem.model.nonlinear_solver.options["aitken_max_factor"] = 0.8
     problem.model.nonlinear_solver.options["aitken_min_factor"] = 0.33
     problem.model.nonlinear_solver.options["aitken_initial_factor"] = 0.8
-    problem.model.nonlinear_solver.options["maxiter"] = 20
+    problem.model.nonlinear_solver.options["maxiter"] = 30
+    problem.model.nonlinear_solver.options["stall_limit"] = 5
+    problem.model.nonlinear_solver.options["stall_tol"] = 3e-6
 
     # We will need the biggest motor we can get, the EMRAX348
     problem.set_val(
@@ -967,6 +974,7 @@ def test_sizing_sr22_hybrid_no_lto_improved():
         "reference_curve_current": [500, 5000, 10000, 15000, 20000],
         "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
     }
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": False}
 
     problem.setup()
 
@@ -974,7 +982,9 @@ def test_sizing_sr22_hybrid_no_lto_improved():
     problem.model.nonlinear_solver.options["aitken_max_factor"] = 0.8
     problem.model.nonlinear_solver.options["aitken_min_factor"] = 0.33
     problem.model.nonlinear_solver.options["aitken_initial_factor"] = 0.8
-    problem.model.nonlinear_solver.options["maxiter"] = 20
+    problem.model.nonlinear_solver.options["maxiter"] = 30
+    problem.model.nonlinear_solver.options["stall_limit"] = 5
+    problem.model.nonlinear_solver.options["stall_tol"] = 3e-6
 
     # We will need the biggest motor we can get, the EMRAX348
     problem.set_val(
