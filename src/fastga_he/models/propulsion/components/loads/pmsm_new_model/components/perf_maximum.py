@@ -9,7 +9,7 @@ import openmdao.api as om
 
 class PerformancesMaximum(om.ExplicitComponent):
     """
-    Class to identify the maximum currents, voltage, torque and rpm of the PMSM.
+     Class to identify the maximum currents, voltage, torque and rpm of the PMSM.
     """
 
     def initialize(self):

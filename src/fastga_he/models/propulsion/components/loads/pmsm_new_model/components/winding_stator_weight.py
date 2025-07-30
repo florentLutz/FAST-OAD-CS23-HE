@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingStatorWindingWeight(om.ExplicitComponent):
-    """Computation of the stator winding weight of the PMSM."""
+    """ Computation of the stator winding weight of the PMSM."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
@@ -25,17 +25,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-            val=np.nan,
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases",
-            val=np.nan,
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
+            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
         )
 
@@ -45,17 +35,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_twisting_coeff",
-            val=np.nan,
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":end_winding_coeff",
-            val=np.nan,
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
+            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_length",
             val=np.nan,
             units="m",
         )
@@ -91,86 +71,57 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
-            method="fd",
+            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_length",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
-            method="fd",
+            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_mat_density",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":insul_mat_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_twisting_coeff",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":end_winding_coeff",
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        q = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases"]
-        m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases"]
-        p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-        Lm = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"]
+        lc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_length"]
         hs = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"]
         rho_c = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_mat_density"]
         rho_insl = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":insul_mat_density"]
         k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
-        k_tb = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":end_winding_coeff"]
-        k_lc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_twisting_coeff"]
 
-        Ns = 2 * p * q * m
-        vol_wind = k_tb * k_lc * hs * Lm * Ns * ls
+        Ns = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"]
+        vol_wind = lc * hs * Ns * ls
         mat_mix_density = k_fill * rho_c + (1 - k_fill) * rho_insl
         W_stat_wind = vol_wind * mat_mix_density
 
@@ -178,90 +129,64 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             W_stat_wind
         )
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #     q = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases"]
-    #     m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases"]
-    #     p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-    #     Lm = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"]
-    #     hs = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height"]
-    #     ls = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"]
-    #     rho_c = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_mat_density"]
-    #     rho_insl = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":insul_mat_density"]
-    #     k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
-    #     k_tb = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":end_winding_coeff"]
-    #     k_lc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_twisting_coeff"]
-    #
-    #     Ns = 2 * p * q * m
-    #     vol_wind = k_tb * k_lc * hs * Lm * Ns * ls
-    #     mat_mix_density = k_fill * rho_c + (1 - k_fill) * rho_insl
-    #
-    #     dW_dktb = k_lc * hs * Lm * Ns * ls * mat_mix_density
-    #     dW_dklc = k_tb * hs * Lm * Ns * ls * mat_mix_density
-    #     dW_dhs = k_tb * k_lc * Lm * Ns * ls * mat_mix_density
-    #     dW_dLm = k_tb * k_lc * hs * Ns * ls * mat_mix_density
-    #     dW_dls = k_tb * k_lc * hs * Lm * Ns * mat_mix_density
-    #     dW_dp = k_tb * k_lc * hs * Lm * q * m * ls * mat_mix_density
-    #     dW_dq = k_tb * k_lc * hs * Lm * p * m * ls * mat_mix_density
-    #     dW_dm = k_tb * k_lc * hs * Lm * p * q * ls * mat_mix_density
-    #
-    #     dW_dkfill = vol_wind * (rho_c - rho_insl)
-    #     dW_drhoc = vol_wind * (k_fill)
-    #     dW_drhoinsl = vol_wind * (1 - k_fill)
-    #
-    #     # Equation II-46: Slot height hs
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":end_winding_coeff",
-    #     ] = dW_dktb
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_twisting_coeff",
-    #     ] = dW_dklc
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
-    #     ] = dW_dhs
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-    #     ] = dW_dls
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
-    #     ] = dW_dLm
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-    #     ] = dW_dp
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases",
-    #     ] = dW_dq
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
-    #     ] = dW_dm
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
-    #     ] = dW_dkfill
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_mat_density",
-    #     ] = dW_drhoc
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":insul_mat_density",
-    #     ] = dW_drhoinsl
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+        lc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"]
+        hs = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height"]
+        ls = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"]
+        rho_c = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_mat_density"]
+        rho_insl = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":insul_mat_density"]
+        k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
+
+        Ns = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"]
+        vol_wind = lc * hs * Ns * ls
+        mat_mix_density = k_fill * rho_c + (1 - k_fill) * rho_insl
+
+
+        dW_dlc = hs * Ns * ls * mat_mix_density
+        dW_dhs = lc * Ns * ls * mat_mix_density
+        dW_dls = lc * hs * Ns * mat_mix_density
+        dW_dNs = lc * hs * ls * mat_mix_density
+
+
+        dW_dkfill = vol_wind * (rho_c - rho_insl)
+        dW_drhoc = vol_wind * (k_fill)
+        dW_drhoinsl = vol_wind * (1 - k_fill)
+
+        # Equation II-46: Slot height hs
+
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_lenght",
+        ] = dW_dlc
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
+        ] = dW_dhs
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
+        ] = dW_dls
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
+        ] = dW_dNs
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
+        ] = dW_dkfill
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":cond_mat_density",
+        ] = dW_drhoc
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":insul_mat_density",
+        ] = dW_drhoinsl

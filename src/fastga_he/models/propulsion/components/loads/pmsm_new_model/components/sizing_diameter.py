@@ -10,7 +10,7 @@ class SizingStatorDiameter(om.ExplicitComponent):
     """Computation of the diameter of the stator bore of the PMSM."""
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
+        #  Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
@@ -55,13 +55,13 @@ class SizingStatorDiameter(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Tangential_stress",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":torque_rating",
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -75,35 +75,35 @@ class SizingStatorDiameter(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"] = D
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #     x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"]
-    #     y = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Tangential_stress"]
-    #     z = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":torque_rating"]
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient",
-    #     ] = (
-    #         2
-    #         * (z ** (1 / 3) * (np.pi * y) ** (2 / 3))
-    #         / (3 * (2 ** (2 / 3)) * np.pi * y * x ** (2 / 3))
-    #     )
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Tangential_stress",
-    #     ] = (
-    #         -2
-    #         * (x ** (1 / 3) * z ** (1 / 3) * (np.pi * y) ** (2 / 3))
-    #         / (3 * (2 ** (2 / 3)) * np.pi * y**2)
-    #     )
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":torque_rating",
-    #     ] = (
-    #         2
-    #         * (x ** (1 / 3) * (np.pi * y) ** (2 / 3))
-    #         / (3 * (2 ** (2 / 3)) * np.pi * y * z ** (2 / 3))
-    #     )
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+        x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"]
+        y = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Tangential_stress"]
+        z = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":torque_rating"]
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient",
+        ] = (
+            2
+            * (z ** (1 / 3) * (np.pi * y) ** (2 / 3))
+            / (3 * (2 ** (2 / 3)) * np.pi * y * x ** (2 / 3))
+        )
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Tangential_stress",
+        ] = (
+            -2
+            * (x ** (1 / 3) * z ** (1 / 3) * (np.pi * y) ** (2 / 3))
+            / (3 * (2 ** (2 / 3)) * np.pi * y**2)
+        )
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":torque_rating",
+        ] = (
+            2
+            * (x ** (1 / 3) * (np.pi * y) ** (2 / 3))
+            / (3 * (2 ** (2 / 3)) * np.pi * y * z ** (2 / 3))
+        )

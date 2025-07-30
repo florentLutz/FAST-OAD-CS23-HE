@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingConductorSection(om.ExplicitComponent):
     """
-    Computation of the Conducor section.
+     Computation of the Conducor section.
 
     """
 
@@ -54,7 +54,7 @@ class SizingConductorSection(om.ExplicitComponent):
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor",
             ],
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -68,28 +68,28 @@ class SizingConductorSection(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section"] = S_cond
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #     S_slot = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section"]
-    #     k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
-    #     k_sc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor"]
-    #
-    #
-    #
-    #     S_cond = S_slot * k_sc * k_fill
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
-    #     ] = k_fill*k_sc
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
-    #     ] = S_slot*k_sc
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor",
-    #     ] = S_slot*k_fill
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+        S_slot = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section"]
+        k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
+        k_sc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor"]
+
+
+
+        S_cond = S_slot * k_sc * k_fill
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
+        ] = k_fill*k_sc
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
+        ] = S_slot*k_sc
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor",
+        ] = S_slot*k_fill
 

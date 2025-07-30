@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class PerformancesActivePower(om.ExplicitComponent):
-    """Computation of the electric active power required to run the motor."""
+    """ Computation of the electric active power required to run the motor."""
 
     def initialize(self):
         self.options.declare(

@@ -11,7 +11,7 @@ import openmdao.api as om
 
 
 class PerformancesPowerLosses(om.ExplicitComponent):
-    """Computation of the total power losses as sum of Mechanical, Iron, Joule losses."""
+    """ Computation of the total power losses as sum of Mechanical, Iron, Joule losses."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
@@ -60,7 +60,7 @@ class PerformancesPowerLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":iron_power_losses",
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":mechanical_power_losses",
             ],
-            method="fd",
+            method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
@@ -79,23 +79,23 @@ class PerformancesPowerLosses(om.ExplicitComponent):
 
         outputs["power_losses"] = P_losses / 1000.0
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     number_of_points = self.options["number_of_points"]
-    #     pmsm_id = self.options["pmsm_id"]
-    #
-    #     rotor_losses_factor = 2  # to take into account the total electromagnetic rotor losses
-    #
-    #     partials[
-    #         "power_losses",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
-    #     ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
-    #
-    #     partials[
-    #         "power_losses",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":iron_power_losses",
-    #     ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
-    #
-    #     partials[
-    #         "power_losses",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":mechanical_power_losses",
-    #     ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        number_of_points = self.options["number_of_points"]
+        pmsm_id = self.options["pmsm_id"]
+
+        rotor_losses_factor = 2  # to take into account the total electromagnetic rotor losses
+
+        partials[
+            "power_losses",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
+        ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
+
+        partials[
+            "power_losses",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":iron_power_losses",
+        ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
+
+        partials[
+            "power_losses",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":mechanical_power_losses",
+        ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0

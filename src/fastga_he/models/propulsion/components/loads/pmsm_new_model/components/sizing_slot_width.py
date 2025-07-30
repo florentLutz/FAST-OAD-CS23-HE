@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingSlotWidth(om.ExplicitComponent):
-    """Computation of the slot width of the PMSM."""
+    """ Computation of the slot width of the PMSM."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
@@ -59,7 +59,7 @@ class SizingSlotWidth(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio", val=np.nan
+            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p", val=np.nan
         )
 
         self.add_output(
@@ -105,7 +105,7 @@ class SizingSlotWidth(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
+            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p",
             method="fd",
         )
 
@@ -117,17 +117,16 @@ class SizingSlotWidth(om.ExplicitComponent):
         K_m = inputs[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density"
         ]
-        x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio"]
+        x2p_ratio = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p"]
         p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
         Nc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"]
         Ns = Nc  # Ncs = 1
-        x_2p = x ** (2 * p)
         mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
         # Equation II-46: Slot height hs
 
         r_tooth = (2 / np.pi) * np.sqrt(
-            (B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2)
+            (B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio
         )
         ls = (1 - r_tooth) * 2 * np.pi * R / Ns
 

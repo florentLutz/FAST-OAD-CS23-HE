@@ -10,7 +10,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
     """Computation of the rotor diameter of a cylindrical PMSM."""
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
+        #  Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
@@ -42,25 +42,25 @@ class SizingRotorDiameter(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":rot_diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":rot_diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Airgap_thickness",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Airgap_thickness",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

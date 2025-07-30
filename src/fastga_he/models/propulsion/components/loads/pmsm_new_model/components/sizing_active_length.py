@@ -10,7 +10,7 @@ class SizingActiveLength(om.ExplicitComponent):
     """Computation of the Active Length of a cylindrical PMSM."""
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
+        #  Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
@@ -38,13 +38,13 @@ class SizingActiveLength(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient",
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -57,18 +57,18 @@ class SizingActiveLength(om.ExplicitComponent):
             / inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"]
         )
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-    #     ] = 1 / inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"]
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient",
-    #     ] = (
-    #         -inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"]
-    #         / inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"] ** 2
-    #     )
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
+        ] = 1 / inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"]
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient",
+        ] = (
+            -inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"]
+            / inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Form_coefficient"] ** 2
+        )

@@ -8,7 +8,7 @@ from ..components.compute_easy import EASY_compute
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-XML_FILE = "problem_outputs_from_RTA_mio.xml"
+XML_FILE = "problem_outputs_from_RTA_mio2.xml"
 
 def test_diameter():
     ivc = get_indep_var_comp(

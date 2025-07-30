@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class SizingPMSMDrag(om.ExplicitComponent):
     """
-    Additional drag coefficient due to the installation of the PMSM depending on the location,
+     Additional drag coefficient due to the installation of the PMSM depending on the location,
     inside the nose, it will be computed as not contributing, just like we did it for ICE,
     turboprop, ... If it is on the wing, is will be computed considering it has a fairing going
     beyond the length to avoid having a "pancake" on the wing. Based on the formula from

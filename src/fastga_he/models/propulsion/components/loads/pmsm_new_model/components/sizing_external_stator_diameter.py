@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingExtStatorDiameter(om.ExplicitComponent):
-    """Computation of the external stator diameter of a cylindrical PMSM."""
+    """ Computation of the external stator diameter of a cylindrical PMSM."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
@@ -45,19 +45,19 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_yoke_height",
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -74,20 +74,20 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
             + inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"]
         )
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-    #     ] = 1
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
-    #     ] = 1
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_yoke_height",
-    #     ] = 1
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
+        ] = 1
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
+        ] = 1
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ext_stator_diameter",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_yoke_height",
+        ] = 1

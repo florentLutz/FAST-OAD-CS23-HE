@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingSlotHeight(om.ExplicitComponent):
-    """Computation of the slot height of the PMSM."""
+    """ Computation of the slot height of the PMSM."""
 
     def initialize(self):
         # Reference motor : EMRAX 268
@@ -77,7 +77,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         )
 
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio", val=np.nan
+            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p", val=np.nan
         )
 
         self.add_output(
@@ -141,7 +141,7 @@ class SizingSlotHeight(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
+            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p",
             method="fd",
         )
 
@@ -157,9 +157,8 @@ class SizingSlotHeight(om.ExplicitComponent):
         k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
         B_st = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":tooth_flux_density"]
         K_m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density"]
-        x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio"]
+        x2p_ratio = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p"]
         p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-        x_2p = x ** (2 * p)
         mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
         # Equation II-46: Slot height hs
@@ -174,7 +173,7 @@ class SizingSlotHeight(om.ExplicitComponent):
                     (2 / np.pi)
                     * np.sqrt(
                         (B_m / B_st) ** 2
-                        + ((mu_0 * K_m / B_st) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2)
+                        + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio
                     )
                 )
             )

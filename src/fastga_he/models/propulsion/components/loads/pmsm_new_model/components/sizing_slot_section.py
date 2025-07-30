@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingSlotSection(om.ExplicitComponent):
     """
-    Computation of the Slot section.
+     Computation of the Slot section.
 
     """
 
@@ -49,7 +49,7 @@ class SizingSlotSection(om.ExplicitComponent):
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
             ],
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -61,23 +61,23 @@ class SizingSlotSection(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section"] = S_slot
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #     hs = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height"]
-    #     ls = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"]
-    #
-    #     S_slot = hs * ls
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
-    #     ] = ls
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-    #     ] = hs
-    #
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+        hs = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height"]
+        ls = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"]
+
+        S_slot = hs * ls
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_height",
+        ] = ls
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
+        ] = hs
+
 
 
 

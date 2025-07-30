@@ -6,27 +6,27 @@ if __name__ == "__main__":
 
     # Input parameters
     Pem_PU = 1.0  # Power in PU
-    S_base = 284599.9999999997  # 1432599.9999999997  # Base power [W]
-    RPM = 14300  # Rotational speed [rpm]
+    S_base = 1432599.9999999997  # 1432599.9999999997  # Base power [W]
+    RPM = 15970  # Rotational speed [rpm]
     rho_cu_20 = 1.68e-8  # Copper resistivity at 20°C [Ohm·m]
     alpha_th = 0.00393  # Temperature coefficient for copper [1/°C]
     T_win = 180  # Winding temperature [°C]
-    sigma = 70000  # Tangential stress [N/m²]
-    j_rms = 20e6  # RMS current density [A/m²]
-    A_rms = 110e3  # RMS linear current density
-    K_m = 155.500  # Max surface current density [A/m]
+    sigma = 50000  # Tangential stress [N/m²]
+    j_rms = 8.1e6  # RMS current density [A/m²]
+    A_rms = 81.4e3  # RMS linear current density [A/m]
+    K_m = 111.100  # Max surface current density [A/m]
     B_m = 0.9  # Airgap flux density [T]
-    B_st = 1.25  # Tooth flux density [T]
-    B_sy = 1.25  # Yoke flux density [T]
-    lambda_ = 0.5  # Form coefficient
+    B_st = 1.3  # Tooth flux density [T]
+    B_sy = 1.2  # Yoke flux density [T]
+    lambda_ = 0.6  # Form coefficient
     k_fill = 0.5  # Slot fill factor
-    p = 4  # Number of pole pairs
+    p = 2  # Number of pole pairs
     k_tb = 1.4  # End winding coefficient
 
     # Unknown constants (assumed)
     k_w = 0.97  # Winding factor
     k_sc = 1  # Slot-conductor factor
-    x = 0.958  # Rotor/stator radius ratio
+    x = 0.97  # Rotor/stator radius ratio
     k_lc = 1.25  # conductor twisting coefficient
     x_2p = x ** (2 * p)
     T = 300  # Air temperature [K]
@@ -52,7 +52,8 @@ if __name__ == "__main__":
     # Derived quantities
     Pem = Pem_PU * S_base  # Real power [W]
     Omega = 2 * np.pi * RPM / 60  # Mechanical angular speed [rad/s]
-
+    Torque = Pem / Omega
+    print(f"tORQUE (T): {Torque:.4f} Nm")
     # Equation II-43: Stator inner radius R
     R = ((lambda_ / (4 * np.pi * sigma)) * (Pem / Omega)) ** (1 / 3)
     R_r = x * R  # Rotor outer radius

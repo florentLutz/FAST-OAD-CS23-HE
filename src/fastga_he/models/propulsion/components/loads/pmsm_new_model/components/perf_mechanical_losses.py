@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesMechanicalLosses(om.ExplicitComponent):
     """
-    Computation of the Mechanical losses.
+     Computation of the Mechanical losses.
 
     """
 

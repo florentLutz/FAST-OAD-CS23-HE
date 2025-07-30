@@ -25,9 +25,9 @@ FastoadLoader()
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
-CONFIGURATION_FILE = "oad_process_turboshaft.yml"
+CONFIGURATION_FILE = "oad_process_parallel_retrofit.yml"
 MISSION_FILE = "sizing_mission_R.yml"
-SOURCE_FILE = "inputs_turboshaft.xml"
+SOURCE_FILE = "inputs_parallel_retrofit.xml"
 RESULTS_FOLDER = "problem_folder"
 
 
@@ -516,11 +516,6 @@ def test_sizing_atr_42_turboshaft():
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
-
-    problem.model_options["*"] = {
-        "cell_capacity_ref": 5.0,
-        "cell_weight_ref": 45.0e-3,
-    }
 
     problem.setup()
     model = problem.model

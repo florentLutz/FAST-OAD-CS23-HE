@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingWindingResistivity(om.ExplicitComponent):
     """
-    Computation of the Winding resistivity.
+     Computation of the Winding resistivity.
 
     """
 
@@ -39,7 +39,7 @@ class SizingWindingResistivity(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistivity",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":winding_temperature",
-            method="fd",
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -53,19 +53,19 @@ class SizingWindingResistivity(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistivity"] = rho_cu_Twin
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #
-    #     T_win = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":winding_temperature"]
-    #     rho_cu_20 = 1.68e-8  # Copper resistivity at 20°C [Ohm·m]
-    #     alpha_th = 0.00393  # Temperature coefficient for copper [1/°C]
-    #
-    #     rho_cu_Twin = rho_cu_20 * (1 + alpha_th * (T_win - 20))
-    #
-    #     drho_dTwin = rho_cu_20 * alpha_th
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistivity",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":winding_temperature",
-    #     ] = drho_dTwin
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+
+        T_win = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":winding_temperature"]
+        rho_cu_20 = 1.68e-8  # Copper resistivity at 20°C [Ohm·m]
+        alpha_th = 0.00393  # Temperature coefficient for copper [1/°C]
+
+        rho_cu_Twin = rho_cu_20 * (1 + alpha_th * (T_win - 20))
+
+        drho_dTwin = rho_cu_20 * alpha_th
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistivity",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":winding_temperature",
+        ] = drho_dTwin
 

@@ -10,7 +10,7 @@ class SizingRatioX2p(om.ExplicitComponent):
     """Computation of the slot height of the PMSM."""
 
     def initialize(self):
-        # Reference motor : EMRAX 268
+        # Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
@@ -37,7 +37,7 @@ class SizingRatioX2p(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
-            method="fd",
+            method="exact",
         )
 
 
@@ -53,16 +53,16 @@ class SizingRatioX2p(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p"] = ratio
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #
-    #     x_2p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p"]
-    #
-    #     # Equation II-46: Slot height hs
-    #
-    #     ratio = ((1 + x_2p) / (1 - x_2p)) ** 2
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
-    #     ] = 4 * (1 + x_2p)/ ((1 - x_2p)**3)
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+
+        x_2p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p"]
+
+        # Equation II-46: Slot height hs
+
+        ratio = ((1 + x_2p) / (1 - x_2p)) ** 2
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
+        ] = 4 * (1 + x_2p)/ ((1 - x_2p)**3)

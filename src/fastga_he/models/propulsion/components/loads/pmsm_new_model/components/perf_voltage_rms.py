@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesVoltageRMS(om.ExplicitComponent):
     """
-    Computation of the RMS of the voltage from the RMS of the current and apparent power.
+     Computation of the RMS of the voltage from the RMS of the current and apparent power.
 
     Formula can be seen in :cite:`wildi:2005`.
     """

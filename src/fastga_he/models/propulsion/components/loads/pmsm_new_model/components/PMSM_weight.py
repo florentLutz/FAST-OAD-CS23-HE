@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingMotorWeight(om.ExplicitComponent):
-    """Computation of the PMSM weight."""
+    """ Computation of the PMSM weight."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami

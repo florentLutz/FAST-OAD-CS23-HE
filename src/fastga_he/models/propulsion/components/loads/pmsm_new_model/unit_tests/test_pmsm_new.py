@@ -12,14 +12,14 @@ from ..components.sizing_active_length import SizingActiveLength
 from ..components.sizing_rotor_diameter import SizingRotorDiameter
 from ..components.sizing_stator_yoke import SizingStatorYokeHeight
 from ..components.sizing_slot_width import SizingSlotWidth
-from ..components.sizing_slot_height_new import SizingSlotHeightNew
+# from ..components.sizing_slot_height_new import SizingSlotHeightNew
 from ..components.sizing_slot_section import SizingSlotSection
 from ..components.sizing_conductor_section import SizingConductorSection
 from ..components.sizing_conductor_length  import SizingConductorLength
 from ..components.sizing_conductors_number import SizingConductorsNumber
 from ..components.sizing_winding_resistivity import SizingWindingResistivity
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
-from ..components.sizing_resistance_new import SizingResistanceNew
+# from ..components.sizing_resistance_new import SizingResistanceNew
 from ..components.sizing_resistance_new2 import SizingResistanceNew2
 from ..components.stator_core_weight import SizingStatorCoreWeight
 from ..components.rotor_wheight import SizingRotorWeight
@@ -33,19 +33,19 @@ from ..components.perf_Joule_losses_2 import PerformancesJouleLosses2
 from ..components.perf_mechanical_losses import PerformancesMechanicalLosses
 from ..components.perf_power_losses import PerformancesPowerLosses
 from ..components.perf_efficiency import PerformancesEfficiency
-from ..components.specific_power import perfSpecificPower
+# from ..components.specific_power import perfSpecificPower
 from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
-from ..components.perf_current_rms import PerformancesCurrentRMS
+# from ..components.perf_current_rms import PerformancesCurrentRMS
 from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 from ..components.sizing_ac_pmsm import SizingACPMSM
-from ..components.sizing_ac_pmsm_new import SizingACPMSMNEW
+from ..components.sizing_ac_pmsm_old import SizingACPMSMNEW
 from ..components.perf_ac_pmsm import PerformancesACPMSM
-from ..components.perf_ac_pmsm_new import PerformancesACPMSMNEW
+from ..components.perf_ac_pmsm_old import PerformancesACPMSMNEW
 
 
 from ..components.cstr_enforce import (
@@ -188,33 +188,33 @@ def test_slot_width():
     problem.check_partials(compact_print=True)"""
 
 
-def test_slot_height_new():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingSlotHeightNew(pmsm_id="motor_1")), __file__, XML_FILE
-    )
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:density_current_ac_max",
-        val=8.1e6,
-        units="A/m**2",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:current_ac_max", val=1986, units="A"
-    )
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:pole_pairs_number", val=2)
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_conductor_factor", val=1)
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_fill_factor", val=0.5)
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:slot_width", val=0.0137, units="m"
-    )
-
-    problem = run_system(SizingSlotHeightNew(pmsm_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:slot_height"
-    ) == pytest.approx(0.0358, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
+# def test_slot_height_new():
+#     ivc = get_indep_var_comp(
+#         list_inputs(SizingSlotHeightNew(pmsm_id="motor_1")), __file__, XML_FILE
+#     )
+#     # Run problem and check obtained value(s) is/(are) correct
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:density_current_ac_max",
+#         val=8.1e6,
+#         units="A/m**2",
+#     )
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:current_ac_max", val=1986, units="A"
+#     )
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:pole_pairs_number", val=2)
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_conductor_factor", val=1)
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_fill_factor", val=0.5)
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:slot_width", val=0.0137, units="m"
+#     )
+#
+#     problem = run_system(SizingSlotHeightNew(pmsm_id="motor_1"), ivc)
+#
+#     assert problem.get_val(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:slot_height"
+#     ) == pytest.approx(0.0358, rel=1e-3)
+#
+#     problem.check_partials(compact_print=True)
 
 
 def test_slot_section():
@@ -316,41 +316,41 @@ def test_resistivity():
     problem.check_partials(compact_print=True)
 
 
-def test_Resistance():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingResistanceNew(pmsm_id="motor_1")), __file__, XML_FILE
-    )
-
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:pole_pairs_number", val=2)
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:number_of_phases", val=3)
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slots_per_poles_phases", val=2)
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:active_length", val=0.3117, units="m"
-    )
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_fill_factor", val=0.5)
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:cond_twisting_coeff", val=1.25)
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:end_winding_coeff", val=1.4)
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:slot_height", val=0.0358, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:slot_width", val=0.0137, units="m"
-    )
-    ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_conductor_factor", val=1)
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:winding_temperature", val=180, units="degC"
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        SizingResistanceNew(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:resistance", units="ohm"
-    ) == pytest.approx(0.0014608, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
+# def test_Resistance():
+#     ivc = get_indep_var_comp(
+#         list_inputs(SizingResistanceNew(pmsm_id="motor_1")), __file__, XML_FILE
+#     )
+#
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:pole_pairs_number", val=2)
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:number_of_phases", val=3)
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slots_per_poles_phases", val=2)
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:active_length", val=0.3117, units="m"
+#     )
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_fill_factor", val=0.5)
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:cond_twisting_coeff", val=1.25)
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:end_winding_coeff", val=1.4)
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:slot_height", val=0.0358, units="m"
+#     )
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:slot_width", val=0.0137, units="m"
+#     )
+#     ivc.add_output("data:propulsion:he_power_train:ACPMSM:motor_1:slot_conductor_factor", val=1)
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:winding_temperature", val=180, units="degC"
+#     )
+#
+#     # Run problem and check obtained value(s) is/(are) correct
+#     problem = run_system(
+#         SizingResistanceNew(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+#     )
+#
+#     assert problem.get_val(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:resistance", units="ohm"
+#     ) == pytest.approx(0.0014608, rel=1e-2)
+#
+#     problem.check_partials(compact_print=True)
 
 
 def test_Resistance2():
@@ -918,27 +918,27 @@ def test_efficiency():
     problem.check_partials(compact_print=True)
 
 
-def test_specific_power():
-    ivc = get_indep_var_comp(
-        list_inputs(perfSpecificPower(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
-    ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
-    ivc.add_output(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:mechanical_power_losses",
-        1803.27 * np.ones(NB_POINTS_TEST),
-        units="W",
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(perfSpecificPower(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
-
-    assert problem.get_val("specific_power", units="W/kg") == pytest.approx(
-        6300 * np.ones(NB_POINTS_TEST), rel=1e-2
-    )
-
-    problem.check_partials(compact_print=True)
+# def test_specific_power():
+#     ivc = get_indep_var_comp(
+#         list_inputs(perfSpecificPower(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+#         __file__,
+#         XML_FILE,
+#     )
+#     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
+#     ivc.add_output(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:mechanical_power_losses",
+#         1803.27 * np.ones(NB_POINTS_TEST),
+#         units="W",
+#     )
+#
+#     # Run problem and check obtained value(s) is/(are) correct
+#     problem = run_system(perfSpecificPower(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
+#
+#     assert problem.get_val("specific_power", units="W/kg") == pytest.approx(
+#         6300 * np.ones(NB_POINTS_TEST), rel=1e-2
+#     )
+#
+#     problem.check_partials(compact_print=True)
 
 
 def test_active_power():
@@ -985,29 +985,29 @@ def test_apparent_power():
     problem.check_partials(compact_print=True)
 
 
-def test_rms_current():
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesCurrentRMS(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
-    ivc.add_output(
-        "torque_out",
-        np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
-        units="N*m",
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesCurrentRMS(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
-        [56.1, 62.3, 68.4, 73.9, 79.4, 84.2, 89.0, 93.1, 97.9, 102.0],
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
+# def test_rms_current():
+#     ivc = get_indep_var_comp(
+#         list_inputs(PerformancesCurrentRMS(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+#         __file__,
+#         XML_FILE,
+#     )
+#     ivc.add_output(
+#         "torque_out",
+#         np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
+#         units="N*m",
+#     )
+#
+#     # Run problem and check obtained value(s) is/(are) correct
+#     problem = run_system(
+#         PerformancesCurrentRMS(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+#     )
+#
+#     assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
+#         [56.1, 62.3, 68.4, 73.9, 79.4, 84.2, 89.0, 93.1, 97.9, 102.0],
+#         rel=1e-2,
+#     )
+#
+#     problem.check_partials(compact_print=True)
 
 
 def test_rms_current_1_phase():

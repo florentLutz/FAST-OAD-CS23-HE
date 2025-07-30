@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesVoltagePeak(om.ExplicitComponent):
     """
-    Computation of the peak line to neutral voltage from the RMS value of the voltage.
+     Computation of the peak line to neutral voltage from the RMS value of the voltage.
 
     Formula can be seen in :cite:`wildi:2005`.
     """

@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesJouleLosses2(om.ExplicitComponent):
     """
-    Computation of the Joule losses.
+     Computation of the Joule losses.
 
     """
 
@@ -48,7 +48,7 @@ class PerformancesJouleLosses2(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
             wrt=["ac_current_rms_in_one_phase"],
-            method="fd",
+            method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
@@ -57,7 +57,7 @@ class PerformancesJouleLosses2(om.ExplicitComponent):
             wrt=[
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistance",
             ],
-            method="fd",
+            method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
@@ -71,22 +71,22 @@ class PerformancesJouleLosses2(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses"] = P_j /1000.0
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #     I_rms = inputs["ac_current_rms_in_one_phase"]
-    #     R_s = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistance"]
-    #     P_j = R_s * I_rms**2
-    #
-    #     dP_dRs = I_rms**2
-    #
-    #     dP_dIrms = 2 * R_s * I_rms
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistance",
-    #     ] = dP_dRs / 1000.0
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
-    #         "ac_current_rms_in_one_phase",
-    #     ] = dP_dIrms / 1000.0
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+        I_rms = inputs["ac_current_rms_in_one_phase"]
+        R_s = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistance"]
+        P_j = R_s * I_rms**2
+
+        dP_dRs = I_rms**2
+
+        dP_dIrms = 2 * R_s * I_rms
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":resistance",
+        ] = dP_dRs / 1000.0
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses",
+            "ac_current_rms_in_one_phase",
+        ] = dP_dIrms / 1000.0

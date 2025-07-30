@@ -10,7 +10,7 @@ class Sizingx2p(om.ExplicitComponent):
     """Computation of the contribute x^2p used for sizing the slot width and yoke height ."""
 
     def initialize(self):
-        # Reference motor : EMRAX 268
+        # Reference motor : HASTECS project, Sarah Touhami
 
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
@@ -41,13 +41,13 @@ class Sizingx2p(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-            method="fd",
+            method="exact",
         )
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
             wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
-            method="fd",
+            method="exact",
         )
 
 
@@ -59,19 +59,19 @@ class Sizingx2p(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p"] = x_2p
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #
-    #     x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio"]
-    #     p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-    #     x_2p = x ** (2 * p)
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
-    #     ] = (2 * p) * (x ** (2*p-1))
-    #
-    #     partials[
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
-    #         "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-    #     ] = 2 * x_2p * np.log(x)
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+
+        x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio"]
+        p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
+        x_2p = x ** (2 * p)
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
+        ] = (2 * p) * (x ** (2*p-1))
+
+        partials[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
+        ] = 2 * x_2p * np.log(x)

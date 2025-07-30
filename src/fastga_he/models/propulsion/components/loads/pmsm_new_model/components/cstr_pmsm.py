@@ -16,7 +16,7 @@ from ..constants import (
 
 class ConstraintsPMSM(om.Group):
     """
-    Class that gather the different constraints for the PMSM be they ensure or enforce.
+     Class that gather the different constraints for the PMSM be they ensure or enforce.
     """
 
     def initialize(self):

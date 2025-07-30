@@ -15,7 +15,7 @@ coeffs_reshaped = np.load(pth.join(DATA_FOLDER_PATH, npy_file_name))
 
 class PerformancesIronLosses(om.ExplicitComponent):
     """
-    Computation of the Iron losses.
+     Computation of the Iron losses.
 
     """
 
