@@ -523,7 +523,6 @@ def test_doe_sr22_hybrid_power_split():
     problem.setup()
 
     for power_split in power_splits:
-
         problem.set_val(
             "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
             power_split,
@@ -570,10 +569,66 @@ def test_optimization_sr22_hybrid():
     recorder = om.SqliteRecorder("driver_cases.sql")
     problem.driver.add_recorder(recorder)
 
-    problem.driver.recording_options['record_desvars'] = True
-    problem.driver.recording_options['record_objectives'] = True
+    problem.driver.recording_options["record_desvars"] = True
+    problem.driver.recording_options["record_objectives"] = True
 
     problem.setup()
+    problem.run_driver()
+    problem.write_outputs()
+
+
+def test_optimization_sr22_hybrid_slsqp():
+    """
+    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
+    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals(step=1e-7)
+
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        lower=80.0,
+        upper=95.0,
+    )
+    # We expect emissions around 260kg of CO2eq
+    problem.model.add_objective(
+        name="data:environmental_impact:sizing:emissions", units="g", scaler=1e-4
+    )
+
+    problem.driver = om.ScipyOptimizeDriver(
+        tol=1e-4, optimizer="SLSQP", debug_print=["objs", "desvars"]
+    )
+    problem.driver.opt_settings["eps"] = 1e-7
+
+    recorder = om.SqliteRecorder("driver_cases_slsqp.sql")
+    problem.driver.add_recorder(recorder)
+
+    problem.driver.recording_options["record_desvars"] = True
+    problem.driver.recording_options["record_objectives"] = True
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        val=90.0,
+        units="percent",
+    )
+
     problem.run_driver()
     problem.write_outputs()
 
