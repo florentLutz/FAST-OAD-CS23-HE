@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import pathlib
 from shutil import rmtree
@@ -140,7 +140,7 @@ def test_sizing_sr22_electric_original():
 def test_sizing_sr22_electric_two_motors():
     """
     Same tests as above except, to increase confidence in e-motor results we will take two "stacked"
-    motors instead of a big one, as is doable with EMRAX engine. They will be coupled by a gearbox
+    motors instead of a big one, as is doable with EMRAX motor. They will be coupled by a gearbox
     of 0 kg and 0.99 efficiency. Also, because the E-motor doesn't lose power with altitude, the
     climb rate at cruise level will be improved which should result in better energy efficiency.
     """
