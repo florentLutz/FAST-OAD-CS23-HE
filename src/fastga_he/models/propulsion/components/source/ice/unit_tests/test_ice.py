@@ -499,6 +499,7 @@ def test_performances_ice():
         val=np.linspace(150.0, 250.0, NB_POINTS_TEST),
         units="kW",
     )
+    ivc.add_output("altitude", val=np.linspace(8000.0, 0.0, NB_POINTS_TEST), units="ft")
     ivc.add_output(
         "rpm",
         val=np.linspace(2500.0, 2699.0, NB_POINTS_TEST),
@@ -1004,6 +1005,7 @@ def test_in_flight_emissions():
         val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
         units="kg",
     )
+    ivc.add_output("altitude", val=np.linspace(8000.0, 0.0, NB_POINTS_TEST), units="ft")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
