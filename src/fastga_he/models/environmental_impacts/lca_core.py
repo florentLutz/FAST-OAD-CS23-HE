@@ -6,7 +6,6 @@ import pathlib
 import re
 import shutil
 import logging
-from typing import Dict, List
 
 # To properly handle the case where the optional dependencies are not installed
 try:

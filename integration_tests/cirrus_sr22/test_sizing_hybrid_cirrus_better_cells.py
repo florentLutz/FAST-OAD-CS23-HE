@@ -12,7 +12,6 @@ import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
-from fastga_he.gui.payload_range import payload_range_outer
 from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
