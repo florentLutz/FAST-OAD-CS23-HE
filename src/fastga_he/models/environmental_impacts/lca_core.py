@@ -6,7 +6,6 @@ import pathlib
 import re
 import shutil
 import logging
-from typing import Dict, List
 
 # To properly handle the case where the optional dependencies are not installed
 try:
@@ -14,11 +13,10 @@ try:
     import dotenv
     import lca_algebraic as agb
     from lca_modeller.io.configuration import LCAProblemConfigurator
+
+    LCA_AVAILABLE = True
 except ImportError:
-    raise ImportError(
-        "This feature is only usable with the lca optional dependency group.\n"
-        "Install it with poetry install --extras lca"
-    )
+    LCA_AVAILABLE = False
 
 import numpy as np
 import openmdao.api as om
@@ -75,6 +73,12 @@ class LCACore(om.ExplicitComponent):
         self.clean_method_name = set()
 
     def initialize(self):
+        if not LCA_AVAILABLE:
+            raise ImportError(
+                "This feature is only usable with the lca optional dependency group.\n"
+                "Install it with poetry install --extras lca"
+            )
+
         self.options.declare(
             name="power_train_file_path",
             default=None,
@@ -439,15 +443,19 @@ class LCACore(om.ExplicitComponent):
 
     def compute_impacts_from_lambdas(
         self,
-        lambdas: List[agb.LambdaWithParamNames],
+        lambdas,
         axis: str,
-        **params: Dict[str, agb.SingleOrMultipleFloat],
+        **params,
     ):
         """
         Modified version of compute_impacts from lca_algebraic.
         More like a wrapper of _postLCAAlgebraic, to avoid calling _preLCAAlgebraic which is
         unnecessarily time-consuming when lambdas have already been calculated and doesn't have to
         be updated.
+
+        :param lambdas: List[agb.LambdaWithParamNames]
+        :param axis: str
+        :param **params: Dict[str, agb.SingleOrMultipleFloat]
         """
         dfs = dict()
 

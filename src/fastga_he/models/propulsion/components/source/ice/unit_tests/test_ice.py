@@ -48,6 +48,7 @@ from ..components.perf_inflight_h2o_emissions import PerformancesICEInFlightH2OE
 from ..components.perf_inflight_hc_emissions import PerformancesICEInFlightHCEmissions
 from ..components.perf_inflight_lead_emissions import PerformancesICEInFlightLeadEmissions
 from ..components.perf_inflight_emissions_sum import PerformancesICEInFlightEmissionsSum
+from ..components.perf_inflight_lto_emissions_sum import PerformancesICELTOEmissionsSum
 from ..components.perf_inflight_emissions import PerformancesICEInFlightEmissions
 
 from ..components.sizing_ice import SizingICE
@@ -498,6 +499,7 @@ def test_performances_ice():
         val=np.linspace(150.0, 250.0, NB_POINTS_TEST),
         units="kW",
     )
+    ivc.add_output("altitude", val=np.linspace(8000.0, 0.0, NB_POINTS_TEST), units="ft")
     ivc.add_output(
         "rpm",
         val=np.linspace(2500.0, 2699.0, NB_POINTS_TEST),
@@ -859,6 +861,143 @@ def test_in_flight_emissions_sum():
     problem.check_partials(compact_print=True)
 
 
+def test_lto_emissions_sum():
+    ivc = om.IndepVarComp()
+    ivc.add_output("altitude", val=np.linspace(8000.0, 0.0, NB_POINTS_TEST), units="ft")
+    ivc.add_output(
+        "CO2_emissions",
+        units="g",
+        val=np.array(
+            [
+                15872.0,
+                17050.0,
+                18290.0,
+                19623.0,
+                21111.0,
+                22723.0,
+                24459.0,
+                26164.0,
+                28210.0,
+                30132.0,
+            ]
+        ),
+    )
+    ivc.add_output(
+        "CO_emissions",
+        units="g",
+        val=np.array(
+            [4085.76, 4389.0, 4708.2, 5051.34, 5434.38, 5849.34, 6296.22, 6735.12, 7261.8, 7756.56]
+        ),
+    )
+    ivc.add_output(
+        "NOx_emissions",
+        units="g",
+        val=np.array(
+            [16.0768, 17.27, 18.526, 19.8762, 21.3834, 23.0162, 24.7746, 26.5016, 28.574, 30.5208]
+        ),
+    )
+    ivc.add_output(
+        "SOx_emissions",
+        units="g",
+        val=np.array([2.1504, 2.31, 2.478, 2.6586, 2.8602, 3.0786, 3.3138, 3.5448, 3.822, 4.0824]),
+    )
+    ivc.add_output(
+        "H2O_emissions",
+        units="g",
+        val=np.array(
+            [
+                6333.44,
+                6803.5,
+                7298.3,
+                7830.21,
+                8423.97,
+                9067.21,
+                9759.93,
+                10440.28,
+                11256.7,
+                12023.64,
+            ]
+        ),
+    )
+    ivc.add_output(
+        "HC_emissions",
+        units="g",
+        val=np.array(
+            [
+                96.59904,
+                103.7685,
+                111.3153,
+                119.42811,
+                128.48427,
+                138.29511,
+                148.86063,
+                159.23748,
+                171.6897,
+                183.38724,
+            ]
+        ),
+    )
+    ivc.add_output(
+        "lead_emissions",
+        units="g",
+        val=np.array(
+            [4.06528, 4.367, 4.6846, 5.02602, 5.40714, 5.82002, 6.26466, 6.70136, 7.2254, 7.71768]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICELTOEmissionsSum(ice_id="ice_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2_LTO", units="kg"
+    ) == pytest.approx(108.965, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO_LTO", units="kg"
+    ) == pytest.approx(28.05, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:NOx_LTO", units="g"
+    ) == pytest.approx(110.371, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:SOx_LTO", units="g"
+    ) == pytest.approx(14.763, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:H2O_LTO", units="kg"
+    ) == pytest.approx(43.48055, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:HC_LTO", units="g"
+    ) == pytest.approx(663.175, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:lead_LTO", units="g"
+    ) == pytest.approx(27.9091, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesICEInFlightEmissionsSum(
+            ice_id="ice_1", number_of_points=NB_POINTS_TEST, number_of_points_reserve=2
+        ),
+        ivc,
+    )
+
+    # For sanity, just to check that the option doesn't change the main results
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2", units="kg"
+    ) == pytest.approx(223.634, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2_main_route",
+        units="kg",
+    ) == pytest.approx(169.26, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:lead_main_route",
+        units="g",
+    ) == pytest.approx(43.3524, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_in_flight_emissions():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -866,6 +1005,7 @@ def test_in_flight_emissions():
         val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
         units="kg",
     )
+    ivc.add_output("altitude", val=np.linspace(8000.0, 0.0, NB_POINTS_TEST), units="ft")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

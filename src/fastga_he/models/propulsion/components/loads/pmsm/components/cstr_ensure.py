@@ -13,6 +13,8 @@ import numpy as np
 
 import fastoad.api as oad
 
+SERVICE_CONSTRAINTS_PMSM_RPM_ENSURE = "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE] = (
     "fastga_he.submodel.propulsion.constraints.pmsm.voltage.ensure"
 )
@@ -75,9 +77,7 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
         )
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_PMSM_RPM, "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
-)
+@oad.RegisterSubmodel(SUBMODEL_CONSTRAINTS_PMSM_RPM, SERVICE_CONSTRAINTS_PMSM_RPM_ENSURE)
 class ConstraintsRPMEnsure(om.ExplicitComponent):
     """
     Class that computes the difference between the maximum rpm seen by the pmsm during the

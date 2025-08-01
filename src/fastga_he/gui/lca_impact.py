@@ -872,7 +872,7 @@ def _update_fig_axis(fig: go.Figure):
     # You may wonder why I set the y-axis to the right, well that's because if it's on the left
     # changing the tick font changes the range !
     # You could try to solve that problem, but if you don't manage to update the counter below:
-    # hours_wasted: 1.5
+    # hours_wasted: 1.75
 
 
 def _get_list_contributing_components_and_variables(

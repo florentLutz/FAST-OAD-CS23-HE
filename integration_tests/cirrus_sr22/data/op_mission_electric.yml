@@ -1,0 +1,32 @@
+title: Payload range drawing for thermal version of the aircraft
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/op_mission_elec_in.xml
+output_file: ../results/op_mission_elec_out.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+  performances:
+    id: fastga_he.performances.op_mission_target_SoC
+    number_of_points_climb: 30
+    number_of_points_cruise: 30
+    number_of_points_descent: 20
+    number_of_points_reserve: 10
+    power_train_file_path: ./electric_propulsion_two_motors.yml
+    use_linesearch: False
+    pre_condition_pt: True
+    use_apply_nonlinear: True
+    variable_name_target_SoC: data__propulsion__he_power_train__battery_pack__battery_pack_1__SOC_min
+
+submodels:
+  submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
+  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.ensure
+  submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
+  submodel.propulsion.dc_dc_converter.inductor.inductance: null

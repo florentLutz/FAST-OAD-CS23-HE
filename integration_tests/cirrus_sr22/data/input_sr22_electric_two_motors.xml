@@ -3,7 +3,7 @@
     <TLAR>
       <NPAX_design>2.0<!--design number of passengers (two pilots are included de facto, meaning for a 2 seater, NPAX_design is equal to 0)--></NPAX_design>
       <luggage_mass_design units="kg">55.0<!--luggage design mass--></luggage_mass_design>
-      <range units="NM">971.0<!--top-level requirement: design range--></range>
+      <range units="NM">100.0<!--top-level requirement: design range--></range>
       <v_approach units="kn">79.0<!--approach speed--></v_approach>
       <v_cruise units="kn">160.0<!--cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">186.0<!--maximum speed at sea level--></v_max_sl>
@@ -120,34 +120,6 @@
       </IC_engine>
       <he_power_train>
         <thrust_distribution>1.0</thrust_distribution>
-        <ICE>
-          <ice_1>
-            <pme_max units="bar">20.62<!--Maximum Mean Effective Pressure in the ICE cylinders--></pme_max>
-            <power_rating_SL units="W">231000.0<!--Maximum power the motor can provide at Sea Level--></power_rating_SL>
-            <rpm_max units="1/min">2700.0<!--Maximum RPM on the shaft of the engine--></rpm_max>
-            <strokes_number>4.0</strokes_number>
-          </ice_1>
-        </ICE>
-        <fuel_system>
-          <fuel_system_1>
-            <fuel_distribution>[1.0, 1.0]</fuel_distribution>
-            <fuel_type>1.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
-          </fuel_system_1>
-        </fuel_system>
-        <fuel_tank>
-          <fuel_tank_1>
-            <fuel_type>1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
-            <CG>
-              <y_ratio>0.4<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
-            </CG>
-          </fuel_tank_1>
-          <fuel_tank_2>
-            <fuel_type>1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
-            <CG>
-              <y_ratio>0.4<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
-            </CG>
-          </fuel_tank_2>
-        </fuel_tank>
         <propeller>
           <propeller_1>
             <activity_factor>128.6<!--Activity factor of the propeller--></activity_factor>
@@ -161,6 +133,190 @@
             <solidity>0.13517604<!--Solidity of the propeller--></solidity>
           </propeller_1>
         </propeller>
+        <DC_SSPC>
+          <dc_sspc_1>
+            <CG>
+              <y_ratio>0.4</y_ratio>
+            </CG>
+          </dc_sspc_1>
+          <dc_sspc_2>
+            <CG>
+              <y_ratio>0.4</y_ratio>
+            </CG>
+          </dc_sspc_2>
+        </DC_SSPC>
+        <DC_cable_harness>
+          <harness_1>
+            <cable_temperature_mission units="degK">303.15</cable_temperature_mission>
+          </harness_1>
+        </DC_cable_harness>
+        <DC_splitter>
+          <dc_splitter_1>
+            <power_split units="percent">50.0</power_split>
+          </dc_splitter_1>
+        </DC_splitter>
+        <planetary_gear>
+          <planetary_gear_1>
+            <efficiency is_input="True">0.99<!--Efficiency of the planetary gear--></efficiency>
+            <gear_ratio>1.0</gear_ratio>
+            <power_split units="percent">50.0</power_split>
+            <tech_level_constant is_input="True">0.0<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
+          </planetary_gear_1>
+        </planetary_gear>
+        <PMSM>
+          <motor_1>
+            <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
+            <rpm_rating units="1/min" is_input="True">4000.0<!--Max voltage of the motor--></rpm_rating>
+            <voltage_caliber units="V" is_input="True">830.0<!--Max voltage of the motor--></voltage_caliber>
+            <torque_rating units="N*m" is_input="True">425.0<!--Max voltage of the motor--></torque_rating>
+          </motor_1>
+          <motor_2>
+            <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
+            <rpm_rating units="1/min" is_input="True">4000.0<!--Max voltage of the motor--></rpm_rating>
+            <voltage_caliber units="V" is_input="True">830.0<!--Max voltage of the motor--></voltage_caliber>
+            <torque_rating units="N*m" is_input="True">425.0<!--Max voltage of the motor--></torque_rating>
+          </motor_2>
+        </PMSM>
+        <inverter>
+          <inverter_1>
+            <efficiency_mission>0.98</efficiency_mission>
+            <junction_temperature_mission units="degK">288.15</junction_temperature_mission>
+            <current_ripple is_input="True">0.2<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <front_length_ratio is_input="True">0.9<!--Location of the inverter CG as a ratio of the aircraft front length--></front_length_ratio>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
+            <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
+            <control_card>
+              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
+            </control_card>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <heat_sink>
+              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
+              <coolant>
+                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
+                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
+                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
+                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
+              </coolant>
+              <tube>
+                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
+                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
+              </tube>
+            </heat_sink>
+            <igbt>
+              <gate_voltage units="V" is_input="True">0.87</gate_voltage>
+            </igbt>
+            <capacitor>
+              <aspect_ratio>2.0</aspect_ratio>
+            </capacitor>
+            <inductor>
+              <air_gap units="mm">2.7</air_gap>
+              <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+            </inductor>
+            <tube>
+              <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
+            </tube>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
+          </inverter_1>
+          <inverter_2>
+            <efficiency_mission>0.98</efficiency_mission>
+            <junction_temperature_mission units="degK">288.15</junction_temperature_mission>
+            <current_ripple is_input="True">0.2<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
+            <front_length_ratio is_input="True">0.9<!--Location of the inverter CG as a ratio of the aircraft front length--></front_length_ratio>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
+            <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
+            <control_card>
+              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
+            </control_card>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <heat_sink>
+              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
+              <coolant>
+                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
+                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
+                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
+                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
+              </coolant>
+              <tube>
+                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
+                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
+              </tube>
+            </heat_sink>
+            <igbt>
+              <gate_voltage units="V" is_input="True">0.87</gate_voltage>
+            </igbt>
+            <capacitor>
+              <aspect_ratio>2.0</aspect_ratio>
+            </capacitor>
+            <inductor>
+              <air_gap units="mm">2.7</air_gap>
+              <inductance units="H" is_input="False">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+            </inductor>
+            <tube>
+              <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
+            </tube>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
+          </inverter_2>
+        </inverter>
+        <battery_pack>
+          <battery_pack_1>
+            <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
+            <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <number_modules>12.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
+            <module>
+              <number_cells is_input="True">120.0<!--Number of cells in series inside one battery module--></number_cells>
+            </module>
+            <CG>
+              <y_ratio>0.5</y_ratio>
+            </CG>
+          </battery_pack_1>
+          <battery_pack_2>
+            <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
+            <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
+            <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <number_modules>12.0<!--Minimum state-of-charge that the battery can have without degradation--></number_modules>
+            <module>
+              <number_cells is_input="True">120.0<!--Number of cells in series inside one battery module--></number_cells>
+            </module>
+            <CG>
+              <y_ratio>0.5</y_ratio>
+            </CG>
+          </battery_pack_2>
+        </battery_pack>
       </he_power_train>
     </propulsion>
     <aerodynamics>
@@ -191,7 +347,7 @@
       <sizing>
         <initial_climb>
           <energy units="W*h">0.0</energy>
-          <fuel units="kg">0.08855397685162596</fuel>
+          <fuel units="kg">0.0</fuel>
         </initial_climb>
         <landing>
           <elevator_angle units="deg">-25.0<!--position of the elevator during landing--></elevator_angle>
@@ -202,7 +358,7 @@
           <elevator_angle units="deg">-25.0<!--position of the elevator during takeoff--></elevator_angle>
           <energy units="W*h">0.0</energy>
           <flap_angle units="deg">10.0<!--flap angle during takeoff phase in sizing mission--></flap_angle>
-          <fuel units="kg">0.4560783599663149</fuel>
+          <fuel units="kg">0.0</fuel>
           <thrust_rate>1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
@@ -234,7 +390,7 @@
           </reserve>
           <climb>
             <climb_rate>
-              <cruise_level units="ft/min">922.0<!--target climb rate at the end of climb--></cruise_level>
+              <cruise_level units="ft/min">1300.0<!--target climb rate at the end of climb--></cruise_level>
               <sea_level units="ft/min">1398.0<!--target climb rate at sea level--></sea_level>
             </climb_rate>
           </climb>
@@ -330,11 +486,22 @@
         <main_route>
           <reserve>
             <speed>
-              <k_factor is_input="True">2.2<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
+              <k_factor is_input="True">1.3<!--Ration between the speed during the reserve segment and stall speed--></k_factor>
             </speed>
           </reserve>
         </main_route>
       </sizing>
     </mission>
   </settings>
+  <convergence>
+    <propulsion>
+      <he_power_train>
+        <propeller>
+          <propeller_1>
+            <min_power units="kW" is_input="True">5.0<!--Convergence parameter used to aid convergence since, if power is too low in the network, the code will have trouble converging--></min_power>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+  </convergence>
 </FASTOAD_model>
