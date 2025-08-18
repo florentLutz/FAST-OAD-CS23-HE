@@ -28,47 +28,39 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density",
             val=np.nan,
@@ -85,49 +77,41 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",

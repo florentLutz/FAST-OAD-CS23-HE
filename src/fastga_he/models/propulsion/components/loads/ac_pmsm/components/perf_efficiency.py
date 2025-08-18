@@ -45,6 +45,10 @@ class PerformancesEfficiency(om.ExplicitComponent):
             upper=1.0,
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt=["shaft_power_out", "power_losses"],

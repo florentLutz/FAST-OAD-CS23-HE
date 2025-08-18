@@ -79,6 +79,10 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=4.20,
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":current_ac_max",
             wrt="ac_current_rms_in_one_phase",

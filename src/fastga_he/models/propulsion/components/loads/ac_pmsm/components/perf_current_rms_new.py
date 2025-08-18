@@ -36,6 +36,10 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
             desc="RMS current in all the phases of the motor",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="torque_out",

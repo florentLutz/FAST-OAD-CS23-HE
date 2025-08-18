@@ -25,7 +25,7 @@ from .sizing_pmsm_weight import SizingMotorWeight
 from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_cg_y import SizingPMSMCGY
 from .sizing_pmsm_drag import SizingPMSMDrag
-from .cstr_pmsm import ConstraintsPMSM
+from .cstr_ac_pmsm import ConstraintsPMSM
 from .sizing_x2p import Sizingx2p
 from .sizing_ratio_x2p import SizingRatioX2p
 from ..constants import POSSIBLE_POSITION
@@ -66,21 +66,31 @@ class SizingACPMSM(om.Group):
 
         self.add_subsystem("ratio_x2p", SizingRatioX2p(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("hy", SizingStatorYokeHeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "yoke_height", SizingStatorYokeHeight(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
-        self.add_subsystem("Nc", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "conductor ", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
-        self.add_subsystem("ls", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("slot_width", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("hs", SizingSlotHeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("slot_height", SizingSlotHeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("Ss", SizingSlotSection(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "slot_cross_section", SizingSlotSection(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
-        self.add_subsystem("Sc", SizingConductorSection(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "conductor_cross_section", SizingConductorSection(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem("lc", SizingConductorLength(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("rho_c", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "winding_resistivity", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem("R_c", SizingResistanceNew2(pmsm_id=pmsm_id), promotes=["data:*"])
 
@@ -89,16 +99,16 @@ class SizingACPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "StatCoreWeight", SizingStatorCoreWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+            "stator_core_weight", SizingStatorCoreWeight(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "WindingWeight", SizingStatorWindingWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+            "winding_weight", SizingStatorWindingWeight(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("RotorWeight", SizingRotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("rotor_weight", SizingRotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("FrameWeight", SizingFrameWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("frame_weight", SizingFrameWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem("mass", SizingMotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 

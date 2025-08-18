@@ -48,12 +48,17 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Max continuous torque of the motor",
         )
+
         self.add_output(
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
             units="N*m",
             val=0.0,
             desc="Respected if <0",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
             wrt=[
@@ -78,6 +83,7 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_max",
         ] = 1.0
+
         partials[
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
@@ -113,12 +119,17 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Max continuous rpm of the motor",
         )
+
         self.add_output(
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
             units="min**-1",
             val=0.0,
             desc="Respected if <0",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
             wrt=[
@@ -143,6 +154,7 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_max",
         ] = 1.0
+
         partials[
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
@@ -187,6 +199,9 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             desc="Respected if <0",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_caliber",
             wrt=[
@@ -211,6 +226,7 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_caliber",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_ac_max",
         ] = 1.0
+
         partials[
             "constraints:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_caliber",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_caliber",

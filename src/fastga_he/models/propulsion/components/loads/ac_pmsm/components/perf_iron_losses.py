@@ -56,6 +56,10 @@ class PerformancesIronLosses(om.ExplicitComponent):
             shape=number_of_points,
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
             wrt=["rpm"],

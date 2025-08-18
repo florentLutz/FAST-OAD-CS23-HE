@@ -66,6 +66,16 @@ class SizingPMSMDrag(om.ExplicitComponent):
                 "data:aerodynamics:" + ls_tag + ":unit_reynolds", val=np.nan, units="m**-1"
             )
 
+        self.add_output(
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
+            val=0.0,
+        )
+
+    def setup_partials(self):
+        if self.options["position"] == "on_the_wing":
+            pmsm_id = self.options["pmsm_id"]
+            ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+
             self.declare_partials(
                 of="*",
                 wrt=[
@@ -77,11 +87,6 @@ class SizingPMSMDrag(om.ExplicitComponent):
                 ],
                 method="exact",
             )
-
-        self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
-            val=0.0,
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]

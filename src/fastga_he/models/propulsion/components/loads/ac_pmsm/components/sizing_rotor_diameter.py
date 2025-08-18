@@ -24,7 +24,6 @@ class SizingRotorDiameter(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio", val=np.nan
         )
@@ -33,33 +32,15 @@ class SizingRotorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
             units="m",
         )
-
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
             units="m",
         )
 
+    def setup_partials(self):
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            method="exact",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
-            method="exact",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            method="exact",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
+            of="*",
+            wrt="*",
             method="exact",
         )
 
@@ -69,12 +50,11 @@ class SizingRotorDiameter(om.ExplicitComponent):
         x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
         D = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
         # Equation II-43: Stator inner radius R
-        D_r = x * D
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] = D_r
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] = x * D
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"] = (
-            (1 - x) * D / 2
+            (1.0 - x) * D / 2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -93,9 +73,11 @@ class SizingRotorDiameter(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
-        ] = (-inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]) / 2
+        ] = (-inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]) / 2.0
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-        ] = (1 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]) / 2
+        ] = (
+            1.0 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
+        ) / 2.0

@@ -16,6 +16,7 @@ if __name__ == "__main__":
     for i in range(4):  # i = potenza di sqrt(f)
         for j in range(4):  # j = potenza di sqrt(Bm)
             coeff = coeffs_reshaped[i][j]
+            print(coeff)
             term = coeff * (sqrt_f ** (i + 1)) * (sqrt_Bm ** (j + 1))
             Pf_pred += term
 

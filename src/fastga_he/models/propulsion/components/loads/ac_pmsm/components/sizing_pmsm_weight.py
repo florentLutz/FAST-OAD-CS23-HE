@@ -29,19 +29,16 @@ class SizingMotorWeight(om.ExplicitComponent):
             val=np.nan,
             units="kg",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
             val=np.nan,
             units="kg",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
             val=np.nan,
             units="kg",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             val=np.nan,
@@ -52,6 +49,9 @@ class SizingMotorWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
             units="kg",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",

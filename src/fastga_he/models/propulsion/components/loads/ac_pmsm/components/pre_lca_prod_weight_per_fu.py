@@ -51,6 +51,9 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             desc="Weight of the PMSM required for a functional unit",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="*",
             wrt=[
@@ -90,6 +93,7 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             inputs["data:TLAR:aircraft_lifespan"]
             / inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":lifespan"]
         )
+
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",

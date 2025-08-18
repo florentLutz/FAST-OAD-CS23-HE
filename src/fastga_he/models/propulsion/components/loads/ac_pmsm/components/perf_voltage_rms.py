@@ -32,6 +32,9 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
             desc="RMS voltage at the input of the motor",
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="*",

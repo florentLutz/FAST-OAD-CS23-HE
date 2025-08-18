@@ -49,6 +49,8 @@ class SizingPMSMCGY(om.ExplicitComponent):
                 desc="Y position of the PMSM center of gravity as a ratio of the wing half-span",
             )
 
+    def setup_partials(self):
+        if self.options["position"] == "on_the_wing":
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

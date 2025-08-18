@@ -30,12 +30,10 @@ class SizingConductorLength(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":cond_twisting_coeff",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
             val=np.nan,
@@ -44,6 +42,9 @@ class SizingConductorLength(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length", units="m"
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",

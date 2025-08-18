@@ -30,7 +30,6 @@ class SizingSlotSection(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             val=np.nan,
@@ -41,6 +40,9 @@ class SizingSlotSection(om.ExplicitComponent):
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
             units="m**2",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
@@ -53,24 +55,21 @@ class SizingSlotSection(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
-        ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
 
-        S_slot = hs * ls
-
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"] = S_slot
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"] = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
+            * inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
-        hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
-        ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-        ] = ls
+        ] = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-        ] = hs
+        ] = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]

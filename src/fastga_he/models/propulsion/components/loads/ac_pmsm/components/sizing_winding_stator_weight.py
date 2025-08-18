@@ -63,6 +63,9 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             units="kg",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
@@ -101,6 +104,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         lc = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
@@ -121,6 +125,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         lc = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]

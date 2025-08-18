@@ -86,6 +86,7 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
             desc="Value of the maximum power the PMSM can provide, used for sizing",
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", val=0.001)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

@@ -29,18 +29,19 @@ class SizingConductorsNumber(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
             val=np.nan,
         )
 
         self.add_output("data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number")
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
@@ -58,7 +59,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
-        N_c = 2 * p * q * m
+        N_c = 2.0 * p * q * m
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"] = N_c
 
@@ -68,21 +69,17 @@ class SizingConductorsNumber(om.ExplicitComponent):
         m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
-        dR_dp = 2 * q * m
-        dR_dq = 2 * p * m
-        dR_dm = 2 * p * q
-
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-        ] = dR_dp
+        ] = 2.0 * q * m
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
-        ] = dR_dq
+        ] = 2.0 * p * m
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
-        ] = dR_dm
+        ] = 2.0 * p * q

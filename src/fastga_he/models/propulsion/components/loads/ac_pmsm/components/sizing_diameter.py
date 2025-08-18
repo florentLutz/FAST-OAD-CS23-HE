@@ -28,13 +28,11 @@ class SizingStatorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
             val=np.nan,
             units="N/m**2",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
             val=np.nan,
@@ -46,18 +44,19 @@ class SizingStatorDiameter(om.ExplicitComponent):
             units="m",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
@@ -71,9 +70,10 @@ class SizingStatorDiameter(om.ExplicitComponent):
         T_max = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating"]
 
         # Equation II-43: Stator inner radius R
-        D = 2 * (((lambda_ / (4 * np.pi * sigma)) * T_max) ** (1 / 3))
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] = D
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] = 2.0 * (
+            ((lambda_ / (4.0 * np.pi * sigma)) * T_max) ** (1.0 / 3.0)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
@@ -85,25 +85,25 @@ class SizingStatorDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient",
         ] = (
-            2
-            * (z ** (1 / 3) * (np.pi * y) ** (2 / 3))
-            / (3 * (2 ** (2 / 3)) * np.pi * y * x ** (2 / 3))
+            2.0
+            * (z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
+            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * y * x ** (2.0 / 3.0))
         )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
         ] = (
-            -2
-            * (x ** (1 / 3) * z ** (1 / 3) * (np.pi * y) ** (2 / 3))
-            / (3 * (2 ** (2 / 3)) * np.pi * y**2)
+            -2.0
+            * (x ** (1.0 / 3.0) * z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
+            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * y**2.0)
         )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
         ] = (
-            2
-            * (x ** (1 / 3) * (np.pi * y) ** (2 / 3))
-            / (3 * (2 ** (2 / 3)) * np.pi * y * z ** (2 / 3))
+            2.0
+            * (x ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
+            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * y * z ** (2.0 / 3.0))
         )

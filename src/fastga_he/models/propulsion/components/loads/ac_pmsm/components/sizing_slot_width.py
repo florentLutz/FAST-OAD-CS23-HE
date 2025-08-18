@@ -28,36 +28,30 @@ class SizingSlotWidth(om.ExplicitComponent):
         #     name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
         #     val=np.nan,
         # )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density",
             val=np.nan,
             units="T",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
             val=np.nan,
             units="A/m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
             units="T",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p", val=np.nan
         )
@@ -67,50 +61,12 @@ class SizingSlotWidth(om.ExplicitComponent):
             units="m",
         )
 
-        # self.declare_partials(
-        #     of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-        #     wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-        #     method="fd",
-        # )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
-            method="fd",
-        )
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         R = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2
         B_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
         B_st = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density"]
@@ -121,12 +77,14 @@ class SizingSlotWidth(om.ExplicitComponent):
         # p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
         Nc = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
         Ns = Nc  # Ncs = 1
-        mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
+        mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
         # Equation II-46: Slot height hs
 
-        r_tooth = (2 / np.pi) * np.sqrt((B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio)
-        ls = (1 - r_tooth) * 2 * np.pi * R / Ns
+        r_tooth = (2.0 / np.pi) * np.sqrt(
+            (B_m / B_st) ** 2.0 + ((mu_0 * K_m / B_st) ** 2.0) * x2p_ratio
+        )
+        ls = (1.0 - r_tooth) * 2.0 * np.pi * R / Ns
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"] = ls
 

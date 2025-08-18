@@ -33,6 +33,9 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
             shape=number_of_points,
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="*",

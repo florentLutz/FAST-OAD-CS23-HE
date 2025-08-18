@@ -30,8 +30,9 @@ from ..components.sizing_winding_stator_weight import SizingStatorWindingWeight
 from ..components.sizing_pmsm_weight import SizingMotorWeight
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_iron_losses import PerformancesIronLosses
-from ..components.perf_Joule_losses import PerformancesJouleLosses
-from ..components.perf_Joule_losses_2 import PerformancesJouleLosses2
+
+# from ..components.perf_Joule_losses import PerformancesJouleLosses
+from ..components.perf_joule_losses_2 import PerformancesJouleLosses2
 from ..components.perf_mechanical_losses import PerformancesMechanicalLosses
 from ..components.perf_power_losses import PerformancesPowerLosses
 from ..components.perf_efficiency import PerformancesEfficiency
@@ -47,7 +48,8 @@ from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 from ..components.sizing_ac_pmsm import SizingACPMSM
-from ..components.sizing_ac_pmsm_old import SizingACPMSMNEW
+
+# from ..components.sizing_ac_pmsm_old import SizingACPMSMNEW
 from ..components.perf_ac_pmsm import PerformancesACPMSM
 from ..components.perf_ac_pmsm_old import PerformancesACPMSMNEW
 
@@ -62,7 +64,7 @@ from ..components.cstr_ensure import (
     ConstraintsRPMEnsure,
     ConstraintsVoltageEnsure,
 )
-from ..components.cstr_pmsm import ConstraintPMSMPowerRateMission
+from ..components.cstr_ac_pmsm import ConstraintPMSMPowerRateMission
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -546,77 +548,75 @@ def test_ACPMSM_weight():
     problem.check_partials(compact_print=True)
 
 
-"""
-def test_motor_cg_x():
-    expected_cg = [2.39, 0.25]
-
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-        ivc = get_indep_var_comp(
-            list_inputs(SizingACPMSMCGX(pmsm_id="motor_1", position=option)),
-            __file__,
-            XML_FILE,
-        )
-        # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingACPMSMCGX(pmsm_id="motor_1", position=option), ivc)
-
-        assert problem.get_val(
-            "data:propulsion:he_power_train:ACPMSM:motor_1:CG:x", units="m"
-        ) == pytest.approx(expected_value, rel=1e-2)
-
-        problem.check_partials(compact_print=True)
-
-
-def test_motor_cg_y():
-    expected_cg = [1.5, 0.0]
-
-    for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
-        ivc = get_indep_var_comp(
-            list_inputs(SizingACPMSMCGY(pmsm_id="motor_1", position=option)),
-            __file__,
-            XML_FILE,
-        )
-        # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingACPMSMCGY(pmsm_id="motor_1", position=option), ivc)
-
-        assert problem.get_val(
-            "data:propulsion:he_power_train:ACPMSM:motor_1:CG:y", units="m"
-        ) == pytest.approx(expected_value, rel=1e-2)
-
-        problem.check_partials(compact_print=True)
-
-
-def test_motor_drag():
-    expected_drag_ls = [0.357, 0.0]
-    expected_drag_cruise = [0.352, 0.0]
-
-    for option, ls_drag, cruise_drag in zip(
-        POSSIBLE_POSITION, expected_drag_ls, expected_drag_cruise
-    ):
-        for ls_option in [True, False]:
-            ivc = get_indep_var_comp(
-                list_inputs(
-                    SizingACPMSMDrag(pmsm_id="motor_1", position=option, low_speed_aero=ls_option)
-                ),
-                __file__,
-                XML_FILE,
-            )
-            # Run problem and check obtained value(s) is/(are) correct
-            problem = run_system(
-                SizingACPMSMDrag(pmsm_id="motor_1", position=option, low_speed_aero=ls_option), ivc
-            )
-
-            if ls_option:
-                assert problem.get_val(
-                    "data:propulsion:he_power_train:ACPMSM:motor_1:low_speed:CD0",
-                ) * 1e3 == pytest.approx(ls_drag, rel=1e-2)
-            else:
-                assert problem.get_val(
-                    "data:propulsion:he_power_train:ACPMSM:motor_1:cruise:CD0",
-                ) * 1e3 == pytest.approx(cruise_drag, rel=1e-2)
-
-            # Slight error on reynolds is due to step
-            problem.check_partials(compact_print=True)
-"""
+# def test_motor_cg_x():
+#     expected_cg = [2.39, 0.25]
+#
+#     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+#         ivc = get_indep_var_comp(
+#             list_inputs(SizingACPMSMCGX(pmsm_id="motor_1", position=option)),
+#             __file__,
+#             XML_FILE,
+#         )
+#         # Run problem and check obtained value(s) is/(are) correct
+#         problem = run_system(SizingACPMSMCGX(pmsm_id="motor_1", position=option), ivc)
+#
+#         assert problem.get_val(
+#             "data:propulsion:he_power_train:ACPMSM:motor_1:CG:x", units="m"
+#         ) == pytest.approx(expected_value, rel=1e-2)
+#
+#         problem.check_partials(compact_print=True)
+#
+#
+# def test_motor_cg_y():
+#     expected_cg = [1.5, 0.0]
+#
+#     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
+#         ivc = get_indep_var_comp(
+#             list_inputs(SizingACPMSMCGY(pmsm_id="motor_1", position=option)),
+#             __file__,
+#             XML_FILE,
+#         )
+#         # Run problem and check obtained value(s) is/(are) correct
+#         problem = run_system(SizingACPMSMCGY(pmsm_id="motor_1", position=option), ivc)
+#
+#         assert problem.get_val(
+#             "data:propulsion:he_power_train:ACPMSM:motor_1:CG:y", units="m"
+#         ) == pytest.approx(expected_value, rel=1e-2)
+#
+#         problem.check_partials(compact_print=True)
+#
+#
+# def test_motor_drag():
+#     expected_drag_ls = [0.357, 0.0]
+#     expected_drag_cruise = [0.352, 0.0]
+#
+#     for option, ls_drag, cruise_drag in zip(
+#         POSSIBLE_POSITION, expected_drag_ls, expected_drag_cruise
+#     ):
+#         for ls_option in [True, False]:
+#             ivc = get_indep_var_comp(
+#                 list_inputs(
+#                     SizingACPMSMDrag(pmsm_id="motor_1", position=option, low_speed_aero=ls_option)
+#                 ),
+#                 __file__,
+#                 XML_FILE,
+#             )
+#             # Run problem and check obtained value(s) is/(are) correct
+#             problem = run_system(
+#                 SizingACPMSMDrag(pmsm_id="motor_1", position=option, low_speed_aero=ls_option), ivc
+#             )
+#
+#             if ls_option:
+#                 assert problem.get_val(
+#                     "data:propulsion:he_power_train:ACPMSM:motor_1:low_speed:CD0",
+#                 ) * 1e3 == pytest.approx(ls_drag, rel=1e-2)
+#             else:
+#                 assert problem.get_val(
+#                     "data:propulsion:he_power_train:ACPMSM:motor_1:cruise:CD0",
+#                 ) * 1e3 == pytest.approx(cruise_drag, rel=1e-2)
+#
+#             # Slight error on reynolds is due to step
+#             problem.check_partials(compact_print=True)
 
 
 def test_constraints_torque_enforce():
@@ -633,7 +633,7 @@ def test_constraints_torque_enforce():
     problem.check_partials(compact_print=True)
 
 
-"""def test_constraints_rpm_enforce():
+def test_constraints_rpm_enforce():
     ivc = get_indep_var_comp(
         list_inputs(ConstraintsRPMEnforce(pmsm_id="motor_1")), __file__, XML_FILE
     )
@@ -703,21 +703,20 @@ def test_constraints_voltage_ensure():
     problem.check_partials(compact_print=True)
 
 
-def test_constraint_power_for_power_rate():
-    ivc = get_indep_var_comp(
-        list_inputs(ConstraintACPMSMPowerRateMission(pmsm_id="motor_1")),
-        __file__,
-        XML_FILE,
-    )
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(ConstraintACPMSMPowerRateMission(pmsm_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:ACPMSM:motor_1:shaft_power_rating", units="kW"
-    ) == pytest.approx(70.0, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-"""
+# def test_constraint_power_for_power_rate():
+#     ivc = get_indep_var_comp(
+#         list_inputs(ConstraintACPMSMPowerRateMission(pmsm_id="motor_1")),
+#         __file__,
+#         XML_FILE,
+#     )
+#     # Run problem and check obtained value(s) is/(are) correct
+#     problem = run_system(ConstraintACPMSMPowerRateMission(pmsm_id="motor_1"), ivc)
+#
+#     assert problem.get_val(
+#         "data:propulsion:he_power_train:ACPMSM:motor_1:shaft_power_rating", units="kW"
+#     ) == pytest.approx(70.0, rel=1e-2)
+#
+#     problem.check_partials(compact_print=True)
 
 
 def test_torque():

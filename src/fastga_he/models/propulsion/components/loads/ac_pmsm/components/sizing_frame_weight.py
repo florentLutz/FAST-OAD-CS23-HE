@@ -29,18 +29,15 @@ class SizingFrameWeight(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density",
             val=np.nan,
@@ -51,36 +48,34 @@ class SizingFrameWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter",
             units="m",
         )
-
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             units="kg",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             method="exact",
         )
-
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
@@ -90,61 +85,68 @@ class SizingFrameWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
         R_out = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"] / 2
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"]
+            / 2.0
         )
         Lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         k_tb = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff"]
         rho_fr = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density"]
 
-        R_out_mm = R_out * 1000
+        R_out_mm = R_out * 1000.0
 
-        tau_r_ = 0.7371 * R_out**2 - 0.580 * R_out + 1.1599 if R_out_mm <= 400 else 1.04
+        tau_r_ = 0.7371 * R_out**2.0 - 0.580 * R_out + 1.1599 if R_out_mm <= 400.0 else 1.04
         R_fr = tau_r_ * R_out
 
         # Frame weight
         W_frame = rho_fr * (
-            np.pi * Lm * k_tb * (R_fr**2 - R_out**2) + 2 * np.pi * (tau_r_ - 1) * R_out * R_fr**2
+            np.pi * Lm * k_tb * (R_fr**2.0 - R_out**2.0)
+            + 2.0 * np.pi * (tau_r_ - 1.0) * R_out * R_fr**2.0
         )
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter"] = 2 * R_fr
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter"] = (
+            2.0 * R_fr
+        )
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight"] = W_frame
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
         R_out = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"] / 2
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"]
+            / 2.0
         )
         Lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         k_tb = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff"]
         rho_fr = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density"]
 
-        R_out_mm = R_out * 1000
+        R_out_mm = R_out * 1000.0
 
         tau_r_ = 0.7371 * R_out**2 - 0.580 * R_out + 1.1599 if R_out_mm <= 400 else 1.04
-        dt_dD = 0.7371 * R_out - 0.580 / 2 if R_out_mm <= 400 else 0
+        dt_dD = 0.7371 * R_out - 0.29 if R_out_mm <= 400 else 0.0
         R_fr = tau_r_ * R_out
-        dRfr_dD = tau_r_ / 2 + dt_dD * R_out
+        dRfr_dD = tau_r_ / 2.0 + dt_dD * R_out
 
         dW_dD = rho_fr * (
-            np.pi * Lm * k_tb * (2 * R_fr * dRfr_dD - R_out)
-            + 2 * np.pi * dt_dD * R_out * R_fr**2
-            + 2 * np.pi * (tau_r_ - 1) * 0.5 * R_fr**2
-            + 2 * np.pi * (tau_r_ - 1) * R_out * 2 * R_fr * dRfr_dD
+            np.pi * Lm * k_tb * (2.0 * R_fr * dRfr_dD - R_out)
+            + 2.0 * np.pi * dt_dD * R_out * R_fr**2.0
+            + 2.0 * np.pi * (tau_r_ - 1.0) * 0.5 * R_fr**2.0
+            + 2.0 * np.pi * (tau_r_ - 1.0) * R_out * 2.0 * R_fr * dRfr_dD
         )
         dW_drho = (
-            np.pi * Lm * k_tb * (R_fr**2 - R_out**2) + 2 * np.pi * (tau_r_ - 1) * R_out * R_fr**2
+            np.pi * Lm * k_tb * (R_fr**2.0 - R_out**2.0)
+            + 2.0 * np.pi * (tau_r_ - 1.0) * R_out * R_fr**2.0
         )
         dW_dLm = rho_fr * (
-            np.pi * k_tb * (R_fr**2 - R_out**2) + 2 * np.pi * (tau_r_ - 1) * R_out * R_fr**2
+            np.pi * k_tb * (R_fr**2.0 - R_out**2.0)
+            + 2.0 * np.pi * (tau_r_ - 1.0) * R_out * R_fr**2.0
         )
         dW_dktb = rho_fr * (
-            np.pi * Lm * (R_fr**2 - R_out**2) + 2 * np.pi * (tau_r_ - 1) * R_out * R_fr**2
+            np.pi * Lm * (R_fr**2.0 - R_out**2.0) + 2.0 * np.pi * (tau_r_ - 1.0) * R_out * R_fr**2.0
         )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
-        ] = 2 * dRfr_dD
+        ] = 2.0 * dRfr_dD
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",

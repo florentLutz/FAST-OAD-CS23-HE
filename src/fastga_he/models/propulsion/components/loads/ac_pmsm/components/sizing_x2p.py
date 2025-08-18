@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class Sizingx2p(om.ExplicitComponent):
-    """Computation of the contribute x^2p used for sizing the slot width and yoke height ."""
+    """Computation of the x^2p contribution used for sizing the slot width and yoke height ."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami

@@ -34,6 +34,9 @@ class SizingRatioX2p(om.ExplicitComponent):
             units="m",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p",
@@ -43,20 +46,21 @@ class SizingRatioX2p(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        x_2p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"]
-
         # Equation II-46: Slot height hs
 
-        ratio = ((1 + x_2p) / (1 - x_2p)) ** 2
-
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"] = ratio
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"] = (
+            (1.0 + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"])
+            / (1.0 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"])
+        ) ** 2.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        x_2p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"]
-
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p",
-        ] = 4 * (1 + x_2p) / ((1 - x_2p) ** 3)
+        ] = (
+            4.0
+            * (1.0 + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"])
+            / ((1.0 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"]) ** 3.0)
+        )

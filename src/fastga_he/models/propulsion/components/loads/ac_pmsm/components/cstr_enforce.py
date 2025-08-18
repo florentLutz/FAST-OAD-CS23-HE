@@ -52,6 +52,10 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
             val=250.0,
             desc="Max continuous torque of the motor",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_max",
@@ -90,12 +94,17 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum value of the motor rpm during the mission",
         )
+
         self.add_output(
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
             units="min**-1",
             val=5000.0,
             desc="Max continuous rpm of the motor",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_rating",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_max",
@@ -134,12 +143,17 @@ class ConstraintsVoltageEnforce(om.ExplicitComponent):
             val=np.nan,
             desc="Maximum value of the peak voltage at the input of the motor",
         )
+
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_caliber",
             val=800.0,
             units="V",
             desc="Max voltage of the motor",
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_caliber",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_ac_max",

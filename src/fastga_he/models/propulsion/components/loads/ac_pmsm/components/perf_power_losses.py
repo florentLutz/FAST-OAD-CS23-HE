@@ -53,6 +53,10 @@ class PerformancesPowerLosses(om.ExplicitComponent):
             shape=number_of_points,
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="power_losses",
             wrt=[

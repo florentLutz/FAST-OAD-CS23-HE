@@ -30,19 +30,16 @@ class SizingResistanceNew2(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
             val=np.nan,
             units="m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
             val=np.nan,
             units="m**2",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity",
             val=np.nan,
@@ -55,6 +52,9 @@ class SizingResistanceNew2(om.ExplicitComponent):
             val=0.0,
             shape=number_of_points,
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
@@ -69,42 +69,40 @@ class SizingResistanceNew2(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         l_c = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length"]
         S_cond = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section"]
         N_c = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
         rho_cu_Twin = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity"]
-        R_s = N_c * rho_cu_Twin * l_c / S_cond
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"] = R_s
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"] = (
+            N_c * rho_cu_Twin * l_c / S_cond
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         l_c = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length"]
         S_cond = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section"]
         N_c = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
         rho_cu_Twin = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity"]
-
-        dR_dNc = rho_cu_Twin * l_c / S_cond
-        dR_dLc = N_c * rho_cu_Twin / S_cond
-        dR_drhoTwin = N_c * l_c / S_cond
-        dR_dScond = -(N_c * rho_cu_Twin * l_c) / (S_cond**2)
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
-        ] = dR_dNc
+        ] = rho_cu_Twin * l_c / S_cond
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
-        ] = dR_dLc
+        ] = N_c * rho_cu_Twin / S_cond
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity",
-        ] = dR_drhoTwin
+        ] = N_c * l_c / S_cond
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
-        ] = dR_dScond
+        ] = -(N_c * rho_cu_Twin * l_c) / (S_cond**2.0)

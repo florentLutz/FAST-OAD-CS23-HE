@@ -110,11 +110,11 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
         x2p_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"]
-        mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
+        mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
         # Equation II-46: Slot height hs
 
-        hy = (R / p) * np.sqrt((B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * x2p_ratio)
+        hy = (R / p) * np.sqrt((B_m / B_sy) ** 2.0 + ((mu_0 * K_m / B_sy) ** 2.0) * x2p_ratio)
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height"] = hy
 
@@ -130,62 +130,51 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-        mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
-        #
-        # hy = (R / p) * np.sqrt(
-        #     (B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * x2p_ratio)
-
-        dhy_dD = (1 / (2 * p)) * np.sqrt((B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * x2p_ratio)
+        mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-        ] = dhy_dD
-
-        dhy_dp = -(R / (p**2)) * np.sqrt((B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * x2p_ratio)
+        ] = (1.0 / (2.0 * p)) * np.sqrt(
+            (B_m / B_sy) ** 2.0 + ((mu_0 * K_m / B_sy) ** 2.0) * x2p_ratio
+        )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-        ] = dhy_dp
-
-        dhy_dx2pratio = (
-            (R / (p))
-            * ((mu_0 * K_m / B_sy) ** 2)
-            / (2 * np.sqrt((B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * x2p_ratio))
+        ] = -(R / (p**2.0)) * np.sqrt(
+            (B_m / B_sy) ** 2.0 + ((mu_0 * K_m / B_sy) ** 2.0) * x2p_ratio
         )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
-        ] = dhy_dx2pratio
-
-        dhy_dBm = (
-            (R / (p))
-            * (B_m / (B_sy**2))
-            / (np.sqrt((B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * x2p_ratio))
+        ] = (
+            (R / p)
+            * ((mu_0 * K_m / B_sy) ** 2.0)
+            / (2.0 * np.sqrt((B_m / B_sy) ** 2.0 + ((mu_0 * K_m / B_sy) ** 2.0) * x2p_ratio))
         )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
-        ] = dhy_dBm
-
-        dhy_dBsy = -(R / (p)) * np.sqrt((B_m**2 + (mu_0 * K_m) ** 2) * x2p_ratio) / ((B_sy) ** 2)
-
-        partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":yoke_flux_density",
-        ] = dhy_dBsy
-
-        dhy_dKm = (
-            (R / (p))
-            * (((mu_0 / B_sy) ** 2) * x2p_ratio * K_m)
-            / np.sqrt((B_m**2 + (mu_0 * K_m) ** 2))
-            / ((B_sy) ** 2)
+        ] = (
+            (R / p)
+            * (B_m / (B_sy**2.0))
+            / (np.sqrt((B_m / B_sy) ** 2.0 + ((mu_0 * K_m / B_sy) ** 2.0) * x2p_ratio))
         )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":yoke_flux_density",
+        ] = -(R / p) * np.sqrt((B_m**2.0 + (mu_0 * K_m) ** 2.0) * x2p_ratio) / (B_sy**2.0)
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
-        ] = dhy_dKm
+        ] = (
+            (R / p)
+            * (((mu_0 / B_sy) ** 2.0) * x2p_ratio * K_m)
+            / np.sqrt((B_m**2.0 + (mu_0 * K_m) ** 2.0))
+            / (B_sy**2.0)
+        )

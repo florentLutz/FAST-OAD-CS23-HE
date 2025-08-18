@@ -30,12 +30,10 @@ class SizingConductorSection(om.ExplicitComponent):
             val=np.nan,
             units="m**2",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
             val=np.nan,
@@ -44,6 +42,9 @@ class SizingConductorSection(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section", units="m**2"
         )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",

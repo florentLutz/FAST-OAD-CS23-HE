@@ -41,7 +41,6 @@ class SizingPMSMCGX(om.ExplicitComponent):
             )
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
-
             self.add_input(
                 name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
                 val=np.nan,
@@ -63,6 +62,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
             desc="X position of the PMSM center of gravity",
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

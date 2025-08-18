@@ -6,7 +6,7 @@ import openmdao.api as om
 
 from .perf_torque import PerformancesTorque
 from .perf_iron_losses import PerformancesIronLosses
-from .perf_Joule_losses_2 import PerformancesJouleLosses2
+from .perf_joule_losses_2 import PerformancesJouleLosses2
 from .perf_mechanical_losses import PerformancesMechanicalLosses
 from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency

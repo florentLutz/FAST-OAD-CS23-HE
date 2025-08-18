@@ -31,51 +31,42 @@ class SizingSlotHeight(om.ExplicitComponent):
             val=np.nan,
             units="A/m**2",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor",
             val=np.nan,
         )
-
         # self.add_input(
         #     name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
         #     val=np.nan,
         # )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density",
             val=np.nan,
             units="T",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
             val=np.nan,
             units="A/m",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
             val=np.nan,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
             val=np.nan,
             units="N/m**2",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
             units="T",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p", val=np.nan
         )
@@ -85,68 +76,12 @@ class SizingSlotHeight(om.ExplicitComponent):
             units="m",
         )
 
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":density_current_ac_max",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor",
-            method="fd",
-        )
-
-        # self.declare_partials(
-        #     of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-        #     wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-        #     method="fd",
-        # )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
-            method="fd",
-        )
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
         k_w = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor"]
         B_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
@@ -163,7 +98,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"]
         # p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-        mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
+        mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
         # Equation II-46: Slot height hs
         numerator = np.sqrt(2) * sigma
