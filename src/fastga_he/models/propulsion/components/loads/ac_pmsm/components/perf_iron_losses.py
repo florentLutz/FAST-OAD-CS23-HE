@@ -10,7 +10,7 @@ DATA_FOLDER_PATH = pth.join(
     pth.join(pth.dirname(pth.dirname(__file__)), "methodology"), "iron_losses"
 )
 npy_file_name = "coeffs_reshaped.npy"
-coeffs_reshaped = np.load(pth.join(DATA_FOLDER_PATH, npy_file_name))
+COEFFS_RESHAPED = np.load(pth.join(DATA_FOLDER_PATH, npy_file_name))
 
 
 class PerformancesIronLosses(om.ExplicitComponent):
@@ -33,11 +33,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
-        self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-            val=np.nan,
-        )
+        self.add_input("frequency", units="s**-1", val=np.nan, shape=number_of_points)
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
@@ -62,30 +58,27 @@ class PerformancesIronLosses(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
-            wrt=["rpm"],
-            method="fd",
+            wrt=["frequency"],
+            method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
             ],
-            method="fd",
+            method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        RPM = inputs["rpm"]
-        p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
         w_motor = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass"]
         bm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
-        f = RPM * p / 60.0
+        f = inputs["frequency"]
         sqrt_f = np.sqrt(f)
         sqrt_bm = np.sqrt(bm)
 
@@ -94,28 +87,46 @@ class PerformancesIronLosses(om.ExplicitComponent):
 
         for i in range(4):  # i = power of sqrt(f)
             for j in range(4):  # j = power of sqrt(bm)
-                coeff = coeffs_reshaped[i][j]
-                term = coeff * (sqrt_f ** (i + 1)) * (sqrt_bm ** (j + 1))
-                Sp_pow += term
-
-        # Specific power times the PMSM weight
-        P_iron = w_motor * Sp_pow
+                coeff = COEFFS_RESHAPED[i][j]
+                Sp_pow += coeff * (sqrt_f ** (i + 1.0)) * (sqrt_bm ** (j + 1.0))
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses"] = (
-            P_iron / 1000.0
+            w_motor * Sp_pow / 1000.0
         )
 
-    # def compute_partials(self, inputs, partials, discrete_inputs=None):
-    #     pmsm_id = self.options["pmsm_id"]
-    #     RPM = inputs["rpm"]
-    #     p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-    #     w_motor = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass"]
-    #     bm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
-    #     f = RPM * p / 60
-    #     sqrt_f = np.sqrt(f)
-    #     sqrt_bm = np.sqrt(bm)
-    #
-    #     # partials[
-    #     #    "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
-    #     #    "ac_current_rms_in_one_phase",
-    #     # ] = dP_dIrms
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pmsm_id = self.options["pmsm_id"]
+        w_motor = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass"]
+        bm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
+        f = inputs["frequency"]
+        sqrt_f = np.sqrt(f)
+        sqrt_bm = np.sqrt(bm)
+
+        Sp_pow = 0.0
+        dSp_pow_df = 0.0
+        dSp_pow_dbm = 0.0
+
+        for i in range(4):  # i = power of sqrt(f)
+            for j in range(4):  # j = power of sqrt(bm)
+                coeff = COEFFS_RESHAPED[i][j]
+                Sp_pow += coeff * (sqrt_f ** (i + 1)) * (sqrt_bm ** (j + 1))
+                dSp_pow_df += (
+                    coeff * (i + 1.0) * 0.5 * (f ** (0.5 * i - 0.5)) * (sqrt_bm ** (j + 1.0))
+                )
+                dSp_pow_dbm += (
+                    coeff * (sqrt_f ** (i + 1.0)) * (j + 1.0) * 0.5 * (bm ** (0.5 * j - 0.5))
+                )
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
+        ] = Sp_pow / 1000.0
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses", "frequency"
+        ] = dSp_pow_df * w_motor / 1000.0
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
+        ] = dSp_pow_dbm * w_motor / 1000.0

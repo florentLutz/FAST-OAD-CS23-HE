@@ -33,7 +33,7 @@
         </geometry>
         <propulsion>
             <he_power_train>
-                <ACPMSM>
+                <AC_PMSM>
                     <motor_1>
                         <mass units="kg">225.59</mass>
                         <from_LE units="m">0.15</from_LE>
@@ -66,7 +66,7 @@
                             <y_ratio>0.333</y_ratio>
                         </CG>
                     </motor_1>
-                </ACPMSM>
+                </AC_PMSM>
             </he_power_train>
         </propulsion>
     </data>
