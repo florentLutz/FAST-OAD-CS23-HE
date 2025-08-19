@@ -26,8 +26,8 @@ from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_cg_y import SizingPMSMCGY
 from .sizing_pmsm_drag import SizingPMSMDrag
 from .cstr_ac_pmsm import ConstraintsPMSM
-from .sizing_x2p import Sizingx2p
 from .sizing_ratio_x2p import SizingRatioX2p
+from .sizing_tooth_ratio import SizingToothRatio
 from ..constants import POSSIBLE_POSITION
 
 
@@ -62,9 +62,9 @@ class SizingACPMSM(om.Group):
 
         self.add_subsystem("RotDiameter", SizingRotorDiameter(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("x2p", Sizingx2p(pmsm_id=pmsm_id), promotes=["data:*"])
-
         self.add_subsystem("ratio_x2p", SizingRatioX2p(pmsm_id=pmsm_id), promotes=["data:*"])
+
+        self.add_subsystem("tooth_ratio", SizingToothRatio(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem(
             "yoke_height", SizingStatorYokeHeight(pmsm_id=pmsm_id), promotes=["data:*"]

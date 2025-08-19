@@ -114,7 +114,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
 
         # Equation II-46: Slot height hs
 
-        hy = (R / p) * np.sqrt((B_m / B_sy) ** 2.0 + ((mu_0 * K_m / B_sy) ** 2.0) * x2p_ratio)
+        hy = (R / p) * np.sqrt((B_m / B_sy) ** 2.0 + ((mu_0 * K_m * x2p_ratio / B_sy) ** 2.0))
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height"] = hy
 

@@ -25,8 +25,11 @@ class SizingRatioX2p(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio", val=np.nan
         )
 
         self.add_output(
@@ -35,32 +38,30 @@ class SizingRatioX2p(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p",
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        # Equation II-46: Slot height hs
+        x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
+        p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"] = (
-            (1.0 + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"])
-            / (1.0 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"])
-        ) ** 2.0
+            1.0 + x ** (2.0 * p)
+        ) / (1.0 - x ** (2.0 * p))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
+        x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
+        p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
+
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p",
-        ] = (
-            4.0
-            * (1.0 + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"])
-            / ((1.0 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":x2p"]) ** 3.0)
-        )
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
+        ] = 4.0 * p * x ** (2.0 * p - 1.0) / (x ** (2.0 * p) - 1.0) ** 2.0
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+        ] = 4.0 * x ** (2.0 * p) * np.log(x) / (x ** (2.0 * p) - 1.0) ** 2.0

@@ -12,6 +12,7 @@ from ..components.sizing_active_length import SizingActiveLength
 from ..components.sizing_rotor_diameter import SizingRotorDiameter
 from ..components.sizing_stator_yoke import SizingStatorYokeHeight
 from ..components.sizing_slot_width import SizingSlotWidth
+from ..components.sizing_ratio_x2p import SizingRatioX2p
 
 # from ..components.sizing_slot_height_new import SizingSlotHeightNew
 from ..components.sizing_slot_section import SizingSlotSection
@@ -317,6 +318,22 @@ def test_resistivity():
     assert problem.get_val(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:resistivity"
     ) == pytest.approx(2.736384e-08, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_x2p_ratio():
+    ivc = om.IndepVarComp()
+
+    # Run problem and check obtained value(s) is/(are) correct
+    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:radius_ratio", val=0.97)
+    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
+
+    problem = run_system(SizingRatioX2p(pmsm_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:ratiox2p"
+    ) == pytest.approx(16.435, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

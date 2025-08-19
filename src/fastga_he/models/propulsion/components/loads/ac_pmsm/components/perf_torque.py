@@ -38,6 +38,7 @@ class PerformancesTorque(om.ExplicitComponent):
         self.declare_partials(
             of="shaft_power_for_power_rate",
             wrt="shaft_power_out",
+            method="exact",
             val=np.ones(number_of_points),
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
