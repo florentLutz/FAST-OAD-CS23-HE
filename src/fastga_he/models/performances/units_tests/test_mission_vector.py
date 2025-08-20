@@ -1774,9 +1774,9 @@ def test_op_mission_vector_from_yml():
     )
     sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
     assert sizing_energy == pytest.approx(99.22, abs=1e-2)
-    assert problem.get_val("data:mission:operational:main_route:energy", units="kW*h") == pytest.approx(
-        71.04, abs=1e-2
-    )
+    assert problem.get_val(
+        "data:mission:operational:main_route:energy", units="kW*h"
+    ) == pytest.approx(71.04, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
