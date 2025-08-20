@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesJouleLosses2(om.ExplicitComponent):
+class PerformancesJouleLosses(om.ExplicitComponent):
     """
     Computation of the Joule losses.
 

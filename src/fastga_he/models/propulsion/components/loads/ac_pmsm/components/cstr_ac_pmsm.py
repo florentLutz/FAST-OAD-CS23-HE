@@ -62,7 +62,7 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
     This class will define the value of the maximum power we use to get the power rate inside the
     mission, it is mandatory that we compute it outside the mission when sizing the power train
     or else when recomputing the wing area it will be stuck at one which we don't want. It's
-    nothing complex but we need it done outside of the mission and we need consistent naming.
+    nothing complex but has to be done outside the mission with consistent naming.
     """
 
     def initialize(self):
@@ -82,7 +82,7 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":shaft_power_rating",
             units="MW",
-            val=1.4326000,
+            val=1.4326,
             desc="Value of the maximum power the PMSM can provide, used for sizing",
         )
 

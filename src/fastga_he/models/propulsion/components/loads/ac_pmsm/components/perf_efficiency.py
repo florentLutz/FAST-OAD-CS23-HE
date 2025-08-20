@@ -52,7 +52,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         self.declare_partials(
             of="*",
             wrt=["shaft_power_out", "power_losses"],
-            method="fd",
+            method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )

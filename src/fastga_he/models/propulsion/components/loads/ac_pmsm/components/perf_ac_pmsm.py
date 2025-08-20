@@ -6,7 +6,7 @@ import openmdao.api as om
 
 from .perf_torque import PerformancesTorque
 from .perf_iron_losses import PerformancesIronLosses
-from .perf_joule_losses_2 import PerformancesJouleLosses2
+from .perf_joule_losses import PerformancesJouleLosses
 from .perf_mechanical_losses import PerformancesMechanicalLosses
 from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency
@@ -15,6 +15,8 @@ from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms_new import PerformancesCurrentRMS
 from .perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from .perf_voltage_rms import PerformancesVoltageRMS
+from .perf_windage_reynolds import PerformancesWindageReynolds
+from .perf_windage_friction_coeff import PerformancesWindageFrictionCoefficient
 from .perf_voltage_peak import PerformancesVoltagePeak
 from .perf_maximum import PerformancesMaximum
 
@@ -39,6 +41,20 @@ class PerformancesACPMSM(om.Group):
         )
 
         self.add_subsystem(
+            "windage_reynold",
+            PerformancesWindageReynolds(pmsm_id=pmsm_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "windage_friction_coeff",
+            PerformancesWindageFrictionCoefficient(
+                pmsm_id=pmsm_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
             "iron_losses",
             PerformancesIronLosses(pmsm_id=pmsm_id, number_of_points=number_of_points),
             promotes=["*"],
@@ -46,7 +62,7 @@ class PerformancesACPMSM(om.Group):
 
         self.add_subsystem(
             "joule_losses",
-            PerformancesJouleLosses2(pmsm_id=pmsm_id, number_of_points=number_of_points),
+            PerformancesJouleLosses(pmsm_id=pmsm_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 
