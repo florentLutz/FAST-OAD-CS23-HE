@@ -12,7 +12,7 @@ from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency
 from .perf_active_power import PerformancesActivePower
 from .perf_apparent_power import PerformancesApparentPower
-from .perf_current_rms_new import PerformancesCurrentRMS
+from .perf_current_rms import PerformancesCurrentRMS
 from .perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from .perf_voltage_rms import PerformancesVoltageRMS
 from .perf_windage_reynolds import PerformancesWindageReynolds

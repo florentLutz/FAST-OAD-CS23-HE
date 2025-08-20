@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class PerformancesJouleLosses(om.ExplicitComponent):
     """
-    Computation of the Joule losses.
-
+    Computation of the motor joule losses.
     """
 
     def initialize(self):
@@ -63,30 +62,26 @@ class PerformancesJouleLosses(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        I_rms = inputs["ac_current_rms_in_one_phase"]
-        R_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
 
-        P_j = R_s * I_rms**2.0
+        i_rms = inputs["ac_current_rms_in_one_phase"]
+        r_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses"] = (
-            P_j / 1000.0
+            r_s * i_rms**2.0 / 1000.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
-        I_rms = inputs["ac_current_rms_in_one_phase"]
-        R_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
 
-        dP_dRs = I_rms**2.0
-
-        dP_dIrms = 2.0 * R_s * I_rms
+        i_rms = inputs["ac_current_rms_in_one_phase"]
+        r_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
-        ] = dP_dRs / 1000.0
+        ] = i_rms**2.0 / 1000.0
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
             "ac_current_rms_in_one_phase",
-        ] = dP_dIrms / 1000.0
+        ] = 2.0 * r_s * i_rms / 1000.0

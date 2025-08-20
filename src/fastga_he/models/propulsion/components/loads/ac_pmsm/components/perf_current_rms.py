@@ -58,12 +58,10 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        torque = inputs["torque_out"]
-        k_t = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_constant"]
-
-        rms_current = torque / k_t
-
-        outputs["ac_current_rms_in"] = rms_current
+        outputs["ac_current_rms_in"] = (
+            inputs["torque_out"]
+            / inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_constant"]
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]

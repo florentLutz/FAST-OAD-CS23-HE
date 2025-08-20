@@ -8,9 +8,8 @@ import openmdao.api as om
 
 class PerformancesVoltageRMS(om.ExplicitComponent):
     """
-     Computation of the RMS of the voltage from the RMS of the current and apparent power.
-
-    Formula can be seen in :cite:`wildi:2005`.
+    Computation of the RMS of the voltage from the RMS of the current and apparent power.
+    Formula can be obtained from :cite:`wildi:2005`.
     """
 
     def initialize(self):
@@ -44,7 +43,6 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        # Ones_like or Zeros_like ?
         outputs["ac_voltage_rms_in"] = np.where(
             inputs["ac_current_rms_in"] != 0.0,
             inputs["apparent_power"] / inputs["ac_current_rms_in"],
@@ -57,6 +55,7 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
             1.0 / (inputs["ac_current_rms_in"]),
             np.full_like(inputs["ac_current_rms_in"], 1e-6),
         )
+
         partials["ac_voltage_rms_in", "ac_current_rms_in"] = -(
             np.where(
                 inputs["ac_current_rms_in"] != 0.0,

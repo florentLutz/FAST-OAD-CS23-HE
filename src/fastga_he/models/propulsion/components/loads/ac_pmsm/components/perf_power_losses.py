@@ -5,13 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
-# There is a problem with that model in that if the input shaft power goes to 0 so does the
-# efficiency which then cause the apparent power to not be 0, cutting off too small value
-# should solve the problem
-
 
 class PerformancesPowerLosses(om.ExplicitComponent):
-    """Computation of the total power losses as sum of Mechanical, Iron, Joule losses."""
+    """
+    Computation of the total motor power losses as sum of the mechanical, iron,  and joule
+    losses.
+    """
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami

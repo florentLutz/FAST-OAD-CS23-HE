@@ -27,7 +27,10 @@ class PerformancesApparentPower(om.ExplicitComponent):
         )
 
         self.add_output(
-            "apparent_power", units="W", val=np.full(number_of_points, 50e3), shape=number_of_points
+            "apparent_power",
+            units="W",
+            val=np.full(number_of_points, 50.0e3),
+            shape=number_of_points,
         )
 
     def setup_partials(self):

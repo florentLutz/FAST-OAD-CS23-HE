@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
     """
-    Computation of the rms current in one phase based on the current in all phases (DC equivalent).
+    Computation of the rms current in one-phase based on the current in all phases (DC equivalent).
     """
 
     def initialize(self):
