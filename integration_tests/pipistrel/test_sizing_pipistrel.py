@@ -853,7 +853,7 @@ def test_plot_power_profile_results():
         linecolor="black",
         linewidth=3,
         range=[-0.05, 0.9],
-        dtick=.2,
+        dtick=0.2,
     )
     fig.update_yaxes(
         ticks="outside",

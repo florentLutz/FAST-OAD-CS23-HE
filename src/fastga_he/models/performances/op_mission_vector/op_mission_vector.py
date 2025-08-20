@@ -396,8 +396,16 @@ class OperationalMissionVector(om.Group):
                     "data:mission:operational:energy",
                 ),
                 (
+                    "data:mission:sizing:main_route:energy",
+                    "data:mission:operational:main_route:energy",
+                ),
+                (
                     "data:mission:sizing:fuel",
                     "data:mission:operational:fuel",
+                ),
+                (
+                    "data:mission:sizing:main_route:fuel",
+                    "data:mission:operational:main_route:fuel",
                 ),
                 (
                     "data:mission:sizing:main_route:climb:distance",
