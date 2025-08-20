@@ -93,6 +93,7 @@ from fastga_he.models.performances.payload_range.payload_range_inner import Comp
 from fastga_he.models.performances.payload_range.payload_range_inner_group import (
     ComputePayloadRangeInnerGroup,
 )
+from fastga_he.models.performances.energy_specific_air_range import EnergySpecificAirRange
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
@@ -3291,3 +3292,40 @@ def test_payload_range_inner_with_builtin_sampling():
         ],
         abs=1.0,
     )
+
+
+def test_sizing_energy():
+    inputs_list = [
+        "data:mission:sizing:energy",
+        "data:TLAR:range",
+        "data:mission:operational:fuel",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # For the sake of the test
+    ivc.add_output("data:mission:sizing:fuel", units="kg", val=900.0)
+    ivc.add_output("data:mission:operational:energy", units="kW*h", val=50.0)
+    ivc.add_output("data:mission:operational:range", units="NM", val=200.0)
+
+    problem = run_system(EnergySpecificAirRange(), ivc)
+    assert problem.get_val(
+        "data:mission:sizing:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.01230, abs=1e-5)
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(EnergySpecificAirRange(mission="both"), ivc)
+    assert problem.get_val(
+        "data:mission:sizing:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.01230, abs=1e-5)
+    assert problem.get_val(
+        "data:mission:operational:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.1086, abs=1e-5)
+    problem.check_partials(compact_print=True)
+
+    # Should be slightly different wince AvGas contains more energy per unit weight
+    problem = run_system(EnergySpecificAirRange(mission="both", fuel_type="avgas"), ivc)
+    assert problem.get_val(
+        "data:mission:sizing:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.01211, abs=1e-5)
+    problem.check_partials(compact_print=True)
