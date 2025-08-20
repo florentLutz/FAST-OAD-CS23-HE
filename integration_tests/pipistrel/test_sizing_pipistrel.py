@@ -1,3 +1,4 @@
+import time
 import os
 import os.path as pth
 import logging
@@ -9,6 +10,7 @@ import pandas as pd
 
 import plotly.graph_objects as go
 import plotly.express as px
+import plotly.io as pio
 
 import fastoad.api as oad
 import openmdao.api as om
@@ -810,7 +812,7 @@ def test_plot_power_profile_results():
         y = all_data.loc[all_data["name"] == name, y_name]
 
         scatter = go.Scatter(
-            x=x,
+            x=x / 3600.0,
             y=y,
             mode="markers",
             marker={
@@ -826,14 +828,41 @@ def test_plot_power_profile_results():
         fig.add_trace(scatter)
 
     fig.update_layout(
-        xaxis_title="time [s]",
-        yaxis_title=y_name,
+        xaxis_title="Flight time [h]",
+        yaxis_title="Shaft power [kW]",
         showlegend=True,
     )
     fig.update_layout(
         height=800,
         width=1600,
         font_size=18,
+    )
+    fig.update_layout(
+        showlegend=True,
+        margin=dict(l=5, r=5, t=60, b=5),
+        title_x=0.5,
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=15),
+        tickfont=dict(size=15),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+        range=[-0.05, 0.9],
+        dtick=.2,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=15),
+        title_font=dict(size=15),
     )
     fig.update_layout(
         annotations=[
@@ -882,12 +911,21 @@ def test_plot_power_profile_results():
                 borderwidth=1,
                 bgcolor="white",
             ),
-        ]
+        ],
+        xaxis=dict(showgrid=True, gridcolor="lightgray", gridwidth=1),
     )
+    fig.add_vline(x=0, line_width=1, line_color="lightgray")
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
-    # fig.show()
-    # fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.pdf"))
-    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.svg"))
+    fig.show()
+    pdf_path = "results/pipistrel_performances_comparison.pdf"
+
+    pio.write_image(fig, pdf_path, width=1600, height=900)
+    time.sleep(3)
+    pio.write_image(fig, pdf_path, width=1600, height=900)
 
 
 def test_pipistrel_velis_club():
@@ -1038,14 +1076,41 @@ def test_plot_power_profile_results_club():
         fig.add_trace(scatter)
 
     fig.update_layout(
-        xaxis_title="time [h]",
-        yaxis_title=y_name,
+        xaxis_title="Flight time [h]",
+        yaxis_title="Shaft power [kW]",
         showlegend=True,
     )
     fig.update_layout(
         height=800,
         width=1600,
         font_size=18,
+    )
+    fig.update_layout(
+        showlegend=True,
+        margin=dict(l=5, r=5, t=60, b=5),
+        title_x=0.5,
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=15),
+        tickfont=dict(size=15),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+        range=[-0.1, 5.1],
+        dtick=1,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=15),
+        title_font=dict(size=15),
     )
     fig.update_layout(
         annotations=[
@@ -1094,8 +1159,18 @@ def test_plot_power_profile_results_club():
                 borderwidth=1,
                 bgcolor="white",
             ),
-        ]
+        ],
+        xaxis=dict(showgrid=True, gridcolor="lightgray", gridwidth=1),
     )
+    fig.add_vline(x=0, line_width=1, line_color="lightgray")
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
-    # fig.show()
-    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_club_performances_comparison.svg"))
+    fig.show()
+    pdf_path = "results/pipistrel_club_performances_comparison.pdf"
+
+    pio.write_image(fig, pdf_path, width=1600, height=900)
+    time.sleep(3)
+    pio.write_image(fig, pdf_path, width=1600, height=900)
