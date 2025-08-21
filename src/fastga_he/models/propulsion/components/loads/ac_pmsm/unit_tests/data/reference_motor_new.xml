@@ -39,6 +39,7 @@
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
                         <diameter units="m">0.187</diameter>
+                        <resistance units="ohm">0.0014608</resistance>
                         <front_length_ratio units="m">0.5</front_length_ratio>
                         <torque_constant units="N*m/A">0.4312</torque_constant>
                         <torque_max units="N*m">856.6</torque_max>

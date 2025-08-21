@@ -29,10 +29,9 @@ from ..components.sizing_rotor_weight import SizingRotorWeight
 from ..components.sizing_frame_weight import SizingFrameWeight
 from ..components.sizing_winding_stator_weight import SizingStatorWindingWeight
 from ..components.sizing_pmsm_weight import SizingMotorWeight
+
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_iron_losses import PerformancesIronLosses
-
-# from ..components.perf_Joule_losses import PerformancesJouleLosses
 from ..components.perf_joule_losses import PerformancesJouleLosses
 from ..components.perf_windage_reynolds import PerformancesWindageReynolds
 from ..components.perf_windage_friction_coeff import PerformancesWindageFrictionCoefficient
@@ -40,23 +39,18 @@ from ..components.perf_mechanical_losses import PerformancesMechanicalLosses
 from ..components.perf_power_losses import PerformancesPowerLosses
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_frequency import PerformancesFrequency
-
-# from ..components.specific_power import perfSpecificPower
 from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
-
 from ..components.perf_current_rms import PerformancesCurrentRMS
 from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
+
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
+
 from ..components.sizing_ac_pmsm import SizingACPMSM
-
-# from ..components.sizing_ac_pmsm_old import SizingACPMSMNEW
 from ..components.perf_ac_pmsm import PerformancesACPMSM
-# from ..components.perf_ac_pmsm_old import PerformancesACPMSMNEW
-
 
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
@@ -1120,7 +1114,11 @@ def test_peak_voltage():
 
 
 def test_maximum():
-    ivc = om.IndepVarComp()
+    ivc = get_indep_var_comp(
+        list_inputs(PerformancesMaximum(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
 
     ivc.add_output(
         "torque_out",
@@ -1453,71 +1451,16 @@ def test_performance_ACPMSM():
         1970.8434 * np.ones(NB_POINTS_TEST), rel=1e-2
     )
     assert problem.get_val("ac_current_rms_in_one_phase", units="A") == pytest.approx(
-        1970.8434 * np.ones(NB_POINTS_TEST) / 3, rel=1e-2
+        1970.8434 * np.ones(NB_POINTS_TEST) / 3.0, rel=1e-2
     )
     assert problem.get_val("ac_voltage_rms_in", units="V") == pytest.approx(
-        727 * np.ones(NB_POINTS_TEST), rel=1e-2
+        727.0 * np.ones(NB_POINTS_TEST), rel=1e-2
     )
     assert problem.get_val("ac_voltage_peak_in", units="V") == pytest.approx(
-        727 * np.ones(NB_POINTS_TEST) * np.sqrt(3 / 2), rel=1e-2
+        727.0 * np.ones(NB_POINTS_TEST) * np.sqrt(1.5), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
-
-
-# def test_performance_ACPMSM2():
-#     ivc = get_indep_var_comp(
-#         list_inputs(PerformancesACPMSMNEW(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
-#         __file__,
-#         XML_FILE,
-#     )
-#     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
-#     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-#     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:number_of_phases", val=3)
-#
-#     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
-#     ivc.add_output(
-#         "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-#     )
-#     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:end_winding_coeff", val=1.4)
-#     ivc.add_output(
-#         "data:propulsion:he_power_train:AC_PMSM:motor_1:active_length", val=0.3117, units="m"
-#     )
-#     ivc.add_output(
-#         "data:propulsion:he_power_train:AC_PMSM:motor_1:rot_diameter", val=0.1814, units="m"
-#     )
-#     ivc.add_output(
-#         "data:propulsion:he_power_train:AC_PMSM:motor_1:Airgap_thickness", val=0.0028, units="m"
-#     )
-#     ivc.add_output(
-#         "data:propulsion:he_power_train:AC_PMSM:motor_1:rotor_weight", val=56.97, units="kg"
-#     )
-#
-#     ivc.add_output(
-#         "data:propulsion:he_power_train:AC_PMSM:motor_1:resistance", val=0.0014608, units="ohm"
-#     )
-#
-#     # Run problem and check obtained value(s) is/(are) correct
-#     problem = run_system(
-#         PerformancesACPMSMNEW(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-#     )
-#
-#     om.n2(problem)
-#
-#     assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
-#         1970.8434 * np.ones(NB_POINTS_TEST), rel=1e-2
-#     )
-#     assert problem.get_val("ac_current_rms_in_one_phase", units="A") == pytest.approx(
-#         1970.8434 * np.ones(NB_POINTS_TEST) / 3, rel=1e-2
-#     )
-#     assert problem.get_val("ac_voltage_rms_in", units="V") == pytest.approx(
-#         727 * np.ones(NB_POINTS_TEST), rel=1e-2
-#     )
-#     assert problem.get_val("ac_voltage_peak_in", units="V") == pytest.approx(
-#         727 * np.ones(NB_POINTS_TEST) * np.sqrt(3 / 2), rel=1e-2
-#     )
-#
-#     problem.check_partials(compact_print=True)
 
 
 def test_weight_per_fu():

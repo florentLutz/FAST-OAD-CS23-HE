@@ -10,6 +10,7 @@ from .perf_joule_losses import PerformancesJouleLosses
 from .perf_mechanical_losses import PerformancesMechanicalLosses
 from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency
+from .perf_frequency import PerformancesFrequency
 from .perf_active_power import PerformancesActivePower
 from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms import PerformancesCurrentRMS
@@ -55,6 +56,24 @@ class PerformancesACPMSM(om.Group):
         )
 
         self.add_subsystem(
+            "frequency",
+            PerformancesFrequency(pmsm_id=pmsm_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "current_rms",
+            PerformancesCurrentRMS(pmsm_id=pmsm_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "current_rms_one_phase",
+            PerformancesCurrentRMS1Phase(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
             "iron_losses",
             PerformancesIronLosses(pmsm_id=pmsm_id, number_of_points=number_of_points),
             promotes=["*"],
@@ -93,18 +112,6 @@ class PerformancesACPMSM(om.Group):
         self.add_subsystem(
             "apparent_power",
             PerformancesApparentPower(pmsm_id=pmsm_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "current_rms",
-            PerformancesCurrentRMS(pmsm_id=pmsm_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "current_rms_one_phase",
-            PerformancesCurrentRMS1Phase(number_of_points=number_of_points),
             promotes=["*"],
         )
 
