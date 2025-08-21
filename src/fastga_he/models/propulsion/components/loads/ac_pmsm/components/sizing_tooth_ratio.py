@@ -30,9 +30,9 @@ class SizingToothRatio(om.ExplicitComponent):
             units="T",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
-            units="A/m",
+            units="T",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",

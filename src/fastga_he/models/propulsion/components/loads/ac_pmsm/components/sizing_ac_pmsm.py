@@ -25,9 +25,11 @@ from .sizing_pmsm_weight import SizingMotorWeight
 from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_cg_y import SizingPMSMCGY
 from .sizing_pmsm_drag import SizingPMSMDrag
-from .cstr_ac_pmsm import ConstraintsPMSM
 from .sizing_ratio_x2p import SizingRatioX2p
 from .sizing_tooth_ratio import SizingToothRatio
+
+from .cstr_ac_pmsm import ConstraintsPMSM
+
 from ..constants import POSSIBLE_POSITION
 
 
@@ -60,7 +62,9 @@ class SizingACPMSM(om.Group):
 
         self.add_subsystem("length", SizingActiveLength(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("RotDiameter", SizingRotorDiameter(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "rotor_diameter", SizingRotorDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem("ratio_x2p", SizingRatioX2p(pmsm_id=pmsm_id), promotes=["data:*"])
 
@@ -71,7 +75,7 @@ class SizingACPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "conductor ", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"]
+            "conductor_number", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
         self.add_subsystem("slot_width", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
@@ -86,16 +90,22 @@ class SizingACPMSM(om.Group):
             "conductor_cross_section", SizingConductorSection(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("lc", SizingConductorLength(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "conductor_length", SizingConductorLength(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem(
             "winding_resistivity", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("R_c", SizingResistance(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "electric_resistance", SizingResistance(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem(
-            "ExtDiameter", SizingExtStatorDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+            "stator_external_diameter",
+            SizingExtStatorDiameter(pmsm_id=pmsm_id),
+            promotes=["data:*"],
         )
 
         self.add_subsystem(
@@ -111,10 +121,6 @@ class SizingACPMSM(om.Group):
         self.add_subsystem("frame_weight", SizingFrameWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem("mass", SizingMotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        """self.add_subsystem(
-            "resistance", SizingMotorPhaseResistance(pmsm_id=pmsm_id), promotes=["data:*"]
-        )"""
 
         self.add_subsystem(
             "pmsm_cg_x", SizingPMSMCGX(pmsm_id=pmsm_id, position=position), promotes=["data:*"]

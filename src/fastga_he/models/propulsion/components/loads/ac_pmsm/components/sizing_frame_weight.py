@@ -144,18 +144,12 @@ class SizingFrameWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
-        ] = rho_fr * (
-            np.pi * k_tb * (r_fr**2.0 - r_out**2.0)
-            + 2.0 * np.pi * (tau_r_ - 1.0) * r_out * r_fr**2.0
-        )
+        ] = rho_fr * np.pi * k_tb * (r_fr**2.0 - r_out**2.0)
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
-        ] = rho_fr * (
-            np.pi * l_m * (r_fr**2.0 - r_out**2.0)
-            + 2.0 * np.pi * (tau_r_ - 1.0) * r_out * r_fr**2.0
-        )
+        ] = rho_fr * np.pi * l_m * (r_fr**2.0 - r_out**2.0)
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",

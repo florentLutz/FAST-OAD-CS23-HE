@@ -117,16 +117,15 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
 
         vol_wind = lc * hs * ns * ls
         mat_mix_density = k_fill * rho_c + (1.0 - k_fill) * rho_insl
-        W_stat_wind = vol_wind * mat_mix_density
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight"] = (
-            W_stat_wind
+            vol_wind * mat_mix_density
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        lc = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
+        lc = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
         rho_c = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":cond_mat_density"]
@@ -144,7 +143,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_lenght",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
         ] = hs * ns * ls * mat_mix_density
 
         partials[
@@ -159,7 +158,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
         ] = lc * hs * ls * mat_mix_density
 
         partials[

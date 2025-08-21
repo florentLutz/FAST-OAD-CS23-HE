@@ -198,3 +198,8 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
         ] = -hs * lm * ls * 2.0 * p * q * rho_sf
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density",
+        ] = np.pi * lm * (r_out**2.0 - r**2.0) - (hs * lm * ns * ls)
