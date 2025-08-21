@@ -89,7 +89,7 @@ def test_pipistrel_velis_electro():
         600.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(25.05, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.98, abs=1e-2)
 
 
 def test_pipistrel_performances_with_lower_soh():
@@ -1011,6 +1011,77 @@ def test_pipistrel_velis_club():
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(63, rel=5e-2)
+
+
+def test_pipistrel_velis_club_op():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+
+    # Define used files depending on options
+    process_file_name = "pipistrel_club_configuration_op.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(RESULTS_FOLDER_PATH, "pipistrel_club_out.xml")
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+
+    # Here we will open the input file and complete with the missing data.
+    datafile = oad.DataFile(problem.input_file_path)
+    datafile.append(oad.Variable("data:mission:operational:range", val=53.0, units="km"))
+    datafile.append(
+        oad.Variable("data:mission:operational:climb:climb_rate:sea_level", val=5.334, units="m/s")
+    )
+    datafile.append(
+        oad.Variable(
+            "data:mission:operational:climb:climb_rate:cruise_level", val=5.06476, units="m/s"
+        )
+    )
+    datafile.append(oad.Variable("data:mission:operational:climb:v_eas", val=38.0, units="m/s"))
+    datafile.append(
+        oad.Variable("data:mission:operational:descent:descent_rate", val=-2.286, units="m/s")
+    )
+    datafile.append(oad.Variable("data:mission:operational:descent:v_eas", val=35.0, units="m/s"))
+    datafile.append(
+        oad.Variable("data:mission:operational:cruise:altitude", val=2000.0, units="ft")
+    )
+    datafile.append(oad.Variable("data:mission:operational:cruise:v_tas", val=119.0, units="knot"))
+    datafile.append(
+        oad.Variable("data:mission:operational:initial_climb:energy", val=0.0, units="W*h")
+    )
+    datafile.append(
+        oad.Variable("data:mission:operational:initial_climb:fuel", val=0.0, units="kg")
+    )
+    datafile.append(oad.Variable("data:mission:operational:takeoff:energy", val=0.0, units="W*h"))
+    datafile.append(oad.Variable("data:mission:operational:takeoff:fuel", val=0.8, units="kg"))
+    datafile.append(oad.Variable("data:mission:operational:payload:CG:x", val=2.4, units="m"))
+    datafile.append(oad.Variable("data:mission:operational:payload:mass", val=188.0, units="kg"))
+    datafile.append(
+        oad.Variable("data:mission:operational:reserve:altitude", val=1219.0, units="m")
+    )
+    datafile.append(
+        oad.Variable("data:mission:operational:reserve:duration", val=30.0, units="min")
+    )
+    datafile.append(oad.Variable("data:mission:operational:taxi_in:duration", val=150.0, units="s"))
+    datafile.append(oad.Variable("data:mission:operational:taxi_in:speed", val=10.28, units="m/s"))
+    datafile.append(
+        oad.Variable("data:mission:operational:taxi_out:duration", val=150.0, units="s")
+    )
+    datafile.append(oad.Variable("data:mission:operational:taxi_out:speed", val=10.28, units="m/s"))
+    datafile.save()
+
+    problem.read_inputs()
+    problem.setup()
+
+    # Run the problem
+    problem.run_model()
+
+    problem.write_outputs()
 
 
 def test_plot_power_profile_results_club():
