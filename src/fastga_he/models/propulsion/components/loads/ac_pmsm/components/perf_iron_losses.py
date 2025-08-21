@@ -83,15 +83,15 @@ class PerformancesIronLosses(om.ExplicitComponent):
         sqrt_bm = np.sqrt(bm)
 
         # specific power
-        Sp_pow = 0.0
+        sp_pow = 0.0
 
         for i in range(4):  # i = power of sqrt(f)
             for j in range(4):  # j = power of sqrt(bm)
                 coeff = COEFFS_RESHAPED[i][j]
-                Sp_pow += coeff * (sqrt_f ** (i + 1.0)) * (sqrt_bm ** (j + 1.0))
+                sp_pow += coeff * (sqrt_f ** (i + 1.0)) * (sqrt_bm ** (j + 1.0))
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses"] = (
-            w_motor * Sp_pow / 1000.0
+            w_motor * sp_pow / 1000.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -102,31 +102,31 @@ class PerformancesIronLosses(om.ExplicitComponent):
         sqrt_f = np.sqrt(f)
         sqrt_bm = np.sqrt(bm)
 
-        Sp_pow = 0.0
-        dSp_pow_df = 0.0
-        dSp_pow_dbm = 0.0
+        sp_pow = 0.0
+        dsp_pow_df = 0.0
+        dsp_pow_dbm = 0.0
 
         for i in range(4):  # i = power of sqrt(f)
             for j in range(4):  # j = power of sqrt(bm)
                 coeff = COEFFS_RESHAPED[i][j]
-                Sp_pow += coeff * (sqrt_f ** (i + 1)) * (sqrt_bm ** (j + 1))
-                dSp_pow_df += (
+                sp_pow += coeff * (sqrt_f ** (i + 1)) * (sqrt_bm ** (j + 1))
+                dsp_pow_df += (
                     coeff * (i + 1.0) * 0.5 * (f ** (0.5 * i - 0.5)) * (sqrt_bm ** (j + 1.0))
                 )
-                dSp_pow_dbm += (
+                dsp_pow_dbm += (
                     coeff * (sqrt_f ** (i + 1.0)) * (j + 1.0) * 0.5 * (bm ** (0.5 * j - 0.5))
                 )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
-        ] = Sp_pow / 1000.0
+        ] = sp_pow / 1000.0
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses", "frequency"
-        ] = dSp_pow_df * w_motor / 1000.0
+        ] = dsp_pow_df * w_motor / 1000.0
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
-        ] = dSp_pow_dbm * w_motor / 1000.0
+        ] = dsp_pow_dbm * w_motor / 1000.0

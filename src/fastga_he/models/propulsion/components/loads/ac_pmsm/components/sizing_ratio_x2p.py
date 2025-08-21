@@ -7,7 +7,10 @@ import openmdao.api as om
 
 
 class SizingRatioX2p(om.ExplicitComponent):
-    """Computation of the slot height of the PMSM."""
+    """
+    Computation of a fraction in the airgap flux density calculation. This ratio consists of the
+    radius ratio and the number of pole pairs.
+    """
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami

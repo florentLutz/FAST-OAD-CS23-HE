@@ -62,10 +62,11 @@ class SizingToothRatio(om.ExplicitComponent):
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"]
         mu_0 = 4.0 * np.pi * 1.0e-7  # Magnetic permeability [H/m]
+        max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio"] = (
-            2.0 / np.pi
-        ) * np.sqrt((b_m / b_st) ** 2.0 + ((mu_0 * k_m * x2p_ratio / b_st) ** 2.0))
+            2.0 * max_total_airgap_flux_density / (np.pi * np.abs(b_st))
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
@@ -77,24 +78,34 @@ class SizingToothRatio(om.ExplicitComponent):
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
-        common_term = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
+        max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
-        ] = 2.0 * (mu_0 * k_m) ** 2.0 * x2p_ratio / (np.pi * np.abs(b_st) * common_term)
+        ] = (
+            2.0
+            * (mu_0 * k_m) ** 2.0
+            * x2p_ratio
+            / (np.pi * np.abs(b_st) * max_total_airgap_flux_density)
+        )
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
-        ] = 2.0 * b_m / (np.pi * np.abs(b_st) * common_term)
+        ] = 2.0 * b_m / (np.pi * np.abs(b_st) * max_total_airgap_flux_density)
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density",
-        ] = -2.0 * common_term / (np.pi * b_st * np.abs(b_st))
+        ] = -2.0 * max_total_airgap_flux_density / (np.pi * b_st * np.abs(b_st))
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
-        ] = 2.0 * (mu_0 * x2p_ratio) ** 2.0 * k_m / (np.pi * np.abs(b_st) * common_term)
+        ] = (
+            2.0
+            * (mu_0 * x2p_ratio) ** 2.0
+            * k_m
+            / (np.pi * np.abs(b_st) * max_total_airgap_flux_density)
+        )
