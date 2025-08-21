@@ -119,9 +119,13 @@ def test_length():
 
 
 def test_yoke_height():
-    ivc = get_indep_var_comp(list_inputs(SizingActiveLength(pmsm_id="motor_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(SizingStatorYokeHeight(pmsm_id="motor_1")), __file__, XML_FILE
+    )
+
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
+    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:ratiox2p", val=16.435)
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:surface_current_density",
         val=111.100,
