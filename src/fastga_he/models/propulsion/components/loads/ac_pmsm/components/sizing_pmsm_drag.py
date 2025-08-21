@@ -182,6 +182,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
                     + 2.0 * cf * np.pi * motor_diameter * (1.0 / 4.0 + fineness)
                 )
             )
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":fairing:fineness",
@@ -198,10 +199,12 @@ class SizingPMSMDrag(om.ExplicitComponent):
                     + cf * form_factor * np.pi * motor_diameter**2.0
                 )
             )
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
                 "data:geometry:wing:area",
             ] = -interference_factor * cf * form_factor * fairing_wet_area / wing_area**2.0
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
                 "data:aerodynamics:" + ls_tag + ":mach",
@@ -218,6 +221,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
                 * 2.0
                 * mach
             )
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
                 "data:aerodynamics:" + ls_tag + ":unit_reynolds",

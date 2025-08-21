@@ -48,13 +48,12 @@ class SizingRotorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
-        D = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
+        d = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
         # Equation II-43: Stator inner radius R
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] = x * D
-
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] = x * d
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"] = (
-            (1.0 - x) * D / 2.0
+            (1.0 - x) * d / 2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

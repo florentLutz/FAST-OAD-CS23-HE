@@ -55,13 +55,14 @@ class SizingConductorsNumber(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         q = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases"]
         m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
-        N_c = 2.0 * p * q * m
-
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"] = N_c
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"] = (
+            2.0 * p * q * m
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]

@@ -15,7 +15,7 @@ from .sizing_conductor_section import SizingConductorSection
 from .sizing_conductor_length import SizingConductorLength
 from .sizing_conductors_number import SizingConductorsNumber
 from .sizing_winding_resistivity import SizingWindingResistivity
-from .sizing_resistance_new2 import SizingResistanceNew2
+from .sizing_resistance import SizingResistance
 from .sizing_external_stator_diameter import SizingExtStatorDiameter
 from .sizing_stator_core_weight import SizingStatorCoreWeight
 from .sizing_winding_stator_weight import SizingStatorWindingWeight
@@ -92,7 +92,7 @@ class SizingACPMSM(om.Group):
             "winding_resistivity", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("R_c", SizingResistanceNew2(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("R_c", SizingResistance(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem(
             "ExtDiameter", SizingExtStatorDiameter(pmsm_id=pmsm_id), promotes=["data:*"]

@@ -65,9 +65,9 @@ class SizingRotorWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        Lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
+        lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-        R_r = (inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"]) / 2.0
+        r_r = (inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"]) / 2.0
 
         if p <= 10.0:
             rho_rot = -431.67 * p + 7932.0
@@ -77,15 +77,15 @@ class SizingRotorWeight(om.ExplicitComponent):
             rho_rot = 1600.0
 
         # Rotor weight
-        W_rot = np.pi * R_r**2.0 * Lm * rho_rot
-
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight"] = W_rot
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight"] = (
+            np.pi * r_r**2.0 * lm * rho_rot
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
-        Lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
+        lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-        R_r = (inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"]) / 2.0
+        r_r = (inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"]) / 2.0
 
         if p <= 10.0:
             rho_rot = -431.67 * p + 7932.0
@@ -100,14 +100,14 @@ class SizingRotorWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
-        ] = np.pi * R_r**2.0 * rho_rot
+        ] = np.pi * r_r**2.0 * rho_rot
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
-        ] = np.pi * R_r * Lm * rho_rot
+        ] = np.pi * r_r * lm * rho_rot
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-        ] = np.pi * R_r**2.0 * Lm * drho_dp
+        ] = np.pi * r_r**2.0 * lm * drho_dp

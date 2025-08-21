@@ -113,9 +113,9 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":insul_mat_density"
         ]
         k_fill = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor"]
-        Ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
+        ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
 
-        vol_wind = lc * hs * Ns * ls
+        vol_wind = lc * hs * ns * ls
         mat_mix_density = k_fill * rho_c + (1.0 - k_fill) * rho_insl
         W_stat_wind = vol_wind * mat_mix_density
 
@@ -135,9 +135,9 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         ]
         k_fill = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor"]
 
-        Ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
+        ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
 
-        vol_wind = lc * hs * Ns * ls
+        vol_wind = lc * hs * ns * ls
         mat_mix_density = k_fill * rho_c + (1.0 - k_fill) * rho_insl
 
         # Equation II-46: Slot height hs
@@ -145,17 +145,17 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_lenght",
-        ] = hs * Ns * ls * mat_mix_density
+        ] = hs * ns * ls * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-        ] = lc * Ns * ls * mat_mix_density
+        ] = lc * ns * ls * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-        ] = lc * hs * Ns * mat_mix_density
+        ] = lc * hs * ns * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",

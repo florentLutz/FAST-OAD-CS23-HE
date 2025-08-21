@@ -49,32 +49,32 @@ class SizingSlotWidth(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        R = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
+        d = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
         tooth_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio"]
-        N = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
+        ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"] = (
-            (1.0 - tooth_ratio) * np.pi * R / N
+            (1.0 - tooth_ratio) * np.pi * d / ns
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        R = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2.0
+        d = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2.0
         tooth_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio"]
-        N = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
+        ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-        ] = (1.0 - tooth_ratio) * np.pi / N
+        ] = (1.0 - tooth_ratio) * np.pi / ns
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
-        ] = -np.pi * R / N
+        ] = -np.pi * d / ns
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
-        ] = -(1.0 - tooth_ratio) * np.pi * R / N**2.0
+        ] = -(1.0 - tooth_ratio) * np.pi * d / ns**2.0

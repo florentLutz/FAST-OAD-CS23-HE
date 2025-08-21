@@ -72,6 +72,9 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             units="kg",
         )
 
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
@@ -120,89 +123,78 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        R = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2
-        R_out = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"] / 2
+        r = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2.0
+        r_out = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"]
+            / 2.0
         )
         q = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases"]
         m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-        Lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
+        lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
         rho_sf = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density"]
 
         # Equation II-46: Slot height hs
 
-        Ns = 2 * p * q * m
-        W_stat_core = (np.pi * Lm * (R_out**2 - R**2) - (hs * Lm * Ns * ls)) * rho_sf
-
+        ns = 2.0 * p * q * m
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight"] = (
-            W_stat_core
-        )
+            np.pi * lm * (r_out**2.0 - r**2.0) - (hs * lm * ns * ls)
+        ) * rho_sf
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
-        R = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2
-        R_out = (
+        r = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] / 2
+        r_out = (
             inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"] / 2
         )
         q = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases"]
         m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
         p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
-        Lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
+        lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
         rho_sf = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density"]
 
-        # Equation II-46: Slot height hs
-
-        Ns = 2 * p * q * m
-        dW_dD = -np.pi * Lm * R * rho_sf
-        dW_dD_ext = np.pi * Lm * R_out * rho_sf
-        dW_dhs = -Lm * ls * Ns * rho_sf
-        dW_dls = -Lm * hs * Ns * rho_sf
-        dW_dLm = (np.pi * (R_out**2 - R**2) - ls * hs * Ns) * rho_sf
-        dW_dp = -hs * Lm * ls * 2 * q * m * rho_sf
-        dW_dq = -hs * Lm * ls * 2 * p * m * rho_sf
-        dW_dm = -hs * Lm * ls * 2 * p * q * rho_sf
+        ns = 2.0 * p * q * m
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-        ] = dW_dD
+        ] = -np.pi * lm * r * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
-        ] = dW_dD_ext
+        ] = np.pi * lm * r_out * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-        ] = dW_dhs
+        ] = -lm * ls * ns * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
-        ] = dW_dls
+        ] = -lm * hs * ns * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
-        ] = dW_dLm
+        ] = (np.pi * (r_out**2.0 - r**2.0) - ls * hs * ns) * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-        ] = dW_dp
+        ] = -hs * lm * ls * 2.0 * q * m * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
-        ] = dW_dq
+        ] = -hs * lm * ls * 2.0 * p * m * rho_sf
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
-        ] = dW_dm
+        ] = -hs * lm * ls * 2.0 * p * q * rho_sf

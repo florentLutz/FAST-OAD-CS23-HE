@@ -23,7 +23,7 @@ from ..components.sizing_winding_resistivity import SizingWindingResistivity
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
 
 # from ..components.sizing_resistance_new import SizingResistanceNew
-from ..components.sizing_resistance_new2 import SizingResistanceNew2
+from ..components.sizing_resistance import SizingResistance
 from ..components.sizing_stator_core_weight import SizingStatorCoreWeight
 from ..components.sizing_rotor_weight import SizingRotorWeight
 from ..components.sizing_frame_weight import SizingFrameWeight
@@ -372,9 +372,7 @@ def test_x2p_ratio():
 
 
 def test_Resistance2():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingResistanceNew2(pmsm_id="motor_1")), __file__, XML_FILE
-    )
+    ivc = get_indep_var_comp(list_inputs(SizingResistance(pmsm_id="motor_1")), __file__, XML_FILE)
 
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:conductors_number", val=24)
     ivc.add_output(
@@ -392,9 +390,7 @@ def test_Resistance2():
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        SizingResistanceNew2(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
+    problem = run_system(SizingResistance(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:resistance", units="ohm"

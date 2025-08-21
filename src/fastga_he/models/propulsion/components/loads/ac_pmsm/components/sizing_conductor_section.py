@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingConductorSection(om.ExplicitComponent):
     """
-    Computation of the Conducor section.
+    Computation of the conductor section.
 
     """
 
@@ -58,19 +58,21 @@ class SizingConductorSection(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        S_slot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"]
+
+        s_slot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"]
         k_fill = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor"]
         k_sc = inputs[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor"
         ]
 
-        S_cond = S_slot * k_sc * k_fill
-
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section"] = S_cond
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section"] = (
+            s_slot * k_sc * k_fill
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
-        S_slot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"]
+
+        s_slot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"]
         k_fill = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor"]
         k_sc = inputs[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor"
@@ -84,9 +86,9 @@ class SizingConductorSection(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
-        ] = S_slot * k_sc
+        ] = s_slot * k_sc
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
-        ] = S_slot * k_fill
+        ] = s_slot * k_fill

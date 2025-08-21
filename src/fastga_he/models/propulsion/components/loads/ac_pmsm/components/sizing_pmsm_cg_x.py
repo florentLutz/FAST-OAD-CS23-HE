@@ -99,15 +99,18 @@ class SizingPMSMCGX(om.ExplicitComponent):
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:x",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":from_LE",
-            ] = -1
+            ] = -1.0
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:x",
                 "data:geometry:wing:MAC:length",
             ] = -0.25
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:x",
                 "data:geometry:wing:MAC:at25percent:x",
             ] = 1.0
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:x",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
@@ -118,6 +121,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:x",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":front_length_ratio",
             ] = inputs["data:geometry:fuselage:front_length"]
+
             partials[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:x",
                 "data:geometry:fuselage:front_length",

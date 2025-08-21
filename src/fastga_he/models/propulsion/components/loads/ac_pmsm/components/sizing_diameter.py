@@ -65,18 +65,19 @@ class SizingStatorDiameter(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         lambda_ = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient"]
         sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
         T_max = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating"]
 
         # Equation II-43: Stator inner radius R
-
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] = 2.0 * (
             ((lambda_ / (4.0 * np.pi * sigma)) * T_max) ** (1.0 / 3.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
+
         x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient"]
         y = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
         z = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating"]
