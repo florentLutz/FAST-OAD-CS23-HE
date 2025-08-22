@@ -25,11 +25,11 @@ class SizingStatorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient",
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
         )
@@ -49,12 +49,12 @@ class SizingStatorDiameter(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient",
+            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient",
             method="exact",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
+            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
             method="exact",
         )
         self.declare_partials(
@@ -66,8 +66,8 @@ class SizingStatorDiameter(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        lambda_ = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient"]
-        sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
+        lambda_ = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient"]
+        sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress"]
         T_max = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating"]
 
         # Equation II-43: Stator inner radius R
@@ -78,13 +78,13 @@ class SizingStatorDiameter(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient"]
-        y = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
+        x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient"]
+        y = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress"]
         z = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating"]
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Form_coefficient",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient",
         ] = (
             2.0
             * (z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
@@ -93,7 +93,7 @@ class SizingStatorDiameter(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
         ] = (
             -2.0
             * (x ** (1.0 / 3.0) * z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))

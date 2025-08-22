@@ -44,7 +44,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
         )
@@ -68,7 +68,7 @@ class SizingSlotHeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
+        sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress"]
         k_w = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor"]
         b_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
         j_rms = inputs[
@@ -87,7 +87,7 @@ class SizingSlotHeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress"]
+        sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress"]
         k_w = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor"]
         b_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
         j_rms = inputs[
@@ -101,7 +101,7 @@ class SizingSlotHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Tangential_stress",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
         ] = np.sqrt(2.0) / (k_w * b_m * j_rms * k_sc * k_fill * (1.0 - r_tooth))
 
         partials[

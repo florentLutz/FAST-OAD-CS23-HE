@@ -32,7 +32,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
             units="m",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             val=np.nan,
             units="m",
         )
@@ -68,7 +68,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
         )
         self.declare_partials(
             of="airgap_reynolds_number",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -79,7 +79,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
-        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"]
+        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
 
         temp = 300.0  # Air temperature [K]
         pr = 1.0  # Air pressure [atm]
@@ -97,7 +97,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
-        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"]
+        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
 
         temp = 300.0  # Air temperature [K]
         pr = 1.0  # Air pressure [atm]
@@ -114,7 +114,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         partials[
             "airgap_reynolds_number",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
         ] = (rho_air * r_rot * omega) / mu_air
 
         partials["airgap_reynolds_number", "rpm"] = (

@@ -34,7 +34,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             units="m",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             val=np.nan,
             units="m",
         )
@@ -64,7 +64,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             of="airgap_friction_coeff",
             wrt=[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -75,7 +75,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
-        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"]
+        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
         re_a = inputs["airgap_reynolds_number"]
         re_r = inputs["rotor_end_reynolds_number"]
         cf_a = np.zeros_like(re_a)
@@ -99,7 +99,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
 
         r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
         d_rot = r_rot * 2.0
-        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"]
+        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
         re_a = inputs["airgap_reynolds_number"]
         re_r = inputs["rotor_end_reynolds_number"]
 
@@ -128,7 +128,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
 
         partials[
             "airgap_friction_coeff",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
         ] = dcfde_g
 
         partials[

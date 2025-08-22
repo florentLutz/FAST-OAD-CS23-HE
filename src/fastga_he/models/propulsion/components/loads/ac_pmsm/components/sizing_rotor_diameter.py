@@ -33,7 +33,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
             units="m",
         )
         self.add_output(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             units="m",
         )
 
@@ -52,7 +52,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         # Equation II-43: Stator inner radius R
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] = x * d
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness"] = (
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"] = (
             (1.0 - x) * d / 2.0
         )
 
@@ -70,12 +70,12 @@ class SizingRotorDiameter(om.ExplicitComponent):
         ] = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
         ] = (-inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]) / 2.0
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Airgap_thickness",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
         ] = (
             1.0 - inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
