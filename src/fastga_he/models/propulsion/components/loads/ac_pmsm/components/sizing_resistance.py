@@ -29,6 +29,7 @@ class SizingResistance(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
+            desc="Number of conductor slots",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",

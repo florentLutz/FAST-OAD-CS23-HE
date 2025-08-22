@@ -8,13 +8,11 @@ import openmdao.api as om
 
 class PerformancesPowerLosses(om.ExplicitComponent):
     """
-    Computation of the total motor power losses as sum of the mechanical, iron,  and joule
+    Computation of the total motor power losses as sum of the mechanical, iron, and joule
     losses.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
@@ -27,7 +25,7 @@ class PerformancesPowerLosses(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
             units="W",
             val=np.nan,
             shape=number_of_points,
@@ -59,7 +57,7 @@ class PerformancesPowerLosses(om.ExplicitComponent):
         self.declare_partials(
             of="power_losses",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mechanical_power_losses",
             ],
@@ -71,7 +69,7 @@ class PerformancesPowerLosses(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        p_j = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses"]
+        p_j = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses"]
         p_iron = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses"]
         p_mec_loss = inputs[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mechanical_power_losses"
@@ -90,7 +88,7 @@ class PerformancesPowerLosses(om.ExplicitComponent):
 
         partials[
             "power_losses",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
         ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
 
         partials[

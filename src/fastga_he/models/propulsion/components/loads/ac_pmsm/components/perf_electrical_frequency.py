@@ -6,8 +6,11 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesFrequency(om.ExplicitComponent):
-    """Computation of the frequency from number of pole pairs and rpm."""
+class PerformancesElectricalFrequency(om.ExplicitComponent):
+    """
+    Computation of the electrical frequency determines the speed at which the magnetic field
+    rotates inside the motor.
+    """
 
     def initialize(self):
         self.options.declare(
@@ -25,23 +28,30 @@ class PerformancesFrequency(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
+            desc="Number of the north and south pole pairs in the PMSM",
         )
 
-        self.add_output("frequency", units="s**-1", val=0.0, shape=number_of_points)
+        self.add_output(
+            "electrical_frequency",
+            units="s**-1",
+            val=0.0,
+            shape=number_of_points,
+            desc="Number of the north and south pairs in the PMSM",
+        )
 
     def setup_partials(self):
         pmsm_id = self.options["pmsm_id"]
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="frequency",
+            of="electrical_frequency",
             wrt="rpm",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="frequency",
+            of="electrical_frequency",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             method="exact",
             rows=np.arange(number_of_points),
@@ -51,7 +61,7 @@ class PerformancesFrequency(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        outputs["frequency"] = (
+        outputs["electrical_frequency"] = (
             inputs["rpm"]
             * inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
             / 60.0
@@ -62,10 +72,11 @@ class PerformancesFrequency(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         partials[
-            "frequency", "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"
+            "electrical_frequency",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
         ] = inputs["rpm"] / 60.0
 
-        partials["frequency", "rpm"] = np.full(
+        partials["electrical_frequency", "rpm"] = np.full(
             number_of_points,
             inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
             / 60.0,

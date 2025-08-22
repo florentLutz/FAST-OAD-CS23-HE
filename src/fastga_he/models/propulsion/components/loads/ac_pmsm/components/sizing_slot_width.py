@@ -7,19 +7,15 @@ import openmdao.api as om
 
 
 class SizingSlotWidth(om.ExplicitComponent):
-    """Computation of the slot width of the PMSM."""
+    """
+    Computation of single slot width of the PMSM.The formula is obtained from
+    equation (III-55) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
@@ -27,15 +23,18 @@ class SizingSlotWidth(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
+            desc="Number of conductor slots",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
             val=np.nan,
+            desc="The fraction between overall tooth length and stator bore circumference",
         )
 
         self.add_output(

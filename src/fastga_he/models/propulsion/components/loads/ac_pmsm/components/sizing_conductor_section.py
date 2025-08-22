@@ -8,8 +8,7 @@ import openmdao.api as om
 
 class SizingConductorSection(om.ExplicitComponent):
     """
-    Computation of the conductor section.
-
+    Computation of the conductor material area coverage in one stator slot of the PMSM.
     """
 
     def initialize(self):
@@ -29,14 +28,17 @@ class SizingConductorSection(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
             val=np.nan,
             units="m**2",
+            desc="Single slot cross section area on the motor stator",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
             val=np.nan,
+            desc="The factor describes the conductor material fullness inside the stator slots",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
             val=np.nan,
+            desc="The area factor considers the cross-section shape twist due to wire bunching",
         )
 
         self.add_output(

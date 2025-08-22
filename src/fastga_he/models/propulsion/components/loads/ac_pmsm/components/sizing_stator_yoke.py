@@ -7,19 +7,15 @@ import openmdao.api as om
 
 
 class SizingStatorYokeHeight(om.ExplicitComponent):
-    """Computation of the slot height of the PMSM."""
+    """
+    Computation of the stator yoke thickness of the PMSM. The formula is obtained from
+    equation (II-45) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
@@ -27,6 +23,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
+            desc="Number of the north and south pairs in the PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",
@@ -36,11 +33,13 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":yoke_flux_density",
             val=np.nan,
             units="T",
+            desc="Magnetic flux density at the stator yoke layer",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
@@ -51,11 +50,13 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
             units="T",
+            desc="The magnetic flux density provided by the permanent magnets",
         )
 
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
             units="m",
+            desc="Stator yoke thickness of the PMSM",
         )
 
     def setup_partials(self):

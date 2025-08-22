@@ -7,11 +7,12 @@ import openmdao.api as om
 
 
 class SizingActiveLength(om.ExplicitComponent):
-    """Computation of the Active Length of a cylindrical PMSM."""
+    """
+    Computation of the length in the PMSM that is electromagnetically active. The formula is
+    obtained from equation (II-44) in :cite:`touhami:2020`.
+    """
 
     def initialize(self):
-        #  Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -23,6 +24,7 @@ class SizingActiveLength(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient",
@@ -32,6 +34,7 @@ class SizingActiveLength(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             units="m",
+            desc="The stator length of PMSM",
         )
 
     def setup_partials(self):
@@ -51,8 +54,6 @@ class SizingActiveLength(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-
-        # Equation II-43: Stator inner radius R
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"] = (
             inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]

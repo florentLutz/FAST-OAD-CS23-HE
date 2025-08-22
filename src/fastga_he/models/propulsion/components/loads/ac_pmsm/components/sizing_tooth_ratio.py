@@ -28,11 +28,13 @@ class SizingToothRatio(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_flux_density",
             val=np.nan,
             units="T",
+            desc="Magnetic flux density at the stator teeth(slot) layer",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
             units="T",
+            desc="The magnetic flux density provided by the permanent magnets",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
@@ -46,7 +48,9 @@ class SizingToothRatio(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio", val=0.04
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
+            val=0.04,
+            desc="The fraction between overall tooth length and stator bore circumference",
         )
 
     def setup_partials(self):

@@ -47,8 +47,8 @@ class PerformancesTorque(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         power = inputs["shaft_power_out"]
         rpm = inputs["rpm"]
-        omega = rpm * 2.0 * np.pi / 60
 
+        omega = rpm * 2.0 * np.pi / 60
         torque = power / omega
 
         outputs["torque_out"] = torque
@@ -58,7 +58,6 @@ class PerformancesTorque(om.ExplicitComponent):
         power = inputs["shaft_power_out"]
         rpm = inputs["rpm"]
 
-        omega = rpm * 2.0 * np.pi / 60
+        partials["torque_out", "shaft_power_out"] = 60.0 / (rpm * 2.0 * np.pi)
 
-        partials["torque_out", "shaft_power_out"] = 1.0 / omega
-        partials["torque_out", "rpm"] = -power / omega**2.0 * 2.0 * np.pi / 60
+        partials["torque_out", "rpm"] = -power / rpm**2.0 * np.pi / 30.0

@@ -9,12 +9,10 @@ import openmdao.api as om
 class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
     """
     Computation of the friction coefficients resulting from windage in mechanical loss
-    estimation.
+    estimation. The conditions are given by equation (II-73) and (II-76) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -29,7 +27,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         self.add_input("airgap_reynolds_number", val=np.nan, shape=number_of_points)
         self.add_input("rotor_end_reynolds_number", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             val=np.nan,
             units="m",
         )
@@ -37,6 +35,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             val=np.nan,
             units="m",
+            desc="The distance between the rotor and the stator bore",
         )
 
         self.add_output("airgap_friction_coeff", val=np.zeros(number_of_points))
@@ -63,7 +62,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         self.declare_partials(
             of="airgap_friction_coeff",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             ],
             method="exact",
@@ -74,16 +73,18 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
+        r_rot = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+        )
         e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
         re_a = inputs["airgap_reynolds_number"]
         re_r = inputs["rotor_end_reynolds_number"]
         cf_a = np.zeros_like(re_a)
 
         # Conditions
-        mask_1 = (re_a > 500) & (re_a < 1e4)
-        mask_2 = re_a >= 1e4
-        mask_3 = re_a <= 500
+        mask_1 = (re_a > 500.0) & (re_a < 1.0e4)
+        mask_2 = re_a >= 1.0e4
+        mask_3 = re_a <= 500.0
 
         cf_a[mask_1] = 0.515 * (e_g / r_rot) ** 0.3 * (re_a[mask_1] ** -0.5)
         cf_a[mask_2] = 0.0325 * (e_g / r_rot) ** 0.3 * (re_a[mask_2] ** -0.2)
@@ -91,13 +92,15 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
 
         outputs["airgap_friction_coeff"] = cf_a
         outputs["rotor_end_friction_coeff"] = np.where(
-            re_r < 3e5, 3.87 / re_r**0.5, 0.146 / re_r**0.2
+            re_r < 3.0e5, 3.87 / re_r**0.5, 0.146 / re_r**0.2
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
+        r_rot = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+        )
         d_rot = r_rot * 2.0
         e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
         re_a = inputs["airgap_reynolds_number"]
@@ -108,9 +111,9 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         dcfdrot = np.zeros_like(re_a)
 
         # Conditions
-        mask_1 = (re_a > 500) & (re_a < 1e4)
-        mask_2 = re_a >= 1e4
-        mask_3 = re_a <= 500
+        mask_1 = (re_a > 500.0) & (re_a < 1.0e4)
+        mask_2 = re_a >= 1.0e4
+        mask_3 = re_a <= 500.0
 
         dcfdre[mask_1] = -0.2575 * (e_g / r_rot) ** 0.3 * (re_a[mask_1] ** -1.5)
         dcfdre[mask_2] = -0.0065 * (e_g / r_rot) ** 0.3 * (re_a[mask_2] ** -1.2)
@@ -133,9 +136,9 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
 
         partials[
             "airgap_friction_coeff",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
         ] = dcfdrot
 
         partials["rotor_end_friction_coeff", "rotor_end_reynolds_number"] = np.where(
-            re_r < 3e5, -1.935 / re_r**1.5, -0.0292 / re_r**1.2
+            re_r < 3.0e5, -1.935 / re_r**1.5, -0.0292 / re_r**1.2
         )

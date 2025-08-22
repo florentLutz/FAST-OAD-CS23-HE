@@ -7,27 +7,21 @@ import openmdao.api as om
 
 
 class SizingSlotHeight(om.ExplicitComponent):
-    """Computation of the slot height of the PMSM."""
+    """
+    Computation of single slot height of the PMSM in radial direction. The formula is obtained from
+    equation (II-46) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        # Reference motor : EMRAX 268
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:"
-            + pmsm_id
-            + ":density_current_ac_max",  # doubt I don't know it
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":density_current_ac_max",
             val=np.nan,
             units="A/m**2",
         )
@@ -38,28 +32,35 @@ class SizingSlotHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
             val=np.nan,
+            desc="The area factor considers the cross-section shape twist due to wire bunching",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
             val=np.nan,
+            desc="The factor describes the conductor material fullness inside the stator slots",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
+            desc="The tangential tensile strength of the material",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
             units="T",
+            desc="The magnetic flux density provided by the permanent magnets",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio", val=np.nan
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
+            val=np.nan,
+            desc="The fraction between overall tooth length and stator bore circumference",
         )
 
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
             units="m",
+            desc="Single stator slot height (radial)",
         )
 
     def setup_partials(self):

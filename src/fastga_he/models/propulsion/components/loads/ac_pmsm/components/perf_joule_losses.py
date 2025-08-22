@@ -8,12 +8,11 @@ import openmdao.api as om
 
 class PerformancesJouleLosses(om.ExplicitComponent):
     """
-    Computation of the motor joule losses.
+    Computation of the motor joule losses due to ohmic heating in conductors. This is obtained
+    from part II.3.1 in :cite:`touhami:2020`
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -37,21 +36,21 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
             units="kW",
             val=0.0,
             shape=number_of_points,
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
             wrt=["ac_current_rms_in_one_phase"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
             wrt=[
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
             ],
@@ -66,7 +65,7 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         i_rms = inputs["ac_current_rms_in_one_phase"]
         r_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses"] = (
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses"] = (
             r_s * i_rms**2.0 / 1000.0
         )
 
@@ -77,11 +76,11 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         r_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
         ] = i_rms**2.0 / 1000.0
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":Joule_power_losses",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
             "ac_current_rms_in_one_phase",
         ] = 2.0 * r_s * i_rms / 1000.0

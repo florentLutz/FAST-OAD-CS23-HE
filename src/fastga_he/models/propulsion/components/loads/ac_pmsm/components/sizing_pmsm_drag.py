@@ -47,6 +47,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
 
         if position == "on_the_wing":
@@ -54,6 +55,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
                 name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
                 val=np.nan,
                 units="m",
+                desc="The stator length of PMSM",
             )
             self.add_input(
                 name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":fairing:fineness",

@@ -7,19 +7,15 @@ import openmdao.api as om
 
 
 class SizingStatorDiameter(om.ExplicitComponent):
-    """Computation of the diameter of the stator bore of the PMSM."""
+    """
+    Computation of the stator bore diameter of the PMSM. The formula is obtained from equation (
+    II-43) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        #  Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
@@ -27,11 +23,13 @@ class SizingStatorDiameter(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient",
             val=np.nan,
+            desc="The fraction of stator bore diameter and active length",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
+            desc="The tangential tensile strength of the material",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
@@ -42,26 +40,11 @@ class SizingStatorDiameter(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":form_coefficient",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating",
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
@@ -70,7 +53,6 @@ class SizingStatorDiameter(om.ExplicitComponent):
         sigma = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tangential_stress"]
         T_max = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_rating"]
 
-        # Equation II-43: Stator inner radius R
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"] = 2.0 * (
             ((lambda_ / (4.0 * np.pi * sigma)) * T_max) ** (1.0 / 3.0)
         )

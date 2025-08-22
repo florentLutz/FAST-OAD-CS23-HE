@@ -7,11 +7,12 @@ import openmdao.api as om
 
 
 class SizingRotorDiameter(om.ExplicitComponent):
-    """Computation of the rotor diameter of a cylindrical PMSM."""
+    """
+    Computation of the rotor diameter and airgap thickness of a cylindrical PMSM. The formulas
+    are obtained from equation (II-50) and (II-51) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        #  Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -23,18 +24,22 @@ class SizingRotorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio", val=np.nan
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
+            val=np.nan,
+            desc="the radius ratio of the rotor radius and the stator bore radius",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             units="m",
         )
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             units="m",
+            desc="The distance between the rotor and the stator bore",
         )
 
     def setup_partials(self):
@@ -49,9 +54,8 @@ class SizingRotorDiameter(om.ExplicitComponent):
 
         x = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
         d = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
-        # Equation II-43: Stator inner radius R
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] = x * d
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] = x * d
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"] = (
             (1.0 - x) * d / 2.0
         )
@@ -60,12 +64,12 @@ class SizingRotorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio",
         ] = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
         ] = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":radius_ratio"]
 

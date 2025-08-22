@@ -8,12 +8,11 @@ import openmdao.api as om
 
 class PerformancesWindageReynolds(om.ExplicitComponent):
     """
-    Computation of the reynold's numbers for the friction coefficients of motor windage.
+    Computation of the reynold's numbers for the friction coefficients of motor windage. The
+    formulas are given by equation (II-72) and (II-77) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -27,7 +26,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             val=np.nan,
             units="m",
         )
@@ -35,6 +34,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
             val=np.nan,
             units="m",
+            desc="The distance between the rotor and the stator bore",
         )
 
         self.add_output(
@@ -61,7 +61,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
         )
         self.declare_partials(
             of="*",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -78,9 +78,10 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         rpm = inputs["rpm"]
-        r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
+        r_rot = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+        )
         e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
-
         temp = 300.0  # Air temperature [K]
         pr = 1.0  # Air pressure [atm]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
@@ -96,9 +97,10 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         rpm = inputs["rpm"]
-        r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
+        r_rot = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+        )
         e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
-
         temp = 300.0  # Air temperature [K]
         pr = 1.0  # Air pressure [atm]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
@@ -109,7 +111,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         partials[
             "airgap_reynolds_number",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
         ] = (0.5 * rho_air * e_g * omega) / mu_air
 
         partials[
@@ -123,7 +125,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         partials[
             "rotor_end_reynolds_number",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
         ] = (rho_air * r_rot * omega) / mu_air
 
         partials["rotor_end_reynolds_number", "rpm"] = (

@@ -27,10 +27,12 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
+            desc="Number of conductor slots",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
             val=np.nan,
+            desc="The factor describes the conductor material fullness inside the stator slots",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
@@ -41,6 +43,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
             val=np.nan,
             units="m",
+            desc="Single stator slot height (radial)",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",

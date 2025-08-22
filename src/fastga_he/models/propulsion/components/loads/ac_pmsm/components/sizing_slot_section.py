@@ -8,13 +8,10 @@ import openmdao.api as om
 
 class SizingSlotSection(om.ExplicitComponent):
     """
-    Computation of the Slot section.
-
+    Computation of single slot cross-section ares of the PMSM.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -29,6 +26,7 @@ class SizingSlotSection(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
             val=np.nan,
             units="m",
+            desc="Single stator slot height (radial)",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",

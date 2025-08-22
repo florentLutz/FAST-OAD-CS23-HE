@@ -8,13 +8,12 @@ import openmdao.api as om
 
 class PerformancesMechanicalLosses(om.ExplicitComponent):
     """
-    Computation of the Mechanical losses.
-
+    Computation of the mechanical losses result from frictions between gas and rotating solid or
+    between rotating solid and stationary solid. This is obtained from part II.3.3 in
+    :cite:`touhami:2020`.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -27,10 +26,20 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
-        self.add_input("airgap_friction_coeff", val=np.nan, shape=number_of_points)
-        self.add_input("rotor_end_friction_coeff", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "airgap_friction_coeff",
+            val=np.nan,
+            shape=number_of_points,
+            desc="Air friction coefficient of airgap",
+        )
+        self.add_input(
+            "rotor_end_friction_coeff",
+            val=np.nan,
+            shape=number_of_points,
+            desc="Air friction coefficient at the two rotor ends",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
             val=np.nan,
             units="m",
         )
@@ -38,10 +47,12 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             val=np.nan,
             units="m",
+            desc="The stator length of PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
             val=np.nan,
+            desc="The factor to account extra length from end winding",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
@@ -70,7 +81,7 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mechanical_power_losses",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
                 "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
@@ -90,7 +101,9 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"
         ]
         k_tb = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff"]
-        r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
+        r_rot = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+        )
         w_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight"]
         cf_bearing = 0.0015  # Bearing friction coefficient
         d_bearing = 0.03  # Bearing bore diameter [m]
@@ -131,7 +144,9 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"
         ]
         k_tb = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff"]
-        r_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter"] / 2.0
+        r_rot = (
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+        )
         w_rot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight"]
         cf_bearing = 0.0015  # Bearing friction coefficient
         d_bearing = 0.03  # Bearing bore diameter [m]
@@ -175,7 +190,7 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mechanical_power_losses",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rot_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
         ] = (
             2.0 * p_windage_airgap / r_rot
             + cf_r * np.pi * rho_air * omega**3.0 * 605.0 * r_rot**4.0 / 243.0

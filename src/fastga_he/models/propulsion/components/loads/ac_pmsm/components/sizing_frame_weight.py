@@ -28,15 +28,18 @@ class SizingFrameWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             val=np.nan,
             units="m",
+            desc="The stator length of PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
             val=np.nan,
+            desc="The factor to account extra length from end winding",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
             val=np.nan,
             units="m",
+            desc="The outer stator diameter of the PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density",
@@ -58,12 +61,12 @@ class SizingFrameWeight(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
+            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
             method="exact",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
+            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
             method="exact",
         )
         self.declare_partials(
@@ -86,8 +89,7 @@ class SizingFrameWeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         r_out = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"]
-            / 2.0
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter"] / 2.0
         )
         l_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         k_tb = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff"]
@@ -113,8 +115,7 @@ class SizingFrameWeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         r_out = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter"]
-            / 2.0
+            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter"] / 2.0
         )
         l_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         k_tb = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff"]
@@ -128,12 +129,12 @@ class SizingFrameWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
         ] = 2.0 * drfr_dd
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ext_stator_diameter",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
         ] = rho_fr * (
             np.pi * l_m * k_tb * (2.0 * r_fr * drfr_dd - r_out)
             + 2.0 * np.pi * dt_dd * r_out * r_fr**2.0

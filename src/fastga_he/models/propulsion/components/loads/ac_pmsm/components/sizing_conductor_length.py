@@ -8,13 +8,11 @@ import openmdao.api as om
 
 class SizingConductorLength(om.ExplicitComponent):
     """
-    Computation of the Conductor length.
-
+    Computation of the conductor wire length. The two coefficient are obtained from part II.2.3a
+    and II.2.5 in :cite:`touhami:2020`.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -29,14 +27,17 @@ class SizingConductorLength(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
             val=np.nan,
             units="m",
+            desc="The stator length of PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":cond_twisting_coeff",
             val=np.nan,
+            desc="The factor to account the conductor wire bunching",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
             val=np.nan,
+            desc="The factor to account extra length from end winding",
         )
 
         self.add_output(

@@ -8,13 +8,12 @@ import openmdao.api as om
 
 class SizingConductorsNumber(om.ExplicitComponent):
     """
-    Computation of the Conductors number.
+    Computation of the number of the conductor slots. The formula is obtained from
+    equation (III-58) in :cite:`touhami:2020.
 
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -28,6 +27,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
+            desc="Number of the north and south pairs in the PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
@@ -36,9 +36,13 @@ class SizingConductorsNumber(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
             val=np.nan,
+            desc="The number of conductor slots per poles and per phases",
         )
 
-        self.add_output("data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number")
+        self.add_output(
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
+            desc="Number of conductor slots",
+        )
 
     def setup_partials(self):
         pmsm_id = self.options["pmsm_id"]

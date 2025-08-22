@@ -9,7 +9,8 @@ import openmdao.api as om
 
 class PerformancesMaximum(om.ExplicitComponent):
     """
-    Class to identify the maximum currents, voltage, torque and rpm of the PMSM.
+    Class to identify the maximum currents, voltage, torque, losses, shaft power and rpm of the
+    PMSM.
     """
 
     def initialize(self):
@@ -159,19 +160,24 @@ class PerformancesMaximum(om.ExplicitComponent):
             1.0,
             0.0,
         )
+
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":voltage_ac_max",
             "ac_voltage_peak_in",
         ] = np.where(inputs["ac_voltage_peak_in"] == np.max(inputs["ac_voltage_peak_in"]), 1.0, 0.0)
+
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":torque_max", "torque_out"
         ] = np.where(inputs["torque_out"] == np.max(inputs["torque_out"]), 1.0, 0.0)
+
         partials["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rpm_max", "rpm"] = (
             np.where(inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0)
         )
+
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":losses_max", "power_losses"
         ] = np.where(inputs["power_losses"] == np.max(inputs["power_losses"]), 1.0, 0.0)
+
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":shaft_power_max",
             "shaft_power_out",

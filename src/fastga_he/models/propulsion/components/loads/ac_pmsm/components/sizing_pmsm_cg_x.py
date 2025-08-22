@@ -45,6 +45,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
                 name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
                 val=np.nan,
                 units="m",
+                desc="The stator length of PMSM",
             )
 
         else:
