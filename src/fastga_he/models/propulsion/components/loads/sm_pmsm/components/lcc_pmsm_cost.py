@@ -43,7 +43,9 @@ class LCCPMSMCost(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
-        torque_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"]
+        torque_rating = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
+        ]
         rpm_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost"] = (
@@ -52,7 +54,9 @@ class LCCPMSMCost(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
-        torque_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"]
+        torque_rating = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
+        ]
         rpm_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"]
         power_rating = 2.0 * np.pi * torque_rating * rpm_rating / 60.0
 
