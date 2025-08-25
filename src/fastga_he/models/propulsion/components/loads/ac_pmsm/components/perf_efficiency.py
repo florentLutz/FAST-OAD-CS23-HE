@@ -87,7 +87,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
         partials["efficiency", "shaft_power_out"] = np.where(
-            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
+            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
             inputs["settings:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":k_efficiency"]
             * inputs["power_losses"]
             / (inputs["shaft_power_out"] + inputs["power_losses"]) ** 2.0,
@@ -95,7 +95,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
         partials["efficiency", "power_losses"] = np.where(
-            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
+            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
             -(
                 inputs["settings:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":k_efficiency"]
                 * inputs["shaft_power_out"]
@@ -107,7 +107,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         partials[
             "efficiency", "settings:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":k_efficiency"
         ] = np.where(
-            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
+            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
             inputs["shaft_power_out"] / (inputs["shaft_power_out"] + inputs["power_losses"]),
             np.full_like(inputs["shaft_power_out"], 1e-6),
         )

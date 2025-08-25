@@ -21,7 +21,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":density_current_ac_max",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":current_density_ac_max",
             val=np.nan,
             units="A/m**2",
         )
@@ -73,7 +73,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         k_w = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor"]
         b_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
         j_rms = inputs[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":density_current_ac_max"
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":current_density_ac_max"
         ]
         k_sc = inputs[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor"
@@ -92,7 +92,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         k_w = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_factor"]
         b_m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
         j_rms = inputs[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":density_current_ac_max"
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":current_density_ac_max"
         ]
         k_sc = inputs[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor"
@@ -117,7 +117,7 @@ class SizingSlotHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":density_current_ac_max",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":current_density_ac_max",
         ] = -np.sqrt(2.0) * sigma / (k_w * b_m * j_rms**2.0 * k_sc * k_fill * (1.0 - r_tooth))
 
         partials[
