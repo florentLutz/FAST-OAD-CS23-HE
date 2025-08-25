@@ -681,13 +681,9 @@ def test_iron_losses():
 
     ivc.add_output("electrical_frequency", np.full(NB_POINTS_TEST, 532.33), units="s**-1")
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9,
-        units="T"
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
     )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:mass", val=225.59,
-        units="kg"
-    )
+    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:mass", val=225.59, units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -729,7 +725,11 @@ def test_windage_reynolds():
 
 def test_windage_friction_coefficient():
     ivc = get_indep_var_comp(
-        list_inputs( PerformancesWindageFrictionCoefficient(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        list_inputs(
+            PerformancesWindageFrictionCoefficient(
+                pmsm_id="motor_1", number_of_points=NB_POINTS_TEST
+            )
+        ),
         __file__,
         XML_FILE,
     )
@@ -755,8 +755,9 @@ def test_windage_friction_coefficient():
 
 def test_mechanical_losses():
     ivc = get_indep_var_comp(
-        list_inputs(PerformancesMechanicalLosses(pmsm_id="motor_1",
-                                                           number_of_points=NB_POINTS_TEST)),
+        list_inputs(
+            PerformancesMechanicalLosses(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)
+        ),
         __file__,
         XML_FILE,
     )
@@ -875,9 +876,7 @@ def test_rms_current():
         units="N*m",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:torque_constant",
-        0.4312,
-        units="N*m/A"
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:torque_constant", 0.4312, units="N*m/A"
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1090,16 +1089,16 @@ def test_performance_ACPMSM():
     )
 
     assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
-        np.full(NB_POINTS_TEST,1970.8434), rel=1e-2
+        np.full(NB_POINTS_TEST, 1970.8434), rel=1e-2
     )
     assert problem.get_val("ac_current_rms_in_one_phase", units="A") == pytest.approx(
         np.full(NB_POINTS_TEST, 656.9478), rel=1e-2
     )
     assert problem.get_val("ac_voltage_rms_in", units="V") == pytest.approx(
-        np.full(NB_POINTS_TEST,727), rel=1e-2
+        np.full(NB_POINTS_TEST, 727), rel=1e-2
     )
     assert problem.get_val("ac_voltage_peak_in", units="V") == pytest.approx(
-        np.full(NB_POINTS_TEST,890.4), rel=1e-2
+        np.full(NB_POINTS_TEST, 890.4), rel=1e-2
     )
 
     om.n2(problem)

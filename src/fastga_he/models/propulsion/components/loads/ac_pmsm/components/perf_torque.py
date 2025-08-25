@@ -62,4 +62,4 @@ class PerformancesTorque(om.ExplicitComponent):
 
         partials["torque_out", "shaft_power_out"] = 1.0 / omega
 
-        partials["torque_out", "rpm"] = -power / omega ** 2.0 * 2.0 * np.pi / 60
+        partials["torque_out", "rpm"] = -power / omega**2.0 * 2.0 * np.pi / 60
