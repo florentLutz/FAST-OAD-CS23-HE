@@ -6,9 +6,11 @@ import os
 import os.path as pth
 from shutil import rmtree
 import logging
-
+import numpy as np
 
 import pytest
+import os
+import csv
 
 import numpy as np
 import openmdao.api as om
@@ -21,6 +23,7 @@ from utils.filter_residuals import filter_residuals
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
+
 RESULTS_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity")
 RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH = pth.join(
     pth.dirname(__file__), "results_sensitivity_full_sizing"
@@ -32,6 +35,55 @@ RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_3 = pth.join(
     pth.dirname(__file__), "results_sensitivity_full_sizing_3"
 )
 
+def residuals_analyzer(recorder_path, solver):
+    cr = om.CaseReader(recorder_path)
+
+    solver_cases = cr.get_cases(solver)
+
+    # Get only the last 10 cases (or all if less than 10)
+    last_10_cases = solver_cases[-3:]
+
+    variable_dict = {name: 0.0 for name in last_10_cases[-1].residuals}
+
+    for case in last_10_cases:
+        for residual in case.residuals:
+            variable_dict[residual] = np.sum(np.abs(case.residuals[residual]))
+
+
+    sorted_variable_dict = dict(sorted(variable_dict.items(), key=lambda x: x[1], reverse=True))
+
+    return sorted_variable_dict
+  
+def outputs_analyzer(recorder_path, solver):
+    cr = om.CaseReader(recorder_path)
+
+    solver_cases = cr.get_cases(solver)
+
+    # Get only the last 10 cases (or all if less than 10)
+    last_10_cases = solver_cases[-10:]
+
+    # Initialize a dictionary to store outputs for each variable and iteration
+    variable_dict = {}
+
+    for case in last_10_cases:
+        for output, value in case.outputs.items():
+            if (
+                    isinstance(value, np.ndarray) and value.ndim == 1
+            ):  # Check if the value is a 1D numpy array
+                if output not in variable_dict:
+                    variable_dict[output] = []
+                # Extract the scalar value if it's a single-element array
+                scalar_value = value.item() if value.size == 1 else value
+                variable_dict[output].append(scalar_value)
+
+    # Remove variables with all zero values
+    non_zero_variable_dict = {
+        key: value
+        for key, value in variable_dict.items()
+        if not np.allclose(np.array(value), 0, atol=1e-10)
+    }
+
+    return non_zero_variable_dict
 
 @pytest.fixture(scope="module")
 def cleanup():
@@ -84,6 +136,109 @@ def test_sizing_kodiak_100():
     )
     # Actual value is 2110 lbs or 960 kg
 
+
+def test_sizing_kodiak_100_full_electric():
+    """Test the overall aircraft design process with wing positioning."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_elec_kodiak100.xml"
+    process_file_name = "full_sizing_kodiak100_elec.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_kodiak100.html")
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 5.0,
+        "cell_weight_ref": 45.0e-3,
+    }
+
+    problem.setup()
+
+    model = problem.model
+    recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
+    solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
+    solver.add_recorder(recorder)
+    solver.recording_options["record_solver_residuals"] = True
+    solver.recording_options["record_outputs"] = True
+
+    om.n2(problem, show_browser=False, outfile=n2_path)
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    # sorted_variable_residuals = residuals_analyzer(recorder, solver)
+    #
+    # # Create the folder if it doesn't exist
+    # os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
+    #
+    # # Construct the file path
+    # file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
+    #
+    # # Open the file for writing
+    # with open(file_path, "w", newline="") as csvfile:
+    #     writer = csv.writer(csvfile)
+    #
+    #     # Write the header
+    #     writer.writerow(["Variable name", "Residuals"])
+    #
+    #     # Write the sum of residuals for each iteration
+    #     for name, sum_res in sorted_variable_residuals.items():
+    #         writer.writerow([name, sum_res])
+    #
+    # cr = om.CaseReader(recorder)
+    #
+    problem.write_outputs()
+    #
+    # assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+    #     4174.0, rel=1e-2
+    # )
+    # # Actual value is 3290 kg
+    # assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+    #     1727.0, rel=1e-2
+    # )
+    # # Actual value is 1712 kg
+    # assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
+    #     933.00, rel=1e-2
+    # )
+    # # Actual value is 2110 lbs or 960 kg
+
+# def test_read_case_recorder():
+#     recorder_data_file_path = pth.join(DATA_FOLDER_PATH, "cases.sql")
+#
+#     cr = om.CaseReader(recorder_data_file_path)
+#     # sorted_variable_residuals = residuals_analyzer(recorder_data_file_path, solver)
+#
+#     # Create the folder if it doesn't exist
+#     os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
+#
+#     # Construct the file path
+#     file_path = os.path.join(RESULTS_FOLDER_PATH, "dhc6_hybrid_residuals_analysis.csv")
+#
+#     # Open the file for writing
+#     with open(file_path, "w", newline="") as csvfile:
+#         writer = csv.writer(csvfile)
+#
+#         # Write the header
+#         writer.writerow(["Variable name", "Residuals"])
+#
+#         # Write the sum of residuals for each iteration
+#         for name, sum_res in sorted_variable_residuals.items():
+#             writer.writerow([name, sum_res])
+#
+#     cr = om.CaseReader(recorder_data_file_path)
 
 def test_operational_mission_kodiak_100():
     """Test the overall aircraft design process with wing positioning."""

@@ -11,6 +11,9 @@ import pytest
 import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
+from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
+from fastga.models.aerodynamics.components import ComputeDeltaElevator
+from fastga.models.aerodynamics.components.fuselage import ComputeCmAlphaFuselage
 
 from fastga_he.gui.payload_range import payload_range_outer
 from utils.filter_residuals import filter_residuals

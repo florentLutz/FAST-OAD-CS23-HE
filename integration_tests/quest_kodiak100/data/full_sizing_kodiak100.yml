@@ -60,6 +60,11 @@ model:
         wing_area:
             id: fastga.loop.wing_area
 
+    environmental_impact:
+        id: fastga_he.environmental.energy_simple
+        mission: design
+        electricity_mix: europe
+
 submodels:
     service.weight.mass.payload: null
     service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.roskam
