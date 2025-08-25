@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -36,7 +36,7 @@ class SizingPMSMCGY(om.ExplicitComponent):
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
 
         self.add_output(
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y",
             units="m",
             val=0.0,
             desc="Y position of the DC bus center of gravity",
@@ -44,11 +44,13 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
         if position == "on_the_wing":
             self.add_input(
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y_ratio",
                 val=np.nan,
                 desc="Y position of the PMSM center of gravity as a ratio of the wing half-span",
             )
 
+    def setup_partials(self):
+        if self.options["position"] == "on_the_wing":
             self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -56,14 +58,14 @@ class SizingPMSMCGY(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         if position == "on_the_wing":
-            outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y"] = (
+            outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
-                * inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y_ratio"]
+                * inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y_ratio"]
                 / 2.0
             )
 
         else:
-            outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y"] = 0.0
+            outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
@@ -71,10 +73,11 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
         if position == "on_the_wing":
             partials[
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y",
                 "data:geometry:wing:span",
-            ] = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y_ratio"] / 2.0
+            ] = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y_ratio"] / 2.0
+
             partials[
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y",
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":CG:y_ratio",
             ] = inputs["data:geometry:wing:span"] / 2.0

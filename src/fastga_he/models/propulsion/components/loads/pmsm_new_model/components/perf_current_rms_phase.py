@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
     """
-    Computation of the rms current in one phase based on the current in all phases (DC equivalent).
+    Computation of the rms current in one-phase based on the current in all phases (DC equivalent).
     """
 
     def initialize(self):
@@ -33,13 +33,16 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
             shape=number_of_points,
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
-            val=np.ones(number_of_points) / 3.0,
+            val=np.full(number_of_points, 1.0 / 3.0),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

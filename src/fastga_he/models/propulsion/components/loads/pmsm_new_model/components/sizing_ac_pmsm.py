@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 
@@ -15,19 +15,21 @@ from .sizing_conductor_section import SizingConductorSection
 from .sizing_conductor_length import SizingConductorLength
 from .sizing_conductors_number import SizingConductorsNumber
 from .sizing_winding_resistivity import SizingWindingResistivity
-from .sizing_resistance_new2 import SizingResistanceNew2
+from .sizing_resistance import SizingResistance
 from .sizing_external_stator_diameter import SizingExtStatorDiameter
-from .stator_core_weight import SizingStatorCoreWeight
-from .winding_stator_weight import SizingStatorWindingWeight
-from .rotor_wheight import SizingRotorWeight
-from .Frame_wheight import SizingFrameWeight
-from .PMSM_weight import SizingMotorWeight
+from .sizing_stator_core_weight import SizingStatorCoreWeight
+from .sizing_winding_stator_weight import SizingStatorWindingWeight
+from .sizing_rotor_weight import SizingRotorWeight
+from .sizing_frame_weight import SizingFrameWeight
+from .sizing_pmsm_weight import SizingMotorWeight
 from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_cg_y import SizingPMSMCGY
 from .sizing_pmsm_drag import SizingPMSMDrag
-from .cstr_pmsm import ConstraintsPMSM
-from .sizing_x2p import Sizingx2p
 from .sizing_ratio_x2p import SizingRatioX2p
+from .sizing_tooth_ratio import SizingToothRatio
+
+from .cstr_ac_pmsm import ConstraintsPMSM
+
 from ..constants import POSSIBLE_POSITION
 
 
@@ -60,51 +62,65 @@ class SizingACPMSM(om.Group):
 
         self.add_subsystem("length", SizingActiveLength(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("RotDiameter", SizingRotorDiameter(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("x2p", Sizingx2p(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "rotor_diameter", SizingRotorDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem("ratio_x2p", SizingRatioX2p(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("hy", SizingStatorYokeHeight(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("Nc", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("ls", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("hs", SizingSlotHeight(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("Ss", SizingSlotSection(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("Sc", SizingConductorSection(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("lc", SizingConductorLength(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("rho_c", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("R_c", SizingResistanceNew2(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("tooth_ratio", SizingToothRatio(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem(
-            "ExtDiameter", SizingExtStatorDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+            "yoke_height", SizingStatorYokeHeight(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "StatCoreWeight", SizingStatorCoreWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+            "conductor_number", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem("slot_width", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
+
+        self.add_subsystem("slot_height", SizingSlotHeight(pmsm_id=pmsm_id), promotes=["data:*"])
+
+        self.add_subsystem(
+            "slot_cross_section", SizingSlotSection(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "WindingWeight", SizingStatorWindingWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+            "conductor_cross_section", SizingConductorSection(pmsm_id=pmsm_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("RotorWeight", SizingRotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "conductor_length", SizingConductorLength(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
-        self.add_subsystem("FrameWeight", SizingFrameWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "winding_resistivity", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "electric_resistance", SizingResistance(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "stator_external_diameter",
+            SizingExtStatorDiameter(pmsm_id=pmsm_id),
+            promotes=["data:*"],
+        )
+
+        self.add_subsystem(
+            "stator_core_weight", SizingStatorCoreWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "winding_weight", SizingStatorWindingWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem("rotor_weight", SizingRotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+
+        self.add_subsystem("frame_weight", SizingFrameWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem("mass", SizingMotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        """self.add_subsystem(
-            "resistance", SizingMotorPhaseResistance(pmsm_id=pmsm_id), promotes=["data:*"]
-        )"""
 
         self.add_subsystem(
             "pmsm_cg_x", SizingPMSMCGX(pmsm_id=pmsm_id, position=position), promotes=["data:*"]

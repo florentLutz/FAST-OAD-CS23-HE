@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,9 +8,8 @@ import openmdao.api as om
 
 class PerformancesVoltageRMS(om.ExplicitComponent):
     """
-     Computation of the RMS of the voltage from the RMS of the current and apparent power.
-
-    Formula can be seen in :cite:`wildi:2005`.
+    Computation of the RMS of the voltage from the RMS of the current and apparent power.
+    Formula can be obtained from :cite:`wildi:2005`.
     """
 
     def initialize(self):
@@ -32,6 +31,9 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
             desc="RMS voltage at the input of the motor",
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="*",
@@ -41,7 +43,6 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        # Ones_like or Zeros_like ?
         outputs["ac_voltage_rms_in"] = np.where(
             inputs["ac_current_rms_in"] != 0.0,
             inputs["apparent_power"] / inputs["ac_current_rms_in"],
@@ -54,6 +55,7 @@ class PerformancesVoltageRMS(om.ExplicitComponent):
             1.0 / (inputs["ac_current_rms_in"]),
             np.full_like(inputs["ac_current_rms_in"], 1e-6),
         )
+
         partials["ac_voltage_rms_in", "ac_current_rms_in"] = -(
             np.where(
                 inputs["ac_current_rms_in"] != 0.0,

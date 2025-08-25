@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,13 +8,12 @@ import openmdao.api as om
 
 class SizingConductorsNumber(om.ExplicitComponent):
     """
-    Computation of the Conductors number.
+    Computation of the number of the conductor slots. The formula is obtained from
+    equation (III-58) in :cite:`touhami:2020.
 
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -24,68 +23,68 @@ class SizingConductorsNumber(om.ExplicitComponent):
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
-        number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
+            desc="Number of the north and south pairs in the PMSM",
         )
-
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
             val=np.nan,
         )
-
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
             val=np.nan,
+            desc="The number of conductor slots per poles and per phases",
         )
 
-        self.add_output("data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number")
+        self.add_output(
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
+            desc="Number of conductor slots",
+        )
+
+    def setup_partials(self):
+        pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
+            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             wrt=[
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases",
-                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
             ],
             method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        q = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases"]
-        m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases"]
-        p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
 
-        N_c = 2 * p * q * m
+        q = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases"]
+        m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
+        p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
-        outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"] = N_c
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"] = (
+            2.0 * p * q * m
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
-        q = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases"]
-        m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases"]
-        p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-
-        N_c = 2 * p * q * m
-
-        dR_dp = 2 * q * m
-        dR_dq = 2 * p * m
-        dR_dm = 2 * p * q
+        q = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases"]
+        m = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases"]
+        p = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
 
         partials[
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-        ] = dR_dp
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+        ] = 2.0 * q * m
 
         partials[
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":number_of_phases",
-        ] = dR_dq
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":number_of_phases",
+        ] = 2.0 * p * m
 
         partials[
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
-        ] = dR_dm
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slots_per_poles_phases",
+        ] = 2.0 * p * q

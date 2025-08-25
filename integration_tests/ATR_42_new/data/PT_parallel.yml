@@ -34,10 +34,10 @@ power_train_components:
     position: on_the_wing  # "on_the_wing", "in_the_front", "in_the_back"
 
   motor_1:
-    id: fastga_he.pt_component.ac_pmsm
+    id: fastga_he.pt_component.pmsm_new_model
     position: on_the_wing  # "on_the_wing", "in_the_nose"
   motor_2:
-    id: fastga_he.pt_component.ac_pmsm
+    id: fastga_he.pt_component.pmsm_new_model
     position: on_the_wing  # "on_the_wing", "in_the_nose"
 
   inverter_1:

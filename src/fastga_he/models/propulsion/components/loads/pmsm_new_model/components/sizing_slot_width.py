@@ -1,154 +1,80 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
 
 
 class SizingSlotWidth(om.ExplicitComponent):
-    """Computation of the slot width of the PMSM."""
+    """
+    Computation of single slot width of the PMSM.The formula is obtained from
+    equation (III-55) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
             val=np.nan,
+            desc="Number of conductor slots",
         )
-
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
-            val=np.nan,
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
+            desc="Stator bore diameter of the PMSM",
         )
-
         self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":tooth_flux_density",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
             val=np.nan,
-            units="T",
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density",
-            val=np.nan,
-            units="A/m",
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":airgap_flux_density",
-            val=np.nan,
-            units="T",
-        )
-
-        self.add_input(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p", val=np.nan
+            desc="The fraction between overall tooth length and stator bore circumference",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             units="m",
+            desc="Single stator slot width (along the circumference)",
         )
 
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":tooth_flux_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":airgap_flux_density",
-            method="fd",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
-            wrt="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p",
-            method="fd",
-        )
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
-        R = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"] / 2
-        B_m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":airgap_flux_density"]
-        B_st = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":tooth_flux_density"]
-        K_m = inputs[
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density"
-        ]
-        x2p_ratio = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p"]
-        p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-        Nc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"]
-        Ns = Nc  # Ncs = 1
-        mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
 
-        # Equation II-46: Slot height hs
+        d = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
+        tooth_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio"]
+        ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
 
-        r_tooth = (2 / np.pi) * np.sqrt((B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio)
-        ls = (1 - r_tooth) * 2 * np.pi * R / Ns
+        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"] = (
+            (1.0 - tooth_ratio) * np.pi * d / ns
+        )
 
-        outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"] = ls
-
-    """def compute_partials(self, inputs, partials, discrete_inputs=None):
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        pmsm_id = self.options["pmsm_id"]
-        R = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"] / 2
-        B_m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":airgap_flux_density"]
-        B_sy = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":yoke_flux_density"]
-        K_m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density"]
-        x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio"]
-        p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
-        x_2p = x ** (2 * p)
-        mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
-
-        # Equation II-46: Slot height hs
-
-        dhy_dD = (1 / (2 * p)) * np.sqrt(
-            (B_m / B_sy) ** 2 + ((mu_0 * K_m / B_sy) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2))
+        d = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
+        tooth_ratio = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio"]
+        ns = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number"]
 
         partials[
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter",
-        ] = dhy_dD"""
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
+        ] = (1.0 - tooth_ratio) * np.pi / ns
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":tooth_ratio",
+        ] = -np.pi * d / ns
+
+        partials[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
+        ] = -(1.0 - tooth_ratio) * np.pi * d / ns**2.0

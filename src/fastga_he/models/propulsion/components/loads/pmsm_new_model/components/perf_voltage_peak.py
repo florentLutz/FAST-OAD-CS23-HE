@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,9 +8,8 @@ import openmdao.api as om
 
 class PerformancesVoltagePeak(om.ExplicitComponent):
     """
-     Computation of the peak line to neutral voltage from the RMS value of the voltage.
-
-    Formula can be seen in :cite:`wildi:2005`.
+    Computation of the peak line to neutral voltage from the RMS value of the voltage.
+    Formula can be obtained from :cite:`wildi:2005`.
     """
 
     def initialize(self):
@@ -36,6 +35,9 @@ class PerformancesVoltagePeak(om.ExplicitComponent):
             shape=number_of_points,
             desc="Peak line to neutral voltage at the input of the motor",
         )
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
             of="*",
