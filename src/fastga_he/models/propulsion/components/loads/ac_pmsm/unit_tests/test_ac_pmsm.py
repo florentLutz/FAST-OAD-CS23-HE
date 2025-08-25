@@ -72,14 +72,18 @@ NB_POINTS_TEST = 10
 
 
 def test_diameter():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingStatorDiameter(pmsm_id="motor_1")), __file__, XML_FILE
-    )
+    ivc = om.IndepVarComp()
+
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:form_coefficient", val=0.6)
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:tangential_stress",
         val=50000,
         units="N/m**2",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:torque_rating",
+        val=856.6,
+        units="N*m",
     )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingStatorDiameter(pmsm_id="motor_1"), ivc)
@@ -92,22 +96,35 @@ def test_diameter():
 
 
 def test_rotor_diameter():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingRotorDiameter(pmsm_id="motor_1")), __file__, XML_FILE
-    )
+    ivc = om.IndepVarComp()
+
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:radius_ratio", val=0.97)
+    ivc.add_output(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:diameter",
+        val=0.187,
+        units="m",
+    )
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingRotorDiameter(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:rotor_diameter", units="m"
     ) == pytest.approx(0.1814, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_thickness", units="m"
+    ) == pytest.approx(0.0028, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_length():
-    ivc = get_indep_var_comp(list_inputs(SizingActiveLength(pmsm_id="motor_1")), __file__, XML_FILE)
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:diameter",
+        val=0.187,
+        units="m",
+    )
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:form_coefficient", val=0.6)
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(SizingActiveLength(pmsm_id="motor_1"), ivc)
@@ -124,22 +141,6 @@ def test_yoke_height():
         list_inputs(SizingStatorYokeHeight(pmsm_id="motor_1")), __file__, XML_FILE
     )
 
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:ratiox2p", val=16.435)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:surface_current_density",
-        val=111.100,
-        units="A/m",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:yoke_flux_density", val=1.2, units="T"
-    )
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:radius_ratio", val=0.6)
-
     problem = run_system(SizingStatorYokeHeight(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
@@ -150,21 +151,7 @@ def test_yoke_height():
 
 
 def test_tooth_ratio():
-    ivc = om.IndepVarComp()
-
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:ratiox2p", val=16.435)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:surface_current_density",
-        val=111.100,
-        units="A/m",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:tooth_flux_density", val=1.3, units="T"
-    )
+    ivc = get_indep_var_comp(list_inputs(SizingToothRatio(pmsm_id="motor_1")), __file__, XML_FILE)
 
     problem = run_system(SizingToothRatio(pmsm_id="motor_1"), ivc)
 
@@ -176,11 +163,16 @@ def test_tooth_ratio():
 
 
 def test_slot_width():
-    ivc = get_indep_var_comp(list_inputs(SizingSlotWidth(pmsm_id="motor_1")), __file__, XML_FILE)
+    ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:conductors_number", val=24)
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:tooth_ratio", val=0.4407)
+    ivc.add_output(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:diameter",
+        val=0.187,
+        units="m",
+    )
 
     problem = run_system(SizingSlotWidth(pmsm_id="motor_1"), ivc)
 
@@ -193,33 +185,6 @@ def test_slot_width():
 
 def test_slot_height():
     ivc = get_indep_var_comp(list_inputs(SizingSlotHeight(pmsm_id="motor_1")), __file__, XML_FILE)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:density_current_ac_max",
-        val=8.1e6,
-        units="A/m**2",
-    )
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:winding_factor", val=0.97)
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:slot_conductor_factor", val=1)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:tooth_flux_density", val=1.3, units="T"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:surface_current_density",
-        val=111.100,
-        units="A/m",
-    )
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:slot_fill_factor", val=0.5)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:tangential_stress",
-        val=50000,
-        units="N/m**2",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-    )
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:tooth_ratio", val=0.4407)
 
     problem = run_system(SizingSlotHeight(pmsm_id="motor_1"), ivc)
 
@@ -250,7 +215,7 @@ def test_slot_section():
     problem.check_partials(compact_print=True)
 
 
-def test_cond_section():
+def test_conductor_section_area():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -269,7 +234,7 @@ def test_cond_section():
     problem.check_partials(compact_print=True)
 
 
-def test_cond_number():
+def test_conductor_slot_number():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -286,7 +251,7 @@ def test_cond_number():
     problem.check_partials(compact_print=True)
 
 
-def test_cond_length():
+def test_conductor_length():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -339,21 +304,10 @@ def test_x2p_ratio():
 
 
 def test_resistance():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:conductors_number", val=24)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:conductor_length", val=0.545475, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:conductor_section",
-        val=0.00024523,
-        units="m**2",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:resistivity",
-        val=2.736384e-08,
-        units="ohm*m",
+    ivc = get_indep_var_comp(
+        list_inputs(SizingResistance(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -370,17 +324,21 @@ def test_resistance():
 
 
 def test_external_stator_diameter():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingExtStatorDiameter(pmsm_id="motor_1")), __file__, XML_FILE
-    )
+    ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
+    ivc.add_output(
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:diameter",
+        val=0.187,
+        units="m",
+    )
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_height", val=0.0358, units="m"
     )
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:stator_yoke_height", val=0.0351, units="m"
     )
+
     problem = run_system(SizingExtStatorDiameter(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
@@ -395,27 +353,6 @@ def test_stator_core_weight():
         list_inputs(SizingStatorCoreWeight(pmsm_id="motor_1")), __file__, XML_FILE
     )
 
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:number_of_phases", val=3)
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:slots_per_poles_phases", val=2)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:active_length", val=0.3117, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:stator_diameter", val=0.3288, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_width", val=0.01348, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_height", val=0.0358, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:magnetic_material_density",
-        val=8150,
-        units="kg/m**3",
-    )
     problem = run_system(SizingStatorCoreWeight(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
@@ -430,30 +367,6 @@ def test_stator_winding_weight():
         list_inputs(SizingStatorWindingWeight(pmsm_id="motor_1")), __file__, XML_FILE
     )
 
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:slot_fill_factor", val=0.5)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_height", val=0.0358, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_width", val=0.01348, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:conductor_material_density",
-        val=8960,
-        units="kg/m**3",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:insulation_material_density",
-        val=1400,
-        units="kg/m**3",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:conductor_length", val=0.545475, units="m"
-    )
-
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:conductors_number", val=24)
-
     problem = run_system(SizingStatorWindingWeight(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
@@ -464,7 +377,7 @@ def test_stator_winding_weight():
 
 
 def test_rotor_weight():
-    ivc = get_indep_var_comp(list_inputs(SizingRotorWeight(pmsm_id="motor_1")), __file__, XML_FILE)
+    ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
@@ -487,18 +400,6 @@ def test_rotor_weight():
 def test_frame_weight():
     ivc = get_indep_var_comp(list_inputs(SizingFrameWeight(pmsm_id="motor_1")), __file__, XML_FILE)
 
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:end_winding_coeff", val=1.4)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:active_length", val=0.3117, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:stator_diameter", val=0.3288, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:frame_density", val=2100, units="kg/m**3"
-    )
-
     problem = run_system(SizingFrameWeight(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
@@ -514,21 +415,6 @@ def test_frame_weight():
 
 def test_ACPMSM_weight():
     ivc = get_indep_var_comp(list_inputs(SizingMotorWeight(pmsm_id="motor_1")), __file__, XML_FILE)
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:stator_core_weight", val=116.40, units="kg"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:stator_winding_weight",
-        val=32.69,
-        units="kg",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:rotor_weight", val=56.97, units="kg"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:frame_weight", val=19.52, units="kg"
-    )
 
     problem = run_system(SizingMotorWeight(pmsm_id="motor_1"), ivc)
 
@@ -778,10 +664,6 @@ def test_iron_losses():
         XML_FILE,
     )
 
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-    )
-    # ivc.add_output('data:propulsion:he_power_train:AC_PMSM:motor_1:mass', val=225.59, units="kg")
     ivc.add_output("electrical_frequency", np.full(NB_POINTS_TEST, 532.33), units="s**-1")
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -857,9 +739,6 @@ def test_mechanical_losses():
     ivc.add_output("rotor_end_friction_coeff", np.full(NB_POINTS_TEST, 0.0094564))
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:rotor_diameter", val=0.1814, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
     )
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:active_length", val=0.3117, units="m"
@@ -1148,15 +1027,6 @@ def test_sizing_ACPMSM():
         units="N/m**2",
     )
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:radius_ratio", val=0.97)
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:surface_current_density",
-        val=111.100,
-        units="A/m",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-    )
     ivc.add_output(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:yoke_flux_density", val=1.2, units="T"
     )
@@ -1185,11 +1055,6 @@ def test_sizing_ACPMSM():
         "data:propulsion:he_power_train:AC_PMSM:motor_1:insulation_material_density",
         val=1400,
         units="kg/m**3",
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:density_current_ac_max",
-        val=8.1e6,
-        units="A/m**2",
     )
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:winding_factor", val=0.97)
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:slot_conductor_factor", val=1)
@@ -1268,10 +1133,6 @@ def test_performance_ACPMSM():
     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
 
-    ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:pole_pairs_number", val=2)
-    ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
-    )
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:number_of_phases", val=3)
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:slots_per_poles_phases", val=2)
     ivc.add_output("data:propulsion:he_power_train:AC_PMSM:motor_1:cond_twisting_coeff", val=1.25)
