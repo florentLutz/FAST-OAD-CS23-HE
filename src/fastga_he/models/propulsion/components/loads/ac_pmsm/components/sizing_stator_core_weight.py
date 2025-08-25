@@ -61,11 +61,13 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             val=np.nan,
             units="m",
+            desc="Single stator slot width (along the circumference)",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density",
+            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magnetic_material_density",
             val=np.nan,
             units="kg/m**3",
+            desc="The density of soft magnetic material",
         )
 
         self.add_output(
@@ -89,7 +91,9 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
-        rho_sf = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density"]
+        rho_sf = inputs[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magnetic_material_density"
+        ]
         ns = 2.0 * p * q * m
 
         outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight"] = (
@@ -109,7 +113,9 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         lm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length"]
         hs = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
         ls = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width"]
-        rho_sf = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density"]
+        rho_sf = inputs[
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magnetic_material_density"
+        ]
         ns = 2.0 * p * q * m
 
         partials[
@@ -154,5 +160,5 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magn_mat_density",
+            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":magnetic_material_density",
         ] = np.pi * lm * (r_out**2.0 - r**2.0) - (hs * lm * ns * ls)

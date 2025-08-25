@@ -11,12 +11,11 @@ COPPER_TEMPERATURE_COEFF = 0.00393  # Temperature coefficient for copper [1/°C]
 
 class SizingWindingResistivity(om.ExplicitComponent):
     """
-    Computation of the Winding resistivity.
-
+    Computation of the copper electrical resistivity varies with temperature. The formula is
+    obtained from equation (II-64) in :cite:`touhami:2020.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -31,11 +30,13 @@ class SizingWindingResistivity(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_temperature",
             val=np.nan,
             units="degC",
+            desc="The temperature of the winding conductor cable",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity",
             units="ohm*m",
+            desc="Copper electrical resistivity",
         )
 
     def setup_partials(self):

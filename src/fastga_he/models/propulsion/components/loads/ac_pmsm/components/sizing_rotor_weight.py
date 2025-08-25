@@ -43,23 +43,7 @@ class SizingRotorWeight(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]

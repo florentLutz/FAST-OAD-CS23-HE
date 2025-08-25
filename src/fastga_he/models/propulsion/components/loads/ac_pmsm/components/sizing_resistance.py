@@ -8,13 +8,11 @@ import openmdao.api as om
 
 class SizingResistance(om.ExplicitComponent):
     """
-    Computation of the Resistance (all phases).
-
+    Computation of the electrical resistance (all phases). The formula is obtained from equation (
+    II-64) in :cite:`touhami:2020.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
@@ -35,6 +33,7 @@ class SizingResistance(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
             val=np.nan,
             units="m",
+            desc="Electrical conductor cable length",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
@@ -45,6 +44,7 @@ class SizingResistance(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity",
             val=np.nan,
             units="ohm*m",
+            desc="Copper electrical resistivity",
         )
 
         self.add_output(
@@ -55,18 +55,7 @@ class SizingResistance(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
-            wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductors_number",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_length",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]

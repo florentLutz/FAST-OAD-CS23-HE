@@ -7,19 +7,15 @@ import openmdao.api as om
 
 
 class SizingToothRatio(om.ExplicitComponent):
-    """Computation of the ratio between tooth length to bore radius."""
+    """
+    Computation of the ratio between tooth length to bore radius. The formula is obtained from
+    equation (II-48) in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
@@ -40,6 +36,7 @@ class SizingToothRatio(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":surface_current_density",
             val=np.nan,
             units="A/m",
+            desc="The surface current density of the winding conductor cable",
         )
         self.add_input(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":ratiox2p",

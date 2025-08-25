@@ -40,6 +40,7 @@ class SizingSlotWidth(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             units="m",
+            desc="Single stator slot width (along the circumference)",
         )
 
     def setup_partials(self):

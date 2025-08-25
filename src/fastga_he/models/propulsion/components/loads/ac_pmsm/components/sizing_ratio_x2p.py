@@ -9,20 +9,14 @@ import openmdao.api as om
 class SizingRatioX2p(om.ExplicitComponent):
     """
     Computation of a fraction in the airgap flux density calculation. This ratio consists of the
-    radius ratio and the number of pole pairs.
+    radius ratio and the number of pole pairs. The formula is obtained from equation (
+    II-24) and (II-25) in :cite:`touhami:2020.
     """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]

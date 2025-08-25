@@ -412,7 +412,9 @@ def test_stator_core_weight():
         "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_height", val=0.0358, units="m"
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:magn_mat_density", val=8150, units="kg/m**3"
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:magnetic_material_density",
+        val=8150,
+        units="kg/m**3",
     )
     problem = run_system(SizingStatorCoreWeight(pmsm_id="motor_1"), ivc)
 
@@ -437,10 +439,12 @@ def test_stator_winding_weight():
         "data:propulsion:he_power_train:AC_PMSM:motor_1:slot_width", val=0.01348, units="m"
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:cond_mat_density", val=8960, units="kg/m**3"
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:conductor_material_density",
+        val=8960,
+        units="kg/m**3",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:insul_mat_density",
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:insulation_material_density",
         val=1400,
         units="kg/m**3",
     )
@@ -1168,13 +1172,17 @@ def test_sizing_ACPMSM():
         "data:propulsion:he_power_train:AC_PMSM:motor_1:current_ac_max", val=1986, units="A"
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:magn_mat_density", val=8150, units="kg/m**3"
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:magnetic_material_density",
+        val=8150,
+        units="kg/m**3",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:cond_mat_density", val=8960, units="kg/m**3"
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:conductor_material_density",
+        val=8960,
+        units="kg/m**3",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:AC_PMSM:motor_1:insul_mat_density",
+        "data:propulsion:he_power_train:AC_PMSM:motor_1:insulation_material_density",
         val=1400,
         units="kg/m**3",
     )

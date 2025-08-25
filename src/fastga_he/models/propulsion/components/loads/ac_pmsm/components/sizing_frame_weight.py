@@ -7,19 +7,15 @@ import openmdao.api as om
 
 
 class SizingFrameWeight(om.ExplicitComponent):
-    """Computation of the frame weight of the PMSM."""
+    """
+    Computation of the frame diameter and weight of the PMSM. The formula is obtained from
+    equation (II-53) and (II-59) respectively in :cite:`touhami:2020.
+    """
 
     def initialize(self):
-        # Reference motor : HASTECS project, Sarah Touhami
-
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        # self.options.declare(
-        # "diameter_ref",
-        # default=0.268,
-        # desc="Diameter of the reference motor in [m]",
-        # )
 
     def setup(self):
         pmsm_id = self.options["pmsm_id"]
@@ -60,28 +56,17 @@ class SizingFrameWeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_diameter",
+            of="*",
             wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
             method="exact",
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
+            wrt=[
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_density",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":active_length",
+                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":end_winding_coeff",
+            ],
             method="exact",
         )
 

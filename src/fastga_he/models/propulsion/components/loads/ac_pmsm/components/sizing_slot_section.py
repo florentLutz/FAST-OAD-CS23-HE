@@ -8,7 +8,8 @@ import openmdao.api as om
 
 class SizingSlotSection(om.ExplicitComponent):
     """
-    Computation of single slot cross-section ares of the PMSM.
+    Computation of single slot cross-section ares of the PMSM. The formula is obtained from
+    equation (II-33) in :cite:`touhami:2020.
     """
 
     def initialize(self):
@@ -32,6 +33,7 @@ class SizingSlotSection(om.ExplicitComponent):
             name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_width",
             val=np.nan,
             units="m",
+            desc="Single stator slot width (along the circumference)",
         )
 
         self.add_output(
