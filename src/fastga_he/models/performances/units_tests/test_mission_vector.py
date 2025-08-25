@@ -3257,12 +3257,12 @@ def test_mission_vector_atr_42():
 
     problem.setup()
 
-    #problem.set_val("data:weight:aircraft:MTOW", units="kg", val=15000.0)
+    # problem.set_val("data:weight:aircraft:MTOW", units="kg", val=15000.0)
     # problem.set_val("data:weight:aircraft:OWE", units="kg", val=10000.0)
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=10855.697082198)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.114459353773869)
-    #problem.set_val("data:weight:aircraft:MZFW", units="kg", val=13000.0)
-    #problem.set_val("data:weight:aircraft:MLW", units="kg", val=14000.0)
+    # problem.set_val("data:weight:aircraft:MZFW", units="kg", val=13000.0)
+    # problem.set_val("data:weight:aircraft:MLW", units="kg", val=14000.0)
 
     # om.n2(problem, show_browser=True)
 

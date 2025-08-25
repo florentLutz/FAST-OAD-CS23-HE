@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesJouleLosses2(om.ExplicitComponent):
     """
-     Computation of the Joule losses.
+    Computation of the Joule losses.
 
     """
 
@@ -69,7 +69,9 @@ class PerformancesJouleLosses2(om.ExplicitComponent):
 
         P_j = R_s * I_rms**2
 
-        outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses"] = P_j /1000.0
+        outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":Joule_power_losses"] = (
+            P_j / 1000.0
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]

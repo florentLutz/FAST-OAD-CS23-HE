@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingConductorLength(om.ExplicitComponent):
     """
-     Computation of the Conductor length.
+    Computation of the Conductor length.
 
     """
 
@@ -42,11 +42,8 @@ class SizingConductorLength(om.ExplicitComponent):
             val=np.nan,
         )
 
-
-
         self.add_output(
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_length",
-            units="m"
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_length", units="m"
         )
 
         self.declare_partials(
@@ -91,4 +88,3 @@ class SizingConductorLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_length",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":end_winding_coeff",
         ] = Lm * k_lc
-

@@ -29,8 +29,10 @@ class Cd0Total(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:geometry:aircraft:wetted_area", val=np.nan, units="m**2")
         self.add_input("data:propulsion:L1_engine:hpc:hpc_pressure_ratio", val=np.nan)
-        self.add_input('data:propulsion:L1_engine:lpc:lpc_pressure_ratio', val=np.nan)
-        self.add_input('data:propulsion:L1_engine:turbine_inlet_temperature', val=np.nan, units="degK")
+        self.add_input("data:propulsion:L1_engine:lpc:lpc_pressure_ratio", val=np.nan)
+        self.add_input(
+            "data:propulsion:L1_engine:turbine_inlet_temperature", val=np.nan, units="degK"
+        )
 
         if self.options["low_speed_aero"]:
             self.add_input("data:aerodynamics:wing:low_speed:CD0", shape_by_conn=True, val=np.nan)
@@ -42,10 +44,9 @@ class Cd0Total(om.ExplicitComponent):
             self.add_input("data:aerodynamics:horizontal_tail:low_speed:CD0", val=np.nan)
             self.add_input("data:aerodynamics:vertical_tail:low_speed:CD0", val=np.nan)
             self.add_input("data:aerodynamics:nacelles:low_speed:CD0", val=np.nan)
-            self.add_output(
-                "data:aerodynamics:aircraft:low_speed:CD0")
-               # copy_shape="data:aerodynamics:wing:low_speed:CD0",
-            #)
+            self.add_output("data:aerodynamics:aircraft:low_speed:CD0")
+            # copy_shape="data:aerodynamics:wing:low_speed:CD0",
+            # )
             self.add_output(
                 "data:aerodynamics:aircraft:low_speed:CD0:clean",
                 copy_shape="data:aerodynamics:wing:low_speed:CD0",
@@ -55,24 +56,26 @@ class Cd0Total(om.ExplicitComponent):
                 copy_shape="data:aerodynamics:wing:low_speed:CD0",
             )
         else:
-            self.add_input("data:aerodynamics:wing:cruise:CD0", val=np.nan)          # modified
+            self.add_input("data:aerodynamics:wing:cruise:CD0", val=np.nan)  # modified
             self.add_input("data:aerodynamics:fuselage:cruise:CD0", shape_by_conn=True, val=np.nan)
             self.add_input("data:aerodynamics:horizontal_tail:cruise:CD0", val=np.nan)
             self.add_input("data:aerodynamics:vertical_tail:cruise:CD0", val=np.nan)
             self.add_input("data:aerodynamics:nacelles:cruise:CD0", val=np.nan)
-            self.add_output("data:aerodynamics:aircraft:cruise:CD0") #,
-                #copy_shape="data:aerodynamics:wing:cruise:CD0",
+            self.add_output("data:aerodynamics:aircraft:cruise:CD0")  # ,
+            # copy_shape="data:aerodynamics:wing:cruise:CD0",
 
             self.add_output(
                 "data:aerodynamics:aircraft:cruise:CD0:clean",
-            copy_shape="data:aerodynamics:fuselage:cruise:CD0",) #,
-                #copy_shape="data:aerodynamics:wing:cruise:CD0",
-            #)
+                copy_shape="data:aerodynamics:fuselage:cruise:CD0",
+            )  # ,
+            # copy_shape="data:aerodynamics:wing:cruise:CD0",
+            # )
             self.add_output(
                 "data:aerodynamics:aircraft:cruise:CD0:parasitic",
-            copy_shape="data:aerodynamics:fuselage:cruise:CD0",) #,
-                #copy_shape="data:aerodynamics:wing:cruise:CD0",
-            #)
+                copy_shape="data:aerodynamics:fuselage:cruise:CD0",
+            )  # ,
+            # copy_shape="data:aerodynamics:wing:cruise:CD0",
+            # )
 
     def setup_partials(self):
         self.declare_partials("*", "*", method="fd")
@@ -87,10 +90,10 @@ class Cd0Total(om.ExplicitComponent):
             cd0_nac = inputs["data:aerodynamics:nacelles:low_speed:CD0"]
 
             k_parasite = (
-                    -2.39 * pow(10, -12) * wet_area_total ** 3
-                    + 2.58 * pow(10, -8) * wet_area_total ** 2
-                    - 0.89 * pow(10, -4) * wet_area_total
-                    + 0.163
+                -2.39 * pow(10, -12) * wet_area_total**3
+                + 2.58 * pow(10, -8) * wet_area_total**2
+                - 0.89 * pow(10, -4) * wet_area_total
+                + 0.163
             )
 
             cd0_total_clean = cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_nac
@@ -103,13 +106,15 @@ class Cd0Total(om.ExplicitComponent):
             cd0_nac = inputs["data:aerodynamics:nacelles:cruise:CD0"]
 
             k_parasite = (
-                    -2.39 * pow(10, -12) * wet_area_total ** 3
-                    + 2.58 * pow(10, -8) * wet_area_total ** 2
-                    - 0.89 * pow(10, -4) * wet_area_total
-                    + 0.163
+                -2.39 * pow(10, -12) * wet_area_total**3
+                + 2.58 * pow(10, -8) * wet_area_total**2
+                - 0.89 * pow(10, -4) * wet_area_total
+                + 0.163
             )
 
-            cd0_total_clean = cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_nac   #np.full_like(cd0_fus, cd0_wing)
+            cd0_total_clean = (
+                cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_nac
+            )  # np.full_like(cd0_fus, cd0_wing)
             cd0_total = cd0_total_clean * (1.0 + k_parasite)
 
         """

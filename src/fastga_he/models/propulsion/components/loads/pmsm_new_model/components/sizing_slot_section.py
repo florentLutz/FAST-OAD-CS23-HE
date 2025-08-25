@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingSlotSection(om.ExplicitComponent):
     """
-     Computation of the Slot section.
+    Computation of the Slot section.
 
     """
 
@@ -77,7 +77,3 @@ class SizingSlotSection(om.ExplicitComponent):
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width",
         ] = hs
-
-
-
-

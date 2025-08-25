@@ -36,13 +36,13 @@ def cleanup():
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
 
 
-
 def test_pipistrel_network_viewer():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):
         power_train_network_viewer(pt_file_path, network_file_path)
+
 
 def residuals_analyzer(recorder_path, solver):
     cr = om.CaseReader(recorder_path)
@@ -61,6 +61,8 @@ def residuals_analyzer(recorder_path, solver):
     sorted_variable_dict = dict(sorted(variable_dict.items(), key=lambda x: x[1], reverse=True))
 
     return sorted_variable_dict
+
+
 def test_non_regression_mission(cleanup):
     run_non_regression_test(
         CONFIGURATION_FILE,
@@ -163,6 +165,8 @@ def run_non_regression_test(
     pd.set_option("display.width", 1000)
     pd.set_option("display.max_colwidth", 120)
     print(df.sort_values(by=["abs_rel_delta"]))
+
+
 """
     if check_only_mtow:
         assert np.all(df.abs_rel_delta.loc[df.name == "data:weight:aircraft:MTOW"] < tolerance)
@@ -171,10 +175,7 @@ def run_non_regression_test(
 """
 
 
-
-
 def test_sizing_atr_42_retrofit():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -225,8 +226,12 @@ def test_sizing_atr_42_retrofit():
 
     # Give good initial guess on a few key value to reduce the time it takes to converge
 
-    problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=100.0)
-    problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=100.0)
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=100.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=100.0
+    )
 
     problem.set_val("data:weight:aircraft:MTOW", units="kg", val=17843.510991945397)
     problem.set_val("data:weight:aircraft:OWE", units="kg", val=10661.282552661316)
@@ -249,13 +254,10 @@ def test_sizing_atr_42_retrofit():
     # Construct the file path
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
 
-
     problem.write_outputs()
 
 
-
 def test_sizing_atr_42_fullsizing():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -316,42 +318,48 @@ def test_sizing_atr_42_fullsizing():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    problem.set_val("subgroup.performances.solve_equilibrium.update_mass.mass", units="kg", val=np.linspace(18000, 16000, 90))
+    problem.set_val(
+        "subgroup.performances.solve_equilibrium.update_mass.mass",
+        units="kg",
+        val=np.linspace(18000, 16000, 90),
+    )
 
-    datafile = oad.DataFile("C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml")
+    datafile = oad.DataFile(
+        "C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml"
+    )
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",
-                "data:weight:airframe:fuselage:mass",
-                "data:weight:airframe:horizontal_tail:mass",
-                "data:weight:airframe:vertical_tail:mass",
-                "data:weight:airframe:landing_gear:main:mass",
-                "data:weight:airframe:landing_gear:front:mass",
-                "data:propulsion:he_power_train:mass",
-                "data:weight:systems:auxiliary_power_unit:mass",
-                "data:weight:systems:electric_systems:electric_generation:mass",
-                "data:weight:systems:electric_systems:electric_common_installation:mass",
-                "data:weight:systems:hydraulic_systems:mass",
-                "data:weight:systems:fire_protection:mass",
-                "data:weight:systems:flight_furnishing:mass",
-                "data:weight:systems:automatic_flight_system:mass",
-                "data:weight:systems:communications:mass",
-                "data:weight:systems:ECS:mass",
-                "data:weight:systems:de-icing:mass",
-                "data:weight:systems:navigation:mass",
-                "data:weight:systems:flight_controls:mass",
-                "data:weight:furniture:furnishing:mass",
-                "data:weight:furniture:water:mass",
-                "data:weight:furniture:interior_integration:mass",
-                "data:weight:furniture:insulation:mass",
-                "data:weight:furniture:cabin_lighting:mass",
-                "data:weight:furniture:seats_crew_accommodation:mass",
-                "data:weight:furniture:oxygen:mass",
-                "data:weight:operational:items:passenger_seats:mass",
-                "data:weight:operational:items:unusable_fuel:mass",
-                "data:weight:operational:items:documents_toolkit:mass",
-                "data:weight:operational:items:galley_structure:mass",
-                "data:weight:operational:equipment:others:mass"
+        "data:weight:airframe:fuselage:mass",
+        "data:weight:airframe:horizontal_tail:mass",
+        "data:weight:airframe:vertical_tail:mass",
+        "data:weight:airframe:landing_gear:main:mass",
+        "data:weight:airframe:landing_gear:front:mass",
+        "data:propulsion:he_power_train:mass",
+        "data:weight:systems:auxiliary_power_unit:mass",
+        "data:weight:systems:electric_systems:electric_generation:mass",
+        "data:weight:systems:electric_systems:electric_common_installation:mass",
+        "data:weight:systems:hydraulic_systems:mass",
+        "data:weight:systems:fire_protection:mass",
+        "data:weight:systems:flight_furnishing:mass",
+        "data:weight:systems:automatic_flight_system:mass",
+        "data:weight:systems:communications:mass",
+        "data:weight:systems:ECS:mass",
+        "data:weight:systems:de-icing:mass",
+        "data:weight:systems:navigation:mass",
+        "data:weight:systems:flight_controls:mass",
+        "data:weight:furniture:furnishing:mass",
+        "data:weight:furniture:water:mass",
+        "data:weight:furniture:interior_integration:mass",
+        "data:weight:furniture:insulation:mass",
+        "data:weight:furniture:cabin_lighting:mass",
+        "data:weight:furniture:seats_crew_accommodation:mass",
+        "data:weight:furniture:oxygen:mass",
+        "data:weight:operational:items:passenger_seats:mass",
+        "data:weight:operational:items:unusable_fuel:mass",
+        "data:weight:operational:items:documents_toolkit:mass",
+        "data:weight:operational:items:galley_structure:mass",
+        "data:weight:operational:equipment:others:mass",
     ]
 
     for names in list_of_variables_to_set:
@@ -378,13 +386,10 @@ def test_sizing_atr_42_fullsizing():
     # Construct the file path
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
 
-
     problem.write_outputs()
 
 
-
 def test_sizing_atr_42_fullsizing_series():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -425,42 +430,48 @@ def test_sizing_atr_42_fullsizing_series():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    problem.set_val("subgroup.performances.solve_equilibrium.update_mass.mass", units="kg", val=np.linspace(18000, 16000, 90))
+    problem.set_val(
+        "subgroup.performances.solve_equilibrium.update_mass.mass",
+        units="kg",
+        val=np.linspace(18000, 16000, 90),
+    )
 
-    datafile = oad.DataFile("C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml")
+    datafile = oad.DataFile(
+        "C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml"
+    )
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",
-                "data:weight:airframe:fuselage:mass",
-                "data:weight:airframe:horizontal_tail:mass",
-                "data:weight:airframe:vertical_tail:mass",
-                "data:weight:airframe:landing_gear:main:mass",
-                "data:weight:airframe:landing_gear:front:mass",
-                "data:propulsion:he_power_train:mass",
-                "data:weight:systems:auxiliary_power_unit:mass",
-                "data:weight:systems:electric_systems:electric_generation:mass",
-                "data:weight:systems:electric_systems:electric_common_installation:mass",
-                "data:weight:systems:hydraulic_systems:mass",
-                "data:weight:systems:fire_protection:mass",
-                "data:weight:systems:flight_furnishing:mass",
-                "data:weight:systems:automatic_flight_system:mass",
-                "data:weight:systems:communications:mass",
-                "data:weight:systems:ECS:mass",
-                "data:weight:systems:de-icing:mass",
-                "data:weight:systems:navigation:mass",
-                "data:weight:systems:flight_controls:mass",
-                "data:weight:furniture:furnishing:mass",
-                "data:weight:furniture:water:mass",
-                "data:weight:furniture:interior_integration:mass",
-                "data:weight:furniture:insulation:mass",
-                "data:weight:furniture:cabin_lighting:mass",
-                "data:weight:furniture:seats_crew_accommodation:mass",
-                "data:weight:furniture:oxygen:mass",
-                "data:weight:operational:items:passenger_seats:mass",
-                "data:weight:operational:items:unusable_fuel:mass",
-                "data:weight:operational:items:documents_toolkit:mass",
-                "data:weight:operational:items:galley_structure:mass",
-                "data:weight:operational:equipment:others:mass"
+        "data:weight:airframe:fuselage:mass",
+        "data:weight:airframe:horizontal_tail:mass",
+        "data:weight:airframe:vertical_tail:mass",
+        "data:weight:airframe:landing_gear:main:mass",
+        "data:weight:airframe:landing_gear:front:mass",
+        "data:propulsion:he_power_train:mass",
+        "data:weight:systems:auxiliary_power_unit:mass",
+        "data:weight:systems:electric_systems:electric_generation:mass",
+        "data:weight:systems:electric_systems:electric_common_installation:mass",
+        "data:weight:systems:hydraulic_systems:mass",
+        "data:weight:systems:fire_protection:mass",
+        "data:weight:systems:flight_furnishing:mass",
+        "data:weight:systems:automatic_flight_system:mass",
+        "data:weight:systems:communications:mass",
+        "data:weight:systems:ECS:mass",
+        "data:weight:systems:de-icing:mass",
+        "data:weight:systems:navigation:mass",
+        "data:weight:systems:flight_controls:mass",
+        "data:weight:furniture:furnishing:mass",
+        "data:weight:furniture:water:mass",
+        "data:weight:furniture:interior_integration:mass",
+        "data:weight:furniture:insulation:mass",
+        "data:weight:furniture:cabin_lighting:mass",
+        "data:weight:furniture:seats_crew_accommodation:mass",
+        "data:weight:furniture:oxygen:mass",
+        "data:weight:operational:items:passenger_seats:mass",
+        "data:weight:operational:items:unusable_fuel:mass",
+        "data:weight:operational:items:documents_toolkit:mass",
+        "data:weight:operational:items:galley_structure:mass",
+        "data:weight:operational:equipment:others:mass",
     ]
 
     for names in list_of_variables_to_set:
@@ -487,13 +498,10 @@ def test_sizing_atr_42_fullsizing_series():
     # Construct the file path
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
 
-
     problem.write_outputs()
 
 
-
 def test_sizing_atr_42_turboshaft():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -535,8 +543,11 @@ def test_sizing_atr_42_turboshaft():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    problem.set_val("subgroup.performances.solve_equilibrium.update_mass.mass", units="kg",
-                    val=np.linspace(18000, 16000, 90))
+    problem.set_val(
+        "subgroup.performances.solve_equilibrium.update_mass.mass",
+        units="kg",
+        val=np.linspace(18000, 16000, 90),
+    )
 
     # recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
     # solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
@@ -560,5 +571,3 @@ def test_sizing_atr_42_turboshaft():
     file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
 
     problem.write_outputs()
-
-

@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingConductorSection(om.ExplicitComponent):
     """
-     Computation of the Conducor section.
+    Computation of the Conducor section.
 
     """
 
@@ -43,8 +43,7 @@ class SizingConductorSection(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
-            units="m**2"
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section", units="m**2"
         )
 
         self.declare_partials(
@@ -65,7 +64,6 @@ class SizingConductorSection(om.ExplicitComponent):
 
         S_cond = S_slot * k_sc * k_fill
 
-
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section"] = S_cond
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -74,22 +72,19 @@ class SizingConductorSection(om.ExplicitComponent):
         k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
         k_sc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor"]
 
-
-
         S_cond = S_slot * k_sc * k_fill
 
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_section",
-        ] = k_fill*k_sc
+        ] = k_fill * k_sc
 
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor",
-        ] = S_slot*k_sc
+        ] = S_slot * k_sc
 
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductor_section",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor",
-        ] = S_slot*k_fill
-
+        ] = S_slot * k_fill

@@ -16,7 +16,7 @@ from ..constants import (
 
 class ConstraintsPMSM(om.Group):
     """
-     Class that gather the different constraints for the PMSM be they ensure or enforce.
+    Class that gather the different constraints for the PMSM be they ensure or enforce.
     """
 
     def initialize(self):
@@ -86,11 +86,11 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
             desc="Value of the maximum power the PMSM can provide, used for sizing",
         )
 
-        self.declare_partials(of="*", wrt="*", val=1.0/1000.0)
+        self.declare_partials(of="*", wrt="*", val=1.0 / 1000.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":shaft_power_rating"] = (
-            inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":shaft_power_max"]/1000.0
+            inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":shaft_power_max"] / 1000.0
         )

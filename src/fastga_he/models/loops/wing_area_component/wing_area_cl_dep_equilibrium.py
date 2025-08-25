@@ -79,7 +79,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
     def setup(self):
         if self.options["power_train_file_path"]:
             self.configurator.load(self.options["power_train_file_path"])
-            
+
             self.simplified_file_path = self.options["power_train_file_path"]
             self.control_parameter_list = self.configurator.get_control_parameter_list()
 

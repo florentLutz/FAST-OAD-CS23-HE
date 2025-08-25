@@ -85,4 +85,3 @@ class UpdateMass(om.ExplicitComponent):
             - fuel_initial_climb
             - np.cumsum(np.concatenate((np.zeros(1), inputs["fuel_consumed_t"][:-1])))
         )
-

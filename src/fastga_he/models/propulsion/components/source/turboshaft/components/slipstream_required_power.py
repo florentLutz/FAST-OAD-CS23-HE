@@ -29,7 +29,12 @@ class SlipstreamRequiredPower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
-        self.add_input("shaft_power_out", units="kW", val=np.ones(number_of_points + 2), shape=number_of_points + 2)
+        self.add_input(
+            "shaft_power_out",
+            units="kW",
+            val=np.ones(number_of_points + 2),
+            shape=number_of_points + 2,
+        )
         self.add_input(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_offtake",
             val=0.0,

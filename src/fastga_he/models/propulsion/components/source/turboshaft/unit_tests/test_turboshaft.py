@@ -100,7 +100,7 @@ def test_fuel_consumption_pw206b():
         problem.get_val("fuel_consumption", units="lb/h")[0]
         / problem.get_val("power_required", units="hp")[0]
     )
-    print("k_sfc:", 0.470/ sfc)
+    print("k_sfc:", 0.470 / sfc)
     # Should be 0.548
 
 

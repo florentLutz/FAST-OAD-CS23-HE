@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingSlotHeight(om.ExplicitComponent):
-    """ Computation of the slot height of the PMSM."""
+    """Computation of the slot height of the PMSM."""
 
     def initialize(self):
         # Reference motor : EMRAX 268
@@ -156,7 +156,9 @@ class SizingSlotHeight(om.ExplicitComponent):
         k_sc = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_conductor_factor"]
         k_fill = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_fill_factor"]
         B_st = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":tooth_flux_density"]
-        K_m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density"]
+        K_m = inputs[
+            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":surface_current_density"
+        ]
         x2p_ratio = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":ratiox2p"]
         p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
         mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
@@ -171,10 +173,7 @@ class SizingSlotHeight(om.ExplicitComponent):
                 1
                 - (
                     (2 / np.pi)
-                    * np.sqrt(
-                        (B_m / B_st) ** 2
-                        + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio
-                    )
+                    * np.sqrt((B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio)
                 )
             )
         )

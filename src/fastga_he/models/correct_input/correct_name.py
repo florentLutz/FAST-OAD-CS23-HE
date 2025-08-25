@@ -13,6 +13,7 @@ from fastoad.module_management.constants import ModelDomain
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.correct_name")
 class HeNameFromRTAname(om.ExplicitComponent):
     """Same variables but with different name in HE and RTA are renamed"""
+
     def setup(self):
         self.add_input("data:TLAR:NPAX", val=np.nan)
         self.add_input("data:geometry:cabin:seats:economical:count_by_row", val=np.nan)
@@ -218,6 +219,7 @@ class HeNameFromRTAname(om.ExplicitComponent):
             wrt="data:propulsion:RTO_power",
             val=1.0,
         )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:TLAR:NPAX_design"] = inputs["data:TLAR:NPAX"]
 
@@ -307,7 +309,9 @@ class HeNameFromRTAname(om.ExplicitComponent):
             "data:propulsion:RTO_power"
         ]
 
-        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_1:shaft_power_rating"] = (2160.0486528826723)
+        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_1:shaft_power_rating"] = (
+            2160.0486528826723
+        )
         #     inputs["data:propulsion:RTO_power"]
         # )
 
@@ -319,7 +323,9 @@ class HeNameFromRTAname(om.ExplicitComponent):
             "data:propulsion:RTO_power"
         ]
 
-        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_2:shaft_power_rating"] = (2160.0486528826723)
+        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_2:shaft_power_rating"] = (
+            2160.0486528826723
+        )
         #     inputs["data:propulsion:RTO_power"]
         # )
 

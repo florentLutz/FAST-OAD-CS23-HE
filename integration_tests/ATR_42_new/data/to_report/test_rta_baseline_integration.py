@@ -36,13 +36,13 @@ def cleanup():
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
 
 
-
 def test_pipistrel_network_viewer():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):
         power_train_network_viewer(pt_file_path, network_file_path)
+
 
 def residuals_analyzer(recorder_path, solver):
     cr = om.CaseReader(recorder_path)
@@ -61,6 +61,8 @@ def residuals_analyzer(recorder_path, solver):
     sorted_variable_dict = dict(sorted(variable_dict.items(), key=lambda x: x[1], reverse=True))
 
     return sorted_variable_dict
+
+
 def test_non_regression_mission(cleanup):
     run_non_regression_test(
         CONFIGURATION_FILE,
@@ -163,6 +165,8 @@ def run_non_regression_test(
     pd.set_option("display.width", 1000)
     pd.set_option("display.max_colwidth", 120)
     print(df.sort_values(by=["abs_rel_delta"]))
+
+
 """
     if check_only_mtow:
         assert np.all(df.abs_rel_delta.loc[df.name == "data:weight:aircraft:MTOW"] < tolerance)
@@ -171,10 +175,7 @@ def run_non_regression_test(
 """
 
 
-
-
 def test_sizing_atr_42():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -278,8 +279,12 @@ def test_sizing_atr_42():
     # problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=11.0)
     # problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
 
-    problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=100.0)
-    problem.set_val("data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=100.0)
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=100.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:number_modules", val=100.0
+    )
 
     problem.set_val("data:weight:aircraft:MTOW", units="kg", val=18000.0)
     problem.set_val("data:weight:aircraft:OWE", units="kg", val=10000.0)
@@ -323,11 +328,10 @@ def test_sizing_atr_42():
 
     # cr = om.CaseReader(recorder)
 
-
     problem.write_outputs()
 
-def test_sizing_atr_42_turboshaft():
 
+def test_sizing_atr_42_turboshaft():
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -416,12 +420,12 @@ def test_mission_vector_atr_42():
 
     problem.setup()
 
-    #problem.set_val("data:weight:aircraft:MTOW", units="kg", val=15000.0)
+    # problem.set_val("data:weight:aircraft:MTOW", units="kg", val=15000.0)
     # problem.set_val("data:weight:aircraft:OWE", units="kg", val=10000.0)
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=10855.697082198)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.114459353773869)
-    #problem.set_val("data:weight:aircraft:MZFW", units="kg", val=13000.0)
-    #problem.set_val("data:weight:aircraft:MLW", units="kg", val=14000.0)
+    # problem.set_val("data:weight:aircraft:MZFW", units="kg", val=13000.0)
+    # problem.set_val("data:weight:aircraft:MLW", units="kg", val=14000.0)
 
     # om.n2(problem, show_browser=True)
 

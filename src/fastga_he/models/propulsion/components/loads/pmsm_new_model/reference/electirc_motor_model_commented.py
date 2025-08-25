@@ -1,4 +1,5 @@
 import numpy as np
+
 """ PMSM model from HASTECS project, Sarah Touhami"""
 if __name__ == "__main__":
     # Physical constants
@@ -190,7 +191,6 @@ if __name__ == "__main__":
     # Carica i coefficienti salvati (matrice 4x4)
     coeffs_reshaped = np.load("coeffs_reshaped.npy")
 
-
     # Valori di test
     f = RPM / 30  # Frequenza in Hz
 
@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
     # Calculation of maximum electromagnetic torque
     S_rot = 2 * np.pi * R_r * Lm  # Rotor surface area
-    Tem_max = Pem/ Omega  # Maximum electromagnetic torque
+    Tem_max = Pem / Omega  # Maximum electromagnetic torque
 
     # Specific torque
     ST = Tem_max / W_mot
@@ -238,4 +238,3 @@ if __name__ == "__main__":
     A_jeq = (P_j + P_mec_loss + P_iron) / (2 * np.pi * R * k_tb * Lm * rho_cu_Twin)
 
     print(f"A_jeq = {A_jeq:.2f} ")
-

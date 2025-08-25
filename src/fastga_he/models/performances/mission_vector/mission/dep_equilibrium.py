@@ -116,7 +116,7 @@ class DEPEquilibrium(om.Group):
 
             options_delta_m = {
                 "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"]
+                "flaps_position": self.options["flaps_position"],
             }
 
             self.add_subsystem(
@@ -179,7 +179,7 @@ class DEPEquilibrium(om.Group):
 
             options_delta_m = {
                 "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"]
+                "flaps_position": self.options["flaps_position"],
             }
 
             self.add_subsystem(

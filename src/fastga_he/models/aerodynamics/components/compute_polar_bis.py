@@ -38,11 +38,10 @@ class ComputePolar(om.ExplicitComponent):
                 shape_by_conn=True,
                 val=np.nan,
             )
-            self.add_input(
-                "data:aerodynamics:aircraft:low_speed:CD0", val=np.nan) #,
-                #shape_by_conn=True,
-                #val=np.nan,
-            #)
+            self.add_input("data:aerodynamics:aircraft:low_speed:CD0", val=np.nan)  # ,
+            # shape_by_conn=True,
+            # val=np.nan,
+            # )
             self.add_input(
                 "data:aerodynamics:aircraft:low_speed:CD:trim",
                 shape_by_conn=True,
@@ -90,7 +89,9 @@ class ComputePolar(om.ExplicitComponent):
 
         elif self.options["polar_type"] == PolarType.HIGH_SPEED:
             self.add_input("data:aerodynamics:aircraft:cruise:CL", shape_by_conn=True, val=np.nan)
-            self.add_input("data:aerodynamics:aircraft:cruise:CD0", val=np.nan)      #, shape_by_conn=True, val=np.nan)
+            self.add_input(
+                "data:aerodynamics:aircraft:cruise:CD0", val=np.nan
+            )  # , shape_by_conn=True, val=np.nan)
             self.add_input(
                 "data:aerodynamics:aircraft:cruise:CD:trim",
                 shape_by_conn=True,

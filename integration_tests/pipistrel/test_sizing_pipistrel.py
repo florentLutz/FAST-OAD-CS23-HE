@@ -763,7 +763,6 @@ def test_aircraft_geometry_plot():
     fig.write_image(pth.join(RESULTS_FOLDER_PATH, "pipistrel_geometry.pdf"))
 
 
-
 def test_aircraft_geometry_plot_ATR42():
     results_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "problem_outputs.xml")
 
@@ -795,8 +794,6 @@ def test_aircraft_geometry_plot_ATR42():
     # fig.show()
     fig.write_image(pth.join(RESULTS_FOLDER_PATH, "ATR42_geometry.svg"))
     fig.write_image(pth.join(RESULTS_FOLDER_PATH, "ATR42_geometry.pdf"))
-
-
 
 
 def test_plot_power_profile_results():

@@ -38,7 +38,7 @@ if __name__ == "__main__":
     k1 = 1  # Smoothness factor
     pr = 1  # Air pressure [atm]
     # Air properties
-    mu_air = 8.88e-15 * T ** 3 - 3.23e-11 * T ** 2 + 6.26e-8 * T + 2.35e-6
+    mu_air = 8.88e-15 * T**3 - 3.23e-11 * T**2 + 6.26e-8 * T + 2.35e-6
     rho_air = 1.293 * (273.15 / T) * pr
 
     # Constants and material properties
@@ -57,7 +57,6 @@ if __name__ == "__main__":
     rho_insl = 1400  # Insulation density [kg/m³]
     rho_fr = 2100  # Frame material density [kg/m³]
 
-
     #################    sizing ##################
     # Derived quantities
     Pem = Pem_PU * S_base  # Real power [W]
@@ -73,25 +72,25 @@ if __name__ == "__main__":
 
     # Equation II-45: Stator yoke thickness hy
     hy = (R / p) * np.sqrt(
-        (B_m / B_sy) ** 2 + (mu_0 ** 2) * ((K_m / B_sy) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2)
+        (B_m / B_sy) ** 2 + (mu_0**2) * ((K_m / B_sy) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2)
     )
 
     # Equation II-46: Slot height hs
     numerator = np.sqrt(2) * sigma
     denominator = k_w * B_m * j_rms
     second_term = 1 / (
-            k_sc
-            * k_fill
-            * (
-                    1
-                    - (
-                            (2 / np.pi)
-                            * np.sqrt(
-                        (B_m / B_st) ** 2
-                        + ((mu_0 * K_m / B_st) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2)
-                    )
-                    )
+        k_sc
+        * k_fill
+        * (
+            1
+            - (
+                (2 / np.pi)
+                * np.sqrt(
+                    (B_m / B_st) ** 2
+                    + ((mu_0 * K_m / B_st) ** 2) * (((1 + x_2p) / (1 - x_2p)) ** 2)
+                )
             )
+        )
     )
     hs = (numerator / denominator) * second_term
 
@@ -100,7 +99,7 @@ if __name__ == "__main__":
 
     # Tooth to bore radius ratio
     term1 = (B_m / B_st) ** 2
-    term2 = (mu_0 ** 2) * ((K_m / B_st) ** 2) * ((1 + x_2p) / (1 - x_2p)) ** 2
+    term2 = (mu_0**2) * ((K_m / B_st) ** 2) * ((1 + x_2p) / (1 - x_2p)) ** 2
     r_tooth = (2 / np.pi) * np.sqrt(term1 + term2)
     Ns = 2 * p * q * m
     ls = (1 - r_tooth) * 2 * np.pi * R / Ns
@@ -110,11 +109,11 @@ if __name__ == "__main__":
     R_sh = R_r / 3
     R_out_mm = R_out * 1000
 
-    tau_r_ = 0.7371 * R_out ** 2 - 0.580 * R_out + 1.1599 if R_out_mm <= 400 else 1.04
+    tau_r_ = 0.7371 * R_out**2 - 0.580 * R_out + 1.1599 if R_out_mm <= 400 else 1.04
     R_fr = tau_r_ * R_out
 
     # Stator weight
-    W_stat_core = (np.pi * Lm * (R_out ** 2 - R ** 2) - (hs * Lm * Ns * ls)) * rho_sf
+    W_stat_core = (np.pi * Lm * (R_out**2 - R**2) - (hs * Lm * Ns * ls)) * rho_sf
     vol_wind = k_tb * k_lc * hs * Lm * Ns * ls
     mat_mix_density = k_fill * rho_c + (1 - k_fill) * rho_insl
     W_stat_wind = vol_wind * mat_mix_density
@@ -124,21 +123,20 @@ if __name__ == "__main__":
     if p <= 10:
         rho_rot = -431.67 * p + 7932
     elif 10 < p <= 50:
-        rho_rot = 1.09 * p ** 2 - 117.45 * p + 4681
+        rho_rot = 1.09 * p**2 - 117.45 * p + 4681
     else:
         rho_rot = 1600
 
     # Rotor weight
-    W_rot = np.pi * R_r ** 2 * Lm * rho_rot
+    W_rot = np.pi * R_r**2 * Lm * rho_rot
 
     # Frame weight
     W_frame = rho_fr * (
-            np.pi * Lm * k_tb * (R_fr ** 2 - R_out ** 2) + 2 * np.pi * (tau_r_ - 1) * R_out * R_fr ** 2
+        np.pi * Lm * k_tb * (R_fr**2 - R_out**2) + 2 * np.pi * (tau_r_ - 1) * R_out * R_fr**2
     )
 
     # Total motor weight
     W_mot = W_stat + W_rot + W_frame
-
 
     T_max = 350
     Tmax_range = np.linspace(50, T_max, 150)
@@ -166,27 +164,27 @@ if __name__ == "__main__":
 
             ########################## LOSSES ##########################
             # Joule losses
-            I_rms = Torque/ kk_t
+            I_rms = Torque / kk_t
             P_j = Resistance * I_rms**2
             # Air properties
-            mu_air = 8.88e-15 * T ** 3 - 3.23e-11 * T ** 2 + 6.26e-8 * T + 2.35e-6
+            mu_air = 8.88e-15 * T**3 - 3.23e-11 * T**2 + 6.26e-8 * T + 2.35e-6
             rho_air = 1.293 * (273.15 / T) * pr
 
             # Reynolds number and friction coefficient
             Re_a = (rho_air * R_r * e_g * Omega) / mu_air
             if 500 < Re_a < 1e4:
-                Cf_a = 0.515 * (e_g / R_r) ** 0.3 * (Re_a ** -0.5)
+                Cf_a = 0.515 * (e_g / R_r) ** 0.3 * (Re_a**-0.5)
             elif Re_a >= 1e4:
-                Cf_a = 0.0325 * (e_g / R_r) ** 0.3 * (Re_a ** -0.2)
+                Cf_a = 0.0325 * (e_g / R_r) ** 0.3 * (Re_a**-0.2)
             else:
                 raise ValueError("Re_a is too low (Re_a < 500)")
 
-            P_windage_airgap = k1 * Cf_a * np.pi * rho_air * R_r ** 4 * Omega ** 3 * L
+            P_windage_airgap = k1 * Cf_a * np.pi * rho_air * R_r**4 * Omega**3 * L
 
             # Rotor windage
-            Re_rot = (rho_air * R_r ** 2 * Omega) / mu_air
-            C_fr = 3.87 / Re_rot ** 0.5 if Re_rot < 3e5 else 0.146 / Re_rot ** 0.2
-            P_windage_rotor = 0.5 * C_fr * np.pi * rho_air * Omega ** 3 * (R_r ** 5 - R_sh ** 5)
+            Re_rot = (rho_air * R_r**2 * Omega) / mu_air
+            C_fr = 3.87 / Re_rot**0.5 if Re_rot < 3e5 else 0.146 / Re_rot**0.2
+            P_windage_rotor = 0.5 * C_fr * np.pi * rho_air * Omega**3 * (R_r**5 - R_sh**5)
 
             # Bearing friction losses
             P_eq = W_rot * g
@@ -215,16 +213,15 @@ if __name__ == "__main__":
 
             P_loss = P_j + P_iron
             #
-            Pele = Pem + 2* P_loss  # + 2 * (P_j + P_iron)
+            Pele = Pem + 2 * P_loss  # + 2 * (P_j + P_iron)
             # Mechanical output power
-            Pmec = Pem -  2 * P_mec_loss
+            Pmec = Pem - 2 * P_mec_loss
 
             # Efficiency
-            efficiency_grid[i,j] = Pmec / Pele
+            efficiency_grid[i, j] = Pmec / Pele
 
             # Specific power
-            Sp_grid[i,j] = Pem / W_mot
-
+            Sp_grid[i, j] = Pem / W_mot
 
 
 RPM_grid, Torque_grid = np.meshgrid(RPM_range, Tmax_range)
@@ -242,21 +239,31 @@ RPM_grid, Torque_grid = np.meshgrid(RPM_range, Tmax_range)
 plt.figure(figsize=(10, 6))
 
 # Contour plot
-cp2 = plt.contourf(RPM_grid, Torque_grid, efficiency_grid, levels=np.linspace(0.86, np.max(efficiency_grid), 10), cmap='viridis')
+cp2 = plt.contourf(
+    RPM_grid,
+    Torque_grid,
+    efficiency_grid,
+    levels=np.linspace(0.86, np.max(efficiency_grid), 10),
+    cmap="viridis",
+)
 cbar = plt.colorbar(cp2, format="%.3f")
-cbar.set_label('Efficiency')
+cbar.set_label("Efficiency")
 
 # Labels
-plt.xlabel('RPM [1/min]')
-plt.ylabel('Torque [Nm]')
-plt.title('Efficiency vs RPM and Torque')
+plt.xlabel("RPM [1/min]")
+plt.ylabel("Torque [Nm]")
+plt.title("Efficiency vs RPM and Torque")
 
 # Punto rosso
-plt.scatter(15000, 166, color='red', s=80, zorder=10, label='Cruise')
+plt.scatter(15000, 166, color="red", s=80, zorder=10, label="Cruise")
 
 # Linee tratteggiate troncate
-plt.plot([min(RPM_range), 15000], [166, 166], color='red', linestyle='--', linewidth=1)  # Orizzontale
-plt.plot([15000, 15000], [min(Tmax_range), 166], color='red', linestyle='--', linewidth=1)  # Verticale
+plt.plot(
+    [min(RPM_range), 15000], [166, 166], color="red", linestyle="--", linewidth=1
+)  # Orizzontale
+plt.plot(
+    [15000, 15000], [min(Tmax_range), 166], color="red", linestyle="--", linewidth=1
+)  # Verticale
 
 # Legenda e layout
 plt.legend()
@@ -264,34 +271,32 @@ plt.tight_layout()
 plt.show()
 
 
-
-
 plt.figure(figsize=(10, 6))
-cp = plt.contour(RPM_grid, Torque_grid, efficiency_grid, levels=np.linspace(0.86, np.max(efficiency_grid), 10), cmap='viridis')
-plt.colorbar(cp, label='Efficiency')
-plt.ylabel('Torque [Nm]')
-plt.xlabel('RPM [1/min]')
-plt.title('Efficiency vs RPM and Torque')
+cp = plt.contour(
+    RPM_grid,
+    Torque_grid,
+    efficiency_grid,
+    levels=np.linspace(0.86, np.max(efficiency_grid), 10),
+    cmap="viridis",
+)
+plt.colorbar(cp, label="Efficiency")
+plt.ylabel("Torque [Nm]")
+plt.xlabel("RPM [1/min]")
+plt.title("Efficiency vs RPM and Torque")
 plt.tight_layout()
 plt.show()
 
 
-#Sp_vec = Sp_grid[200,:]
+# Sp_vec = Sp_grid[200,:]
 # Plot della curva
 
 S_grid, R_grid = np.meshgrid(RPM_range, Tmax_range)
 
 plt.figure(figsize=(10, 6))
-cp = plt.contourf(R_grid, S_grid, Sp_grid, levels=20, cmap='viridis')
-plt.colorbar(cp, label='Efficiency')
-plt.ylabel('RPM [1/min]')
-plt.xlabel('Torque [Nm]')
-plt.title('Efficiency vs RPM and Torque')
+cp = plt.contourf(R_grid, S_grid, Sp_grid, levels=20, cmap="viridis")
+plt.colorbar(cp, label="Efficiency")
+plt.ylabel("RPM [1/min]")
+plt.xlabel("Torque [Nm]")
+plt.title("Efficiency vs RPM and Torque")
 plt.tight_layout()
 plt.show()
-
-
-
-
-
-

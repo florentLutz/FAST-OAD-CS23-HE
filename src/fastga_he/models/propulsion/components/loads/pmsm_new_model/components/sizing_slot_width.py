@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingSlotWidth(om.ExplicitComponent):
-    """ Computation of the slot width of the PMSM."""
+    """Computation of the slot width of the PMSM."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
@@ -125,9 +125,7 @@ class SizingSlotWidth(om.ExplicitComponent):
 
         # Equation II-46: Slot height hs
 
-        r_tooth = (2 / np.pi) * np.sqrt(
-            (B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio
-        )
+        r_tooth = (2 / np.pi) * np.sqrt((B_m / B_st) ** 2 + ((mu_0 * K_m / B_st) ** 2) * x2p_ratio)
         ls = (1 - r_tooth) * 2 * np.pi * R / Ns
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slot_width"] = ls

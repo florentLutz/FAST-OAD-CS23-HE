@@ -23,7 +23,6 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
-
 @pytest.fixture(scope="module")
 def cleanup():
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
@@ -70,6 +69,7 @@ def test_sizing_atr_72():
     problem.write_outputs()
 
     ###
+
 
 def test_sizing_ATR72_HE_PERFORMANCES(cleanup):
     # TODO: Check why he needs the propulsion data as inputs

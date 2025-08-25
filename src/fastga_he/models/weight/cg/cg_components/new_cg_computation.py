@@ -36,13 +36,13 @@ class ComputeCG(om.ExplicitComponent):
                 "data:weight:airframe:wing:CG:x",
                 "data:weight:airframe:fuselage:CG:x",
                 "data:weight:airframe:horizontal_tail:CG:x",
-                "data:weight:airframe:vertical_tail:CG:x",                          #"data:weight:airframe:flight_controls:CG:x"
+                "data:weight:airframe:vertical_tail:CG:x",  # "data:weight:airframe:flight_controls:CG:x"
                 "data:weight:airframe:landing_gear:main:CG:x",
-                "data:weight:airframe:landing_gear:front:CG:x",                     # paint
+                "data:weight:airframe:landing_gear:front:CG:x",  # paint
                 "data:propulsion:he_power_train:CG:x",
                 "data:weight:systems:auxiliary_power_unit:CG:x",
-                "data:weight:systems:electric_systems:electric_generation:CG:x",    #x electric system
-                "data:weight:systems:electric_systems:electric_common_installation:CG:x", #x
+                "data:weight:systems:electric_systems:electric_generation:CG:x",  # x electric system
+                "data:weight:systems:electric_systems:electric_common_installation:CG:x",  # x
                 "data:weight:systems:hydraulic_systems:CG:x",
                 "data:weight:systems:fire_protection:CG:x",
                 "data:weight:systems:flight_furnishing:CG:x",

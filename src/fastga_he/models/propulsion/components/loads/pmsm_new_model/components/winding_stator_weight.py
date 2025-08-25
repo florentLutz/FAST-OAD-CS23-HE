@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingStatorWindingWeight(om.ExplicitComponent):
-    """ Computation of the stator winding weight of the PMSM."""
+    """Computation of the stator winding weight of the PMSM."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
@@ -142,19 +142,16 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         vol_wind = lc * hs * Ns * ls
         mat_mix_density = k_fill * rho_c + (1 - k_fill) * rho_insl
 
-
         dW_dlc = hs * Ns * ls * mat_mix_density
         dW_dhs = lc * Ns * ls * mat_mix_density
         dW_dls = lc * hs * Ns * mat_mix_density
         dW_dNs = lc * hs * ls * mat_mix_density
-
 
         dW_dkfill = vol_wind * (rho_c - rho_insl)
         dW_drhoc = vol_wind * (k_fill)
         dW_drhoinsl = vol_wind * (1 - k_fill)
 
         # Equation II-46: Slot height hs
-
 
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":stator_winding_weight",

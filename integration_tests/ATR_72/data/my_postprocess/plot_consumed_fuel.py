@@ -21,8 +21,20 @@ common_times = np.sort(np.unique(np.concatenate([colonna_time1, colonna_time2]))
 common_times_filtered = common_times[common_times <= 11000]
 
 # Interpolazione
-interp_func1 = interp1d(colonna_time1, colonna_fuel_consumed1, kind="linear", bounds_error=False, fill_value="extrapolate")
-interp_func2 = interp1d(colonna_time2, colonna_fuel_consumed2, kind="linear", bounds_error=False, fill_value="extrapolate")
+interp_func1 = interp1d(
+    colonna_time1,
+    colonna_fuel_consumed1,
+    kind="linear",
+    bounds_error=False,
+    fill_value="extrapolate",
+)
+interp_func2 = interp1d(
+    colonna_time2,
+    colonna_fuel_consumed2,
+    kind="linear",
+    bounds_error=False,
+    fill_value="extrapolate",
+)
 
 interp_fuel1 = interp_func1(common_times_filtered)
 interp_fuel2 = interp_func2(common_times_filtered)

@@ -14,7 +14,6 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 COLORS = px.colors.qualitative.Prism
 
 
-
 def test_aircraft_geometry_plot_ATR42():
     results_pipistrel_file_path = pth.join(DATA_FOLDER_PATH, "plotdelete.xml")
 
@@ -33,10 +32,10 @@ def test_aircraft_geometry_plot_ATR42():
             source=pipistrel_top_view,
             xref="x",
             yref="y",
-            y=4.43*5.12,
-            x=-4.80*5.12 / 2,
-            sizex=4.80*5.12,
-            sizey=4.43*5.12,
+            y=4.43 * 5.12,
+            x=-4.80 * 5.12 / 2,
+            sizex=4.80 * 5.12,
+            sizey=4.43 * 5.12,
             sizing="stretch",
             opacity=0.75,
             layer="below",

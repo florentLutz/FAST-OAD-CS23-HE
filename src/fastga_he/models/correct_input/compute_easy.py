@@ -14,7 +14,8 @@ from stdatm import AtmosphereWithPartials
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.compute_easy", domain=ModelDomain.GEOMETRY)
 class EASY_compute(om.ExplicitComponent):
     """Simple computation to get HE Performances input from RTA OAD output, for instance the cruise
-     speed from the cruise mach"""
+    speed from the cruise mach"""
+
     def setup(self):
         self.add_input("data:TLAR:NPAX_design", val=np.nan)
         self.add_input("data:TLAR:cruise_mach", val=np.nan)
@@ -29,7 +30,7 @@ class EASY_compute(om.ExplicitComponent):
         self.add_input("data:propulsion:RTO_power", val=np.nan, units="W")
 
         self.add_output("data:TLAR:luggage_mass_design", units="kg")
-        self.add_output('data:aerodynamics:cruise:unit_reynolds', units="1/m")
+        self.add_output("data:aerodynamics:cruise:unit_reynolds", units="1/m")
         self.add_output("data:TLAR:v_cruise", units="m/s")
         self.add_output("data:mission:sizing:taxi_in:speed", units="m/s")
         self.add_output("data:mission:sizing:taxi_out:speed", units="m/s")
@@ -77,7 +78,7 @@ class EASY_compute(om.ExplicitComponent):
 
         outputs["data:TLAR:v_cruise"] = V_TAS
 
-        outputs['data:aerodynamics:cruise:unit_reynolds'] = unit_Reynolds
+        outputs["data:aerodynamics:cruise:unit_reynolds"] = unit_Reynolds
 
         outputs["data:TLAR:luggage_mass_design"] = 20 * inputs["data:TLAR:NPAX_design"]
 

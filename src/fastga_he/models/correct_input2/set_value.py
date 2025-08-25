@@ -12,8 +12,9 @@ from fastoad.module_management.constants import ModelDomain
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.set_name2")
 class SetValue2(om.ExplicitComponent):
-    """ Some variables with standard values are required in HE as input,
-         but they are not required as input in RTA, or some values are to complex to be computed"""
+    """Some variables with standard values are required in HE as input,
+    but they are not required as input in RTA, or some values are to complex to be computed"""
+
     def setup(self):
         self.add_input("data:TLAR:NPAX_design", val=np.nan)  # not used
 
@@ -87,11 +88,11 @@ class SetValue2(om.ExplicitComponent):
 
         outputs["data:mission:sizing:main_route:climb:climb_rate:cruise_level"] = 4.0
 
-       # ATR 72 outputs["data:mission:sizing:main_route:climb:climb_rate:sea_level"] = 6.45
+        # ATR 72 outputs["data:mission:sizing:main_route:climb:climb_rate:sea_level"] = 6.45
 
         outputs["data:mission:sizing:main_route:climb:climb_rate:sea_level"] = 9.0
 
-        outputs["data:mission:sizing:main_route:descent:descent_rate"] = -7.62 * 2. / 3.
+        outputs["data:mission:sizing:main_route:descent:descent_rate"] = -7.62 * 2.0 / 3.0
 
         outputs["data:geometry:horizontal_tail:elevator_chord_ratio"] = 0.384
 

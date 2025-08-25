@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingResistanceNew2(om.ExplicitComponent):
     """
-     Computation of the Resistance (all phases).
+    Computation of the Resistance (all phases).
 
     """
 

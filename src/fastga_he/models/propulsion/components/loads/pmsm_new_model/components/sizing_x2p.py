@@ -50,7 +50,6 @@ class Sizingx2p(om.ExplicitComponent):
             method="exact",
         )
 
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
         x = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio"]
@@ -69,7 +68,7 @@ class Sizingx2p(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":radius_ratio",
-        ] = (2 * p) * (x ** (2*p-1))
+        ] = (2 * p) * (x ** (2 * p - 1))
 
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":x2p",

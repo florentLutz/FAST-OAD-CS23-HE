@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class PerformancesTorque(om.ExplicitComponent):
-    """ Computation of the torque from power and rpm."""
+    """Computation of the torque from power and rpm."""
 
     def initialize(self):
         self.options.declare(

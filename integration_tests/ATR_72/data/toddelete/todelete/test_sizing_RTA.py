@@ -57,6 +57,3 @@ def test_sizing_sr22(cleanup):
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
-
-
-

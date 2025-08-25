@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class PerformancesCurrentRMS(om.ExplicitComponent):
-    """ Computation of the rms current in all phases based on the torque and torque constant."""
+    """Computation of the rms current in all phases based on the torque and torque constant."""
 
     def initialize(self):
         self.options.declare(

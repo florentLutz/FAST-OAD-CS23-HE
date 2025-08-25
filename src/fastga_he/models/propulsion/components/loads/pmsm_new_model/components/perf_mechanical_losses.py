@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesMechanicalLosses(om.ExplicitComponent):
     """
-     Computation of the Mechanical losses.
+    Computation of the Mechanical losses.
 
     """
 
@@ -140,7 +140,7 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":mechanical_power_losses"] = (
             P_mec_loss
-        ) /1000.0
+        ) / 1000.0
 
     # def compute_partials(self, inputs, partials, discrete_inputs=None):
     #     pmsm_id = self.options["pmsm_id"]

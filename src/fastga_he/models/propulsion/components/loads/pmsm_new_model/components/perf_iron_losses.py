@@ -15,7 +15,7 @@ coeffs_reshaped = np.load(pth.join(DATA_FOLDER_PATH, npy_file_name))
 
 class PerformancesIronLosses(om.ExplicitComponent):
     """
-     Computation of the Iron losses.
+    Computation of the Iron losses.
 
     """
 
@@ -100,7 +100,9 @@ class PerformancesIronLosses(om.ExplicitComponent):
         # Specific power times the PMSM weight
         P_iron = W_mot * Sp_pow
 
-        outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":iron_power_losses"] = P_iron / 1000.0
+        outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":iron_power_losses"] = (
+            P_iron / 1000.0
+        )
 
     # def compute_partials(self, inputs, partials, discrete_inputs=None):
     #     pmsm_id = self.options["pmsm_id"]

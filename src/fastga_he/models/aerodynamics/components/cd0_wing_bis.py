@@ -51,10 +51,9 @@ class Cd0Wing(om.ExplicitComponent):
             self.add_input("data:aerodynamics:wing:cruise:reynolds", val=np.nan)
             self.add_input("data:aerodynamics:aircraft:cruise:CL", shape_by_conn=True, val=np.nan)
             self.add_input("data:TLAR:cruise_mach", val=np.nan)
-            self.add_output(
-                "data:aerodynamics:wing:cruise:CD0")
-                #copy_shape="data:aerodynamics:aircraft:cruise:CL",
-            #)
+            self.add_output("data:aerodynamics:wing:cruise:CD0")
+            # copy_shape="data:aerodynamics:aircraft:cruise:CL",
+            # )
 
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:thickness_ratio", val=np.nan)

@@ -91,7 +91,9 @@ class SizingPMSMDrag(om.ExplicitComponent):
         motor_diameter = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":diameter"]
 
         if position == "on_the_wing":
-            motor_length = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"]
+            motor_length = inputs[
+                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"
+            ]
             fineness = inputs[
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":fairing:fineness"
             ]

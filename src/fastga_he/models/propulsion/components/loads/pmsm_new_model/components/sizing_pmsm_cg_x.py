@@ -73,7 +73,9 @@ class SizingPMSMCGX(om.ExplicitComponent):
             distance_from_le = inputs[
                 "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":from_LE"
             ]
-            motor_length = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"]
+            motor_length = inputs[
+                "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":active_length"
+            ]
             l0_wing = inputs["data:geometry:wing:MAC:length"]
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
 

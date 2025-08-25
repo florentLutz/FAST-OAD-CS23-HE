@@ -35,6 +35,7 @@ RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_3 = pth.join(
     pth.dirname(__file__), "results_sensitivity_full_sizing_3"
 )
 
+
 def residuals_analyzer(recorder_path, solver):
     cr = om.CaseReader(recorder_path)
 
@@ -49,11 +50,11 @@ def residuals_analyzer(recorder_path, solver):
         for residual in case.residuals:
             variable_dict[residual] = np.sum(np.abs(case.residuals[residual]))
 
-
     sorted_variable_dict = dict(sorted(variable_dict.items(), key=lambda x: x[1], reverse=True))
 
     return sorted_variable_dict
-  
+
+
 def outputs_analyzer(recorder_path, solver):
     cr = om.CaseReader(recorder_path)
 
@@ -68,7 +69,7 @@ def outputs_analyzer(recorder_path, solver):
     for case in last_10_cases:
         for output, value in case.outputs.items():
             if (
-                    isinstance(value, np.ndarray) and value.ndim == 1
+                isinstance(value, np.ndarray) and value.ndim == 1
             ):  # Check if the value is a 1D numpy array
                 if output not in variable_dict:
                     variable_dict[output] = []
@@ -84,6 +85,7 @@ def outputs_analyzer(recorder_path, solver):
     }
 
     return non_zero_variable_dict
+
 
 @pytest.fixture(scope="module")
 def cleanup():
@@ -215,6 +217,7 @@ def test_sizing_kodiak_100_full_electric():
     # )
     # # Actual value is 2110 lbs or 960 kg
 
+
 # def test_read_case_recorder():
 #     recorder_data_file_path = pth.join(DATA_FOLDER_PATH, "cases.sql")
 #
@@ -239,6 +242,7 @@ def test_sizing_kodiak_100_full_electric():
 #             writer.writerow([name, sum_res])
 #
 #     cr = om.CaseReader(recorder_data_file_path)
+
 
 def test_operational_mission_kodiak_100():
     """Test the overall aircraft design process with wing positioning."""

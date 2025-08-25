@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
+import os.path as pth
 import numpy as np
 import pytest
 
@@ -1009,6 +1010,39 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
+def test_performance_ACPMSM():
+    ivc = get_indep_var_comp(
+        list_inputs(PerformancesACPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+
+    ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
+    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesACPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1970.8434), rel=1e-2
+    )
+    assert problem.get_val("ac_current_rms_in_one_phase", units="A") == pytest.approx(
+        np.full(NB_POINTS_TEST, 656.9478), rel=1e-2
+    )
+    assert problem.get_val("ac_voltage_rms_in", units="V") == pytest.approx(
+        np.full(NB_POINTS_TEST, 727), rel=1e-2
+    )
+    assert problem.get_val("ac_voltage_peak_in", units="V") == pytest.approx(
+        np.full(NB_POINTS_TEST, 890.4), rel=1e-2
+    )
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
+
+
 def test_sizing_ACPMSM():
     ivc = get_indep_var_comp(list_inputs(SizingACPMSM(pmsm_id="motor_1")), __file__, XML_FILE)
 
@@ -1068,40 +1102,7 @@ def test_sizing_ACPMSM():
         "data:propulsion:he_power_train:AC_PMSM:motor_1:mass", units="kg"
     ) == pytest.approx(190.46, rel=1e-2)
 
-    om.n2(problem)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_performance_ACPMSM():
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesACPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
-
-    ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesACPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
-        np.full(NB_POINTS_TEST, 1970.8434), rel=1e-2
-    )
-    assert problem.get_val("ac_current_rms_in_one_phase", units="A") == pytest.approx(
-        np.full(NB_POINTS_TEST, 656.9478), rel=1e-2
-    )
-    assert problem.get_val("ac_voltage_rms_in", units="V") == pytest.approx(
-        np.full(NB_POINTS_TEST, 727), rel=1e-2
-    )
-    assert problem.get_val("ac_voltage_peak_in", units="V") == pytest.approx(
-        np.full(NB_POINTS_TEST, 890.4), rel=1e-2
-    )
-
-    om.n2(problem)
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
     problem.check_partials(compact_print=True)
 

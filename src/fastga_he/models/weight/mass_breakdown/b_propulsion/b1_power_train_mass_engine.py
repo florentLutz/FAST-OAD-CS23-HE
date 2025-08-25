@@ -28,5 +28,3 @@ class PowerTrainMassEngine(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:weight:propulsion:mass"] = inputs["data:propulsion:he_power_train:mass"]
-
-

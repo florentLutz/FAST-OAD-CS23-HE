@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingConductorsNumber(om.ExplicitComponent):
     """
-     Computation of the Conductors number.
+    Computation of the Conductors number.
 
     """
 
@@ -41,9 +41,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
             val=np.nan,
         )
 
-        self.add_output(
-            "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"
-        )
+        self.add_output("data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number")
 
         self.declare_partials(
             of="data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
@@ -63,7 +61,6 @@ class SizingConductorsNumber(om.ExplicitComponent):
 
         N_c = 2 * p * q * m
 
-
         outputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number"] = N_c
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -72,14 +69,11 @@ class SizingConductorsNumber(om.ExplicitComponent):
         m = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases"]
         p = inputs["data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":pole_pairs_number"]
 
-
         N_c = 2 * p * q * m
-
 
         dR_dp = 2 * q * m
         dR_dq = 2 * p * m
         dR_dm = 2 * p * q
-
 
         partials[
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
@@ -95,4 +89,3 @@ class SizingConductorsNumber(om.ExplicitComponent):
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":conductors_number",
             "data:propulsion:he_power_train:ACPMSM:" + pmsm_id + ":slots_per_poles_phases",
         ] = dR_dm
-

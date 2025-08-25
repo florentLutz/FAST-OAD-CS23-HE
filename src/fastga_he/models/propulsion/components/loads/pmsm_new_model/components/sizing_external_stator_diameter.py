@@ -7,7 +7,7 @@ import openmdao.api as om
 
 
 class SizingExtStatorDiameter(om.ExplicitComponent):
-    """ Computation of the external stator diameter of a cylindrical PMSM."""
+    """Computation of the external stator diameter of a cylindrical PMSM."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami

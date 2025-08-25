@@ -25,7 +25,7 @@ integral_result = np.trapz(product, y)
 CL_ref = integral_result / (S_w / 2)
 print(f"CL_ref: {CL_ref} ")
 Cl0_ref = 0.3
-CL_vec = L_y * 0.3/0.7832967521264312
+CL_vec = L_y * 0.3 / 0.7832967521264312
 product2 = CL_vec * ch_vec
 integral_result2 = np.trapz(product2, y)
 

@@ -13,7 +13,7 @@ CUTOFF_ETA_MAX = 1.0
 
 
 class PerformancesEfficiency(om.ExplicitComponent):
-    """ Computation of the efficiency from shaft power and power losses."""
+    """Computation of the efficiency from shaft power and power losses."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami

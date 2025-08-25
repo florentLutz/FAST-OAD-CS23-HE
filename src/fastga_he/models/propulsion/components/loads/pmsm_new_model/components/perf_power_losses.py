@@ -11,7 +11,7 @@ import openmdao.api as om
 
 
 class PerformancesPowerLosses(om.ExplicitComponent):
-    """ Computation of the total power losses as sum of Mechanical, Iron, Joule losses."""
+    """Computation of the total power losses as sum of Mechanical, Iron, Joule losses."""
 
     def initialize(self):
         # Reference motor : HASTECS project, Sarah Touhami
