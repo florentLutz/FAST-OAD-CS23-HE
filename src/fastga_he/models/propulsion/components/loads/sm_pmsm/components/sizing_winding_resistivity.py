@@ -27,14 +27,14 @@ class SizingWindingResistivity(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_temperature",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":winding_temperature",
             val=np.nan,
             units="degC",
             desc="The temperature of the winding conductor cable",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistivity",
             units="ohm*m",
             desc="Copper electrical resistivity",
         )
@@ -45,14 +45,14 @@ class SizingWindingResistivity(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistivity"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistivity"] = (
             COPPER_RESISTIVITY_20
             * (
                 1.0
                 + COPPER_TEMPERATURE_COEFF
                 * (
                     inputs[
-                        "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":winding_temperature"
+                        "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":winding_temperature"
                     ]
                     - 20.0
                 )

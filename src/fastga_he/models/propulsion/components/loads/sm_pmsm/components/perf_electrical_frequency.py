@@ -26,7 +26,7 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
 
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number",
             val=np.nan,
             desc="Number of the north and south pole pairs in the PMSM",
         )
@@ -52,7 +52,7 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
         )
         self.declare_partials(
             of="electrical_frequency",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -63,7 +63,7 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
 
         outputs["electrical_frequency"] = (
             inputs["rpm"]
-            * inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
+            * inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number"]
             / 60.0
         )
 
@@ -73,11 +73,11 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
 
         partials[
             "electrical_frequency",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number",
         ] = inputs["rpm"] / 60.0
 
         partials["electrical_frequency", "rpm"] = np.full(
             number_of_points,
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":pole_pairs_number"]
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number"]
             / 60.0,
         )

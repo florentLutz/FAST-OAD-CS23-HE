@@ -33,7 +33,7 @@
         </geometry>
         <propulsion>
             <he_power_train>
-                <AC_PMSM>
+                <SM_PMSM>
                     <motor_1>
                         <mass units="kg">225.59</mass>
                         <stator_core_weight units="kg">116.4</stator_core_weight>
@@ -105,7 +105,7 @@
                             <y_ratio>0.333</y_ratio>
                         </CG>
                     </motor_1>
-                </AC_PMSM>
+                </SM_PMSM>
             </he_power_train>
         </propulsion>
     </data>

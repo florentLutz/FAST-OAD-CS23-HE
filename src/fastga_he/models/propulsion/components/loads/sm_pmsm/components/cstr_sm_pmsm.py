@@ -75,13 +75,13 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":shaft_power_max",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_max",
             units="kW",
             val=np.nan,
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":shaft_power_rating",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_rating",
             units="MW",
             val=1.4326,
             desc="Value of the maximum power the PMSM can provide, used for sizing",
@@ -93,7 +93,7 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":shaft_power_rating"] = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":shaft_power_max"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_rating"] = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_max"]
             / 1000.0
         )

@@ -40,19 +40,19 @@ class PerformancesIronLosses(om.ExplicitComponent):
             desc="Number of the north and south pairs in the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density",
             val=np.nan,
             units="T",
             desc="The magnetic flux density provided by the permanent magnets",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
             val=np.nan,
             units="kg",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
             units="kW",
             val=0.0,
             shape=number_of_points,
@@ -64,17 +64,17 @@ class PerformancesIronLosses(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
             wrt=["electrical_frequency"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -84,8 +84,8 @@ class PerformancesIronLosses(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        w_motor = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass"]
-        bm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
+        w_motor = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass"]
+        bm = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density"]
         f = inputs["electrical_frequency"]
         sqrt_f = np.sqrt(f)
         sqrt_bm = np.sqrt(bm)
@@ -98,15 +98,15 @@ class PerformancesIronLosses(om.ExplicitComponent):
                 coeff = COEFFS_RESHAPED[i][j]
                 sp_pow += coeff * (sqrt_f ** (i + 1.0)) * (sqrt_bm ** (j + 1.0))
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses"] = (
             w_motor * sp_pow / 1000.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        w_motor = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass"]
-        bm = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density"]
+        w_motor = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass"]
+        bm = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density"]
         f = inputs["electrical_frequency"]
         sqrt_f = np.sqrt(f)
         sqrt_bm = np.sqrt(bm)
@@ -127,16 +127,16 @@ class PerformancesIronLosses(om.ExplicitComponent):
                 )
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
         ] = sp_pow / 1000.0
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
             "electrical_frequency",
         ] = dsp_pow_df * w_motor / 1000.0
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":iron_power_losses",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_flux_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density",
         ] = dsp_pow_dbm * w_motor / 1000.0

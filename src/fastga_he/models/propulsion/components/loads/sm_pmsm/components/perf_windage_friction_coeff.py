@@ -27,12 +27,12 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         self.add_input("airgap_reynolds_number", val=np.nan, shape=number_of_points)
         self.add_input("rotor_end_reynolds_number", val=np.nan, shape=number_of_points)
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
             val=np.nan,
             units="m",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
             val=np.nan,
             units="m",
             desc="The distance between the rotor and the stator bore",
@@ -62,8 +62,8 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         self.declare_partials(
             of="airgap_friction_coeff",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -74,9 +74,9 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         r_rot = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
         )
-        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
+        e_g = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness"]
         re_a = inputs["airgap_reynolds_number"]
         re_r = inputs["rotor_end_reynolds_number"]
         cf_a = np.zeros_like(re_a)
@@ -99,10 +99,10 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         r_rot = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter"] / 2.0
         )
         d_rot = r_rot * 2.0
-        e_g = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness"]
+        e_g = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness"]
         re_a = inputs["airgap_reynolds_number"]
         re_r = inputs["rotor_end_reynolds_number"]
 
@@ -131,12 +131,12 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
 
         partials[
             "airgap_friction_coeff",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":airgap_thickness",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
         ] = dcfde_g
 
         partials[
             "airgap_friction_coeff",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
         ] = dcfdrot
 
         partials["rotor_end_friction_coeff", "rotor_end_reynolds_number"] = np.where(

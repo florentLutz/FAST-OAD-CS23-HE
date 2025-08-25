@@ -30,29 +30,29 @@ class PerformancesJouleLosses(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistance",
             val=np.nan,
             units="ohm",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
             units="kW",
             val=0.0,
             shape=number_of_points,
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
             wrt=["ac_current_rms_in_one_phase"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistance",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -63,9 +63,9 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        r_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
+        r_s = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistance"]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses"] = (
             r_s * i_rms**2.0 / 1000.0
         )
 
@@ -73,14 +73,14 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        r_s = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance"]
+        r_s = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistance"]
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":resistance",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistance",
         ] = i_rms**2.0 / 1000.0
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":joule_power_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
             "ac_current_rms_in_one_phase",
         ] = 2.0 * r_s * i_rms / 1000.0

@@ -21,26 +21,26 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_height",
             val=np.nan,
             units="m",
             desc="Single stator slot height (radial)",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_yoke_height",
             val=np.nan,
             units="m",
             desc="Stator yoke thickness of the PMSM",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter",
             units="m",
             desc="The outer stator diameter of the PMSM",
         )
@@ -49,29 +49,29 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_height",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_yoke_height",
             ],
             val=2.0,
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter",
-            wrt="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
             val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_diameter"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter"] = (
             2.0
             * (
-                inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_height"]
+                inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_height"]
                 + inputs[
-                    "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_yoke_height"
+                    "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_yoke_height"
                 ]
             )
-            + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":diameter"]
+            + inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]
         )

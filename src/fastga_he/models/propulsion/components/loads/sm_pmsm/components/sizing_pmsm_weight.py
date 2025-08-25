@@ -20,28 +20,28 @@ class SizingMotorWeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_core_weight",
             val=np.nan,
             units="kg",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_winding_weight",
             val=np.nan,
             units="kg",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight",
             val=np.nan,
             units="kg",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_weight",
             val=np.nan,
             units="kg",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
             units="kg",
         )
 
@@ -49,7 +49,7 @@ class SizingMotorWeight(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
             wrt="*",
             val=1.0,
         )
@@ -57,9 +57,9 @@ class SizingMotorWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":mass"] = (
-            inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_core_weight"]
-            + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":stator_winding_weight"]
-            + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":rotor_weight"]
-            + inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":frame_weight"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass"] = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_core_weight"]
+            + inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_winding_weight"]
+            + inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight"]
+            + inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_weight"]
         )

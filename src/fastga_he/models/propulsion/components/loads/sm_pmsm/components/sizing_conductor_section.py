@@ -24,35 +24,35 @@ class SizingConductorSection(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_section",
             val=np.nan,
             units="m**2",
             desc="Single slot cross section area on the motor stator",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_fill_factor",
             val=np.nan,
             desc="The factor describes the conductor material fullness inside the stator slots",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_conductor_factor",
             val=np.nan,
             desc="The area factor considers the cross-section shape twist due to wire bunching",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section", units="m**2"
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_section", units="m**2"
         )
 
     def setup_partials(self):
         pmsm_id = self.options["pmsm_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
+            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_section",
             wrt=[
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
-                "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_section",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_fill_factor",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_conductor_factor",
             ],
             method="exact",
         )
@@ -60,36 +60,36 @@ class SizingConductorSection(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        s_slot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"]
-        k_fill = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor"]
+        s_slot = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_section"]
+        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_fill_factor"]
         k_sc = inputs[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor"
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_conductor_factor"
         ]
 
-        outputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_section"] = (
             s_slot * k_sc * k_fill
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        s_slot = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section"]
-        k_fill = inputs["data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor"]
+        s_slot = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_section"]
+        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_fill_factor"]
         k_sc = inputs[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor"
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_conductor_factor"
         ]
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_section",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_section",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_section",
         ] = k_fill * k_sc
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_fill_factor",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_section",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_fill_factor",
         ] = s_slot * k_sc
 
         partials[
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":conductor_section",
-            "data:propulsion:he_power_train:AC_PMSM:" + pmsm_id + ":slot_conductor_factor",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_section",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_conductor_factor",
         ] = s_slot * k_fill
