@@ -28,12 +28,12 @@ from .sizing_pmsm_drag import SizingPMSMDrag
 from .sizing_ratio_x2p import SizingRatioX2p
 from .sizing_tooth_ratio import SizingToothRatio
 
-from .cstr_ac_pmsm import ConstraintsPMSM
+from .cstr_sm_pmsm import ConstraintsSMPMSM
 
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingACPMSM(om.Group):
+class SizingSMPMSM(om.Group):
     def initialize(self):
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
@@ -54,7 +54,7 @@ class SizingACPMSM(om.Group):
 
         self.add_subsystem(
             name="constraints_pmsm",
-            subsys=ConstraintsPMSM(pmsm_id=pmsm_id),
+            subsys=ConstraintsSMPMSM(pmsm_id=pmsm_id),
             promotes=["*"],
         )
 

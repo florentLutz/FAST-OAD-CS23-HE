@@ -87,7 +87,7 @@ from .loads.pmsm import (
 )
 from .connectors.gearbox import SizingGearbox, PerformancesGearbox, SlipstreamGearbox, PreLCAGearbox
 from .loads.pmsm import SizingPMSM, PerformancesPMSM, SlipstreamPMSM, PreLCAPMSM
-from .loads.pmsm_new_model import SizingACPMSM, PerformancesACPMSM, SlipstreamACPMSM, PreLCAPMSM
+from .loads.sm_pmsm import SizingSMPMSM, PerformancesSMPMSM, SlipstreamSMPMSM, PreLCAPMSM
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 from .propulsor.propeller import (
     SizingPropeller,

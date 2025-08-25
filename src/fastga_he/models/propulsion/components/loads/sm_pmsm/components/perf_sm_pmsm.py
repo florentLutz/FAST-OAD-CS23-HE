@@ -22,7 +22,7 @@ from .perf_voltage_peak import PerformancesVoltagePeak
 from .perf_maximum import PerformancesMaximum
 
 
-class PerformancesACPMSM(om.Group):
+class PerformancesSMPMSM(om.Group):
     def initialize(self):
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False

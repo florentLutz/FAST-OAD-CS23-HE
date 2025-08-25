@@ -31,7 +31,7 @@ from ..components.sizing_rotor_weight import SizingRotorWeight
 from ..components.sizing_frame_weight import SizingFrameWeight
 from ..components.sizing_winding_stator_weight import SizingStatorWindingWeight
 from ..components.sizing_pmsm_weight import SizingMotorWeight
-from ..components.sizing_ac_pmsm import SizingACPMSM
+from ..components.sizing_sm_pmsm import SizingSMPMSM
 
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_iron_losses import PerformancesIronLosses
@@ -49,7 +49,7 @@ from ..components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
 from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.perf_ac_pmsm import PerformancesACPMSM
+from ..components.perf_sm_pmsm import PerformancesSMPMSM
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 
@@ -63,7 +63,7 @@ from ..components.cstr_ensure import (
     ConstraintsRPMEnsure,
     ConstraintsVoltageEnsure,
 )
-from ..components.cstr_ac_pmsm import ConstraintPMSMPowerRateMission
+from ..components.cstr_sm_pmsm import ConstraintPMSMPowerRateMission
 from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -1012,7 +1012,7 @@ def test_maximum():
 
 def test_performance_ACPMSM():
     ivc = get_indep_var_comp(
-        list_inputs(PerformancesACPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        list_inputs(PerformancesSMPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
         XML_FILE,
     )
@@ -1022,7 +1022,7 @@ def test_performance_ACPMSM():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesACPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesSMPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
     assert problem.get_val("ac_current_rms_in", units="A") == pytest.approx(
@@ -1044,10 +1044,10 @@ def test_performance_ACPMSM():
 
 
 def test_sizing_ACPMSM():
-    ivc = get_indep_var_comp(list_inputs(SizingACPMSM(pmsm_id="motor_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(list_inputs(SizingSMPMSM(pmsm_id="motor_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingACPMSM(pmsm_id="motor_1"), ivc)
+    problem = run_system(SizingSMPMSM(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:AC_PMSM:motor_1:diameter", units="m"

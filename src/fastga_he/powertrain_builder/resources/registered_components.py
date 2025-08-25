@@ -191,7 +191,7 @@ PMSM = {
     CTRL_PARAM: [],
 }
 PMSM_new = {
-    ID: "fastga_he.pt_component.pmsm_new_model",
+    ID: "fastga_he.pt_component.sm_pmsm",
     CN: "ACPMSM",
     CN_ID: "pmsm_id",
     CT: "ACPMSM",

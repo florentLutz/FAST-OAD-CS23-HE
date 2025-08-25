@@ -14,13 +14,13 @@ import numpy as np
 import fastoad.api as oad
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE] = (
-    "fastga_he.submodel.propulsion.constraints.pmsm_new_model.voltage.ensure"
+    "fastga_he.submodel.propulsion.constraints.sm_pmsm.voltage.ensure"
 )
 
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_PMSM_TORQUE,
-    "fastga_he.submodel.propulsion.constraints.pmsm_new_model.torque.ensure",
+    "fastga_he.submodel.propulsion.constraints.sm_pmsm.torque.ensure",
 )
 class ConstraintsTorqueEnsure(om.ExplicitComponent):
     """
@@ -92,7 +92,7 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_PMSM_RPM,
-    "fastga_he.submodel.propulsion.constraints.pmsm_new_model.rpm.ensure",
+    "fastga_he.submodel.propulsion.constraints.sm_pmsm.rpm.ensure",
 )
 class ConstraintsRPMEnsure(om.ExplicitComponent):
     """
@@ -164,7 +164,7 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
 
 @oad.RegisterSubmodel(
     SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE,
-    "fastga_he.submodel.propulsion.constraints.pmsm_new_model.voltage.ensure",
+    "fastga_he.submodel.propulsion.constraints.sm_pmsm.voltage.ensure",
 )
 class ConstraintsVoltageEnsure(om.ExplicitComponent):
     """

@@ -4,7 +4,7 @@ power_train_components:
   propeller_1:
     id: fastga_he.pt_component.propeller
   motor_1:
-    id: fastga_he.pt_component.pmsm_new_model
+    id: fastga_he.pt_component.sm_pmsm
   inverter_1:
     id: fastga_he.pt_component.inverter
   dc_sspc_1:
