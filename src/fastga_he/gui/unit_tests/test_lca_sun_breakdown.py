@@ -82,9 +82,10 @@ def test_lca_sun_breakdown_kodiak_and_hybrid_paper():
     fig.show()
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_sun_breakdown_kodiak_rel_absolute():
     fig = lca_impacts_sun_breakdown(
-        pth.join(DATA_FOLDER_PATH, "kodiak_100_ef.xml"),
+        pth.join(SENSITIVITY_STUDIES_FOLDER_PATH, "ref_kodiak_op_7077.xml"),
         full_burst=True,
         name_aircraft="Reference Kodiak 100",
         rel="single_score",

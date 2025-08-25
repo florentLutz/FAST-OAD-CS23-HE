@@ -49,6 +49,7 @@
             <he_power_train>
                 <PEMFC_stack>
                     <pemfc_stack_1>
+                        <power_rating units="kW">0.2</power_rating>
                         <specific_power units="kW/kg">0.345</specific_power>
                         <power_density units="kW/m**3">124</power_density>
                         <number_of_layers>35.0</number_of_layers>

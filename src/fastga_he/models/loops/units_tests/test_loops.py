@@ -2,7 +2,7 @@
 test module for wing area computation.
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -16,21 +16,21 @@ test module for wing area computation.
 
 import os
 import os.path as pth
-
+import copy
 import pytest
-
 import fastoad.api as oad
 
 from numpy.testing import assert_allclose
-
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
-
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 from ..wing_area_component.wing_area_cl_dep_equilibrium import (
     UpdateWingAreaLiftDEPEquilibrium,
     ConstraintWingAreaLiftDEPEquilibrium,
 )
 from ..update_wing_area_group import UpdateWingAreaGroupDEP
-
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -39,11 +39,32 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-def test_advanced_cl():
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
+
+
+def test_advanced_cl(restore_submodels):
     xml_file = "pipistrel_like.xml"
 
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+        "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+        "fastga_he.submodel.performances.dep_effect.none"
+    )
+
     inputs_list = list_inputs(
-        UpdateWingAreaLiftDEPEquilibrium(propulsion_id="fastga.wrapper.propulsion.basicIC_engine")
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            produce_simplified_pt_file=True,
+        )
     )
     # Research independent input value in .xml file
     ivc_loop = get_indep_var_comp(
@@ -53,7 +74,10 @@ def test_advanced_cl():
     )
 
     problem_loop = run_system(
-        UpdateWingAreaLiftDEPEquilibrium(propulsion_id="fastga.wrapper.propulsion.basicIC_engine"),
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            produce_simplified_pt_file=True,
+        ),
         ivc_loop,
     )
     assert_allclose(problem_loop["wing_area"], 9.97, atol=1e-2)
@@ -86,21 +110,15 @@ def test_advanced_cl():
     )
 
 
-def test_advanced_cl_with_proper_submodels():
-    xml_file = "pipistrel_like.xml"
-    propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
-
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
+def test_advanced_cl_with_proper_submodels_turboshaft():
+    xml_file = "kodiak_100.xml"
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "turboshaft_propulsion.yml")
 
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         )
     )
     # Research independent input value in .xml file
@@ -114,6 +132,36 @@ def test_advanced_cl_with_proper_submodels():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
+        ),
+        ivc_loop,
+    )
+    assert_allclose(problem_loop["wing_area"], 23.36, atol=1e-2)
+
+
+def test_advanced_cl_with_proper_submodels():
+    xml_file = "pipistrel_like.xml"
+    propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    inputs_list = list_inputs(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
+        )
+    )
+    # Research independent input value in .xml file
+    ivc_loop = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        xml_file,
+    )
+
+    problem_loop = run_system(
+        UpdateWingAreaLiftDEPEquilibrium(
+            propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
+            power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         ),
         ivc_loop,
     )
@@ -162,17 +210,11 @@ def test_advanced_cl_octo_propulsion():
     xml_file = "octo_assembly.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "octo_assembly.yml")
 
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
-
     inputs_list = list_inputs(
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         )
     )
     # Research independent input value in .xml file
@@ -186,6 +228,7 @@ def test_advanced_cl_octo_propulsion():
         UpdateWingAreaLiftDEPEquilibrium(
             propulsion_id="fastga.wrapper.propulsion.basicIC_engine",
             power_train_file_path=propulsion_file,
+            produce_simplified_pt_file=True,
         ),
         ivc_loop,
     )
@@ -225,17 +268,9 @@ def test_advanced_cl_group():
     xml_file = "pipistrel_like.xml"
     propulsion_file = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
 
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
-
     inputs_list = list_inputs(
         UpdateWingAreaGroupDEP(
-            propulsion_id="",
-            power_train_file_path=propulsion_file,
+            propulsion_id="", power_train_file_path=propulsion_file, produce_simplified_pt_file=True
         )
     )
     # Research independent input value in .xml file
@@ -247,8 +282,7 @@ def test_advanced_cl_group():
 
     problem = run_system(
         UpdateWingAreaGroupDEP(
-            propulsion_id="",
-            power_train_file_path=propulsion_file,
+            propulsion_id="", power_train_file_path=propulsion_file, produce_simplified_pt_file=True
         ),
         ivc_loop,
     )

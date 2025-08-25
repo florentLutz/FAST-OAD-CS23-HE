@@ -65,22 +65,28 @@
     </aerodynamics>
     <environmental_impact>
       <operational>
-        <emission_factor is_input="False">2.2235348503139574<!--Total emissions during the operational mission per kg of payload per km [kgCO2/kg/km]--></emission_factor>
-        <emissions units="g" is_input="False">938900.9317541703<!--Total emissions during the operational mission, in gCO2,eq--></emissions>
+        <emission_factor is_input="False">2.223534850315865<!--Total emissions during the operational mission per kg of payload per km [gCO2/kg/km]--></emission_factor>
+        <emissions units="g" is_input="False">938900.931754976<!--Total emissions during the operational mission, in gCO2,eq--></emissions>
         <energy_emissions units="g" is_input="False">0.0<!--Emissions related to energy production during the operational mission, in gCO2,eq--></energy_emissions>
-        <fuel_emissions units="g" is_input="False">938900.9317541703<!--Emissions related to fuel consumption and production during the operational mission, in gCO2,eq--></fuel_emissions>
+        <fuel_emissions units="g" is_input="False">938900.931754976<!--Emissions related to fuel consumption and production during the operational mission, in gCO2,eq--></fuel_emissions>
       </operational>
       <operation>
         <operational>
           <he_power_train>
             <turboshaft>
               <turboshaft_1>
-                <CO units="kg" is_input="False">1.1543289396635779</CO>
-                <CO2 units="kg" is_input="False">728.3815609277175</CO2>
-                <H2O units="kg" is_input="False">285.5809796727691</H2O>
-                <HC units="kg" is_input="False">0.11543289396635778</HC>
-                <NOx units="kg" is_input="False">2.6318699824329563</NOx>
-                <SOx units="kg" is_input="False">0.18469263034617245</SOx>
+                <CO units="kg" is_input="False">1.1543289396646337</CO>
+                <CO2 units="kg" is_input="False">728.3815609283839</CO2>
+                <CO2_main_route units="kg" is_input="False">516.957783529373</CO2_main_route>
+                <CO_main_route units="kg" is_input="False">0.8192674857834753</CO_main_route>
+                <H2O units="kg" is_input="False">285.5809796730305</H2O>
+                <H2O_main_route units="kg" is_input="False">202.6867759828319</H2O_main_route>
+                <HC units="kg" is_input="False">0.1154328939664634</HC>
+                <HC_main_route units="kg" is_input="False">0.08192674857834757</HC_main_route>
+                <NOx units="kg" is_input="False">2.6318699824353655</NOx>
+                <NOx_main_route units="kg" is_input="False">1.8679298675863243</NOx_main_route>
+                <SOx units="kg" is_input="False">0.18469263034634145</SOx>
+                <SOx_main_route units="kg" is_input="False">0.1310827977253561</SOx_main_route>
               </turboshaft_1>
             </turboshaft>
           </he_power_train>
@@ -89,12 +95,18 @@
           <he_power_train>
             <turboshaft>
               <turboshaft_1>
-                <CO units="g" is_input="False">1154.3289396635778</CO>
-                <CO2 units="g" is_input="False">728381.5609277175</CO2>
-                <H2O units="g" is_input="False">285580.9796727691</H2O>
-                <HC units="g" is_input="False">115.43289396635778</HC>
-                <NOx units="g" is_input="False">2631.8699824329565</NOx>
-                <SOx units="g" is_input="False">184.69263034617245</SOx>
+                <CO units="g" is_input="False">1154.3289396646337</CO>
+                <CO2 units="g" is_input="False">728381.560928384</CO2>
+                <CO2_main_route units="g" is_input="False">516957.783529373<!--Emission of CO2 excluding reserve, quantity of interest for the LCA--></CO2_main_route>
+                <CO_main_route units="g" is_input="False">819.2674857834753<!--Emission of CO excluding reserve, quantity of interest for the LCA--></CO_main_route>
+                <H2O units="g" is_input="False">285580.9796730305</H2O>
+                <H2O_main_route units="g" is_input="False">202686.7759828319<!--Emission of H2O excluding reserve, quantity of interest for the LCA--></H2O_main_route>
+                <HC units="g" is_input="False">115.4328939664634</HC>
+                <HC_main_route units="g" is_input="False">81.92674857834757<!--Emission of HC excluding reserve, quantity of interest for the LCA--></HC_main_route>
+                <NOx units="g" is_input="False">2631.8699824353653</NOx>
+                <NOx_main_route units="g" is_input="False">1867.9298675863242<!--Emission of NOx excluding reserve, quantity of interest for the LCA--></NOx_main_route>
+                <SOx units="g" is_input="False">184.69263034634145</SOx>
+                <SOx_main_route units="g" is_input="False">131.0827977253561<!--Emission of SOx excluding reserve, quantity of interest for the LCA--></SOx_main_route>
               </turboshaft_1>
             </turboshaft>
           </he_power_train>
@@ -124,45 +136,48 @@
     </geometry>
     <mission>
       <inner_payload_range>
-        <emission_factor is_input="False">[0.042144564790837016, 0.0273468443778968, 0.020906940616054102, 0.019904358065590592, 0.019755460993349704, 0.028256098665490857, 0.01837127183438911, 0.014026040904193873, 0.013350222866614374, 0.013250070621451714, 0.009744792959953098, 0.0064192068243898925, 0.00486168607605738, 0.004620500562255725, 0.004585077040000971, 0.0060510595854484745, 0.004045178420039275, 0.0030394450101046185, 0.0028840124594404232, 0.002861233329417876, 0.005969489868857784, 0.0039929724244599195, 0.002999330169167684, 0.0028457708397578896, 0.0028232653749319147, 0.004473989740681483, 0.003398068722963238, 0.00237314246396621, 0.002193995608934256, 0.002158020045597146, 0.003602397702903128, 0.0034554427442977163, 0.00214241944581753, 0.0018934294104056679, 0.001835682872370039, 0.0032988632172568275, 0.003885390504049191, 0.0021985186750181638, 0.0018701736986814319, 0.001791024648803909]<!--Emission factor in kgCO2 per kg of payload per km--></emission_factor>
-        <emissions units="kg" is_input="False">[533.8936379476554, 855.6576675247882, 1962.4769639312885, 3113.9454996400036, 3708.7814829799963, 536.9287137830422, 856.9767603727688, 1962.8457740903646, 3113.7829883583768, 3708.5083814262775, 555.518213467291, 865.2804576622808, 1966.0008166045147, 3114.1143684192225, 3708.287644991964, 574.9179458039235, 874.0829329321865, 1970.2915914096188, 3115.889841437671, 3709.5350968820103, 575.6598201303484, 874.4190958161371, 1970.4655798611516, 3115.9698841867134, 3709.5930960217715, 595.110283895462, 761.0914943778132, 1594.5927156203331, 2457.0300555987287, 2900.08973091374, 616.0821100066912, 634.6687805744981, 1180.5086969534968, 1738.8517534969164, 2022.9835011178047, 626.8573751659242, 567.7965627413372, 963.8501037388761, 1366.5012522343964, 1570.4022105104655]<!--Emissions of the aircraft in kgCO2--></emissions>
+        <emission_factor is_input="False">[0.04214456479072889, 0.027346844377822477, 0.02090694061599836, 0.019904358065545386, 0.019755460993309666, 0.028256098665420597, 0.01837127183434202, 0.014026040904158512, 0.013350222866585994, 0.013250070621426796, 0.009744792959933498, 0.0064192068243795605, 0.0048616860760495005, 0.0046205005622500135, 0.004585077039996433, 0.006051059585439205, 0.004045178420036803, 0.003039445010102525, 0.0028840124594394956, 0.002861233329417637, 0.005969489868848746, 0.003992972424457631, 0.002999330169165725, 0.0028457708397570704, 0.0028232653749317746, 0.004473989740676778, 0.00339806872296404, 0.0023731424639663865, 0.0021939956089349322, 0.0021580200455981655, 0.0036023977029010557, 0.0034554427443020427, 0.0021424194458195367, 0.0018934294104075366, 0.0018356828723719832, 0.0032988632172557134, 0.0038853905040570616, 0.0021985186750215794, 0.0018701736986841688, 0.0017910246488065454]<!--Emission factor in kgCO2 per kg of payload per km--></emission_factor>
+        <emissions units="kg" is_input="False">[533.8936379475215, 855.6576675242095, 1962.4769639300619, 3113.945499639287, 3708.7814829800504, 536.92871378295, 856.976760372202, 1962.84577408915, 3113.7829883576806, 3708.5083814263576, 555.5182134674595, 865.2804576617785, 1966.0008166033522, 3114.1143684185795, 3708.28764499211, 574.9179458043737, 874.0829329317281, 1970.2915914084333, 3115.8898414369396, 3709.5350968820235, 575.6598201308094, 874.4190958156801, 1970.4655798599636, 3115.969884185973, 3709.5930960217743, 595.1102838962137, 761.0914943778243, 1594.5927156200983, 2457.030055598942, 2900.0897309144675, 616.082110007763, 634.6687805747732, 1180.5086969536362, 1738.8517534972093, 2022.983501118291, 626.8573751671635, 567.7965627416512, 963.8501037389543, 1366.5012522343834, 1570.4022105104646]<!--Emissions of the aircraft in kgCO2--></emissions>
         <energy units="kW*h" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--Fuel consumed during selected mission--></energy>
-        <fuel units="kg" is_input="False">[140.12956376578882, 224.582064967136, 515.0858173048001, 817.3085300892398, 973.4334600997365, 140.926171596599, 224.9282835624065, 515.1826178714867, 817.2658762095477, 973.3617799019102, 145.8053053719924, 227.10773166988997, 516.0107130195577, 817.3528526034704, 973.3038438299118, 150.8970986362004, 229.4180926331198, 517.1369006324459, 817.8188560203861, 973.6312590241497, 151.09181630717805, 229.50632436119082, 517.1825668926907, 817.8398646159353, 973.6464818954781, 156.1969249069454, 199.76154708079088, 418.5282718163604, 644.8897783723697, 761.1784070639737, 161.7013412091053, 166.57973243425147, 309.84480234999916, 456.3915363508967, 530.9667981936495, 164.52949479420582, 149.02796922344808, 252.9790298527234, 358.66174599327985, 412.1790578767626]<!--Fuel consumed during selected mission--></fuel>
+        <fuel units="kg" is_input="False">[140.12956376575366, 224.58206496698412, 515.0858173044782, 817.3085300890517, 973.4334600997507, 140.92617159657482, 224.92828356225772, 515.182617871168, 817.2658762093649, 973.3617799019311, 145.80530537203663, 227.10773166975815, 516.0107130192525, 817.3528526033017, 973.3038438299501, 150.89709863631856, 229.4180926329995, 517.1369006321347, 817.8188560201941, 973.6312590241531, 151.09181630729904, 229.50632436107088, 517.1825668923789, 817.8398646157409, 973.6464818954788, 156.1969249071427, 199.76154708079378, 418.52827181629874, 644.8897783724257, 761.1784070641647, 161.7013412093866, 166.5797324343237, 309.84480235003576, 456.3915363509736, 530.9667981937772, 164.5294947945311, 149.0279692235305, 252.9790298527439, 358.6617459932765, 412.17905787676233]<!--Fuel consumed during selected mission--></fuel>
         <payload units="kg" is_input="False">[76.0, 76.0, 76.0, 76.0, 76.0, 114.0, 114.0, 114.0, 114.0, 114.0, 342.0, 342.0, 342.0, 342.0, 342.0, 570.0, 570.0, 570.0, 570.0, 570.0, 578.5343077189973, 578.5343077189973, 578.5343077189973, 578.5343077189973, 578.5343077189973, 798.0, 798.0, 798.0, 798.0, 798.0, 1026.0, 1026.0, 1026.0, 1026.0, 1026.0, 1140.0, 1140.0, 1140.0, 1140.0, 1140.0]</payload>
-        <range units="nmi" is_input="False">[90.00333406363848, 222.29938057578138, 666.8981417273442, 1111.4969028789071, 1333.7962834546884, 90.00333406363848, 220.94490328412402, 662.834709852372, 1104.72451642062, 1325.669419704744, 90.00333406363848, 212.81803953417963, 638.4541186025389, 1064.090197670898, 1276.9082372050777, 90.00333406363848, 204.69117578423524, 614.0735273527057, 1023.4558789211761, 1228.1470547054114, 90.00333406363848, 204.3869777314616, 613.1609331943848, 1021.934888657308, 1226.3218663887696, 90.00333406363848, 151.55170858493742, 454.65512575481233, 757.758542924687, 909.3102515096245, 90.00333406363848, 96.66184748544805, 289.98554245634415, 483.30923742724025, 579.9710849126883, 90.00333406363848, 69.21691693570337, 207.6507508071101, 346.0845846785169, 415.30150161422023]</range>
+        <range units="nmi" is_input="False">[90.00333406384682, 222.2993805762352, 666.8981417287056, 1111.4969028811759, 1333.7962834574112, 90.00333406384682, 220.94490328454427, 662.8347098536328, 1104.7245164227213, 1325.6694197072657, 90.00333406384682, 212.81803953439865, 638.454118603196, 1064.0901976719933, 1276.908237206392, 90.00333406384682, 204.69117578425303, 614.0735273527591, 1023.4558789212651, 1228.1470547055183, 90.00333406384682, 204.3869777314719, 613.1609331944156, 1021.9348886573594, 1226.3218663888313, 90.00333406384682, 151.55170858490385, 454.6551257547115, 757.7585429245192, 909.3102515094231, 90.00333406384682, 96.66184748536892, 289.98554245610677, 483.3092374268446, 579.9710849122135, 90.00333406384682, 69.21691693560145, 207.65075080680433, 346.08458467800716, 415.30150161360865]</range>
       </inner_payload_range>
       <operational>
-        <TOW units="kg" is_input="False">3113.187794527346</TOW>
+        <TOW units="kg" is_input="False">3113.1877945275573</TOW>
         <duration units="s" is_input="False">9421.869478911876</duration>
+        <main_route>
+          <duration units="s" is_input="False">9421.869478911876</duration>
+        </main_route>
         <energy units="W*h" is_input="False">0.0</energy>
-        <fuel units="kg" is_input="False">246.16578793271555</fuel>
-        <range units="nmi" is_input="True">200.0</range>
+        <fuel units="kg" is_input="False">246.16578793292678</fuel>
+        <range units="m" is_input="True">370400.0</range>
         <climb>
           <distance units="m" is_input="False">35995.664907714294</distance>
           <duration units="s" is_input="False">627.6141946273906</duration>
           <energy units="W*h" is_input="False">0.0</energy>
-          <fuel units="kg" is_input="False">21.877505660387445</fuel>
-          <v_eas units="knot" is_input="True">101.0</v_eas>
+          <fuel units="kg" is_input="False">21.877505660443674</fuel>
+          <v_eas units="m/s" is_input="True">51.95888888888889</v_eas>
           <climb_rate>
-            <cruise_level units="ft/min" is_input="True">1002.0</cruise_level>
-            <sea_level units="ft/min" is_input="True">1545.0</sea_level>
+            <cruise_level units="m/s" is_input="True">5.09016</cruise_level>
+            <sea_level units="m/s" is_input="True">7.8486</sea_level>
           </climb_rate>
         </climb>
         <cruise>
-          <altitude units="ft" is_input="True">10000.0</altitude>
+          <altitude units="m" is_input="True">3048.0</altitude>
           <distance units="m" is_input="False">276210.69288316224</distance>
           <duration units="s" is_input="False">4474.255284284485</duration>
           <energy units="W*h" is_input="False">0.0</energy>
-          <fuel units="kg" is_input="False">114.39751283349477</fuel>
-          <v_tas units="knot" is_input="True">120.0</v_tas>
+          <fuel units="kg" is_input="False">114.397512833563</fuel>
+          <v_tas units="m/s" is_input="True">61.733333333333334</v_tas>
         </cruise>
         <descent>
-          <descent_rate units="ft/min" is_input="True">-800.0</descent_rate>
-          <distance units="m" is_input="False">73998.0617019611</distance>
+          <descent_rate units="m/s" is_input="True">-4.064</descent_rate>
+          <distance units="m" is_input="False">73998.0617021069</distance>
           <duration units="s" is_input="False">1020.0</duration>
           <energy units="W*h" is_input="False">0.0</energy>
-          <fuel units="kg" is_input="False">18.047469501311188</fuel>
-          <v_eas units="knot" is_input="True">140.0</v_eas>
+          <fuel units="kg" is_input="False">18.047469501147226</fuel>
+          <v_eas units="m/s" is_input="True">72.02222222222223</v_eas>
         </descent>
         <initial_climb>
           <energy units="W*h" is_input="True">0.0</energy>
@@ -175,11 +190,11 @@
           </CG>
         </payload>
         <reserve>
-          <altitude units="ft" is_input="True">10000.0</altitude>
-          <duration units="min" is_input="True">45.0</duration>
+          <altitude units="m" is_input="True">3048.0</altitude>
+          <duration units="s" is_input="True">2700.0</duration>
           <energy units="W*h" is_input="False">0.0</energy>
-          <fuel units="kg" is_input="False">67.01229077598042</fuel>
-          <v_tas units="m/s" is_input="False">58.53488701050972</v_tas>
+          <fuel units="kg" is_input="False">67.01229077623167</fuel>
+          <v_tas units="m/s" is_input="False">58.534887011049655</v_tas>
         </reserve>
         <takeoff>
           <energy units="W*h" is_input="True">0.0</energy>
@@ -188,24 +203,24 @@
         <taxi_in>
           <duration units="s" is_input="True">300.0</duration>
           <energy units="W*h" is_input="False">0.0</energy>
-          <fuel units="kg" is_input="False">4.765504580770845</fuel>
-          <speed units="knot" is_input="True">20.0</speed>
+          <fuel units="kg" is_input="False">4.765504580770602</fuel>
+          <speed units="m/s" is_input="True">10.28888888888889</speed>
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_in>
         <taxi_out>
           <duration units="s" is_input="True">300.0</duration>
           <energy units="W*h" is_input="False">0.0</energy>
-          <fuel units="kg" is_input="False">4.765504580770845</fuel>
-          <speed units="knot" is_input="True">20.0</speed>
+          <fuel units="kg" is_input="False">4.765504580770602</fuel>
+          <speed units="m/s" is_input="True">10.28888888888889</speed>
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
       </operational>
       <payload_range>
         <carbon_intensity_electricity units="g/MJ" is_input="True">72.7</carbon_intensity_electricity>
         <carbon_intensity_fuel is_input="True">3.81<!--Carbon intensity of the fuel in kgCO2 per kg of fuel--></carbon_intensity_fuel>
-        <emission_factor is_input="False">[0.0, 0.0017910213944016635, 0.0028232581864683134, 0.0]<!--Emission factor in kgCO2 per kg of payload per km--></emission_factor>
+        <emission_factor is_input="False">[0.0, 0.0017910213944043012, 0.002823258186468171, 0.0]<!--Emission factor in kgCO2 per kg of payload per km--></emission_factor>
         <payload units="kg" is_input="False">[1140.0, 1140.0, 578.5343077189973, 0.0]</payload>
-        <range units="nmi" is_input="False">[0.0, 415.30150161422023, 1226.3218663887696, 1350.0500109545771]</range>
+        <range units="nmi" is_input="False">[0.0, 415.30150161360865, 1226.3218663888313, 1350.0500109577024]</range>
       </payload_range>
     </mission>
     <propulsion>
@@ -216,22 +231,24 @@
             <mass units="lbm" is_input="False">120.08097771972173<!--Weight of the fuel system--></mass>
             <fuel_distribution is_input="True">[1.0, 1.0]</fuel_distribution>
             <number_engine is_input="False">1.0<!--Number of engine connected to this fuel system--></number_engine>
-            <total_fuel_flowed units="kg" is_input="False">230.86578793271553<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <total_fuel_flowed units="kg" is_input="False">230.8657879329268<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
           </fuel_system_1>
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
-            <capacity units="kg" is_input="True">486.822</capacity>
             <mass units="kg" is_input="False">4.568286332207444<!--Weight of the fuel tanks--></mass>
-            <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <capacity units="kg" is_input="True">486.822</capacity>
+            <fuel_consumed_main_route units="kg" is_input="False">81.92674857834757<!--Amount of fuel from that tank which will be consumed during the main route (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
+            <fuel_consumed_mission units="kg" is_input="False">115.4328939664634<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
             <CG>
               <x units="m" is_input="True">4.462616605755205</x>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
-            <capacity units="kg" is_input="True">486.822</capacity>
             <mass units="kg" is_input="False">4.568286332207444<!--Weight of the fuel tanks--></mass>
-            <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <capacity units="kg" is_input="True">486.822</capacity>
+            <fuel_consumed_main_route units="kg" is_input="False">81.92674857834757<!--Amount of fuel from that tank which will be consumed during the main route (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
+            <fuel_consumed_mission units="kg" is_input="False">115.4328939664634<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
             <CG>
               <x units="m" is_input="True">4.462616605755205</x>
             </CG>
@@ -241,7 +258,7 @@
           <propeller_1>
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">0.978931649778388<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
-            <blade_twist units="deg" is_input="True">25.0<!--Twist between the propeller blade root and tip--></blade_twist>
+            <blade_twist units="rad" is_input="True">0.4363323129985824<!--Twist between the propeller blade root and tip--></blade_twist>
             <cl_clean_ref is_input="True">0.0</cl_clean_ref>
             <diameter units="m" is_input="True">2.44<!--Diameter of the propeller--></diameter>
             <diameter_to_chord_ratio is_input="True">1.357505606827031<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
@@ -252,8 +269,8 @@
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
-            <tip_mach_max is_input="False">0.6705623695034154<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
-            <torque_max units="N*m" is_input="False">2178.0352948856907<!--Maximum value of the propeller torque--></torque_max>
+            <tip_mach_max is_input="False">0.6705623694910567<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
+            <torque_max units="N*m" is_input="False">2178.035294894001<!--Maximum value of the propeller torque--></torque_max>
             <wing_chord_ref units="m" is_input="True">1.7974143073361883<!--Value of the wing chord behind the propeller--></wing_chord_ref>
             <mass units="kg" is_input="False">37.72884819682395</mass>
             <material is_input="True">0.0<!--1.0 for composite, 0.0 for aluminium--></material>
@@ -262,10 +279,10 @@
         <turboshaft>
           <turboshaft_1>
             <mass units="kg" is_input="False">217.75644000000003<!--Installed weight of the turboshaft--></mass>
-            <power_max units="kW" is_input="False">511.0723492053901<!--Maximum power the turboshaft has to provide--></power_max>
+            <power_max units="kW" is_input="False">511.07234920762664<!--Maximum power the turboshaft has to provide--></power_max>
             <power_offtake units="kW" is_input="True">30.0<!--Mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
             <power_rating units="kW" is_input="True">551.0<!--Flat rating of the turboshaft--></power_rating>
-            <shaft_power_rating units="kW" is_input="True">551.0</shaft_power_rating>
+            <shaft_power_rating units="W" is_input="True">551000.0</shaft_power_rating>
             <design_point>
               <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
@@ -280,7 +297,7 @@
               <SOx units="g/kg" is_input="True">0.8</SOx>
             </emission_index>
             <limit>
-              <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
+              <ITT units="degK" is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
               <OPR is_input="True">8.5<!--Limit OPR of the turboshaft--></OPR>
             </limit>
           </turboshaft_1>

@@ -1,0 +1,218 @@
+title: Powertrain definition file
+
+power_train_components:
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+    position: on_the_wing
+  turboshaft_2:
+    id: fastga_he.pt_component.turboshaft
+    position: on_the_wing
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+  battery_1:
+    id: fastga_he.pt_component.battery_pack
+    position: underbelly
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing
+  motor_2:
+    id: fastga_he.pt_component.pmsm
+    position: on_the_wing
+  battery_2:
+    id: fastga_he.pt_component.battery_pack
+    position: underbelly
+  gearbox_2:
+    id: fastga_he.pt_component.planetary_gear
+    position: in_the_front
+    option:
+      gear_mode: percent_split
+  gearbox_1:
+    id: fastga_he.pt_component.planetary_gear
+    position: in_the_front
+    option:
+      gear_mode: percent_split
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: on_the_wing
+  fuel_system:
+    id: fastga_he.pt_component.fuel_system
+    position: in_the_front
+    options:
+      number_of_engines: 2
+      number_of_tanks: 2
+  dc_sspc_1:
+    id: fastga_he.pt_component.dc_sspc
+    position: in_the_front
+    options:
+      closed_by_default: true
+  bus_nose_1:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_front
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing
+  harness_2:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing
+  dc_sspc_2:
+    id: fastga_he.pt_component.dc_sspc
+    position: in_the_front
+    options:
+      closed_by_default: true
+  bus_nose_2:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_front
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 2
+  harness_3:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing
+  harness_4:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_front
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: in_the_front
+  dc_splitter_1:
+    id: fastga_he.pt_component.dc_splitter
+    position: inside_the_wing
+  harness_5:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    position: in_the_front
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: in_the_front
+  dc_splitter_2:
+    id: fastga_he.pt_component.dc_splitter
+    position: inside_the_wing
+  harness_6:
+    id: fastga_he.pt_component.dc_line
+    position: from_front_to_wing
+  speed_reducer_1:
+    id: fastga_he.pt_component.speed_reducer
+    position: in_the_front
+  speed_reducer_2:
+    id: fastga_he.pt_component.speed_reducer
+    position: in_the_front
+
+component_connections:
+- source: [fuel_system, 1]
+  target: fuel_tank_1
+
+- source: speed_reducer_1
+  target: turboshaft_1
+
+- source: speed_reducer_2
+  target: turboshaft_2
+
+- source: [fuel_system, 2]
+  target: fuel_tank_2
+
+- source: dc_sspc_1
+  target: battery_1
+
+- source: [gearbox_1, 1]
+  target: motor_1
+
+- source: [gearbox_2, 1]
+  target: motor_2
+
+- source: dc_sspc_2
+  target: battery_2
+
+- source: propeller_1
+  target: [gearbox_1, 1]
+
+- source: propeller_2
+  target: [gearbox_2, 1]
+
+- source: turboshaft_1
+  target: [fuel_system, 1]
+
+- source: turboshaft_2
+  target: [fuel_system, 2]
+
+- source: [bus_nose_1, 1]
+  target: dc_sspc_1
+
+- source: harness_1
+  target: [bus_nose_1, 1]
+
+- source: harness_2
+  target: [bus_nose_1, 2]
+
+- source: [dc_splitter_1, 1]
+  target: harness_1
+
+- source: [dc_splitter_2, 1]
+  target: harness_2
+
+- source: [bus_nose_2, 1]
+  target: dc_sspc_2
+
+- source: harness_3
+  target: [bus_nose_2, 1]
+
+- source: harness_4
+  target: [bus_nose_2, 2]
+
+- source: [dc_splitter_1, 2]
+  target: harness_3
+
+- source: [dc_splitter_2, 2]
+  target: harness_4
+
+- source: inverter_1
+  target: [dc_bus_1, 1]
+
+- source: motor_1
+  target: inverter_1
+
+- source: harness_5
+  target: [dc_splitter_1, 1]
+
+- source: [dc_bus_1, 1]
+  target: harness_5
+
+- source: inverter_2
+  target: [dc_bus_2, 1]
+
+- source: motor_2
+  target: inverter_2
+
+- source: harness_6
+  target: [dc_splitter_2, 1]
+
+- source: [dc_bus_2, 1]
+  target: harness_6
+
+- source: [gearbox_1, 2]
+  target: speed_reducer_1
+
+- source: [gearbox_2, 2]
+  target: speed_reducer_2
+
+watcher_file_path:

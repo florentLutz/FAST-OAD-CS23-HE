@@ -1,9 +1,9 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
+import fastoad.api as oad
 import numpy as np
 import pytest
 import openmdao.api as om
@@ -26,12 +26,18 @@ from ..components.sizing_heat_capacity import SizingHeatCapacityCable
 from ..components.sizing_cable_radius import SizingCableRadius
 from ..components.sizing_harness_cg_x import SizingHarnessCGX
 from ..components.sizing_harness_cg_y import SizingHarnessCGY
+from ..components.sizing_insulation_cross_section import SizingInsulationCrossSection
+from ..components.sizing_shield_cross_section import SizingShieldCrossSection
+from ..components.sizing_sheath_cross_section import SizingSheathCrossSection
 from ..components.perf_current import PerformancesCurrent, PerformancesHarnessCurrent
 from ..components.perf_losses_one_cable import PerformancesLossesOneCable
 from ..components.perf_temperature_derivative import PerformancesTemperatureDerivative
 from ..components.perf_temperature_increase import PerformancesTemperatureIncrease
 from ..components.perf_temperature_from_increase import PerformancesTemperatureFromIncrease
-from ..components.perf_temperature import PerformancesTemperature
+from ..components.perf_temperature import (
+    PerformancesTemperature,
+    SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE,
+)
 from ..components.perf_temperature_constant import PerformancesTemperatureConstant
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_resistance_no_loop import PerformancesResistanceNoLoop
@@ -39,13 +45,16 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.cstr_enforce import ConstraintsCurrentEnforce, ConstraintsVoltageEnforce
 from ..components.cstr_ensure import ConstraintsCurrentEnsure, ConstraintsVoltageEnsure
 from ..components.pre_lca_prod_length_per_fu import PreLCAHarnessProdLengthPerFU
+from ..components.lcc_harness_core_unit_cost import LCCHarnessCoreUnitCost
+from ..components.lcc_harness_unit_cost import LCCHarnessUnitCost
+from ..components.lcc_harness_cost import LCCHarnessCost
 
 from ..components.perf_harness import PerformancesHarness
 from ..components.sizing_harness import SizingHarness
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import POSSIBLE_POSITION, SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE
 
 XML_FILE = "sample_cable.xml"
 NB_POINTS_TEST = 10
@@ -331,6 +340,80 @@ def test_harness_cg_y():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_insulation_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+
+    problem = run_system(SizingInsulationCrossSection(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:section",
+        units="m**2",
+    ) == pytest.approx(3.25e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_shield_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+
+    problem = run_system(SizingShieldCrossSection(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:shield:section",
+        units="m**2",
+    ) == pytest.approx(6.3e-06, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sheath_layer_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:conductor:radius",
+        units="m",
+        val=3.71e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:insulation:thickness",
+        units="m",
+        val=0.0012,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:thickness",
+        units="mm",
+        val=1.36,
+    )
+
+    problem = run_system(SizingSheathCrossSection(harness_id="harness_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:sheath:section",
+        units="m**2",
+    ) == pytest.approx(4.95e-05, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_perf_current():
@@ -752,6 +835,9 @@ def test_constraints_voltage_ensure():
 
 def test_performances_harness():
     # Research independent input value in .xml file
+    oad.RegisterSubmodel.active_models[SUBMODEL_DC_LINE_PERFORMANCES_TEMPERATURE_PROFILE] = (
+        SUBMODEL_DC_LINE_TEMPERATURE_STEADY_STATE
+    )
     ivc = get_indep_var_comp(
         list_inputs(PerformancesHarness(harness_id="harness_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -938,5 +1024,61 @@ def test_length_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_cable_harness:harness_1:length_per_fu", units="m"
     ) == pytest.approx(7e-6, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_core_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        name="data:propulsion:he_power_train:DC_cable_harness:harness_1:material",
+        val=1.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHarnessCoreUnitCost(harness_id="harness_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
+        units="USD/m**3",
+    ) == pytest.approx(92556.8, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_wire_cost():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(LCCHarnessUnitCost(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:cost_per_volume",
+        units="USD/m**3",
+        val=92556.8,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHarnessUnitCost(harness_id="harness_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(148.07, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(LCCHarnessCost(harness_id="harness_1")), __file__, XML_FILE
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCHarnessCost(harness_id="harness_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_cable_harness:harness_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(148.07, rel=1e-2)
 
     problem.check_partials(compact_print=True)

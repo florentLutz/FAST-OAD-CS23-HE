@@ -6,6 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
+# TODO: Rename class
 class LCAUseFlightPerFU(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
@@ -67,4 +68,56 @@ class LCAUseFlightPerFU(om.ExplicitComponent):
         )
         partials["data:environmental_impact:flight_per_fu", payload_name] = -1.0 / (
             inputs[range_mission_name] * inputs[payload_name] ** 2.0 / 85.0
+        )
+
+
+class LCAUseFlightPerFUFlightHours(om.ExplicitComponent):
+    def initialize(self):
+        self.options.declare(
+            name="use_operational_mission",
+            default=False,
+            types=bool,
+            desc="The characteristics and consumption of the operational mission will be used",
+        )
+
+    def setup(self):
+        if not self.options["use_operational_mission"]:
+            duration_mission_name = "data:mission:sizing:main_route:duration"
+
+        else:
+            duration_mission_name = "data:mission:operational:main_route:duration"
+
+        self.add_input(
+            name=duration_mission_name,
+            units="h",
+            val=np.nan,
+        )
+
+        self.add_output(
+            "data:environmental_impact:flight_per_fu",
+            val=1e-8,
+            desc="Number of flight required to perform a functional unit, defined here as "
+            "flying one hour",
+        )
+
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        if not self.options["use_operational_mission"]:
+            duration_mission_name = "data:mission:sizing:main_route:duration"
+
+        else:
+            duration_mission_name = "data:mission:operational:main_route:duration"
+
+        outputs["data:environmental_impact:flight_per_fu"] = 1.0 / inputs[duration_mission_name]
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        if not self.options["use_operational_mission"]:
+            duration_mission_name = "data:mission:sizing:main_route:duration"
+
+        else:
+            duration_mission_name = "data:mission:operational:main_route:duration"
+
+        partials["data:environmental_impact:flight_per_fu", duration_mission_name] = -1.0 / (
+            inputs[duration_mission_name] ** 2.0
         )

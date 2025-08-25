@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO.
+# Copyright (C) 2025 ISAE-SUPAERO.
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -75,6 +75,18 @@ class DEPEquilibrium(om.Group):
             "can save some time in specific cases",
             allow_none=False,
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -86,14 +98,18 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_thrust",
                 EquilibriumThrust(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
@@ -108,11 +124,6 @@ class DEPEquilibrium(om.Group):
                 oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=options_delta_m),
                 promotes=["*"],
             )
-            options_dep = {
-                "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"],
-                "power_train_file_path": self.options["power_train_file_path"],
-            }
             self.add_subsystem(
                 "preparation_for_energy_consumption",
                 PrepareForEnergyConsumption(number_of_points=number_of_points),
@@ -124,6 +135,7 @@ class DEPEquilibrium(om.Group):
                 "propulsion_id": self.options["propulsion_id"],
                 "power_train_file_path": self.options["power_train_file_path"],
                 "pre_condition_pt": self.options["pre_condition_pt"],
+                "sort_component": self.options["sort_component"],
             }
             self.add_subsystem(
                 "compute_energy_consumed",
@@ -133,6 +145,12 @@ class DEPEquilibrium(om.Group):
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
             )
+            options_dep = {
+                "number_of_points": number_of_points,
+                "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
+                "low_speed_aero": self.options["low_speed_aero"],
+            }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),
@@ -143,14 +161,18 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_equilibrium_alpha",
                 EquilibriumAlpha(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
             self.add_subsystem(
                 "compute_equilibrium_thrust",
                 EquilibriumThrust(
-                    number_of_points=number_of_points, flaps_position=self.options["flaps_position"]
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
                 ),
                 promotes=["*"],
             )
@@ -165,11 +187,6 @@ class DEPEquilibrium(om.Group):
                 oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=options_delta_m),
                 promotes=["*"],
             )
-            options_dep = {
-                "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"],
-                "power_train_file_path": self.options["power_train_file_path"],
-            }
             self.add_subsystem(
                 "preparation_for_energy_consumption",
                 PrepareForEnergyConsumption(number_of_points=number_of_points),
@@ -180,6 +197,7 @@ class DEPEquilibrium(om.Group):
                 "propulsion_id": self.options["propulsion_id"],
                 "power_train_file_path": self.options["power_train_file_path"],
                 "pre_condition_pt": self.options["pre_condition_pt"],
+                "sort_component": self.options["sort_component"],
             }
             self.add_subsystem(
                 "compute_energy_consumed",
@@ -204,6 +222,12 @@ class DEPEquilibrium(om.Group):
                     "fuel_mass_t_econ",
                 ],
             )
+            options_dep = {
+                "number_of_points": number_of_points,
+                "flaps_position": self.options["flaps_position"],
+                "power_train_file_path": self.options["power_train_file_path"],
+                "low_speed_aero": self.options["low_speed_aero"],
+            }
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(HE_SUBMODEL_DEP_EFFECT, options=options_dep),

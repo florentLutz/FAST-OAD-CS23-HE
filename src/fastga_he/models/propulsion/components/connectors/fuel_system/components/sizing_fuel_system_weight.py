@@ -68,11 +68,9 @@ class SizingFuelSystemWeight(om.ExplicitComponent):
         volume = inputs[
             "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":connected_volume"
         ]
-        number_of_engine = float(
-            inputs[
-                "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine"
-            ]
-        )
+        number_of_engine = inputs[
+            "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":number_engine"
+        ].item()
         fuel_type = inputs[
             "data:propulsion:he_power_train:fuel_system:" + fuel_system_id + ":fuel_type"
         ]

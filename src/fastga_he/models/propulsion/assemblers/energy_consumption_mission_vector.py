@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 import itertools
 
 import openmdao.api as om
@@ -17,6 +17,7 @@ from fastga_he.models.propulsion.assemblers.constants import (
 from fastga_he.models.propulsion.assemblers.fuel_cg_from_pt_file import FuelCGFromPTFile
 
 ENERGY_CONSUMPTION_FROM_PT_FILE = "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = ENERGY_CONSUMPTION_FROM_PT_FILE
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_ENERGY_CONSUMPTION, ENERGY_CONSUMPTION_FROM_PT_FILE)
@@ -46,6 +47,12 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
         )
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
         )
         self.options.declare(
             name="pre_condition_pt",
@@ -78,6 +85,7 @@ class PowerTrainPerformancesFromFileWithInterface(om.Group):
             "number_of_points": number_of_points,
             "add_solver": False,
             "pre_condition_pt": pre_condition_pt,
+            "sort_component": self.options["sort_component"],
         }
 
         # For some reasons that I only knew when I coded the mission vector, all flight

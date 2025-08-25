@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -21,6 +21,9 @@ from .sizing_cable_radius import SizingCableRadius
 from .sizing_harness_cg_x import SizingHarnessCGX
 from .sizing_harness_cg_y import SizingHarnessCGY
 from .sizing_harness_drag import SizingHarnessDrag
+from .sizing_insulation_cross_section import SizingInsulationCrossSection
+from .sizing_shield_cross_section import SizingShieldCrossSection
+from .sizing_sheath_cross_section import SizingSheathCrossSection
 
 from .cstr_harness import ConstraintsHarness
 
@@ -90,7 +93,21 @@ class SizingHarness(om.Group):
             SizingCableRadius(harness_id=harness_id),
             promotes=["data:*", "settings:*"],
         )
-
+        self.add_subsystem(
+            "insulation_layer_cross_section",
+            SizingInsulationCrossSection(harness_id=harness_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "shield_layer_cross_section",
+            SizingShieldCrossSection(harness_id=harness_id),
+            promotes=["data:*", "settings:*"],
+        )
+        self.add_subsystem(
+            "sheath_layer_cross_section",
+            SizingSheathCrossSection(harness_id=harness_id),
+            promotes=["data:*", "settings:*"],
+        )
         self.add_subsystem(
             "resistance_per_length",
             SizingResistancePerLength(harness_id=harness_id),

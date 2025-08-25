@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -34,6 +34,8 @@ from ..components.sizing_generator_cg_x import SizingGeneratorCGX
 from ..components.sizing_generator_cg_y import SizingGeneratorCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAGeneratorProdWeightPerFU
+from ..components.lcc_generator_cost import LCCGeneratorCost
+from ..components.lcc_generator_operation import LCCGeneratorOperationalCost
 
 from ..components.perf_mission_rpm import PerformancesRPMMission
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
@@ -638,6 +640,8 @@ def test_constraints_ensure_torque():
         "constraints:propulsion:he_power_train:generator:generator_1:torque_rating", units="N*m"
     ) == pytest.approx(-2.0, rel=1e-2)
 
+    problem.check_partials(compact_print=True)
+
 
 def test_constraints_ensure_rpm():
     ivc = get_indep_var_comp(
@@ -650,6 +654,8 @@ def test_constraints_ensure_rpm():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:generator:generator_1:rpm_rating", units="min**-1"
     ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_constraints_voltage_ensure():
@@ -697,5 +703,41 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:generator:generator_1:mass_per_fu", units="kg"
     ) == pytest.approx(6.1752e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:generator:generator_1:shaft_power_rating",
+        70.0,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCGeneratorCost(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:purchase_cost", units="USD"
+    ) == pytest.approx(6387.88, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:generator:generator_1:purchase_cost",
+        2895.61,
+        units="USD",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCGeneratorOperationalCost(generator_id="generator_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:generator:generator_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(193.04, rel=1e-2)
 
     problem.check_partials(compact_print=True)

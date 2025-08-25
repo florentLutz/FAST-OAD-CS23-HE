@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2024 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 
 import openmdao.api as om
@@ -20,7 +20,6 @@ from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
 )
-
 from .mission_range_from_soc import OperationalMissionVectorWithTargetSoC
 from .mission_range_from_fuel import OperationalMissionVectorWithTargetFuel
 
@@ -167,6 +166,7 @@ class ComputePayloadRange(om.ExplicitComponent):
                     pre_condition_pt=True,
                     use_linesearch=False,
                     use_apply_nonlinear=False,
+                    variable_name_threshold_fuel="data:mission:payload_range:target_fuel",
                 ),
                 promotes=["*"],
             )
@@ -183,20 +183,13 @@ class ComputePayloadRange(om.ExplicitComponent):
                     use_linesearch=False,
                     use_apply_nonlinear=False,
                     variable_name_target_SoC="data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min",
+                    variable_name_threshold_SoC="data:mission:payload_range:threshold_SoC",
                 ),
                 promotes=["*"],
             )
 
-        # Replace the old solver with a NewtonSolver to handle the ImplicitComponent
-        model.op_mission.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        model.op_mission.nonlinear_solver.options["iprint"] = 0
-        model.op_mission.nonlinear_solver.options["maxiter"] = 100
-        model.op_mission.nonlinear_solver.options["rtol"] = 1e-5
-        model.op_mission.nonlinear_solver.options["atol"] = 1e-5
-        model.op_mission.nonlinear_solver.options["stall_limit"] = 2
-        model.op_mission.nonlinear_solver.options["stall_tol"] = 1e-5
-        model.op_mission.linear_solver = om.DirectSolver()
-
+        # TODO: find a way to do this that doesn't involve accessing private attribute
+        self.cached_problem.model_options = self._problem_meta["model_options"]
         self.cached_problem.setup()
 
         # There are four points in the payload range as computed by this framework. Points A, B,
@@ -205,9 +198,9 @@ class ComputePayloadRange(om.ExplicitComponent):
         payload_array = np.zeros(4)
         ef_array = np.zeros(4)
 
-        max_payload = inputs["data:weight:aircraft:max_payload"][0]
-        mtow = inputs["data:weight:aircraft:MTOW"][0]
-        owe = inputs["data:weight:aircraft:OWE"][0]
+        max_payload = inputs["data:weight:aircraft:max_payload"].item()
+        mtow = inputs["data:weight:aircraft:MTOW"].item()
+        owe = inputs["data:weight:aircraft:OWE"].item()
 
         carbon_intensity_fuel = inputs["data:mission:payload_range:carbon_intensity_fuel"]
         carbon_intensity_electricity = (
@@ -254,7 +247,7 @@ class ComputePayloadRange(om.ExplicitComponent):
             * carbon_intensity_electricity
         )
         emission_factor_b = emissions_point_b / (range_point_b * 1.852) / max_payload
-        ef_array[1] = emission_factor_b
+        ef_array[1] = emission_factor_b.item()
 
         # Point D corresponds to MFW and MTOW. On an electric aircraft this point is the same as
         # the previous one, so we will simply not recompute it.
@@ -270,7 +263,7 @@ class ComputePayloadRange(om.ExplicitComponent):
             range_point_d = self.cached_problem.get_val(
                 "data:mission:operational:range", units="NM"
             )[0]
-            payload_array[2] = payload
+            payload_array[2] = payload.item()
             range_array[2] = range_point_d
 
             emissions_point_d = (
@@ -281,7 +274,7 @@ class ComputePayloadRange(om.ExplicitComponent):
                 * carbon_intensity_electricity
             )
             emission_factor_d = emissions_point_d / (range_point_d * 1.852) / payload
-            ef_array[2] = emission_factor_d
+            ef_array[2] = emission_factor_d.item()
         else:
             payload_array[2] = payload_array[1]
             range_array[2] = range_array[1]

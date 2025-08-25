@@ -5,11 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
+
 from ..components.perf_cell_temperature import PerformancesCellTemperatureMission
+from ..components.perf_average_cell_temperature import PerformancesAverageCellTemperature
 from ..components.perf_direct_bus_connection import PerformancesBatteryDirectBusConnection
 from ..components.perf_module_current import PerformancesModuleCurrent
-from ..components.perf_open_circuit_voltage import PerformancesOpenCircuitVoltage
-from ..components.perf_internal_resistance import PerformancesInternalResistance
 from ..components.perf_cell_voltage import PerformancesCellVoltage
 from ..components.perf_module_voltage import PerformancesModuleVoltage
 from ..components.perf_battery_voltage import PerformancesBatteryVoltage
@@ -27,7 +28,11 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_battery_efficiency import PerformancesBatteryEfficiency
 from ..components.perf_energy_consumption import PerformancesEnergyConsumption
 from ..components.perf_battery_energy_consumed import PerformancesEnergyConsumed
+from ..components.perf_battery_energy_consumed_main_route import PerformancesEnergyConsumedMainRoute
+from ..components.perf_soc_end_main_route import PerformancesSOCEndMainRoute
 from ..components.perf_inflight_emissions import PerformancesBatteryPackInFlightEmissions
+
+from ..constants import SERVICE_BATTERY_OCV, SERVICE_BATTERY_R_INT
 
 
 class PerformancesBatteryPack(om.Group):
@@ -42,6 +47,12 @@ class PerformancesBatteryPack(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            "number_of_points_reserve",
+            default=None,  # By default, for retro-compatibility, we want it disabled
+            desc="number of equilibrium to be treated in reserve",
+            types=int,
+        )
+        self.options.declare(
             name="direct_bus_connection",
             default=False,
             types=bool,
@@ -53,10 +64,18 @@ class PerformancesBatteryPack(om.Group):
         number_of_points = self.options["number_of_points"]
         battery_pack_id = self.options["battery_pack_id"]
         direct_bus_connection = self.options["direct_bus_connection"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         self.add_subsystem(
             "cell_temperature",
             PerformancesCellTemperatureMission(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "average_cell_temperature",
+            PerformancesAverageCellTemperature(
                 number_of_points=number_of_points, battery_pack_id=battery_pack_id
             ),
             promotes=["*"],
@@ -96,21 +115,27 @@ class PerformancesBatteryPack(om.Group):
         )
         self.add_subsystem(
             "update_soc",
-            PerformancesUpdateSOC(number_of_points=number_of_points),
+            PerformancesUpdateSOC(
+                number_of_points=number_of_points, battery_pack_id=battery_pack_id
+            ),
             promotes=["*"],
         )
         # Though these variable depends on variables that are looped on, they don't affect the
         # value that we loop on hence why they are put here to save time.
+
+        options_battery_pack = {
+            "number_of_points": number_of_points,
+            "battery_pack_id": battery_pack_id,
+        }
+
         self.add_subsystem(
             "open_circuit_voltage",
-            PerformancesOpenCircuitVoltage(number_of_points=number_of_points),
+            oad.RegisterSubmodel.get_submodel(SERVICE_BATTERY_OCV, options=options_battery_pack),
             promotes=["*"],
         )
         self.add_subsystem(
             "internal_resistance",
-            PerformancesInternalResistance(
-                number_of_points=number_of_points, battery_pack_id=battery_pack_id
-            ),
+            oad.RegisterSubmodel.get_submodel(SERVICE_BATTERY_R_INT, options=options_battery_pack),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -187,6 +212,25 @@ class PerformancesBatteryPack(om.Group):
             ),
             promotes=["*"],
         )
+        if number_of_points_reserve:
+            self.add_subsystem(
+                "energy_consumed_main_route",
+                PerformancesEnergyConsumedMainRoute(
+                    number_of_points=number_of_points,
+                    battery_pack_id=battery_pack_id,
+                    number_of_points_reserve=number_of_points_reserve,
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                "soc_end_route",
+                PerformancesSOCEndMainRoute(
+                    number_of_points=number_of_points,
+                    battery_pack_id=battery_pack_id,
+                    number_of_points_reserve=number_of_points_reserve,
+                ),
+                promotes=["*"],
+            )
 
         fuel_consumed = om.IndepVarComp()
         fuel_consumed.add_output("fuel_consumed_t", np.full(number_of_points, 0.0), units="kg")

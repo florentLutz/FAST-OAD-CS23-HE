@@ -2,7 +2,7 @@
 Test mission vector module.
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -18,6 +18,7 @@ import os
 import os.path as pth
 import pytest
 import copy
+import warnings
 
 import numpy as np
 import openmdao.api as om
@@ -69,6 +70,10 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
     PerformancePerPhase,
 )
 from fastga_he.models.performances.mission_vector.mission.sizing_time import SizingDuration
+from fastga_he.models.performances.mission_vector.constants import (
+    HE_SUBMODEL_ENERGY_CONSUMPTION,
+    HE_SUBMODEL_DEP_EFFECT,
+)
 
 from fastga_he.models.performances.mission_vector.initialization.initialize_cg import InitializeCoG
 from fastga_he.models.performances.mission_vector.mission_vector import MissionVector
@@ -76,6 +81,9 @@ from fastga_he.models.propulsion.assemblers.sizing_from_pt_file import PowerTrai
 from fastga_he.models.performances.op_mission_vector.update_tow import UpdateTOW
 
 from fastga_he.models.performances.payload_range.payload_range import ComputePayloadRange
+from fastga_he.models.performances.payload_range.mission_range_from_soc import (
+    OperationalMissionVectorWithTargetSoC,
+)
 
 from fastga_he.models.performances.payload_range.payload_range_inner_sampling import (
     ComputePayloadRangeInnerSampling,
@@ -94,6 +102,28 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 XML_FILE = "sample_ac.xml"
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+
+@pytest.fixture(autouse=False)
+def catch_warnings():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        yield
+
+        for warning in w:
+            print(warning)
+
+
+@pytest.fixture()
+def restore_submodels():
+    """
+    Since the submodels in the configuration file differ from the defaults, this restore process
+    ensures subsequent assembly tests run under default conditions.
+    """
+    old_submodels = copy.deepcopy(oad.RegisterSubmodel.active_models)
+    yield
+    oad.RegisterSubmodel.active_models = old_submodels
 
 
 def test_initialize_altitude():
@@ -779,16 +809,16 @@ def test_initialize_airspeed_derivatives():
     )
     expected_derivative = np.array(
         [
-            0.127,
-            0.098,
-            0.088,
-            0.094,
-            0.114,
-            0.023,
-            0.073,
-            0.021,
-            0.092,
-            0.070,
+            0.00330842,
+            0.0032472,
+            0.00317812,
+            0.00310071,
+            0.00301457,
+            0.00292544,
+            0.00282017,
+            0.0027103,
+            0.00258387,
+            0.00245106,
             0.0,
             0.0,
             0.0,
@@ -799,11 +829,11 @@ def test_initialize_airspeed_derivatives():
             0.0,
             0.0,
             0.0,
-            -0.079,
-            -0.0542,
-            -0.0138,
-            -0.0560,
-            -0.0713,
+            -0.00356722,
+            -0.00330743,
+            -0.00307075,
+            -0.00285019,
+            -0.00264925,
             0.0,
             0.0,
             0.0,
@@ -811,7 +841,9 @@ def test_initialize_airspeed_derivatives():
             0.0,
         ]
     )
-    assert np.max(np.abs(problem.get_val("d_vx_dt", units="m/s**2") - expected_derivative)) <= 1e-1
+    assert problem.get_val("d_vx_dt", units="m/s**2") == pytest.approx(
+        expected_derivative, abs=1e-1
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -1574,8 +1606,15 @@ def test_sizing_duration():
     problem.check_partials(compact_print=True)
 
 
-def test_mission_vector():
+def test_mission_vector(restore_submodels):
     # Research independent input value in .xml file
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
+        "fastga_he.submodel.performances.energy_consumption.basic"
+    )
+    oad.RegisterSubmodel.active_models[HE_SUBMODEL_DEP_EFFECT] = (
+        "fastga_he.submodel.performances.dep_effect.none"
+    )
+
     ivc = get_indep_var_comp(
         list_inputs(
             MissionVector(
@@ -1811,7 +1850,7 @@ def test_mission_vector_from_yml_simplified_models():
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(157.14, abs=1e-2)
+    assert sizing_energy == pytest.approx(157.22, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
@@ -2115,9 +2154,6 @@ def test_mission_vector_from_yml_fuel_and_battery_gear():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_recording():
-    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
-        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
-    )
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
     )
@@ -2136,14 +2172,11 @@ def test_recording():
     oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.generator.rpm"] = (
         "fastga_he.submodel.propulsion.constraints.generator.rpm.ensure"
     )
-    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
-        "fastga_he.submodel.performances.dep_effect.from_pt_file"
-    )
 
     # Define used files depending on options
     xml_file_name = "sample_ac_fuel_and_battery_propulsion.xml"
 
-    problem = om.Problem()
+    problem = om.Problem(reports=False)
     model = problem.model
 
     group = om.Group()
@@ -2418,6 +2451,47 @@ def test_residuals_viewer():
                 "compute_energy_consumed.power_train_performances.motor_4.ac_current_rms_in"
             ],
         )
+
+
+def test_op_mission_with_target_soc():
+    xml_file = "op_mission_inputs.xml"
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly.yml")
+
+    oad.RegisterSubmodel.active_models["submodel.performances_he.energy_consumption"] = (
+        "fastga_he.submodel.performances.energy_consumption.from_pt_file"
+    )
+    oad.RegisterSubmodel.active_models["submodel.performances_he.dep_effect"] = (
+        "fastga_he.submodel.performances.dep_effect.from_pt_file"
+    )
+
+    system = OperationalMissionVectorWithTargetSoC(
+        number_of_points_climb=30,
+        number_of_points_cruise=30,
+        number_of_points_descent=20,
+        number_of_points_reserve=10,
+        power_train_file_path=pt_file_path,
+        pre_condition_pt=True,
+        use_linesearch=False,
+        use_apply_nonlinear=False,
+        variable_name_target_SoC="data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min",
+    )
+    system.nonlinear_solver.options["iprint"] = 2
+
+    ivc = get_indep_var_comp(
+        list_inputs(system),
+        __file__,
+        xml_file,
+    )
+
+    problem = run_system(system, ivc)
+
+    # In test_op_mission_vector_from_yml, the mission end with an SoC of 37% so here, since we will
+    # have it end at a smaller SoC the range should be greater than the 200 km
+    range_array = problem.get_val("data:mission:operational:range", units="km")
+    assert range_array == pytest.approx(273, abs=1.0)
+
+    problem.output_file_path = pth.join(RESULTS_FOLDER_PATH, "mission_with_target_SOC.xml")
+    problem.write_outputs()
 
 
 def test_payload_range_elec():

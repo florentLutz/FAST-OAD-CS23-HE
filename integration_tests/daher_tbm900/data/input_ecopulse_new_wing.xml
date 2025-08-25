@@ -394,6 +394,8 @@
         <inverter>
           <inverter_1>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_landing>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_landing>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
@@ -451,6 +453,8 @@
             </properties>
           </inverter_1>
           <inverter_2>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_landing>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_landing>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -509,6 +513,8 @@
             </properties>
           </inverter_2>
           <inverter_3>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_landing>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_landing>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -567,6 +573,8 @@
             </properties>
           </inverter_3>
           <inverter_4>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_landing>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_landing>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -625,6 +633,8 @@
             </properties>
           </inverter_4>
           <inverter_5>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_landing>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_landing>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -683,6 +693,8 @@
             </properties>
           </inverter_5>
           <inverter_6>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_landing>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_landing>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
@@ -854,9 +866,12 @@
           <rectifier>
             <front_length_ratio is_input="True">0.9<!--Location of the rectifier CG as a ratio of the aircraft front length--></front_length_ratio>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the rectifier for the points--></heat_sink_temperature_mission>
+            <heat_sink_temperature_landing units="degK" is_input="True">288.15<!--Heat sink temperature of the rectifier for the points--></heat_sink_temperature_landing>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the rectifier for the points--></switching_frequency_mission>
             <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
+            <switching_frequency_landing units="Hz" is_input="True">12000.0<!--Switching frequency of the rectifier for the points--></switching_frequency_landing>
+            <voltage_out_target_landing units="V" is_input="True">800.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_landing>
             <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <capacitor>
               <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
@@ -916,6 +931,8 @@
             <rear_length_ratio is_input="True">0.1<!--Location of the turbo generator CG as a ratio of the aircraft rear length--></rear_length_ratio>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the turbo generator for the points--></voltage_out_target_mission>
+            <rpm_landing units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_landing>
+            <voltage_out_target_landing units="V" is_input="True">800.0<!--Target output voltage of the turbo generator for the points--></voltage_out_target_landing>
           </turbo_generator>
         </turbo_generator>
         <turboshaft>

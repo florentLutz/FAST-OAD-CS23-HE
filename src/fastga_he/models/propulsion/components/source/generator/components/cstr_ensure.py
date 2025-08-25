@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_GENERATOR_TORQUE,
@@ -48,19 +48,23 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Max continuous torque of the generator",
         )
+
         self.add_output(
             "constraints:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
             units="N*m",
             val=0.0,
             desc="Respected if <0",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
-            wrt=[
-                "data:propulsion:he_power_train:generator:" + generator_id + ":torque_max",
-                "data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:generator:" + generator_id + ":torque_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
+            wrt="data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -72,18 +76,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:generator:" + generator_id + ":torque_max"]
             - inputs["data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        generator_id = self.options["generator_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":torque_rating",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -116,19 +108,23 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Max continuous rpm of the generator",
         )
+
         self.add_output(
             "constraints:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
             units="min**-1",
             val=0.0,
             desc="Respected if <0",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
-            wrt=[
-                "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max",
-                "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
+            wrt="data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -140,18 +136,6 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max"]
             - inputs["data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        generator_id = self.options["generator_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":rpm_rating",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -198,11 +182,15 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:generator:"
             + generator_id
             + ":voltage_caliber",
-            wrt=[
-                "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max",
-                "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:generator:"
+            + generator_id
+            + ":voltage_caliber",
+            wrt="data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -216,15 +204,3 @@ class ConstraintsVoltageEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        generator_id = self.options["generator_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_ac_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber",
-            "data:propulsion:he_power_train:generator:" + generator_id + ":voltage_caliber",
-        ] = -1.0

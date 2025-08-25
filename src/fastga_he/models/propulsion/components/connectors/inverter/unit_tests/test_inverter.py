@@ -5,6 +5,7 @@
 import numpy as np
 import openmdao.api as om
 import pytest
+import fastoad.api as oad
 
 from ..components.sizing_energy_coefficient_scaling import SizingInverterEnergyCoefficientScaling
 from ..components.sizing_energy_coefficients import SizingInverterEnergyCoefficients
@@ -32,6 +33,7 @@ from ..components.perf_modulation_index import PerformancesModulationIndex
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_gate_voltage import PerformancesGateVoltage
+from ..components.perf_ac_power_out import PerformancesACPowerOut
 from ..components.perf_conduction_loss import PerformancesConductionLosses
 from ..components.perf_total_loss import PerformancesLosses
 from fastga_he.models.propulsion.components.connectors.inverter.components.stale.perf_temperature_derivative import (
@@ -49,23 +51,31 @@ from ..components.perf_dc_current import PerformancesDCCurrent
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_inverter import PerformancesInverter
 from ..components.pre_lca_prod_weight_per_fu import PreLCAInverterProdWeightPerFU
+from ..components.lcc_inverter_cost import LCCInverterCost
+from ..components.lcc_inverter_operational_cost import LCCInverterOperationalCost
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentEnforce,
     ConstraintsVoltageEnforce,
     ConstraintsLossesEnforce,
     ConstraintsFrequencyEnforce,
+    ConstraintsPowerOutputEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsCurrentEnsure,
     ConstraintsVoltageEnsure,
     ConstraintsLossesEnsure,
     ConstraintsFrequencyEnsure,
+    ConstraintsPowerOutputEnsure,
 )
 
 from .....sub_components import SizingHeatSink, SizingCapacitor, SizingInductor
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_INVERTER_EFFICIENCY,
+    SUBMODEL_INVERTER_JUNCTION_TEMPERATURE,
+)
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -613,6 +623,24 @@ def test_constraints_enforce_frequency():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_enforce_power_output():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerOutputEnforce(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsPowerOutputEnforce(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
+        units="kW",
+    ) == pytest.approx(200.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_ensure_current():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -681,6 +709,24 @@ def test_constraints_ensure_frequency():
         "constraints:propulsion:he_power_train:inverter:inverter_1:switching_frequency",
         units="Hz",
     ) == pytest.approx(-3.0e3, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_ensure_power_output():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerOutputEnsure(inverter_id="inverter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsPowerOutputEnsure(inverter_id="inverter_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
+        units="kW",
+    ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1261,6 +1307,32 @@ def test_efficiency_mission():
     problem3.check_partials(compact_print=True)
 
 
+def test_ac_power_out():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="ac_voltage_rms_out",
+        val=np.array([580.0, 594.8, 610.4, 626.4, 642.7, 659.3, 676.0, 692.9, 710.0, 727.1]),
+        units="V",
+    )
+    ivc.add_output(
+        name="ac_current_rms_out_one_phase",
+        val=np.linspace(200.0, 500.0, NB_POINTS_TEST),
+        units="A",
+    )
+
+    problem = run_system(
+        PerformancesACPowerOut(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    power_rating = np.array(
+        [348.0, 416.36, 488.32, 563.76, 642.7, 725.23, 811.2, 900.77, 994.0, 1090.65]
+    )
+    assert problem.get_val("ac_power_out", units="kW") == pytest.approx(power_rating, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_dc_current():
     ivc = om.IndepVarComp()
     ivc.add_output("dc_voltage_in", units="V", val=np.full(NB_POINTS_TEST, 1000.0))
@@ -1331,6 +1403,11 @@ def test_maximum():
         val=np.array([710.4, 728.5, 747.6, 767.2, 787.1, 807.5, 827.9, 848.6, 869.6, 890.5]),
     )
     ivc.add_output(
+        "ac_power_out",
+        units="kW",
+        val=np.array([348.0, 416.36, 488.32, 563.76, 642.7, 725.23, 811.2, 900.77, 994.0, 1090.65]),
+    )
+    ivc.add_output(
         "diode_temperature",
         units="degK",
         val=np.array(
@@ -1375,6 +1452,9 @@ def test_maximum():
         "data:propulsion:he_power_train:inverter:inverter_1:voltage_dc_max", units="V"
     ) == pytest.approx(1000.5, rel=1e-2)
     assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_max", units="kW"
+    ) == pytest.approx(1090.65, rel=1e-2)
+    assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:igbt:temperature_max", units="degK"
     ) == pytest.approx(473.05, rel=1e-2)
     assert problem.get_val(
@@ -1397,6 +1477,12 @@ def test_maximum():
 
 
 def test_performances_inverter_tot():
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.inverter.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_INVERTER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses"
+    )
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesInverter(inverter_id="inverter_1", number_of_points=NB_POINTS_TEST)
@@ -1467,5 +1553,45 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:mass_per_fu", units="kg"
     ) == pytest.approx(8.564e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
+        val=200.0,
+        units="kW",
+    )
+
+    problem = run_system(
+        LCCInverterCost(inverter_id="inverter_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:purchase_cost", units="USD"
+    ) == pytest.approx(7629.22, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="data:propulsion:he_power_train:inverter:inverter_1:purchase_cost",
+        val=18391.45,
+        units="USD",
+    )
+
+    problem = run_system(
+        LCCInverterOperationalCost(inverter_id="inverter_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:inverter:inverter_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(1226.096, rel=1e-3)
 
     problem.check_partials(compact_print=True)

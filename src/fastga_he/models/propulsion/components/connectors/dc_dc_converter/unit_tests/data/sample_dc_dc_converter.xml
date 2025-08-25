@@ -1,7 +1,7 @@
 <FASTOAD_model>
     <data>
         <TLAR>
-            <aircraft_lifespan>25.0</aircraft_lifespan>
+            <aircraft_lifespan units="yr">25.0</aircraft_lifespan>
         </TLAR>
         <environmental_impact>
             <aircraft_per_fu>1e-6</aircraft_per_fu>
@@ -31,13 +31,15 @@
                     <dc_dc_converter_1>
                         <mass units="kg">86.0</mass>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <dc_power_in_max units="kW">364.0</dc_power_in_max>
+                        <dc_power_in_rating units="kW">364.0</dc_power_in_rating>
                         <switching_frequency_mission units="Hz">[3000., 4000., 5000., 6000., 7000., 8000., 9000., 10000., 11000., 12000.]</switching_frequency_mission>
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
                             <capacity units="mF">0.460</capacity>
                             <mass units="kg">1.21</mass>
-                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                            <aspect_ratio>2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <mass units="kg">102.0</mass>

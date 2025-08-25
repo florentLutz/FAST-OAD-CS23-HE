@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import scipy as sp
@@ -12,10 +12,11 @@ from fastga_he.exceptions import ControlParameterInconsistentShapeError
 
 from ..constants import SUBMODEL_RECTIFIER_EFFICIENCY
 
+FIXED_RECTIFIER_EFFICIENCY = "fastga_he.submodel.propulsion.rectifier.efficiency.fixed"
+oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = FIXED_RECTIFIER_EFFICIENCY
 
-@oad.RegisterSubmodel(
-    SUBMODEL_RECTIFIER_EFFICIENCY, "fastga_he.submodel.propulsion.rectifier.efficiency.fixed"
-)
+
+@oad.RegisterSubmodel(SUBMODEL_RECTIFIER_EFFICIENCY, FIXED_RECTIFIER_EFFICIENCY)
 class PerformancesEfficiencyMission(om.ExplicitComponent):
     """
     Component which takes the desired efficiency for rectifier operation from the data and gives

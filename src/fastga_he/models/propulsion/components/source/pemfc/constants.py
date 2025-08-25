@@ -4,6 +4,7 @@
 from stdatm import AtmosphereWithPartials
 
 SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA = "submodel.propulsion.constraints.pemfc.effective_area"
+SUBMODEL_CONSTRAINTS_PEMFC_POWER = "submodel.propulsion.constraints.pemfc.power"
 
 POSSIBLE_POSITION = ["in_the_front", "wing_pod", "underbelly", "in_the_back"]
 

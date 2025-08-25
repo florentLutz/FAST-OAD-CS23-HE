@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -59,7 +59,20 @@ class ConstraintsCurrentRMS1PhaseEnsure(om.ExplicitComponent):
             "during the mission, constraint is respected if < 0",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":current_ac_caliber",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":current_ac_caliber",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
+            val=-1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
@@ -74,22 +87,6 @@ class ConstraintsCurrentRMS1PhaseEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        rectifier_id = self.options["rectifier_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:"
-            + rectifier_id
-            + ":current_ac_caliber",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:"
-            + rectifier_id
-            + ":current_ac_caliber",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":current_ac_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -135,7 +132,20 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
             desc="Caliber peak voltage at the input of the rectifier, used for sizing",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":voltage_ac_caliber",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":voltage_ac_caliber",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber",
+            val=-1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
@@ -150,22 +160,6 @@ class ConstraintsVoltagePeakEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        rectifier_id = self.options["rectifier_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:"
-            + rectifier_id
-            + ":voltage_ac_caliber",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:"
-            + rectifier_id
-            + ":voltage_ac_caliber",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":voltage_ac_caliber",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -206,6 +200,7 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             units="Hz",
             desc="Maximum switching frequency of the IGBT modules in the rectifier, used for sizing",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:rectifier:"
             + rectifier_id
@@ -215,17 +210,22 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
             desc="Constraints on the maximum switching frequency of the IGBT modules in the "
             "rectifier, respected when <0",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:rectifier:"
             + rectifier_id
             + ":switching_frequency",
-            wrt=[
-                "data:propulsion:he_power_train:rectifier:"
-                + rectifier_id
-                + ":switching_frequency_max",
-                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":switching_frequency",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -245,22 +245,6 @@ class ConstraintsFrequencyEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        rectifier_id = self.options["rectifier_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:"
-            + rectifier_id
-            + ":switching_frequency",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:"
-            + rectifier_id
-            + ":switching_frequency",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":switching_frequency",
-        ] = -1.0
 
 
 @oad.RegisterSubmodel(
@@ -294,6 +278,7 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             val=np.nan,
             units="W",
         )
+
         self.add_output(
             name="constraints:propulsion:he_power_train:rectifier:"
             + rectifier_id
@@ -302,15 +287,20 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
             units="W",
             desc="Respected if negative",
         )
+
         self.declare_partials(
             of="constraints:propulsion:he_power_train:rectifier:"
             + rectifier_id
             + ":dissipable_heat",
-            wrt=[
-                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
-                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":dissipable_heat",
+            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -324,15 +314,3 @@ class ConstraintsLossesEnsure(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        rectifier_id = self.options["rectifier_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":losses_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
-            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":dissipable_heat",
-        ] = -1.0

@@ -10,18 +10,29 @@ import pathlib
 import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
+# Even though lca_modeller is not used directly here a core subcomponent of that module requires it
+# And I feel like it's better to raise the ImportError here.
+try:
+    # Ruff, please ignore this unused import it's just to check that the opt dependencies are here
+    from lca_modeller.io.configuration import LCAProblemConfigurator  # noqa: F401
+
+    LCA_AVAILABLE = True
+except ImportError:
+    LCA_AVAILABLE = False
+
+
 import fastga_he.models.propulsion.components as he_comp
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from .lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from .lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
-from .lca_aircraft_per_fu import LCAAircraftPerFU
+from .lca_max_airframe_hours import LCAEquivalentMaxAirframeHours
+from .lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from .lca_core import LCACore
 from .lca_core_normalization import LCACoreNormalisation
 from .lca_core_weighting import LCACoreWeighting
 from .lca_core_aggregation import LCACoreAggregation
 from .lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from .lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-from .lca_electricty_per_fu import LCAElectricityPerFU
 from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
@@ -30,9 +41,10 @@ from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from .lca_kerosene_per_fu import LCAKerosenePerFU
 from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from .lca_line_test_mission_ratio import LCARatioTestFlightMission
-from .lca_use_flight_per_fu import LCAUseFlightPerFU
+from .lca_use_flight_per_fu import LCAUseFlightPerFU, LCAUseFlightPerFUFlightHours
 from .lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from .lca_wing_weight_per_fu import LCAWingWeightPerFU
+from .constants import SERVICE_ELECTRICITY_PER_FU
 from .resources.constants import (
     METHODS_TO_FILE,
     METHODS_TO_NORMALIZATION,
@@ -51,10 +63,23 @@ class LCA(om.Group):
         self.configurator = FASTGAHEPowerTrainConfigurator()
 
     def initialize(self):
+        if not LCA_AVAILABLE:
+            raise ImportError(
+                "The modules with the fastga_he.lca.legacy id can only be used with lca optional "
+                "dependency group.\n Install it with poetry install --extras lca"
+            )
+
         self.options.declare(
             name="power_train_file_path",
             default=None,
             desc="Path to the file containing the description of the power",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="functional_unit",
+            default="PAX.km",
+            desc="Functional unit to be used for the LCA",
+            values=["PAX.km", "Flight hours"],
             allow_none=False,
         )
         self.options.declare(
@@ -74,7 +99,7 @@ class LCA(om.Group):
             name="ecoinvent_version",
             default="3.9.1",
             desc="EcoInvent version to use",
-            values=["3.9.1"],
+            values=["3.9.1", "3.10.1"],
         )
         self.options.declare(
             name="airframe_material",
@@ -167,21 +192,45 @@ class LCA(om.Group):
                 ),
                 promotes=["*"],
             )
+        else:
+            self.add_subsystem(
+                name="equivalent_max_airframe_hours",
+                subsys=LCAEquivalentMaxAirframeHours(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
 
-        self.add_subsystem(
-            name="aircraft_per_fu",
-            subsys=LCAAircraftPerFU(
-                use_operational_mission=self.options["use_operational_mission"]
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="flight_per_fu",
-            subsys=LCAUseFlightPerFU(
-                use_operational_mission=self.options["use_operational_mission"]
-            ),
-            promotes=["*"],
-        )
+        if self.options["functional_unit"] == "Flight hours":
+            self.add_subsystem(
+                name="aircraft_per_fu",
+                subsys=LCAAircraftPerFUFlightHours(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="flight_per_fu",
+                subsys=LCAUseFlightPerFUFlightHours(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                name="aircraft_per_fu",
+                subsys=LCAAircraftPerFU(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="flight_per_fu",
+                subsys=LCAUseFlightPerFU(
+                    use_operational_mission=self.options["use_operational_mission"]
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="line_tests_mission_ratio",
@@ -208,10 +257,26 @@ class LCA(om.Group):
             )
 
         # Adds all the LCA groups for the airframe which will be here regardless of the powertrain
-        self.add_subsystem(name="pre_lca_wing", subsys=LCAWingWeightPerFU(), promotes=["*"])
-        self.add_subsystem(name="pre_lca_fuselage", subsys=LCAFuselageWeightPerFU(), promotes=["*"])
-        self.add_subsystem(name="pre_lca_htp", subsys=LCAHTPWeightPerFU(), promotes=["*"])
-        self.add_subsystem(name="pre_lca_vtp", subsys=LCAVTPWeightPerFU(), promotes=["*"])
+        self.add_subsystem(
+            name="pre_lca_wing",
+            subsys=LCAWingWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pre_lca_fuselage",
+            subsys=LCAFuselageWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pre_lca_htp",
+            subsys=LCAHTPWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pre_lca_vtp",
+            subsys=LCAVTPWeightPerFU(airframe_material=self.options["airframe_material"]),
+            promotes=["*"],
+        )
         self.add_subsystem(name="pre_lca_lg", subsys=LCALandingGearWeightPerFU(), promotes=["*"])
         self.add_subsystem(
             name="pre_lca_flight_control", subsys=LCAFlightControlsWeightPerFU(), promotes=["*"]
@@ -227,6 +292,7 @@ class LCA(om.Group):
             components_name_id,
             components_type,
             components_om_type,
+            _,
             _,
         ) = self.configurator.get_sizing_element_lists()
 
@@ -289,10 +355,14 @@ class LCA(om.Group):
         battery_names, battery_types = self.configurator.get_battery_list()
 
         if battery_names:
+            options_electricity_per_fu = {
+                "batteries_name_list": battery_names,
+                "batteries_type_list": battery_types,
+            }
             self.add_subsystem(
                 name="pre_lca_electricity",
-                subsys=LCAElectricityPerFU(
-                    batteries_name_list=battery_names, batteries_type_list=battery_types
+                subsys=oad.RegisterSubmodel.get_submodel(
+                    SERVICE_ELECTRICITY_PER_FU, options=options_electricity_per_fu
                 ),
                 promotes=["*"],
             )

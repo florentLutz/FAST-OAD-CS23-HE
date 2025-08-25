@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -10,11 +10,13 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .constants import SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS
 
-
-@oad.RegisterSubmodel(
-    SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS,
-    "fastga_he.submodel.propulsion.wing.punctual_loads.from_pt_file",
+PUNCTUAL_LOAD_FROM_PT_FILE = "fastga_he.submodel.propulsion.wing.punctual_loads.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS] = (
+    PUNCTUAL_LOAD_FROM_PT_FILE
 )
+
+
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_LOADS, PUNCTUAL_LOAD_FROM_PT_FILE)
 class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -87,8 +89,8 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        punctual_masses_y_ratio = []
-        punctual_masses_masses = []
+        punctual_masses_y_ratio = np.array([])
+        punctual_masses_masses = np.array([])
 
         for punctual_mass_name, punctual_mass_type in zip(
             self.curated_name_list, self.curated_type_list
@@ -98,8 +100,8 @@ class PowerTrainPunctualLoadsFromFile(om.ExplicitComponent):
             )
             mass_name = PT_DATA_PREFIX + punctual_mass_type + ":" + punctual_mass_name + ":mass"
 
-            punctual_masses_y_ratio.append(float(inputs[y_ratio_name]))
-            punctual_masses_masses.append(float(inputs[mass_name]))
+            punctual_masses_y_ratio = np.append(punctual_masses_y_ratio, inputs[y_ratio_name])
+            punctual_masses_masses = np.append(punctual_masses_masses, inputs[mass_name])
 
         outputs["data:weight:airframe:wing:punctual_mass:y_ratio"] = punctual_masses_y_ratio
         outputs["data:weight:airframe:wing:punctual_mass:mass"] = punctual_masses_masses

@@ -54,6 +54,7 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
                 + ice_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             self.add_input(name=input_name, val=np.nan, units="kg")
 
@@ -107,6 +108,7 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
                 + ice_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             operation_output_name = (
                 "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"
@@ -148,6 +150,7 @@ class PreLCAICEUseEmissionPerFU(om.ExplicitComponent):
                 + ice_id
                 + ":"
                 + specie
+                + "_main_route"
             )
             operation_output_name = (
                 "data:LCA:operation:he_power_train:ICE:" + ice_id + ":" + specie + "_per_fu"

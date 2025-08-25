@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -16,10 +16,11 @@ import fastga_he.models.propulsion.components as he_comp
 
 from .constants import SUBMODEL_POWER_TRAIN_PERF, SUBMODEL_THRUST_DISTRIBUTOR
 
+PERFORMANCE_FROM_PT_FILE = "fastga_he.submodel.propulsion.performances.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_PERF] = PERFORMANCE_FROM_PT_FILE
 
-@oad.RegisterSubmodel(
-    SUBMODEL_POWER_TRAIN_PERF, "fastga_he.submodel.propulsion.performances.from_pt_file"
-)
+
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_PERF, PERFORMANCE_FROM_PT_FILE)
 class PowerTrainPerformancesFromFile(om.Group):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -48,6 +49,12 @@ class PowerTrainPerformancesFromFile(om.Group):
             default=False,
             desc="Boolean to pre_condition the different components of the PT, "
             "can save some time in specific cases",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
         self.options.declare(
@@ -110,6 +117,21 @@ class PowerTrainPerformancesFromFile(om.Group):
             subsys=oad.RegisterSubmodel.get_submodel(SUBMODEL_THRUST_DISTRIBUTOR, options=options),
             promotes=["data:*", "thrust"],
         )
+
+        if self.options["sort_component"]:
+            (
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            ) = self.configurator.reorder_components(
+                components_name,
+                components_name_id,
+                components_om_type,
+                components_options,
+                components_promotes,
+            )
 
         # Enforces SSPC are added last, not done before because it might breaks the connections
         # necessary to ensure the coherence of SSPC states when connected to both end of a cable

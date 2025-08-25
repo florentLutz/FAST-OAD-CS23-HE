@@ -319,7 +319,7 @@
         <fuel_tank>
           <fuel_tank_1>
             <capacity units="kg" is_input="False">117.92498033349055<!--Capacity of the tank in terms of weight--></capacity>
-            <fuel_consumed_mission units="kg" is_input="False">116.73421198226158<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">116.73421198226158<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <fuel_total_mission units="kg" is_input="False">117.92498033349055<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
             <fuel_type is_input="True">1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <mass units="kg" is_input="False">1.1675740627078273<!--Weight of the fuel tanks--></mass>
@@ -351,7 +351,7 @@
           </fuel_tank_1>
           <fuel_tank_2>
             <capacity units="kg" is_input="False">117.92498033349055<!--Capacity of the tank in terms of weight--></capacity>
-            <fuel_consumed_mission units="kg" is_input="False">116.73421198226158<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">116.73421198226158<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <fuel_total_mission units="kg" is_input="False">117.92498033349055<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
             <fuel_type is_input="True">1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <mass units="kg" is_input="False">1.1675740627078273<!--Weight of the fuel tanks--></mass>
@@ -772,6 +772,7 @@
           </sizing_factor>
         </cs23>
         <main_route>
+          <duration units="s" is_input="False">25928.681157428684</duration>
           <climb>
             <distance units="m" is_input="False">78612.73079879078</distance>
             <duration units="s" is_input="False">1149.6942523488574</duration>
@@ -1050,13 +1051,13 @@
           <he_power_train>
             <ICE>
               <ice_1>
-                <CO units="g" is_input="False">186307.80232368954</CO>
-                <CO2 units="g" is_input="False">723752.114290022</CO2>
-                <H2O units="g" is_input="False">288800.44044411526</H2O>
-                <HC units="g" is_input="False">4404.848754938659</HC>
-                <NOx units="g" is_input="False">733.090851248603</NOx>
-                <SOx units="g" is_input="False">98.05673806509975</SOx>
-                <lead units="g" is_input="False">185.37392862783142</lead>
+                <CO_main_route units="g" is_input="False">186307.80232368954</CO_main_route>
+                <CO2_main_route units="g" is_input="False">723752.114290022</CO2_main_route>
+                <H2O_main_route units="g" is_input="False">288800.44044411526</H2O_main_route>
+                <HC_main_route units="g" is_input="False">4404.848754938659</HC_main_route>
+                <NOx_main_route units="g" is_input="False">733.090851248603</NOx_main_route>
+                <SOx_main_route units="g" is_input="False">98.05673806509975</SOx_main_route>
+                <lead_main_route units="g" is_input="False">185.37392862783142</lead_main_route>
               </ice_1>
             </ICE>
           </he_power_train>

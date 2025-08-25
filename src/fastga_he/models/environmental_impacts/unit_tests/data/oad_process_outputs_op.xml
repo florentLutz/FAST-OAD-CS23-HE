@@ -73,12 +73,12 @@
           <he_power_train>
             <turboshaft>
               <turboshaft_1>
-                <CO units="kg" is_input="False">1.1543289396635779</CO>
-                <CO2 units="kg" is_input="False">728.3815609277175</CO2>
-                <H2O units="kg" is_input="False">285.5809796727691</H2O>
-                <HC units="kg" is_input="False">0.11543289396635778</HC>
-                <NOx units="kg" is_input="False">2.6318699824329563</NOx>
-                <SOx units="kg" is_input="False">0.18469263034617245</SOx>
+                <CO_main_route units="kg" is_input="False">1.1543289396635779</CO_main_route>
+                <CO2_main_route units="kg" is_input="False">728.3815609277175</CO2_main_route>
+                <H2O_main_route units="kg" is_input="False">285.5809796727691</H2O_main_route>
+                <HC_main_route units="kg" is_input="False">0.11543289396635778</HC_main_route>
+                <NOx_main_route units="kg" is_input="False">2.6318699824329563</NOx_main_route>
+                <SOx_main_route units="kg" is_input="False">0.18469263034617245</SOx_main_route>
               </turboshaft_1>
             </turboshaft>
           </he_power_train>
@@ -87,12 +87,12 @@
           <he_power_train>
             <turboshaft>
               <turboshaft_1>
-                <CO units="g" is_input="False">1154.3289396635778</CO>
-                <CO2 units="g" is_input="False">728381.5609277175</CO2>
-                <H2O units="g" is_input="False">285580.9796727691</H2O>
-                <HC units="g" is_input="False">115.43289396635778</HC>
-                <NOx units="g" is_input="False">2631.8699824329565</NOx>
-                <SOx units="g" is_input="False">184.69263034617245</SOx>
+                <CO_main_route units="g" is_input="False">1154.3289396635778</CO_main_route>
+                <CO2_main_route units="g" is_input="False">728381.5609277175</CO2_main_route>
+                <H2O_main_route units="g" is_input="False">285580.9796727691</H2O_main_route>
+                <HC_main_route units="g" is_input="False">115.43289396635778</HC_main_route>
+                <NOx_main_route units="g" is_input="False">2631.8699824329565</NOx_main_route>
+                <SOx_main_route units="g" is_input="False">184.69263034617245</SOx_main_route>
               </turboshaft_1>
             </turboshaft>
           </he_power_train>
@@ -135,6 +135,9 @@
         <energy units="W*h" is_input="False">0.0</energy>
         <fuel units="kg" is_input="False">246.16578793271555</fuel>
         <range units="nmi" is_input="True">200.0</range>
+        <main_route>
+          <duration units="s" is_input="False">9421.869478911876</duration>
+        </main_route>
         <climb>
           <distance units="m" is_input="False">35995.664907714294</distance>
           <duration units="s" is_input="False">627.6141946273906</duration>
@@ -221,7 +224,7 @@
           <fuel_tank_1>
             <capacity units="kg" is_input="True">486.822</capacity>
             <mass units="kg" is_input="False">4.568286332207444<!--Weight of the fuel tanks--></mass>
-            <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <CG>
               <x units="m" is_input="True">4.462616605755205</x>
             </CG>
@@ -229,7 +232,7 @@
           <fuel_tank_2>
             <capacity units="kg" is_input="True">486.822</capacity>
             <mass units="kg" is_input="False">4.568286332207444<!--Weight of the fuel tanks--></mass>
-            <fuel_consumed_mission units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">115.43289396635777<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <CG>
               <x units="m" is_input="True">4.462616605755205</x>
             </CG>
@@ -270,12 +273,12 @@
               <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <emission_index>
-              <CO units="g/kg" is_input="True">5.0</CO>
-              <CO2 units="g/kg" is_input="True">3155.0</CO2>
-              <H2O units="g/kg" is_input="True">1237.0</H2O>
-              <HC units="g/kg" is_input="True">0.5</HC>
-              <NOx units="g/kg" is_input="True">11.4</NOx>
-              <SOx units="g/kg" is_input="True">0.8</SOx>
+              <CO_main_route units="g/kg" is_input="True">5.0</CO_main_route>
+              <CO2_main_route units="g/kg" is_input="True">3155.0</CO2_main_route>
+              <H2O_main_route units="g/kg" is_input="True">1237.0</H2O_main_route>
+              <HC_main_route units="g/kg" is_input="True">0.5</HC_main_route>
+              <NOx_main_route units="g/kg" is_input="True">11.4</NOx_main_route>
+              <SOx_main_route units="g/kg" is_input="True">0.8</SOx_main_route>
             </emission_index>
             <limit>
               <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>

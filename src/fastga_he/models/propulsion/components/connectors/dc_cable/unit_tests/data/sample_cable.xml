@@ -37,9 +37,14 @@
                         </conductor>
                         <insulation>
                             <thickness units="m">0.0012</thickness>
+                            <section units="m**2">3.25e-05</section>
                         </insulation>
+                        <shield>
+                            <section units="m**2">6.3e-06</section>
+                        </shield>
                         <sheath>
                             <thickness units="mm">1.36</thickness>
+                            <section units="m**2">4.95e-05</section>
                         </sheath>
                         <contactor>
                             <mass units="kg">4.95</mass>

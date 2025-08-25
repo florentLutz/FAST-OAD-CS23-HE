@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -51,7 +51,16 @@ class ConstraintsFuelTankCapacityEnsure(om.ExplicitComponent):
             desc="Constraints on the tank capacity in kg, respected if <0",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
+            wrt="data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_total_mission",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
+            wrt="data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
+            val=-1.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         fuel_tank_id = self.options["fuel_tank_id"]
@@ -62,15 +71,3 @@ class ConstraintsFuelTankCapacityEnsure(om.ExplicitComponent):
             ]
             - inputs["data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        fuel_tank_id = self.options["fuel_tank_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":fuel_total_mission",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
-            "data:propulsion:he_power_train:fuel_tank:" + fuel_tank_id + ":capacity",
-        ] = -1.0

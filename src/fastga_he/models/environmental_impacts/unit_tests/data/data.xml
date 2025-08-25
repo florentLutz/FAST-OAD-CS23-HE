@@ -491,6 +491,7 @@
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <energy_consumed_mission units="W*h" is_input="False">12506.640872674561<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
+            <energy_consumed_main_route units="W*h" is_input="False">12506.640872674561<!--Energy drawn from the battery for the mission--></energy_consumed_main_route>
             <mass units="kg" is_input="False">75.00000000000001<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">1152.0<!--Total number of cells in the battery pack--></number_cells>
@@ -535,6 +536,7 @@
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
             <energy_consumed_mission units="W*h" is_input="False">12506.640872674567<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
+            <energy_consumed_main_route units="W*h" is_input="False">12506.640872674561<!--Energy drawn from the battery for the mission--></energy_consumed_main_route>
             <mass units="kg" is_input="False">75.00000000000001<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">1152.0<!--Total number of cells in the battery pack--></number_cells>
@@ -1090,6 +1092,9 @@
     <mission>
       <operational>
         <range units="km">250.0</range>
+        <main_route>
+          <duration units="s" is_input="False">13977.0</duration>
+        </main_route>
         <duration units="s" is_input="False">13977.0</duration>
         <energy units="kW*h" is_input="False">160.0</energy>
         <fuel units="kg" is_input="False">224.62529117214783</fuel>
@@ -1150,6 +1155,7 @@
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
         <main_route>
+          <duration units="s" is_input="False">3494.343859355023</duration>
           <climb>
             <distance units="m" is_input="False">8492.316454382377</distance>
             <duration units="s" is_input="False">214.96391679117636</duration>
@@ -1461,20 +1467,20 @@
           <he_power_train>
             <battery_pack>
               <battery_pack_1>
-                <CO units="g" is_input="False">0.0</CO>
-                <CO2 units="g" is_input="False">0.0</CO2>
-                <H2O units="g" is_input="False">0.0</H2O>
-                <HC units="g" is_input="False">0.0</HC>
-                <NOx units="g" is_input="False">0.0</NOx>
-                <SOx units="g" is_input="False">0.0</SOx>
+                <CO_main_route units="g" is_input="False">0.0</CO_main_route>
+                <CO2_main_route units="g" is_input="False">0.0</CO2_main_route>
+                <H2O_main_route units="g" is_input="False">0.0</H2O_main_route>
+                <HC_main_route units="g" is_input="False">0.0</HC_main_route>
+                <NOx_main_route units="g" is_input="False">0.0</NOx_main_route>
+                <SOx_main_route units="g" is_input="False">0.0</SOx_main_route>
               </battery_pack_1>
               <battery_pack_2>
-                <CO units="g" is_input="False">0.0</CO>
-                <CO2 units="g" is_input="False">0.0</CO2>
-                <H2O units="g" is_input="False">0.0</H2O>
-                <HC units="g" is_input="False">0.0</HC>
-                <NOx units="g" is_input="False">0.0</NOx>
-                <SOx units="g" is_input="False">0.0</SOx>
+                <CO_main_route units="g" is_input="False">0.0</CO_main_route>
+                <CO2_main_route units="g" is_input="False">0.0</CO2_main_route>
+                <H2O_main_route units="g" is_input="False">0.0</H2O_main_route>
+                <HC_main_route units="g" is_input="False">0.0</HC_main_route>
+                <NOx_main_route units="g" is_input="False">0.0</NOx_main_route>
+                <SOx_main_route units="g" is_input="False">0.0</SOx_main_route>
               </battery_pack_2>
             </battery_pack>
           </he_power_train>

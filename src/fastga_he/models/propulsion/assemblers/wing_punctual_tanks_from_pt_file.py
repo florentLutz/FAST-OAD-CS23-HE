@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -10,11 +10,13 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .constants import SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS
 
-
-@oad.RegisterSubmodel(
-    SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS,
-    "fastga_he.submodel.propulsion.wing.punctual_tanks.from_pt_file",
+PUNCTUAL_TANK_FROM_PT_FILE = "fastga_he.submodel.propulsion.wing.punctual_tanks.from_pt_file"
+oad.RegisterSubmodel.active_models[SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS] = (
+    PUNCTUAL_TANK_FROM_PT_FILE
 )
+
+
+@oad.RegisterSubmodel(SUBMODEL_POWER_TRAIN_WING_PUNCTUAL_TANKS, PUNCTUAL_TANK_FROM_PT_FILE)
 class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -95,9 +97,9 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
             )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        punctual_tanks_y_ratio = []
+        punctual_tanks_y_ratio = np.array([])
         # Is named masses but really, it is their capacity
-        punctual_tanks_masses = []
+        punctual_tanks_masses = np.array([])
 
         for punctual_tanks_name, punctual_tanks_type in zip(
             self.curated_name_list, self.curated_type_list
@@ -113,8 +115,8 @@ class PowerTrainPunctualTanksFromFile(om.ExplicitComponent):
                 + ":fuel_total_mission"
             )
 
-            punctual_tanks_y_ratio.append(float(inputs[y_ratio_name]))
-            punctual_tanks_masses.append(float(inputs[mass_name]))
+            punctual_tanks_y_ratio = np.append(punctual_tanks_y_ratio, inputs[y_ratio_name])
+            punctual_tanks_masses = np.append(punctual_tanks_masses, inputs[mass_name])
 
         outputs["data:weight:airframe:wing:punctual_tanks:y_ratio"] = punctual_tanks_y_ratio
         outputs["data:weight:airframe:wing:punctual_tanks:fuel_inside"] = punctual_tanks_masses

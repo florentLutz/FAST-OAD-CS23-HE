@@ -23,9 +23,9 @@ class LCARatioTestFlightMission(om.ExplicitComponent):
 
     def setup(self):
         if not self.options["use_operational_mission"]:
-            self.add_input("data:mission:sizing:duration", units="h", val=np.nan)
+            self.add_input("data:mission:sizing:main_route:duration", units="h", val=np.nan)
         else:
-            self.add_input("data:mission:operational:duration", units="h", val=np.nan)
+            self.add_input("data:mission:operational:main_route:duration", units="h", val=np.nan)
 
         self.add_input(
             "data:environmental_impact:line_test:duration",
@@ -44,9 +44,9 @@ class LCARatioTestFlightMission(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         if not self.options["use_operational_mission"]:
-            mission_duration = inputs["data:mission:sizing:duration"]
+            mission_duration = inputs["data:mission:sizing:main_route:duration"]
         else:
-            mission_duration = inputs["data:mission:operational:duration"]
+            mission_duration = inputs["data:mission:operational:main_route:duration"]
 
         outputs["data:environmental_impact:line_test:mission_ratio"] = (
             inputs["data:environmental_impact:line_test:duration"] / mission_duration
@@ -54,9 +54,9 @@ class LCARatioTestFlightMission(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         if not self.options["use_operational_mission"]:
-            mission_duration_name = "data:mission:sizing:duration"
+            mission_duration_name = "data:mission:sizing:main_route:duration"
         else:
-            mission_duration_name = "data:mission:operational:duration"
+            mission_duration_name = "data:mission:operational:main_route:duration"
 
         partials[
             "data:environmental_impact:line_test:mission_ratio",

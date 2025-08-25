@@ -4,7 +4,7 @@ power train module with the aircraft sizing modules from FAST-OAD-GA based on th
 """
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import copy
 import json
@@ -54,8 +54,13 @@ PROMOTION_FROM_MISSION = {
     "exterior_temperature": "degK",
 }
 # TODO: Find a more generic way to do that, as an attributes in registered_components.py maybe ?
-TYPE_TO_FUEL = {"turboshaft": "jet_fuel", "ICE": "avgas"}
-
+TYPE_TO_FUEL = {
+    "turboshaft": "jet_fuel",
+    "ICE": "avgas",
+    "high_rpm_ICE": "avgas",
+    "PEMFC_stack": "hydrogen",
+}
+ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 DEFAULT_VOLTAGE_VALUE = 737.800
 
 
@@ -631,6 +636,70 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distance_from_propulsive_load, propulsive_load_names
 
+    def get_distance_from_propulsor(self):
+        propulsor_names = []
+
+        # First and for reason that will appear clear later, we get a list of propulsor
+        for component_type_class, component_name in zip(
+            self._components_type_class, self._components_name
+        ):
+            if "propulsor" in component_type_class:
+                propulsor_names.append(component_name)
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        distance_from_propulsor = {}
+        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+
+        for component_name in self._components_name:
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_propulsors = list(set(propulsor_names) & set(connected_components))
+
+            min_distance = np.inf
+            for prop in connected_propulsors:
+                distance_to_load = connections_length_between_nodes[component_name][prop]
+                if distance_to_load < min_distance:
+                    min_distance = distance_to_load
+
+            distance_from_propulsor[component_name] = min_distance
+
+        return distance_from_propulsor
+
+    def reorder_components(self, *lists):
+        """
+        Reorders components by their distance from the nearest propeller and assigns proper
+        sequential indices. Takes multiple property lists where the first list contains component
+        names/keys, and reorders all lists according to the distance-based mapping. This improves
+        robustness by ensuring that variables are updated in a correct order for each run.
+
+        :param *lists: Variable number of property lists to be reordered. The first list should
+        contain component names/keys that correspond to keys in the distance_from_propulsor
+        dictionary. All subsequent lists will be reordered according to the same mapping.
+
+        :return: tuple: All input lists reordered according to distance from propulsor, maintaining
+        the same order and count as input lists.
+        """
+        # Sort items by value first, then by original key order to maintain consistency
+        distance_from_prop = self.get_distance_from_propulsor()
+        sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
+
+        # Create new dictionary with proper sequential indices
+        reindexed_dict = {}
+        for index, (key, original_value) in enumerate(sorted_items):
+            reindexed_dict[key] = index
+
+        # Reorder other property lists using the same mapping
+        reordered_lists = []
+        for lst in lists:
+            reordered = [None] * len(lst)
+            for old_pos, key in enumerate(lists[0]):
+                new_pos = reindexed_dict[key]
+                reordered[new_pos] = lst[old_pos]
+            reordered_lists.append(reordered)
+
+        return tuple(reordered_lists)
+
     def check_sspc_states(self, declared_state):
         self._construct_connection_graph()
         graph = self._connection_graph
@@ -690,6 +759,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_name_id,
             self._components_type,
             self._components_om_type,
+            self._components_options,
             self._components_position,
         )
 
@@ -1029,6 +1099,24 @@ class FASTGAHEPowerTrainConfigurator:
             fuel_types.append(TYPE_TO_FUEL[name_to_type[closest_source]])
 
         return fuel_tanks_names, fuel_tanks_types, fuel_types
+
+    def get_electricity_storage_list(self) -> Tuple[list, list]:
+        """
+        Returns the list of electricity storage components inside the power train.
+        """
+
+        self._get_components()
+        components_names = []
+        components_types = []
+
+        for component_id, component_name, component_type in zip(
+            self._components_id, self._components_name, self._components_type
+        ):
+            if component_id in ELECTRICITY_STORAGE_TYPES:
+                components_names.append(component_name)
+                components_types.append(component_type)
+
+        return components_names, components_types
 
     def get_residuals_watcher_elements_list(self) -> tuple:
         """
@@ -1597,11 +1685,9 @@ class FASTGAHEPowerTrainConfigurator:
         # we have all the info we need
 
         try:
-            number_of_cell_in_series = float(
-                inputs[
-                    PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
-                ]
-            )
+            number_of_cell_in_series = inputs[
+                PT_DATA_PREFIX + component_type + ":" + component_name + ":module:number_cells"
+            ].item()
 
         except RuntimeError as e:
             error_message = e.args[0]
@@ -1611,10 +1697,10 @@ class FASTGAHEPowerTrainConfigurator:
             # Sometimes the number of cells is not one deep but two deep so we try both
             try:
                 proper_abs_name = ".".join(split_abs_name[1:])
-                number_of_cell_in_series = float(inputs[proper_abs_name])
+                number_of_cell_in_series = inputs[proper_abs_name].item()
             except KeyError:
                 proper_abs_name = ".".join(split_abs_name[2:])
-                number_of_cell_in_series = float(inputs[proper_abs_name])
+                number_of_cell_in_series = inputs[proper_abs_name].item()
 
         return number_of_cell_in_series
 
@@ -1964,6 +2050,9 @@ class FASTGAHEPowerTrainConfigurator:
                             if name_to_id[component_name] == "fastga_he.pt_component.dc_sspc":
                                 if output_name not in self._components_connection_outputs:
                                     output_name = component_name + ".dc_current_in"
+
+                            if name_to_id[component_name] == "fastga_he.pt_component.dc_line":
+                                output_name = component_name + ".dc_current"
 
                             # We look at the number of the corresponding splitter input
                             index = self._components_connection_outputs.index(output_name)

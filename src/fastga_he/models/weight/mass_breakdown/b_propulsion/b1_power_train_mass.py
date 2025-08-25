@@ -1,17 +1,18 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
 
-from fastga.models.weight.mass_breakdown.constants import SUBMODEL_PROPULSION_MASS
+from fastga.models.weight.mass_breakdown.constants import SERVICE_PROPULSION_MASS
+
+POWERTRAIN_MASS_PROPULSION = "fastga_he.submodel.weight.mass.propulsion.power_train"
+oad.RegisterSubmodel.active_models[SERVICE_PROPULSION_MASS] = POWERTRAIN_MASS_PROPULSION
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_PROPULSION_MASS, "fastga_he.submodel.weight.mass.propulsion.power_train"
-)
+@oad.RegisterSubmodel(SERVICE_PROPULSION_MASS, POWERTRAIN_MASS_PROPULSION)
 class PowerTrainMass(om.ExplicitComponent):
     def initialize(self):
         # Needed even if it isn't used because the original one has that option ...

@@ -61,18 +61,13 @@ model:
 #    power_train_file_path: ./PT_fuel_propulsion.yml
 
 submodels:
-  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
-  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
   submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.ensure
-  submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
-  submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
-  submodel.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
-  submodel.weight.mass.system.power_system: null
-  submodel.geometry.nacelle.dimension: null
-  submodel.geometry.vertical_tail.position.fd: null
-  submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
-  submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
+  service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+  service.weight.mass.system.power_system: null
+  service.geometry.nacelle.dimension: null
+  service.geometry.vertical_tail.distance.fd: null
+  service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
 
 optimization: # This section is needed only if optimization process is run
   design_variables:

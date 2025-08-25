@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_SPEED_REDUCER_TORQUE,
@@ -47,7 +47,6 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Max continuous input torque of the gearbox",
         )
-
         self.add_input(
             "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":torque_out_max",
             units="N*m",
@@ -84,29 +83,37 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:speed_reducer:"
             + speed_reducer_id
             + ":torque_in_rating",
-            wrt=[
-                "data:propulsion:he_power_train:speed_reducer:"
-                + speed_reducer_id
-                + ":torque_in_max",
-                "data:propulsion:he_power_train:speed_reducer:"
-                + speed_reducer_id
-                + ":torque_in_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:speed_reducer:"
+            + speed_reducer_id
+            + ":torque_in_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:speed_reducer:"
+            + speed_reducer_id
+            + ":torque_in_rating",
+            wrt="data:propulsion:he_power_train:speed_reducer:"
+            + speed_reducer_id
+            + ":torque_in_rating",
+            val=-1.0,
         )
         self.declare_partials(
             of="constraints:propulsion:he_power_train:speed_reducer:"
             + speed_reducer_id
             + ":torque_out_rating",
-            wrt=[
-                "data:propulsion:he_power_train:speed_reducer:"
-                + speed_reducer_id
-                + ":torque_out_max",
-                "data:propulsion:he_power_train:speed_reducer:"
-                + speed_reducer_id
-                + ":torque_out_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:speed_reducer:"
+            + speed_reducer_id
+            + ":torque_out_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:speed_reducer:"
+            + speed_reducer_id
+            + ":torque_out_rating",
+            wrt="data:propulsion:he_power_train:speed_reducer:"
+            + speed_reducer_id
+            + ":torque_out_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -144,36 +151,3 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
                 + ":torque_out_rating"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        speed_reducer_id = self.options["speed_reducer_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:speed_reducer:"
-            + speed_reducer_id
-            + ":torque_in_rating",
-            "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":torque_in_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:speed_reducer:"
-            + speed_reducer_id
-            + ":torque_in_rating",
-            "data:propulsion:he_power_train:speed_reducer:"
-            + speed_reducer_id
-            + ":torque_in_rating",
-        ] = -1.0
-
-        partials[
-            "constraints:propulsion:he_power_train:speed_reducer:"
-            + speed_reducer_id
-            + ":torque_out_rating",
-            "data:propulsion:he_power_train:speed_reducer:" + speed_reducer_id + ":torque_out_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:speed_reducer:"
-            + speed_reducer_id
-            + ":torque_out_rating",
-            "data:propulsion:he_power_train:speed_reducer:"
-            + speed_reducer_id
-            + ":torque_out_rating",
-        ] = -1.0

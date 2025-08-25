@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
@@ -29,9 +29,12 @@ from ..components.perf_duty_cycle import PerformancesDutyCycle
 from ..components.perf_currents import PerformancesCurrents
 from ..components.perf_conduction_losses import PerformancesConductionLosses
 from ..components.perf_switching_losses import PerformancesSwitchingLosses
+from ..components.perf_dc_power_in import PerformancesDCPowerIn
 from ..components.perf_total_losses import PerformancesLosses
 from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_maximum import PerformancesMaximum
+from ..components.lcc_dc_dc_converter_cost import LCCDCDCConverterCost
+from ..components.lcc_dc_dc_converter_operational_cost import LCCDCDCConverterOperationalCost
 
 from ..components.cstr_enforce import (
     ConstraintsCurrentCapacitorEnforce,
@@ -42,6 +45,7 @@ from ..components.cstr_enforce import (
     ConstraintsVoltageInputEnforce,
     ConstraintsLossesEnforce,
     ConstraintsFrequencyEnforce,
+    ConstraintsPowerInputEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsCurrentCapacitorEnsure,
@@ -52,6 +56,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageInputEnsure,
     ConstraintsLossesEnsure,
     ConstraintsFrequencyEnsure,
+    ConstraintsPowerInputEnsure,
 )
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCADCDCConverterProdWeightPerFU
@@ -649,6 +654,24 @@ def test_constraints_frequency_enforce():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_power_input_enforce():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerInputEnforce(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsPowerInputEnforce(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_rating",
+        units="kW",
+    ) == pytest.approx(364.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_current_capacitor_ensure():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -797,6 +820,24 @@ def test_constraints_frequency_ensure():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency",
         units="Hz",
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_power_input_ensure():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsPowerInputEnsure(dc_dc_converter_id="dc_dc_converter_1")),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(ConstraintsPowerInputEnsure(dc_dc_converter_id="dc_dc_converter_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_rating",
+        units="kW",
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -1230,6 +1271,26 @@ def test_converter_efficiency():
     problem.check_partials(compact_print=True)
 
 
+def test_dc_power_in():
+    ivc = om.IndepVarComp()
+    voltage_in = np.linspace(710, 910, NB_POINTS_TEST)
+    ivc.add_output("dc_voltage_in", voltage_in, units="V")
+    dc_current_in = np.linspace(200.0, 400.0, NB_POINTS_TEST)
+    ivc.add_output("dc_current_in", dc_current_in, units="A")
+
+    problem = run_system(
+        PerformancesDCPowerIn(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    dc_power_in = np.array(
+        [142.00, 162.72, 184.42, 207.11, 230.79, 255.45, 281.11, 307.75, 335.38, 364.00]
+    )
+    assert problem.get_val("dc_power_in", units="kW") == pytest.approx(dc_power_in, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_maximum():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -1266,6 +1327,10 @@ def test_maximum():
         [1070.5, 1351.7, 1664.7, 2013.9, 2406.7, 2828.8, 3299.3, 3814.9, 4367.6, 4967.6]
     )
     ivc.add_output("losses_converter", val=total_losses, units="W")
+    dc_power_in = np.array(
+        [142.00, 162.72, 184.42, 207.11, 230.79, 255.45, 281.11, 307.75, 335.38, 364.00]
+    )
+    ivc.add_output("dc_power_in", val=dc_power_in, units="kW")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -1308,6 +1373,10 @@ def test_maximum():
         units="W",
     ) == pytest.approx(4967.6, rel=1e-2)
     assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_max",
+        units="kW",
+    ) == pytest.approx(364.0, rel=1e-2)
+    assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:switching_frequency_max",
         units="Hz",
     ) == pytest.approx(12000, rel=1e-2)
@@ -1332,5 +1401,49 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass_per_fu", units="kg"
     ) == pytest.approx(0.000172, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_rating",
+        364.0,
+        units="kW",
+    )
+
+    problem = run_system(
+        LCCDCDCConverterCost(dc_dc_converter_id="dc_dc_converter_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(6617.61, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
+        6617.61,
+        units="USD",
+    )
+
+    problem = run_system(
+        LCCDCDCConverterOperationalCost(dc_dc_converter_id="dc_dc_converter_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:operational_cost",
+        units="USD/yr",
+    ) == pytest.approx(441.17, rel=1e-2)
 
     problem.check_partials(compact_print=True)

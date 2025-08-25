@@ -1,10 +1,11 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
 import numpy as np
+import fastoad.api as oad
 
 from ..components.perf_voltage_out_target import PerformancesVoltageOutTargetMission
 from ..components.perf_switching_frequency import PerformancesSwitchingFrequencyMission
@@ -39,6 +40,8 @@ from ..components.sizing_rectifier_cg_x import SizingRectifierCGX
 from ..components.sizing_rectifier_cg_y import SizingRectifierCGY
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCARectifierProdWeightPerFU
+from ..components.lcc_rectifier_cost import LCCRectifierCost
+from ..components.lcc_rectifier_operational_cost import LCCRectifierOperationalCost
 
 from ..components.sizing_rectifier import SizingRectifier
 from ..components.perf_rectifier import PerformancesRectifier
@@ -60,7 +63,11 @@ from .....sub_components import SizingHeatSink, SizingInductor, SizingCapacitor
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
-from ..constants import POSSIBLE_POSITION
+from ..constants import (
+    POSSIBLE_POSITION,
+    SUBMODEL_RECTIFIER_EFFICIENCY,
+    SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE,
+)
 
 XML_FILE = "sample_rectifier.xml"
 NB_POINTS_TEST = 10
@@ -209,7 +216,7 @@ def test_switching_losses():
     ivc.add_output(
         "ac_current_rms_in_one_phase", np.linspace(200.0, 500.0, NB_POINTS_TEST), units="A"
     )
-    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST))
+    ivc.add_output("switching_frequency", np.linspace(3000.0, 12000.0, NB_POINTS_TEST), units="Hz")
 
     problem = run_system(
         PerformancesSwitchingLosses(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST),
@@ -1231,6 +1238,12 @@ def test_sizing_rectifier():
 
 
 def test_performances_rectifier():
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_EFFICIENCY] = (
+        "fastga_he.submodel.propulsion.rectifier.efficiency.from_losses"
+    )
+    oad.RegisterSubmodel.active_models[SUBMODEL_RECTIFIER_JUNCTION_TEMPERATURE] = (
+        "fastga_he.submodel.propulsion.rectifier.junction_temperature.from_losses"
+    )
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRectifier(rectifier_id="rectifier_1", number_of_points=NB_POINTS_TEST)
@@ -1270,5 +1283,45 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass_per_fu", units="kg"
     ) == pytest.approx(3.436e-05, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:current_ac_caliber",
+        units="A",
+        val=150.0,
+    )
+
+    problem = run_system(
+        LCCRectifierCost(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost", units="USD"
+    ) == pytest.approx(2292.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost",
+        units="USD",
+        val=2292.0,
+    )
+
+    problem = run_system(
+        LCCRectifierOperationalCost(rectifier_id="rectifier_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:rectifier:rectifier_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(152.8, rel=1e-2)
 
     problem.check_partials(compact_print=True)

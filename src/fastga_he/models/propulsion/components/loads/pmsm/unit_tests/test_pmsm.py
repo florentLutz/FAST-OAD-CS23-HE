@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -32,6 +32,8 @@ from ..components.perf_voltage_rms import PerformancesVoltageRMS
 from ..components.perf_voltage_peak import PerformancesVoltagePeak
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
+from ..components.lcc_pmsm_cost import LCCPMSMCost
+from ..components.lcc_pmsm_operational_cost import LCCPMSMOperationalCost
 
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
@@ -44,6 +46,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageEnsure,
 )
 from ..components.cstr_pmsm import ConstraintPMSMPowerRateMission
+from ..components.cstr_pmsm_adjust_rpm_rating import ConstraintsPMSMAdjustRPMRating
 
 from ..components.sizing_pmsm import SizingPMSM
 from ..components.perf_pmsm import PerformancesPMSM
@@ -385,6 +388,22 @@ def test_constraint_power_for_power_rate():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_rating", units="kW"
     ) == pytest.approx(70.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_adjust_rpm():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:shaft_power_rating", val=70.0, units="kW"
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsPMSMAdjustRPMRating(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:rpm_rating", units="min**-1"
+    ) == pytest.approx(5084.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -737,5 +756,42 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:mass_per_fu", units="kg"
     ) == pytest.approx(3.238e-5, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnsure(motor_id="motor_1")), __file__, XML_FILE
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:torque_rating",
+        150.0,
+        units="N*m",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost", units="USD"
+    ) == pytest.approx(8120.33, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost",
+        20815.61,
+        units="USD",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCPMSMOperationalCost(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PMSM:motor_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(1387.7, rel=1e-2)
 
     problem.check_partials(compact_print=True)

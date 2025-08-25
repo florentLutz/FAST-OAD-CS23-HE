@@ -39,9 +39,10 @@ packages = [
 # of poetry.lock file will modify docs/requirements.txt and make
 # the commit fail because "files were modified by this hook". In that case,
 # doing again the commit including changes in docs/requirements.txt will succeed.
-python = "^3.10, <3.11"
+python = "^3.10, <3.12"
 fast-oad-cs23 = { git = "https://github.com/supaero-aircraft-design/FAST-GA.git", branch = "main" }
 fast-oad-core = "^1.7.3"
+openmdao = "<3.38"
 stdatm = "^0.4.2"
 networkx = "*"
 pyvis = "*"
@@ -49,7 +50,7 @@ Pillow = "9.3"
 kaleido = "0.2.1"
 click = "8.0.4"
 debugpy = "1.5.0"
-lca-modeller = "^0.1.1b0"
+lca-modeller = { version = "^0.1.1b0", optional=true, python="3.10" }
 
 [tool.poetry.group.dev.dependencies]
 pyvplm = { git = "https://github.com/florentLutz/pyvplm.git", branch = "master" }
@@ -70,6 +71,9 @@ sphinxcontrib-bibtex = "^2.6.3"
 pre-commit = "^3.5.0"
 nbstripout = "^0.6.0"
 ruff = "0.5.4"
+
+[tool.poetry.extras]
+lca = ["lca-modeller"]
 
 [tool.poetry.plugins."fastoad.plugins"]
 "cs23_he_plugin" = "fastga_he"

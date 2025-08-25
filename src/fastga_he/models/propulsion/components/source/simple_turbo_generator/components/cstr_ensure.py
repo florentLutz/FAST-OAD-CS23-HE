@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_TURBO_GENERATOR_POWER,
@@ -49,6 +49,7 @@ class ConstraintsPowerEnsure(om.ExplicitComponent):
             val=np.nan,
             desc="Max continuous shaft power of the turbo generator",
         )
+
         self.add_output(
             "constraints:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
@@ -62,15 +63,19 @@ class ConstraintsPowerEnsure(om.ExplicitComponent):
             of="constraints:propulsion:he_power_train:turbo_generator:"
             + turbo_generator_id
             + ":power_rating",
-            wrt=[
-                "data:propulsion:he_power_train:turbo_generator:"
-                + turbo_generator_id
-                + ":shaft_power_max",
-                "data:propulsion:he_power_train:turbo_generator:"
-                + turbo_generator_id
-                + ":power_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":shaft_power_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":power_rating",
+            wrt="data:propulsion:he_power_train:turbo_generator:"
+            + turbo_generator_id
+            + ":power_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -92,23 +97,3 @@ class ConstraintsPowerEnsure(om.ExplicitComponent):
                 + ":power_rating"
             ]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        turbo_generator_id = self.options["turbo_generator_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:turbo_generator:"
-            + turbo_generator_id
-            + ":power_rating",
-            "data:propulsion:he_power_train:turbo_generator:"
-            + turbo_generator_id
-            + ":shaft_power_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:turbo_generator:"
-            + turbo_generator_id
-            + ":power_rating",
-            "data:propulsion:he_power_train:turbo_generator:"
-            + turbo_generator_id
-            + ":power_rating",
-        ] = -1.0

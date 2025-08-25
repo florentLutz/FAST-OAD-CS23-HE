@@ -113,6 +113,15 @@
                         </CG>
                     </ice_1>
                 </ICE>
+                <high_rpm_ICE>
+                    <ice_1>
+                        <sfc units="g/kW/h">280.0</sfc>
+                        <from_LE units="m">0.5</from_LE>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                    </ice_1>
+                </high_rpm_ICE>
                 <rectifier>
                     <rectifier_1>
                         <switching_frequency_max units="Hz" is_input="False">12000.0<!--Maximum value of the switching frequency of the rectifier--></switching_frequency_max>
@@ -126,6 +135,8 @@
                         <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the rectifier for the points--></voltage_out_target_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <casing>
                             <thermal_resistance units="K/W">0.01</thermal_resistance>
                         </casing>
@@ -160,7 +171,7 @@
                             <thermal_resistance units="K/W">0.321</thermal_resistance>
                         </diode>
                         <capacitor>
-                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                            <aspect_ratio>2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <inductance units="H">300.0e-6</inductance>
@@ -293,11 +304,12 @@
                         <mass units="kg">86.0</mass>
                         <losses_max units="W" is_input="False">1958.0316619368884</losses_max>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
                             <current_max units="A">380.0</current_max>
-                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                            <aspect_ratio>2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <air_gap units="mm">10</air_gap>
@@ -323,6 +335,7 @@
                         <voltage_caliber units="V">860.0</voltage_caliber>
                         <voltage_in_caliber units="V">860.0</voltage_in_caliber>
                         <voltage_in_max units="V">860.0</voltage_in_max>
+                        <dc_power_in_max units="kW">300.0</dc_power_in_max>
                         <voltage_out_max units="V">850.0</voltage_out_max>
                         <current_ripple>0.1</current_ripple>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
@@ -370,6 +383,7 @@
                         </cruise>
                         <mass units="kg">86.0</mass>
                         <voltage_out_target_mission units="V">850.0</voltage_out_target_mission>
+                        <efficiency_mission>0.988</efficiency_mission>
                         <switching_frequency_mission units="Hz">12.0e3</switching_frequency_mission>
                         <capacitor>
                             <current_caliber units="A">400.0</current_caliber>
@@ -401,6 +415,7 @@
                         <voltage_in_max units="V">860.0</voltage_in_max>
                         <voltage_out_max units="V">850.0</voltage_out_max>
                         <current_ripple>0.1</current_ripple>
+                        <dc_power_in_max units="kW">300.0</dc_power_in_max>
                         <switching_frequency units="Hz">12000.0</switching_frequency>
                         <switching_frequency_max units="Hz" is_input="True">12000.0<!--Maximum switching frequency seen during the mission in the converter--></switching_frequency_max>
                         <scaling>
@@ -605,6 +620,7 @@
                         <material>1.0</material>
                         <current_caliber units="A">800.0</current_caliber>
                         <current_max units="A">750.0</current_max>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <voltage_caliber units="V">1000.0</voltage_caliber>
                         <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -653,6 +669,8 @@
                             <CD0>0.0</CD0>
                         </cruise>
                         <mass units="kg">40.69</mass>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
                         <casing>
@@ -693,11 +711,12 @@
                         <switching_frequency units="Hz">15.0e3</switching_frequency>
                         <switching_frequency_max units="Hz" is_input="True">12000.0</switching_frequency_max>
                         <power_factor>1.0</power_factor>
+                        <ac_power_out_max units="kW">189.365</ac_power_out_max>
                         <capacitor>
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
                             <mass units="kg">3.832</mass>
-                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                            <aspect_ratio>2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <air_gap units="mm">10</air_gap>
@@ -807,6 +826,7 @@
                         <material>0.0</material>
                         <torque_rating units="N*m">817.0</torque_rating>
                         <torque_max units="N*m">817.0</torque_max>
+                        <rpm_max units="1/min">2000.0</rpm_max>
                     </propeller_1>
                 </propeller>
                 <DC_splitter>

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO.
+# Copyright (C) 2025 ISAE-SUPAERO.
 
 import logging
 
@@ -28,6 +28,11 @@ from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
     SUBMODEL_CG_VARIATION,
+)
+from fastga_he.models.performances.mission_vector.initialization.constants import (
+    SUBMODEL_RESERVE_SPEED_VECT,
+    SUBMODEL_CLIMB_SPEED_VECT,
+    SUBMODEL_DESCENT_SPEED_VECT,
 )
 from fastga_he.models.propulsion.assemblers.energy_consumption_mission_vector import (
     ENERGY_CONSUMPTION_FROM_PT_FILE,
@@ -115,6 +120,12 @@ class MissionVector(om.Group):
             "is to be used, can reduce time depending on the situation",
             allow_none=False,
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points_climb = self.options["number_of_points_climb"]
@@ -131,6 +142,10 @@ class MissionVector(om.Group):
             oad.RegisterSubmodel.get_submodel(SUBMODEL_CG_VARIATION),
             promotes=["*"],
         )
+        if self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT):
+            inputs_promote_list = ["data:*", "settings:*"]
+        else:
+            inputs_promote_list = ["data:*"]
         self.add_subsystem(
             "initialization",
             Initialize(
@@ -139,7 +154,7 @@ class MissionVector(om.Group):
                 number_of_points_descent=number_of_points_descent,
                 number_of_points_reserve=number_of_points_reserve,
             ),
-            promotes_inputs=["data:*", "settings:*"],
+            promotes_inputs=inputs_promote_list,
             promotes_outputs=[],
         )
         self.add_subsystem(
@@ -153,6 +168,7 @@ class MissionVector(om.Group):
                 power_train_file_path=self.options["power_train_file_path"],
                 use_linesearch=self.options["use_linesearch"],
                 pre_condition_pt=self.options["pre_condition_pt"],
+                sort_component=self.options["sort_component"],
             ),
             promotes=["data:*", "convergence:*", "settings:*"],
         )
@@ -880,29 +896,35 @@ class MissionVector(om.Group):
         # One point to be careful about is that the non_linear guessing is done before any model is
         # actually ran. Therefore it relies on initial values for other variables and problem
         # inputs. This should be kept in mind !
+
+        if self.is_service_active(SUBMODEL_CLIMB_SPEED_VECT):
+            cl_max_clean = inputs[
+                "initialization.initialize_climb_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item()
+        elif self.is_service_active(SUBMODEL_DESCENT_SPEED_VECT):
+            cl_max_clean = inputs[
+                "initialization.initialize_descent_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item()
+        elif self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT):
+            cl_max_clean = inputs[
+                "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
+            ].item()
+        else:
+            cl_max_clean = 1.5
+
         dummy_tas_array = self._get_initial_guess_true_airspeed(
             mass=outputs["solve_equilibrium.update_mass.mass"],
-            wing_area=float(
-                inputs[
-                    "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
-                ]
-            ),
-            cruise_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
-                ]
-            ),
-            cl_max_clean=float(
-                inputs[
-                    "initialization.initialize_reserve_speed.data:aerodynamics:wing:low_speed:CL_max_clean"
-                ]
-            ),
-            cruise_tas=float(inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"]),
-            reserve_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
-                ]
-            ),
+            wing_area=inputs[
+                "solve_equilibrium.compute_dep_equilibrium.compute_equilibrium_alpha.data:geometry:wing:area"
+            ].item(),
+            cruise_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+            ].item(),
+            cl_max_clean=cl_max_clean,
+            cruise_tas=inputs["initialization.initialize_airspeed.data:TLAR:v_cruise"].item(),
+            reserve_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+            ].item(),
         )
 
         outputs["initialization.initialize_airspeed.true_airspeed"] = dummy_tas_array
@@ -1075,16 +1097,12 @@ class MissionVector(om.Group):
         """
 
         dummy_altitude = self._get_initial_guess_altitude(
-            cruise_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
-                ]
-            ),
-            reserve_altitude=float(
-                inputs[
-                    "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
-                ]
-            ),
+            cruise_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:cruise:altitude"
+            ].item(),
+            reserve_altitude=inputs[
+                "initialization.initialize_altitude.data:mission:sizing:main_route:reserve:altitude"
+            ].item(),
         )
 
         outputs["initialization.initialize_altitude.altitude"] = dummy_altitude
@@ -1245,6 +1263,13 @@ class MissionVector(om.Group):
             outputs["solve_equilibrium.performance_per_phase.non_consumable_energy_t"] = np.zeros(
                 number_of_points_total
             )
+
+    @staticmethod
+    def is_service_active(service_id: str) -> bool:
+        try:
+            return bool(oad.RegisterSubmodel.active_models[service_id])
+        except KeyError:
+            return True
 
 
 def get_propulsive_power(

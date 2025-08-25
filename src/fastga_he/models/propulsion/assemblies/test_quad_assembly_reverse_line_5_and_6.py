@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -490,31 +490,31 @@ def test_assembly():
     ) * problem.get_val("component.dc_dc_converter_1.dc_voltage_in", units="V") == pytest.approx(
         np.array(
             [
-                298683.0,
-                301013.0,
-                303355.0,
-                305708.0,
-                308072.0,
-                310447.0,
-                312833.0,
-                315231.0,
-                317640.0,
-                320060.0,
-                322491.0,
-                324934.0,
-                327389.0,
-                329854.0,
-                332331.0,
-                334820.0,
-                337320.0,
-                339832.0,
-                342355.0,
-                344890.0,
-                347437.0,
-                349995.0,
-                352565.0,
-                355146.0,
-                357740.0,
+                303711.0,
+                306123.0,
+                308546.2,
+                310980.7,
+                313426.5,
+                315883.6,
+                318352.0,
+                320831.8,
+                323323.0,
+                325825.6,
+                328339.6,
+                330865.1,
+                333402.0,
+                335950.5,
+                338510.5,
+                341082.1,
+                343665.3,
+                346260.1,
+                348866.5,
+                351484.6,
+                354114.4,
+                356755.9,
+                359409.2,
+                362074.2,
+                364751.0,
             ]
         ),
         abs=1,

@@ -1,14 +1,12 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
-
 import fastoad.api as oad
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
-
 from fastga_he.models.performances.op_mission_vector.op_mission_vector import (
     OperationalMissionVector,
 )
@@ -226,8 +224,8 @@ class ComputePayloadRangeInner(om.ExplicitComponent):
 
                 inner_fuel_array[idx] = fuel_that_mission
                 inner_energy_array[idx] = energy_that_mission
-                inner_emissions_array[idx] = emission_that_mission
-                inner_emission_factor_array[idx] = emission_factor_that_mission
+                inner_emissions_array[idx] = emission_that_mission.item()
+                inner_emission_factor_array[idx] = emission_factor_that_mission.item()
 
             else:
                 inner_fuel_array[idx] = INVALID_COMPUTATION_RESULT

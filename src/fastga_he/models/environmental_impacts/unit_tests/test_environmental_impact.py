@@ -7,16 +7,24 @@ import pathlib
 
 import pytest
 
-from lca_modeller.gui.plots import process_tree
+import fastoad.api as oad
+
+try:
+    from lca_modeller.gui.plots import process_tree
+
+    IMPORTS_LCA = True
+except ImportError:
+    IMPORTS_LCA = False
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 from ..lca import LCA
 from ..lca_equivalent_year_of_life import LCAEquivalentYearOfLife
 from ..lca_equivalent_flight_per_year import LCAEquivalentFlightsPerYear
-from ..lca_aircraft_per_fu import LCAAircraftPerFU
+from ..lca_max_airframe_hours import LCAEquivalentMaxAirframeHours
+from ..lca_aircraft_per_fu import LCAAircraftPerFU, LCAAircraftPerFUFlightHours
 from ..lca_delivery_mission_ratio import LCARatioDeliveryFlightMission
 from ..lca_distribution_cargo import LCADistributionCargoMassDistancePerFU
-from ..lca_electricty_per_fu import LCAElectricityPerFU
+from ..lca_electricty_per_fu import LCAElectricityPerFU, LCAElectricityPerFUFromUsePhaseValue
 from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
@@ -25,7 +33,7 @@ from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from ..lca_kerosene_per_fu import LCAKerosenePerFU
 from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
 from ..lca_line_test_mission_ratio import LCARatioTestFlightMission
-from ..lca_use_flight_per_fu import LCAUseFlightPerFU
+from ..lca_use_flight_per_fu import LCAUseFlightPerFU, LCAUseFlightPerFUFlightHours
 from ..lca_vtp_weight_per_fu import LCAVTPWeightPerFU
 from ..lca_wing_weight_per_fu import LCAWingWeightPerFU
 from ..simple_energy_impact import SimpleEnergyImpacts
@@ -171,8 +179,8 @@ def test_aircraft_equivalent_year_of_life():
 def test_aircraft_equivalent_flight_per_year():
     inputs_list = [
         "data:TLAR:max_airframe_hours",
-        "data:mission:sizing:duration",
-        "data:mission:operational:duration",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
     ]
 
     ivc = get_indep_var_comp(
@@ -197,6 +205,44 @@ def test_aircraft_equivalent_flight_per_year():
     )
 
     assert problem.get_val("data:TLAR:flight_per_year") == pytest.approx(72.94, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_equivalent_max_airframe_hours():
+    inputs_list = [
+        "data:TLAR:aircraft_lifespan",
+        "data:TLAR:flight_per_year",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAEquivalentMaxAirframeHours(),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:max_airframe_hours", units="h") == pytest.approx(
+        5314.34, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(
+        LCAEquivalentMaxAirframeHours(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:TLAR:max_airframe_hours", units="h") == pytest.approx(
+        21256.68, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -241,6 +287,44 @@ def test_aircraft_per_fu_pax_km():
     problem.check_partials(compact_print=True)
 
 
+def test_aircraft_per_fu_flight_hours():
+    inputs_list = [
+        "data:TLAR:aircraft_lifespan",
+        "data:TLAR:flight_per_year",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAAircraftPerFUFlightHours(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
+        0.00018817, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(
+        LCAAircraftPerFUFlightHours(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
+        4.70440185e-05, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_use_flight_per_fu_pax_km():
     inputs_list = [
         "data:TLAR:range",
@@ -280,6 +364,43 @@ def test_use_flight_per_fu_pax_km():
     problem.check_partials(compact_print=True)
 
 
+def test_use_flight_per_fu_flight_hours():
+    inputs_list = [
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
+    ]
+
+    ivc = get_indep_var_comp(
+        inputs_list,
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAUseFlightPerFUFlightHours(),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
+        1.03023633, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAUseFlightPerFUFlightHours(use_operational_mission=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:environmental_impact:flight_per_fu") == pytest.approx(
+        0.257566, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_wing_weight_per_fu():
     inputs_list = [
         "data:environmental_impact:aircraft_per_fu",
@@ -300,6 +421,14 @@ def test_wing_weight_per_fu():
 
     assert problem.get_val("data:weight:airframe:wing:mass_per_fu", units="kg") == pytest.approx(
         9.07426865e-05, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    # Check it still works with the option enabled
+    problem = run_system(
+        LCAWingWeightPerFU(airframe_material="composite"),
+        ivc,
     )
 
     problem.check_partials(compact_print=True)
@@ -329,6 +458,14 @@ def test_fuselage_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+    # Check that it still works with the option enabled
+    problem = run_system(
+        LCAFuselageWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_htp_weight_per_fu():
     inputs_list = [
@@ -354,6 +491,14 @@ def test_htp_weight_per_fu():
 
     problem.check_partials(compact_print=True)
 
+    # Check that it still works with the option enabled
+    problem = run_system(
+        LCAHTPWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_vtp_weight_per_fu():
     inputs_list = [
@@ -376,6 +521,14 @@ def test_vtp_weight_per_fu():
     assert problem.get_val(
         "data:weight:airframe:vertical_tail:mass_per_fu", units="kg"
     ) == pytest.approx(3.45032812e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    # Check that it still works with the option enabled
+    problem = run_system(
+        LCAVTPWeightPerFU(airframe_material="composite"),
+        ivc,
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -458,8 +611,8 @@ def test_empty_aircraft_weight_per_fu():
 
 def test_line_tests_sizing_ratio():
     inputs_list = [
-        "data:mission:sizing:duration",
-        "data:mission:operational:duration",
+        "data:mission:sizing:main_route:duration",
+        "data:mission:operational:main_route:duration",
         "data:environmental_impact:line_test:duration",
     ]
 
@@ -564,8 +717,8 @@ def test_electricity_per_fu_velis():
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
         "data:environmental_impact:delivery:mission_ratio",
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_mission",
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_mission",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route",
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:energy_consumed_main_route",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "data.xml")
@@ -582,6 +735,37 @@ def test_electricity_per_fu_velis():
     assert problem.get_val(
         "data:LCA:operation:he_power_train:electricity:energy_per_fu", units="W*h"
     ) == pytest.approx(233.23046823, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu", units="W*h"
+    ) == pytest.approx(0.25769592, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:electricity:energy_per_fu", units="W*h"
+    ) == pytest.approx(1.25066409, rel=1e-5)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_electricity_per_fu_velis_from_use_phase_value():
+    inputs_list = [
+        "data:environmental_impact:flight_per_fu",
+        "data:environmental_impact:aircraft_per_fu",
+        "data:environmental_impact:line_test:mission_ratio",
+        "data:environmental_impact:delivery:mission_ratio",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "data.xml")
+    ivc.add_output(
+        "data:LCA:operation:he_power_train:electricity:energy_per_fu", val=233.23046823, units="W*h"
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAElectricityPerFUFromUsePhaseValue(
+            batteries_name_list=["battery_pack_1", "battery_pack_2"],
+            batteries_type_list=["battery_pack", "battery_pack"],
+        ),
+        ivc,
+    )
     assert problem.get_val(
         "data:LCA:manufacturing:he_power_train:electricity:energy_per_fu", units="W*h"
     ) == pytest.approx(0.25769592, rel=1e-5)
@@ -627,10 +811,10 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:propeller_1"
-    ) == pytest.approx(0.0046814, rel=1e-4)
+    ) == pytest.approx(0.0027558696608642936, rel=1e-4)
     assert problem.get_val(
         "data:environmental_impact:total_natural_resources:production:propeller_1"
-    ) == pytest.approx(0.000264937, rel=1e-4)
+    ) == pytest.approx(0.0001303969218601463, rel=1e-4)
 
     assert problem.get_val("data:environmental_impact:aircraft_per_fu") == pytest.approx(
         1.70306211e-06, rel=1e-2
@@ -666,7 +850,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.1038672180654924, rel=1e-5)
+    ) == pytest.approx(0.07661772257755672, rel=1e-5)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:battery_pack_1"
@@ -674,7 +858,7 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:sum"
-    ) == pytest.approx(0.01535945984419287, abs=1e-5)
+    ) == pytest.approx(0.015348882271229677, abs=1e-5)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:manufacturing:sum"
@@ -688,13 +872,174 @@ def test_lca_pipistrel():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:distribution:sum"
-    ) == pytest.approx(0.000270645, rel=1e-4)
+    ) == pytest.approx(0.00027046063751871727, rel=1e-4)
 
     problem.check_partials(compact_print=True)
 
     lca_model = problem.model.component.lca_core.model
 
-    process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
+    if IMPORTS_LCA:
+        process_tree(lca_model, outfile=os.path.join(RESULTS_FOLDER_PATH, "lca_pipistrel.html"))
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_pipistrel_lca_comparison_paper():
+    # The analysis we try to replicate here is not exactly the pipistrel we size and test earlier.
+    # Rather it looks to be an earlier version of the pipistrel whose empty weight is 370kg as
+    # opposed to the 428kg of the Valis Electro. We will, however, try to replicate those result
+    # by adjusting the content of the LCA conf file. We'll make the assumption of a similar
+    # powertrain (but different values).
+
+    component = LCA(
+        power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
+        component_level_breakdown=True,
+        airframe_material="composite",
+        delivery_method="train",
+        normalization=True,
+        weighting=True,
+        aircraft_lifespan_in_hours=True,
+        ecoinvent_version="3.9.1",
+        functional_unit="Flight hours",
+        write_lca_conf=False,
+        lca_conf_file_path=DATA_FOLDER_PATH / "pipistrel_alpha_electro.yml",
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(component),
+        __file__,
+        "pipistrel_alpha.xml",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        component,
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_alpha_standard.xml"
+    problem.write_outputs()
+
+    problem.set_val("data:TLAR:max_airframe_hours", units="h", val=500.0)
+    problem.run_model()
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "pipistrel_alpha_short.xml"
+    problem.write_outputs()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_extract_results_from_pipistrel_lca_comparison_standard():
+    alpha_standard_datafile = oad.DataFile(RESULTS_FOLDER_PATH / "pipistrel_alpha_standard.xml")
+
+    airframe_impact = (
+        alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:flight_controls"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:fuselage"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:horizontal_tail"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:landing_gear"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:vertical_tail"
+        ].value[0]
+        + alpha_standard_datafile["data:environmental_impact:climate_change:production:wing"].value[
+            0
+        ]
+    )
+
+    print("Impact of airframe: ", airframe_impact)
+
+    battery_impact = (
+        alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_1"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_2"
+        ].value[0]
+    )
+
+    print("Impact of battery: ", battery_impact)
+
+    electricity_impact = (
+        alpha_standard_datafile[
+            "data:environmental_impact:climate_change:operation:electricity_for_mission"
+        ].value[0]
+        + alpha_standard_datafile[
+            "data:environmental_impact:climate_change:production:assembly"
+        ].value[0]
+    )
+
+    print("Impact of electricity: ", electricity_impact)
+
+    impact_others = (
+        alpha_standard_datafile["data:environmental_impact:climate_change:sum"].value[0]
+        - airframe_impact
+        - battery_impact
+        - electricity_impact
+    )
+
+    print("Impact of others: ", impact_others)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_extract_results_from_pipistrel_lca_comparison_short():
+    alpha_short_datafile = oad.DataFile(RESULTS_FOLDER_PATH / "pipistrel_alpha_short.xml")
+
+    airframe_impact = (
+        alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:flight_controls"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:fuselage"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:horizontal_tail"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:landing_gear"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:vertical_tail"
+        ].value[0]
+        + alpha_short_datafile["data:environmental_impact:climate_change:production:wing"].value[0]
+    )
+
+    print("Impact of airframe: ", airframe_impact)
+
+    battery_impact = (
+        alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_1"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:battery_pack_2"
+        ].value[0]
+    )
+
+    print("Impact of battery: ", battery_impact)
+
+    electricity_impact = (
+        alpha_short_datafile[
+            "data:environmental_impact:climate_change:operation:electricity_for_mission"
+        ].value[0]
+        + alpha_short_datafile[
+            "data:environmental_impact:climate_change:production:assembly"
+        ].value[0]
+    )
+
+    print("Impact of electricity: ", electricity_impact)
+
+    impact_others = (
+        alpha_short_datafile["data:environmental_impact:climate_change:sum"].value[0]
+        - airframe_impact
+        - battery_impact
+        - electricity_impact
+    )
+
+    print("Impact of others: ", impact_others)
 
 
 def test_kerosene_per_fu_tbm900():
@@ -703,8 +1048,8 @@ def test_kerosene_per_fu_tbm900():
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:line_test:mission_ratio",
         "data:environmental_impact:delivery:mission_ratio",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_main_route",
     ]
 
     ivc = get_indep_var_comp(inputs_list, __file__, DATA_FOLDER_PATH / "tbm900.xml")
@@ -761,11 +1106,11 @@ def test_lca_tbm900():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00204463, rel=1e-5)
+    ) == pytest.approx(0.00018677255609807612, rel=1e-5)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:turboshaft_1"
-    ) == pytest.approx(0.00032111, rel=1e-3)
+    ) == pytest.approx(6.3786e-5, rel=1e-3)
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:operation:turboshaft_1"
@@ -787,7 +1132,7 @@ def test_lca_tbm900():
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
         problem.get_val("data:environmental_impact:line_test:duration", units="h")
-        / problem.get_val("data:mission:sizing:duration", units="h")
+        / problem.get_val("data:mission:sizing:main_route:duration", units="h")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),
@@ -851,7 +1196,7 @@ def test_lca_tbm900_ef():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00201339, rel=1e-5)
+    ) == pytest.approx(0.000182843387198129, rel=1e-5)
     assert problem.get_val(
         "data:environmental_impact:climate_change_normalized:production:sum"
     ) == pytest.approx(
@@ -861,12 +1206,12 @@ def test_lca_tbm900_ef():
     )
     assert problem.get_val(
         "data:environmental_impact:climate_change_normalized:production:sum"
-    ) == pytest.approx(2.666748329464666e-07, rel=1e-5)
+    ) == pytest.approx(2.4217667178560132e-08, rel=1e-5)
     assert problem.get_val(
         "data:environmental_impact:climate_change_weighted:sum"
-    ) == pytest.approx(7.664468375891523e-06, rel=1e-5)
+    ) == pytest.approx(7.613406896780802e-06, rel=1e-5)
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        1.757843076088849e-05, rel=1e-5
+        1.746314961195058e-05, rel=1e-5
     )
 
 
@@ -906,7 +1251,7 @@ def test_lca_tbm900_ef_inputs_as_hours():
 
     assert problem.get_val(
         "data:environmental_impact:climate_change:production:sum"
-    ) == pytest.approx(0.00201339, rel=1e-5)
+    ) == pytest.approx(0.000182843387198129, rel=1e-5)
 
 
 def test_gasoline_per_fu_sr22():
@@ -914,8 +1259,8 @@ def test_gasoline_per_fu_sr22():
         "data:environmental_impact:flight_per_fu",
         "data:environmental_impact:aircraft_per_fu",
         "data:environmental_impact:delivery:mission_ratio",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_mission",
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_mission",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route",
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_2:fuel_consumed_main_route",
         "data:environmental_impact:line_test:mission_ratio",
     ]
 
@@ -991,7 +1336,7 @@ def test_lca_cirrus_sr22():
         "data:environmental_impact:climate_change:manufacturing:sum"
     ) == pytest.approx(
         problem.get_val("data:environmental_impact:line_test:duration", units="h")
-        / problem.get_val("data:mission:sizing:duration", units="h")
+        / problem.get_val("data:mission:sizing:main_route:duration", units="h")
         * problem.get_val("data:environmental_impact:climate_change:operation:sum")
         * problem.get_val("data:environmental_impact:aircraft_per_fu")
         / problem.get_val("data:environmental_impact:flight_per_fu"),

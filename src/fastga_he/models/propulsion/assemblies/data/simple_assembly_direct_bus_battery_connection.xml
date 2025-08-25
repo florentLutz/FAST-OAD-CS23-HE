@@ -331,6 +331,7 @@
                         <material>1.0</material>
                         <current_caliber units="A">800.0</current_caliber>
                         <current_max units="A">750.0</current_max>
+                        <cable_temperature_mission units="degK">288.15</cable_temperature_mission>
                         <voltage_caliber units="V">1000.0</voltage_caliber>
                         <voltage_max units="V">800.0</voltage_max>
                         <number_cables>1.0</number_cables>
@@ -368,6 +369,8 @@
                 </DC_cable_harness>
                 <inverter>
                     <inverter_1>
+                        <efficiency_mission>0.942</efficiency_mission>
+                        <junction_temperature_mission units="degK">305.0</junction_temperature_mission>
                         <CG>
                             <x units="m">2.69</x>
                             <y_ratio>0.34</y_ratio>
@@ -423,7 +426,7 @@
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
                             <mass units="kg">3.832</mass>
-                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                            <aspect_ratio>2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <inductance units="H">11.5e-6</inductance>

@@ -1,0 +1,19 @@
+title: Payload range drawing for thermal version of the aircraft
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/payload_range_thermal_in.xml
+output_file: ../results/payload_range_thermal_out.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+  outer_payload_range:
+    id: fastga_he.payload_range.outer
+    power_train_file_path: ./fuel_propulsion.yml
+
+submodels:
+  submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.ensure

@@ -1,12 +1,13 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_INVERTER_CURRENT,
     SUBMODEL_CONSTRAINTS_INVERTER_VOLTAGE,
     SUBMODEL_CONSTRAINTS_INVERTER_LOSSES,
     SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY,
+    SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT,
 )
 
 import openmdao.api as om
@@ -56,6 +57,13 @@ class ConstraintsInverter(om.Group):
             name="constraints_frequency_inverter",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_INVERTER_FREQUENCY, options=option_inverter_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="constraints_power_output_inverter",
+            subsys=oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_CONSTRAINTS_INVERTER_POWER_OUT, options=option_inverter_id
             ),
             promotes=["*"],
         )

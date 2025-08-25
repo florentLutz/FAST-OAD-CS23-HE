@@ -6,12 +6,12 @@
                 <he_power_train>
                   <battery_pack>
                     <battery_pack_1>
-                      <CO units="g" is_input="False">0.0</CO>
-                      <CO2 units="g" is_input="False">0.0</CO2>
-                      <H2O units="g" is_input="False">0.0</H2O>
-                      <HC units="g" is_input="False">0.0</HC>
-                      <NOx units="g" is_input="False">0.0</NOx>
-                      <SOx units="g" is_input="False">0.0</SOx>
+                      <CO_main_route units="g" is_input="False">0.0</CO_main_route>
+                      <CO2_main_route units="g" is_input="False">0.0</CO2_main_route>
+                      <H2O_main_route units="g" is_input="False">0.0</H2O_main_route>
+                      <HC_main_route units="g" is_input="False">0.0</HC_main_route>
+                      <NOx_main_route units="g" is_input="False">0.0</NOx_main_route>
+                      <SOx_main_route units="g" is_input="False">0.0</SOx_main_route>
                     </battery_pack_1>
                   </battery_pack>
                 </he_power_train>
@@ -88,8 +88,8 @@
                             <width units="m">1.14</width>
                         </dimension>
                         <cell_temperature_mission units="degK">288.15</cell_temperature_mission>
-                        <SOC_min>40.0</SOC_min>
-                        <min_safe_SOC>20.0</min_safe_SOC>
+                        <SOC_min units="percent">40.0</SOC_min>
+                        <min_safe_SOC units="percent">20.0</min_safe_SOC>
                         <number_modules>200.0</number_modules>
                         <number_cells>8000.0</number_cells>
                         <volume units="L">1550.0</volume>

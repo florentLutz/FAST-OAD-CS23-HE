@@ -212,22 +212,22 @@
           <he_power_train>
             <battery_pack>
               <battery_pack_1>
-                <CO units="g" is_input="False">0.0</CO>
-                <CO2 units="g" is_input="False">0.0</CO2>
-                <H2O units="g" is_input="False">0.0</H2O>
-                <HC units="g" is_input="False">0.0</HC>
-                <NOx units="g" is_input="False">0.0</NOx>
-                <SOx units="g" is_input="False">0.0</SOx>
+                <CO_main_route units="g" is_input="False">0.0</CO_main_route>
+                <CO2_main_route units="g" is_input="False">0.0</CO2_main_route>
+                <H2O_main_route units="g" is_input="False">0.0</H2O_main_route>
+                <HC_main_route units="g" is_input="False">0.0</HC_main_route>
+                <NOx_main_route units="g" is_input="False">0.0</NOx_main_route>
+                <SOx_main_route units="g" is_input="False">0.0</SOx_main_route>
               </battery_pack_1>
             </battery_pack>
             <turboshaft>
               <turboshaft_1>
-                <CO units="g" is_input="False">976.0607202237438</CO>
-                <CO2 units="g" is_input="False">615894.3144611823</CO2>
-                <H2O units="g" is_input="False">241477.42218335427</H2O>
-                <HC units="g" is_input="False">97.6060720223744</HC>
-                <NOx units="g" is_input="False">2225.418442110136</NOx>
-                <SOx units="g" is_input="False">156.16971523579903</SOx>
+                <CO_main_route units="g" is_input="False">976.0607202237438</CO_main_route>
+                <CO2_main_route units="g" is_input="False">615894.3144611823</CO2_main_route>
+                <H2O_main_route units="g" is_input="False">241477.42218335427</H2O_main_route>
+                <HC_main_route units="g" is_input="False">97.6060720223744</HC_main_route>
+                <NOx_main_route units="g" is_input="False">2225.418442110136</NOx_main_route>
+                <SOx_main_route units="g" is_input="False">156.16971523579903</SOx_main_route>
               </turboshaft_1>
             </turboshaft>
           </he_power_train>
@@ -329,6 +329,7 @@
           </sizing_factor>
         </cs23>
         <main_route>
+          <duration units="s" is_input="False">9421.869478911876</duration>
           <climb>
             <distance units="m" is_input="False">35995.664907714294</distance>
             <duration units="s" is_input="False">627.6141946273906</duration>
@@ -619,7 +620,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <energy_consumed_mission units="W*h" is_input="False">24803.07179946501<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
+            <energy_consumed_main_route units="W*h" is_input="False">24803.07179946501<!--Energy drawn from the battery for the mission--></energy_consumed_main_route>
             <mass units="kg" is_input="False">234.54877054860393<!--Mass of the battery pack--></mass>
             <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <number_cells is_input="False">4002.965684029507<!--Total number of cells in the battery pack--></number_cells>
@@ -679,7 +680,7 @@
         <fuel_tank>
           <fuel_tank_1>
             <capacity units="kg" is_input="True">486.822<!--Capacity of the tank in terms of weight--></capacity>
-            <fuel_consumed_mission units="kg" is_input="False">97.60607202237438<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">97.60607202237438<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <fuel_total_mission units="kg" is_input="False">98.58214296819602<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
             <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <mass units="kg" is_input="False">0.9760608214672875<!--Weight of the fuel tanks--></mass>
@@ -711,7 +712,7 @@
           </fuel_tank_1>
           <fuel_tank_2>
             <capacity units="kg" is_input="True">486.822<!--Capacity of the tank in terms of weight--></capacity>
-            <fuel_consumed_mission units="kg" is_input="False">97.60607202237438<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_consumed_main_route units="kg" is_input="False">97.60607202237438<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
             <fuel_total_mission units="kg" is_input="False">98.58214296819602<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
             <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <mass units="kg" is_input="False">0.9760608214672875<!--Weight of the fuel tanks--></mass>

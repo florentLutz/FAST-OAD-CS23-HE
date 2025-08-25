@@ -1,0 +1,132 @@
+<FASTOAD_model>
+  <data>
+    <environmental_impact>
+      <acidification_terrestrial>
+        <normalization_factor is_input="True">41.0</normalization_factor>
+        <sum is_input="False">6.38e-2<!--kg SO2-Eq for the whole process--></sum>
+      </acidification_terrestrial>
+      <acidification_terrestrial_normalized>
+        <sum is_input="False">0.0015560975609756097</sum>
+      </acidification_terrestrial_normalized>
+      <climate_change>
+        <normalization_factor is_input="True">7990.0</normalization_factor>
+        <sum is_input="False">2.17e1<!--kg CO2-Eq for the whole process--></sum>
+      </climate_change>
+      <climate_change_normalized>
+        <sum is_input="False">0.002715894868585732</sum>
+      </climate_change_normalized>
+      <ecotoxicity_freshwater>
+        <normalization_factor is_input="True">25.2</normalization_factor>
+        <sum is_input="False">3.10e-1<!--kg 1,4-DCB-Eq for the whole process--></sum>
+      </ecotoxicity_freshwater>
+      <ecotoxicity_freshwater_normalized>
+        <sum is_input="False">0.012301587301587301</sum>
+      </ecotoxicity_freshwater_normalized>
+      <ecotoxicity_marine>
+        <normalization_factor is_input="True">43.4</normalization_factor>
+        <sum is_input="False">4.34e-1<!--kg 1,4-DCB-Eq for the whole process--></sum>
+      </ecotoxicity_marine>
+      <ecotoxicity_marine_normalized>
+        <sum is_input="False">0.01</sum>
+      </ecotoxicity_marine_normalized>
+      <ecotoxicity_terrestrial>
+        <normalization_factor is_input="True">15200.0</normalization_factor>
+        <sum is_input="False">2.59e2<!--kg 1,4-DCB-Eq for the whole process--></sum>
+      </ecotoxicity_terrestrial>
+      <ecotoxicity_terrestrial_normalized>
+        <sum is_input="False">0.017039473684210528</sum>
+      </ecotoxicity_terrestrial_normalized>
+      <energy_resources_non-renewablefossil>
+        <normalization_factor is_input="True">569.9</normalization_factor>
+        <sum is_input="False">8.89<!--kg oil-Eq for the whole process--></sum>
+      </energy_resources_non-renewablefossil>
+      <energy_resources_non-renewablefossil_normalized>
+        <sum is_input="False">0.015599227934725393</sum>
+      </energy_resources_non-renewablefossil_normalized>
+      <eutrophication_freshwater>
+        <normalization_factor is_input="True">0.65</normalization_factor>
+        <sum is_input="False">1.81e-3<!--kg P-Eq for the whole process--></sum>
+      </eutrophication_freshwater>
+      <eutrophication_freshwater_normalized>
+        <sum is_input="False">0.0027846153846153845</sum>
+      </eutrophication_freshwater_normalized>
+      <eutrophication_marine>
+        <normalization_factor is_input="True">4.62</normalization_factor>
+        <sum is_input="False">2.38e-4<!--kg N-Eq for the whole process--></sum>
+      </eutrophication_marine>
+      <eutrophication_marine_normalized>
+        <sum is_input="False">5.151515151515152e-5</sum>
+      </eutrophication_marine_normalized>
+      <human_toxicity_carcinogenic>
+        <normalization_factor is_input="True">10.3</normalization_factor>
+        <sum is_input="False">4.63e-1<!--kg 1,4-DCB-Eq for the whole process--></sum>
+      </human_toxicity_carcinogenic>
+      <human_toxicity_carcinogenic_normalized>
+        <sum is_input="False">0.04495145631067961</sum>
+      </human_toxicity_carcinogenic_normalized>
+      <human_toxicity_non-carcinogenic>
+        <normalization_factor is_input="True">31300.0</normalization_factor>
+        <sum is_input="False">1.25e2<!--kg 1,4-DCB-Eq for the whole process--></sum>
+      </human_toxicity_non-carcinogenic>
+      <human_toxicity_non-carcinogenic_normalized>
+        <sum is_input="False">0.003993610223642172</sum>
+      </human_toxicity_non-carcinogenic_normalized>
+      <ionising_radiation>
+        <normalization_factor is_input="True">480.0</normalization_factor>
+        <sum is_input="False">5.22e-1<!--kBq Co-60-Eq for the whole process--></sum>
+      </ionising_radiation>
+      <ionising_radiation_normalized>
+        <sum is_input="False">0.0010875000000000001</sum>
+      </ionising_radiation_normalized>
+      <land_use>
+        <normalization_factor is_input="True">6170.0</normalization_factor>
+        <sum is_input="False">1.18e-1<!--m2*a crop-Eq for the whole process--></sum>
+      </land_use>
+      <land_use_normalized>
+        <sum is_input="False">1.912479740680713e-05</sum>
+      </land_use_normalized>
+      <material_resources_metals_minerals>
+        <normalization_factor is_input="True">120000.0</normalization_factor>
+        <sum is_input="False">2.18e-2<!--kg Cu-Eq for the whole process--></sum>
+      </material_resources_metals_minerals>
+      <material_resources_metals_minerals_normalized>
+        <sum is_input="False">1.8166666666666667e-07</sum>
+      </material_resources_metals_minerals_normalized>
+      <ozone_depletion>
+        <normalization_factor is_input="True">0.06</normalization_factor>
+        <sum is_input="False">8.45e-06<!--kg CFC-11-Eq for the whole process--></sum>
+      </ozone_depletion>
+      <ozone_depletion_normalized>
+        <sum is_input="False">0.00141</sum>
+      </ozone_depletion_normalized>
+      <particulate_matter_formation>
+        <normalization_factor is_input="True">25.6</normalization_factor>
+        <sum is_input="False">2.36e-2<!--kg PM2.5-Eq for the whole process--></sum>
+      </particulate_matter_formation>
+      <particulate_matter_formation_normalized>
+        <sum is_input="False">0.000921875</sum>
+      </particulate_matter_formation_normalized>
+      <photochemical_oxidant_formation_human_health>
+        <normalization_factor is_input="True">20.6</normalization_factor>
+        <sum is_input="False">5.38e-2<!--kg NOx-Eq for the whole process--></sum>
+      </photochemical_oxidant_formation_human_health>
+      <photochemical_oxidant_formation_human_health_normalized>
+        <sum is_input="False">0.002611650485436893</sum>
+      </photochemical_oxidant_formation_human_health_normalized>
+      <photochemical_oxidant_formation_terrestrial_ecosystems>
+        <normalization_factor is_input="True">17.7</normalization_factor>
+        <sum is_input="False">5.94e-2<!--kg NOx-Eq for the whole process--></sum>
+      </photochemical_oxidant_formation_terrestrial_ecosystems>
+      <photochemical_oxidant_formation_terrestrial_ecosystems_normalized>
+        <sum is_input="False">0.003355932203389831</sum>
+      </photochemical_oxidant_formation_terrestrial_ecosystems_normalized>
+      <water_use>
+        <normalization_factor is_input="True">267.0</normalization_factor>
+        <sum is_input="False">3.42e-2<!--m3 for the whole process--></sum>
+      </water_use>
+      <water_use_normalized>
+        <sum is_input="False">0.00012808988764044944</sum>
+      </water_use_normalized>
+    </environmental_impact>
+  </data>
+</FASTOAD_model>

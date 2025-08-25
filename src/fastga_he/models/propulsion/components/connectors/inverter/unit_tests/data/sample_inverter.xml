@@ -1,7 +1,7 @@
 <FASTOAD_model>
     <data>
         <TLAR>
-            <aircraft_lifespan>25.0</aircraft_lifespan>
+            <aircraft_lifespan units="yr">25.0</aircraft_lifespan>
         </TLAR>
         <environmental_impact>
             <aircraft_per_fu>1e-6</aircraft_per_fu>
@@ -31,6 +31,8 @@
                     <inverter_1>
                         <heat_sink_temperature_mission units="degK">288.15</heat_sink_temperature_mission>
                         <switching_frequency_mission units="Hz">12000.0</switching_frequency_mission>
+                        <ac_power_out_max units="kW">200.0</ac_power_out_max>
+                        <ac_power_out_rating unit="kW">200.0</ac_power_out_rating>
                         <casing>
                             <mass units="kg">1.0446</mass>
                             <heat_capacity units="J/degK">208.92</heat_capacity>
@@ -74,7 +76,7 @@
                             <capacity units="F">2.02e-3</capacity>
                             <current_caliber units="A">199.18</current_caliber>
                             <mass units="kg">3.832</mass>
-                            <aspect_ratio units="kg">2.0</aspect_ratio>
+                            <aspect_ratio>2.0</aspect_ratio>
                         </capacitor>
                         <inductor>
                             <air_gap units="mm">10</air_gap>

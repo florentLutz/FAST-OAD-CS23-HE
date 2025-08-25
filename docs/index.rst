@@ -12,6 +12,27 @@ For a description of models used in FAST-OAD-CS23-HE, you may look at
     Models in FAST-OAD-CS23-HE are still a work in progress.
 
 
+Powertrain builder
+==================
+
+The powertrain builder is a novel feature exclusive to FAST-OAD-CS23-HE, enabling flexible configuration of aircraft
+powertrain architectures. It offers high flexibility in the definition of the propulsive system. To active this module, simply set the ``power_train_configuration_file path`` option to
+the model(s) with either or both of these two IDs, ``fastga_he.power_train.sizing`` or ``fastga_he.performances.mission_vector``
+, in the `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_.
+
+.. code:: yaml
+
+  power_train_sizing:
+    id: fastga_he.power_train.sizing
+    power_train_file_path: ./<powertrain_config>.yml
+  performances:
+    id: fastga_he.performances.mission_vector
+    ⋮
+    power_train_file_path: ./<powertrain_config>.yml
+    sort_component: true
+
+For further details of powertrain builder, you may look at :ref:`powertrain-builder-index`.
+
 
 Contents
 ========
@@ -21,6 +42,8 @@ Contents
 
    License <license>
    Authors <authors>
+   Powertrain Builder <pt_builder>
+   Citation <citation>
    Changelog <changelog>
    API Reference <api/modules>
 

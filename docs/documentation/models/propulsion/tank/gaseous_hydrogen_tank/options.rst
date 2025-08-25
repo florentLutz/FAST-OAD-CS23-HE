@@ -9,10 +9,10 @@ Tank position option
 ********************
 The gaseous hydrogen tank model has four possible installation position:
 
-| "wing_pod" : Tank installed under the wing with user specified position.
-| "underbelly" : Tank installed under and outside the fuselage.
-| "in_the_cabin" : Tank installed at the middle section inside the fuselage.
-| "in_the_back" : Tank installed at the rear section inside the fuselage.
+| ``wing_pod`` : Tank installed under the wing with user specified position.
+| ``underbelly`` : Tank installed under and outside the fuselage.
+| ``in_the_cabin`` : Tank installed at the middle section inside the fuselage.
+| ``in_the_back`` : Tank installed at the rear section inside the fuselage.
 
 ********************
 Multiple tank option

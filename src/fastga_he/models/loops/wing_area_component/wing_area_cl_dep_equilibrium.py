@@ -2,7 +2,7 @@
 Computation of wing area update and constraints based on the equilibrium of the aircraft
 """
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -63,11 +63,23 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             default="",
             desc="Path to the file containing the description of the power",
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="produce_simplified_pt_file",
+            default=False,
+            desc="Boolean to split powertrain architecture into smaller branches",
+            allow_none=False,
+        )
 
     def setup(self):
         if self.options["power_train_file_path"]:
             self.configurator.load(self.options["power_train_file_path"])
-            # self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
+            
             self.simplified_file_path = self.options["power_train_file_path"]
             self.control_parameter_list = self.configurator.get_control_parameter_list()
 
@@ -78,7 +90,10 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
 
         input_zip = zip_equilibrium_input(
-            self.options["propulsion_id"], self.simplified_file_path, self.control_parameter_list
+            self.options["propulsion_id"],
+            self.simplified_file_path,
+            self.options["sort_component"],
+            self.control_parameter_list,
         )[0]
         for (
             var_names,
@@ -149,6 +164,7 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
             self.options["propulsion_id"],
             self.simplified_file_path,
             self.control_parameter_list,
+            self.options["sort_component"],
         )
 
         # Again with the damned optimizer. It can sometimes happen that he simply does not care
@@ -235,7 +251,9 @@ class _IDThrustRate(om.ExplicitComponent):
         partials["thrust_rate", "thrust_rate_t_econ"] = d_t_r_econ_d_t_r
 
 
-def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_list) -> float:
+def compute_wing_area(
+    inputs, propulsion_id, pt_file_path, control_parameter_list, sort_component
+) -> float:
     # To deactivate all the logging messages from matplotlib
     logging.getLogger("matplotlib.font_manager").disabled = True
     logging.getLogger("matplotlib.pyplot").disabled = True
@@ -253,8 +271,8 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
 
     # To compute the maximum AOA possible, should be done in its own component but oh well
     delta_cl_flaps = inputs["data:aerodynamics:flaps:landing:CL"]
-    cl_alpha = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
-    cl_0_wing = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
+    cl_alpha = inputs["data:aerodynamics:wing:low_speed:CL_alpha"]
+    cl_0_wing = inputs["data:aerodynamics:wing:low_speed:CL0_clean"]
     max_cl = inputs["data:aerodynamics:aircraft:landing:CL_max"]
 
     alpha_max = (max_cl - delta_cl_flaps - cl_0_wing) / cl_alpha * 180.0 / np.pi
@@ -273,7 +291,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
 
     try:
         input_zip, inputs_name_for_promotion = zip_equilibrium_input(
-            propulsion_id, pt_file_path, control_parameter_list
+            propulsion_id, pt_file_path, sort_component, control_parameter_list
         )
 
         ivc = om.IndepVarComp()
@@ -290,7 +308,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
         ivc.add_output(name="mass", val=np.array([mlw]), units="kg")
         # x_cg should be evaluated at the worst case scenario so either max aft or max fwd
         ivc.add_output(name="x_cg", val=np.array([cg_max_fwd]), units="m")
-        ivc.add_output(name="gamma", val=np.array([0.0]), units=None)
+        ivc.add_output(name="gamma", val=np.array([0.0]), units="deg")
         ivc.add_output(name="altitude", val=np.array([0.0]), units="m")
         ivc.add_output(name="density", val=Atmosphere(np.array([0.0])).density, units="kg/m**3")
         ivc.add_output(name="exterior_temperature", val=Atmosphere(0.0).temperature, units="degK")
@@ -299,7 +317,7 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
         ivc.add_output(name="true_airspeed", val=np.array([stall_speed]), units="m/s")
         ivc.add_output(name="engine_setting", val=np.array([EngineSetting.TAKEOFF]))
 
-        problem = om.Problem()
+        problem = om.Problem(reports=False)
         model = problem.model
 
         model.add_subsystem("ivc", ivc, promotes_outputs=["*"])
@@ -310,6 +328,8 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
             "propulsion_id": propulsion_id,
             "power_train_file_path": pt_file_path,
             "flaps_position": "landing",
+            "sort_component": sort_component,
+            "low_speed_aero": True,
         }
         model.add_subsystem(
             "equilibrium",
@@ -318,6 +338,14 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
             promotes_outputs=["*"],
         )
         model.add_subsystem("thrust_rate_id", _IDThrustRate(), promotes=["*"])
+
+        if pt_file_path:
+            configurator = FASTGAHEPowerTrainConfigurator()
+            configurator.load(pt_file_path)
+            slip_ins, perf_outs = configurator.get_performances_to_slipstream_element_lists()
+
+            for perf_out, slip_in in zip(perf_outs, slip_ins):
+                model.connect("power_train_performances." + perf_out, slip_in)
 
         # SLSQP uses gradient ?
         problem.driver = om.ScipyOptimizeDriver()
@@ -379,14 +407,15 @@ def compute_wing_area(inputs, propulsion_id, pt_file_path, control_parameter_lis
     return wing_area_approach
 
 
-def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=None):
+def zip_equilibrium_input(propulsion_id, pt_file_path, sort_component, control_parameter_list=None):
     """
     Returns a list of the variables needed for the computation of the equilibrium. Based on
     the submodel currently registered and the propulsion_id required.
 
     :param propulsion_id: ID of propulsion wrapped to be used for computation of equilibrium.
     :param pt_file_path: Path to the powertrain file.
-    :param control_parameter_list: a list of control parameters to rename
+    :param sort_component: Option for powertrain component sorting.
+    :param control_parameter_list: a list of control parameters to rename.
     :return inputs_zip: a zip containing a list of name, a list of units, a list of shapes,
     a list of shape_by_conn boolean and a list of copy_shape str.
     """
@@ -397,6 +426,8 @@ def zip_equilibrium_input(propulsion_id, pt_file_path, control_parameter_list=No
         "propulsion_id": propulsion_id,
         "power_train_file_path": pt_file_path,
         "flaps_position": "landing",
+        "sort_component": sort_component,
+        "low_speed_aero": True,
     }
     new_component.add_subsystem(
         "system",

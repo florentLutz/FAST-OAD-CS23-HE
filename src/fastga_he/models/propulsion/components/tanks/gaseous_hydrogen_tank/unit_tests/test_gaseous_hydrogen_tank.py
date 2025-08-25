@@ -29,8 +29,11 @@ from ..components.sizing_tank_length_fuselage_contraints import (
 from ..components.cstr_enforce import ConstraintsGaseousHydrogenTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsGaseousHydrogenTankCapacityEnsure
 
-from ..components.perf_fuel_mission_consumed import PerformancesGaseousHydrogenConsumedMission
+from ..components.perf_fuel_consumed_mission import PerformancesGaseousHydrogenConsumedMission
+from ..components.perf_fuel_consumed_main_route import PerformancesGaseousHydrogenConsumedMainRoute
 from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
+
+from ..components.lcc_gaseous_hydrogen_tank_cost import LCCGaseousHydrogenTankCost
 
 from ..components.sizing_tank import SizingGaseousHydrogenTank
 from ..components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
@@ -658,6 +661,29 @@ def test_hydrogen_gas_consumed_mission():
     problem.check_partials(compact_print=True)
 
 
+def test_hydrogen_gas_consumed_main_route():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("fuel_consumed_t", val=np.ones(NB_POINTS_TEST), units="kg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesGaseousHydrogenConsumedMainRoute(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1",
+            number_of_points=NB_POINTS_TEST,
+            number_of_points_reserve=2,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_consumed_main_route",
+        units="kg",
+    ) == pytest.approx(8.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_hydrogen_gas_remaining_mission():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
@@ -667,7 +693,7 @@ def test_hydrogen_gas_remaining_mission():
         units="kg",
         val=140.0,
     )
-    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0))
+    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0), units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -686,7 +712,7 @@ def test_hydrogen_gas_remaining_mission():
 def test_performances_gaseous_hydrogen_tank():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
 
     problem = run_system(
         PerformancesGaseousHydrogenTank(
@@ -704,3 +730,25 @@ def test_performances_gaseous_hydrogen_tank():
         units="kg",
     ) == pytest.approx(279.62, rel=1e-2)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
+        val=140.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCGaseousHydrogenTankCost(gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:purchase_cost",
+        units="USD",
+    ) == pytest.approx(893.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)

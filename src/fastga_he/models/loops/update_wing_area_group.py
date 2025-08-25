@@ -1,6 +1,6 @@
 """Computation of wing area and wing area related constraints."""
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -49,6 +49,18 @@ class UpdateWingAreaGroupDEP(om.Group):
             default="",
             desc="Path to the file containing the description of the power",
         )
+        self.options.declare(
+            name="sort_component",
+            default=False,
+            desc="Boolean to sort the component with proper order for adding subsystem operations",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="produce_simplified_pt_file",
+            default=False,
+            desc="Boolean to split powertrain architecture into smaller branches",
+            allow_none=False,
+        )
 
     def setup(self):
         """Adding the update groups, the selection of the maximum and the constraints."""
@@ -63,6 +75,8 @@ class UpdateWingAreaGroupDEP(om.Group):
             UpdateWingAreaLiftDEPEquilibrium(
                 propulsion_id=self.options["propulsion_id"],
                 power_train_file_path=self.options["power_train_file_path"],
+                sort_component=self.options["sort_component"],
+                produce_simplified_pt_file=self.options["produce_simplified_pt_file"],
             ),
             promotes_inputs=["*"],
             promotes_outputs=[],

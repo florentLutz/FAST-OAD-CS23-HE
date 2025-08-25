@@ -4,7 +4,8 @@
 
 import openmdao.api as om
 
-from ..components.perf_fuel_mission_consumed import PerformancesGaseousHydrogenConsumedMission
+from ..components.perf_fuel_consumed_mission import PerformancesGaseousHydrogenConsumedMission
+from ..components.perf_fuel_consumed_main_route import PerformancesGaseousHydrogenConsumedMainRoute
 from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
 
 
@@ -22,6 +23,12 @@ class PerformancesGaseousHydrogenTank(om.Group):
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
+            "number_of_points_reserve",
+            default=None,  # By default, for retro-compatibility, we want it disabled
+            desc="number of equilibrium to be treated in reserve",
+            types=int,
+        )
+        self.options.declare(
             name="gaseous_hydrogen_tank_id",
             default=None,
             desc="Identifier of the gaseous hydrogen tank",
@@ -31,6 +38,7 @@ class PerformancesGaseousHydrogenTank(om.Group):
     def setup(self):
         number_of_points = self.options["number_of_points"]
         gaseous_hydrogen_tank_id = self.options["gaseous_hydrogen_tank_id"]
+        number_of_points_reserve = self.options["number_of_points_reserve"]
 
         self.add_subsystem(
             "hydrogen_gas_consumed_mission",
@@ -39,6 +47,17 @@ class PerformancesGaseousHydrogenTank(om.Group):
             ),
             promotes=["*"],
         )
+
+        if self.options["number_of_points_reserve"]:
+            self.add_subsystem(
+                "hydrogen_gas_consumed_main_route",
+                PerformancesGaseousHydrogenConsumedMainRoute(
+                    number_of_points=number_of_points,
+                    gaseous_hydrogen_tank_id=gaseous_hydrogen_tank_id,
+                    number_of_points_reserve=number_of_points_reserve,
+                ),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             "hydrogen_gas_remaining_mission",

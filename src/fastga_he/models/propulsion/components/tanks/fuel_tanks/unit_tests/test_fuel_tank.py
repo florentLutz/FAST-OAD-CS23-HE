@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 
 import openmdao.api as om
@@ -21,10 +21,13 @@ from ..components.sizing_tank_prep_for_loads import SizingFuelTankPreparationFor
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAFuelTankProdWeightPerFU
 
+from ..components.lcc_fuel_tank_cost import LCCFuelTankCost
+
 from ..components.cstr_enforce import ConstraintsFuelTankCapacityEnforce
 from ..components.cstr_ensure import ConstraintsFuelTankCapacityEnsure
 
-from ..components.perf_fuel_mission_consumed import PerformancesFuelConsumedMission
+from ..components.perf_fuel_consumed_mission import PerformancesFuelConsumedMission
+from ..components.perf_fuel_consumed_main_route import PerformancesFuelConsumedMainRoute
 from ..components.perf_fuel_remaining import PerformancesFuelRemainingMission
 
 from ..components.sizing_tank import SizingFuelTank
@@ -377,7 +380,7 @@ def test_constraints_ensure_tank_capacity():
 def test_fuel_consumed_mission():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -394,6 +397,26 @@ def test_fuel_consumed_mission():
     problem.check_partials(compact_print=True)
 
 
+def test_fuel_consumed_main_route():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesFuelConsumedMainRoute(
+            fuel_tank_id="fuel_tank_1", number_of_points=NB_POINTS_TEST, number_of_points_reserve=2
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:fuel_consumed_main_route", units="kg"
+    ) == pytest.approx(202.39, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_fuel_remaining_mission():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -405,7 +428,7 @@ def test_fuel_remaining_mission():
         __file__,
         XML_FILE,
     )
-    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0))
+    ivc.add_output("fuel_consumed_t", val=np.full(NB_POINTS_TEST, 14.0), units="kg")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -424,7 +447,7 @@ def test_fuel_remaining_mission():
 def test_performances_fuel_tank():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST))
+    ivc.add_output("fuel_consumed_t", val=np.linspace(13.37, 42.0, NB_POINTS_TEST), units="kg")
 
     problem = run_system(
         PerformancesFuelTank(fuel_tank_id="fuel_tank_1", number_of_points=NB_POINTS_TEST),
@@ -455,5 +478,19 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:mass_per_fu", units="kg"
     ) == pytest.approx(1.4e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:volume", units="L", val=393.0
+    )
+
+    problem = run_system(LCCFuelTankCost(fuel_tank_id="fuel_tank_1"), ivc)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:purchase_cost", units="USD"
+    ) == pytest.approx(4194.31, rel=1e-2)
 
     problem.check_partials(compact_print=True)

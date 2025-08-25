@@ -18,9 +18,23 @@ class SizingDuration(om.ExplicitComponent):
         self.add_input("data:mission:sizing:taxi_in:duration", val=np.nan, units="s")
 
         self.add_output("data:mission:sizing:duration", val=3600.0, units="s")
+        self.add_output("data:mission:sizing:main_route:duration", val=3600.0, units="s")
 
+    def setup_partials(self):
         self.declare_partials(
             of="data:mission:sizing:duration", wrt="*:duration", method="exact", val=1.0
+        )
+        self.declare_partials(
+            of="data:mission:sizing:main_route:duration",
+            wrt=[
+                "data:mission:sizing:main_route:climb:duration",
+                "data:mission:sizing:main_route:cruise:duration",
+                "data:mission:sizing:main_route:descent:duration",
+                "data:mission:sizing:taxi_out:duration",
+                "data:mission:sizing:taxi_in:duration",
+            ],
+            method="exact",
+            val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -29,6 +43,14 @@ class SizingDuration(om.ExplicitComponent):
             + inputs["data:mission:sizing:main_route:cruise:duration"]
             + inputs["data:mission:sizing:main_route:descent:duration"]
             + inputs["data:mission:sizing:main_route:reserve:duration"]
+            + inputs["data:mission:sizing:taxi_out:duration"]
+            + inputs["data:mission:sizing:taxi_in:duration"]
+        )
+
+        outputs["data:mission:sizing:main_route:duration"] = (
+            inputs["data:mission:sizing:main_route:climb:duration"]
+            + inputs["data:mission:sizing:main_route:cruise:duration"]
+            + inputs["data:mission:sizing:main_route:descent:duration"]
             + inputs["data:mission:sizing:taxi_out:duration"]
             + inputs["data:mission:sizing:taxi_in:duration"]
         )

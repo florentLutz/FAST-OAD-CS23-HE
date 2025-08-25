@@ -2,10 +2,21 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
-import brightway2 as bw
-from dotenv import load_dotenv
+try:
+    import brightway2 as bw
+    from dotenv import load_dotenv
+
+    IMPORTS_LCA = True
+except ImportError:
+    IMPORTS_LCA = False
 
 if __name__ == "__main__":
+    if not IMPORTS_LCA:
+        raise ImportError(
+            "This feature is only usable with the lca optional dependency group.\n"
+            "Install it with poetry install --extras lca"
+        )
+
     bw.projects.set_current("MethodListing")
     load_dotenv()
 

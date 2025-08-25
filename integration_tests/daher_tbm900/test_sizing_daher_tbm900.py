@@ -23,13 +23,14 @@ from fastga_he.gui.power_train_weight_breakdown import power_train_mass_breakdow
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
+WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
 
 
 @pytest.fixture(scope="module")
 def cleanup():
     """Empties results folder to avoid any conflicts."""
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
-    rmtree("D:/tmp", ignore_errors=True)
+    rmtree(WORKDIR_FOLDER_PATH, ignore_errors=True)
 
 
 def test_sizing_tbm900():
@@ -200,12 +201,12 @@ def test_ecopulse_new_wing():
     )
     assert problem.get_val(
         "data:environmental_impact:sizing:emissions", units="kg"
-    ) == pytest.approx(1218.0, abs=1.0)
+    ) == pytest.approx(1216.67, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        4.492, abs=1e-2
+        4.426, abs=1e-2
     )
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2473.5, rel=1e-3
+        2468.0, rel=1e-3
     )
 
 

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 from ..constants import (
     SUBMODEL_CONSTRAINTS_GEARBOX_TORQUE,
@@ -56,11 +56,13 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
 
         self.declare_partials(
             of="constraints:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-            wrt=[
-                "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max",
-                "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-            ],
-            method="exact",
+            wrt="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
+            wrt="data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -72,15 +74,3 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max"]
             - inputs["data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        gearbox_id = self.options["gearbox_id"]
-
-        partials[
-            "constraints:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-            "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_max",
-        ] = 1.0
-        partials[
-            "constraints:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-            "data:propulsion:he_power_train:gearbox:" + gearbox_id + ":torque_out_rating",
-        ] = -1.0
