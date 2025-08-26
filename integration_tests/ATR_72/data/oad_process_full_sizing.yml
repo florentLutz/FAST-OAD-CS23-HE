@@ -62,14 +62,14 @@ model:
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_72\data\fuel_propulsion.yml
+      power_train_file_path: ../data/fuel_propulsion.yml
       out_file: ../results/fuel_propulsion.csv
       use_linesearch: False
       pre_condition_pt: False
       use_apply_nonlinear: False
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_72\data\fuel_propulsion.yml
+      power_train_file_path: ../data/fuel_propulsion.yml
 #  engine_size:
 #    id: rta.loop.engine_size
 

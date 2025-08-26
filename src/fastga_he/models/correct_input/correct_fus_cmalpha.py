@@ -55,7 +55,7 @@ class ComputeCmAlphaFuselage(FigureDigitization):
         x0_25 = x_wing - 0.25 * l0_wing - x0_wing + 0.25 * l1_wing
         ratio_x025 = x0_25 / fus_length
 
-        k_fus = self.k_fus(ratio_x025)
+        k_fus = 0.01 - 0.063 * ratio_x025 + 0.211 * ratio_x025**2.0
 
         cm_alpha_fus = -k_fus * width_max**2 * fus_length / (l0_wing * wing_area) * 180.0 / np.pi
 

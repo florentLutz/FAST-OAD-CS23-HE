@@ -15,7 +15,6 @@ Computation of wing area update and constraints based on the equilibrium of the 
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-import os
 
 import numpy as np
 import openmdao.api as om

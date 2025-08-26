@@ -35,36 +35,45 @@ class Cd0Wing(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-        if self.options["low_speed_aero"]:
-            self.add_input("data:aerodynamics:wing:low_speed:reynolds", val=np.nan)
-            self.add_input(
-                "data:aerodynamics:aircraft:low_speed:CL",
-                shape_by_conn=True,
-                val=np.nan,
-            )
-            self.add_input("data:aerodynamics:aircraft:takeoff:mach", val=np.nan)
-            self.add_output(
-                "data:aerodynamics:wing:low_speed:CD0",
-                copy_shape="data:aerodynamics:aircraft:low_speed:CL",
-            )
-        else:
-            self.add_input("data:aerodynamics:wing:cruise:reynolds", val=np.nan)
-            self.add_input("data:aerodynamics:aircraft:cruise:CL", shape_by_conn=True, val=np.nan)
-            self.add_input("data:TLAR:cruise_mach", val=np.nan)
-            self.add_output("data:aerodynamics:wing:cruise:CD0")
-            # copy_shape="data:aerodynamics:aircraft:cruise:CL",
-            # )
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+        mach_variable = (
+            "data:aerodynamics:aircraft:takeoff:mach"
+            if self.options["low_speed_aero"]
+            else "data:TLAR:cruise_mach"
+        )
 
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:thickness_ratio", val=np.nan)
         self.add_input("data:geometry:wing:wetted_area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
         self.add_input("data:geometry:wing:sweep_25", val=np.nan, units="deg")
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":reynolds", val=np.nan)
+        self.add_input(
+            "data:aerodynamics:aircraft:" + ls_tag + ":CL",
+            shape_by_conn=True,
+            val=np.nan,
+        )
+        self.add_input(mach_variable, val=np.nan)
+
+        if self.options["low_speed_aero"]:
+            self.add_output(
+                "data:aerodynamics:wing:low_speed:CD0",
+                copy_shape="data:aerodynamics:aircraft:low_speed:CL",
+            )
+        else:
+            self.add_output("data:aerodynamics:wing:cruise:CD0")
 
     def setup_partials(self):
         self.declare_partials("*", "*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
+        mach_variable = (
+            "data:aerodynamics:aircraft:takeoff:mach"
+            if self.options["low_speed_aero"]
+            else "data:TLAR:cruise_mach"
+        )
+
         wing_geometry = LiftingSurfaceGeometry(
             thickness_ratio=inputs["data:geometry:wing:thickness_ratio"],
             MAC_length=inputs["data:geometry:wing:MAC:length"],
@@ -73,15 +82,11 @@ class Cd0Wing(om.ExplicitComponent):
             cambered=True,
             interaction_coeff=0.04,
         )
+
         wing_area = inputs["data:geometry:wing:area"]
-        if self.options["low_speed_aero"]:
-            cl = inputs["data:aerodynamics:aircraft:low_speed:CL"]
-            mach = inputs["data:aerodynamics:aircraft:takeoff:mach"]
-            reynolds = inputs["data:aerodynamics:wing:low_speed:reynolds"]
-        else:
-            cl = inputs["data:aerodynamics:aircraft:cruise:CL"]
-            mach = inputs["data:TLAR:cruise_mach"]
-            reynolds = inputs["data:aerodynamics:wing:cruise:reynolds"]
+        cl = inputs["data:aerodynamics:aircraft:" + ls_tag + ":CL"]
+        mach = inputs[mach_variable]
+        reynolds = inputs["data:aerodynamics:wing:" + ls_tag + ":reynolds"]
 
         cd0_wing = compute_cd0_lifting_surface(wing_geometry, mach, reynolds, wing_area, cl)
 

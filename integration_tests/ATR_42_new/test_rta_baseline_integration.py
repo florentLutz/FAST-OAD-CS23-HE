@@ -36,14 +36,6 @@ def cleanup():
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
 
 
-def test_pipistrel_network_viewer():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
-    network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
-
-    if not os.path.exists(network_file_path):
-        power_train_network_viewer(pt_file_path, network_file_path)
-
-
 def residuals_analyzer(recorder_path, solver):
     cr = om.CaseReader(recorder_path)
 
@@ -61,6 +53,14 @@ def residuals_analyzer(recorder_path, solver):
     sorted_variable_dict = dict(sorted(variable_dict.items(), key=lambda x: x[1], reverse=True))
 
     return sorted_variable_dict
+
+
+def test_network_viewer():
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
+    network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
+
+    if not os.path.exists(network_file_path):
+        power_train_network_viewer(pt_file_path, network_file_path)
 
 
 def test_non_regression_mission(cleanup):

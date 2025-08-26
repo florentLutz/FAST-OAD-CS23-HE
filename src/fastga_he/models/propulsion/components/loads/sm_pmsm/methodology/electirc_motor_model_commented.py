@@ -1,6 +1,8 @@
 import numpy as np
 
-""" PMSM model from HASTECS project, Sarah Touhami"""
+""" 
+PMSM model from HASTECS project :cite:`touhami:2020`
+"""
 if __name__ == "__main__":
     # Physical constants
     mu_0 = 4 * np.pi * 1e-7  # Magnetic permeability [H/m]
