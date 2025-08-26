@@ -53,6 +53,9 @@ from ..components.perf_sm_pmsm import PerformancesSMPMSM
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 
+from ..components.lcc_sm_pmsm_cost import LCCSMPMSMCost
+from ..components.lcc_sm_pmsm_operational_cost import LCCSMPMSMOperationalCost
+
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
     ConstraintsRPMEnforce,
@@ -1122,5 +1125,36 @@ def test_weight_per_fu():
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mass_per_fu", units="kg"
     ) == pytest.approx(4.512e-4, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cost():
+    ivc = get_indep_var_comp(list_inputs(LCCSMPMSMCost(pmsm_id="motor_1")), __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCSMPMSMCost(pmsm_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:purchase_cost", units="USD"
+    ) == pytest.approx(24521.15, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_cost():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:purchase_cost",
+        24521.15,
+        units="USD",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(LCCSMPMSMOperationalCost(pmsm_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:operational_cost", units="USD/yr"
+    ) == pytest.approx(1634.74, rel=1e-2)
 
     problem.check_partials(compact_print=True)

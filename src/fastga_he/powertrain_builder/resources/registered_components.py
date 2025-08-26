@@ -190,11 +190,11 @@ PMSM = {
     ETA: 0.95,
     CTRL_PARAM: [],
 }
-PMSM_new = {
+SM_PMSM = {
     ID: "fastga_he.pt_component.sm_pmsm",
-    CN: "ACPMSM",
+    CN: "SMPMSM",
     CN_ID: "pmsm_id",
-    CT: "ACPMSM",
+    CT: "SM_PMSM",
     ATT: None,
     PT: ["settings:*"],
     SPT: [],
@@ -1176,7 +1176,7 @@ PEMFC_STACK = {
 KNOWN_COMPONENTS = [
     PROPELLER,
     PMSM,
-    PMSM_new,
+    SM_PMSM,
     INVERTER,
     DC_BUS,
     DC_LINE,
