@@ -1,6 +1,6 @@
 """Computation of CL and CD for whole aircraft."""
 #  This file is part of FAST-OAD_CS25
-#  Copyright (C) 2024 ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025 ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -38,10 +38,7 @@ class ComputePolar(om.ExplicitComponent):
                 shape_by_conn=True,
                 val=np.nan,
             )
-            self.add_input("data:aerodynamics:aircraft:low_speed:CD0", val=np.nan)  # ,
-            # shape_by_conn=True,
-            # val=np.nan,
-            # )
+            self.add_input("data:aerodynamics:aircraft:low_speed:CD0", val=np.nan)
             self.add_input(
                 "data:aerodynamics:aircraft:low_speed:CD:trim",
                 shape_by_conn=True,
@@ -168,17 +165,17 @@ class ComputePolar(om.ExplicitComponent):
         else:
             outputs["data:aerodynamics:aircraft:cruise:CD"] = cd
 
-            Cl_opt, Cd_opt = get_optimum_ClCd(np.array([cd, cl]))[0:2]
+            Cl_opt, Cd_opt = get_optimal_ClCd(np.array([cd, cl]))[0:2]
             outputs["data:aerodynamics:aircraft:cruise:L_D_max"] = Cl_opt / Cd_opt
             outputs["data:aerodynamics:aircraft:cruise:optimal_CL"] = Cl_opt
             outputs["data:aerodynamics:aircraft:cruise:optimal_CD"] = Cd_opt
 
 
-def get_optimum_ClCd(ClCd):
+def get_optimal_ClCd(ClCd):
     lift_drag_ratio = ClCd[1, :] / ClCd[0, :]
     optimum_index = np.argmax(lift_drag_ratio)
 
-    optimum_Cz = ClCd[1][optimum_index]
-    optimum_Cd = ClCd[0][optimum_index]
+    optimal_Cz = ClCd[1][optimum_index]
+    optimal_Cd = ClCd[0][optimum_index]
 
-    return optimum_Cz, optimum_Cd
+    return optimal_Cz, optimal_Cd
