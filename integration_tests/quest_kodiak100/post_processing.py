@@ -144,7 +144,7 @@ if __name__ == "__main__":
         xanchor="right",
         yanchor="bottom",
         align="right",
-        showarrow=False
+        showarrow=False,
     )
 
     fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
