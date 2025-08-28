@@ -17,7 +17,6 @@ import fastoad.api as oad
 
 from fastga.models.aerodynamics.components.figure_digitization import FigureDigitization
 from fastoad.module_management.constants import ModelDomain
-from fastga.models.aerodynamics.constants import SUBMODEL_CM_ALPHA_FUSELAGE
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.cm_alpha_fus2", domain=ModelDomain.GEOMETRY)

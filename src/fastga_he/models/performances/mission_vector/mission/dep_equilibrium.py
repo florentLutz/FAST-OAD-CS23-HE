@@ -15,7 +15,6 @@ from ..constants import (
 from ..mission.energy_consumption_preparation import PrepareForEnergyConsumption
 from .equilibrium_alpha import EquilibriumAlpha
 from .equilibrium_thrust import EquilibriumThrust
-from .equilibrium_delta_m import EquilibriumDeltaM
 
 from ..constants import SUBMODEL_DELTA_M
 
@@ -117,6 +116,7 @@ class DEPEquilibrium(om.Group):
             options_delta_m = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
+                "low_speed_aero": self.options["low_speed_aero"],
             }
 
             self.add_subsystem(
@@ -180,6 +180,7 @@ class DEPEquilibrium(om.Group):
             options_delta_m = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
+                "low_speed_aero": self.options["low_speed_aero"],
             }
 
             self.add_subsystem(

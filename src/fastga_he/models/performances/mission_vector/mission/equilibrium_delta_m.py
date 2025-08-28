@@ -255,6 +255,12 @@ class EquilibriumDeltaMTanh(om.ExplicitComponent):
             default="cruise",
             desc="position of the flaps for the computation of the equilibrium",
         )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -283,7 +289,7 @@ class EquilibriumDeltaMTanh(om.ExplicitComponent):
 
 
 @oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.setvalue")
-class EquilibriumDeltaMTanh(om.ExplicitComponent):
+class EquilibriumDeltaMSetValue(om.ExplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 
     def initialize(self):
@@ -294,6 +300,12 @@ class EquilibriumDeltaMTanh(om.ExplicitComponent):
             "flaps_position",
             default="cruise",
             desc="position of the flaps for the computation of the equilibrium",
+        )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
         )
 
     def setup(self):

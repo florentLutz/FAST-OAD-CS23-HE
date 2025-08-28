@@ -8,7 +8,6 @@ import numpy as np
 import fastoad.api as oad
 
 from fastoad.module_management.constants import ModelDomain
-from stdatm import AtmosphereWithPartials
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.aero_approx2", domain=ModelDomain.GEOMETRY)

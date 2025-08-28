@@ -7,8 +7,6 @@ import numpy as np
 
 import fastoad.api as oad
 
-from fastoad.module_management.constants import ModelDomain
-
 
 @oad.RegisterOpenMDAOSystem("fastga_he.correct_input.correct_name2")
 class HeNameFromRTAname2(om.ExplicitComponent):
