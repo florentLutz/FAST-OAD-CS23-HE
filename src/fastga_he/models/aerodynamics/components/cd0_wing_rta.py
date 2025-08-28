@@ -128,8 +128,9 @@ class _FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
             (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * length
         )
 
-        partials["plate_drag_friction_coeff", "data:geometry:wing:MAC:length"] = -10.095959 / (
-            (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * reynolds
+        partials["plate_drag_friction_coeff", "data:aerodynamics:wing:" + ls_tag + ":reynolds"] = (
+            -10.095959
+            / ((1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * reynolds)
         )
 
 
@@ -216,14 +217,10 @@ class _CamberContribution(om.ExplicitComponent):
             0.0,
         )
 
-        partials["camber_contribution", "data:geometry:wing:sweep_25"] = np.where(
-            camber_contribution == contribution_median,
-            (
-                17.154 * cl_sw_frac**3.0 * np.tan(sw_25)
-                - 7.396 * cl_sw_frac**2.0 * np.tan(sw_25)
-                + 0.764 * cl_sw_frac * np.tan(sw_25)
-            ),
-            0.0,
+        partials["camber_contribution", "data:geometry:wing:sweep_25"] = np.median(
+            17.154 * cl_sw_frac**3.0 * np.tan(sw_25)
+            - 7.396 * cl_sw_frac**2.0 * np.tan(sw_25)
+            + 0.764 * cl_sw_frac * np.tan(sw_25)
         )
 
 
@@ -243,7 +240,7 @@ class _SweepCorrection(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["sweep_correction"] = (
             1.0
-            - 0.000178 * inputs["data:geometry:wing:sweep_25"] ** 2
+            - 0.000178 * inputs["data:geometry:wing:sweep_25"] ** 2.0
             - 0.0065 * inputs["data:geometry:wing:sweep_25"]
         )
 
@@ -332,8 +329,9 @@ class _Cd0Wing(om.ExplicitComponent):
             / wing_area
         )
 
-        partials["data:aerodynamics:wing:" + ls_tag + ":CD0", "data:geometry:wing:area"] = (
+        partials["data:aerodynamics:wing:" + ls_tag + ":CD0", "data:geometry:wing:area"] = -(
             ((thickness_contribution + camber_contribution) * sweep_correction + 0.04 + 1.0)
             * cf
             * wet_area
+            / wing_area**2.0
         )

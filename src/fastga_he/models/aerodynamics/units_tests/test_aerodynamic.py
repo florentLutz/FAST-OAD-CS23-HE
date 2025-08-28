@@ -3,15 +3,24 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os.path as pth
-
 import pytest
 
+from ..components.cd0_power_train import Cd0PowerTrain
 from ..components.compute_polar_rta import (
     ComputePolar,
     _ComputePolarCL,
     _ComputePolarCD,
     _ComputePolarOptimal,
 )
+from ..components.cd0_wing_rta import (
+    _FlatPlateFrictionDragCoefficient,
+    _SweepCorrection,
+    _CamberContribution,
+    _RelativeThicknessContribution,
+    _Cd0Wing,
+    Cd0Wing,
+)
+from ..components.cd0_total_rta import _TotalCd0ParasiticFactor, _AircraftCd0, _Cd0Median, Cd0Total
 
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 from fastoad_cs25.models.aerodynamics.constants import PolarType
@@ -19,7 +28,20 @@ from fastoad_cs25.models.aerodynamics.constants import PolarType
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
-XML_FILE = "inputs_full_sizing.xml"
+XML_FILE = "data.xml"
+
+
+def test_powertrain_cd0():
+    ivc = get_indep_var_comp(list_inputs(Cd0PowerTrain()), __file__, XML_FILE)
+
+    problem = run_system(Cd0PowerTrain(), ivc)
+
+    assert problem.get_val("data:aerodynamics:nacelles:cruise:CD0") == pytest.approx(
+        0.0008112,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_polar_cl():
@@ -188,27 +210,6 @@ def test_polar_cl():
     problem.check_partials(compact_print=True)
 
 
-def test_polar_optimal():
-    ivc = get_indep_var_comp(list_inputs(_ComputePolarOptimal()), __file__, XML_FILE)
-
-    problem = run_system(_ComputePolarOptimal(), ivc)
-
-    assert problem.get_val("data:aerodynamics:aircraft:cruise:L_D_max") == pytest.approx(
-        17.225,
-        rel=1e-3,
-    )
-    assert problem.get_val("data:aerodynamics:aircraft:cruise:optimal_CL") == pytest.approx(
-        0.92,
-        rel=1e-3,
-    )
-    assert problem.get_val("data:aerodynamics:aircraft:cruise:optimal_CD") == pytest.approx(
-        0.0534,
-        rel=1e-3,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_polar_cd():
     ivc = get_indep_var_comp(
         list_inputs(_ComputePolarCD(polar_type=PolarType.TAKEOFF)), __file__, XML_FILE
@@ -369,6 +370,322 @@ def test_polar_cd():
             0.18507382069591036,
             0.18645194088668926,
         ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_polar_optimal():
+    ivc = get_indep_var_comp(list_inputs(_ComputePolarOptimal()), __file__, XML_FILE)
+
+    problem = run_system(_ComputePolarOptimal(), ivc)
+
+    assert problem.get_val("data:aerodynamics:aircraft:cruise:L_D_max") == pytest.approx(
+        17.225,
+        rel=1e-3,
+    )
+    assert problem.get_val("data:aerodynamics:aircraft:cruise:optimal_CL") == pytest.approx(
+        0.92,
+        rel=1e-3,
+    )
+    assert problem.get_val("data:aerodynamics:aircraft:cruise:optimal_CD") == pytest.approx(
+        0.0534,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_polar():
+    for type in PolarType:
+        ivc = get_indep_var_comp(list_inputs(ComputePolar(polar_type=type)), __file__, XML_FILE)
+
+        problem = run_system(ComputePolar(polar_type=type), ivc)
+
+        problem.check_partials(compact_print=True)
+
+
+def test_flat_plate_friction():
+    ivc = get_indep_var_comp(list_inputs(_FlatPlateFrictionDragCoefficient()), __file__, XML_FILE)
+
+    problem = run_system(_FlatPlateFrictionDragCoefficient(), ivc)
+
+    assert problem.get_val("plate_drag_friction_coeff") == pytest.approx(
+        0.002794,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_thickness_contribution():
+    ivc = get_indep_var_comp(list_inputs(_RelativeThicknessContribution()), __file__, XML_FILE)
+
+    problem = run_system(_RelativeThicknessContribution(), ivc)
+
+    assert problem.get_val("thickness_contribution") == pytest.approx(
+        0.53528,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_camber_contribution():
+    ivc = get_indep_var_comp(list_inputs(_CamberContribution()), __file__, XML_FILE)
+
+    problem = run_system(_CamberContribution(), ivc)
+
+    assert problem.get_val("camber_contribution") == pytest.approx(
+        0.5035,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_sweep_contribution():
+    ivc = get_indep_var_comp(list_inputs(_SweepCorrection()), __file__, XML_FILE)
+
+    problem = run_system(_SweepCorrection(), ivc)
+
+    assert problem.get_val("sweep_correction") == pytest.approx(
+        0.9997,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cd0_wing():
+    ivc = get_indep_var_comp(list_inputs(_Cd0Wing()), __file__, XML_FILE)
+    ivc.add_output("plate_drag_friction_coeff", val=0.002794)
+    ivc.add_output("thickness_contribution", val=0.53528)
+    ivc.add_output("camber_contribution", val=0.5035)
+    ivc.add_output("sweep_correction", val=0.9997)
+
+    problem = run_system(_Cd0Wing(), ivc)
+
+    assert problem.get_val("data:aerodynamics:wing:cruise:CD0") == pytest.approx(
+        0.01053,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cd0_wing_overall():
+    ivc = get_indep_var_comp(list_inputs(Cd0Wing()), __file__, XML_FILE)
+
+    problem = run_system(Cd0Wing(), ivc)
+
+    assert problem.get_val("data:aerodynamics:wing:cruise:CD0") == pytest.approx(
+        0.01053,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_parasitic_factor():
+    ivc = get_indep_var_comp(list_inputs(_TotalCd0ParasiticFactor()), __file__, XML_FILE)
+
+    problem = run_system(_TotalCd0ParasiticFactor(), ivc)
+
+    assert problem.get_val("k_parasitic") == pytest.approx(
+        0.1321,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cd0_aircraft():
+    ivc = get_indep_var_comp(list_inputs(_AircraftCd0()), __file__, XML_FILE)
+    ivc.add_output("k_parasitic", val=0.1321)
+
+    problem = run_system(_AircraftCd0(), ivc)
+
+    assert problem.get_val("data:aerodynamics:aircraft:cruise:CD0:parasitic") == pytest.approx(
+        [
+            0.0032381657656552695,
+            0.0032356091895059257,
+            0.0032330751793916853,
+            0.003230563735312547,
+            0.0032280748572685127,
+            0.0032256085452595806,
+            0.003223164799285752,
+            0.003220743619347026,
+            0.0032183450054434036,
+            0.003215968957574884,
+            0.003213615475741467,
+            0.0032112845599431535,
+            0.003208976210179943,
+            0.0032066904264518355,
+            0.0032044272087588302,
+            0.003202186557100929,
+            0.0031999684714781305,
+            0.0031977729518904347,
+            0.0031955999983378424,
+            0.003193449610820353,
+            0.0031913217893379665,
+            0.003189216533890683,
+            0.0031871338444785023,
+            0.003185073721101425,
+            0.0031830361637594506,
+            0.003181021172452579,
+            0.003179028747180811,
+            0.0031770588879441457,
+            0.0031751115947425833,
+            0.003173186867576124,
+            0.0031712847064447676,
+            0.003169405111348515,
+            0.0031675480822873645,
+            0.0031657136192613173,
+            0.003163901722270373,
+            0.0031621123913145323,
+            0.0031603456263937938,
+            0.0031586014275081582,
+            0.0031568797946576266,
+            0.003155180727842197,
+            0.0031535042270618716,
+            0.003151850292316648,
+            0.0031502189236065287,
+            0.003148610120931511,
+            0.003147023884291597,
+            0.0031454602136867862,
+            0.0031439191091170784,
+            0.0031424005705824733,
+            0.0031409045980829715,
+            0.0031394311916185724,
+            0.0031379803511892763,
+            0.0031365520767950837,
+            0.003135146368435994,
+            0.003133763226112007,
+            0.003132402649823123,
+            0.0031310646395693426,
+            0.003129749195350665,
+            0.00312845631716709,
+            0.0031271860050186184,
+            0.00312593825890525,
+            0.003124713078826984,
+            0.003123510464783821,
+            0.0031223304167757615,
+            0.0031211729348028052,
+            0.003120038018864951,
+            0.0031189256689622006,
+            0.0031178358850945534,
+            0.003116768667262009,
+            0.0031157240154645674,
+            0.0031147019297022285,
+            0.0031137024099749935,
+            0.003112725456282861,
+            0.0031117710686258313,
+            0.003110839247003905,
+            0.0031099299914170812,
+            0.0031090433018653614,
+            0.0031081791783487437,
+            0.0031073376208672295,
+            0.0031065186294208184,
+            0.0031057222040095102,
+            0.0031049483446333047,
+            0.003104197051292202,
+            0.0031034683239862027,
+            0.0031027621627153067,
+            0.0031020785674795138,
+            0.003101417538278824,
+            0.0031007790751132365,
+            0.003100163177982752,
+            0.0030995698468873714,
+            0.0030989990818270927,
+            0.0030984508828019175,
+            0.0030979252498118458,
+            0.0030974221828568766,
+            0.003096941681937011,
+            0.003096483747052248,
+            0.003096048378202588,
+            0.003095635575388031,
+            0.0030952453386085773,
+            0.003094877667864226,
+            0.003094532563154978,
+            0.003094210024480833,
+            0.0030939100518417913,
+            0.0030936326452378525,
+            0.0030933778046690163,
+            0.003093145530135284,
+            0.003092935821636654,
+            0.0030927486791731272,
+            0.0030925841027447036,
+            0.003092442092351383,
+            0.0030923226479931654,
+            0.00309222576967005,
+            0.003092151457382039,
+            0.00309209971112913,
+            0.003092070530911324,
+            0.0030920639167286218,
+            0.003092079868581022,
+            0.003092118386468526,
+            0.003092179470391132,
+            0.0030922631203488416,
+            0.003092369336341654,
+            0.0030924981183695697,
+            0.003092649466432588,
+            0.0030928233805307096,
+            0.003093019860663934,
+            0.0030932389068322615,
+            0.0030934805190356925,
+            0.003093744697274226,
+            0.0030940314415478626,
+            0.0030943407518566027,
+            0.003094672628200445,
+            0.003095027070579391,
+            0.003095404078993439,
+            0.003095803653442591,
+            0.003096225793926846,
+            0.0030966705004462037,
+            0.0030971377730006646,
+            0.003097627611590228,
+            0.0030981400162148954,
+            0.003098674986874665,
+            0.003099232523569538,
+            0.003099812626299514,
+            0.003100415295064593,
+            0.0031010405298647747,
+            0.00310168833070006,
+            0.003102358697570448,
+            0.0031030516304759383,
+            0.003103767129416533,
+            0.0031045051943922298,
+            0.0031052658254030296,
+            0.003106049022448933,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cd0_aircraft_median():
+    ivc = get_indep_var_comp(list_inputs(_Cd0Median()), __file__, XML_FILE)
+
+    problem = run_system(_Cd0Median(), ivc)
+
+    assert problem.get_val("data:aerodynamics:aircraft:cruise:CD0") == pytest.approx(
+        0.02664,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cd0_aircraft_overall():
+    ivc = get_indep_var_comp(list_inputs(Cd0Total()), __file__, XML_FILE)
+
+    problem = run_system(Cd0Total(), ivc)
+
+    assert problem.get_val("data:aerodynamics:aircraft:cruise:CD0") == pytest.approx(
+        0.02664,
         rel=1e-3,
     )
 

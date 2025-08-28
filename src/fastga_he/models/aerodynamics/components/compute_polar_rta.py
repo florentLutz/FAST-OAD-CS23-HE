@@ -159,10 +159,10 @@ class _ComputePolarCD(om.ExplicitComponent):
                 "*", "data:aerodynamics:high_lift_devices:" + type_tag + ":CD", method="exact"
             )
 
-            if self.options["polar_type"] == PolarType.HIGH_SPEED:
-                self.declare_partials(
-                    "*", "data:aerodynamics:aircraft:cruise:CD:compressibility", method="exact"
-                )
+        elif self.options["polar_type"] == PolarType.HIGH_SPEED:
+            self.declare_partials(
+                "*", "data:aerodynamics:aircraft:cruise:CD:compressibility", method="exact"
+            )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         hs_tag = "cruise" if self.options["polar_type"] == PolarType.HIGH_SPEED else "low_speed"
@@ -214,18 +214,29 @@ class _ComputePolarCD(om.ExplicitComponent):
             else np.zeros_like(cl)
         )
         coef_k = inputs["data:aerodynamics:aircraft:" + hs_tag + ":induced_drag_coefficient"]
-        delta_cd_hl = 0.0
+        delta_cd_hl = (
+            inputs["data:aerodynamics:high_lift_devices:" + type_tag + ":CD"]
+            if (
+                self.options["polar_type"] == PolarType.TAKEOFF
+                or self.options["polar_type"] == PolarType.LANDING
+            )
+            else 0.0
+        )
 
         if (
             self.options["polar_type"] == PolarType.TAKEOFF
             or self.options["polar_type"] == PolarType.LANDING
         ):
-            delta_cd_hl = inputs["data:aerodynamics:high_lift_devices:" + type_tag + ":CD"]
-
             partials[
                 "data:aerodynamics:aircraft:" + type_tag + ":CD",
                 "data:aerodynamics:high_lift_devices:" + type_tag + ":CD",
             ] = np.full_like(cl, k_cd)
+
+        elif self.options["polar_type"] == PolarType.HIGH_SPEED:
+            partials[
+                "data:aerodynamics:aircraft:" + type_tag + ":CD",
+                "data:aerodynamics:aircraft:cruise:CD:compressibility",
+            ] = np.diag(np.full_like(cl, k_cd))
 
         partials[
             "data:aerodynamics:aircraft:" + type_tag + ":CD",
@@ -235,7 +246,7 @@ class _ComputePolarCD(om.ExplicitComponent):
         partials[
             "data:aerodynamics:aircraft:" + type_tag + ":CD",
             "data:aerodynamics:aircraft:" + hs_tag + ":CD:trim",
-        ] = np.full_like(cl, k_cd)
+        ] = np.diag(np.full_like(cl, k_cd))
 
         partials[
             "data:aerodynamics:aircraft:" + type_tag + ":CD",
@@ -245,7 +256,7 @@ class _ComputePolarCD(om.ExplicitComponent):
         partials[
             "data:aerodynamics:aircraft:" + type_tag + ":CD",
             "data:aerodynamics:aircraft:" + type_tag + ":CL",
-        ] = 2.0 * k_cd * coef_k * cl * k_winglet_cd
+        ] = np.diag(2.0 * k_cd * coef_k * cl * k_winglet_cd)
 
         partials[
             "data:aerodynamics:aircraft:" + type_tag + ":CD",

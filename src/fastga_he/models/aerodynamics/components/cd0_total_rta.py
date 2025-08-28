@@ -88,7 +88,7 @@ class _AircraftCd0(om.ExplicitComponent):
         cd0_shape = "data:aerodynamics:fuselage:" + ls_tag + ":CD0"
 
         self.add_input("k_parasitic")
-        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CD0", shape_by_conn=True, val=np.nan)
+        self.add_input("data:aerodynamics:wing:" + ls_tag + ":CD0", val=np.nan)
         self.add_input(
             "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
             shape_by_conn=True,
@@ -111,7 +111,7 @@ class _AircraftCd0(om.ExplicitComponent):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.declare_partials(
-            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:clean",
+            "*",
             [
                 "data:aerodynamics:wing:" + ls_tag + ":CD0",
                 "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
@@ -119,18 +119,11 @@ class _AircraftCd0(om.ExplicitComponent):
                 "data:aerodynamics:vertical_tail:" + ls_tag + ":CD0",
                 "data:aerodynamics:nacelles:" + ls_tag + ":CD0",
             ],
-            val=1.0,
+            method="exact",
         )
         self.declare_partials(
             "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
-            [
-                "k_parasitic",
-                "data:aerodynamics:wing:" + ls_tag + ":CD0",
-                "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
-                "data:aerodynamics:horizontal_tail:" + ls_tag + ":CD0",
-                "data:aerodynamics:vertical_tail:" + ls_tag + ":CD0",
-                "data:aerodynamics:nacelles:" + ls_tag + ":CD0",
-            ],
+            "k_parasitic",
             method="exact",
         )
 
@@ -145,10 +138,10 @@ class _AircraftCd0(om.ExplicitComponent):
         cd0_nac = inputs["data:aerodynamics:nacelles:" + ls_tag + ":CD0"]
 
         outputs["data:aerodynamics:aircraft:" + ls_tag + ":CD0:clean"] = (
-            cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_nac
+            np.full_like(cd0_fus, cd0_wing + cd0_ht + cd0_vt + cd0_nac) + cd0_fus
         )
         outputs["data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic"] = k_parasitic * (
-            cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_nac
+            np.full_like(cd0_fus, cd0_wing + cd0_ht + cd0_vt + cd0_nac) + cd0_fus
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -161,34 +154,59 @@ class _AircraftCd0(om.ExplicitComponent):
         cd0_vt = inputs["data:aerodynamics:vertical_tail:" + ls_tag + ":CD0"]
         cd0_nac = inputs["data:aerodynamics:nacelles:" + ls_tag + ":CD0"]
 
+        partials[
+            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:clean",
+            "data:aerodynamics:wing:" + ls_tag + ":CD0",
+        ] = np.ones_like(cd0_fus)
+
+        partials[
+            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
+            "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
+        ] = np.diag(np.ones_like(cd0_fus))
+
+        partials[
+            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
+            "data:aerodynamics:horizontal_tail:" + ls_tag + ":CD0",
+        ] = np.ones_like(cd0_fus)
+
+        partials[
+            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
+            "data:aerodynamics:vertical_tail:" + ls_tag + ":CD0",
+        ] = np.ones_like(cd0_fus)
+
+        partials[
+            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
+            "data:aerodynamics:nacelles:" + ls_tag + ":CD0",
+        ] = np.ones_like(cd0_fus)
+
         partials["data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic", "k_parasitic"] = (
-            cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_nac
+            np.full_like(cd0_fus, cd0_wing + cd0_ht + cd0_vt + cd0_nac) + cd0_fus
         )
 
         partials[
             "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
             "data:aerodynamics:wing:" + ls_tag + ":CD0",
-        ] = k_parasitic
+        ] = np.full_like(cd0_fus, k_parasitic)
 
         partials[
             "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
             "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
-        ] = k_parasitic
+        ] = np.diag(np.full_like(cd0_fus, k_parasitic))
 
         partials[
             "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
             "data:aerodynamics:horizontal_tail:" + ls_tag + ":CD0",
-        ] = k_parasitic
+        ] = np.full_like(cd0_fus, k_parasitic)
 
         partials[
             "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
             "data:aerodynamics:vertical_tail:" + ls_tag + ":CD0",
-        ] = k_parasitic
+        ] = np.full_like(cd0_fus, k_parasitic)
 
         partials[
             "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
             "data:aerodynamics:nacelles:" + ls_tag + ":CD0",
-        ] = k_parasitic
+        ] = np.full_like(cd0_fus, k_parasitic)
 
 
 class _Cd0Median(om.ExplicitComponent):
