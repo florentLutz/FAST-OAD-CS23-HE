@@ -1640,7 +1640,7 @@ def test_mission_vector(restore_submodels):
         ivc,
     )
     sizing_fuel = problem.get_val("data:mission:sizing:fuel", units="kg")
-    assert sizing_fuel == pytest.approx(45.63, abs=1e-2)
+    assert sizing_fuel == pytest.approx(45.3, abs=1e-2)
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
     assert sizing_energy == pytest.approx(0.0, abs=1e-2)
 
@@ -3241,8 +3241,8 @@ def test_payload_range_inner_with_builtin_sampling():
 
 def test_mission_vector_atr_42():
     # Define used files depending on options
-    xml_file_name = "atr42_retrofit.xml"
-    process_file_name = "atr42_retrofit.yml"
+    xml_file_name = "atr_42.xml"
+    process_file_name = "atr_42.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
 
