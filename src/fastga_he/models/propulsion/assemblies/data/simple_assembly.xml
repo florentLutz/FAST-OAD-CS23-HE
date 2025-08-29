@@ -449,7 +449,7 @@
                         </energy_rr>
                     </inverter_1>
                 </inverter>
-                <ACPMSM>
+                <SMPMSM>
                     <motor_1>
                         <pole_pairs_number is_input="True" >2<!--number of pole pairs--> </pole_pairs_number>
                         <number_of_phases is_input="True" >3<!--number of phases--> </number_of_phases>
@@ -470,7 +470,7 @@
                         <torque_constant units="N*m/A" is_input="True" >0.4278<!--k_tb--> </torque_constant>
 
                     </motor_1>
-                </ACPMSM>
+                </SMPMSM>
                 <PMSM>
                     <motor_1>
                         <voltage_ac_max units="V" is_input="True">414.83894592299646<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
