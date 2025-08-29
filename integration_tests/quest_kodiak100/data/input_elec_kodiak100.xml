@@ -175,7 +175,7 @@
             <power_split is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
           </dc_splitter_1>
         </DC_splitter>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <winding_factor is_input="True"> 0.97</winding_factor>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
@@ -213,7 +213,7 @@
               <CD0 is_input="True">nan</CD0>
             </low_speed>
           </motor_1>
-        </ACPMSM>
+        </SMPMSM>
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <fuel_system>
           <fuel_system_1>

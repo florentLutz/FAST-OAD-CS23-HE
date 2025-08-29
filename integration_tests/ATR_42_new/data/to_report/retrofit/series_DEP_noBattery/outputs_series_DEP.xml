@@ -185,7 +185,7 @@
         <low_speed>
           <CD0 is_input="False">8.214926676770411e-05</CD0>
         </low_speed>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <Airgap_thickness units="m" is_input="False">0.002103340382309838</Airgap_thickness>
             <Form_coefficient is_input="True">0.6</Form_coefficient>
@@ -588,7 +588,7 @@
               <CD0 is_input="False">1.3691544461284019e-05</CD0>
             </low_speed>
           </motor_6>
-        </ACPMSM>
+        </SMPMSM>
         <DC_bus>
           <bus_1>
             <current_caliber units="A" is_input="False">1000.0</current_caliber>
@@ -3681,7 +3681,7 @@
     </weight>
     <propulsion>
       <he_power_train>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <k_efficiency is_input="True">1.0<!--K factor for the PMSM efficiency--></k_efficiency>
             <power_factor is_input="True">1.0</power_factor>
@@ -3706,7 +3706,7 @@
             <k_efficiency is_input="True">1.0<!--K factor for the PMSM efficiency--></k_efficiency>
             <power_factor is_input="True">1.0</power_factor>
           </motor_6>
-        </ACPMSM>
+        </SMPMSM>
         <DC_bus>
           <insulation>
             <breakdown_voltage units="V" is_input="True">340.0<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
@@ -4089,7 +4089,7 @@
   <constraints>
     <propulsion>
       <he_power_train>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <voltage_caliber units="V" is_input="False">195.02355733995023<!--Respected if <0--></voltage_caliber>
           </motor_1>
@@ -4108,7 +4108,7 @@
           <motor_6>
             <voltage_caliber units="V" is_input="False">195.02355733995023<!--Respected if <0--></voltage_caliber>
           </motor_6>
-        </ACPMSM>
+        </SMPMSM>
         <fuel_tank>
           <fuel_tank_1>
             <capacity units="kg" is_input="False">301.7794892316763<!--Constraints on the tank capacity in kg, respected if <0--></capacity>

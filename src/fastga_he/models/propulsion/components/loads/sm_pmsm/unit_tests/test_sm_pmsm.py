@@ -417,7 +417,7 @@ def test_frame_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_ACPMSM_weight():
+def test_SMPMSM_weight():
     ivc = get_indep_var_comp(list_inputs(SizingMotorWeight(pmsm_id="motor_1")), __file__, XML_FILE)
 
     problem = run_system(SizingMotorWeight(pmsm_id="motor_1"), ivc)
@@ -1013,7 +1013,7 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
-def test_performance_ACPMSM():
+def test_performance_SMPMSM():
     ivc = get_indep_var_comp(
         list_inputs(PerformancesSMPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -1046,7 +1046,7 @@ def test_performance_ACPMSM():
     problem.check_partials(compact_print=True)
 
 
-def test_sizing_ACPMSM():
+def test_sizing_SMPMSM():
     ivc = get_indep_var_comp(list_inputs(SizingSMPMSM(pmsm_id="motor_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct

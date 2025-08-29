@@ -185,7 +185,7 @@
         <low_speed>
           <CD0 is_input="False">0.0010899618089557316</CD0>
         </low_speed>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <Airgap_thickness units="m" is_input="False">0.0016072612671891836</Airgap_thickness>
             <Form_coefficient is_input="True">0.6</Form_coefficient>
@@ -320,7 +320,7 @@
               <CD0 is_input="False">8.411621596015225e-06</CD0>
             </low_speed>
           </motor_2>
-        </ACPMSM>
+        </SMPMSM>
         <DC_DC_converter>
           <dc_dc_converter_1>
             <current_in_caliber units="A" is_input="False">359.7314573893727<!--Current caliber of one arm of the DC/DC converter--></current_in_caliber>
@@ -2052,7 +2052,7 @@
     </weight>
     <propulsion>
       <he_power_train>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <k_efficiency is_input="True">1.0<!--K factor for the PMSM efficiency--></k_efficiency>
             <power_factor is_input="True">1.0</power_factor>
@@ -2061,7 +2061,7 @@
             <k_efficiency is_input="True">1.0<!--K factor for the PMSM efficiency--></k_efficiency>
             <power_factor is_input="True">1.0</power_factor>
           </motor_2>
-        </ACPMSM>
+        </SMPMSM>
         <DC_bus>
           <insulation>
             <breakdown_voltage units="V" is_input="True">340.0<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
@@ -2336,14 +2336,14 @@
   <constraints>
     <propulsion>
       <he_power_train>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <voltage_caliber units="V" is_input="False">919.2099776016819<!--Respected if <0--></voltage_caliber>
           </motor_1>
           <motor_2>
             <voltage_caliber units="V" is_input="False">919.2099776016819<!--Respected if <0--></voltage_caliber>
           </motor_2>
-        </ACPMSM>
+        </SMPMSM>
         <fuel_tank>
           <fuel_tank_1>
             <capacity units="kg" is_input="False">-16.218285999362706<!--Constraints on the tank capacity in kg, respected if <0--></capacity>

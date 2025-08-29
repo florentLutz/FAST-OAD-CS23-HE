@@ -328,7 +328,7 @@
             </tube>
           </dc_dc_converter_2>
         </DC_DC_converter>
-        <ACPMSM>
+        <SMPMSM>
           <motor_1>
             <winding_factor is_input="True"> 0.97</winding_factor>
             <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
@@ -392,7 +392,7 @@
             <winding_temperature units="degC" is_input="True">180</winding_temperature>
             <yoke_flux_density units="T" is_input="True">1.2</yoke_flux_density>
           </motor_2>
-        </ACPMSM>
+        </SMPMSM>
         <battery_pack>
           <battery_pack_1>
             <CG>
