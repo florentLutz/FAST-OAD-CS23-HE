@@ -126,6 +126,12 @@ class MissionVector(om.Group):
             desc="Boolean to sort the component with proper order for adding subsystem operations",
             allow_none=False,
         )
+        self.options.declare(
+            name="rta_activation",
+            default=False,
+            desc="Boolean to identify whether rta package is used",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points_climb = self.options["number_of_points_climb"]
@@ -137,9 +143,13 @@ class MissionVector(om.Group):
 
         self.nonlinear_solver.options["use_apply_nonlinear"] = self.options["use_apply_nonlinear"]
 
+        options_cg_variation = {
+            "rta_activation": self.options["rta_activation"],
+        }
+
         self.add_subsystem(
             "in_flight_cg_variation",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_CG_VARIATION),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CG_VARIATION, options=options_cg_variation),
             promotes=["*"],
         )
         if self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT):
