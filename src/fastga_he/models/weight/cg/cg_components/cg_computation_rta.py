@@ -19,7 +19,7 @@ from rta.models.weight.cg.cg_components.compute_cg_loadcase1 import ComputeCGLoa
 from rta.models.weight.cg.cg_components.compute_cg_loadcase2 import ComputeCGLoadCase2
 from rta.models.weight.cg.cg_components.compute_cg_loadcase3 import ComputeCGLoadCase3
 from rta.models.weight.cg.cg_components.compute_max_cg_ratio import ComputeMaxCGratio
-from .new_cg_computation import ComputeCGRatioAft
+from .cg_computation_cs25 import ComputeCGRatioAft
 from openmdao.api import Group
 from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.weight.cg.constants import SERVICE_GLOBAL_CG

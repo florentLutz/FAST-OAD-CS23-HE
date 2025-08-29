@@ -7,10 +7,10 @@ import openmdao.api as om
 import fastoad.api as oad
 from ..constants import SERVICE_PROPULSION_MASS
 
+POWERTRAIN_MASS_ENGINE = "fastga_he.submodel.weight.mass.propulsion.engine.power_train"
 
-@oad.RegisterSubmodel(
-    SERVICE_PROPULSION_MASS, "fastga_he.submodel.weight.mass.propulsion.engine.power_train"
-)
+
+@oad.RegisterSubmodel(SERVICE_PROPULSION_MASS, POWERTRAIN_MASS_ENGINE)
 class PowerTrainMassEngine(om.ExplicitComponent):
     def initialize(self):
         # Needed even if it isn't used because the original one has that option ...

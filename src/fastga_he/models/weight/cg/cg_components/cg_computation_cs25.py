@@ -36,7 +36,7 @@ class ComputeCG(om.ExplicitComponent):
                 "data:weight:airframe:wing:CG:x",
                 "data:weight:airframe:fuselage:CG:x",
                 "data:weight:airframe:horizontal_tail:CG:x",
-                "data:weight:airframe:vertical_tail:CG:x",  # "data:weight:airframe:flight_controls:CG:x"
+                "data:weight:airframe:vertical_tail:CG:x",
                 "data:weight:airframe:landing_gear:main:CG:x",
                 "data:weight:airframe:landing_gear:front:CG:x",  # paint
                 "data:propulsion:he_power_train:CG:x",
