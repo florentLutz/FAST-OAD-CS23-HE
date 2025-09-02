@@ -24,12 +24,14 @@ model:
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
             result_folder_path: ../workdir
             use_openvsp: false
+            wing_airfoil: naca23015.af
         aerodynamics_highspeed:
             id: fastga.aerodynamics.highspeed.legacy
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
             result_folder_path: ../workdir
             compute_mach_interpolation: false
             use_openvsp: false
+            wing_airfoil: naca23015.af
         power_train_sizing:
             id: fastga_he.power_train.sizing
             power_train_file_path: ./turboshaft_propulsion.yml
@@ -78,10 +80,10 @@ submodels:
     submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
     service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
-    service.weight.mass.system.power_system: null
     service.geometry.nacelle.dimension: null
     submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
     submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
+    submodel.weight.cg.loadcase.ground: fastga_he.submodel.weight.cg.loadcase.ground.simple
     submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
     submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
     service.weight.mass.furniture.seats: null

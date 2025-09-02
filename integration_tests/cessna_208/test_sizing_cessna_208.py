@@ -7,19 +7,19 @@ import logging
 
 import pytest
 
-import numpy as np
-import openmdao.api as om
 import fastoad.api as oad
 
-from fastga_he.gui.payload_range import payload_range_outer
 from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
 
-def test_sizing_cessna_208ex():
-    """Test the overall aircraft design process with wing positioning under VLM method."""
+def test_sizing_cessna_208b():
+    """
+    We will not do the latest version of the C208 rather we'll do the C208 before the re-engining so
+    it will be rated at 600hp.
+    """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -49,10 +49,10 @@ def test_sizing_cessna_208ex():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        1601.0, rel=1e-2
-    )
-    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(992.0, rel=1e-2)
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        234.00, rel=1e-2
+        982.00, rel=5e-2
+    )
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(2146.0, rel=5e-2) # From the POH found online + weight of seats at around 100kg
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3968.0, rel=5e-2
     )
