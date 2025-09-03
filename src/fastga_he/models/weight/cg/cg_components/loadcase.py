@@ -7,7 +7,10 @@ import numpy as np
 
 import fastoad.api as oad
 
-from fastga.models.weight.cg.cg_components.constants import SUBMODEL_LOADCASE_FLIGHT_X, SUBMODEL_LOADCASE_GROUND_X
+from fastga.models.weight.cg.cg_components.constants import (
+    SUBMODEL_LOADCASE_FLIGHT_X,
+    SUBMODEL_LOADCASE_GROUND_X,
+)
 
 # For retro-compatibility reasons, we want the legacy submodel as default
 oad.RegisterSubmodel.active_models[SUBMODEL_LOADCASE_FLIGHT_X] = (

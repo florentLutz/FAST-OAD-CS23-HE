@@ -52,7 +52,9 @@ def test_sizing_cessna_208b():
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
         982.00, rel=5e-2
     )
-    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(2146.0, rel=5e-2) # From the POH found online + weight of seats at around 100kg
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        2146.0, rel=5e-2
+    )  # From the POH found online + weight of seats at around 100kg
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         3968.0, rel=5e-2
     )
