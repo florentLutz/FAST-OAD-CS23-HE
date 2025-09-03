@@ -59,10 +59,37 @@ def test_sizing_cessna_208b():
         3968.0, rel=5e-2
     )
 
+
+def test_op_mission_cessna_208b():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_c208_op_mission.xml"
+    process_file_name = "op_mission_fuel.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+
 def test_sizing_hybrid_cessna_208b():
     """
     Parallel hybrid version of the c208b, in this first version we won't allow resizing of the
-    turboshaft, we'll just "replace" thermal power by electric power. Designed for 200nm
+    turboshaft, we'll just "replace" thermal power by electric power. Designed for 200nm. Max
+    payload will be set equal to payload of the orig C208B on its operationnal mission to not give
+    the hybrid an unwanted advantage linked with the resizing
     """
 
     logging.basicConfig(level=logging.WARNING)
@@ -81,7 +108,22 @@ def test_sizing_hybrid_cessna_208b():
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
+
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
     problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
 
     problem.run_model()
 

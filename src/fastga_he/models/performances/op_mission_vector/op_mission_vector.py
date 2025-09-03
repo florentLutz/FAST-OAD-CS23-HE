@@ -323,6 +323,14 @@ class OperationalMissionVector(om.Group):
                 )
             )
 
+        if not (
+            self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT)
+            or self.is_service_active(SUBMODEL_DESCENT_SPEED_VECT)
+            or self.is_service_active(SUBMODEL_CLIMB_SPEED_VECT)
+        ):
+            initialization_input_promote_list.remove("data:aerodynamics:*")
+            initialization_input_promote_list.remove("data:geometry:*")
+
         self.add_subsystem(
             "initialization",
             Initialize(
@@ -611,13 +619,20 @@ class OperationalMissionVector(om.Group):
             "initialization.initialize_airspeed.equivalent_airspeed", "to_csv.equivalent_airspeed"
         )
 
-        self.connect(
-            "solve_equilibrium.mass",
-            [
-                "to_csv.mass",
-                "initialization.mass",
-            ],
-        )
+        if (
+            self.is_service_active(SUBMODEL_RESERVE_SPEED_VECT)
+            or self.is_service_active(SUBMODEL_DESCENT_SPEED_VECT)
+            or self.is_service_active(SUBMODEL_CLIMB_SPEED_VECT)
+        ):
+            self.connect(
+                "solve_equilibrium.mass",
+                [
+                    "to_csv.mass",
+                    "initialization.mass",
+                ],
+            )
+        else:
+            self.connect("solve_equilibrium.mass", "to_csv.mass")
 
         self.connect("solve_equilibrium.fuel_consumed_t", "to_csv.fuel_consumed_t")
         self.connect(
