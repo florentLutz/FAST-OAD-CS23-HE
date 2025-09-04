@@ -5,6 +5,10 @@
 import openmdao.api as om
 import numpy as np
 
+from .perf_k_sfc import (
+    PerformancesSpecificFuelConsumptionKFactorConstant,
+    PerformancesSpecificFuelConsumptionKFactorVariable,
+)
 from .perf_density_ratio import PerformancesDensityRatio
 from .perf_mach import PerformancesMach
 from .perf_required_power import PerformancesRequiredPower
@@ -33,11 +37,34 @@ class PerformancesTurboshaft(om.Group):
             desc="Identifier of the turboshaft",
             allow_none=False,
         )
+        self.options.declare(
+            name="adjust_sfc",
+            default=False,
+            desc="If yes, the correction factor for the sfc will be computed based on the rated "
+            "power and some predefined reference points. Otherwise it is constant.",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         turboshaft_id = self.options["turboshaft_id"]
 
+        if self.options["adjust_sfc"]:
+            self.add_subsystem(
+                name="k_sfc",
+                subsys=PerformancesSpecificFuelConsumptionKFactorVariable(
+                    number_of_points=number_of_points, turboshaft_id=turboshaft_id
+                ),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                name="k_sfc",
+                subsys=PerformancesSpecificFuelConsumptionKFactorConstant(
+                    number_of_points=number_of_points, turboshaft_id=turboshaft_id
+                ),
+                promotes=["*"],
+            )
         self.add_subsystem(
             name="density_ratio",
             subsys=PerformancesDensityRatio(number_of_points=number_of_points),

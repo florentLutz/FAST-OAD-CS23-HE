@@ -25,6 +25,10 @@ from ..components.pre_lca_use_emission_per_fu import PreLCATurboshaftUseEmission
 from ..components.lcc_turboshaft_cost import LCCTurboshaftCost
 from ..components.lcc_turboshaft_operational_cost import LCCTurboshaftOperationalCost
 
+from ..components.perf_k_sfc import (
+    PerformancesSpecificFuelConsumptionKFactorConstant,
+    PerformancesSpecificFuelConsumptionKFactorVariable,
+)
 from ..components.perf_density_ratio import PerformancesDensityRatio
 from ..components.perf_mach import PerformancesMach
 from ..components.perf_required_power import PerformancesRequiredPower
@@ -375,6 +379,73 @@ def test_turboshaft_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:low_speed:CD0",
     ) * 1e3 == pytest.approx(4.273, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_k_sfc():
+    ivc = om.IndepVarComp()
+    ivc.add_output("settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_sfc", val=1.1)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesSpecificFuelConsumptionKFactorConstant(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("k_sfc") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1.1),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_k_sfc_variable():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",
+        val=575.174,
+        units="kW",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesSpecificFuelConsumptionKFactorVariable(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("k_sfc") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1.0),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    new_ivc = om.IndepVarComp()
+    new_ivc.add_output(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",
+        val=350.0,
+        units="kW",
+    )
+
+    problem = run_system(
+        PerformancesSpecificFuelConsumptionKFactorVariable(
+            number_of_points=NB_POINTS_TEST, turboshaft_id="turboshaft_1"
+        ),
+        new_ivc,
+    )
+
+    assert problem.get_val("k_sfc") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1.1333),
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_sfc"
+    ) == pytest.approx(1.1333, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

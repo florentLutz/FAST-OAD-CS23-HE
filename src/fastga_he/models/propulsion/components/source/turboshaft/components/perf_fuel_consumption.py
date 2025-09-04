@@ -55,16 +55,21 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
             desc="Flat rating of the turboshaft",
         )
         self.add_input(
-            "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_sfc",
+            "k_sfc",
             val=1.0,
-            desc="K-factor to adjust the sfc/fuel consumption of the turboshaft",
+            shape=number_of_points,
+            desc="K-factor to adjust the sfc/fuel consumption of the turboshaft, vectorial format",
         )
 
         self.add_output("fuel_consumption", units="kg/h", val=120.0, shape=number_of_points)
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        turboshaft_id = self.options["turboshaft_id"]
+
         self.declare_partials(
             of="fuel_consumption",
-            wrt=["mach", "density_ratio", "power_required"],
+            wrt=["mach", "density_ratio", "power_required", "k_sfc"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -78,7 +83,6 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
                 + turboshaft_id
                 + ":design_point:power_ratio",
                 "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
-                "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_sfc",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -105,7 +109,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
             + turboshaft_id
             + ":design_point:power_ratio"
         ]
-        k_fc = inputs["settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_sfc"]
+        k_fc = inputs["k_sfc"]
 
         design_power = power_rating * power_ratio
 
@@ -157,7 +161,7 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
             + turboshaft_id
             + ":design_point:power_ratio"
         ]
-        k_fc = inputs["settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_sfc"]
+        k_fc = inputs["k_sfc"]
 
         design_power = power_rating * power_ratio
 
@@ -290,7 +294,4 @@ class PerformancesTurboshaftFuelConsumption(om.ExplicitComponent):
             d_fc_d_log_fc * d_log_fc_d_log_power * d_log_power_d_power * k_fc
         )
 
-        partials[
-            "fuel_consumption",
-            "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_sfc",
-        ] = fuel_consumption
+        partials["fuel_consumption", "k_sfc"] = fuel_consumption
