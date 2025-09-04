@@ -48,7 +48,7 @@ class EASY_compute(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            of="data:TLAR:luggage_mass_design", wrt="data:TLAR:NPAX_design", val=20
+            of="data:TLAR:luggage_mass_design", wrt="data:TLAR:NPAX_design", val=20.0
         )
         self.declare_partials(
             of="data:TLAR:v_cruise", wrt="data:mission:sizing:main_route:cruise:altitude"
@@ -80,7 +80,7 @@ class EASY_compute(om.ExplicitComponent):
 
         outputs["data:aerodynamics:cruise:unit_reynolds"] = unit_Reynolds
 
-        outputs["data:TLAR:luggage_mass_design"] = 20 * inputs["data:TLAR:NPAX_design"]
+        outputs["data:TLAR:luggage_mass_design"] = 20.0 * inputs["data:TLAR:NPAX_design"]
 
         outputs["data:mission:sizing:taxi_in:speed"] = (
             inputs["data:mission:sizing:taxi_in:distance"]
@@ -122,10 +122,6 @@ class EASY_compute(om.ExplicitComponent):
         ] = inputs["data:propulsion:Design_Thermo_Power"] / inputs["data:propulsion:RTO_power"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        # cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
-        # sos = AtmosphereWithPartials(cruise_alt, altitude_in_feet=False).speed_of_sound
-        # partials["tip_mach", "altitude"] =  inputs["data:TLAR:cruise_mach"]*sos
-
         partials["data:mission:sizing:taxi_in:speed", "data:mission:sizing:taxi_in:distance"] = (
             1.0 / inputs["data:mission:sizing:taxi_in:duration"]
         )

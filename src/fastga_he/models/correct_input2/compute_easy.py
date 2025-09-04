@@ -36,18 +36,6 @@ class EASY_compute2(om.ExplicitComponent):
         self.add_output("data:TLAR:v_cruise", units="m/s")
         self.add_output("data:mission:sizing:taxi_in:speed", units="m/s")
         self.add_output("data:mission:sizing:taxi_out:speed", units="m/s")
-        # turboshaft
-        """self.add_output("data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR")
-        self.add_output("data:propulsion:he_power_train:turboshaft:turboshaft_1:limit:OPR")
-        self.add_output(
-            "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:power_ratio"
-        )
-
-        self.add_output("data:propulsion:he_power_train:turboshaft:turboshaft_2:design_point:OPR")
-        self.add_output("data:propulsion:he_power_train:turboshaft:turboshaft_2:limit:OPR")
-        self.add_output(
-            "data:propulsion:he_power_train:turboshaft:turboshaft_2:design_point:power_ratio"
-        )"""
 
         self.declare_partials(
             of="data:TLAR:luggage_mass_design", wrt="data:TLAR:NPAX_design", val=20
@@ -102,40 +90,7 @@ class EASY_compute2(om.ExplicitComponent):
             / inputs["data:mission:sizing:taxi_out:duration"]
         )
 
-        # turboshaft
-        """outputs["data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR"] = (
-            inputs["data:propulsion:L1_engine:hpc:hpc_pressure_ratio"]
-            * inputs["data:propulsion:L1_engine:lpc:lpc_pressure_ratio"]
-        )
-
-        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_1:limit:OPR"] = (
-            inputs["data:propulsion:L1_engine:hpc:hpc_pressure_ratio"]
-            * inputs["data:propulsion:L1_engine:lpc:lpc_pressure_ratio"]
-        )
-
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:power_ratio"
-        ] = inputs["data:propulsion:Design_Thermo_Power"] / inputs["data:propulsion:RTO_power"]
-
-        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_2:design_point:OPR"] = (
-            inputs["data:propulsion:L1_engine:hpc:hpc_pressure_ratio"]
-            * inputs["data:propulsion:L1_engine:lpc:lpc_pressure_ratio"]
-        )
-
-        outputs["data:propulsion:he_power_train:turboshaft:turboshaft_2:limit:OPR"] = (
-            inputs["data:propulsion:L1_engine:hpc:hpc_pressure_ratio"]
-            * inputs["data:propulsion:L1_engine:lpc:lpc_pressure_ratio"]
-        )
-
-        outputs[
-            "data:propulsion:he_power_train:turboshaft:turboshaft_2:design_point:power_ratio"
-        ] = inputs["data:propulsion:Design_Thermo_Power"] / inputs["data:propulsion:RTO_power"]"""
-
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        # cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
-        # sos = AtmosphereWithPartials(cruise_alt, altitude_in_feet=False).speed_of_sound
-        # partials["tip_mach", "altitude"] =  inputs["data:TLAR:cruise_mach"]*sos
-
         partials["data:mission:sizing:taxi_in:speed", "data:mission:sizing:taxi_in:distance"] = (
             1.0 / inputs["data:mission:sizing:taxi_in:duration"]
         )

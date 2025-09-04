@@ -1,18 +1,12 @@
 import os.path as pth
-import shutil
 from shutil import rmtree
 import logging
 import fastoad.api as oad
-import numpy as np
 import openmdao.api as om
-import pandas as pd
 import pytest
 from fastoad.module_management._plugins import FastoadLoader
-from numpy.testing import assert_allclose
-
 from fastoad import api
-from fastoad.io import VariableIO
-from fastoad.io.configuration.configuration import FASTOADProblemConfigurator
+
 
 from utils.filter_residuals import filter_residuals
 
@@ -81,8 +75,8 @@ def test_sizing_ATR72_HE_PERFORMANCES(cleanup):
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
-    xml_file_name = "input_performances_HE.xml"
-    process_file_name = "oad_process_performances_HE.yml"
+    xml_file_name = "input_performances_he.xml"
+    process_file_name = "oad_process_performances_he.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()

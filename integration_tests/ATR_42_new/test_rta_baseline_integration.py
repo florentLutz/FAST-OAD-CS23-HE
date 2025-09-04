@@ -68,8 +68,6 @@ def test_non_regression_mission(cleanup):
         CONFIGURATION_FILE,
         SOURCE_FILE,
         RESULTS_FOLDER,
-        check_only_mtow=False,
-        tolerance=1.0e-2,
     )
 
 
@@ -77,8 +75,6 @@ def run_non_regression_test(
     conf_file,
     legacy_result_file,
     result_dir,
-    check_only_mtow=True,
-    tolerance=5.0e-2,
 ):
     results_folder_path = pth.join(RESULTS_FOLDER_PATH, result_dir)
     configuration_file_path = pth.join(results_folder_path, conf_file)
@@ -167,14 +163,6 @@ def run_non_regression_test(
     print(df.sort_values(by=["abs_rel_delta"]))
 
 
-"""
-    if check_only_mtow:
-        assert np.all(df.abs_rel_delta.loc[df.name == "data:weight:aircraft:MTOW"] < tolerance)
-    else:
-        assert np.all(df.abs_rel_delta < tolerance)
-"""
-
-
 def test_sizing_atr_42_retrofit():
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
@@ -188,13 +176,9 @@ def test_sizing_atr_42_retrofit():
     configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()
 
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name))
-    # print(oad.RegisterSubmodel.active_models["service.mass.propulsion"])
-
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -257,26 +241,18 @@ def test_sizing_atr_42_retrofit():
     problem.write_outputs()
 
 
-def test_sizing_atr_42_fullsizing():
+def test_sizing_atr_42_full_sizing():
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-    # Define used files depending on options
-    xml_file_name = SOURCE_FILE
-    process_file_name = CONFIGURATION_FILE
-
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, CONFIGURATION_FILE))
     problem = configurator.get_problem()
 
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name))
-    # print(oad.RegisterSubmodel.active_models["service.mass.propulsion"])
-
     # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    ref_inputs = pth.join(DATA_FOLDER_PATH, SOURCE_FILE)
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -318,15 +294,13 @@ def test_sizing_atr_42_fullsizing():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    problem.set_val(
-        "subgroup.performances.solve_equilibrium.update_mass.mass",
-        units="kg",
-        val=np.linspace(18000, 16000, 90),
-    )
+    # problem.set_val(
+    #     "subgroup.performances.solve_equilibrium.update_mass.mass",
+    #     units="kg",
+    #     val=np.linspace(18000, 16000, 90),
+    # )
 
-    datafile = oad.DataFile(
-        "C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml"
-    )
+    datafile = oad.DataFile("data/atr42_retrofit_data.xml")
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",
@@ -430,15 +404,13 @@ def test_sizing_atr_42_fullsizing_series():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    problem.set_val(
-        "subgroup.performances.solve_equilibrium.update_mass.mass",
-        units="kg",
-        val=np.linspace(18000, 16000, 90),
-    )
+    # problem.set_val(
+    #     "subgroup.performances.solve_equilibrium.update_mass.mass",
+    #     units="kg",
+    #     val=np.linspace(18000, 16000, 90),
+    # )
 
-    datafile = oad.DataFile(
-        "C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml"
-    )
+    datafile = oad.DataFile("atr42_retrofit_data.xml")
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",
@@ -549,7 +521,6 @@ def test_sizing_atr_42_turboshaft():
     #     units="kg",
     #     val=np.linspace(18000, 16000, 90),
     # )
-
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 

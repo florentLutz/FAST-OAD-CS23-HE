@@ -27,6 +27,7 @@ model:
     use_linesearch: False
     pre_condition_pt: True
     out_file: ../results/hybrid_atr42_retrofit.csv
+    rta_activation: True
 #  change_input:
 #    id: fastga_he.correct_input2
   weight:

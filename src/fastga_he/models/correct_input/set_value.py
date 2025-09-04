@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
 import numpy as np
@@ -37,10 +37,6 @@ class SetValue(om.ExplicitComponent):
 
         # more airfoil input required: dy, maximum camber and its position, position of maximum thickness
         self.add_output("data:aerodynamics:wing:cruise:CM0_clean")
-        # the following have been setted considering aircraft parametres
-        # self.add_output('data:aerodynamics:horizontal_tail:airfoil:CL_alpha', units="1/rad")
-        # self.add_output("data:aerodynamics:wing:cruise:CL0_clean")
-        # self.add_output("data:aerodynamics:wing:low_speed:CL0_clean")
 
         # propeller
         # standard
