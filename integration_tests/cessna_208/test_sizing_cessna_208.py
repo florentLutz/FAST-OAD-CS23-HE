@@ -110,7 +110,11 @@ def test_sizing_hybrid_cessna_208b():
     problem.read_inputs()
 
     problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
-    problem.model_options["*turboshaft_1*"] = {"adjust_sfc": True, "reference_rated_power": [300, 503.3475], "reference_k_sfc": [1.2, 1.05]}
+    problem.model_options["*turboshaft_1*"] = {
+        "adjust_sfc": True,
+        "reference_rated_power": [300, 503.3475],
+        "reference_k_sfc": [1.2, 1.05],
+    }
     problem.model_options["*"] = {
         "cell_capacity_ref": 2.5,
         "cell_weight_ref": 45.0e-3,
@@ -133,9 +137,7 @@ def test_sizing_hybrid_cessna_208b():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         3968.0, rel=5e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        434.0, rel=1e-2
-    )
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(434.0, rel=1e-2)
 
 
 def test_sizing_hybrid_cessna_208b_better_fit():
@@ -162,9 +164,11 @@ def test_sizing_hybrid_cessna_208b_better_fit():
     problem.read_inputs()
 
     problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
-    problem.model_options["*turboshaft_1*"] = {"adjust_sfc": True,
-                                               "reference_rated_power": [300, 503.3475],
-                                               "reference_k_sfc": [1.2, 1.05]}
+    problem.model_options["*turboshaft_1*"] = {
+        "adjust_sfc": True,
+        "reference_rated_power": [300, 503.3475],
+        "reference_k_sfc": [1.2, 1.05],
+    }
     problem.model_options["*"] = {
         "cell_capacity_ref": 2.5,
         "cell_weight_ref": 45.0e-3,
@@ -192,6 +196,4 @@ def test_sizing_hybrid_cessna_208b_better_fit():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         3968.0, rel=5e-2
     )
-    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        332.0, rel=1e-2
-    )
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(332.0, rel=1e-2)
