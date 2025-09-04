@@ -29,7 +29,7 @@ def cleanup():
 
 
 def test_sizing_atr_72():
-    CONFIGURATION_FILE = "oad_process_full_sizing.yml"
+    CONFIGURATION_FILE = "atr_72_full_sizing.yml"
     SOURCE_FILE = "inputs_full_sizing.xml"
 
     """Test the overall aircraft design process with wing positioning."""
@@ -81,15 +81,15 @@ def test_sizing_ATR72_HE_PERFORMANCES(cleanup):
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
-    xml_file_name = "input_Performances_HE.xml"
-    process_file_name = "OAD_process_Performances_HE.yml"
+    xml_file_name = "input_performances_HE.xml"
+    process_file_name = "oad_process_performances_HE.yml"
 
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_cirrus.html")
+    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_atr72.html")
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)

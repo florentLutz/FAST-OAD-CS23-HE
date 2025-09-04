@@ -294,7 +294,7 @@ class EquilibriumDeltaMSetValue(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be " "treated"
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
             "flaps_position",

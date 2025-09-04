@@ -24,7 +24,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input(
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_constant",
-            val=0.4312,
+            val=1.0,
             units="N*m/A",
         )
 

@@ -543,17 +543,13 @@ def test_sizing_atr_42_turboshaft():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    problem.set_val(
-        "subgroup.performances.solve_equilibrium.update_mass.mass",
-        units="kg",
-        val=np.linspace(18000, 16000, 90),
-    )
+    # Intentionally commented
+    # problem.set_val(
+    #     "subgroup.performances.solve_equilibrium.update_mass.mass",
+    #     units="kg",
+    #     val=np.linspace(18000, 16000, 90),
+    # )
 
-    # recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
-    # solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
-    # solver.add_recorder(recorder)
-    # solver.recording_options["record_solver_residuals"] = True
-    # solver.recording_options["record_outputs"] = True
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 
@@ -561,8 +557,6 @@ def test_sizing_atr_42_turboshaft():
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
-
-    # sorted_variable_residuals = residuals_analyzer(recorder, problem)
 
     # Create the folder if it doesn't exist
     os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)

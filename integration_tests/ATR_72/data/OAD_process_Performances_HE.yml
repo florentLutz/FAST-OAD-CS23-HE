@@ -50,6 +50,7 @@ model:
     use_linesearch: False
     pre_condition_pt: False
     use_apply_nonlinear: False
+    rta_activation: True
 
 
 

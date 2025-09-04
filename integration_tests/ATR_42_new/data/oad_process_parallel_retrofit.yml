@@ -26,6 +26,7 @@ model:
     power_train_file_path: PT_parallel.yml
     use_linesearch: False
     pre_condition_pt: True
+    rta_activation: True
     out_file: ../results/hybrid_atr42_retrofit.csv
 #  change_input:
 #    id: fastga_he.correct_input2

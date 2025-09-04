@@ -63,17 +63,7 @@ def residuals_analyzer(recorder_path, solver):
     return sorted_variable_dict
 
 
-def test_non_regression_mission(cleanup):
-    run_non_regression_test(
-        CONFIGURATION_FILE,
-        SOURCE_FILE,
-        RESULTS_FOLDER,
-        check_only_mtow=False,
-        tolerance=1.0e-2,
-    )
-
-
-def run_non_regression_test(
+def test_non_regression(
     conf_file,
     legacy_result_file,
     result_dir,
@@ -181,18 +171,14 @@ def test_sizing_atr_42():
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-    # Define used files depending on options
-    xml_file_name = SOURCE_FILE
-    process_file_name = CONFIGURATION_FILE
-
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, CONFIGURATION_FILE))
     problem = configurator.get_problem()
 
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name))
     # print(oad.RegisterSubmodel.active_models["service.mass.propulsion"])
 
     # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+    ref_inputs = pth.join(DATA_FOLDER_PATH, SOURCE_FILE)
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
     # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 

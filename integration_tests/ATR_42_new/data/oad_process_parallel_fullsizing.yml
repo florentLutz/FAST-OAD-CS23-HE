@@ -68,6 +68,7 @@ model:
       use_linesearch: False
       pre_condition_pt: True
       use_apply_nonlinear: True
+      rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
       power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\PT_parallel.yml

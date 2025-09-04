@@ -291,7 +291,7 @@
             <solidity is_input="True">0.3<!--Solidity of the propeller--></solidity>
           </propeller_2>
         </propeller>
-        <SMPMSM>
+        <SM_PMSM>
           <motor_1>
             <winding_factor is_input="True"> 0.97</winding_factor>
             <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
@@ -300,16 +300,16 @@
             </CG>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
-            <Form_coefficient is_input="True">0.6</Form_coefficient>
-            <Tangential_stress units="N/m**2" is_input="True">50000</Tangential_stress>
+            <form_coefficient is_input="True">0.6</form_coefficient>
+            <tangential_stress units="N/m**2" is_input="True">50000</tangential_stress>
             <airgap_flux_density units="T" is_input="True">0.9</airgap_flux_density>
-            <cond_mat_density units="kg/m**3" is_input="True">8960</cond_mat_density>
+            <conductor_material_density units="kg/m**3" is_input="True">8960</conductor_material_density>
             <cond_twisting_coeff is_input="True">1.25</cond_twisting_coeff>
-            <density_current_ac_max units="A/m**2" is_input="True">8.1e6</density_current_ac_max>
+            <current_density_ac_max units="A/m**2" is_input="True">8.1e6</current_density_ac_max>
             <end_winding_coeff is_input="True">1.4</end_winding_coeff>
             <frame_density units="kg/m**3" is_input="True">2100</frame_density>
-            <insul_mat_density units="kg/m**3" is_input="True">1400</insul_mat_density>
-            <magn_mat_density units="kg/m**3" is_input="True">8150</magn_mat_density>
+            <insulation_material_density units="kg/m**3" is_input="True">1400</insulation_material_density>
+            <magnetic_material_density units="kg/m**3" is_input="True">8150</magnetic_material_density>
             <number_of_phases is_input="True">3</number_of_phases>
             <pole_pairs_number is_input="True">2</pole_pairs_number>
             <radius_ratio is_input="True">0.97</radius_ratio>
@@ -332,16 +332,16 @@
             </CG>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
-            <Form_coefficient is_input="True">0.6</Form_coefficient>
-            <Tangential_stress units="N/m**2" is_input="True">50000</Tangential_stress>
+            <form_coefficient is_input="True">0.6</form_coefficient>
+            <tangential_stress units="N/m**2" is_input="True">50000</tangential_stress>
             <airgap_flux_density units="T" is_input="True">0.9</airgap_flux_density>
-            <cond_mat_density units="kg/m**3" is_input="True">8960</cond_mat_density>
+            <conductor_material_density units="kg/m**3" is_input="True">8960</conductor_material_density>
             <cond_twisting_coeff is_input="True">1.25</cond_twisting_coeff>
-            <density_current_ac_max units="A/m**2" is_input="True">8.1e6</density_current_ac_max>
+            <current_density_ac_max units="A/m**2" is_input="True">8.1e6</current_density_ac_max>
             <end_winding_coeff is_input="True">1.4</end_winding_coeff>
             <frame_density units="kg/m**3" is_input="True">2100</frame_density>
-            <insul_mat_density units="kg/m**3" is_input="True">1400</insul_mat_density>
-            <magn_mat_density units="kg/m**3" is_input="True">8150</magn_mat_density>
+            <insulation_material_density units="kg/m**3" is_input="True">1400</insulation_material_density>
+            <magnetic_material_density units="kg/m**3" is_input="True">8150</magnetic_material_density>
             <number_of_phases is_input="True">3</number_of_phases>
             <pole_pairs_number is_input="True">2</pole_pairs_number>
             <radius_ratio is_input="True">0.97</radius_ratio>
@@ -355,7 +355,7 @@
             <winding_temperature units="degC" is_input="True">180</winding_temperature>
             <yoke_flux_density units="T" is_input="True">1.2</yoke_flux_density>
           </motor_2>
-        </SMPMSM>
+        </SM_PMSM>
         <PMSM>
           <motor_1>
             <front_length_ratio is_input="True">0.41<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
@@ -1247,18 +1247,21 @@
           </CG>
         </engine>
         <engine_controls_instrumentation>
+          <mass units="kg" is_input="False">31.274473647728<!--Mass of the propulsion system_inp_data:weight:propulsion:engine_controls_instrumentation:mass--></mass>
           <CG>
             <x units="m" is_input="False">2.4929548</x>
           </CG>
         </engine_controls_instrumentation>
         <fuel_lines>
+          <mass units="kg" is_input="False">185.4747362014734<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
           <CG>
-            <x units="m" is_input="False">10.568483355461352<!--fuel lines (B2): X-position of center of gravity--></x>
+            <x units="m" is_input="False">11.082322997944509<!--fuel lines (B2): X-position of center of gravity--></x>
           </CG>
         </fuel_lines>
         <propeller>
+          <mass units="kg" is_input="False">307.42287816198314<!--Mass of the propulsion system_inp_data:weight:propulsion:propeller:mass--></mass>
           <CG>
-            <x units="m" is_input="False">7.9462541535396065</x>
+            <x units="m" is_input="False">8.396427271476417</x>
           </CG>
         </propeller>
       </propulsion>
