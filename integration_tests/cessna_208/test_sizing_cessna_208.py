@@ -132,3 +132,56 @@ def test_sizing_hybrid_cessna_208b():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         3968.0, rel=5e-2
     )
+
+
+def test_sizing_hybrid_cessna_208b_better_fit():
+    """
+    Same as above except we allow resizing of the turboshaft. to the same turboshaft as for the
+    Kodiak.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_c208_retrofit.xml"
+    process_file_name = "hybrid_c208_retrofit_perfect_fit.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    # We won't fix the turboshaft here, rather let the code resize it for a perfect fit. We will
+    # assume that the turboshaft will be of the same family as the original one. So the same thermo-
+    # dynamic parameter will be kept, same k_sfc as well.
+
+    problem.run_model()
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "oad_process_outputs_he_better_fit.xml"
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3968.0, rel=5e-2
+    )

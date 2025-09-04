@@ -41,6 +41,7 @@ from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_fuel_consumption import PerformancesTurboshaftFuelConsumption
 from ..components.perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
 from ..components.perf_sfc import PerformancesSFC
+from ..components.perf_equivalent_efficiency import PerformancesEquivalentEfficiency
 
 from ..components.perf_inflight_co2_emissions import PerformancesTurboshaftInFlightCO2Emissions
 from ..components.perf_inflight_h2o_emissions import PerformancesTurboshaftInFlightH2OEmissions
@@ -734,6 +735,27 @@ def test_sfc():
 
     assert problem.get_val("specific_fuel_consumption", units="kg/h/kW") == pytest.approx(
         np.array([0.707, 0.634, 0.572, 0.519, 0.471, 0.429, 0.392, 0.358, 0.328, 0.300]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_equivalent_efficiency():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "specific_fuel_consumption",
+        units="kg/h/kW",
+        val=np.array([0.707, 0.634, 0.572, 0.519, 0.471, 0.429, 0.392, 0.358, 0.328, 0.300]),
+    )
+
+    problem = run_system(
+        PerformancesEquivalentEfficiency(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("equivalent_efficiency") == pytest.approx(
+        np.array([0.118, 0.132, 0.146, 0.161, 0.177, 0.195, 0.213, 0.233, 0.255, 0.279]),
         rel=1e-2,
     )
 

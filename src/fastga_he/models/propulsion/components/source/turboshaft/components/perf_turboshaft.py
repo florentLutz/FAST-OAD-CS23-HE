@@ -11,6 +11,7 @@ from .perf_required_power import PerformancesRequiredPower
 from .perf_fuel_consumption import PerformancesTurboshaftFuelConsumption
 from .perf_fuel_consumed import PerformancesTurboshaftFuelConsumed
 from .perf_sfc import PerformancesSFC
+from .perf_equivalent_efficiency import PerformancesEquivalentEfficiency
 from .perf_power_for_power_rate import PerformancesPowerForPowerRate
 from .perf_max_power_itt_limit import PerformancesMaxPowerITTLimit
 from .perf_equivalent_rated_power_itt_limit import PerformancesEquivalentRatedPowerITTLimit
@@ -83,6 +84,11 @@ class PerformancesTurboshaft(om.Group):
         self.add_subsystem(
             name="sfc",
             subsys=PerformancesSFC(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="equivalent_efficiency",
+            subsys=PerformancesEquivalentEfficiency(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

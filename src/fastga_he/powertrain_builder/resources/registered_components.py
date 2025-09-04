@@ -816,6 +816,7 @@ TURBOSHAFT = {
         {"SOx_emissions": "g"},
         {"H2O_emissions": "kg"},
         {"HC_emissions": "g"},
+        {"equivalent_efficiency": None}
     ],
     SMP: [
         {"exhaust_velocity": "m/s"},
