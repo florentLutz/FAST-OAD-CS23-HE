@@ -23,9 +23,9 @@ from utils.filter_residuals import filter_residuals
 FastoadLoader()
 
 
-DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
+DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "parallel")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
-CONFIGURATION_FILE = "oad_process_parallel_fullsizing.yml"
+CONFIGURATION_FILE = "atr42_fullsizing.yml"
 MISSION_FILE = "sizing_mission_R.yml"
 SOURCE_FILE = "inputs_parallel_fullsizing.xml"
 RESULTS_FOLDER = "problem_folder"
@@ -37,7 +37,7 @@ def cleanup():
 
 
 def test_pipistrel_network_viewer():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "pt_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):
@@ -482,9 +482,7 @@ def test_sizing_atr_42_fullsizing():
         val=np.linspace(18000, 16000, 90),
     )
 
-    datafile = oad.DataFile(
-        "C:/Users/a.carotenuto/Documents/GitHub/FAST-OAD-CS23-HE/integration_tests/ATR_42_new/data/to_report/retrofit/parallel/ATR42_retrofit_outputs.xml"
-    )
+    datafile = oad.DataFile("parallel/ATR42_retrofit_outputs.xml")
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",

@@ -39,12 +39,12 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         self.add_output(
             "airgap_reynolds_number",
-            val=np.zeros(number_of_points),
+            val=np.full(number_of_points, 3e4),
             desc="The reynolds number of the airgap between the rotor and stator.",
         )
         self.add_output(
             "rotor_end_reynolds_number",
-            val=np.zeros(number_of_points),
+            val=np.full(number_of_points, 9e5),
             desc="The reynolds number of the gap two rotor ends and the casing",
         )
 

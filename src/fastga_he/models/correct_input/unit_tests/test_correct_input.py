@@ -106,6 +106,7 @@ def test_induced_drag():
 
     problem.check_partials(compact_print=True)
 
+
 def test_aero_approx():
     ivc = get_indep_var_comp(list_inputs(Aero_compute()), __file__, XML_FILE)
 

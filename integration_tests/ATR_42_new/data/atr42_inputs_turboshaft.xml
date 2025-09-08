@@ -1,10 +1,10 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX is_input="True">72.0<!--top-level requirement: number of passengers, assuming a classic eco/business class repartition--></NPAX>
-      <approach_speed units="m/s" is_input="True">60.0<!--top-level requirement: approach speed--></approach_speed>
-      <cruise_mach is_input="True">0.45<!--top-level requirement: cruise Mach number--></cruise_mach>
-      <range units="nmi" is_input="True">750.0<!--top-level requirement: design range--></range>
+      <NPAX is_input="True">48.0<!--top-level requirement: number of passengers, assuming a classic eco/business class repartition--></NPAX>
+      <approach_speed units="m/s" is_input="True">58.0<!--top-level requirement: approach speed--></approach_speed>
+      <cruise_mach is_input="True">0.5<!--top-level requirement: cruise Mach number--></cruise_mach>
+      <range units="nmi" is_input="True">726.0<!--top-level requirement: design range--></range>
     </TLAR>
     <geometry>
       <has_T_tail is_input="True">1.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
@@ -27,9 +27,9 @@
         <span_ratio is_input="True">0.623<!--ratio (width of flaps)/(total span)--></span_ratio>
       </flap>
       <horizontal_tail>
-        <aspect_ratio is_input="True">4.555<!--aspect ratio of horizontal tail--></aspect_ratio>
-        <sweep_25 units="deg" is_input="True">6.32<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
-        <taper_ratio is_input="True">0.613<!--taper ratio of horizontal tail--></taper_ratio>
+        <aspect_ratio is_input="True">4.9<!--aspect ratio of horizontal tail--></aspect_ratio>
+        <sweep_25 units="deg" is_input="True">7.42<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
+        <taper_ratio is_input="True">0.58<!--taper ratio of horizontal tail--></taper_ratio>
         <thickness_ratio is_input="True">0.12<!--thickness ratio of horizontal tail--></thickness_ratio>
       </horizontal_tail>
       <propulsion>
@@ -56,7 +56,7 @@
         <thickness_ratio is_input="True">0.12<!--thickness ratio of vertical tail--></thickness_ratio>
       </vertical_tail>
       <wing>
-        <aspect_ratio is_input="True">12.0<!--wing aspect ratio--></aspect_ratio>
+        <aspect_ratio is_input="True">11.1<!--wing aspect ratio--></aspect_ratio>
         <sweep_100_inner units="rad" is_input="True">0.0<!--sweep angle at trailing edge of wing (inner side of the kink)--></sweep_100_inner>
         <sweep_25 units="rad" is_input="True">0.04014257279586958<!--sweep angle at 25% chord of wing--></sweep_25>
         <virtual_taper_ratio is_input="True">0.618<!--taper ratio of wing computed from virtual root chord--></virtual_taper_ratio>
@@ -95,9 +95,8 @@
       </lc2>
     </load_case>
     <propulsion>
-      <Design_Thermo_Power units="W" is_input="True">2497648.194206328<!--Power used to compute the gas turbine mass flow rate--></Design_Thermo_Power>
-      <Power_Offtake units="W" is_input="True">nan</Power_Offtake>
-      <RTO_power units="W" is_input="True">2047252.6182019084<!--Reserve take off power of the gas turbine--></RTO_power>
+      <Design_Thermo_Power units="W" is_input="True">1900000.0<!--Power used to compute the gas turbine mass flow rate--></Design_Thermo_Power>
+      <RTO_power units="hp" is_input="True">2086.6300120691967<!--Reserve take off power of the gas turbine--></RTO_power>
       <L1_engine>
         <turbine_inlet_temperature units="degK" is_input="True">1526.0</turbine_inlet_temperature>
         <hpc>
@@ -114,10 +113,10 @@
         <thrust_distribution is_input="True">[1.0, 1.0]</thrust_distribution>
         <fuel_system>
           <fuel_system_1>
-            <fuel_distribution is_input="True">1.0</fuel_distribution>
-            <fuel_type is_input="True">3.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <fuel_distribution is_input="True">[1.0, 1.0]</fuel_distribution>
+            <fuel_type is_input="True">1.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
-              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.2941<!--Y position of the ICE center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
           </fuel_system_1>
         </fuel_system>
@@ -141,14 +140,14 @@
             <blade_twist units="rad" is_input="True">0.6106686068549907<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="cm" is_input="True">396.0<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.189<!--Distance between the propeller and the leading edge--></from_LE>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">6.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">1100.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.3<!--Solidity of the propeller--></solidity>
             <CG>
-              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.2941<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             </CG>
           </propeller_1>
           <propeller_2>
@@ -156,14 +155,14 @@
             <blade_twist units="rad" is_input="True">0.6106686068549907<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="cm" is_input="True">396.0<!--Diameter of the propeller--></diameter>
-            <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.189<!--Distance between the propeller and the leading edge--></from_LE>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
             <number_blades is_input="True">6.0<!--Number of blades on the propeller--></number_blades>
             <rpm_mission units="1/min" is_input="True">1100.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.3<!--Solidity of the propeller--></solidity>
             <CG>
-              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.2941<!--Location of the propeller along the span as a fraction of the span--></y_ratio>
             </CG>
           </propeller_2>
         </propeller>
@@ -177,7 +176,7 @@
             <design_point>
               <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+              <power_ratio is_input="True">1.3<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <emission_index>
               <CO units="g/kg" is_input="True">5.0</CO>
@@ -201,7 +200,7 @@
             <design_point>
               <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+              <power_ratio is_input="True">1.3<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <emission_index>
               <CO units="g/kg" is_input="True">5.0</CO>
@@ -219,13 +218,13 @@
         </turboshaft>
       </he_power_train>
       <propeller>
-        <disk_loading units="kW/m**2" is_input="True">184.99</disk_loading>
-        <max_power units="kW" is_input="True">2239.694364312888</max_power>
+        <disk_loading units="kW/m**2" is_input="True">154.99</disk_loading>
+        <max_power units="kW" is_input="True">1570.694364312888</max_power>
       </propeller>
     </propulsion>
     <aerodynamics>
       <cruise>
-        <mach is_input="True">0.5<!--mach number representative of high speed aerodynamics--></mach>
+        <mach is_input="True">0.45<!--mach number representative of high speed aerodynamics--></mach>
       </cruise>
       <aircraft>
         <cruise>
@@ -257,15 +256,24 @@
     </handling_qualities>
     <weight>
       <aircraft>
-        <max_payload units="kg" is_input="True">7050.0<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">6840.0<!--_inp_data:weight:aircraft:payload--></payload>
+        <max_payload units="kg" is_input="True">5500.0<!--max payload weight--></max_payload>
+        <payload units="kg" is_input="True">4560.0<!--_inp_data:weight:aircraft:payload--></payload>
         <sizing_block_fuel units="kg" is_input="True">2653.600779637683<!--block fuel quantity (i.e. loaded before taxi-out) used for sizing process--></sizing_block_fuel>
         <sizing_onboard_fuel_at_input_weight units="kg" is_input="True">2622.2284392840807<!--_inp_data:weight:aircraft:sizing_onboard_fuel_at_input_weight--></sizing_onboard_fuel_at_input_weight>
       </aircraft>
       <propulsion>
         <engine>
-          <mass units="kg" is_input="True">779.1788430737936<!--Mass of the propulsion system_inp_data:weight:propulsion:engine:mass--></mass>
+          <mass units="kg" is_input="True">779.1788430737936<!--engine (B1): mass--></mass>
         </engine>
+        <engine_controls_instrumentation>
+          <mass units="kg" is_input="True">31.274473647728<!--Mass of the propulsion system_inp_data:weight:propulsion:engine_controls_instrumentation:mass--></mass>
+        </engine_controls_instrumentation>
+        <fuel_lines>
+          <mass units="kg" is_input="True">185.4747362014734<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
+        </fuel_lines>
+        <propeller>
+          <mass units="kg" is_input="True">307.42287816198314<!--Mass of the propulsion system_inp_data:weight:propulsion:propeller:mass--></mass>
+        </propeller>
       </propulsion>
     </weight>
     <mission>
@@ -311,7 +319,7 @@
           <range is_input="True">0.3<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
           <aft>
             <MAC_position>
-              <margin is_input="True">-0.0<!--Added margin for getting most aft CG position, as ratio of mean aerodynamic chord--></margin>
+              <margin is_input="True">-0.02<!--Added margin for getting most aft CG position, as ratio of mean aerodynamic chord--></margin>
             </MAC_position>
           </aft>
         </CG>
@@ -410,7 +418,7 @@
     </geometry>
     <weight>
       <aircraft>
-        <mlw_mzfw_ratio is_input="True">1.0925<!--empiric ratio used for evaluate the MLW from the MZFW--></mlw_mzfw_ratio>
+        <mlw_mzfw_ratio is_input="True">1.0958<!--empiric ratio used for evaluate the MLW from the MZFW--></mlw_mzfw_ratio>
       </aircraft>
       <airframe>
         <fuselage>
@@ -598,18 +606,6 @@
     <aerodynamics>
       <aircraft>
         <cruise>
-          <CD>
-            <k is_input="True">1.0<!--correction ratio to apply to computed drag coefficient in cruise conditions--></k>
-            <offset is_input="True">0.0<!--correction offset to apply to computed drag coefficient in cruise conditions--></offset>
-            <compressibility>
-              <characteristic_mach_increment is_input="True">0.0<!--increment to apply to the computed characteristic Mach (where compressibility drag is 20 d.c.)--></characteristic_mach_increment>
-              <max_value is_input="True">0.5<!--maximum authorized value for compressibility drag. Allows to prevent the model from overestimating the compressibility effect, especially for aircraft models after year 2000.--></max_value>
-            </compressibility>
-            <winglet_effect>
-              <k is_input="True">0.9473<!--correction ratio to apply to computed induced drag coefficient in cruise conditions--></k>
-              <offset is_input="True">0.0<!--correction ratio to apply to computed drag coefficient in cruise conditions--></offset>
-            </winglet_effect>
-          </CD>
           <CL>
             <k is_input="True">1.0<!--ratio to apply to defined cl range (which goes by default from 0.0 to 1.5) in cruise polar computation--></k>
             <offset is_input="True">0.0<!--offset to apply to defined cl range (which goes by default from 0.0 to 1.5) in cruise polar computation--></offset>
@@ -618,6 +614,12 @@
               <offset is_input="True">0.0<!--offset to apply to defined cl range (which goes by default from 0.0 to 1.5) in cruise polar computation--></offset>
             </winglet_effect>
           </CL>
+          <CD>
+            <compressibility>
+              <characteristic_mach_increment is_input="True">0.0<!--increment to apply to the computed characteristic Mach (where compressibility drag is 20 d.c.)--></characteristic_mach_increment>
+              <max_value is_input="True">0.5<!--maximum authorized value for compressibility drag. Allows to prevent the model from overestimating the compressibility effect, especially for aircraft models after year 2000.--></max_value>
+            </compressibility>
+          </CD>
         </cruise>
       </aircraft>
       <high_lift_devices>

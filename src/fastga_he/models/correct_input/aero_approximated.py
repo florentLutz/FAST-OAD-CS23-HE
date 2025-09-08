@@ -158,11 +158,11 @@ class _Cl_Ref(om.ExplicitComponent):
     """Computation of the cl_ref based on an elliptic distribution assumption"""
 
     def setup(self):
-        self.add_input("vector_product", val=np.nan, shape_by_conn=True)
+        self.add_input("vector_product", val=np.nan, shape=100)
         self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
-        self.add_output("data:aerodynamics:wing:low_speed:CL_ref")
+        self.add_output("data:aerodynamics:wing:low_speed:CL_ref", val=0.67888)
 
     def setup_partials(self):
         self.declare_partials("*", "*", method="exact")
@@ -172,7 +172,7 @@ class _Cl_Ref(om.ExplicitComponent):
         product = inputs["vector_product"]
         b = inputs["data:geometry:wing:b_50"]
 
-        outputs["data:aerodynamics:wing:low_speed:CL_ref"] = np.trapz(product, dx=b / 198) / (
+        outputs["data:aerodynamics:wing:low_speed:CL_ref"] = np.trapz(product, dx=b / 198.0) / (
             0.5 * s_w
         )
 
@@ -182,15 +182,15 @@ class _Cl_Ref(om.ExplicitComponent):
         b = inputs["data:geometry:wing:b_50"]
 
         partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:area"] = -np.trapz(
-            product, dx=b / 198
+            product, dx=b / 198.0
         ) / (0.5 * s_w**2.0)
 
         partials["data:aerodynamics:wing:low_speed:CL_ref", "vector_product"] = (
-            np.array([b / 198] + [b / 99] * 98 + [b / 198]) / s_w
+            np.array([b / 198.0] + [b / 99.0] * 98 + [b / 198.0]) / s_w
         )
 
         partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:b_50"] = np.trapz(
-            product, dx=1 / 198
+            product, dx=1.0 / 198.0
         ) / (0.5 * s_w)
 
 
@@ -201,7 +201,9 @@ class _Induced_Drag_Coefficient(om.ExplicitComponent):
         self.add_input("data:geometry:horizontal_tail:aspect_ratio", val=np.nan)
         self.add_input("data:aerodynamics:aircraft:cruise:oswald_coefficient", val=np.nan)
 
-        self.add_output("data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient")
+        self.add_output(
+            "data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient", val=0.08234
+        )
 
     def setup_partials(self):
         self.declare_partials("*", "*", method="exact")

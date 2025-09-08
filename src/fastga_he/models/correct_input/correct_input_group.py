@@ -23,4 +23,4 @@ class CorrectName1Group(om.Group):
         self.add_subsystem(
             name="correct_fus_cmalpha", subsys=ComputeCmAlphaFuselage(), promotes=["*"]
         )
-        self.add_subsystem(name="aero_approximated", subsys=Aero_compute(), promotes=["*"])
+        self.add_subsystem(name="aero_approximated", subsys=Aero_compute(), promotes=["data:*"])

@@ -37,7 +37,7 @@ def cleanup():
 
 
 def test_pipistrel_network_viewer():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "pt_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):

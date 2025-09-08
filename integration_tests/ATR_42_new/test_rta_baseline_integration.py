@@ -56,7 +56,7 @@ def residuals_analyzer(recorder_path, solver):
 
 
 def test_network_viewer():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "PT_parallel.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "pt_parallel.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "ATR42_assembly_hybridPT.html")
 
     if not os.path.exists(network_file_path):
@@ -294,11 +294,11 @@ def test_sizing_atr_42_full_sizing():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    # problem.set_val(
-    #     "subgroup.performances.solve_equilibrium.update_mass.mass",
-    #     units="kg",
-    #     val=np.linspace(18000, 16000, 90),
-    # )
+    problem.set_val(
+        "performances.solve_equilibrium.update_mass.mass",
+        units="kg",
+        val=np.linspace(18000, 16000, 90),
+    )
 
     datafile = oad.DataFile("data/atr42_retrofit_data.xml")
 
@@ -404,13 +404,13 @@ def test_sizing_atr_42_fullsizing_series():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    # problem.set_val(
-    #     "subgroup.performances.solve_equilibrium.update_mass.mass",
-    #     units="kg",
-    #     val=np.linspace(18000, 16000, 90),
-    # )
+    problem.set_val(
+        "performances.solve_equilibrium.update_mass.mass",
+        units="kg",
+        val=np.linspace(18000, 16000, 90),
+    )
 
-    datafile = oad.DataFile("atr42_retrofit_data.xml")
+    datafile = oad.DataFile("data/atr42_retrofit_data.xml")
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",
@@ -480,8 +480,8 @@ def test_sizing_atr_42_turboshaft():
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
-    xml_file_name = SOURCE_FILE
-    process_file_name = CONFIGURATION_FILE
+    xml_file_name = "atr42_inputs_turboshaft"
+    process_file_name = "atr42_turboshaft.yml"
 
     configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()
@@ -515,12 +515,11 @@ def test_sizing_atr_42_turboshaft():
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
 
-    # Intentionally commented
-    # problem.set_val(
-    #     "subgroup.performances.solve_equilibrium.update_mass.mass",
-    #     units="kg",
-    #     val=np.linspace(18000, 16000, 90),
-    # )
+    problem.set_val(
+        "subgroup.performances.solve_equilibrium.update_mass.mass",
+        units="kg",
+        val=np.linspace(18000, 16000, 90),
+    )
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 
