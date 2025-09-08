@@ -1,11 +1,11 @@
-title: Sample OAD Process
+title: Resized ATR 42 with parallel hybrid powertrain
 
 # List of folder paths where user added custom registered OpenMDAO components
 module_folders:
 
 # Input and output files
-input_file: ../results/problem_inputs.xml
-output_file: ../results/problem_outputs.xml
+input_file: ../results/resized_hybrid_inputs.xml
+output_file: ../results/resized_hybrid_oututs.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
@@ -55,23 +55,22 @@ model:
     change_input:
       id: fastga_he.correct_input2
 
-#    pt_mass:
-#      id: fastga_he.submodel.weight.mass.propulsion.engine.power_train
     performances:
       id: fastga_he.performances.mission_vector
       number_of_points_climb: 30
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\PT_parallel.yml
-      out_file: ../results/fuel_propulsion.csv
+      power_train_file_path: pt_parallel.yml
+      out_file: ../results/full_sized_hybrid_propulsion.csv
       use_linesearch: False
       pre_condition_pt: True
+      sort_component: True
       use_apply_nonlinear: True
       rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\PT_parallel.yml
+      power_train_file_path: pt_parallel.yml
 #  engine_size:
 #    id: rta.loop.engine_size
 
@@ -84,7 +83,7 @@ submodels:
   service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
   service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.new
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
-  submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
+  submodel.propulsion.constraints.sm_pmsm.torque: fastga_he.submodel.propulsion.constraints.sm_pmsm.torque.enforce
   submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.fixed
   submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
   submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed

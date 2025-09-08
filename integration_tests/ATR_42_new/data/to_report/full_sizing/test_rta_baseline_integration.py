@@ -27,7 +27,7 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "parallel")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 CONFIGURATION_FILE = "atr42_fullsizing.yml"
 MISSION_FILE = "sizing_mission_R.yml"
-SOURCE_FILE = "inputs_parallel_fullsizing.xml"
+SOURCE_FILE = "inputs_parallel_hybrid_fullsizing.xml"
 RESULTS_FOLDER = "problem_folder"
 
 
