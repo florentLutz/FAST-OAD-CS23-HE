@@ -5,6 +5,8 @@
 import pathlib
 import logging
 
+import numpy as np
+
 import pytest
 
 import fastoad.api as oad
@@ -13,6 +15,8 @@ from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
+DOE_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_doe_no_resizing"
+DOE_RESIZED_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_doe_resizing"
 
 
 def test_sizing_cessna_208b():
@@ -125,6 +129,13 @@ def test_sizing_hybrid_cessna_208b():
     problem.setup()
 
     problem.set_val(
+        "data:weight:aircraft:MTOW",
+        units="kg",
+        val=3968.0,
+    )
+    problem.model.aircraft_sizing.nonlinear_solver.options["maxiter"] = 30
+
+    problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
         val=8.0,
         units="h**-1",
@@ -138,6 +149,73 @@ def test_sizing_hybrid_cessna_208b():
         3968.0, rel=5e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(434.0, rel=1e-2)
+
+
+def test_doe_sizing_hybrid_cessna_208b():
+    """
+    Same test as above except with varying values of the power share parameter.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_c208_retrofit.xml"
+    process_file_name = "hybrid_c208_retrofit.yml"
+
+    # We'll go from 10 kW below the max power to 10 kW below the cruise power (from experience it is
+    # going to diverge at this point)
+    power_shares = np.arange(270.0, 391.0, 10.0)
+
+    for power_share in power_shares:
+        configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+        problem = configurator.get_problem()
+
+        # Create inputs
+        ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+        problem.write_needed_inputs(ref_inputs)
+        problem.read_inputs()
+
+        problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+        problem.model_options["*turboshaft_1*"] = {
+            "adjust_sfc": True,
+            "reference_rated_power": [300, 503.3475],
+            "reference_k_sfc": [1.2, 1.05],
+        }
+        problem.model_options["*"] = {
+            "cell_capacity_ref": 2.5,
+            "cell_weight_ref": 45.0e-3,
+            "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+            "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+        }
+
+        problem.setup()
+
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+            val=8.0,
+            units="h**-1",
+        )
+
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share",
+            units="kW",
+            val=power_share,
+        )
+        problem.set_val(
+            "data:weight:aircraft:MTOW",
+            units="kg",
+            val=3968.0,
+        )
+
+        problem.run_model()
+
+        problem.output_file_path = DOE_RESULTS_FOLDER_PATH / (
+            str(int(round(power_share, 0))) + "_power_share.xml"
+        )
+        problem.write_outputs()
 
 
 def test_sizing_hybrid_cessna_208b_better_fit():
@@ -183,6 +261,11 @@ def test_sizing_hybrid_cessna_208b_better_fit():
         val=8.0,
         units="h**-1",
     )
+    problem.set_val(
+        "data:weight:aircraft:MTOW",
+        units="kg",
+        val=3968.0,
+    )
 
     # We won't fix the turboshaft here, rather let the code resize it for a perfect fit. We will
     # assume that the turboshaft will be of the same family as the original one. So the same thermo-
@@ -197,3 +280,72 @@ def test_sizing_hybrid_cessna_208b_better_fit():
         3968.0, rel=5e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(332.0, rel=1e-2)
+
+
+def test_doe_sizing_hybrid_cessna_208b_better_fit():
+    """
+    Same test as above except with varying values of the power share parameter.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_c208_retrofit.xml"
+    process_file_name = "hybrid_c208_retrofit_perfect_fit.yml"
+
+    # We'll go from 10 kW below the max power to 10 kW below the cruise power (from experience it is
+    # going to diverge at this point)
+    power_shares = np.arange(270.0, 401.0, 10.0)
+    # power_shares = np.arange(270.0, 290.5, 1.0)
+
+    for power_share in power_shares:
+        configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+        problem = configurator.get_problem()
+
+        # Create inputs
+        ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+        problem.write_needed_inputs(ref_inputs)
+        problem.read_inputs()
+
+        problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+        problem.model_options["*turboshaft_1*"] = {
+            "adjust_sfc": True,
+            "reference_rated_power": [300, 503.3475],
+            "reference_k_sfc": [1.2, 1.05],
+        }
+        problem.model_options["*"] = {
+            "cell_capacity_ref": 2.5,
+            "cell_weight_ref": 45.0e-3,
+            "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+            "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+        }
+
+        problem.setup()
+
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+            val=8.0,
+            units="h**-1",
+        )
+
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share",
+            units="kW",
+            val=power_share,
+        )
+
+        problem.set_val(
+            "data:weight:aircraft:MTOW",
+            units="kg",
+            val=3968.0,
+        )
+
+        problem.run_model()
+
+        problem.output_file_path = DOE_RESIZED_RESULTS_FOLDER_PATH / (
+            str(int(round(power_share, 0))) + "_power_share.xml"
+        )
+        problem.write_outputs()

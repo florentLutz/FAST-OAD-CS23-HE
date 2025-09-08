@@ -12,7 +12,7 @@ driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
 
 model:
   aircraft_sizing:
-    nonlinear_solver: om.NonlinearBlockGS(maxiter=100, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True)
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=20, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True)
     linear_solver: om.LinearBlockGS()
     power_train_sizing:
       id: fastga_he.power_train.sizing
@@ -36,6 +36,8 @@ model:
       id: fastga_he.environmental.energy_simple
       mission: design
       electricity_mix: france
+    mtow:
+      id: fastga.loop.mtow
 
 
 
@@ -50,8 +52,6 @@ submodels:
   submodel.performances.mission_vector.descent_speed: null
   submodel.performances.mission_vector.climb_speed: null
   submodel.performances.mission_vector.reserve_speed: null
-  service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.roskam
-  service.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
@@ -75,8 +75,14 @@ submodels:
   service.weight.mass.furniture.seats: null
   submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
   submodel.weight.cg.loadcase.ground: fastga_he.submodel.weight.cg.loadcase.ground.simple
-  service.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
   submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
-  submodel.weight.mass.mzfw_and_mlw: null
+  submodel.weight.mass.mzfw_and_mlw: fastga_he.submodel.weight.mass.mzfw_and_mlw.only_zfw
   submodel.performances.cg_variation: fastga_he.submodel.performances.cg_variation.simple
   submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.ensure
+  service.weight.mass.airframe: fastga.submodel.weight.mass.airframe.weight_nan
+  service.weight.mass.airframe.fuselage: null
+  service.weight.mass.airframe.wing: null
+  service.weight.mass.airframe.tail: null
+  service.weight.mass.airframe.paint: null
+  service.weight.mass.airframe.flight_controls: null
+  service.weight.mass.airframe.landing_gear: null
