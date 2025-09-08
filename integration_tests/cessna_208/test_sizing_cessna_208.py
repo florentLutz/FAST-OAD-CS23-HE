@@ -349,3 +349,39 @@ def test_doe_sizing_hybrid_cessna_208b_better_fit():
             str(int(round(power_share, 0))) + "_power_share.xml"
         )
         problem.write_outputs()
+
+
+def test_resizing_c208b_new_mission():
+    """
+    Sizes a pseudo C208 with the same mission as the one the hybrid version were sized on. Will
+    allow resizing of the turboshaft.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_c208_with_resizing.xml"
+    process_file_name = "full_sizing_c208_with_resizing.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs and run the problem
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+    problem.run_model()
+    problem.write_outputs()
+
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
+        400.00, rel=5e-2
+    ) # Should be lower than the fuel of the original on the off design mission (428 kg)
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        2028.0, rel=5e-2
+    )  # Should be lower than the original OWE 2146
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3578.0, rel=5e-2
+    )  # Should be lower than the TOW of the original on the off design mission (3708 kg)

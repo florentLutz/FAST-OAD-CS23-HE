@@ -26,7 +26,12 @@ from fastga.models.weight.mass_breakdown.a_airframe.constants import (
     SERVICE_LANDING_GEAR_MASS,
     SERVICE_PAINT_MASS,
 )
-from fastga.models.weight.mass_breakdown.constants import SERVICE_AIRFRAME_MASS
+from fastga.models.weight.mass_breakdown.constants import (
+    SERVICE_AIRFRAME_MASS,
+    SUBMODEL_AIRFRAME_MASS_LEGACY,
+)
+
+oad.RegisterSubmodel.active_models[SERVICE_AIRFRAME_MASS] = SUBMODEL_AIRFRAME_MASS_LEGACY
 
 
 @oad.RegisterSubmodel(SERVICE_AIRFRAME_MASS, "fastga.submodel.weight.mass.airframe.weight_nan")
