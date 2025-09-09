@@ -4,7 +4,6 @@
 
 import numpy as np
 import openmdao.api as om
-import os.path as pth
 
 from ..constants import IRON_LOSSES_COEFF
 

@@ -15,14 +15,15 @@ Estimation of global center of gravity
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from openmdao.api import Group
+from fastoad.module_management.service_registry import RegisterSubmodel
+from fastoad_cs25.models.weight.cg.constants import SERVICE_GLOBAL_CG
+
 from rta.models.weight.cg.cg_components.compute_cg_loadcase1 import ComputeCGLoadCase1
 from rta.models.weight.cg.cg_components.compute_cg_loadcase2 import ComputeCGLoadCase2
 from rta.models.weight.cg.cg_components.compute_cg_loadcase3 import ComputeCGLoadCase3
 from rta.models.weight.cg.cg_components.compute_max_cg_ratio import ComputeMaxCGratio
 from .cg_computation_cs25 import ComputeCGRatioAft
-from openmdao.api import Group
-from fastoad.module_management.service_registry import RegisterSubmodel
-from fastoad_cs25.models.weight.cg.constants import SERVICE_GLOBAL_CG
 
 
 @RegisterSubmodel(SERVICE_GLOBAL_CG, "rta.submodel.weight.cg.global.new")

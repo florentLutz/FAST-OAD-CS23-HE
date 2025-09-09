@@ -1,4 +1,4 @@
-title: atr_72_full_sizing
+title: Sample OAD Process
 
 # List of folder paths where user added custom registered OpenMDAO components
 module_folders:
@@ -37,41 +37,50 @@ model:
       payload_from_npax: false
     mtow:
       id: fastoad.mass_performances.compute_MTOW
-    hq_tail_sizing:
-      id: fastoad.handling_qualities.tail_sizing
-    hq_static_margin:
-      id: fastoad.handling_qualities.static_margin
-    wing_position:
-      id: fastoad.loop.wing_position
     aerodynamics_highspeed:
       id: fastoad.aerodynamics.highspeed.legacy
     aerodynamics_lowspeed:
       id: fastoad.aerodynamics.lowspeed.legacy
     aerodynamics_takeoff:
       id: rta.aerodynamics.takeoff
+    hq_tail_sizing:
+      id: fastoad.handling_qualities.tail_sizing
+    hq_static_margin:
+      id: fastoad.handling_qualities.static_margin
+    wing_position:
+      id: fastoad.loop.wing_position
     wing_area:
       id: fastoad.loop.wing_area
 
     change_input:
       id: fastga_he.rta_variables
 
-
+#    pt_mass:
+#      id: fastga_he.submodel.weight.mass.propulsion.engine.power_train
     performances:
       id: fastga_he.performances.mission_vector
       number_of_points_climb: 30
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: ../data/fuel_propulsion.yml
+      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\fuel_propulsion.yml
       out_file: ../results/fuel_propulsion.csv
       use_linesearch: False
       pre_condition_pt: False
       use_apply_nonlinear: False
-      rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: ../data/fuel_propulsion.yml
+      power_train_file_path: C:\Users\a.carotenuto\Documents\GitHub\FAST-OAD-CS23-HE\integration_tests\ATR_42_new\data\fuel_propulsion.yml
 
+
+    environmental_impact:
+      id: fastga_he.environmental.energy_simple
+      mission: design
+      electricity_mix: europe
+
+
+#  engine_size:
+#    id: rta.loop.engine_size
 
 submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.as_float
@@ -79,4 +88,29 @@ submodels:
   service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.as_float
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+#  service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.new
+#  service.performances.delta_m: fastga_he.submodel.performances.delta_m.tanh
+#  service.aerodynamics.CD0.fuselage: rta.submodel.aerodynamics.CD0.fuselage
+#  service.aerodynamics.CD0.wing: rta.submodel.aerodynamics.CD0.wing
+#  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.as_float"
+#  service.aerodynamics.CD0.nacelles_pylons: rta.submodel.aerodynamics.CD0.nacelles
+#  service.aerodynamics.CD0.sum: rta.submodel.aerodynamics.CD0.sum
+#  service.aerodynamics.induced_drag_coefficient: fastoad.submodel.aerodynamics.induced_drag_coefficient.legacy
+#  service.geometry.fuselage.basic: rta.submodel.geometry.fuselage.basic
+#  service.geometry.fuselage.with_cabin_sizing: rta.submodel.geometry.fuselage.with_cabin_sizing
+#  service.geometry.wing: rta.submodel.geometry.wing
+#  service.geometry.nacelle_and_pylon: rta.submodel.geometry.nacelles
+#  service.cg.wing.control_surfaces: rta.submodel.cg.wing.control_surfaces.legacy
 
+#optimization: # This section is needed only if optimization process is run
+ # design_variables:
+ #   - name: data:geometry:wing:aspect_ratio
+  #    lower: 9.0
+  #    upper: 18.0
+ # constraints:
+ #   - name: data:geometry:wing:span
+ #     upper: 60.0
+ # objective:
+ #   - name: data:mission:sizing:needed_block_fuel
+  #    scaler: 1.e-4

@@ -6,16 +6,10 @@ import os
 import os.path as pth
 from shutil import rmtree
 import logging
-import numpy as np
-
 import pytest
-import os
-import csv
-
 import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
-
 import plotly.graph_objects as go
 
 from utils.filter_residuals import filter_residuals

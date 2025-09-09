@@ -1,11 +1,11 @@
-title: atr_72_full_sizing
+title: ATR 42 OAD Process
 
 # List of folder paths where user added custom registered OpenMDAO components
 module_folders:
 
 # Input and output files
-input_file: ../results/problem_inputs.xml
-output_file: ../results/problem_outputs.xml
+input_file: ../results/atr42_full_sizing_inputs.xml
+output_file: ../results/atr42_full_sizing_outputs.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
@@ -37,24 +37,23 @@ model:
       payload_from_npax: false
     mtow:
       id: fastoad.mass_performances.compute_MTOW
-    hq_tail_sizing:
-      id: fastoad.handling_qualities.tail_sizing
-    hq_static_margin:
-      id: fastoad.handling_qualities.static_margin
-    wing_position:
-      id: fastoad.loop.wing_position
     aerodynamics_highspeed:
       id: fastoad.aerodynamics.highspeed.legacy
     aerodynamics_lowspeed:
       id: fastoad.aerodynamics.lowspeed.legacy
     aerodynamics_takeoff:
       id: rta.aerodynamics.takeoff
+    hq_tail_sizing:
+      id: fastoad.handling_qualities.tail_sizing
+    hq_static_margin:
+      id: fastoad.handling_qualities.static_margin
+    wing_position:
+      id: fastoad.loop.wing_position
     wing_area:
       id: fastoad.loop.wing_area
 
     change_input:
       id: fastga_he.rta_variables
-
 
     performances:
       id: fastga_he.performances.mission_vector
@@ -62,7 +61,7 @@ model:
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: ../data/fuel_propulsion.yml
+      power_train_file_path: PT_fuel_propulsion.yml
       out_file: ../results/fuel_propulsion.csv
       use_linesearch: False
       pre_condition_pt: False
@@ -70,7 +69,7 @@ model:
       rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: ../data/fuel_propulsion.yml
+      power_train_file_path: PT_fuel_propulsion.yml
 
 
 submodels:
@@ -79,4 +78,6 @@ submodels:
   service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.as_float
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+  service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.new
 

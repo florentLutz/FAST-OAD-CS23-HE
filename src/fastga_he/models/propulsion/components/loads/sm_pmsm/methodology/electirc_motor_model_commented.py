@@ -1,4 +1,5 @@
 import numpy as np
+from fastga_he.models.propulsion.components.loads.sm_pmsm.constants import IRON_LOSSES_COEFF
 
 """ 
 PMSM model from HASTECS project :cite:`touhami:2020`
@@ -190,27 +191,23 @@ if __name__ == "__main__":
     print(f"Total mechanical losses: {P_mec_loss:.2f} W")
 
     # Iron losses
-    # Carica i coefficienti salvati (matrice 4x4)
-    coeffs_reshaped = np.load("coeffs_reshaped.npy")
 
-    # Valori di test
-    f = RPM / 30  # Frequenza in Hz
-
+    f = RPM / 30  # frequency in Hz
     sqrt_f = np.sqrt(f)
     sqrt_Bm = np.sqrt(B_m)
 
     P_iron = 0
 
-    for i in range(4):  # i = potenza di sqrt(f)
-        for j in range(4):  # j = potenza di sqrt(Bm)
-            coeff = coeffs_reshaped[i][j]
+    for i in range(4):  # i = power of sqrt(f)
+        for j in range(4):  # j = power of sqrt(Bm)
+            coeff = IRON_LOSSES_COEFF[i][j]
             term = coeff * (sqrt_f ** (i + 1)) * (sqrt_Bm ** (j + 1))
             P_iron += term
 
-    # Se necessario, moltiplica per un fattore di scala (es. 224.88)
+    # If necessary, multiply by a scaling factor (e.g., 224.88)
     P_iron *= 224.88
 
-    print(f"Per f = {f:.2f} Hz e Bm = {B_m} T, le perdite stimate sono: {P_iron:.2f} W/kg")
+    print(f"For f = {f:.2f} Hz and Bm = {B_m} T, the estimated losses are: {P_iron:.2f} W/kg")
 
     P_loss = P_j + P_mec_loss + P_iron
     #

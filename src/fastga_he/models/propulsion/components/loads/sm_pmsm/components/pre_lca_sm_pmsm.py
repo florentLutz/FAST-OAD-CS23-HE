@@ -7,7 +7,7 @@ import openmdao.api as om
 from .pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 
 
-class PreLCAPMSM(om.Group):
+class PreLCASMPMSM(om.Group):
     def initialize(self):
         self.options.declare(
             name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False

@@ -15,7 +15,7 @@ model:
   linear_solver: om.LinearBlockGS()
   power_train_sizing:
     id: fastga_he.power_train.sizing
-    power_train_file_path: atr42_hybrid_assembly.yml
+    power_train_file_path: PT_series.yml
 
   performances:
     id: fastga_he.performances.mission_vector
@@ -23,9 +23,10 @@ model:
     number_of_points_cruise: 30
     number_of_points_descent: 20
     number_of_points_reserve: 10
-    power_train_file_path: atr42_hybrid_assembly.yml
+    power_train_file_path: PT_series.yml
     use_linesearch: False
     pre_condition_pt: True
+    out_file: ../results/hybrid_atr42_retrofit.csv
 #  change_input:
 #    id: fastga_he.rta_variables
   weight:
@@ -34,6 +35,15 @@ model:
 
   payload_update:
     id: fastga_he.weight.payload_for_retrofit
+
+  hq_static_margin:
+    id: fastoad.handling_qualities.static_margin
+
+  environmental_impact:
+    id: fastga_he.environmental.energy_simple
+    mission: design
+    electricity_mix: europe
+
 
 submodels:
   submodel.weight.mass.payload: null
@@ -50,13 +60,17 @@ submodels:
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
-  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.constant
+  submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
+  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.fixed
+  submodel.propulsion.rectifier.junction_temperature: fastga_he.submodel.propulsion.rectifier.junction_temperature.fixed
+  submodel.propulsion.rectifier.efficiency: fastga_he.submodel.propulsion.rectifier.efficiency.fixed
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.constraints.pmsm.torque: fastga_he.submodel.propulsion.constraints.pmsm.torque.enforce
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
-  submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
-  submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+  service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.new
+  #service.cg.global: rta.submodel.weight.cg.global.new
   submodel.weight.mass.system.power_system: null
   submodel.weight.mass.system.avionics_system: null
   submodel.weight.mass.system.life_support_system: null
@@ -70,9 +84,18 @@ submodels:
   submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
   submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
   submodel.weight.mass.furniture.seats: null
-  submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
   submodel.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
-  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
+  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
   submodel.weight.mass.mzfw_and_mlw: null
-  submodel.performances.cg_variation: fastga_he.submodel.performances.cg_variation.simple
+#  submodel.performances.cg_variation: fastga_he.submodel.performances.cg_variation.simple
   submodel.propulsion.constraints.fuel_tank.capacity: fastga_he.submodel.propulsion.constraints.fuel_tank.capacity.ensure
+
+
+#optimization: # This section is needed only if optimization process is run
+#  design_variables:
+#    - name: aspect_ratio
+#      lower: 2.0
+#      upper: 20.0
+#  objective:
+#    - name: mtow
+##      scaler: -1.0  # Activate this line to maximize the objective instead of minimizing it.
