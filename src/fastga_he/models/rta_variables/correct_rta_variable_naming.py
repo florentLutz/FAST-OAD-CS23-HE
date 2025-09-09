@@ -10,7 +10,9 @@ import fastoad.api as oad
 
 @oad.RegisterOpenMDAOSystem("fastga_he.rta_variables.correct_rta_variable_naming")
 class CorrectRTANaming(om.ExplicitComponent):
-    """Same variables but with different name in HE and RTA are renamed"""
+    """
+    Naming correction to connect the equivalent variables in both FAST-GA-HE and FAST-OAD-RTA.
+    """
 
     def setup(self):
         self.add_input("data:TLAR:NPAX", val=np.nan)

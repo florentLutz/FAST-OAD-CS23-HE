@@ -14,7 +14,7 @@ from .rta_aero_approximation import AeroApproximation
 @oad.RegisterOpenMDAOSystem("fastga_he.rta_variables")
 class RTAVariable(om.Group):
     """
-    Gather all the discipline module into the main problem
+    Gather all the bridging components for FAST-GA-HE and FAST-OAD-RTA.
     """
 
     def setup(self):

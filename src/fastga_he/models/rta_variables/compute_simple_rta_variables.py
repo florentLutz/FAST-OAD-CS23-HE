@@ -15,8 +15,9 @@ from stdatm import AtmosphereWithPartials
     "fastga_he.rta_variables.compute_rta_variable", domain=ModelDomain.GEOMETRY
 )
 class ComputeRTAVariable(om.ExplicitComponent):
-    """Simple computation to get HE Performances input from RTA OAD output, for instance the cruise
-    speed from the cruise mach"""
+    """
+    Simple computation to obtain FAST-GA-HE Performances inputs from RTA outputs.
+    """
 
     def setup(self):
         self.add_input("data:TLAR:NPAX_design", val=np.nan)

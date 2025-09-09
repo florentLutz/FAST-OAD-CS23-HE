@@ -10,8 +10,9 @@ import fastoad.api as oad
 
 @oad.RegisterOpenMDAOSystem("fastga_he.rta_variables.set_rta_variable")
 class SetRTAVariable(om.ExplicitComponent):
-    """Some variables with standard values are required in HE as input,
-    but they are not required as input in RTA, or some values are to complex to be computed"""
+    """
+    Define variable that doesn't exist in FAST-OAD-RTA or requires complex computation.
+    """
 
     def setup(self):
         self.add_input("data:TLAR:NPAX_design", val=np.nan)  # not used
@@ -53,7 +54,7 @@ class SetRTAVariable(om.ExplicitComponent):
 
         outputs[
             "data:mission:sizing:landing:elevator_angle"
-        ] = -0.6363323129985824  # -0.6363323129985824
+        ] = -0.6363323129985824
 
         outputs["data:geometry:cabin:seats:pilot:length"] = 1.05
 
