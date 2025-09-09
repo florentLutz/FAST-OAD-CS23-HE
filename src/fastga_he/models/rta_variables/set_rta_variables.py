@@ -52,9 +52,7 @@ class SetRTAVariable(om.ExplicitComponent):
 
         outputs["data:geometry:horizontal_tail:elevator_chord_ratio"] = 0.384
 
-        outputs[
-            "data:mission:sizing:landing:elevator_angle"
-        ] = -0.6363323129985824
+        outputs["data:mission:sizing:landing:elevator_angle"] = -0.6363323129985824
 
         outputs["data:geometry:cabin:seats:pilot:length"] = 1.05
 

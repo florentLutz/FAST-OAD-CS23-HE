@@ -83,6 +83,9 @@ submodels:
     submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
     submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
     submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.ensure
+    submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state
+    submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
+    submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
     submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
     submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
@@ -95,3 +98,5 @@ submodels:
     submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
     submodel.weight.mass.furniture.seats: null
     submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+    # To ensure compatibility in case RTA is installed.
+    service.geometry.wing: fastga.submodel.geometry.wing.legacy

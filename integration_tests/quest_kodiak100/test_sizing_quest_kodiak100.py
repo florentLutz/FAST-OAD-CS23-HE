@@ -30,57 +30,6 @@ RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_3 = pth.join(
 )
 
 
-def residuals_analyzer(recorder_path, solver):
-    cr = om.CaseReader(recorder_path)
-
-    solver_cases = cr.get_cases(solver)
-
-    # Get only the last 10 cases (or all if less than 10)
-    last_10_cases = solver_cases[-3:]
-
-    variable_dict = {name: 0.0 for name in last_10_cases[-1].residuals}
-
-    for case in last_10_cases:
-        for residual in case.residuals:
-            variable_dict[residual] = np.sum(np.abs(case.residuals[residual]))
-
-    sorted_variable_dict = dict(sorted(variable_dict.items(), key=lambda x: x[1], reverse=True))
-
-    return sorted_variable_dict
-
-
-def outputs_analyzer(recorder_path, solver):
-    cr = om.CaseReader(recorder_path)
-
-    solver_cases = cr.get_cases(solver)
-
-    # Get only the last 10 cases (or all if less than 10)
-    last_10_cases = solver_cases[-10:]
-
-    # Initialize a dictionary to store outputs for each variable and iteration
-    variable_dict = {}
-
-    for case in last_10_cases:
-        for output, value in case.outputs.items():
-            if (
-                isinstance(value, np.ndarray) and value.ndim == 1
-            ):  # Check if the value is a 1D numpy array
-                if output not in variable_dict:
-                    variable_dict[output] = []
-                # Extract the scalar value if it's a single-element array
-                scalar_value = value.item() if value.size == 1 else value
-                variable_dict[output].append(scalar_value)
-
-    # Remove variables with all zero values
-    non_zero_variable_dict = {
-        key: value
-        for key, value in variable_dict.items()
-        if not np.allclose(np.array(value), 0, atol=1e-10)
-    }
-
-    return non_zero_variable_dict
-
-
 @pytest.fixture(scope="module")
 def cleanup():
     """Empties results folder to avoid any conflicts."""

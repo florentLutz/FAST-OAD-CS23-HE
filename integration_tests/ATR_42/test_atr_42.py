@@ -35,7 +35,6 @@ def test_sizing_atr_42_turboshaft():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
