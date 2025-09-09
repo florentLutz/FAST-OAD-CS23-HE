@@ -181,29 +181,8 @@ def test_sizing_kodiak_100_full_electric():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    # sorted_variable_residuals = residuals_analyzer(recorder, solver)
-    #
-    # # Create the folder if it doesn't exist
-    # os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
-    #
-    # # Construct the file path
-    # file_path = os.path.join(RESULTS_FOLDER_PATH, "cases.csv")
-    #
-    # # Open the file for writing
-    # with open(file_path, "w", newline="") as csvfile:
-    #     writer = csv.writer(csvfile)
-    #
-    #     # Write the header
-    #     writer.writerow(["Variable name", "Residuals"])
-    #
-    #     # Write the sum of residuals for each iteration
-    #     for name, sum_res in sorted_variable_residuals.items():
-    #         writer.writerow([name, sum_res])
-    #
-    # cr = om.CaseReader(recorder)
-    #
     problem.write_outputs()
-    #
+
     # assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
     #     4174.0, rel=1e-2
     # )
@@ -215,33 +194,7 @@ def test_sizing_kodiak_100_full_electric():
     # assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
     #     933.00, rel=1e-2
     # )
-    # # Actual value is 2110 lbs or 960 kg
-
-
-# def test_read_case_recorder():
-#     recorder_data_file_path = pth.join(DATA_FOLDER_PATH, "cases.sql")
-#
-#     cr = om.CaseReader(recorder_data_file_path)
-#     # sorted_variable_residuals = residuals_analyzer(recorder_data_file_path, solver)
-#
-#     # Create the folder if it doesn't exist
-#     os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
-#
-#     # Construct the file path
-#     file_path = os.path.join(RESULTS_FOLDER_PATH, "dhc6_hybrid_residuals_analysis.csv")
-#
-#     # Open the file for writing
-#     with open(file_path, "w", newline="") as csvfile:
-#         writer = csv.writer(csvfile)
-#
-#         # Write the header
-#         writer.writerow(["Variable name", "Residuals"])
-#
-#         # Write the sum of residuals for each iteration
-#         for name, sum_res in sorted_variable_residuals.items():
-#             writer.writerow([name, sum_res])
-#
-#     cr = om.CaseReader(recorder_data_file_path)
+    # Actual value is 2110 lbs or 960 kg
 
 
 def test_operational_mission_kodiak_100():

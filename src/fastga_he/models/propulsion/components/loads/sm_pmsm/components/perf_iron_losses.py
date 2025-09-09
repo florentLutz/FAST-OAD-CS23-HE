@@ -6,11 +6,7 @@ import numpy as np
 import openmdao.api as om
 import os.path as pth
 
-DATA_FOLDER_PATH = pth.join(
-    pth.join(pth.dirname(pth.dirname(__file__)), "methodology"), "iron_losses"
-)
-npy_file_name = "coeffs_reshaped.npy"
-COEFFS_RESHAPED = np.load(pth.join(DATA_FOLDER_PATH, npy_file_name))
+from ..constants import IRON_LOSSES_COEFF
 
 
 class PerformancesIronLosses(om.ExplicitComponent):
@@ -95,8 +91,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
 
         for i in range(4):  # i = power of sqrt(f)
             for j in range(4):  # j = power of sqrt(bm)
-                coeff = COEFFS_RESHAPED[i][j]
-                sp_pow += coeff * (sqrt_f ** (i + 1.0)) * (sqrt_bm ** (j + 1.0))
+                sp_pow += IRON_LOSSES_COEFF[i][j] * (sqrt_f ** (i + 1.0)) * (sqrt_bm ** (j + 1.0))
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses"] = (
             w_motor * sp_pow / 1000.0
@@ -117,7 +112,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
 
         for i in range(4):  # i = power of sqrt(f)
             for j in range(4):  # j = power of sqrt(bm)
-                coeff = COEFFS_RESHAPED[i][j]
+                coeff = IRON_LOSSES_COEFF[i][j]
                 sp_pow += coeff * (sqrt_f ** (i + 1)) * (sqrt_bm ** (j + 1))
                 dsp_pow_df += (
                     coeff * (i + 1.0) * 0.5 * (f ** (0.5 * i - 0.5)) * (sqrt_bm ** (j + 1.0))

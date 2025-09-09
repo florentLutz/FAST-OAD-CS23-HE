@@ -176,7 +176,7 @@
             <design_point>
               <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.3<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <emission_index>
               <CO units="g/kg" is_input="True">5.0</CO>
@@ -200,7 +200,7 @@
             <design_point>
               <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.3<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
             <emission_index>
               <CO units="g/kg" is_input="True">5.0</CO>

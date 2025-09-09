@@ -175,21 +175,21 @@
             <power_split is_input="True">50.0<!--Percent of the power going to the first (primary) input, in %--></power_split>
           </dc_splitter_1>
         </DC_splitter>
-        <SMPMSM>
+        <SM_PMSM>
           <motor_1>
             <winding_factor is_input="True"> 0.97</winding_factor>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
-            <Form_coefficient is_input="True">0.6</Form_coefficient>
-            <Tangential_stress units="N/m**2" is_input="True">50000</Tangential_stress>
+            <form_coefficient is_input="True">0.6</form_coefficient>
+            <tangential_stress units="N/m**2" is_input="True">50000</tangential_stress>
             <airgap_flux_density units="T" is_input="True">0.9</airgap_flux_density>
-            <cond_mat_density units="kg/m**3" is_input="True">8960</cond_mat_density>
+            <conductor_material_density units="kg/m**3" is_input="True">8960</conductor_material_density>
             <cond_twisting_coeff is_input="True">1.25</cond_twisting_coeff>
-            <density_current_ac_max units="A/m**2" is_input="True">8.1e6</density_current_ac_max>
+            <current_density_ac_max units="A/m**2" is_input="True">8.1e6</current_density_ac_max>
             <end_winding_coeff is_input="True">1.4</end_winding_coeff>
             <frame_density units="kg/m**3" is_input="True">2100</frame_density>
-            <insul_mat_density units="kg/m**3" is_input="True">1400</insul_mat_density>
-            <magn_mat_density units="kg/m**3" is_input="True">8150</magn_mat_density>
+            <insulation_material_density units="kg/m**3" is_input="True">1400</insulation_material_density>
+            <magnetic_material_density units="kg/m**3" is_input="True">8150</magnetic_material_density>
             <number_of_phases is_input="True">3</number_of_phases>
             <pole_pairs_number is_input="True">2</pole_pairs_number>
             <radius_ratio is_input="True">0.97</radius_ratio>
@@ -213,7 +213,7 @@
               <CD0 is_input="True">nan</CD0>
             </low_speed>
           </motor_1>
-        </SMPMSM>
+        </SM_PMSM>
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <fuel_system>
           <fuel_system_1>

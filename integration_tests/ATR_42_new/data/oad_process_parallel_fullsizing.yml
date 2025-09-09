@@ -5,7 +5,7 @@ module_folders:
 
 # Input and output files
 input_file: ../results/resized_hybrid_inputs.xml
-output_file: ../results/resized_hybrid_oututs.xml
+output_file: ../results/resized_hybrid_outputs.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
@@ -63,16 +63,14 @@ model:
       number_of_points_reserve: 10
       power_train_file_path: pt_parallel.yml
       out_file: ../results/full_sized_hybrid_propulsion.csv
-      use_linesearch: False
-      pre_condition_pt: True
+      use_linesearch: True
+      pre_condition_pt: False
       sort_component: True
       use_apply_nonlinear: True
       rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
       power_train_file_path: pt_parallel.yml
-#  engine_size:
-#    id: rta.loop.engine_size
 
 submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.as_float
@@ -82,38 +80,15 @@ submodels:
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
   service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
   service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.new
+  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.constraints.sm_pmsm.torque: fastga_he.submodel.propulsion.constraints.sm_pmsm.torque.enforce
-  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.fixed
+  submodel.propulsion.constraints.sm_pmsm.rpm: fastga_he.submodel.propulsion.constraints.sm_pmsm.rpm.ensure
+  submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
-  submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.fixed
+#  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
+#  submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
   submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
-#  service.performances.delta_m: fastga_he.submodel.performances.delta_m.tanh
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null
-#  submodel.performances.mission_vector.climb_speed: null
-#  submodel.performances.mission_vector.descent_speed: null
   submodel.propulsion.dc_dc_converter.weight: null
-#  service.aerodynamics.CD0.fuselage: rta.submodel.aerodynamics.CD0.fuselage
-#  service.aerodynamics.CD0.wing: rta.submodel.aerodynamics.CD0.wing
-#  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.as_float"
-#  service.aerodynamics.CD0.nacelles_pylons: rta.submodel.aerodynamics.CD0.nacelles
-#  service.aerodynamics.CD0.sum: rta.submodel.aerodynamics.CD0.sum
-#  service.aerodynamics.induced_drag_coefficient: fastoad.submodel.aerodynamics.induced_drag_coefficient.legacy
-#  service.geometry.fuselage.basic: rta.submodel.geometry.fuselage.basic
-#  service.geometry.fuselage.with_cabin_sizing: rta.submodel.geometry.fuselage.with_cabin_sizing
-#  service.geometry.wing: rta.submodel.geometry.wing
-#  service.geometry.nacelle_and_pylon: rta.submodel.geometry.nacelles
-#  service.cg.wing.control_surfaces: rta.submodel.cg.wing.control_surfaces.legacy
-
-#optimization: # This section is needed only if optimization process is run
- # design_variables:
- #   - name: data:geometry:wing:aspect_ratio
-  #    lower: 9.0
-  #    upper: 18.0
- # constraints:
- #   - name: data:geometry:wing:span
- #     upper: 60.0
- # objective:
- #   - name: data:mission:sizing:needed_block_fuel
-  #    scaler: 1.e-4

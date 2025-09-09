@@ -86,7 +86,7 @@ submodels:
     submodel.weight.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train
     submodel.weight.cg.propulsion: fastga_he.submodel.weight.cg.propulsion.power_train
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
-    submodel.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+    service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
     submodel.weight.mass.system.power_system: null
     submodel.geometry.nacelle.dimension: null
     submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file

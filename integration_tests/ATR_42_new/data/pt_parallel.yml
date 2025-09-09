@@ -98,7 +98,7 @@ component_connections:
   - source: propeller_1
     target: [planetary_gear_1, 1]
 
-  - source: [planetary_gear_1, 2]
+  - source: [planetary_gear_1, 1]
     target: turboshaft_1
 
   - source: turboshaft_1
@@ -107,7 +107,7 @@ component_connections:
   - source: [fuel_system_1,1]
     target: fuel_tank_1
 
-  - source: [planetary_gear_1, 1]
+  - source: [planetary_gear_1, 2]
     target: speed_reducer_1
 
   - source: speed_reducer_1
@@ -130,7 +130,7 @@ component_connections:
   - source: propeller_2
     target: [planetary_gear_2, 1]
 
-  - source: [planetary_gear_2, 2]
+  - source: [planetary_gear_2, 1]
     target: turboshaft_2
 
   - source: turboshaft_2
@@ -139,7 +139,7 @@ component_connections:
   - source: [fuel_system_1,2]
     target: fuel_tank_2
 
-  - source: [planetary_gear_2, 1]
+  - source: [planetary_gear_2, 2]
     target: speed_reducer_2
 
   - source: speed_reducer_2

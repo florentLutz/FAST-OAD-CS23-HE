@@ -106,7 +106,9 @@ def test_sizing_atr_42_retrofit_hybrid():
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, "oad_process_parallel_retrofit.yml"))
+    configurator = api.FASTOADProblemConfigurator(
+        pth.join(DATA_FOLDER_PATH, "oad_process_parallel_retrofit.yml")
+    )
     problem = configurator.get_problem()
 
     # Create inputs
@@ -209,14 +211,16 @@ def test_sizing_atr_42_retrofit_hybrid():
 
     problem.write_outputs()
 
+
 def test_hybrid_atr_42_full_sizing():
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, "oad_process_parallel_fullsizing.yml"))
+    configurator = api.FASTOADProblemConfigurator(
+        pth.join(DATA_FOLDER_PATH, "oad_process_parallel_fullsizing.yml")
+    )
     problem = configurator.get_problem()
 
     # Create inputs
@@ -233,12 +237,11 @@ def test_hybrid_atr_42_full_sizing():
     problem.set_val("data:geometry:wing:area", units="m**2", val=53.3)
     problem.set_val("data:geometry:horizontal_tail:area", units="m**2", val=10.645)
     problem.set_val("data:geometry:vertical_tail:area", units="m**2", val=11.0)
-    #
 
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=18000.0)
-    problem.set_val("data:weight:aircraft:OWE", units="kg", val=11659.0)
-    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=17159.5)
-    problem.set_val("data:weight:aircraft:MLW", units="kg", val=18189.10294470838)
+    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=18600.0)
+    problem.set_val("data:weight:aircraft:OWE", units="kg", val=11250.0)
+    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=16700.0)
+    problem.set_val("data:weight:aircraft:MLW", units="kg", val=18300.0)
 
     problem.set_val("data:weight:aircraft_empty:mass", units="kg", val=11414.2)
     problem.set_val("data:weight:aircraft_empty:CG:x", units="m", val=10.514757)
@@ -287,7 +290,6 @@ def test_hybrid_atr_42_full_sizing():
 
     for names in list_of_variables_to_set:
         problem.set_val(names, datafile[names].value, units=datafile[names].units)
-
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 
