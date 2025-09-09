@@ -385,3 +385,88 @@ def test_resizing_c208b_new_mission():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         3578.0, rel=5e-2
     )  # Should be lower than the TOW of the original on the off design mission (3708 kg)
+
+
+def test_sizing_hybrid_cessna_208b_better_fit_full_sizing():
+    """
+    Full sizing of the hybrid Cessna 208
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_c208.xml"
+    process_file_name = "hybrid_c208_full_sizing.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+    problem.model_options["*turboshaft_1*"] = {
+        "adjust_sfc": True,
+        "reference_rated_power": [300, 503.3475],
+        "reference_k_sfc": [1.2, 1.05],
+    }
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min",
+        val=75.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:c_rate_max",
+        val=3.0,
+        units="h**-1",
+    )
+    problem.set_val(
+        "data:weight:aircraft:MTOW",
+        units="kg",
+        val=3968.0,
+    )
+    problem.set_val(
+        "data:geometry:wing:area",
+        units="m**2",
+        val=25.0,
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:current_in_max",
+        val=100.0,
+        units="A",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_max",
+        val=400.0,
+        units="kW",
+    )
+
+    # We won't fix the turboshaft here, rather let the code resize it for a perfect fit. We will
+    # assume that the turboshaft will be of the same family as the original one. So the same thermo-
+    # dynamic parameter will be kept, same k_sfc as well.
+
+    problem.run_model()
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3968.0, rel=5e-2
+    )
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(332.0, rel=1e-2)
