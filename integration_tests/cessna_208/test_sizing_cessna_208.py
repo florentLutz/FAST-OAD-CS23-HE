@@ -378,7 +378,7 @@ def test_resizing_c208b_new_mission():
 
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
         400.00, rel=5e-2
-    ) # Should be lower than the fuel of the original on the off design mission (428 kg)
+    )  # Should be lower than the fuel of the original on the off design mission (428 kg)
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
         2028.0, rel=5e-2
     )  # Should be lower than the original OWE 2146

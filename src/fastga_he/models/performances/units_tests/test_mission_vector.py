@@ -3294,7 +3294,7 @@ def test_payload_range_inner_with_builtin_sampling():
     )
 
 
-def test_sizing_energy():
+def test_sizing_energy_specific_air_range():
     inputs_list = [
         "data:mission:sizing:energy",
         "data:TLAR:range",
