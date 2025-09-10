@@ -266,6 +266,12 @@ def test_sizing_hybrid_cessna_208b_better_fit():
         units="kg",
         val=3968.0,
     )
+    # This was found to be the best point
+    # problem.set_val(
+    #     "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_share",
+    #     units="kW",
+    #     val=277.0,
+    # )
 
     # We won't fix the turboshaft here, rather let the code resize it for a perfect fit. We will
     # assume that the turboshaft will be of the same family as the original one. So the same thermo-

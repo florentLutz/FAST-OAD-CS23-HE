@@ -577,6 +577,61 @@ def test_optimization_sr22_hybrid():
     problem.write_outputs()
 
 
+def test_optimization_sr22_hybrid_new_bed():
+    """
+    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
+    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals()
+
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        lower=20.0,
+        upper=80.0,
+    )
+    problem.model.add_objective(name="data:environmental_impact:sizing:emissions", units="kg")
+
+    recorder = om.SqliteRecorder("driver_cases.sql")
+    problem.driver.add_recorder(recorder)
+
+    problem.driver.recording_options["record_desvars"] = True
+    problem.driver.recording_options["record_objectives"] = True
+
+    # To assess the range of BED for which hybrid is feasible, we artificially improve the battery
+    # energy density by reducing the weight of the reference cell. Reference cell has a battery
+    # energy density of 261 Wh/kg with a cell weight of 50.0g we do simple cross product to achieve
+    # energy densities of 275, 300, 325, ...
+    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261. / 375.}
+
+    problem.setup()
+
+    problem.set_val(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        val=75.0
+    )
+
+    problem.run_driver()
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_new_bed.xml"
+    problem.write_outputs()
+
+
 def test_optimization_sr22_hybrid_slsqp():
     """
     Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
