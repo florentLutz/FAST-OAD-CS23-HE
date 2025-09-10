@@ -290,8 +290,8 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
     )
 
     # Baseline
-    # design_ranges = np.array([100])
-    design_ranges = np.array([50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375])
+    design_ranges = np.array([200])
+    # design_ranges = np.array([50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375])
 
     mtows = []
     batt_masses = []
@@ -577,6 +577,51 @@ def test_optimization_sr22_hybrid():
     problem.write_outputs()
 
 
+def test_sizing_sr22_hybrid_new_bed():
+    """
+    Tests a hybrid sr22 with the same climb, cruise, descent and reserve profile as the original
+    one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
+    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261.0 / 400.0}
+
+    problem.setup()
+
+    # om.n2(problem, show_browser=False, outfile=n2_path)
+
+    problem.set_val(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        val=60.,
+    )
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_mda_new_bed.xml"
+    problem.write_outputs()
+
+
 def test_optimization_sr22_hybrid_new_bed():
     """
     Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
@@ -602,7 +647,7 @@ def test_optimization_sr22_hybrid_new_bed():
     problem.model.add_design_var(
         name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
         units="percent",
-        lower=20.0,
+        lower=40.0,
         upper=80.0,
     )
     problem.model.add_objective(name="data:environmental_impact:sizing:emissions", units="kg")
@@ -617,14 +662,14 @@ def test_optimization_sr22_hybrid_new_bed():
     # energy density by reducing the weight of the reference cell. Reference cell has a battery
     # energy density of 261 Wh/kg with a cell weight of 50.0g we do simple cross product to achieve
     # energy densities of 275, 300, 325, ...
-    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261. / 375.}
+    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261.0 / 400.0}
 
     problem.setup()
 
     problem.set_val(
         name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
         units="percent",
-        val=75.0
+        val=70.0,
     )
 
     problem.run_driver()

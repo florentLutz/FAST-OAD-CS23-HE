@@ -56,6 +56,9 @@ model:
     id: fastga.loop.wing_position
   wing_area:
     id: fastga.loop.wing_area
+  environmental_impact:
+    id: fastga_he.environmental.energy_simple
+    electricity_mix: france
 
 submodels:
   submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
