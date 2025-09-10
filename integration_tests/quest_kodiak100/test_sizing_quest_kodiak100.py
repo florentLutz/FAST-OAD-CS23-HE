@@ -98,7 +98,6 @@ def test_sizing_kodiak_100_full_electric():
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_kodiak100.html")
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -109,13 +108,6 @@ def test_sizing_kodiak_100_full_electric():
     }
 
     problem.setup()
-
-    model = problem.model
-    recorder = om.SqliteRecorder(pth.join(DATA_FOLDER_PATH, "cases.sql"))
-    solver = model.aircraft_sizing.performances.solve_equilibrium.compute_dep_equilibrium.nonlinear_solver
-    solver.add_recorder(recorder)
-    solver.recording_options["record_solver_residuals"] = True
-    solver.recording_options["record_outputs"] = True
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 

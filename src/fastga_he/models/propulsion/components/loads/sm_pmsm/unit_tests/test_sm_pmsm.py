@@ -649,6 +649,8 @@ def test_joule_losses():
 
     ivc.add_output("ac_current_rms_in_one_phase", 1970.84 * np.ones(NB_POINTS_TEST), units="A")
 
+    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:number_of_phases", val=3)
+
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesJouleLosses(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
@@ -656,7 +658,7 @@ def test_joule_losses():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:joule_power_losses", units="W"
-    ) == pytest.approx(5674 * np.ones(NB_POINTS_TEST), rel=1e-2)
+    ) == pytest.approx(17022 * np.ones(NB_POINTS_TEST), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -797,7 +799,7 @@ def test_power_losses():
     )
     ivc.add_output(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:joule_power_losses",
-        5783.96 * np.ones(NB_POINTS_TEST),
+        17022 * np.ones(NB_POINTS_TEST),
         units="W",
     )
 
@@ -807,7 +809,7 @@ def test_power_losses():
     )
 
     assert problem.get_val("power_losses", units="W") == pytest.approx(
-        22424.96 * np.ones(NB_POINTS_TEST), rel=1e-2
+        22450.52 * np.ones(NB_POINTS_TEST), rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -817,7 +819,7 @@ def test_efficiency():
     ivc = om.IndepVarComp()
 
     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
-    ivc.add_output("power_losses", 22424.96 * np.ones(NB_POINTS_TEST), units="W")
+    ivc.add_output("power_losses", 22450.52 * np.ones(NB_POINTS_TEST), units="W")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -1013,7 +1015,7 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
-def test_performance_SMPMSM():
+def test_performance_SM_PMSM():
     ivc = get_indep_var_comp(
         list_inputs(PerformancesSMPMSM(pmsm_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
@@ -1046,7 +1048,7 @@ def test_performance_SMPMSM():
     problem.check_partials(compact_print=True)
 
 
-def test_sizing_SMPMSM():
+def test_sizing_SM_PMSM():
     ivc = get_indep_var_comp(list_inputs(SizingSMPMSM(pmsm_id="motor_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct

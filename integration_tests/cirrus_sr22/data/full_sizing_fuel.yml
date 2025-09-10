@@ -68,6 +68,8 @@ submodels:
   service.geometry.nacelle.dimension: null
   service.geometry.vertical_tail.distance.fd: null
   service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
+  # To ensure compatibility in case RTA is installed.
+  service.geometry.wing: fastga.submodel.geometry.wing.legacy
 
 optimization: # This section is needed only if optimization process is run
   design_variables:

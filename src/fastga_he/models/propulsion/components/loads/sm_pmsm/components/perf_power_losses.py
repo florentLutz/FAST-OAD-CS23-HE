@@ -74,9 +74,9 @@ class PerformancesPowerLosses(om.ExplicitComponent):
         p_mec_loss = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mechanical_power_losses"
         ]
-        rotor_losses_factor = 2.0  # to take into account the total electromagnetic rotor losses
+        # rotor_losses_factor = 2.0  # to take into account the total electromagnetic rotor losses
 
-        p_losses = rotor_losses_factor * (p_mec_loss + p_iron + p_j)
+        p_losses = p_mec_loss + p_iron + p_j
 
         outputs["power_losses"] = p_losses / 1000.0
 
@@ -84,19 +84,19 @@ class PerformancesPowerLosses(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
         pmsm_id = self.options["pmsm_id"]
 
-        rotor_losses_factor = 2.0  # to take into account the total electromagnetic rotor losses
+        # rotor_losses_factor = 2.0  # to take into account the total electromagnetic rotor losses
 
         partials[
             "power_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
-        ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
+        ] = np.ones(number_of_points) / 1000.0
 
         partials[
             "power_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
-        ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
+        ] = np.ones(number_of_points) / 1000.0
 
         partials[
             "power_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mechanical_power_losses",
-        ] = rotor_losses_factor * np.ones(number_of_points) / 1000.0
+        ] = np.ones(number_of_points) / 1000.0

@@ -183,6 +183,7 @@
             <form_coefficient is_input="True">0.6</form_coefficient>
             <tangential_stress units="N/m**2" is_input="True">50000</tangential_stress>
             <airgap_flux_density units="T" is_input="True">0.9</airgap_flux_density>
+            <rpm_rating units="1/min" is_input="True">17000.0<!--Max continuous rpm of the motor--></rpm_rating>
             <conductor_material_density units="kg/m**3" is_input="True">8960</conductor_material_density>
             <cond_twisting_coeff is_input="True">1.25</cond_twisting_coeff>
             <current_density_ac_max units="A/m**2" is_input="True">8.1e6</current_density_ac_max>

@@ -26,7 +26,7 @@ def test_sizing_atr_42_turboshaft():
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
-    xml_file_name = "atr42_inputs_turboshaft.xml"
+    xml_file_name = "atr42_inputs.xml"
     process_file_name = "atr42_turboshaft.yml"
 
     configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
@@ -87,7 +87,7 @@ def test_sizing_atr_42_retrofit_hybrid():
     problem = configurator.get_problem()
 
     # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, "inputs_parallel_hybrid_retrofit.xml")
+    ref_inputs = pth.join(DATA_FOLDER_PATH, "hybrid_atr_inputs_retrofit.xml")
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
 
     problem.write_needed_inputs(ref_inputs)
@@ -134,7 +134,7 @@ def test_sizing_atr_42_retrofit_hybrid():
         val=np.linspace(18000, 16000, 90),
     )
 
-    datafile = oad.DataFile("data/atr42_retrofit_data.xml")
+    datafile = oad.DataFile("data/set_up_data.xml")
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",
@@ -198,7 +198,7 @@ def test_hybrid_atr_42_full_sizing():
     problem = configurator.get_problem()
 
     # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, "inputs_parallel_hybrid_fullsizing.xml")
+    ref_inputs = pth.join(DATA_FOLDER_PATH, "hybrid_atr_inputs_full_sizing.xml")
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
 
     problem.write_needed_inputs(ref_inputs)
@@ -225,7 +225,7 @@ def test_hybrid_atr_42_full_sizing():
         val=np.linspace(18000, 16000, 90),
     )
 
-    datafile = oad.DataFile("data/atr42_retrofit_data.xml")
+    datafile = oad.DataFile("data/set_up_data.xml")
 
     list_of_variables_to_set = [
         "data:weight:airframe:wing:mass",

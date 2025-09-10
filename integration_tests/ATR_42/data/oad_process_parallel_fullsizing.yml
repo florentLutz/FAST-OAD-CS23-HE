@@ -61,16 +61,16 @@ model:
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: pt_parallel.yml
+      power_train_file_path: parallel_hybrid_assembly.yml
       out_file: ../results/full_sized_hybrid_propulsion.csv
-      use_linesearch: True
+      use_linesearch: False
       pre_condition_pt: False
       sort_component: True
       use_apply_nonlinear: True
       rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: pt_parallel.yml
+      power_train_file_path: parallel_hybrid_assembly.yml
 
 submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.as_float

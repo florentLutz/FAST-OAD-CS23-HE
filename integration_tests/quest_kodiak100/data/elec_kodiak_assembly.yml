@@ -72,7 +72,7 @@ component_connections:
   - source: dc_sspc_1
     target: battery_pack_1
 
-  - source: [dc_splitter_1, 2 ]
+  - source: [dc_splitter_1, 2]
     target: dc_sspc_2
 
   - source: dc_sspc_2
