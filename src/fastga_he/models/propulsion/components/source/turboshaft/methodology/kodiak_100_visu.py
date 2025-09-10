@@ -276,7 +276,7 @@ if __name__ == "__main__":
         yanchor="bottom",
     )
     fig.add_hline(
-        y=0.495,
+        y=0.482,
         line_width=1,
         line_dash="dash",
         line_color="black",
@@ -388,7 +388,7 @@ if __name__ == "__main__":
         yanchor="bottom",
     )
     fig.add_hline(
-        y=0.394,
+        y=0.384,
         line_width=1,
         line_dash="dash",
         line_color="red",
