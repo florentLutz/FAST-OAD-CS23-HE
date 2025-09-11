@@ -588,7 +588,7 @@ def test_sizing_sr22_hybrid_new_bed():
 
     # Define used files depending on options
     xml_file_name = "input_sr22_hybrid.xml"
-    process_file_name = "full_sizing_hybrid.yml"
+    process_file_name = "full_sizing_hybrid_fixed_eff.yml"
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
     problem = configurator.get_problem()
@@ -610,7 +610,7 @@ def test_sizing_sr22_hybrid_new_bed():
     problem.set_val(
         name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
         units="percent",
-        val=60.,
+        val=60.0,
     )
 
     problem.run_model()
@@ -618,7 +618,7 @@ def test_sizing_sr22_hybrid_new_bed():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_mda_new_bed.xml"
+    # problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_mda_new_bed.xml"
     problem.write_outputs()
 
 

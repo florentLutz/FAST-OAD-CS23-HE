@@ -24,6 +24,7 @@ from ..components.sizing_pmsm_drag import SizingPMSMDrag
 from ..components.perf_torque import PerformancesTorque
 from ..components.perf_losses import PerformancesLosses
 from ..components.perf_efficiency import PerformancesEfficiency
+from ..components.perf_efficiency_fixed import PerformancesFixedEfficiencyMission
 from ..components.perf_active_power import PerformancesActivePower
 from ..components.perf_apparent_power import PerformancesApparentPower
 from ..components.perf_current_rms import PerformancesCurrentRMS
@@ -477,6 +478,41 @@ def test_efficiency():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_efficiency_mission():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:efficiency_mission",
+        val=0.98,
+    )
+
+    problem = run_system(
+        PerformancesFixedEfficiencyMission(motor_id="motor_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("efficiency") == pytest.approx(np.full(NB_POINTS_TEST, 0.98), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    ivc3 = om.IndepVarComp()
+    ivc3.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:efficiency_mission",
+        val=[0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9],
+    )
+
+    problem3 = run_system(
+        PerformancesFixedEfficiencyMission(motor_id="motor_1", number_of_points=NB_POINTS_TEST),
+        ivc3,
+    )
+
+    assert problem3.get_val("efficiency") == pytest.approx(
+        np.array([0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9]),
+        rel=1e-2,
+    )
+
+    problem3.check_partials(compact_print=True)
 
 
 def test_active_power():

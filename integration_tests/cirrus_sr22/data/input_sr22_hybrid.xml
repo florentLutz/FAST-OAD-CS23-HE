@@ -282,6 +282,7 @@
         </ICE>
         <PMSM>
           <motor_1>
+            <efficiency_mission>0.95<!-- Only used if a certain submodel is activated--></efficiency_mission>
             <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
             <rpm_rating units="1/min" is_input="True">4000.0<!--Max voltage of the motor--></rpm_rating>
             <voltage_caliber units="V" is_input="True">660.0<!--Max voltage of the motor--></voltage_caliber>

@@ -3,6 +3,9 @@
 # Copyright (C) 2022 ISAE-SUPAERO
 
 import openmdao.api as om
+import fastoad.api as oad
+
+from ..constants import SUBMODEL_PMSM_EFFICIENCY
 
 from .perf_torque import PerformancesTorque
 from .perf_losses import PerformancesLosses
@@ -40,9 +43,10 @@ class PerformancesPMSM(om.Group):
             PerformancesLosses(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
+        dict_options = {"motor_id": motor_id, "number_of_points": number_of_points}
         self.add_subsystem(
             "efficiency",
-            PerformancesEfficiency(motor_id=motor_id, number_of_points=number_of_points),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_PMSM_EFFICIENCY, options=dict_options),
             promotes=["*"],
         )
         self.add_subsystem(
