@@ -97,7 +97,7 @@ def test_sizing_kodiak_100_full_electric():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_kodiak100.html")
+    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_kodiak100_elec.html")
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -118,18 +118,13 @@ def test_sizing_kodiak_100_full_electric():
 
     problem.write_outputs()
 
-    # assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-    #     4174.0, rel=1e-2
-    # )
-    # # Actual value is 3290 kg
-    # assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-    #     1727.0, rel=1e-2
-    # )
-    # # Actual value is 1712 kg
-    # assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-    #     933.00, rel=1e-2
-    # )
-    # Actual value is 2110 lbs or 960 kg
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3394.82, rel=1e-2
+    )
+    # Actual value is 3290 kg
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        2842.82, rel=1e-2
+    )
 
 
 def test_operational_mission_kodiak_100():
