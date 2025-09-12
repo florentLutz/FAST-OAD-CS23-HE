@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingStatorDiameter(om.ExplicitComponent):
+class SizingStatorBoreDiameter(om.ExplicitComponent):
     """
     Computation of the stator bore diameter of the PMSM. The formula is obtained from equation (
     II-43) in :cite:`touhami:2020.
@@ -38,9 +38,10 @@ class SizingStatorDiameter(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             units="m",
             desc="Stator bore diameter of the PMSM",
+            val=0.1,
         )
 
     def setup_partials(self):
@@ -53,7 +54,7 @@ class SizingStatorDiameter(om.ExplicitComponent):
         sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tangential_stress"]
         T_max = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"] = 2.0 * (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"] = 2.0 * (
             ((lambda_ / (4.0 * np.pi * sigma)) * T_max) ** (1.0 / 3.0)
         )
 
@@ -65,7 +66,7 @@ class SizingStatorDiameter(om.ExplicitComponent):
         z = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient",
         ] = (
             2.0
@@ -74,7 +75,7 @@ class SizingStatorDiameter(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tangential_stress",
         ] = (
             -2.0
@@ -83,7 +84,7 @@ class SizingStatorDiameter(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating",
         ] = (
             2.0

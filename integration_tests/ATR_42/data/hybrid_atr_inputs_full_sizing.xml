@@ -114,6 +114,7 @@
         <DC_DC_converter>
           <dc_dc_converter_1>
             <efficiency_mission is_input="True">0.98<!--Efficiency of the DC/DC converter for the points--></efficiency_mission>
+            <mass units="kg" is_input="True">0.0</mass>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
@@ -123,9 +124,6 @@
             <capacitor>
               <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
             </capacitor>
-            <control_card>
-              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
-            </control_card>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
             </diode>
@@ -156,6 +154,7 @@
           </dc_dc_converter_1>
           <dc_dc_converter_2>
             <efficiency_mission is_input="True">0.98<!--Efficiency of the DC/DC converter for the points--></efficiency_mission>
+            <mass units="kg" is_input="True">0.0</mass>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
             <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
@@ -165,9 +164,6 @@
             <capacitor>
               <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
             </capacitor>
-            <control_card>
-              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
-            </control_card>
             <diode>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
             </diode>
@@ -212,7 +208,6 @@
             <number_of_phases is_input="True">3.0</number_of_phases>
             <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
             <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
-            <rpm_rating units="1/min" is_input="True">17000.0<!--Max continuous rpm of the motor--></rpm_rating>
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
@@ -245,7 +240,6 @@
             <number_of_phases is_input="True">3.0</number_of_phases>
             <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
             <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
-            <rpm_rating units="1/min" is_input="True">17000.0<!--Max continuous rpm of the motor--></rpm_rating>
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
@@ -271,7 +265,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -288,7 +282,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -444,7 +438,7 @@
           <planetary_gear_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">1410<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">1563.0<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -453,7 +447,7 @@
           <planetary_gear_2>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">1410<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">1563.0<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -741,9 +735,9 @@
       <he_power_train>
         <DC_bus>
           <insulation>
-            <breakdown_voltage units="V" is_input="True">340<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
+            <breakdown_voltage units="V" is_input="True">340.0<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
             <density units="kg/m**3" is_input="True">1450.0<!--Density of the insulation, Gexol is assumed--></density>
-            <dielectric_permittivity is_input="True">4<!--Dielectric permittivity of the insulation, chosen as Gexol insulation--></dielectric_permittivity>
+            <dielectric_permittivity is_input="True">4.0<!--Dielectric permittivity of the insulation, chosen as Gexol insulation--></dielectric_permittivity>
             <void_thickness units="m" is_input="True">5e-05</void_thickness>
           </insulation>
         </DC_bus>
@@ -852,7 +846,7 @@
     </geometry>
     <weight>
       <aircraft>
-        <mlw_mzfw_ratio is_input="True">1.06<!--empiric ratio used for evaluate the MLW from the MZFW--></mlw_mzfw_ratio>
+        <mlw_mzfw_ratio is_input="True">1.09<!--empiric ratio used for evaluate the MLW from the MZFW--></mlw_mzfw_ratio>
       </aircraft>
       <airframe>
         <fuselage>

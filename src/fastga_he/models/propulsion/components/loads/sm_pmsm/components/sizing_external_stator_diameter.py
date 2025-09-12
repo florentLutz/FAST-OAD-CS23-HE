@@ -21,7 +21,7 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
@@ -43,6 +43,7 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter",
             units="m",
             desc="The outer stator diameter of the PMSM",
+            val=0.2,
         )
 
     def setup_partials(self):
@@ -58,7 +59,7 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
         )
         self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             val=1.0,
         )
 
@@ -73,5 +74,5 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
                     "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_yoke_height"
                 ]
             )
-            + inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]
+            + inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
         )

@@ -37,6 +37,7 @@ class SizingWindingResistivity(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":resistivity",
             units="ohm*m",
             desc="Copper electrical resistivity",
+            val=0.0015,
         )
 
     def setup_partials(self):

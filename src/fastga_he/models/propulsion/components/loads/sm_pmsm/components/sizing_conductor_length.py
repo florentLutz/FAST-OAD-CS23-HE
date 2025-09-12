@@ -41,7 +41,9 @@ class SizingConductorLength(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_length", units="m"
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductor_length",
+            units="m",
+            val=0.3,
         )
 
     def setup_partials(self):

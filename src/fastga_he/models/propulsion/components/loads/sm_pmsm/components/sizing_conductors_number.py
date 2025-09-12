@@ -42,6 +42,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductors_number",
             desc="Number of conductor slots",
+            val=24,
         )
 
     def setup_partials(self):

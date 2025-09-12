@@ -332,7 +332,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -349,7 +349,7 @@
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
             <cell_volume_fraction is_input="True">0.8<!--Cell volume fraction, represents the contribution to the battery volume of the cells--></cell_volume_fraction>
             <cell_weight_fraction is_input="True">0.768<!--Cell weight fraction, represents the contribution to the battery mass of the cells--></cell_weight_fraction>
-            <min_safe_SOC units="percent" is_input="True">20.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
+            <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -936,7 +936,7 @@
   <tuning>
     <weight>
       <aircraft>
-        <mlw_mzfw_ratio is_input="True">1.0958<!--empiric ratio used for evaluate the MLW from the MZFW--></mlw_mzfw_ratio>
+        <mlw_mzfw_ratio is_input="True">1.09<!--empiric ratio used for evaluate the MLW from the MZFW--></mlw_mzfw_ratio>
       </aircraft>
       <airframe>
         <fuselage>

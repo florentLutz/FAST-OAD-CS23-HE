@@ -39,6 +39,7 @@ class SizingSlotSection(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_section",
             units="m**2",
+            val=0.0002,
         )
 
     def setup_partials(self):

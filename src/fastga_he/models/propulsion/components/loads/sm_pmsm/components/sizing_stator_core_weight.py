@@ -40,7 +40,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             desc="The stator length of PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
@@ -73,6 +73,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_core_weight",
             units="kg",
+            val=25.0,
         )
 
     def setup_partials(self):
@@ -81,7 +82,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"] / 2.0
+        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"] / 2.0
         r_out = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter"] / 2.0
         )
@@ -103,7 +104,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"] / 2.0
+        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"] / 2.0
         r_out = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_diameter"] / 2.0
         )
@@ -120,7 +121,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_core_weight",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
         ] = -np.pi * lm * r * rho_sf
 
         partials[

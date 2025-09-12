@@ -21,7 +21,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
@@ -35,6 +35,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
             units="m",
+            val=0.05,
         )
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
@@ -53,7 +54,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         pmsm_id = self.options["pmsm_id"]
 
         x = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":radius_ratio"]
-        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]
+        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter"] = x * d
         outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness"] = (
@@ -66,21 +67,21 @@ class SizingRotorDiameter(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":radius_ratio",
-        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]
+        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
         ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":radius_ratio"]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":radius_ratio",
-        ] = (-inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]) / 2.0
+        ] = (-inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]) / 2.0
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
         ] = (
             1.0 - inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":radius_ratio"]
         ) / 2.0

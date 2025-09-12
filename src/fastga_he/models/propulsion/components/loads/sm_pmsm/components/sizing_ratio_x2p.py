@@ -35,6 +35,7 @@ class SizingRatioX2p(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":ratiox2p",
             units="m",
+            val=16.5,
         )
 
     def setup_partials(self):

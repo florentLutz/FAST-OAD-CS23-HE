@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingFrameWeight(om.ExplicitComponent):
+class SizingFrameGeometry(om.ExplicitComponent):
     """
     Computation of the frame diameter and weight of the PMSM. The formula is obtained from
     equation (II-53) and (II-59) respectively in :cite:`touhami:2020.
@@ -46,10 +46,12 @@ class SizingFrameWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_diameter",
             units="m",
+            val=0.23,
         )
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_weight",
             units="kg",
+            val=6.0,
         )
 
     def setup_partials(self):

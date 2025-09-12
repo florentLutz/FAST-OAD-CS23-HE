@@ -30,7 +30,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
@@ -58,6 +58,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_yoke_height",
             units="m",
             desc="Stator yoke thickness of the PMSM",
+            val=0.02,
         )
 
     def setup_partials(self):
@@ -66,7 +67,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"] / 2.0
+        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"] / 2.0
         b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density"]
         b_sy = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":yoke_flux_density"]
         k_m = inputs[
@@ -84,7 +85,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pmsm_id = self.options["pmsm_id"]
 
-        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"] / 2.0
+        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"] / 2.0
         b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_flux_density"]
         b_sy = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":yoke_flux_density"]
         k_m = inputs[
@@ -97,7 +98,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
         ] = (1.0 / (2.0 * p)) * max_total_airgap_flux_density / np.abs(b_sy)
 
         partials[

@@ -8,7 +8,7 @@ import pytest
 
 import openmdao.api as om
 
-from ..components.sizing_diameter import SizingStatorDiameter
+from ..components.sizing_bore_diameter import SizingStatorBoreDiameter
 from ..components.sizing_active_length import SizingActiveLength
 from ..components.sizing_rotor_diameter import SizingRotorDiameter
 from ..components.sizing_stator_yoke import SizingStatorYokeHeight
@@ -28,7 +28,7 @@ from ..components.sizing_pmsm_drag import SizingPMSMDrag
 from ..components.sizing_resistance import SizingResistance
 from ..components.sizing_stator_core_weight import SizingStatorCoreWeight
 from ..components.sizing_rotor_weight import SizingRotorWeight
-from ..components.sizing_frame_weight import SizingFrameWeight
+from ..components.sizing_frame_weight import SizingFrameGeometry
 from ..components.sizing_winding_stator_weight import SizingStatorWindingWeight
 from ..components.sizing_pmsm_weight import SizingMotorWeight
 from ..components.sizing_sm_pmsm import SizingSMPMSM
@@ -75,7 +75,7 @@ XML_FILE = "reference_motor_new.xml"
 NB_POINTS_TEST = 10
 
 
-def test_diameter():
+def test_bore_diameter():
     ivc = om.IndepVarComp()
 
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:form_coefficient", val=0.6)
@@ -90,10 +90,10 @@ def test_diameter():
         units="N*m",
     )
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingStatorDiameter(pmsm_id="motor_1"), ivc)
+    problem = run_system(SizingStatorBoreDiameter(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:diameter", units="m"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter", units="m"
     ) == pytest.approx(0.187, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -104,7 +104,7 @@ def test_rotor_diameter():
 
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:radius_ratio", val=0.97)
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:diameter",
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
         val=0.187,
         units="m",
     )
@@ -125,7 +125,7 @@ def test_length():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:diameter",
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
         val=0.187,
         units="m",
     )
@@ -173,7 +173,7 @@ def test_slot_width():
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:conductors_number", val=24)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:tooth_ratio", val=0.4407)
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:diameter",
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
         val=0.187,
         units="m",
     )
@@ -332,7 +332,7 @@ def test_external_stator_diameter():
 
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:diameter",
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
         val=0.187,
         units="m",
     )
@@ -402,9 +402,11 @@ def test_rotor_weight():
 
 
 def test_frame_weight():
-    ivc = get_indep_var_comp(list_inputs(SizingFrameWeight(pmsm_id="motor_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFrameGeometry(pmsm_id="motor_1")), __file__, XML_FILE
+    )
 
-    problem = run_system(SizingFrameWeight(pmsm_id="motor_1"), ivc)
+    problem = run_system(SizingFrameGeometry(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_weight", units="kg"
@@ -468,8 +470,8 @@ def test_motor_cg_y():
 
 
 def test_motor_drag():
-    expected_drag_ls = [0.186, 0.0]
-    expected_drag_cruise = [0.183, 0.0]
+    expected_drag_ls = [0.6, 0.0]
+    expected_drag_cruise = [0.592, 0.0]
 
     for option, ls_drag, cruise_drag in zip(
         POSSIBLE_POSITION, expected_drag_ls, expected_drag_cruise
@@ -1055,7 +1057,7 @@ def test_sizing_SM_PMSM():
     problem = run_system(SizingSMPMSM(pmsm_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:diameter", units="m"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter", units="m"
     ) == pytest.approx(0.187, rel=1e-2)
 
     assert problem.get_val(

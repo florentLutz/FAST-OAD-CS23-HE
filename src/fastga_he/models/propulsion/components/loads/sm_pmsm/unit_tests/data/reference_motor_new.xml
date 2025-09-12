@@ -42,7 +42,8 @@
                         <frame_weight units="kg">19.52</frame_weight>
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
-                        <diameter units="m">0.187</diameter>
+                        <bore_diameter units="m">0.187</bore_diameter>
+                        <frame_diameter units="m">0.3564</frame_diameter>
                         <rotor_diameter units="m">0.1814</rotor_diameter>
                         <conductor_length units="m">0.545475</conductor_length>
                         <stator_diameter units="m">0.3288</stator_diameter>

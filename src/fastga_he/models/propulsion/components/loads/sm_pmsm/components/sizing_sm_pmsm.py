@@ -4,7 +4,7 @@
 
 import openmdao.api as om
 
-from .sizing_diameter import SizingStatorDiameter
+from .sizing_bore_diameter import SizingStatorBoreDiameter
 from .sizing_active_length import SizingActiveLength
 from .sizing_rotor_diameter import SizingRotorDiameter
 from .sizing_stator_yoke import SizingStatorYokeHeight
@@ -20,7 +20,7 @@ from .sizing_external_stator_diameter import SizingExtStatorDiameter
 from .sizing_stator_core_weight import SizingStatorCoreWeight
 from .sizing_winding_stator_weight import SizingStatorWindingWeight
 from .sizing_rotor_weight import SizingRotorWeight
-from .sizing_frame_weight import SizingFrameWeight
+from .sizing_frame_weight import SizingFrameGeometry
 from .sizing_pmsm_weight import SizingMotorWeight
 from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_cg_y import SizingPMSMCGY
@@ -58,7 +58,9 @@ class SizingSMPMSM(om.Group):
             promotes=["*"],
         )
 
-        self.add_subsystem("diameter", SizingStatorDiameter(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "bore_diameter", SizingStatorBoreDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+        )
 
         self.add_subsystem("length", SizingActiveLength(pmsm_id=pmsm_id), promotes=["data:*"])
 
@@ -118,7 +120,7 @@ class SizingSMPMSM(om.Group):
 
         self.add_subsystem("rotor_weight", SizingRotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 
-        self.add_subsystem("frame_weight", SizingFrameWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("frame", SizingFrameGeometry(pmsm_id=pmsm_id), promotes=["data:*"])
 
         self.add_subsystem("mass", SizingMotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
 

@@ -44,10 +44,9 @@ class SizingPMSMDrag(om.ExplicitComponent):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_diameter",
             val=np.nan,
             units="m",
-            desc="Stator bore diameter of the PMSM",
         )
 
         if position == "on_the_wing":
@@ -81,7 +80,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
             self.declare_partials(
                 of="*",
                 wrt=[
-                    "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+                    "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_diameter",
                     "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":fairing:fineness",
                     "data:geometry:wing:area",
                     "data:aerodynamics:" + ls_tag + ":mach",
@@ -95,7 +94,9 @@ class SizingPMSMDrag(om.ExplicitComponent):
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
-        motor_diameter = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]
+        motor_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_diameter"
+        ]
 
         if position == "on_the_wing":
             motor_length = inputs[
@@ -145,7 +146,9 @@ class SizingPMSMDrag(om.ExplicitComponent):
         position = self.options["position"]
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
-        motor_diameter = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter"]
+        motor_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_diameter"
+        ]
 
         if position == "on_the_wing":
             fineness = inputs[
@@ -174,7 +177,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
 
             partials[
                 "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":" + ls_tag + ":CD0",
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":frame_diameter",
             ] = (
                 interference_factor
                 * form_factor
