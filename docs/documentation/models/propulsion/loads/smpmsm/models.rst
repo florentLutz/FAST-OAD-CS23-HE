@@ -4,82 +4,29 @@ Surface-mounted permanent magnet synchronous motor computation
 
 .. contents::
 
-***********************************
-Fuel cell Layer voltage calculation
-***********************************
-The Proton-Exchange Membrane Fuel Cell (PEMFC) system is composed of multiple single-layer PEMFCs, each
-serving as a base unit of the overall stack. The single layer operating voltage is calculated by subtracting the
-reversible open-circuit voltage with the losses from different factors. The equation below, from :cite:`dicks:2018`, is
-the general representation of the fuel cell polarization model that demonstrates the calculation of single layer operating voltage.
+********************************
+Surface-mounted PMSM performance
+********************************
+The
 
-.. math::
 
-   V_{\text{operating}} = V_r - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}}
 
-The :math:`V_{\text{operating}}` represents the operating voltage of the fuel cell under standard conditions, while
-:math:`V_r` is the reversible open-circuit voltage, determined by the Gibbs free energy of the chemical reaction.
-:math:`V_{\text{activation}}` corresponds to the activation loss caused by the kinetic energy barrier at both electrodes
-:cite:`juschus:2021`, :math:`V_{\text{ohmic}}` denotes the ohmic loss due to the electrical resistance of the electrodes
-, and :math:`V_{\text{mass-transport}}` represents the mass-transport loss, which occurs when reactant gases, such as
-oxygen or fuel, face diffusion limitations at the electrodes.
 
-There are two polarization curve models implemented in this component to model single layer operating voltage. The empirical PEMFC polarization
-model is based on Aerostak 200W PEMFC derived by :cite:`hoogendoorn:2018`. The analytical PEMFC polarization model is
-based on the thermodynamic characteristics of fuel cells, as outlined in :cite:`juschus:2021`.
+PMSM joule loss
+===============
 
-.. _models-pemfc-empirical:
 
-Empirical PEMFC polarization model
-==================================
+PMSM Iron loss
+==============
 This model utilizes the empirical open circuit voltage :math:`V_0` and the voltage losses in
 simplified form obtained with curve fitting in :cite:`hoogendoorn:2018`. The voltage deviation due to operating pressure variation is also
 considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ratio between the operating
 pressure :math:`P_{op}` and the nominal operating pressure :math:`P_{nom}`. The unit of current density :math:`j` is
 expressed in [:math:`A/cm^2`] for this model.
 
-.. math::
-    V = V_0 - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}} + \Delta V_p \\
 
-With
-
-.. math::
-    V_{\text{activation}} = B \cdot \ln{(j)} \\[10pt]
-    V_{\text{ohmic}} =  R \cdot j \\[10pt]
-    V_{\text{mass-transport}} =  m \cdot e^{n \cdot j} \\[10pt]
-    P_R = \frac{P_{op}}{P_{nom}} \\[10pt]
-    \Delta V_p = C \cdot \ln{(P_R)} \\[10pt]
-    C = -0.0032  \ln{(P_R)} ^ 2 + 0.0019 \ln{(P_R)} + 0.0542
-
-And
-
-.. raw:: html
-
-   <div style="display: flex; justify-content: center;">
-
-======================  =======================  =============================================
-Parameter                   Value                       Unit
-======================  =======================  =============================================
-:math:`V_0`                   :math:`0.83`                       :math:`\text{V}`
-:math:`B`                   :math:`0.014`           :math:`\text{V}/ln(\text{A}/\text{cm}^2)`
-:math:`R`                   :math:`0.24`               :math:`\Omega \cdot \text{cm}^2`
-:math:`m`                :math:`5.63 × 10^{-6}`                 :math:`\text{V}`
-:math:`n`                   :math:`11.42`                 :math:`\text{cm}^2/\text{A}`
-:math:`P_{\text{nom}}`      :math:`101325`                       :math:`\text{Pa}`
-======================  =======================  =============================================
-
-.. raw:: html
-
-   </div>
-
-
-
-This table proivdes the parameter values that has been considered to model Aerostak 200W in hoogendoorn's research
-:cite:`hoogendoorn:2018`.
-
-.. _models-pemfc-analytical:
-
-Analytical PEMFC polarization model
-===================================
+PMSM mechanical loss
+====================
 This moodel accounts for voltage losses under typical operational conditions, as well as variations in operating
 temperature and pressure, represented by :math:`V_T` and :math:`V_{P_e}`, respectively. The variable :math:`p_{O_2}`
 denotes the operating pressure at the cathode, :math:`p_{H_2}` refers to the operating pressure at the anode, and
