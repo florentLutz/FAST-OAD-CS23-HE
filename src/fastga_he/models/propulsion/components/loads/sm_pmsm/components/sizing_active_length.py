@@ -35,6 +35,7 @@ class SizingActiveLength(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
             units="m",
             desc="The stator length of PMSM",
+            val=0.169,
         )
 
     def setup_partials(self):

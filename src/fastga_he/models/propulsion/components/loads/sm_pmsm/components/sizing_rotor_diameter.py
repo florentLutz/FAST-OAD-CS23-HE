@@ -41,6 +41,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":airgap_thickness",
             units="m",
             desc="The distance between the rotor and the stator bore",
+            val=0.0015,
         )
 
     def setup_partials(self):
