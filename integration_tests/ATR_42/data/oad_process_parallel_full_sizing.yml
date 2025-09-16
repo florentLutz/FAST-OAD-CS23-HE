@@ -25,7 +25,7 @@ model:
 
     # A group can be set with its own solvers.
     # Uncomment the 2 next lines for using the performance module with "mission_file_path:sizing_mission"
-    nonlinear_solver: om.NonlinearBlockGS(maxiter=30, rtol=1e-4, iprint=2)
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=30, rtol=1e-5, iprint=2)
     linear_solver: om.DirectSolver()
 
     geometry:

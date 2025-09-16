@@ -22,12 +22,12 @@ in :ref:`options <options-pemfc>`.
         position: ...
 
 
-A brief description of the SMPMSM component is presented here:
+A brief description of the SM PMSM component is presented here:
 
 .. _table:
 .. toctree::
    :maxdepth: 2
 
-    SMPMSM computation logic <models>
-    SMPMSM options <options>
-    SMPMSM model assumptions <assumptions>
+    SM PMSM computation logic <models>
+    SM PMSM options <options>
+    SM PMSM model assumptions <assumptions>

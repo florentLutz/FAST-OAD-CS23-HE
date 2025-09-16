@@ -4,137 +4,224 @@ Surface-mounted permanent magnet synchronous motor computation
 
 .. contents::
 
-********************************
-Surface-mounted PMSM performance
-********************************
-The
-
-
-
+***********************
+Performance calculation
+***********************
+Most of the performance calculations shares a similar approach as the PMSM model, except the losses caused by various
+factors. The three primary losses of the Surface-mounted PMSM derived by HASTECS project :cite:`touhami:2020` are
+demonstrated below.
 
 PMSM joule loss
 ===============
+Joule loss accounts for most of the PMSM performance loss. It is caused by Ohmic heating in the wound conductor
+wires of the PMSM stator. At low operating speeds, the current density is evenly distributed across the wire’s
+cross-section. To calculate the Joule loss, the wire resistance must be determined first.
+
+.. math::
+    R_s = \frac{N_c}{q} \cdot \rho_{cu}(T_{win}) \\
+    \rho_{cu}(T_{win}) = \rho_{cu20^\circ} [1 + \alpha_{th}(T_{win} - 20^\circ)]
+
+Where :math:`N_c` is the nimber of conductor,  :math:`q` is the number of phase in PMSM, :math:`T_{win}` is the the
+temperature of the winded wires, :math:`\alpha_{th}` is the electrical resistance coefficient of copper, and
+:math:`\rho_{cu20^\circ}` copper density at :math:`20^{\circ}C`.
+
+With the wire electrical resistance and the rms current (:math:`I_{rms}`), the joule loss can be written as:
+
+.. math::
+    P_j = q \cdot R_s \cdot I_{rms}^2
 
 
-PMSM Iron loss
+PMSM iron loss
 ==============
-This model utilizes the empirical open circuit voltage :math:`V_0` and the voltage losses in
-simplified form obtained with curve fitting in :cite:`hoogendoorn:2018`. The voltage deviation due to operating pressure variation is also
-considered in this model shown as :math:`\Delta V_p`. The pressure ratio :math:`P_R` is the ratio between the operating
-pressure :math:`P_{op}` and the nominal operating pressure :math:`P_{nom}`. The unit of current density :math:`j` is
-expressed in [:math:`A/cm^2`] for this model.
+As a second largest contributor of the PMSM performance loss, the iron loss arises from eddy current and the continuous
+variation of the magnetic flux. For better capture the behavior of the SM PMSM, a regression model using Least Squared
+Method by HASTECS project :cite:`touhami:2020` is considered.
+
+.. math::
+    P_{ir} = \sum_{i=1}^{i=4}\sum_{j=1}^{j=4} a_{ij}(\sqrt{B_m})^j(\sqrt{f})^i
+
+:math:`B_m` is the maximum magnetic flux density and :math:`f` is the magnetic field switching frequency.
+
+.. image:: ../../../../../img/iron_loss.svg
+    :width: 600
+    :align: center
+
+The iron loss coefficients (:math:`a_{ij}`) are verified with empirical data provided by HASTECS project
+:cite:`touhami:2020`.
 
 
 PMSM mechanical loss
 ====================
-This moodel accounts for voltage losses under typical operational conditions, as well as variations in operating
-temperature and pressure, represented by :math:`V_T` and :math:`V_{P_e}`, respectively. The variable :math:`p_{O_2}`
-denotes the operating pressure at the cathode, :math:`p_{H_2}` refers to the operating pressure at the anode, and
-:math:`T` is the operating temperature of the fuel cell. The constants :math:`R` and :math:`Fr` are the gas constant
-and Faraday's constant. The pressure voltage correction :math:`\kappa_{vc}`, obtained from
-`juschus' github repository <https://github.com/danieljuschus/pemfc-aircraft-sizing>`_ , adjusts for changes in ambient
-pressure :math:`P_{\text{amb}}`. The current density, :math:`j`, is expressed in [:math:`A/m^2`] for this model.
+Mechanical losses (:math:`P_{mech}`) are the consequence from various factors, friction between air and rotor or
+friction between a stationary solid and a rotating solid.
 
 .. math::
-    V = \kappa_{vc} [E_0 - V_T + V_{P_e} - V_{\text{activation}} - V_{\text{ohmic}} - V_{\text{mass-transport}}]
+    P_{mech} = P_{windage} + 2 P_{bf}
 
-With
+The two major windage losses (:math:`P_{windage}`) result from the fluid friction
+between the air between the component gaps and the rotor. The airgap windage loss (:math:`P_{wa}`) occurs from the fluid
+friction between the stator and rotor while rotating. Similarly, the rotor windage loss (:math:`P_{wr}`) arises from the
+space between both ends of the rotor and the motor casing. The rotor radius is denoted as :math:`R_{r}`, the shaft
+radius as :math:`R_{sh}`, the rotation speed as :math:`\Omega`, and the motor length as :math:`L`.
 
 .. math::
+    P_{windage} = P_{wa} + 2P_{wr} \\
+    P_{wa} = k_1 C_{fa} \pi \rho_{air} \Omega^3 R_r^4 L \\
+    P_{wr} = \frac{1}{2}C_{fr} \pi \rho_{air} \Omega^3(R_r^5 - R_{sh}^5)
 
-    V_T = \frac{\Delta S}{2Fr}(T - T_0) \\[10pt]
-    V_{P_e} = \frac{RT}{2 Fr} \ln( p_{H_2} \sqrt{p_{O_2}}) \\[10pt]
-    V_{\text{activation}} = \frac{RT}{\alpha Fr} \ln \left( \frac{j + j_{leak}}{j_0} \right) \\[10pt]
-    V_{\text{ohmic}} = r \cdot j \\[10pt]
-    V_{\text{mass-transport}} = \epsilon \ln \left( \frac{j_{lim}}{j_{lim} - j - j_{leak}} \right) \\[10pt]
-    \kappa_{vc} = -0.022830 P_{\text{amb}}^4 + 0.230982 P_{\text{amb}}^3 - 0.829603 P_{\text{amb}}^2 + 1.291515 P_{\text{amb}} + 0.329935
+Where the friction coefficient of airgap windage loss (:math:`C_{fa}`) and the friction coefficient of rotor windage
+loss (:math:`C_{fr}`) are:
 
+.. math::
+    C_{fa} = \begin{cases}
+    0.515 \frac{(e_g/R_r)^{0.3}}{Re_{a}^{0.5}} & \text{for laminar flow } 500 < Re_{a} < 10^4 \\
+    0.0325 \frac{(e_g/R_r)^{0.3}}{Re_{a}^{0.2}} & \text{for turbulent flow } Re_{a} > 10^4
+    \end{cases} \\
 
-And
+.. math::
+    C_{fr} = \begin{cases}
+    \frac{3.87}{Re_{rt}^{0.5}} & \text{for laminar flow } Re_{rt} \leq 3.5 \cdot 10^5 \\
+    \frac{0.146}{Re_{rt}^{0.2}} & \text{for turbulent flow } Re_{rt} > 3.5 \cdot 10^5
+    \end{cases} \\
+
+:math:`e_g` is the airgap thickness.
+
+With the air pressure expressed as :math:`pr`, the air density (\rho_{air}) and the air dynamic viscosity
+(:math:`\mu_{air}`) to derive the Reynolds numbers are:
+
+.. math::
+    \rho_{air}(T,pr) = 1.293 \cdot \frac{273.15}{T} \cdot pr \\
+    \mu_{air}(T,1 \ atm) = 8.88 \cdot 10^{−15}T^3 − 3.23 \cdot 10^{−11}T^2 + 6.26 \cdot 10^{−8} T + 2.35 \cdot 10^{−6}
+
+And the Reynolds numbers for both losses are:
+
+.. math::
+   Re_{a} = \frac{\rho_{air} R_r e_g}{\Omega} \\
+   Re_{rt} = \frac{\rho_{air} R_r^2}{\mu_{air}} \Omega
+
+The bearing friction loss is the major contributor of the friction loss between one moving surface and one stationary
+surface. A simplified model for such complex component and the bearing friction coefficient (:math:`C_{fb}`) table for
+various bearing types are provided by the SKF's bearing datasheets :cite:`skf:2016`.
 
 .. raw:: html
 
    <div style="display: flex; justify-content: center;">
 
-=======================  ================  =============================================
-Parameter                  Value                    Unit
-=======================  ================  =============================================
-:math:`E_0`               :math:`1.229`         :math:`\text{V}`
-:math:`\Delta S`          :math:`44.34`     :math:`\text{J}/(\text{mol} \cdot \text{K})`
-:math:`T_0`               :math:`289.15`        :math:`\text{K}`
-:math:`\alpha`            :math:`0.3`           :math:`–`
-:math:`\epsilon`           :math:`0.5`           :math:`\text{V}`
-:math:`r`                 :math:`10^{-6}`   :math:`\Omega \cdot \text{m}^2`
-:math:`j_{\lim}`          :math:`20000`     :math:`\text{A}/\text{m}^2`
-:math:`j_{\text{leak}}`   :math:`100`       :math:`\text{A}/\text{m}^2`
-:math:`j_0`               :math:`1.0`       :math:`\text{A}/\text{m}^2`
-=======================  ================  =============================================
+==================================   ===================================
+Bearing types                        Friction coefficient :math:`C_{fb}`
+==================================   ===================================
+Deep groove ball bearings            :math:`0.0015`
+Cylindrical roller bearings
+- with cage                           :math:`0.0011`
+- full complement                     :math:`0.0020`
+Spherical toroidal roller bearings    :math:`0.0018`
+CARB toroidal roller bearings         :math:`0.0016`
+Angular contact ball bearings
+- single row                          :math:`0.0020`
+- double row                          :math:`0.0024`
+- four-point contact                  :math:`0.0024`
+Hybrid bearings                       --
+==================================   ===================================
 
 .. raw:: html
 
    </div>
 
 
-This table provides the parameter values that has been considered in juschus' research :cite:`juschus:2021`.
+
+.. math::
+    P_{bf} = \frac{1}{2}C_{fb} \cdot P \cdot d_{bb} \cdot \Omega \\
+    P = W_{rt} \cdot g
+
+:math:`W_{rt}` is the rotor weight, :math:`d_{bb}` is the bearing bore diameter and the :math:`g` is the gravitational
+constant.
+
 
 ******************
 Sizing calculation
 ******************
-PEMFC dimension calculation
-===========================
-The PEMFC stack length is calculated by multiplying the number of layers, :math:`N_{layers}`, with the cell length.
-:math:`L_c` is the cell length calculates from dividing total length of the Aerostak 200W by the number of single-layered
-fuel cells.
+SM PMSM dimension calculation
+=============================
+From the electric current balance and magnetic flux balance, the stator bore radius (:math:`R_{rt}`), the active length
+(:math:`L_{m}`), the conductor slot height (:math:`h_{s}`), and the yoke thickness (:math:`h_{y}`) can be derived.
 
 .. math::
-   L_{pemfc} = L_c \cdot N_{layers}
+    R_{rt} = \sqrt[3]{\frac{\lambda}{4\pi\sigma}\frac{P_{em}}{\Omega}} \\
+    L_m = (\frac{2}{\lambda})\sqrt[3]{\frac{\lambda}{4\pi\sigma}\frac{P_{em}}{\Omega}}
 
-Then, utilizing the PEMFC stack volume calculated with the maximum design power :math:`P_{max}` produced by PEMFC and the
-power density of the fuel cell :math:`\rho_{power}`, the cross-section area :math:`A_{cross}` is obtained as:
-
-.. math::
-    A_{cross} = \frac { k_{volume} \cdot P_{max}} {\rho_{power}  \cdot L_{pemfc}}
-
-Where the volume tuning factor :math:`k_{volume}` allows users to manually adjust the volume of the PEMFC stack.
-
-Finally, the height :math:`H_{pemfc}` and width :math:`W_{pemfc}` of the PEMFC stack can be obtained as:
+:math:`\lambda = 2* R/L_m` is the shape coefficient, :math:`\sigma` is the tangential stress, and :math:`P_{em}` is the
+given electromagnetic power.
 
 .. math::
-
-   H_{pemfc} = \sqrt{0.5 A_{cross}} \\
-   W_{pemfc} = \sqrt{2 A_{cross}} \\
-    \text{if positioned underbelly}
+    h_s = \frac{\sqrt{2}\sigma}{k_w B_m j_{rms} k_{sc} k_{fill}} (1-r_{tooth})^{-1}
 
 .. math::
-    H_{pemfc} = W_{pemfc} = \sqrt{A_{cross}} \\
-    \text{if positioned inside fuselage or wing pod}
-
-PEMFC weight calculation
-========================
-The PEMFC stack weight is calculated with the cell density :math:`\rho_{cell}` of Aerostak 200W provided by
-:cite:`hoogendoorn:2018`, which is the total weight divided by the total effective area of the Aerostak 200W PEMFC stack.
-The weight of the PEMFC stack can be expressed as:
+    h_y = \frac{R_{rt}}{p} \sqrt{(\frac{B_{m}}{B_{sy}})^2 + \mu_o^2 (\frac{K_m}{B_{sy}})^2 R_{x2p}^2}
 
 .. math::
+    r_{tooth} = \frac{2}{\pi} \sqrt{(\frac{B_{m}}{B_{st}})^2 + \mu_o^2 (\frac{K_m}{B_{st}})^2 R_{x2p}^2} \\
+    R_{x2p}^2 = \frac{1+x^{2p}}{1-x^{2p}}
 
-    M_{pemfc} =k_{mass} \cdot \lambda_{sp} \cdot \rho_{cell} \cdot A_{eff} \cdot N_{layers}
 
-Where :math:`A_{eff}` is the effective area, :math:`N_{layers}` is number of layers, and :math:`\lambda_{sp}` is the
-specific power ratio. :math:`\lambda_{sp}` is calculated as the specific power of the Aerostak 200W divided by the
-specific power of the PEMFC stack. The mass tuning factor :math:`k_{mass}` allows users to manually adjust
-the weight of the PEMFC stack.
+.. raw:: html
+
+   <div style="display: flex; justify-content: center;">
+
+==================================   =================================================================
+Variable                               Explanation
+==================================   =================================================================
+:math:`B_m`                             Max airgap magnetic flux density
+:math:`K_m`                             Max electric surface current density
+:math:`B_st`                            Magnetic flux density in teeth
+:math:`B_sy`                            Magnetic flux density in the yoke
+:math:`j_{rms}`                         RMS current density
+:math:`p`                               Number of pole pairs
+:math:`k_{fill}`                        Cross section ratio between a slot and the wires in the slots
+:math:`k_{sc}`                          Wire cross section ratio between straight cut and tilted cut
+:math:`k_{w}`                           Wire winding coefficient
+:math:`x`                               Radius ratio of the rotor radius and the stator bore radius
+==================================   =================================================================
+
+.. raw:: html
+
+   </div>
+
+SM PMSM weight calculation
+==========================
+The weight of the SM PMSM is the sum of the weights of all fundamental components, the stator core weight (:math:`W_{stc}`),
+the wire winding weight (:math:`W_{ww}`), the rotor weight (:math:`W_{rt}`) , and the frame weight (:math:`W_{f}`).
+
+.. math::
+    W_{stc} = [\pi \cdot L_m (R_{out}^2-R^2) - (h_s \cdot L_m \cdot N_s \cdot l_s)] \rho_{stc}
+
+.. math::
+    W_{ww} = [k_{tb} k_{tc} h_s L_m N_s l_s][k_{fill} \rho_c (1 - k_{fill}) \rho_{ins}]
+
+.. math::
+    W_{rt} = \pi R_r^2 L_m \rho_{rt}(p) \\
+    \rho_{rt}(p) = \begin{cases}
+    −431.67 p + 7932 & \text{for} p \leq 10 \\
+    1.09 p^2 − 117.45 p + 4681 & \text{for} 10 < p \leq 50 \\
+    1600 & \text{for} p > 50
+    \end{cases} \\
+
+.. math::
+    W_{f} = \rho_{fr} (\pi L_m k_{tb} (R_{fr}^2 - R_{out}^2) + 2 \pi (\tau_r(R_{out}) - 1) R_{out} R_{fr}^2) \\
+    \tau_r(R_{out}) = \begin{cases}
+    0.7371 R_{out}^2 − 0.580 R_{out} + 1.1599 & \text{for} R_{out} \leq 400mm \\
+    1.04 & \text{for} R_{out} > 400mm \\
+    \end{cases} \\
 
 *******************************
 Component Computation Structure
 *******************************
-The following three links are the N2 diagrams representing the performance for both polarization models and sizing
-computation in Proton-Exchange Membrane Fuel Cell (PEMFC) stack component.
+The following tow links are the N2 diagrams representing the performance and sizing computation in Surface-Mounted PMSM
+(SM PMSM) component.
 
 .. raw:: html
 
-   <a href="../../../../../../../n2/n2_performance_pemfc_empirical.html" target="_blank">PEMFC stack performance N2 diagram with empirical polarization model</a><br>
-   <a href="../../../../../../../n2/n2_performance_pemfc_analytical.html" target="_blank">PEMFC stack performance N2 diagram with analytical polarization model</a><br>
-   <a href="../../../../../../../n2/n2_sizing_pemfc.html" target="_blank">PEMFC stack sizing N2 diagram</a>
+   <a href="../../../../../../../n2/n2_performance_sm_pmsm.html" target="_blank">SM PMSM performance N2 diagram</a><br>
+   <a href="../../../../../../../n2/n2_sizing_sm_pmsm.html" target="_blank">SM PMSM sizing N2 diagram</a>
 
 
 

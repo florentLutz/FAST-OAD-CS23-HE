@@ -4,9 +4,9 @@
 Surface mounted permanent magnet synchronous motor option
 =========================================================
 
-**********************
-SMPMSM position option
-**********************
+***********************
+SM PMSM position option
+***********************
 The SMPMSM model has two possible installation positions shown as:
 
 | ``on_the_wing`` : Servo motor mounted on the wing of aircraft
