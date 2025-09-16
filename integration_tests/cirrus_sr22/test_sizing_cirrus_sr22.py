@@ -302,9 +302,6 @@ def test_sizing_sr22_electric_two_motors_improved_plus_range_sensitivity():
         problem.set_val("data:TLAR:range", units="NM", val=design_range)
         problem.run_model()
 
-        _, _, residuals = problem.model.get_nonlinear_vectors()
-        residuals = filter_residuals(residuals)
-
         problem.output_file_path = (
             RESULTS_FOLDER_PATH / "full_sizing_elec_out_two_motors_plus_improved.xml"
         )
@@ -733,6 +730,158 @@ def test_optimization_sr22_hybrid_new_bed_fixed_eff():
 
     problem.run_driver()
     problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_new_bed_fixed_eff.xml"
+    problem.write_outputs()
+
+
+def test_optimization_sr22_hybrid_new_bed_fixed_eff_rotax():
+    """
+    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
+    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). Changes the
+    battery energy density to see for which value a full electric becomes preferable. Assumes fixed
+    efficiency for the motor as well becomes the original model predicts that with the current tech
+    and architecture efficiency will degrade FAST ! Plus a Rotax will be used because at some point
+    the original Lycoming is not suited anymore.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid_fixed_eff_rotax.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals()
+
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        lower=10.0,
+        upper=30.0,
+    )
+    problem.model.add_objective(name="data:environmental_impact:sizing:emissions", units="kg")
+
+    recorder = om.SqliteRecorder("driver_cases.sql")
+    problem.driver.add_recorder(recorder)
+
+    problem.driver.recording_options["record_desvars"] = True
+    problem.driver.recording_options["record_objectives"] = True
+
+    # To assess the range of BED for which hybrid is feasible, we artificially improve the battery
+    # energy density by reducing the weight of the reference cell. Reference cell has a battery
+    # energy density of 261 Wh/kg with a cell weight of 50.0g we do simple cross product to achieve
+    # energy densities of 275, 300, 325, ...
+    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261.0 / 475.0}
+
+    problem.setup()
+
+    problem.set_val(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        val=24.0,
+    )
+
+    problem.run_driver()
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_new_bed_fixed_eff.xml"
+    problem.write_outputs()
+
+
+def test_sizing_sr22_hybrid_new_bed_fixed_eff_rotax():
+    """
+    Sizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the
+    original one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). Changes the
+    battery energy density to see for which value a full electric becomes preferable. Assumes fixed
+    efficiency for the motor as well becomes the original model predicts that with the current tech
+    and architecture efficiency will degrade FAST ! Plus a Rotax will be used because at some point
+    the original Lycoming is not suited anymore.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_hybrid.xml"
+    process_file_name = "full_sizing_hybrid_fixed_eff_rotax.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # To assess the range of BED for which hybrid is feasible, we artificially improve the battery
+    # energy density by reducing the weight of the reference cell. Reference cell has a battery
+    # energy density of 261 Wh/kg with a cell weight of 50.0g we do simple cross product to achieve
+    # energy densities of 275, 300, 325, ...
+    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261.0 / 475.0}
+
+    problem.setup()
+
+    problem.set_val(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        val=18.0,
+    )
+
+    problem.run_model()
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "full_sizing_hybrid_out_fixed_eff_mda_rotax_mda.xml"
+    )
+    problem.write_outputs()
+
+
+def test_sizing_electric_sr22_fixed_eff_sensitivity_bed():
+    """
+    To judge when the full electric becomes more worth that the hybrid, we'll look at when the
+    full electric becomes feasible. Fixed efficiency for motor and inverter will be assumed,
+    and we'll gradually increase the bed of the reference cell. Full electric will be assumed
+    feasible if the weight of the aircraft isn't more than double the original design or when
+    the derivative of the MTOW wrt the design range isn't too high. What is too high ? I don't know
+    yet. According to the formula 19 proposed by Hepperle et al. it is 5.3 kg/nm. According to this
+    criteria it only occurs for BED of 600 Wh/kg or higher. We'll instead consider this to be
+    feasible if MTOW < MTOWeSR22 defined earlier which happens for BED of 475 Wh/kg
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_sr22_electric_fixed_eff.xml"
+    process_file_name = "full_sizing_electric_fixed_eff.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # To assess the range of BED for which hybrid is feasible, we artificially improve the battery
+    # energy density by reducing the weight of the reference cell. Reference cell has a battery
+    # energy density of 261 Wh/kg with a cell weight of 50.0g we do simple cross product to achieve
+    # energy densities of 275, 300, 325, ...
+    problem.model_options["*"] = {"cell_weight_ref": 50.0e-3 * 261.0 / 475.0}
+
+    problem.setup()
+
+    problem.run_model()
+    problem.write_outputs()
+
+    # I'm afraid If I just put +1 nm the code will converge without changing the results
+    problem.set_val("data:TLAR:range", units="NM", val=210)
+    problem.run_model()
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "full_sizing_elec_out_fixed_eff_plus_5.xml"
     problem.write_outputs()
 
 
