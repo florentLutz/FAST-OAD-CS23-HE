@@ -143,6 +143,12 @@ class MissionVector(om.Group):
 
         self.nonlinear_solver.options["use_apply_nonlinear"] = self.options["use_apply_nonlinear"]
 
+        # To ensure compatibility if FAST-OAD-RTA is installed
+        if not self.options["rta_activation"]:
+            oad.RegisterSubmodel.active_models["service.geometry.wing"] = (
+                "fastga.submodel.geometry.wing.legacy"
+            )
+
         options_cg_variation = {
             "rta_activation": self.options["rta_activation"],
         }

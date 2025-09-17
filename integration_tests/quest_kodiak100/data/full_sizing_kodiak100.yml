@@ -89,5 +89,3 @@ submodels:
     submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
     submodel.aerodynamics.wing.extreme_lift_coefficient.clean: null
     service.weight.mass.furniture.seats: null
-    # To ensure compatibility in case RTA is installed.
-    service.geometry.wing: fastga.submodel.geometry.wing.legacy
