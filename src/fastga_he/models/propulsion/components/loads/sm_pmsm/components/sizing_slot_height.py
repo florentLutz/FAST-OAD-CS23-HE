@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingSlotHeight(om.ExplicitComponent):
     """
     Computation of single slot height of the PMSM in radial direction. The formula is obtained from
-    equation (II-46) in :cite:`touhami:2020.
+    equation (II-46) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

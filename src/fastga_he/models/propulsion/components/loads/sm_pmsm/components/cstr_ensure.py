@@ -24,7 +24,7 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE] = (
 )
 class ConstraintsTorqueEnsure(om.ExplicitComponent):
     """
-    Class that computes the difference between the maximum torque seen by the pmsm during the
+    Class that computes the difference between the maximum torque seen by the motor during the
     mission and the value used for sizing, ensuring each component works below its maximum.
     """
 
@@ -96,7 +96,7 @@ class ConstraintsTorqueEnsure(om.ExplicitComponent):
 )
 class ConstraintsRPMEnsure(om.ExplicitComponent):
     """
-    Class that computes the difference between the maximum rpm seen by the pmsm during the
+    Class that computes the difference between the maximum rpm seen by the motor during the
     mission and the value used for sizing, ensuring each component works below its maximum.
     """
 

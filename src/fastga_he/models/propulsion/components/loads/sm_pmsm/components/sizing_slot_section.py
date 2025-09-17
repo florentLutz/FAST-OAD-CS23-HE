@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingSlotSection(om.ExplicitComponent):
     """
     Computation of single slot cross-section ares of the PMSM. The formula is obtained from
-    equation (II-33) in :cite:`touhami:2020.
+    equation (II-33) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

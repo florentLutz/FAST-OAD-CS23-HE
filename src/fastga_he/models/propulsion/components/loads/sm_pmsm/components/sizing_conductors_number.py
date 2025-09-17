@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingConductorsNumber(om.ExplicitComponent):
     """
     Computation of the number of the conductor slots. The formula is obtained from
-    equation (III-58) in :cite:`touhami:2020.
+    equation (III-58) in :cite:`touhami:2020`.
 
     """
 

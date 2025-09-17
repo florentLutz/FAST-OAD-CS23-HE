@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingFrameGeometry(om.ExplicitComponent):
     """
     Computation of the frame diameter and weight of the PMSM. The formula is obtained from
-    equation (II-53) and (II-59) respectively in :cite:`touhami:2020.
+    equation (II-53) and (II-59) respectively in :cite:`touhami:2020`.
     """
 
     def initialize(self):

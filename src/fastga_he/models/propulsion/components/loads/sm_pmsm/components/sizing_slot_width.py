@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingSlotWidth(om.ExplicitComponent):
     """
     Computation of single slot width of the PMSM.The formula is obtained from
-    equation (III-55) in :cite:`touhami:2020.
+    equation (III-55) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

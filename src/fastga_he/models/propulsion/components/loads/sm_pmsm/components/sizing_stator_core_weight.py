@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingStatorCoreWeight(om.ExplicitComponent):
     """
     Computation of the stator core weight of the PMSM. The formula is obtained from
-    equation (II-54) in :cite:`touhami:2020.
+    equation (II-54) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

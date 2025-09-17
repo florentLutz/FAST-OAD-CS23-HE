@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingStatorYokeHeight(om.ExplicitComponent):
     """
     Computation of the stator yoke thickness of the PMSM. The formula is obtained from
-    equation (II-45) in :cite:`touhami:2020.
+    equation (II-45) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

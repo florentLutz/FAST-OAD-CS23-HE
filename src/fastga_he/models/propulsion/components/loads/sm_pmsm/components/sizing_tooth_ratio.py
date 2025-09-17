@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingToothRatio(om.ExplicitComponent):
     """
     Computation of the ratio between tooth length to bore radius. The formula is obtained from
-    equation (II-48) in :cite:`touhami:2020.
+    equation (II-48) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

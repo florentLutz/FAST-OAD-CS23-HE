@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingConductorSection(om.ExplicitComponent):
     """
     Computation of the conductor material area coverage in one stator slot of the PMSM. The
-    formula  is obtained from part II.2.3a in :cite:`touhami:2020.
+    formula  is obtained from part II.2.3a in :cite:`touhami:2020`.
     """
 
     def initialize(self):

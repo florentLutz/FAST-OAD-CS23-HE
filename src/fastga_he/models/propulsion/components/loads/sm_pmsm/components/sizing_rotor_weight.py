@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingRotorWeight(om.ExplicitComponent):
     """
     Computation of the rotor weight of the PMSM. The formula and the conditions are obtained
-    from part II.2.6b in :cite:`touhami:2020.
+    from part II.2.6b in :cite:`touhami:2020`.
     """
 
     def initialize(self):

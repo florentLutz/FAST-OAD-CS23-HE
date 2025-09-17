@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingResistance(om.ExplicitComponent):
     """
     Computation of the electrical resistance (all phases). The formula is obtained from equation (
-    II-64) in :cite:`touhami:2020.
+    II-64) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

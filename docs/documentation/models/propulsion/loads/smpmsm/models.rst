@@ -1,6 +1,13 @@
 ==============================================================
 Surface-mounted permanent magnet synchronous motor computation
 ==============================================================
+The sizing and performance modeling for most electric motor are often inaccurate due to the unconventional design.
+Therefore, the SM PMSM with nonsalient radial flux and supplied with sinewave currents is selected based on its
+simplicity and having a relative accurate modeling. This figure demonstrate the essential parts of a SM PMSM.
+
+.. image:: ../../../../../img/cylindrical_pmsm.svg
+    :width: 600
+    :align: center
 
 .. contents::
 
@@ -13,15 +20,15 @@ demonstrated below.
 
 PMSM joule loss
 ===============
-Joule loss accounts for most of the PMSM performance loss. It is caused by Ohmic heating in the wound conductor
-wires of the PMSM stator. At low operating speeds, the current density is evenly distributed across the wire’s
-cross-section. To calculate the Joule loss, the wire resistance must be determined first.
+Joule loss accounts for most of the PMSM performance loss. It is caused by Ohmic heating in the conductor wires winding
+of the PMSM stator. At low operating speeds, the current density is evenly distributed across the wire’s
+cross-section. To calculate the joule loss, the wire resistance must be determined first.
 
 .. math::
     R_s = \frac{N_c}{q} \cdot \rho_{cu}(T_{win}) \\
     \rho_{cu}(T_{win}) = \rho_{cu20^\circ} [1 + \alpha_{th}(T_{win} - 20^\circ)]
 
-Where :math:`N_c` is the nimber of conductor,  :math:`q` is the number of phase in PMSM, :math:`T_{win}` is the the
+Where :math:`N_c` is the number of conductor,  :math:`q` is the number of phase in PMSM, :math:`T_{win}` is the the
 temperature of the winded wires, :math:`\alpha_{th}` is the electrical resistance coefficient of copper, and
 :math:`\rho_{cu20^\circ}` copper density at :math:`20^{\circ}C`.
 
@@ -86,7 +93,7 @@ loss (:math:`C_{fr}`) are:
 
 :math:`e_g` is the airgap thickness.
 
-With the air pressure expressed as :math:`pr`, the air density (\rho_{air}) and the air dynamic viscosity
+With the air pressure expressed as :math:`pr`, the air density (:math:`\rho_{air}`) and the air dynamic viscosity
 (:math:`\mu_{air}`) to derive the Reynolds numbers are:
 
 .. math::
@@ -140,6 +147,7 @@ constant.
 ******************
 Sizing calculation
 ******************
+
 SM PMSM dimension calculation
 =============================
 From the electric current balance and magnetic flux balance, the stator bore radius (:math:`R_{rt}`), the active length
@@ -149,18 +157,18 @@ From the electric current balance and magnetic flux balance, the stator bore rad
     R_{rt} = \sqrt[3]{\frac{\lambda}{4\pi\sigma}\frac{P_{em}}{\Omega}} \\
     L_m = (\frac{2}{\lambda})\sqrt[3]{\frac{\lambda}{4\pi\sigma}\frac{P_{em}}{\Omega}}
 
-:math:`\lambda = 2* R/L_m` is the shape coefficient, :math:`\sigma` is the tangential stress, and :math:`P_{em}` is the
+:math:`\lambda = 2 R/L_m` is the shape coefficient, :math:`\sigma` is the tangential stress, and :math:`P_{em}` is the
 given electromagnetic power.
 
 .. math::
     h_s = \frac{\sqrt{2}\sigma}{k_w B_m j_{rms} k_{sc} k_{fill}} (1-r_{tooth})^{-1}
 
 .. math::
-    h_y = \frac{R_{rt}}{p} \sqrt{(\frac{B_{m}}{B_{sy}})^2 + \mu_o^2 (\frac{K_m}{B_{sy}})^2 R_{x2p}^2}
+    h_y = \frac{R_{rt}}{p} \sqrt{(\frac{B_{m}}{B_{sy}})^2 + \mu_o^2 (\frac{K_m}{B_{sy}})^2 \tau_{x2p}^2}
 
 .. math::
-    r_{tooth} = \frac{2}{\pi} \sqrt{(\frac{B_{m}}{B_{st}})^2 + \mu_o^2 (\frac{K_m}{B_{st}})^2 R_{x2p}^2} \\
-    R_{x2p}^2 = \frac{1+x^{2p}}{1-x^{2p}}
+    r_{tooth} = \frac{2}{\pi} \sqrt{(\frac{B_{m}}{B_{st}})^2 + \mu_o^2 (\frac{K_m}{B_{st}})^2 \tau_{x2p}^2} \\
+    \tau_{x2p}^2 = \frac{1+x^{2p}}{1-x^{2p}}
 
 
 .. raw:: html
@@ -172,13 +180,13 @@ Variable                               Explanation
 ==================================   =================================================================
 :math:`B_m`                             Max airgap magnetic flux density
 :math:`K_m`                             Max electric surface current density
-:math:`B_st`                            Magnetic flux density in teeth
-:math:`B_sy`                            Magnetic flux density in the yoke
+:math:`B_{st}`                          Magnetic flux density in teeth
+:math:`B_{sy}`                          Magnetic flux density in the yoke
 :math:`j_{rms}`                         RMS current density
 :math:`p`                               Number of pole pairs
 :math:`k_{fill}`                        Cross section ratio between a slot and the wires in the slots
 :math:`k_{sc}`                          Wire cross section ratio between straight cut and tilted cut
-:math:`k_{w}`                           Wire winding coefficient
+:math:`k_w`                             Wire winding coefficient
 :math:`x`                               Radius ratio of the rotor radius and the stator bore radius
 ==================================   =================================================================
 
@@ -189,13 +197,34 @@ Variable                               Explanation
 SM PMSM weight calculation
 ==========================
 The weight of the SM PMSM is the sum of the weights of all fundamental components, the stator core weight (:math:`W_{stc}`),
-the wire winding weight (:math:`W_{ww}`), the rotor weight (:math:`W_{rt}`) , and the frame weight (:math:`W_{f}`).
+the stator winding weight (:math:`W_{stw}`), the rotor weight (:math:`W_{rt}`) , and the frame weight (:math:`W_{f}`).
 
 .. math::
     W_{stc} = [\pi \cdot L_m (R_{out}^2-R^2) - (h_s \cdot L_m \cdot N_s \cdot l_s)] \rho_{stc}
 
 .. math::
-    W_{ww} = [k_{tb} k_{tc} h_s L_m N_s l_s][k_{fill} \rho_c (1 - k_{fill}) \rho_{ins}]
+    W_{stw} = [k_{tb} k_{tc} h_s L_m N_s l_s][k_{fill} \rho_c (1 - k_{fill}) \rho_{ins}]
+
+.. raw:: html
+
+   <div style="display: flex; justify-content: center;">
+
+==================================   =================================================================
+Variable                               Explanation
+==================================   =================================================================
+:math:`N_s`                             Number of the wire slots
+:math:`k_{tb}`                          Cross section ratio between a slot and the wires in the slots
+:math:`k_{tc}`                          Conductor wire twisting coefficient
+:math:`ls`                              Slot width
+:math:`\rho_{stc}`                      Stator core material density
+:math:`\rho_{stw}`                      Stator winding (teeth) material density
+:math:`\rho_{c}`                        Conductor wire material density
+:math:`\rho_{ins}`                      Wire insulation material density
+==================================   =================================================================
+
+.. raw:: html
+
+   </div>
 
 .. math::
     W_{rt} = \pi R_r^2 L_m \rho_{rt}(p) \\
@@ -205,12 +234,18 @@ the wire winding weight (:math:`W_{ww}`), the rotor weight (:math:`W_{rt}`) , an
     1600 & \text{for} p > 50
     \end{cases} \\
 
+:math:`R_r` is the rotor radius and the :math:`\rho_{rt}` is the rotor material density.
+
 .. math::
     W_{f} = \rho_{fr} (\pi L_m k_{tb} (R_{fr}^2 - R_{out}^2) + 2 \pi (\tau_r(R_{out}) - 1) R_{out} R_{fr}^2) \\
     \tau_r(R_{out}) = \begin{cases}
     0.7371 R_{out}^2 − 0.580 R_{out} + 1.1599 & \text{for} R_{out} \leq 400mm \\
     1.04 & \text{for} R_{out} > 400mm \\
     \end{cases} \\
+
+:math:`R_{fr}` is the frame radius, :math:`R_{out}` is the outer stator diameter, and :math:`\tau_r` is the ratio
+of :math:`R_{fr}` and :math:`R_{out}`.
+
 
 *******************************
 Component Computation Structure

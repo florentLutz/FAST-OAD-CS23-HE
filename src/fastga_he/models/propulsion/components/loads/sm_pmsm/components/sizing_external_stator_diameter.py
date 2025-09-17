@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingExtStatorDiameter(om.ExplicitComponent):
     """
     Computation of the external stator diameter of a cylindrical PMSM. The formula is obtained from
-    equation (II-47) in :cite:`touhami:2020.
+    equation (II-47) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

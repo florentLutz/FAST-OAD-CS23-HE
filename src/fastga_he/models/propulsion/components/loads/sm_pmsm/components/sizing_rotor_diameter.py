@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingRotorDiameter(om.ExplicitComponent):
     """
     Computation of the rotor diameter and airgap thickness of a cylindrical PMSM. The formulas
-    are obtained from equation (II-50) and (II-51) in :cite:`touhami:2020.
+    are obtained from equation (II-50) and (II-51) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

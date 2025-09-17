@@ -12,7 +12,7 @@ COPPER_TEMPERATURE_COEFF = 0.00393  # Temperature coefficient for copper [1/°C]
 class SizingWindingResistivity(om.ExplicitComponent):
     """
     Computation of the copper electrical resistivity varies with temperature. The formula is
-    obtained from equation (II-64) in :cite:`touhami:2020.
+    obtained from equation (II-64) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

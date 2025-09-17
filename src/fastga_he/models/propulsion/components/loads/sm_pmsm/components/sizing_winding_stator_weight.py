@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingStatorWindingWeight(om.ExplicitComponent):
     """
     Computation of the stator winding weight of the PMSM. The formula is obtained from
-    equation (II-55) in :cite:`touhami:2020.
+    equation (II-55) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

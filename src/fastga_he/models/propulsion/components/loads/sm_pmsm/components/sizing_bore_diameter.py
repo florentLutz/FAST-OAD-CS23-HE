@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingStatorBoreDiameter(om.ExplicitComponent):
     """
     Computation of the stator bore diameter of the PMSM. The formula is obtained from equation (
-    II-43) in :cite:`touhami:2020.
+    II-43) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
