@@ -358,7 +358,7 @@ def test_doe_sizing_hybrid_cessna_208b_better_fit():
 
 def test_resizing_c208b_new_mission():
     """
-    Sizes a pseudo C208 with the same mission as the one the hybrid version was sized on, with  
+    Sizes a pseudo C208 with the same mission as the one the hybrid version was sized on, with
     the turboshaft resized.
     """
 

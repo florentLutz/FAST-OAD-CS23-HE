@@ -622,7 +622,7 @@ def test_sizing_sr22_hybrid_new_bed():
 
 def test_optimization_sr22_hybrid_new_bed():
     """
-    Optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the 
+    Optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
     original one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
     """
     logging.basicConfig(level=logging.WARNING)
@@ -678,9 +678,9 @@ def test_optimization_sr22_hybrid_new_bed():
 def test_optimization_sr22_hybrid_new_bed_fixed_eff():
     """
     This test optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
-    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery 
-    energy density is changed to see for which value a full electric design becomes preferable. Assuming 
-    the motor efficiency stays the same, the model shows that with today’s technology and setup, 
+    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery
+    energy density is changed to see for which value a full electric design becomes preferable. Assuming
+    the motor efficiency stays the same, the model shows that with today’s technology and setup,
     efficiency will degrade FAST !
     """
     logging.basicConfig(level=logging.WARNING)
@@ -736,9 +736,9 @@ def test_optimization_sr22_hybrid_new_bed_fixed_eff():
 def test_optimization_sr22_hybrid_new_bed_fixed_eff_rotax():
     """
     This test optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
-    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery 
-    energy density is changed to see for which value a full electric design becomes preferable. Assuming 
-    the motor efficiency stays the same, the model shows that with today’s technology and setup, 
+    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery
+    energy density is changed to see for which value a full electric design becomes preferable. Assuming
+    the motor efficiency stays the same, the model shows that with today’s technology and setup,
     efficiency will degrade FAST ! Plus a Rotax will be used because at some point
     the original Lycoming is not suited anymore.
     """
@@ -795,9 +795,9 @@ def test_optimization_sr22_hybrid_new_bed_fixed_eff_rotax():
 def test_sizing_sr22_hybrid_new_bed_fixed_eff_rotax():
     """
     This test sizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
-    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery 
-    energy density is changed to see for which value a full electric design becomes preferable. Assuming 
-    the motor efficiency stays the same, the model shows that with today’s technology and setup, 
+    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery
+    energy density is changed to see for which value a full electric design becomes preferable. Assuming
+    the motor efficiency stays the same, the model shows that with today’s technology and setup,
     efficiency will degrade FAST ! Plus a Rotax will be used because at some point
     the original Lycoming is not suited anymore.
     """
