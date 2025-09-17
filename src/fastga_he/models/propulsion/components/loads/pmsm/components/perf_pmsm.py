@@ -9,7 +9,6 @@ from ..constants import SUBMODEL_PMSM_EFFICIENCY
 
 from .perf_torque import PerformancesTorque
 from .perf_losses import PerformancesLosses
-from .perf_efficiency import PerformancesEfficiency
 from .perf_active_power import PerformancesActivePower
 from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms import PerformancesCurrentRMS
