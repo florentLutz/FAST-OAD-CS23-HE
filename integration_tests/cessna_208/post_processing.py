@@ -8,18 +8,19 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 if __name__ == "__main__":
-    turboshaft_rated_power = 321.0
+    turboshaft_rated_power = 307.0
     gearbox_efficiency = 0.98
+    threshold_value = 277.0
 
     path_to_current_file = pathlib.Path(__file__)
     parent_folder = path_to_current_file.parents[0]
     results_folder_path = parent_folder / "results"
-    pt_watcher_results_file_path = results_folder_path / "hybridized_kodiak_100.csv"
+    pt_watcher_results_file_path = results_folder_path / "hybridized_cessna_208.csv"
 
     pt_watcher_data_pd = pd.read_csv(pt_watcher_results_file_path)
-    power_profile = pt_watcher_data_pd["propeller_1 shaft_power_in [kW]"].to_numpy()[1:-1]
+    power_profile = pt_watcher_data_pd["propeller_1 shaft_power_in [kW]"].to_numpy()[1:-1] / 0.98
 
-    mission_results_file_path = results_folder_path / "hybrid_propulsion.csv"
+    mission_results_file_path = results_folder_path / "hybrid_propulsion_perfect_fit.csv"
 
     mission_data_pd = pd.read_csv(mission_results_file_path)
     time_array = mission_data_pd["time"].to_numpy()
@@ -36,10 +37,10 @@ if __name__ == "__main__":
     a = (first_cruise_power - last_climb_power) / (first_cruise_time - last_climb_time)
     b = last_climb_power - a * last_climb_time
 
-    x_intersection = (turboshaft_rated_power * gearbox_efficiency - b) / a
+    x_intersection = (threshold_value - b) / a
 
     time_array = np.insert(time_array, 30, x_intersection)
-    power_profile = np.insert(power_profile, 30, turboshaft_rated_power * gearbox_efficiency)
+    power_profile = np.insert(power_profile, 30, threshold_value)
 
     end_elec_index = np.argwhere(time_array == x_intersection)[0][0]
     elec_power_profile = power_profile[: end_elec_index + 1]
@@ -51,8 +52,8 @@ if __name__ == "__main__":
     scatter_turboshaft_rated_power_elec_part = go.Scatter(
         x=[min(time_array / 3600), x_intersection / 3600],
         y=[
-            turboshaft_rated_power * gearbox_efficiency,
-            turboshaft_rated_power * gearbox_efficiency,
+            threshold_value,
+            threshold_value,
         ],
         mode="lines",
         showlegend=False,
@@ -74,11 +75,42 @@ if __name__ == "__main__":
     )
     fig.add_trace(scatter)
 
+    index_elec = np.where(power_profile >= 277.0)[0]
+    # Second part must be after cruise, so we take a random index in cruise
+    power_profile_second_part = power_profile[index_elec[np.where(index_elec >= 50)]]
+    time_array_second_part = time_array[index_elec[np.where(index_elec >= 50)]]
+
+    scatter_turboshaft_rated_power_elec_second_part = go.Scatter(
+        x=[min(time_array_second_part / 3600), max(time_array_second_part) / 3600],
+        y=[
+            threshold_value,
+            threshold_value,
+        ],
+        mode="lines",
+        showlegend=False,
+        line=dict(color="gray", dash="dash"),
+    )
+    fig.add_trace(scatter_turboshaft_rated_power_elec_second_part)
+
+    second_elec_power_profile_scatter = go.Scatter(
+        x=time_array_second_part / 3600,
+        y=power_profile_second_part,
+        mode="lines",
+        showlegend=False,
+        line=dict(color=elec_power_color),
+        marker=dict(color=elec_power_color),
+        fill="tonexty",
+        fillcolor=elec_power_color,
+        fillpattern=dict(shape="\\"),
+        name="Electrical power",
+    )
+    fig.add_trace(second_elec_power_profile_scatter)
+
     scatter_turboshaft_power = go.Scatter(
         x=[x_intersection / 3600, max(time_array / 3600)],
         y=[
-            turboshaft_rated_power * gearbox_efficiency,
-            turboshaft_rated_power * gearbox_efficiency,
+            threshold_value,
+            threshold_value,
         ],
         mode="lines",
         showlegend=False,
@@ -89,7 +121,7 @@ if __name__ == "__main__":
     thermal_power_color = "rgba(255,69,0,0.666)"
     turboshaft_power_fill = go.Scatter(
         x=time_array / 3600,
-        y=np.minimum(power_profile, turboshaft_rated_power * gearbox_efficiency),
+        y=np.minimum(power_profile, threshold_value),
         fill="tozeroy",
         mode="lines",
         showlegend=True,
@@ -135,13 +167,13 @@ if __name__ == "__main__":
     )
 
     fig.add_annotation(
-        x=1,
-        y=turboshaft_rated_power,
+        x=0.5,
+        y=threshold_value,
         xref="paper",
-        text="Turboshaft rated power",
+        text="Threshold power",
         bgcolor="rgba(255,255,255,0.75)",
         font=dict(color="grey", size=20),
-        xanchor="right",
+        xanchor="center",
         yanchor="bottom",
         align="right",
         showarrow=False,
@@ -154,9 +186,12 @@ if __name__ == "__main__":
 
     fig.show()
 
-    pdf_path = "results/hybrid_kodiak_power_profile.pdf"
+    write = True
 
-    fig.update_layout(title=None)
-    pio.write_image(fig, pdf_path, width=1900, height=600)
-    time.sleep(3)
-    pio.write_image(fig, pdf_path, width=1900, height=600)
+    if write:
+        pdf_path = "results/hybrid_cessna_power_profile.pdf"
+
+        fig.update_layout(title=None)
+        pio.write_image(fig, pdf_path, width=1900, height=600)
+        time.sleep(3)
+        pio.write_image(fig, pdf_path, width=1900, height=600)

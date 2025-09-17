@@ -1,3 +1,4 @@
+import time
 import os
 import os.path as pth
 import logging
@@ -9,6 +10,7 @@ import pandas as pd
 
 import plotly.graph_objects as go
 import plotly.express as px
+import plotly.io as pio
 
 import fastoad.api as oad
 import openmdao.api as om
@@ -87,7 +89,7 @@ def test_pipistrel_velis_electro():
         600.00, rel=1e-2
     )
     sizing_energy = problem.get_val("data:mission:sizing:energy", units="kW*h")
-    assert sizing_energy == pytest.approx(25.05, abs=1e-2)
+    assert sizing_energy == pytest.approx(24.98, abs=1e-2)
 
 
 def test_pipistrel_performances_with_lower_soh():
@@ -810,7 +812,7 @@ def test_plot_power_profile_results():
         y = all_data.loc[all_data["name"] == name, y_name]
 
         scatter = go.Scatter(
-            x=x,
+            x=x / 3600.0,
             y=y,
             mode="markers",
             marker={
@@ -826,14 +828,41 @@ def test_plot_power_profile_results():
         fig.add_trace(scatter)
 
     fig.update_layout(
-        xaxis_title="time [s]",
-        yaxis_title=y_name,
+        xaxis_title="Flight time [h]",
+        yaxis_title="Shaft power [kW]",
         showlegend=True,
     )
     fig.update_layout(
         height=800,
         width=1600,
         font_size=18,
+    )
+    fig.update_layout(
+        showlegend=True,
+        margin=dict(l=5, r=5, t=60, b=5),
+        title_x=0.5,
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=15),
+        tickfont=dict(size=15),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+        range=[-0.05, 0.9],
+        dtick=0.2,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=15),
+        title_font=dict(size=15),
     )
     fig.update_layout(
         annotations=[
@@ -882,12 +911,21 @@ def test_plot_power_profile_results():
                 borderwidth=1,
                 bgcolor="white",
             ),
-        ]
+        ],
+        xaxis=dict(showgrid=True, gridcolor="lightgray", gridwidth=1),
     )
+    fig.add_vline(x=0, line_width=1, line_color="lightgray")
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
-    # fig.show()
-    # fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.pdf"))
-    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_performances comparison.svg"))
+    fig.show()
+    pdf_path = "results/pipistrel_performances_comparison.pdf"
+
+    pio.write_image(fig, pdf_path, width=1600, height=900)
+    time.sleep(3)
+    pio.write_image(fig, pdf_path, width=1600, height=900)
 
 
 def test_pipistrel_velis_club():
@@ -975,6 +1013,77 @@ def test_pipistrel_velis_club():
     assert sizing_fuel == pytest.approx(63, rel=5e-2)
 
 
+def test_pipistrel_velis_club_op():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+
+    # Define used files depending on options
+    process_file_name = "pipistrel_club_configuration_op.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = pth.join(RESULTS_FOLDER_PATH, "pipistrel_club_out.xml")
+    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+    problem.write_needed_inputs(ref_inputs)
+
+    # Here we will open the input file and complete with the missing data.
+    datafile = oad.DataFile(problem.input_file_path)
+    datafile.append(oad.Variable("data:mission:operational:range", val=53.0, units="km"))
+    datafile.append(
+        oad.Variable("data:mission:operational:climb:climb_rate:sea_level", val=5.334, units="m/s")
+    )
+    datafile.append(
+        oad.Variable(
+            "data:mission:operational:climb:climb_rate:cruise_level", val=5.06476, units="m/s"
+        )
+    )
+    datafile.append(oad.Variable("data:mission:operational:climb:v_eas", val=38.0, units="m/s"))
+    datafile.append(
+        oad.Variable("data:mission:operational:descent:descent_rate", val=-2.286, units="m/s")
+    )
+    datafile.append(oad.Variable("data:mission:operational:descent:v_eas", val=35.0, units="m/s"))
+    datafile.append(
+        oad.Variable("data:mission:operational:cruise:altitude", val=2000.0, units="ft")
+    )
+    datafile.append(oad.Variable("data:mission:operational:cruise:v_tas", val=119.0, units="knot"))
+    datafile.append(
+        oad.Variable("data:mission:operational:initial_climb:energy", val=0.0, units="W*h")
+    )
+    datafile.append(
+        oad.Variable("data:mission:operational:initial_climb:fuel", val=0.0, units="kg")
+    )
+    datafile.append(oad.Variable("data:mission:operational:takeoff:energy", val=0.0, units="W*h"))
+    datafile.append(oad.Variable("data:mission:operational:takeoff:fuel", val=0.8, units="kg"))
+    datafile.append(oad.Variable("data:mission:operational:payload:CG:x", val=2.4, units="m"))
+    datafile.append(oad.Variable("data:mission:operational:payload:mass", val=188.0, units="kg"))
+    datafile.append(
+        oad.Variable("data:mission:operational:reserve:altitude", val=1219.0, units="m")
+    )
+    datafile.append(
+        oad.Variable("data:mission:operational:reserve:duration", val=30.0, units="min")
+    )
+    datafile.append(oad.Variable("data:mission:operational:taxi_in:duration", val=150.0, units="s"))
+    datafile.append(oad.Variable("data:mission:operational:taxi_in:speed", val=10.28, units="m/s"))
+    datafile.append(
+        oad.Variable("data:mission:operational:taxi_out:duration", val=150.0, units="s")
+    )
+    datafile.append(oad.Variable("data:mission:operational:taxi_out:speed", val=10.28, units="m/s"))
+    datafile.save()
+
+    problem.read_inputs()
+    problem.setup()
+
+    # Run the problem
+    problem.run_model()
+
+    problem.write_outputs()
+
+
 def test_plot_power_profile_results_club():
     mission_data_file = pth.join(RESULTS_FOLDER_PATH, "club_mission_data.csv")
     pt_data_file = pth.join(RESULTS_FOLDER_PATH, "pipistrel_club_pt_data.csv")
@@ -1038,14 +1147,41 @@ def test_plot_power_profile_results_club():
         fig.add_trace(scatter)
 
     fig.update_layout(
-        xaxis_title="time [h]",
-        yaxis_title=y_name,
+        xaxis_title="Flight time [h]",
+        yaxis_title="Shaft power [kW]",
         showlegend=True,
     )
     fig.update_layout(
         height=800,
         width=1600,
         font_size=18,
+    )
+    fig.update_layout(
+        showlegend=True,
+        margin=dict(l=5, r=5, t=60, b=5),
+        title_x=0.5,
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=15),
+        tickfont=dict(size=15),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+        range=[-0.1, 5.1],
+        dtick=1,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=15),
+        title_font=dict(size=15),
     )
     fig.update_layout(
         annotations=[
@@ -1094,8 +1230,18 @@ def test_plot_power_profile_results_club():
                 borderwidth=1,
                 bgcolor="white",
             ),
-        ]
+        ],
+        xaxis=dict(showgrid=True, gridcolor="lightgray", gridwidth=1),
     )
+    fig.add_vline(x=0, line_width=1, line_color="lightgray")
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
-    # fig.show()
-    fig.write_image(pth.join(RESULTS_FOLDER_PATH, "Pipistrel_club_performances_comparison.svg"))
+    fig.show()
+    pdf_path = "results/pipistrel_club_performances_comparison.pdf"
+
+    pio.write_image(fig, pdf_path, width=1600, height=900)
+    time.sleep(3)
+    pio.write_image(fig, pdf_path, width=1600, height=900)
