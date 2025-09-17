@@ -622,8 +622,8 @@ def test_sizing_sr22_hybrid_new_bed():
 
 def test_optimization_sr22_hybrid_new_bed():
     """
-    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
-    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
+    Optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the 
+    original one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights).
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -677,11 +677,11 @@ def test_optimization_sr22_hybrid_new_bed():
 
 def test_optimization_sr22_hybrid_new_bed_fixed_eff():
     """
-    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
-    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). Changes the
-    battery energy density to see for which value a full electric becomes prefereable. Assumes fixed
-    efficiency for the motor as well becomes the original model predicts that with the current tech
-    and architecture efficiency will degrade FAST !
+    This test optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
+    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery 
+    energy density is changed to see for which value a full electric design becomes preferable. Assuming 
+    the motor efficiency stays the same, the model shows that with today’s technology and setup, 
+    efficiency will degrade FAST !
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -735,11 +735,11 @@ def test_optimization_sr22_hybrid_new_bed_fixed_eff():
 
 def test_optimization_sr22_hybrid_new_bed_fixed_eff_rotax():
     """
-    Optimizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the o
-    riginal one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). Changes the
-    battery energy density to see for which value a full electric becomes preferable. Assumes fixed
-    efficiency for the motor as well becomes the original model predicts that with the current tech
-    and architecture efficiency will degrade FAST ! Plus a Rotax will be used because at some point
+    This test optimizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
+    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery 
+    energy density is changed to see for which value a full electric design becomes preferable. Assuming 
+    the motor efficiency stays the same, the model shows that with today’s technology and setup, 
+    efficiency will degrade FAST ! Plus a Rotax will be used because at some point
     the original Lycoming is not suited anymore.
     """
     logging.basicConfig(level=logging.WARNING)
@@ -794,11 +794,11 @@ def test_optimization_sr22_hybrid_new_bed_fixed_eff_rotax():
 
 def test_sizing_sr22_hybrid_new_bed_fixed_eff_rotax():
     """
-    Sizes the hybrid sr22 with the same climb, cruise, descent and reserve profile as the
-    original one but a range of 200 nm (this represents 75% of all Cirrus SR22 flights). Changes the
-    battery energy density to see for which value a full electric becomes preferable. Assumes fixed
-    efficiency for the motor as well becomes the original model predicts that with the current tech
-    and architecture efficiency will degrade FAST ! Plus a Rotax will be used because at some point
+    This test sizes the hybrid sr22 with the same climb, cruise, descent, and reserve profile as the
+    original one, but with a range of 200 nm (this represents 75% of all Cirrus SR22 flights). The battery 
+    energy density is changed to see for which value a full electric design becomes preferable. Assuming 
+    the motor efficiency stays the same, the model shows that with today’s technology and setup, 
+    efficiency will degrade FAST ! Plus a Rotax will be used because at some point
     the original Lycoming is not suited anymore.
     """
     logging.basicConfig(level=logging.WARNING)

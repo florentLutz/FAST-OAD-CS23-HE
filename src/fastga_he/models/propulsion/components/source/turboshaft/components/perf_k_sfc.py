@@ -7,6 +7,9 @@ import openmdao.api as om
 
 
 class PerformancesSpecificFuelConsumptionKFactorConstant(om.ExplicitComponent):
+"""
+Component that sets up k_sfc for performance calculation based on a given value.
+"""
     def initialize(self):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"

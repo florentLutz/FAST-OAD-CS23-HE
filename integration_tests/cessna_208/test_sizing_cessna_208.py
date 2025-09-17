@@ -220,8 +220,7 @@ def test_doe_sizing_hybrid_cessna_208b():
 
 def test_sizing_hybrid_cessna_208b_better_fit():
     """
-    Same as above except we allow resizing of the turboshaft. to the same turboshaft as for the
-    Kodiak.
+    Same as above, except the turboshaft is resized up to the same turboshaft as the Kodiak.
     """
 
     logging.basicConfig(level=logging.WARNING)
@@ -359,8 +358,8 @@ def test_doe_sizing_hybrid_cessna_208b_better_fit():
 
 def test_resizing_c208b_new_mission():
     """
-    Sizes a pseudo C208 with the same mission as the one the hybrid version were sized on. Will
-    allow resizing of the turboshaft.
+    Sizes a pseudo C208 with the same mission as the one the hybrid version was sized on, with  
+    the turboshaft resized.
     """
 
     logging.basicConfig(level=logging.WARNING)

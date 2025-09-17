@@ -21,7 +21,7 @@ class PerformancesFixedEfficiencyMission(om.ExplicitComponent):
     Component which takes the desired efficiency for the PMSM operation from the data and gives
     it the right format for the mission. Assume the value doesn't depend on operating
     conditions, another submodel exists where efficiency is computed based on the known formula
-    for pmsm losses
+    for pmsm losses.
 
     The input efficiency can either be a float (then during the whole mission the frequency is
     going to be the same) or an array of number of points elements for the individual control of
