@@ -50,6 +50,12 @@ class PerformancesSpecificFuelConsumptionKFactorConstant(om.ExplicitComponent):
 
 
 class PerformancesSpecificFuelConsumptionKFactorVariable(om.ExplicitComponent):
+    """
+    Component that adjust the k_sfc based on the engine power rating. Ths component has been created
+    because it has been identified that the original model tends to underestimates fuel consumption
+    for smaller turboshaft.
+    """
+
     def initialize(self):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"

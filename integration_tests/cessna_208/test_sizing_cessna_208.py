@@ -92,8 +92,9 @@ def test_sizing_hybrid_cessna_208b():
     """
     Parallel hybrid version of the c208b, in this first version we won't allow resizing of the
     turboshaft, we'll just "replace" thermal power by electric power. Designed for 200nm. Max
-    payload will be set equal to payload of the orig C208B on its operationnal mission to not give
-    the hybrid an unwanted advantage linked with the resizing
+    payload will be set equal to the payload of the original C208B on its operational mission to
+    prevent the hybrid version from having greater payload thanks to the resizing and thus an
+    unwanted edge.
     """
 
     logging.basicConfig(level=logging.WARNING)

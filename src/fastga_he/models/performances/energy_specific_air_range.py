@@ -19,6 +19,11 @@ ENERGY_CONTENT_AVGAS = 43.7  # In M/kg
     "fastga_he.performances.energy_specific_air_range", domain=ModelDomain.PERFORMANCE
 )
 class EnergySpecificAirRange(om.ExplicitComponent):
+    """
+    Component that computes the Energy Specific Air Range (ESAR) which is the distance that can be
+    travelled with one unit of energy.
+    """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
