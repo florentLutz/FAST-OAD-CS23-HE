@@ -52,7 +52,7 @@ model:
     wing_area:
       id: fastoad.loop.wing_area
 
-    change_input:
+    rta_integration:
       id: fastga_he.rta_variables
 
 
