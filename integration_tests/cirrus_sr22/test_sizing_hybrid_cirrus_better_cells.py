@@ -274,6 +274,59 @@ def test_assess_op_perf_optimized_cirrus_sr22():
     )
 
 
+def test_assess_op_perf_optimized_cirrus_sr22_without_hybridization_ratio_change():
+    """
+    Looks at the performances on an op missions of the optimized Cirrus SR22 without adjusting the
+    hybridization ratio
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    process_file_name = "op_mission_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = RESULTS_FOLDER_PATH / "optim_power_split.xml"
+    rename_variables_for_payload_range(ref_inputs)
+
+    # Model options are set up straight into the configuration file
+    problem.write_needed_inputs(ref_inputs)
+
+    datafile = oad.DataFile(problem.input_file_path)
+    datafile[
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split"
+    ].value = np.full(92, 70.9275)
+    datafile.save()
+
+    problem.read_inputs()
+
+    # In addition to a change in battery production process, the characteristics of the battery
+    # packs are changed. We will assume same polarization curve and small relative capacity effect.
+    # We need at least 4 "fake" points for the relative capacity effect as it assumed to be a
+    # deg 3 polynomial.
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 4.000,
+        "cell_weight_ref": 48.0e-3,
+        "reference_curve_current": [100.0, 4000.0, 8000.0, 12000.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+    }
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": False}
+
+    problem.setup()
+
+    problem.set_val("data:mission:operational:range", val=100, units="NM")
+    # We won't go below 100nm because at 100nm the electric Cirrus with better cell is capable of
+    # doing this with much less emissions !
+
+    problem.run_model()
+
+    problem.write_outputs()
+
+
 def test_sizing_sr22_hybrid_no_lto_improved():
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True

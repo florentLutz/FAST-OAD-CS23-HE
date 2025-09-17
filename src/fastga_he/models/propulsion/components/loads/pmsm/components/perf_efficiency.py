@@ -5,13 +5,21 @@
 import numpy as np
 import openmdao.api as om
 
+import fastoad.api as oad
+
+from ..constants import SUBMODEL_PMSM_EFFICIENCY
+
 # There is a problem with that model in that if the input shaft power goes to 0 so does the
 # efficiency which then cause the apparent power to not be 0, cutting off too small value
 # should solve the problem
 CUTOFF_ETA_MIN = 0.5
 CUTOFF_ETA_MAX = 1.0
 
+SUBMODEL_PMSM_EFFICIENCY_FROM_LOSSES = "fastga_he.submodel.propulsion.pmsm.efficiency.from_losses"
+oad.RegisterSubmodel.active_models[SUBMODEL_PMSM_EFFICIENCY] = SUBMODEL_PMSM_EFFICIENCY_FROM_LOSSES
 
+
+@oad.RegisterSubmodel(SUBMODEL_PMSM_EFFICIENCY, SUBMODEL_PMSM_EFFICIENCY_FROM_LOSSES)
 class PerformancesEfficiency(om.ExplicitComponent):
     """Computation of the efficiency from shaft power and power losses."""
 

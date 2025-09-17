@@ -70,6 +70,7 @@ from fastga_he.models.performances.mission_vector.mission.performance_per_phase 
     PerformancePerPhase,
 )
 from fastga_he.models.performances.mission_vector.mission.sizing_time import SizingDuration
+from fastga_he.models.performances.mission_vector.mission.sizing_energy import SizingEnergy
 from fastga_he.models.performances.mission_vector.constants import (
     HE_SUBMODEL_ENERGY_CONSUMPTION,
     HE_SUBMODEL_DEP_EFFECT,
@@ -92,6 +93,7 @@ from fastga_he.models.performances.payload_range.payload_range_inner import Comp
 from fastga_he.models.performances.payload_range.payload_range_inner_group import (
     ComputePayloadRangeInnerGroup,
 )
+from fastga_he.models.performances.energy_specific_air_range import EnergySpecificAirRange
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
@@ -1606,6 +1608,46 @@ def test_sizing_duration():
     problem.check_partials(compact_print=True)
 
 
+def test_sizing_energy():
+    inputs_list = [
+        "data:mission:sizing:main_route:climb:fuel",
+        "data:mission:sizing:main_route:cruise:fuel",
+        "data:mission:sizing:taxi_out:fuel",
+        "data:mission:sizing:taxi_in:fuel",
+        "data:mission:sizing:takeoff:fuel",
+        "data:mission:sizing:initial_climb:fuel",
+        "data:mission:sizing:main_route:climb:energy",
+        "data:mission:sizing:main_route:cruise:energy",
+        "data:mission:sizing:main_route:descent:energy",
+        "data:mission:sizing:main_route:reserve:energy",
+        "data:mission:sizing:taxi_out:energy",
+        "data:mission:sizing:taxi_in:energy",
+        "data:mission:sizing:takeoff:energy",
+        "data:mission:sizing:initial_climb:energy",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # For the sake of the test
+    ivc.add_output("data:mission:sizing:main_route:descent:fuel", units="kg", val=1.0)
+    ivc.add_output("data:mission:sizing:main_route:reserve:fuel", units="kg", val=2.0)
+
+    problem = run_system(SizingEnergy(), ivc)
+
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(3.0, abs=1e-2)
+    assert problem.get_val("data:mission:sizing:energy", units="kW*h") == pytest.approx(
+        220.74, abs=1e-2
+    )
+    assert problem.get_val("data:mission:sizing:main_route:fuel", units="kg") == pytest.approx(
+        1.0, abs=1e-2
+    )
+    assert problem.get_val("data:mission:sizing:main_route:energy", units="kW*h") == pytest.approx(
+        150.22, abs=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_mission_vector(restore_submodels):
     # Research independent input value in .xml file
     oad.RegisterSubmodel.active_models[HE_SUBMODEL_ENERGY_CONSUMPTION] = (
@@ -1728,8 +1770,14 @@ def test_op_mission_vector_from_yml():
 
     sizing_fuel = problem.get_val("data:mission:operational:fuel", units="kg")
     assert sizing_fuel == pytest.approx(0.0, abs=1e-2)
+    assert problem.get_val("data:mission:operational:main_route:fuel", units="kg") == pytest.approx(
+        0.0, abs=1e-2
+    )
     sizing_energy = problem.get_val("data:mission:operational:energy", units="kW*h")
     assert sizing_energy == pytest.approx(99.22, abs=1e-2)
+    assert problem.get_val(
+        "data:mission:operational:main_route:energy", units="kW*h"
+    ) == pytest.approx(71.04, abs=1e-2)
     mission_end_soc = problem.get_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_min", units="percent"
     )
@@ -2107,6 +2155,13 @@ def test_mission_vector_from_yml_fuel_and_battery():
         "data:environmental_impact:operation:sizing:he_power_train:ICE:ice_1:CO2", units="kg"
     )
     assert co2_emissions_ice == pytest.approx(61.16, abs=1e-2)
+
+    assert problem.get_val("data:mission:sizing:main_route:fuel", units="kg") == pytest.approx(
+        15.08, abs=1e-2
+    )
+    assert problem.get_val("data:mission:sizing:main_route:energy", units="kW*h") == pytest.approx(
+        58.28, abs=1e-2
+    )
 
 
 def test_mission_vector_from_yml_fuel_and_battery_gear():
@@ -3237,3 +3292,40 @@ def test_payload_range_inner_with_builtin_sampling():
         ],
         abs=1.0,
     )
+
+
+def test_sizing_energy_specific_air_range():
+    inputs_list = [
+        "data:mission:sizing:energy",
+        "data:TLAR:range",
+        "data:mission:operational:fuel",
+    ]
+
+    ivc = get_indep_var_comp(inputs_list, __file__, XML_FILE)
+
+    # For the sake of the test
+    ivc.add_output("data:mission:sizing:fuel", units="kg", val=900.0)
+    ivc.add_output("data:mission:operational:energy", units="kW*h", val=50.0)
+    ivc.add_output("data:mission:operational:range", units="NM", val=200.0)
+
+    problem = run_system(EnergySpecificAirRange(), ivc)
+    assert problem.get_val(
+        "data:mission:sizing:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.01230, abs=1e-5)
+    problem.check_partials(compact_print=True)
+
+    problem = run_system(EnergySpecificAirRange(mission="both"), ivc)
+    assert problem.get_val(
+        "data:mission:sizing:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.01230, abs=1e-5)
+    assert problem.get_val(
+        "data:mission:operational:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.1086, abs=1e-5)
+    problem.check_partials(compact_print=True)
+
+    # Should be slightly different wince AvGas contains more energy per unit weight
+    problem = run_system(EnergySpecificAirRange(mission="both", fuel_type="avgas"), ivc)
+    assert problem.get_val(
+        "data:mission:sizing:energy_specific_air_range", units="nmi/kW/h"
+    ) == pytest.approx(0.01211, abs=1e-5)
+    problem.check_partials(compact_print=True)

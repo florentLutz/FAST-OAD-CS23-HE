@@ -1,0 +1,40 @@
+title: Sample operational mission computation applied to the Cirrus SR22
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ../results/op_mission_in_fuel.xml
+output_file: ../results/op_mission_out_fuel.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+    performances:
+        id: fastga_he.performances.operational_mission_vector
+        number_of_points_climb: 30
+        number_of_points_cruise: 30
+        number_of_points_descent: 20
+        number_of_points_reserve: 10
+        power_train_file_path: ./turboshaft_propulsion.yml
+        out_file: ../results/turboshaft_propulsion_op_mission.csv
+        use_linesearch: False
+        pre_condition_pt: False
+        use_apply_nonlinear: False
+    environmental_impact:
+        id: fastga_he.environmental.energy_simple
+        mission: operational
+
+submodels:
+    submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
+    service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+    service.weight.mass.system.power_system: null
+    service.geometry.nacelle.dimension: null
+    service.geometry.vertical_tail.distance.fd: null
+    service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
+    submodel.performances.mission_vector.reserve_speed: null
+    submodel.performances.mission_vector.descent_speed: null
+    submodel.performances.mission_vector.climb_speed: null
+

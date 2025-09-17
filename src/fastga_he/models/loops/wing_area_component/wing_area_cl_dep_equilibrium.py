@@ -251,7 +251,7 @@ class _IDThrustRate(om.ExplicitComponent):
         outputs["thrust_rate"] = inputs["thrust_rate_t_econ"][1]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        d_t_r_econ_d_t_r = np.array([1, 0, 1])
+        d_t_r_econ_d_t_r = np.array([0, 1, 0])
         partials["thrust_rate", "thrust_rate_t_econ"] = d_t_r_econ_d_t_r
 
 
