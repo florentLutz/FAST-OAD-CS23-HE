@@ -2,7 +2,7 @@
 Surface-mounted permanent magnet synchronous motor computation
 ==============================================================
 The sizing and performance modeling for most electric motor are often inaccurate due to the unconventional design.
-Therefore, the SM PMSM with nonsalient radial flux and supplied with sinewave currents is selected based on its
+Therefore, the SM PMSM with nonsalient radial flux and supplied with sinewave currents is selected, based on its
 simplicity and having a relative accurate modeling. This figure demonstrate the essential parts of a SM PMSM.
 
 .. image:: ../../../../../img/cylindrical_pmsm.svg
@@ -29,7 +29,7 @@ cross-section. To calculate the joule loss, the wire resistance must be determin
     \rho_{cu}(T_{win}) = \rho_{cu20^\circ} [1 + \alpha_{th}(T_{win} - 20^\circ)]
 
 Where :math:`N_c` is the number of conductor,  :math:`q` is the number of phase in PMSM, :math:`T_{win}` is the the
-temperature of the winded wires, :math:`\alpha_{th}` is the electrical resistance coefficient of copper, and
+temperature of the wire windings, :math:`\alpha_{th}` is the electrical resistance coefficient of copper, and
 :math:`\rho_{cu20^\circ}` copper density at :math:`20^{\circ}C`.
 
 With the wire electrical resistance and the rms current (:math:`I_{rms}`), the joule loss can be written as:
