@@ -44,7 +44,7 @@ class AeroApproximation(om.Group):
 
 
 class _LengthVector(om.ExplicitComponent):
-    """Computation to construct half wing coordinate and chord vector array ."""
+    """Computation to construct half wing coordinate and chord vector array."""
 
     def setup(self):
         self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
@@ -93,7 +93,7 @@ class _LengthVector(om.ExplicitComponent):
 
 
 class _Ly(om.ExplicitComponent):
-    """Computation of the cl_ref based on an elliptic distribution assumption"""
+    """Computation of the cl_ref based on an elliptic distribution assumption."""
 
     def setup(self):
         self.add_input("half_wing_coordinate", val=np.nan, shape=100)
@@ -130,7 +130,7 @@ class _Ly(om.ExplicitComponent):
 
 
 class _VectorProduct(om.ExplicitComponent):
-    """Computation of the vector product in cl_ref based on an elliptic distribution assumption"""
+    """Computation of the vector product in cl_ref."""
 
     def setup(self):
         self.add_input("l_y", val=np.nan, shape=100)
@@ -151,7 +151,7 @@ class _VectorProduct(om.ExplicitComponent):
 
 
 class _Cl_Ref(om.ExplicitComponent):
-    """Computation of the cl_ref based on an elliptic distribution assumption"""
+    """Computation of the cl_ref based on an elliptic distribution assumption."""
 
     def setup(self):
         self.add_input("vector_product", val=np.nan, shape=100)
@@ -191,7 +191,7 @@ class _Cl_Ref(om.ExplicitComponent):
 
 
 class _Induced_Drag_Coefficient(om.ExplicitComponent):
-    """Computation of the induced drag coefficient in cruise"""
+    """Computation of the induced drag coefficient in cruise."""
 
     def setup(self):
         self.add_input("data:geometry:horizontal_tail:aspect_ratio", val=np.nan)
