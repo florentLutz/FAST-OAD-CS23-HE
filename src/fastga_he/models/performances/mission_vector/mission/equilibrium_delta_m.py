@@ -242,55 +242,11 @@ class EquilibriumDeltaM(om.ImplicitComponent):
         )
 
 
-@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.tanh")
-class EquilibriumDeltaMTanh(om.ExplicitComponent):
-    """Find the conditions necessary for the aircraft equilibrium."""
-
-    def initialize(self):
-        self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be " "treated"
-        )
-        self.options.declare(
-            "flaps_position",
-            default="cruise",
-            desc="position of the flaps for the computation of the equilibrium",
-        )
-        self.options.declare(
-            "low_speed_aero",
-            default=False,
-            desc="Boolean to consider low speed aerodynamics",
-            types=bool,
-        )
-
-    def setup(self):
-        number_of_points = self.options["number_of_points"]
-
-        self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
-        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
-
-        self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
-
-        self.declare_partials(of="*", wrt="*", method="exact")
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        x_cg = inputs["x_cg"]
-        x_wing = inputs["data:geometry:wing:MAC:at25percent:x"]
-
-        outputs["delta_m"] = -30.0 * np.tanh((x_cg - x_wing))
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        x_cg = inputs["x_cg"]
-        x_wing = inputs["data:geometry:wing:MAC:at25percent:x"]
-
-        partials["delta_m", "x_cg"] = -np.diag(30.0 / np.cosh((x_cg - x_wing)) ** 2.0)
-        partials["delta_m", "data:geometry:wing:MAC:at25percent:x"] = (
-            30.0 / np.cosh((x_cg - x_wing)) ** 2.0
-        )
-
-
-@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.setvalue")
+@oad.RegisterSubmodel(
+    SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.set_value.retrofit.rta"
+)
 class EquilibriumDeltaMSetValue(om.ExplicitComponent):
-    """Find the conditions necessary for the aircraft equilibrium."""
+    """Find the conditions necessary for the ATR retrofit aircraft equilibrium."""
 
     def initialize(self):
         self.options.declare(
