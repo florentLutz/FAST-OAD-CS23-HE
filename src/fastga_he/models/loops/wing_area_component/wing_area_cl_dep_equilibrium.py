@@ -38,8 +38,7 @@ from fastga_he.models.performances.mission_vector.constants import HE_SUBMODEL_E
 
 _LOGGER = logging.getLogger(__name__)
 
-# MIN_WING_AREA = 50.00
-MIN_WING_AREA = 1.0
+MIN_WING_AREA = 1.00
 
 
 @oad.RegisterSubmodel(
@@ -80,12 +79,10 @@ class UpdateWingAreaLiftDEPEquilibrium(om.ExplicitComponent):
     def setup(self):
         if self.options["power_train_file_path"]:
             self.configurator.load(self.options["power_train_file_path"])
-
             if self.options["produce_simplified_pt_file"]:
                 self.simplified_file_path = self.configurator.produce_simplified_pt_file_copy()
             else:
                 self.simplified_file_path = self.options["power_train_file_path"]
-
             self.control_parameter_list = self.configurator.get_control_parameter_list()
 
         self.add_input("data:TLAR:v_approach", val=np.nan, units="m/s")

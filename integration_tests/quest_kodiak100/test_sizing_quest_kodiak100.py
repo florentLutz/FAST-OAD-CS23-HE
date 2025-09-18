@@ -6,10 +6,14 @@ import os
 import os.path as pth
 from shutil import rmtree
 import logging
+
+
 import pytest
+
 import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
+
 import plotly.graph_objects as go
 
 from utils.filter_residuals import filter_residuals
@@ -17,7 +21,6 @@ from utils.filter_residuals import filter_residuals
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
-
 RESULTS_SENSITIVITY_FOLDER_PATH = pth.join(pth.dirname(__file__), "results_sensitivity")
 RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH = pth.join(
     pth.dirname(__file__), "results_sensitivity_full_sizing"
