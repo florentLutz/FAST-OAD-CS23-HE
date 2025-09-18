@@ -5,10 +5,6 @@
 import openmdao.api as om
 import numpy as np
 
-import fastoad.api as oad
-
-from fastoad.module_management.constants import ModelDomain
-
 
 class AeroApproximation(om.Group):
     """
