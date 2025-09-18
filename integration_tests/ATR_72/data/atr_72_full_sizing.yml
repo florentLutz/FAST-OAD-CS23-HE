@@ -16,7 +16,7 @@ driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
 model:
 
   #  Solvers are defined assuming the OpenMDAO convention "import openmdao.api as om"
-  nonlinear_solver: om.NonlinearBlockGS(maxiter=100, atol=1e-2)
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=100, atol=1e-5)
   linear_solver: om.DirectSolver()
 
 
@@ -25,7 +25,7 @@ model:
 
     # A group can be set with its own solvers.
     # Uncomment the 2 next lines for using the performance module with "mission_file_path: ::sizing_mission"
-    nonlinear_solver: om.NonlinearBlockGS(maxiter=100, atol=1e-2, iprint=0)
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=30, atol=1e-5, iprint=0)
     linear_solver: om.DirectSolver()
 
     geometry:
@@ -74,9 +74,11 @@ model:
 
 
 submodels:
-  service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.as_float
-  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.as_float
-  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.as_float
+  service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
+  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
+  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
+  service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
 

@@ -10,7 +10,7 @@ from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_SUM
 
 
-@RegisterSubmodel(SERVICE_CD0_SUM, "fastoad.submodel.aerodynamics.CD0.sum.as_float")
+@RegisterSubmodel(SERVICE_CD0_SUM, "fastoad.submodel.aerodynamics.CD0.sum.rta")
 class Cd0Total(om.Group):
     """Computes the sum of form drags from aircraft components."""
 

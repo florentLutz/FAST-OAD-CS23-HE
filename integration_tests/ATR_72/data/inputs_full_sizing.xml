@@ -123,13 +123,13 @@
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
-            <fuel_type is_input="True">1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
               <y_ratio is_input="True">0.365<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
           </fuel_tank_1>
           <fuel_tank_2>
-            <fuel_type is_input="True">1.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
             <CG>
               <y_ratio is_input="True">0.365<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
@@ -266,6 +266,15 @@
         <engine>
           <mass units="kg" is_input="True">779.1788430737936<!--Mass of the propulsion system_inp_data:weight:propulsion:engine:mass--></mass>
         </engine>
+        <engine_controls_instrumentation>
+          <mass units="kg" is_input="True">31.274473647728<!--Mass of the propulsion system_inp_data:weight:propulsion:engine_controls_instrumentation:mass--></mass>
+        </engine_controls_instrumentation>
+        <fuel_lines>
+          <mass units="kg" is_input="True">185.4747362014734<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
+        </fuel_lines>
+        <propeller>
+          <mass units="kg" is_input="True">307.42287816198314<!--Mass of the propulsion system_inp_data:weight:propulsion:propeller:mass--></mass>
+        </propeller>
       </propulsion>
     </weight>
     <mission>

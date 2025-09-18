@@ -448,8 +448,8 @@ def test_performances_from_pt_file():
     )
 
 
-def test_performances_from_pt_file_new_pmsm():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_new_pmsm.yml")
+def test_performances_from_pt_file_sm_pmsm():
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_sm_pmsm.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(
@@ -494,16 +494,16 @@ def test_performances_from_pt_file_new_pmsm():
     assert current_in * voltage_in == pytest.approx(
         np.array(
             [
-                197810.0,
-                198798.0,
-                199762.0,
-                200708.0,
-                201641.0,
-                202567.0,
-                203488.0,
-                204403.0,
-                205298.0,
-                206126.0,
+                189754.1,
+                190661.8,
+                191552.8,
+                192426.8,
+                193284.0,
+                194124.5,
+                194948.5,
+                195756.0,
+                196546.7,
+                197319.5,
             ]
         ),
         abs=1,

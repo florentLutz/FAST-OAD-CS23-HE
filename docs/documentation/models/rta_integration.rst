@@ -4,19 +4,27 @@
 RTA integration
 ===============
 `FAST-OAD-RTA <https://github.com/fast-aircraft-design/RTA>`_ is a FAST-OAD plugin for designing and analyzing Regional
-Transport Aircraft. To enable smooth communication between FAST-OAD-RTA and FAST-OAD-CS23-HE input variables, include
-the ``fastga_he.rta_variables`` model and set the ``rta_activation`` option under
-``fastga_he.performances.mission_vector`` (for full-sizing missions) or
-``fastga_he.performances.operational_mission_vector`` (for operational missions) in the ATR aircraft `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_
-after installing FAST-OAD-RTA.
+Transport Aircraft. To ensure smooth communication between FAST-OAD-RTA and FAST-OAD-CS23-HE, the models
+and submodels specified in the following ATR aircraft `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_
+template needs to be added after installing FAST-OAD-RTA.
 
 
 .. code:: yaml
 
-    rta_integration:
-      id: fastga_he.rta_variables
+    model:
+    ⋮
+      subgroup:
+        ⋮
+        rta_integration:
+          id: fastga_he.rta_variables
 
-    performances:
-      id: fastga_he.performances.mission_vector
-      ⋮
-      rta_activation: True
+        performances:
+          id: fastga_he.performances.mission_vector
+          ⋮
+          rta_activation: True
+
+    submodels:
+      service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
+      service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
+      service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
+      service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta

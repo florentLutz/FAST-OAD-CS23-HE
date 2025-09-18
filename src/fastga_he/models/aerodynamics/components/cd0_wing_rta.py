@@ -10,7 +10,7 @@ from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_WING
 
 
-@RegisterSubmodel(SERVICE_CD0_WING, "fastoad.submodel.aerodynamics.CD0.wing.as_float")
+@RegisterSubmodel(SERVICE_CD0_WING, "fastoad.submodel.aerodynamics.CD0.wing.rta")
 class Cd0Wing(om.Group):
     """
     Computation of form drag for wing.

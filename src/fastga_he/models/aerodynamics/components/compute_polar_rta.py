@@ -10,7 +10,7 @@ from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import PolarType, SERVICE_POLAR
 
 
-@RegisterSubmodel(SERVICE_POLAR, "fastoad.submodel.aerodynamics.polar.as_float")
+@RegisterSubmodel(SERVICE_POLAR, "fastoad.submodel.aerodynamics.polar.rta")
 class ComputePolar(om.Group):
     """Computation of CL and CD for whole aircraft."""
 
