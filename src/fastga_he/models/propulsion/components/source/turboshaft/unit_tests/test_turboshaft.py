@@ -87,14 +87,14 @@ def test_fuel_consumption_pw206b():
         val=1400.0,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR", val=8.8
+        "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:OPR", val=8.0
     )
     ivc.add_output(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:design_point:power_ratio", val=1.56
     )
     ivc.add_output("density_ratio", val=1.0)
     ivc.add_output("mach", val=0.01)
-    ivc.add_output("power_required", val=300, units="kW")
+    ivc.add_output("power_required", val=308, units="kW")
 
     problem = run_system(
         PerformancesTurboshaftFuelConsumption(turboshaft_id="turboshaft_1", number_of_points=1),

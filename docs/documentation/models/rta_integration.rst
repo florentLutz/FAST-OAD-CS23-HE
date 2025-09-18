@@ -29,3 +29,5 @@ template needs to be added after installing FAST-OAD-RTA.
       service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
       service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta
       service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta
+      # Apply only for retrofitting
+      service.performances.delta_m: fastga_he.submodel.performances.delta_m.set_value.retrofit.rta
