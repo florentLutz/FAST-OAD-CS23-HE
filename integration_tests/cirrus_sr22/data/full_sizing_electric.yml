@@ -72,7 +72,6 @@ submodels:
   service.geometry.vertical_tail.distance.fd: null
   service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
 
-
 optimization: # This section is needed only if optimization process is run
   design_variables:
     - name: data:propulsion:he_power_train:propeller:propeller_1:solidity

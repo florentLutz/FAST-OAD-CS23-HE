@@ -13,7 +13,6 @@ driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"
 model:
   nonlinear_solver: om.NonlinearBlockGS(maxiter=100, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True)
   linear_solver: om.LinearBlockGS()
-
   geometry:
     id: fastga.geometry.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
@@ -34,7 +33,6 @@ model:
   weight:
     id: fastga.weight.legacy
     propulsion_id: fastga.wrapper.propulsion.basicIC_engine
-
   performances:
     id: fastga_he.performances.mission_vector
     number_of_points_climb: 30
@@ -68,7 +66,6 @@ submodels:
   service.geometry.nacelle.dimension: null
   service.geometry.vertical_tail.distance.fd: null
   service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
-
 
 optimization: # This section is needed only if optimization process is run
   design_variables:
