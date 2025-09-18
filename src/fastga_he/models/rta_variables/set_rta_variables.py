@@ -8,7 +8,6 @@ import numpy as np
 import fastoad.api as oad
 
 
-@oad.RegisterOpenMDAOSystem("fastga_he.rta_variables.set_rta_variable")
 class SetRTAVariable(om.ExplicitComponent):
     """
     Define variable that doesn't exist in FAST-OAD-RTA or requires complex computation.

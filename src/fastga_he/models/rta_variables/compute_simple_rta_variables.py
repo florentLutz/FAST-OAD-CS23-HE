@@ -11,9 +11,7 @@ from fastoad.module_management.constants import ModelDomain
 from stdatm import AtmosphereWithPartials
 
 
-@oad.RegisterOpenMDAOSystem(
-    "fastga_he.rta_variables.compute_rta_variable", domain=ModelDomain.GEOMETRY
-)
+
 class ComputeRTAVariable(om.ExplicitComponent):
     """
     Simple computation to obtain FAST-GA-HE Performances inputs from RTA outputs.

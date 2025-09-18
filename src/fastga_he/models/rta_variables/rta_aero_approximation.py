@@ -10,7 +10,6 @@ import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 
 
-@oad.RegisterOpenMDAOSystem("fastga_he.rta_variables.aero_approx", domain=ModelDomain.GEOMETRY)
 class AeroApproximation(om.Group):
     """
     Computation of the CL_ref and CD_ind based on an elliptic distribution assumption.
