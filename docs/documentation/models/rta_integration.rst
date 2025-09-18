@@ -28,3 +28,4 @@ template needs to be added after installing FAST-OAD-RTA.
       service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
       service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
       service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta
+      service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta

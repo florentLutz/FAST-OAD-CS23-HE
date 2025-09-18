@@ -80,5 +80,5 @@ submodels:
   service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta
 

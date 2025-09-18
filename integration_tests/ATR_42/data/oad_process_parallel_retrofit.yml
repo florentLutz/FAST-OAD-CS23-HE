@@ -60,7 +60,7 @@ submodels:
   submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
   submodel.propulsion.constraints.sm_pmsm.torque: fastga_he.submodel.propulsion.constraints.sm_pmsm.torque.enforce
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta
   submodel.weight.mass.system.power_system: null
   submodel.weight.mass.system.avionics_system: null
   submodel.weight.mass.system.life_support_system: null
