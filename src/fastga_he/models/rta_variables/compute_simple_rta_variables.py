@@ -11,7 +11,6 @@ from fastoad.module_management.constants import ModelDomain
 from stdatm import AtmosphereWithPartials
 
 
-
 class ComputeRTAVariable(om.ExplicitComponent):
     """
     Simple computation to obtain FAST-GA-HE Performances inputs from RTA outputs.
