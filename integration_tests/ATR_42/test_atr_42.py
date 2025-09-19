@@ -35,7 +35,6 @@ def test_sizing_atr_42_turboshaft():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -62,8 +61,6 @@ def test_sizing_atr_42_turboshaft():
         units="kg",
         val=np.linspace(18000, 16000, 90),
     )
-
-    om.n2(problem, show_browser=False, outfile=n2_path)
 
     problem.run_model()
 
@@ -135,7 +132,6 @@ def test_hybrid_atr_42_full_sizing():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, "hybrid_atr_inputs_full_sizing.xml")
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR42.html")
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -169,5 +165,3 @@ def test_hybrid_atr_42_full_sizing():
     os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
 
     problem.write_outputs()
-
-    om.n2(problem, show_browser=False, outfile=n2_path)

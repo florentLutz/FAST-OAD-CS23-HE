@@ -100,7 +100,6 @@ def test_sizing_kodiak_100_full_electric():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_kodiak100_elec.html")
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -111,9 +110,6 @@ def test_sizing_kodiak_100_full_electric():
     }
 
     problem.setup()
-
-    om.n2(problem, show_browser=False, outfile=n2_path)
-
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()

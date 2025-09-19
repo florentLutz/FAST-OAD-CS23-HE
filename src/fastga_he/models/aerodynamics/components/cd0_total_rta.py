@@ -56,9 +56,9 @@ class _TotalCd0ParasiticFactor(om.ExplicitComponent):
         wet_area_total = inputs["data:geometry:aircraft:wetted_area"]
 
         k_parasitic = (
-            -2.39 * pow(10, -12) * wet_area_total**3.0
-            + 2.58 * pow(10, -8) * wet_area_total**2.0
-            - 0.89 * pow(10, -4) * wet_area_total
+            -2.39e-12 * wet_area_total**3.0
+            + 2.58e-8 * wet_area_total**2.0
+            - 0.89e-4 * wet_area_total
             + 0.163
         )
 
@@ -68,9 +68,7 @@ class _TotalCd0ParasiticFactor(om.ExplicitComponent):
         wet_area_total = inputs["data:geometry:aircraft:wetted_area"]
 
         partials["k_parasitic", "data:geometry:aircraft:wetted_area"] = (
-            -7.17 * pow(10, -12) * wet_area_total**2.0
-            + 5.16 * pow(10, -8) * wet_area_total
-            - 0.89 * pow(10, -4)
+            -7.17e-12 * wet_area_total**2.0 + 5.16e-8 * wet_area_total - 0.89e-4
         )
 
 

@@ -9,19 +9,18 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
 def test_sizing_atr_72():
-    CONFIGURATION_FILE = "atr_72_full_sizing.yml"
-    SOURCE_FILE = "inputs_full_sizing.xml"
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, CONFIGURATION_FILE))
+    configurator = api.FASTOADProblemConfigurator(
+        pth.join(DATA_FOLDER_PATH, "atr_72_full_sizing.yml")
+    )
     problem = configurator.get_problem()
 
     # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, SOURCE_FILE)
+    ref_inputs = pth.join(DATA_FOLDER_PATH, "inputs_full_sizing.xml")
     n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR72.html")
 
     problem.write_needed_inputs(ref_inputs)
@@ -42,5 +41,3 @@ def test_sizing_atr_72():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
-
-    ###
