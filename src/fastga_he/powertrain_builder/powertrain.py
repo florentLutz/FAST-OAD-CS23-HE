@@ -232,7 +232,7 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _get_components(self):
         # We will work under the assumption that is one list is empty, all are hence only one if
-        # statement. This allows us to know whether retriggering the identification of
+        # statement. This allows us to know whether re-triggering the identification of
         # components is necessary
 
         if self._components_id is None:
@@ -543,6 +543,255 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
+
+    def _check_connection(self, connections_list):
+        """
+        This function ensures all the connections respect the component connection limits and
+        no connection slop is left un connected once defined.
+
+        The _get_components method must be run beforehand.
+        """
+
+        # This should do nothing if it has already been run.
+        self._get_components()
+
+        # m: multiple, n: no, s: single, i:input, o: output
+        sino_component = [
+            comp
+            for comp, type in zip(self._components_name, self._components_type_class)
+            if type == "propulsor"
+        ]
+        niso_component = [
+            comp
+            for comp, type in zip(self._components_name, self._components_type_class)
+            if type == "tanks" or type == "source"
+        ]
+
+        siso_component = [
+            comp
+            for comp, type in zip(self._components_name, self._components_type_class)
+            if type == "load" or type == "propulsive_load"
+        ]
+
+        (
+            siso_component,
+            simo_component,
+            miso_component,
+            mimo_component,
+            mimo_input_count,
+            mimo_output_count,
+            miso_input_count,
+            simo_output_count,
+        ) = self._categorize_connectors(siso_component)
+
+        # Check critical component(s) existence
+        if not sino_component:
+            _LOGGER.error("Propulsor missing!")
+
+        if not niso_component:
+            _LOGGER.error("Storage tank or battery missing!")
+
+        # Check connections definition
+
+        for comp in sino_component:
+            if not any(
+                connection["source"] == comp and connection["target"]
+                for connection in connections_list
+            ):
+                _LOGGER.error("Propulsor is/are not connected!")
+
+        for comp in niso_component:
+            if not any(
+                connection["target"] == comp and connection["source"]
+                for connection in connections_list
+            ):
+                _LOGGER.error("Storage tank or battery is/are not connected!")
+
+        for comp in siso_component:
+            if (
+                not any(
+                    connection["target"] == comp and connection["source"]
+                    for connection in connections_list
+                )
+            ) or (
+                not any(
+                    connection["source"] == comp and connection["target"]
+                    for connection in connections_list
+                )
+            ):
+                _LOGGER.error("Component is/are not properly connected!")
+
+        if miso_component:
+            for comp in miso_component:
+                input_count_defined = 0
+
+                if not any(
+                    connection["target"] == comp and connection["source"]
+                    for connection in connections_list
+                ):
+                    _LOGGER.error("Connector component is/are not connected!")
+
+                input_count_defined += sum(
+                    1
+                    for connection in connections_list
+                    if connection["source"][0] == comp and connection["target"]
+                )
+
+                if int(input_count_defined) != int(miso_input_count):
+                    _LOGGER.error("Connector component is/are not connected!")
+
+        if simo_component:
+            for comp in simo_component:
+                output_count_defined = 0
+
+                if not any(
+                    connection["source"] == comp and connection["target"]
+                    for connection in connections_list
+                ):
+                    _LOGGER.error("Connector component is/are not connected!")
+
+                output_count_defined += sum(
+                    1
+                    for connection in connections_list
+                    if connection["target"][0] == comp and connection["source"]
+                )
+
+                if int(output_count_defined) != int(simo_output_count):
+                    _LOGGER.error("Connector component is/are not connected!")
+
+        if mimo_component:
+            for comp in mimo_component:
+                input_count_defined = 0
+                output_count_defined = 0
+
+                input_count_defined += sum(
+                    1
+                    for connection in connections_list
+                    if connection["source"][0] == comp and connection["target"]
+                )
+
+                output_count_defined += sum(
+                    1
+                    for connection in connections_list
+                    if connection["target"][0] == comp and connection["source"]
+                )
+
+                if (int(input_count_defined) != int(mimo_input_count)) or (
+                    int(output_count_defined) != int(mimo_output_count)
+                ):
+                    _LOGGER.error("Connector component is/are not connected!")
+
+    def _categorize_connectors(self, siso_component):
+        connector_names = [
+            comp
+            for comp, type in zip(self._components_name, self._components_type_class)
+            if type == "connector"
+        ]
+        connector_options = [
+            option
+            for option, type in zip(self._components_options, self._components_type_class)
+            if type == "connector"
+        ]
+        connector_perf_watchers = [
+            pf_watcher
+            for pf_watcher, type in zip(self._components_perf_watchers, self._components_type_class)
+            if type == "connector"
+        ]
+
+        # m: multiple, s: single, i:input, o: output
+
+        simo_component = []
+        miso_component = []
+        mimo_component = []
+
+        for name, options, perf_watchers in zip(
+            connector_names, connector_options, connector_perf_watchers
+        ):
+            miso_input_count = []
+            simo_output_count = []
+            mimo_input_count = []
+            mimo_output_count = []
+
+            # Check MIMO component
+            if not any(key.startswith("number_of_") for key in options.keys()):
+                siso = True
+                mi = False
+                mo = False
+                max_num_input = 0
+                max_num_output = 0
+
+                # Check component
+                for var in perf_watchers:
+                    if "_in_" in list(var.keys()[0]):
+                        siso = False
+                        mi = True
+                        max_num_input = max(max_num_input, int(list(var.keys())[-1]))
+                    elif "_out_" in list(var.keys()[0]):
+                        siso = False
+                        mo = True
+                        max_num_output = max(max_num_output, int(list(var.keys())[-1]))
+
+                if siso:
+                    siso_component = siso_component + connector_names
+                elif mi and mo:
+                    mimo_component = mimo_component + connector_names
+                    mimo_input_count.append(max_num_input)
+                    mimo_output_count.append(max_num_output)
+                elif mi:
+                    miso_component = miso_component + connector_names
+                    miso_input_count.append(max_num_input)
+                elif mo:
+                    simo_component = simo_component + connector_names
+                    simo_output_count.append(max_num_output)
+
+            else:
+                num_connections = [
+                    v
+                    for k, v in zip(options.keys(), options.values())
+                    if k.startswith("number_of_")
+                ]
+
+                if any(num > 1 for num in num_connections):
+                    if all(num > 1 for num in num_connections):
+                        mimo_component = mimo_component + connector_names
+                        mimo_input_count.append(
+                            int(
+                                options["number_of_inputs"]
+                                or options["number_of_power_sources"]
+                                or options["number_of_engines"]
+                            )
+                        )
+                        mimo_output_count.append(
+                            int((options["number_of_outputs"] or options["number_of_tanks"]))
+                        )
+
+                    elif (options["number_of_outputs"] or options["number_of_tanks"]) > 1:
+                        simo_component = simo_component + connector_names
+                        simo_output_count.append(
+                            int(options["number_of_outputs"] or options["number_of_tanks"])
+                        )
+                    else:
+                        miso_component = miso_component + connector_names
+                        miso_input_count.append(
+                            int(
+                                options["number_of_inputs"]
+                                or options["number_of_power_sources"]
+                                or options["number_of_engines"]
+                            )
+                        )
+                else:
+                    siso_component = siso_component + connector_names
+
+        return (
+            siso_component,
+            simo_component,
+            miso_component,
+            mimo_component,
+            mimo_input_count,
+            mimo_output_count,
+            miso_input_count,
+            simo_output_count,
+        )
 
     def _construct_connection_graph(self):
         graph = nx.Graph()
