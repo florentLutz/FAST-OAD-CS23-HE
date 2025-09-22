@@ -36,7 +36,7 @@ from ..constants import POSSIBLE_POSITION
 class SizingSMPMSM(om.Group):
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
         self.options.declare(
@@ -49,93 +49,97 @@ class SizingSMPMSM(om.Group):
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
         position = self.options["position"]
 
         self.add_subsystem(
             name="constraints_pmsm",
-            subsys=ConstraintsSMPMSM(pmsm_id=pmsm_id),
+            subsys=ConstraintsSMPMSM(motor_id=motor_id),
             promotes=["*"],
         )
 
         self.add_subsystem(
-            "bore_diameter", SizingStatorBoreDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+            "bore_diameter", SizingStatorBoreDiameter(motor_id=motor_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("length", SizingActiveLength(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("length", SizingActiveLength(motor_id=motor_id), promotes=["data:*"])
 
         self.add_subsystem(
-            "rotor_diameter", SizingRotorDiameter(pmsm_id=pmsm_id), promotes=["data:*"]
+            "rotor_diameter", SizingRotorDiameter(motor_id=motor_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("ratio_x2p", SizingRatioX2p(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem("ratio_x2p", SizingRatioX2p(motor_id=motor_id), promotes=["data:*"])
 
-        self.add_subsystem("tooth_ratio", SizingToothRatio(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem(
-            "yoke_height", SizingStatorYokeHeight(pmsm_id=pmsm_id), promotes=["data:*"]
-        )
+        self.add_subsystem("tooth_ratio", SizingToothRatio(motor_id=motor_id), promotes=["data:*"])
 
         self.add_subsystem(
-            "conductor_number", SizingConductorsNumber(pmsm_id=pmsm_id), promotes=["data:*"]
-        )
-
-        self.add_subsystem("slot_width", SizingSlotWidth(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("slot_height", SizingSlotHeight(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem(
-            "slot_cross_section", SizingSlotSection(pmsm_id=pmsm_id), promotes=["data:*"]
+            "yoke_height", SizingStatorYokeHeight(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "conductor_cross_section", SizingConductorSection(pmsm_id=pmsm_id), promotes=["data:*"]
+            "conductor_number", SizingConductorsNumber(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem("slot_width", SizingSlotWidth(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem("slot_height", SizingSlotHeight(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem(
+            "slot_cross_section", SizingSlotSection(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "conductor_length", SizingConductorLength(pmsm_id=pmsm_id), promotes=["data:*"]
-        )
-
-        self.add_subsystem(
-            "winding_resistivity", SizingWindingResistivity(pmsm_id=pmsm_id), promotes=["data:*"]
-        )
-
-        self.add_subsystem(
-            "electric_resistance", SizingResistance(pmsm_id=pmsm_id), promotes=["data:*"]
-        )
-
-        self.add_subsystem(
-            "stator_external_diameter",
-            SizingExtStatorDiameter(pmsm_id=pmsm_id),
+            "conductor_cross_section",
+            SizingConductorSection(motor_id=motor_id),
             promotes=["data:*"],
         )
 
         self.add_subsystem(
-            "stator_core_weight", SizingStatorCoreWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+            "conductor_length", SizingConductorLength(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "winding_weight", SizingStatorWindingWeight(pmsm_id=pmsm_id), promotes=["data:*"]
+            "winding_resistivity", SizingWindingResistivity(motor_id=motor_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("rotor_weight", SizingRotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("frame", SizingFrameGeometry(pmsm_id=pmsm_id), promotes=["data:*"])
-
-        self.add_subsystem("mass", SizingMotorWeight(pmsm_id=pmsm_id), promotes=["data:*"])
+        self.add_subsystem(
+            "electric_resistance", SizingResistance(motor_id=motor_id), promotes=["data:*"]
+        )
 
         self.add_subsystem(
-            "pmsm_cg_x", SizingPMSMCGX(pmsm_id=pmsm_id, position=position), promotes=["data:*"]
+            "stator_external_diameter",
+            SizingExtStatorDiameter(motor_id=motor_id),
+            promotes=["data:*"],
+        )
+
+        self.add_subsystem(
+            "stator_core_weight", SizingStatorCoreWeight(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "winding_weight", SizingStatorWindingWeight(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "rotor_weight", SizingRotorWeight(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem("frame", SizingFrameGeometry(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem("weight", SizingMotorWeight(motor_id=motor_id), promotes=["data:*"])
+
+        self.add_subsystem(
+            "pmsm_cg_x", SizingPMSMCGX(motor_id=motor_id, position=position), promotes=["data:*"]
         )
         self.add_subsystem(
-            "pmsm_cg_y", SizingPMSMCGY(pmsm_id=pmsm_id, position=position), promotes=["data:*"]
+            "pmsm_cg_y", SizingPMSMCGY(motor_id=motor_id, position=position), promotes=["data:*"]
         )
         for low_speed_aero in [True, False]:
             system_name = "pmsm_drag_ls" if low_speed_aero else "pmsm_drag_cruise"
             self.add_subsystem(
                 name=system_name,
                 subsys=SizingPMSMDrag(
-                    pmsm_id=pmsm_id,
+                    motor_id=motor_id,
                     position=position,
                     low_speed_aero=low_speed_aero,
                 ),

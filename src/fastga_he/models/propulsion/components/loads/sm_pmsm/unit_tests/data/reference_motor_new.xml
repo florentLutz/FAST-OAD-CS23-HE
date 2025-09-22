@@ -36,10 +36,10 @@
                 <SM_PMSM>
                     <motor_1>
                         <mass units="kg">225.59</mass>
-                        <stator_core_weight units="kg">116.4</stator_core_weight>
-                        <stator_winding_weight units="kg">32.69</stator_winding_weight>
-                        <rotor_weight units="kg">56.97</rotor_weight>
-                        <frame_weight units="kg">19.52</frame_weight>
+                        <stator_core_mass units="kg">116.4</stator_core_mass>
+                        <stator_winding_mass units="kg">32.69</stator_winding_mass>
+                        <rotor_mass units="kg">56.97</rotor_mass>
+                        <frame_mass units="kg">19.52</frame_mass>
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
                         <bore_diameter units="m">0.187</bore_diameter>

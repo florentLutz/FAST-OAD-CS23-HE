@@ -14,31 +14,31 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
             val=np.nan,
             desc="The fraction of stator bore diameter and active length",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tangential_stress",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
             desc="The tangential tensile strength of the material",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
             val=np.nan,
             units="N*m",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             units="m",
             desc="Stator bore diameter of the PMSM",
             val=0.1,
@@ -48,26 +48,26 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        lambda_ = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient"]
-        sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tangential_stress"]
-        T_max = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating"]
+        lambda_ = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
+        sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
+        T_max = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"] = 2.0 * (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] = 2.0 * (
             ((lambda_ / (4.0 * np.pi * sigma)) * T_max) ** (1.0 / 3.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        x = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient"]
-        y = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tangential_stress"]
-        z = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating"]
+        x = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
+        y = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
+        z = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
         ] = (
             2.0
             * (z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
@@ -75,8 +75,8 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tangential_stress",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
         ] = (
             -2.0
             * (x ** (1.0 / 3.0) * z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
@@ -84,8 +84,8 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
         ] = (
             2.0
             * (x ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))

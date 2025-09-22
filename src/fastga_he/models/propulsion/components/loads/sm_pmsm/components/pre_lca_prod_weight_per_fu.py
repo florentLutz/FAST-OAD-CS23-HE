@@ -15,14 +15,14 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
             units="kg",
             val=np.nan,
         )
@@ -32,7 +32,7 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             desc="Number of aircraft required for a functional unit",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
             units="yr",
             val=15.0,
             desc="Expected lifetime of the PMSM, typically around 15 year",
@@ -45,20 +45,20 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass_per_fu",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass_per_fu",
             units="kg",
             val=1e-6,
             desc="Weight of the PMSM required for a functional unit",
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.declare_partials(
             of="*",
             wrt=[
                 "data:environmental_impact:aircraft_per_fu",
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
             ],
             method="exact",
         )
@@ -66,38 +66,38 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             of="*",
             wrt=[
                 "data:TLAR:aircraft_lifespan",
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
             ],
             method="fd",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass_per_fu"] = (
-            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass_per_fu"] = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass"]
             * inputs["data:environmental_impact:aircraft_per_fu"]
             * np.ceil(
                 inputs["data:TLAR:aircraft_lifespan"]
-                / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan"]
+                / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
             )
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass_per_fu",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass_per_fu",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
         ] = inputs["data:environmental_impact:aircraft_per_fu"] * np.ceil(
             inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan"]
+            / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass_per_fu",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mass"] * np.ceil(
+        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass"] * np.ceil(
             inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan"]
+            / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
         )

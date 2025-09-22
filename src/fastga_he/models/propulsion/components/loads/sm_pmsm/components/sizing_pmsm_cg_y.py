@@ -16,7 +16,7 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
         self.options.declare(
@@ -30,13 +30,13 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
     def setup(self):
         position = self.options["position"]
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         # At least one input is needed regardless of the case
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y",
             units="m",
             val=0.0,
             desc="Y position of the DC bus center of gravity",
@@ -44,7 +44,7 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
         if position == "on_the_wing":
             self.add_input(
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y_ratio",
                 val=np.nan,
                 desc="Y position of the PMSM center of gravity as a ratio of the wing half-span",
             )
@@ -55,29 +55,29 @@ class SizingPMSMCGY(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         position = self.options["position"]
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         if position == "on_the_wing":
-            outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y"] = (
+            outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y"] = (
                 inputs["data:geometry:wing:span"]
-                * inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y_ratio"]
+                * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y_ratio"]
                 / 2.0
             )
 
         else:
-            outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y"] = 0.0
+            outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y"] = 0.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
         position = self.options["position"]
 
         if position == "on_the_wing":
             partials[
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y",
                 "data:geometry:wing:span",
-            ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y_ratio"] / 2.0
+            ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y_ratio"] / 2.0
 
             partials[
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y",
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":CG:y_ratio",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y_ratio",
             ] = inputs["data:geometry:wing:span"] / 2.0

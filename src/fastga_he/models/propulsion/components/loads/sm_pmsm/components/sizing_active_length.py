@@ -14,66 +14,66 @@ class SizingActiveLength(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
             val=np.nan,
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             units="m",
             desc="The stator length of PMSM",
             val=0.169,
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
+            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             method="exact",
         )
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient",
+            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
             method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length"] = (
-            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
-            / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"] = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+            / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
-        ] = 1.0 / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient"]
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+        ] = 1.0 / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
         ] = (
-            -inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
-            / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":form_coefficient"]
+            -inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+            / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
             ** 2.0
         )

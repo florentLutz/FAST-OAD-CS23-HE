@@ -797,7 +797,14 @@ def test_weight_per_fu():
 
 
 def test_cost():
-    ivc = get_indep_var_comp(list_inputs(LCCPMSMCost(motor_id="motor_1")), __file__, XML_FILE)
+    ivc = get_indep_var_comp(
+        list_inputs(ConstraintsRPMEnsure(motor_id="motor_1")), __file__, XML_FILE
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PMSM:motor_1:torque_rating",
+        150.0,
+        units="N*m",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)

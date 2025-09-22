@@ -14,26 +14,26 @@ class LCCSMPMSMCost(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
             val=np.nan,
             units="kN*m",
             desc="Max continuous torque of the motor",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rpm_rating",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating",
             val=np.nan,
             units="min**-1",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost",
             units="USD",
             val=1e4,
             desc="Unit purchase cost of the PMS motor",
@@ -42,31 +42,31 @@ class LCCSMPMSMCost(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         torque_rating = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
         ]
-        rpm_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rpm_rating"]
+        rpm_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost"] = (
             -17120 + 5730 * np.log(2.0 * np.pi * torque_rating * rpm_rating / 60.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         torque_rating = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
         ]
-        rpm_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rpm_rating"]
+        rpm_rating = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rpm_rating",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating",
         ] = 5730.0 / rpm_rating
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":torque_rating",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
         ] = 5730.0 / torque_rating

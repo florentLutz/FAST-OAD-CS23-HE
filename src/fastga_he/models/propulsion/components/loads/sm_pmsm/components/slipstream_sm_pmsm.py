@@ -15,7 +15,7 @@ class SlipstreamSMPMSM(om.Group):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"

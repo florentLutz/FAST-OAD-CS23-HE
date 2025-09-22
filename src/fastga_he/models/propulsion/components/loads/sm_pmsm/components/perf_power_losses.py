@@ -14,31 +14,27 @@ class PerformancesPowerLosses(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
-        )
-        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        pmsm_id = self.options["pmsm_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
-            units="W",
+            "joule_power_losses",
+            units="kW",
             val=np.nan,
             shape=number_of_points,
         )
         self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
-            units="W",
+            "iron_power_losses",
+            units="kW",
             val=np.nan,
             shape=number_of_points,
         )
         self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mechanical_power_losses",
-            units="W",
+            "mechanical_power_losses",
+            units="kW",
             val=np.nan,
             shape=number_of_points,
         )
@@ -51,52 +47,24 @@ class PerformancesPowerLosses(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
             of="power_losses",
             wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
-                "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mechanical_power_losses",
+                "joule_power_losses",
+                "iron_power_losses",
+                "mechanical_power_losses",
             ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
+            val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
-
-        p_j = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses"]
-        p_iron = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses"]
-        p_mec_loss = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mechanical_power_losses"
-        ]
-        # rotor_losses_factor = 2.0  # to take into account the total electromagnetic rotor losses
-
-        p_losses = p_mec_loss + p_iron + p_j
-
-        outputs["power_losses"] = p_losses / 1000.0
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
-        pmsm_id = self.options["pmsm_id"]
-
-        # rotor_losses_factor = 2.0  # to take into account the total electromagnetic rotor losses
-
-        partials[
-            "power_losses",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":joule_power_losses",
-        ] = np.ones(number_of_points) / 1000.0
-
-        partials[
-            "power_losses",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":iron_power_losses",
-        ] = np.ones(number_of_points) / 1000.0
-
-        partials[
-            "power_losses",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":mechanical_power_losses",
-        ] = np.ones(number_of_points) / 1000.0
+        outputs["power_losses"] = (
+            inputs["mechanical_power_losses"]
+            + inputs["iron_power_losses"]
+            + inputs["joule_power_losses"]
+        )

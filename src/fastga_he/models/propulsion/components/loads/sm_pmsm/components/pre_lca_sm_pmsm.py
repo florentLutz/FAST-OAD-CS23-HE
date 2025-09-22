@@ -10,14 +10,14 @@ from .pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 class PreLCASMPMSM(om.Group):
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_subsystem(
             name="weight_per_fu",
-            subsys=PreLCAMotorProdWeightPerFU(pmsm_id=pmsm_id),
+            subsys=PreLCAMotorProdWeightPerFU(motor_id=motor_id),
             promotes=["*"],
         )

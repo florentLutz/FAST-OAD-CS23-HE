@@ -17,7 +17,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
@@ -25,12 +25,12 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
         self.add_input(
-            "settings:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":k_efficiency",
+            "settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency",
             val=1.0,
             desc="K factor for the PMSM efficiency",
         )
@@ -39,12 +39,12 @@ class PerformancesEfficiency(om.ExplicitComponent):
             "efficiency",
             val=np.full(number_of_points, 0.95),
             shape=number_of_points,
-            lower=0.0,
+            lower=0.5,
             upper=1.0,
         )
 
     def setup_partials(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
@@ -56,29 +56,28 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
         self.declare_partials(
             of="*",
-            wrt="settings:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":k_efficiency",
+            wrt="settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
-        k_eff = inputs["settings:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":k_efficiency"]
+        motor_id = self.options["motor_id"]
+        k_eff = inputs["settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency"]
         loss = inputs["power_losses"]
         shaft_power = inputs["shaft_power_out"]
 
-        unclipped_efficiency = np.where(
-            shaft_power != 0.0,
-            k_eff * shaft_power / (shaft_power + loss),
-            np.ones_like(shaft_power),
+        outputs["efficiency"] = np.divide(
+            k_eff * shaft_power,
+            shaft_power + loss,
+            out=np.ones_like(shaft_power),
+            where=shaft_power != 0,
         )
 
-        outputs["efficiency"] = np.clip(unclipped_efficiency, CUTOFF_ETA_MIN, CUTOFF_ETA_MAX)
-
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
-        k_eff = inputs["settings:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":k_efficiency"]
+        motor_id = self.options["motor_id"]
+        k_eff = inputs["settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency"]
         loss = inputs["power_losses"]
         shaft_power = inputs["shaft_power_out"]
 
@@ -101,7 +100,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
         partials[
-            "efficiency", "settings:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":k_efficiency"
+            "efficiency", "settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency"
         ] = np.where(
             (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
             shaft_power / (shaft_power + loss),

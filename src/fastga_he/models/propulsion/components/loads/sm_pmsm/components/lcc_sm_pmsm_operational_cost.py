@@ -14,26 +14,26 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost",
             units="USD",
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
             units="yr",
             val=15.0,
             desc="Expected lifetime of the PMSM, typically around 15 year",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":operational_cost",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost",
             units="USD/yr",
             val=1.0e3,
         )
@@ -41,25 +41,25 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":operational_cost"] = (
-            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost"]
-            / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost"] = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":operational_cost",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost",
-        ] = 1.0 / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan"]
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost",
+        ] = 1.0 / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":operational_cost",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
         ] = (
-            -inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":purchase_cost"]
-            / inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":lifespan"] ** 2.0
+            -inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost"]
+            / inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"] ** 2.0
         )

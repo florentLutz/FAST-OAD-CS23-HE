@@ -8,9 +8,9 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from ..constants import (
-    SUBMODEL_CONSTRAINTS_PMSM_TORQUE,
-    SUBMODEL_CONSTRAINTS_PMSM_RPM,
-    SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE,
+    SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE,
+    SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
+    SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE,
 )
 
 
@@ -21,38 +21,38 @@ class ConstraintsSMPMSM(om.Group):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        option_pmsm_id = {"pmsm_id": pmsm_id}
+        option_motor_id = {"motor_id": motor_id}
 
         self.add_subsystem(
             name="constraints_torque_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_PMSM_TORQUE, options=option_pmsm_id
+                SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE, options=option_motor_id
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="constraints_rpm_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_PMSM_RPM, options=option_pmsm_id
+                SUBMODEL_CONSTRAINTS_SM_PMSM_RPM, options=option_motor_id
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="constraints_voltage_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_PMSM_VOLTAGE, options=option_pmsm_id
+                SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE, options=option_motor_id
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="power_for_power_rate",
-            subsys=ConstraintPMSMPowerRateMission(pmsm_id=pmsm_id),
+            subsys=ConstraintPMSMPowerRateMission(motor_id=motor_id),
             promotes=["*"],
         )
 
@@ -67,20 +67,20 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_max",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max",
             units="kW",
             val=np.nan,
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_rating",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_rating",
             units="MW",
             val=1.4326,
             desc="Value of the maximum power the PMSM can provide, used for sizing",
@@ -90,9 +90,9 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=0.001)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_rating"] = (
-            inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":shaft_power_max"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_rating"] = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max"]
             / 1000.0
         )

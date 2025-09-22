@@ -14,31 +14,31 @@ class SizingSlotWidth(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductors_number",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
             val=np.nan,
             desc="Number of conductor slots",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
             desc="Stator bore diameter of the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tooth_ratio",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             val=np.nan,
             desc="The fraction between overall tooth length and stator bore circumference",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_width",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
             units="m",
             desc="Single stator slot width (along the circumference)",
             val=0.0075,
@@ -48,34 +48,34 @@ class SizingSlotWidth(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
-        tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tooth_ratio"]
-        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductors_number"]
+        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+        tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
+        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_width"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"] = (
             (1.0 - tooth_ratio) * np.pi * d / ns
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter"]
-        tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tooth_ratio"]
-        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductors_number"]
+        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+        tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
+        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_width",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":bore_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
         ] = (1.0 - tooth_ratio) * np.pi / ns
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_width",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":tooth_ratio",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
         ] = -np.pi * d / ns
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":slot_width",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":conductors_number",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
         ] = -(1.0 - tooth_ratio) * np.pi * d / ns**2.0

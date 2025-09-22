@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2025 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -29,7 +29,7 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
         self.add_output(
             "ac_current_rms_in_one_phase",
             units="A",
-            val=75.0,
+            val=10.0 / 3.0,
             shape=number_of_points,
         )
 

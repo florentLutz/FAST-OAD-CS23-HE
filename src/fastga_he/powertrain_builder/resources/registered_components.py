@@ -211,6 +211,9 @@ SM_PMSM = {
         {"torque_out": "N*m"},
         {"ac_current_rms_in": "A"},
         {"ac_voltage_rms_in": "V"},
+        {"joule_power_losses": "kW"},
+        {"iron_power_losses": "kW"},
+        {"mechanical_power_losses": "kW"},
     ],
     SMP: [
         {"delta_Cd": None},

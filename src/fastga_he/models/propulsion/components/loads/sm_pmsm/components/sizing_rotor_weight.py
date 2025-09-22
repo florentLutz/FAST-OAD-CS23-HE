@@ -14,31 +14,31 @@ class SizingRotorWeight(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="pmsm_id", default=None, desc="Identifier of the motor", allow_none=False
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
 
     def setup(self):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
             desc="Number of the north and south pairs in the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             val=np.nan,
             units="m",
             desc="The stator length of PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
             val=np.nan,
             units="m",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             units="kg",
             val=9.3,
         )
@@ -47,12 +47,12 @@ class SizingRotorWeight(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length"]
-        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number"]
+        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
+        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
         r_r = (
-            (inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter"]) / 2.0
+            (inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]) / 2.0
         )
 
         if p <= 10.0:
@@ -63,17 +63,17 @@ class SizingRotorWeight(om.ExplicitComponent):
             rho_rot = 1600.0
 
         # Rotor weight
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass"] = (
             np.pi * r_r**2.0 * lm * rho_rot
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pmsm_id = self.options["pmsm_id"]
+        motor_id = self.options["motor_id"]
 
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length"]
-        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number"]
+        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
+        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
         r_r = (
-            (inputs["data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter"]) / 2.0
+            (inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]) / 2.0
         )
 
         if p <= 10.0:
@@ -87,16 +87,16 @@ class SizingRotorWeight(om.ExplicitComponent):
             drho_dp = 0.0
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":active_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
         ] = np.pi * r_r**2.0 * rho_rot
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
         ] = np.pi * r_r * lm * rho_rot
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":rotor_weight",
-            "data:propulsion:he_power_train:SM_PMSM:" + pmsm_id + ":pole_pairs_number",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
         ] = np.pi * r_r**2.0 * lm * drho_dp
