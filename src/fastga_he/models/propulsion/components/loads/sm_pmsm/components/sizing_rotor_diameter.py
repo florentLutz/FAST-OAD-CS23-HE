@@ -54,12 +54,18 @@ class SizingRotorDiameter(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        x = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"]
-        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+        radius_ratio = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
+        ]
+        bore_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
+        ]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] = x * d
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] = (
+            radius_ratio * bore_diameter
+        )
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"] = (
-            (1.0 - x) * d / 2.0
+            (1.0 - radius_ratio) * bore_diameter / 2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

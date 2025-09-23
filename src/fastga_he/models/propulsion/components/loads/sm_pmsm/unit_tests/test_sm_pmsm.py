@@ -20,12 +20,11 @@ from ..components.sizing_slot_section import SizingSlotSection
 from ..components.sizing_conductor_section import SizingConductorSection
 from ..components.sizing_conductor_length import SizingConductorLength
 from ..components.sizing_conductors_number import SizingConductorsNumber
-from ..components.sizing_winding_resistivity import SizingWindingResistivity
+from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
 from ..components.sizing_pmsm_cg_x import SizingPMSMCGX
 from ..components.sizing_pmsm_cg_y import SizingPMSMCGY
 from ..components.sizing_pmsm_drag import SizingPMSMDrag
-from ..components.sizing_resistance import SizingResistance
 from ..components.sizing_stator_core_weight import SizingStatorCoreWeight
 from ..components.sizing_rotor_weight import SizingRotorWeight
 from ..components.sizing_frame_weight import SizingFrameGeometry
@@ -34,7 +33,10 @@ from ..components.sizing_pmsm_weight import SizingMotorWeight
 from ..components.sizing_sm_pmsm import SizingSMPMSM
 
 from ..components.perf_iron_losses import PerformancesIronLosses
+from ..components.perf_winding_resistivity import PerformancesWindingResistivityFixed
+from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_joule_losses import PerformancesJouleLosses
+from ..components.perf_air_dynamic_viscosity import PerformancesAirDynamicViscosity
 from ..components.perf_windage_reynolds import PerformancesWindageReynolds
 from ..components.perf_windage_friction_coeff import PerformancesWindageFrictionCoefficient
 from ..components.perf_airgap_windage_loss import PerformancesAirgapWindageLoss
@@ -65,7 +67,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageEnsure,
 )
 from ..components.cstr_sm_pmsm import ConstraintPMSMPowerRateMission
-from ..constants import POSSIBLE_POSITION, DEFAULT_DENSITY
+from ..constants import POSSIBLE_POSITION, DEFAULT_DENSITY, DEFAULT_DYNAMIC_VISCOSITY
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -272,19 +274,18 @@ def test_conductor_length():
     problem.check_partials(compact_print=True)
 
 
-def test_resistivity():
-    ivc = om.IndepVarComp()
-
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:winding_temperature", val=180, units="degC"
+def test_pouillet_geometry_factor():
+    ivc = get_indep_var_comp(
+        list_inputs(SizingPouilletGeometryFactor(motor_id="motor_1")),
+        __file__,
+        XML_FILE,
     )
 
-    problem = run_system(SizingWindingResistivity(motor_id="motor_1"), ivc)
+    problem = run_system(SizingPouilletGeometryFactor(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistivity"
-    ) == pytest.approx(2.736384e-08, rel=1e-3)
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:pouillet_geometry_factor", units="m**-1"
+    ) == pytest.approx(53384.17, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -299,28 +300,8 @@ def test_x2p_ratio():
     problem = run_system(SizingRatioX2p(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:ratiox2p"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:x2p_ratio"
     ) == pytest.approx(16.435, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_resistance():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingResistance(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingResistance(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistance", units="ohm"
-    ) == pytest.approx(
-        0.0014608,
-        rel=1e-2,
-    )
 
     problem.check_partials(compact_print=True)
 
@@ -621,16 +602,67 @@ def test_constraint_power_for_power_rate():
     problem.check_partials(compact_print=True)
 
 
+def test_resistivity_fixed():
+    ivc = om.IndepVarComp()
+
+    # Run problem and check obtained value(s) is/(are) correct
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:winding_temperature", val=180, units="degC"
+    )
+
+    problem = run_system(
+        PerformancesWindingResistivityFixed(motor_id="motor_1", number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistivity",
+        units="ohm*m",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 2.736384e-08), rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_resistance():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:pouillet_geometry_factor",
+        val=53384.17,
+        units="m**-1",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistivity",
+        val=2.736384e-08,
+        units="ohm*m",
+        shape=NB_POINTS_TEST,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesResistance(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistance", units="ohm"
+    ) == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.0014608),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_joule_losses():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistance", val=0.0014608, units="ohm"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistance",
+        val=np.full(NB_POINTS_TEST, 0.0014608),
+        units="ohm",
     )
 
     ivc.add_output("ac_current_rms_in_one_phase", 1970.84 * np.ones(NB_POINTS_TEST), units="A")
-
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:number_of_phases", val=3)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -684,6 +716,24 @@ def test_iron_losses():
     problem.check_partials(compact_print=True)
 
 
+def test_air_dynamic_viscosity():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "altitude",
+        units="m",
+        val=np.zeros(NB_POINTS_TEST),
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesAirDynamicViscosity(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("dynamic_viscosity", units="kg/m/s") == pytest.approx(
+        np.full(NB_POINTS_TEST, DEFAULT_DYNAMIC_VISCOSITY), rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
+
+
 def test_windage_reynolds():
     ivc = om.IndepVarComp()
 
@@ -694,6 +744,10 @@ def test_windage_reynolds():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:airgap_thickness", val=0.0028, units="m"
     )
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("density", DEFAULT_DENSITY * np.ones(NB_POINTS_TEST), units="kg/m**3")
+    ivc.add_output(
+        "dynamic_viscosity", DEFAULT_DYNAMIC_VISCOSITY * np.ones(NB_POINTS_TEST), units="kg/m/s"
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -701,10 +755,10 @@ def test_windage_reynolds():
     )
 
     assert problem.get_val("airgap_reynolds_number") == pytest.approx(
-        np.full(NB_POINTS_TEST, 27082.0), rel=1e-2
+        np.full(NB_POINTS_TEST, 29075.3), rel=1e-2
     )
     assert problem.get_val("rotor_end_reynolds_number") == pytest.approx(
-        np.full(NB_POINTS_TEST, 877263.3), rel=1e-2
+        np.full(NB_POINTS_TEST, 941832.2), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -984,6 +1038,7 @@ def test_performance_SM_PMSM():
     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
     ivc.add_output("density", DEFAULT_DENSITY * np.ones(NB_POINTS_TEST), units="kg/m**3")
+    ivc.add_output("altitude", val=np.zeros(NB_POINTS_TEST), units="m")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

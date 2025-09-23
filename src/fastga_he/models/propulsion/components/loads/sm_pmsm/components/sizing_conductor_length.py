@@ -62,31 +62,44 @@ class SizingConductorLength(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
-        k_lc = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff"]
-        k_tb = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"]
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        cond_twisting_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff"
+        ]
+        end_winding_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        ]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"] = (
-            lm * k_lc * k_tb
+            active_length * cond_twisting_coeff * end_winding_coeff
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
-        k_lc = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff"]
-        k_tb = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"]
+
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        cond_twisting_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff"
+        ]
+        end_winding_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = k_lc * k_tb
+        ] = cond_twisting_coeff * end_winding_coeff
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
-        ] = lm * k_tb
+        ] = active_length * end_winding_coeff
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-        ] = lm * k_lc
+        ] = active_length * cond_twisting_coeff

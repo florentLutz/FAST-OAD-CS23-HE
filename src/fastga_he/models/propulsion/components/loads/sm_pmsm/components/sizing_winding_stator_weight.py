@@ -78,74 +78,86 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        lc = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"]
-        hs = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
-        ls = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
-        rho_c = inputs[
+        conductor_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"
+        ]
+        slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
+        slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
+        rho_conduct = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_material_density"
         ]
-        rho_insl = inputs[
+        rho_insulate = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":insulation_material_density"
         ]
-        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"]
-        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"]
+        slot_fill_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
+        ]
+        num_conductors = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"
+        ]
 
-        vol_wind = lc * hs * ns * ls
-        mat_mix_density = k_fill * rho_c + (1.0 - k_fill) * rho_insl
+        winding_volume = conductor_length * slot_height * num_conductors * slot_width
+        mat_mix_density = slot_fill_factor * rho_conduct + (1.0 - slot_fill_factor) * rho_insulate
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass"] = (
-            vol_wind * mat_mix_density
+            winding_volume * mat_mix_density
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        lc = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"]
-        hs = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
-        ls = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
-        rho_c = inputs[
+        conductor_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"
+        ]
+        slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
+        slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
+        rho_conduct = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_material_density"
         ]
-        rho_insl = inputs[
+        rho_insulate = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":insulation_material_density"
         ]
-        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"]
-        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"]
+        slot_fill_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
+        ]
+        num_conductors = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"
+        ]
 
-        vol_wind = lc * hs * ns * ls
-        mat_mix_density = k_fill * rho_c + (1.0 - k_fill) * rho_insl
+        winding_volume = conductor_length * slot_height * num_conductors * slot_width
+        mat_mix_density = slot_fill_factor * rho_conduct + (1.0 - slot_fill_factor) * rho_insulate
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
-        ] = hs * ns * ls * mat_mix_density
+        ] = slot_height * num_conductors * slot_width * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-        ] = lc * ns * ls * mat_mix_density
+        ] = conductor_length * num_conductors * slot_width * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
-        ] = lc * hs * ns * mat_mix_density
+        ] = conductor_length * slot_height * num_conductors * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
-        ] = lc * hs * ls * mat_mix_density
+        ] = conductor_length * slot_height * slot_width * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor",
-        ] = vol_wind * (rho_c - rho_insl)
+        ] = winding_volume * (rho_conduct - rho_insulate)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_material_density",
-        ] = vol_wind * k_fill
+        ] = winding_volume * slot_fill_factor
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":insulation_material_density",
-        ] = vol_wind * (1.0 - k_fill)
+        ] = winding_volume * (1.0 - slot_fill_factor)

@@ -39,9 +39,8 @@ class SizingToothRatio(om.ExplicitComponent):
             desc="The surface current density of the winding conductor cable",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
             val=np.nan,
-            units="m",
         )
 
         self.add_output(
@@ -61,7 +60,7 @@ class SizingToothRatio(om.ExplicitComponent):
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
         ]
-        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p"]
+        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         mu_0 = 4.0 * np.pi * 1.0e-7  # Magnetic permeability [H/m]
         max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
@@ -77,13 +76,13 @@ class SizingToothRatio(om.ExplicitComponent):
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
         ]
-        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p"]
+        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
         max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
         ] = (
             2.0
             * (mu_0 * k_m) ** 2.0

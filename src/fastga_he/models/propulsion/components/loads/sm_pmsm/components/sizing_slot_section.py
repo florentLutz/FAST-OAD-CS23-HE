@@ -16,9 +16,6 @@ class SizingSlotSection(om.ExplicitComponent):
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
-        self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
-        )
 
     def setup(self):
         motor_id = self.options["motor_id"]

@@ -80,77 +80,98 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
-        r_out = (
+        bore_radius = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
+        )
+        stator_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter"] / 2.0
         )
-        m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases"]
-        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
-        hs = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
-        ls = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
-        rho_sf = inputs[
+        slots_per_poles_phases = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases"
+        ]
+        num_pole_pairs = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
+        ]
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
+        slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
+        rho_magnet = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":magnetic_material_density"
         ]
-        ns = 6.0 * p * m
+        ns = 6.0 * num_pole_pairs * slots_per_poles_phases
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass"] = (
-            np.pi * lm * (r_out**2.0 - r**2.0) - (hs * lm * ns * ls)
-        ) * rho_sf
+            np.pi * active_length * (stator_radius**2.0 - bore_radius**2.0)
+            - (slot_height * active_length * ns * slot_width)
+        ) * rho_magnet
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        r = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
-        r_out = (
+        bore_radius = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
+        )
+        stator_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter"] / 2.0
         )
-        m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases"]
-        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
-        hs = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
-        ls = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
-        rho_sf = inputs[
+        slots_per_poles_phases = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases"
+        ]
+        num_pole_pairs = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
+        ]
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
+        slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
+        rho_magnet = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":magnetic_material_density"
         ]
-        ns = 6.0 * p * m
+        ns = 6.0 * num_pole_pairs * slots_per_poles_phases
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-        ] = -np.pi * lm * r * rho_sf
+        ] = -np.pi * active_length * bore_radius * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
-        ] = np.pi * lm * r_out * rho_sf
+        ] = np.pi * active_length * stator_radius * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-        ] = -lm * ls * ns * rho_sf
+        ] = -active_length * slot_width * ns * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
-        ] = -lm * hs * ns * rho_sf
+        ] = -active_length * slot_height * ns * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = (np.pi * (r_out**2.0 - r**2.0) - ls * hs * ns) * rho_sf
+        ] = (
+            np.pi * (stator_radius**2.0 - bore_radius**2.0) - slot_width * slot_height * ns
+        ) * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-        ] = -hs * lm * ls * 6.0 * m * rho_sf
+        ] = -slot_height * active_length * slot_width * 6.0 * slots_per_poles_phases * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
-        ] = -hs * lm * ls * 6.0 * p * rho_sf
+        ] = -slot_height * active_length * slot_width * 6.0 * num_pole_pairs * rho_magnet
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":magnetic_material_density",
-        ] = np.pi * lm * (r_out**2.0 - r**2.0) - (hs * lm * ns * ls)
+        ] = np.pi * active_length * (stator_radius**2.0 - bore_radius**2.0) - (
+            slot_height * active_length * ns * slot_width
+        )

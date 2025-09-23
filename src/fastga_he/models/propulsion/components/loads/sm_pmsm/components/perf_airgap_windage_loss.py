@@ -89,7 +89,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         rho_air = inputs["density"]
-        cf_a = inputs["airgap_friction_coeff"]
+        cf_airgap = inputs["airgap_friction_coeff"]
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
@@ -103,7 +103,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
         airgap_length = active_length * end_winding_coeff
 
         outputs["airgap_windage_loss"] = (
-            cf_a * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * airgap_length
+            cf_airgap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * airgap_length
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -111,7 +111,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         rho_air = inputs["density"]
-        cf_a = inputs["airgap_friction_coeff"]
+        cf_airgap = inputs["airgap_friction_coeff"]
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
@@ -132,22 +132,22 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
         partials[
             "airgap_windage_loss",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = cf_a * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * end_winding_coeff
+        ] = cf_airgap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * end_winding_coeff
 
         partials[
             "airgap_windage_loss",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-        ] = cf_a * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * active_length
+        ] = cf_airgap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * active_length
 
         partials[
             "airgap_windage_loss",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = 2.0 * cf_a * np.pi * rho_air * rotor_radius**3.0 * omega**3.0 * airgap_length
+        ] = 2.0 * cf_airgap * np.pi * rho_air * rotor_radius**3.0 * omega**3.0 * airgap_length
 
         partials["airgap_windage_loss", "rpm"] = (
-            0.1 * cf_a * np.pi**2.0 * rho_air * rotor_radius**4.0 * omega**2.0 * airgap_length
+            0.1 * cf_airgap * np.pi**2.0 * rho_air * rotor_radius**4.0 * omega**2.0 * airgap_length
         )
 
         partials["airgap_windage_loss", "density"] = (
-            cf_a * np.pi * rotor_radius**4.0 * omega**3.0 * airgap_length
+            cf_airgap * np.pi * rotor_radius**4.0 * omega**3.0 * airgap_length
         )

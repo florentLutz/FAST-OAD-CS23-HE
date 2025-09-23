@@ -50,28 +50,36 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        lambda_ = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
+        form_coefficient = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"
+        ]
         sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
-        T_max = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"]
+        torque_rating = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
+        ]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] = 2.0 * (
-            ((lambda_ / (4.0 * np.pi * sigma)) * T_max) ** (1.0 / 3.0)
+            ((form_coefficient / (4.0 * np.pi * sigma)) * torque_rating) ** (1.0 / 3.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        x = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"]
-        y = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
-        z = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"]
+        form_coefficient = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient"
+        ]
+        sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
+        torque_rating = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
+        ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
         ] = (
             2.0
-            * (z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
-            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * y * x ** (2.0 / 3.0))
+            * (torque_rating ** (1.0 / 3.0) * (np.pi * sigma) ** (2.0 / 3.0))
+            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * sigma * form_coefficient ** (2.0 / 3.0))
         )
 
         partials[
@@ -79,8 +87,12 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
         ] = (
             -2.0
-            * (x ** (1.0 / 3.0) * z ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
-            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * y**2.0)
+            * (
+                form_coefficient ** (1.0 / 3.0)
+                * torque_rating ** (1.0 / 3.0)
+                * (np.pi * sigma) ** (2.0 / 3.0)
+            )
+            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * sigma**2.0)
         )
 
         partials[
@@ -88,6 +100,6 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
         ] = (
             2.0
-            * (x ** (1.0 / 3.0) * (np.pi * y) ** (2.0 / 3.0))
-            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * y * z ** (2.0 / 3.0))
+            * (form_coefficient ** (1.0 / 3.0) * (np.pi * sigma) ** (2.0 / 3.0))
+            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * sigma * torque_rating ** (2.0 / 3.0))
         )

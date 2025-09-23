@@ -49,54 +49,61 @@ class SizingRotorWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
-        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
-        r_r = (
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        num_pole_pairs = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
+        ]
+        rotor_radius = (
             (inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]) / 2.0
         )
 
-        if p <= 10.0:
-            rho_rot = -431.67 * p + 7932.0
-        elif 10.0 < p <= 50.0:
-            rho_rot = 1.09 * p**2.0 - 117.45 * p + 4681.0
-        else:
-            rho_rot = 1600.0
+        conditions = [num_pole_pairs <= 10.0, 10.0 < num_pole_pairs <= 50.0]
+
+        rho_rotor = [
+            -431.67 * num_pole_pairs + 7932.0,
+            1.09 * num_pole_pairs**2.0 - 117.45 * num_pole_pairs + 4681.0,
+        ]
 
         # Rotor weight
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass"] = (
-            np.pi * r_r**2.0 * lm * rho_rot
+            np.pi
+            * rotor_radius**2.0
+            * active_length
+            * np.select(conditions, rho_rotor, default=1600.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
         lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
-        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
-        r_r = (
+        num_pole_pairs = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
+        ]
+        rotor_radius = (
             (inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]) / 2.0
         )
 
-        if p <= 10.0:
-            rho_rot = -431.67 * p + 7932.0
-            drho_dp = -431.67
-        elif 10.0 < p <= 50.0:
-            rho_rot = 1.09 * p**2.0 - 117.45 * p + 4681.0
-            drho_dp = 2.0 * 1.09 * p - 117.45
-        else:
-            rho_rot = 1600.0
-            drho_dp = 0.0
+        conditions = [num_pole_pairs <= 10.0, 10.0 < num_pole_pairs <= 50.0]
+
+        rho_rotor = [
+            -431.67 * num_pole_pairs + 7932.0,
+            1.09 * num_pole_pairs**2.0 - 117.45 * num_pole_pairs + 4681.0,
+        ]
+        d_rho_d_p = [-431.67, 2.0 * 1.09 * num_pole_pairs - 117.45]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = np.pi * r_r**2.0 * rho_rot
+        ] = np.pi * rotor_radius**2.0 * np.select(conditions, rho_rotor, default=1600.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = np.pi * r_r * lm * rho_rot
+        ] = np.pi * rotor_radius * lm * np.select(conditions, rho_rotor, default=1600.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-        ] = np.pi * r_r**2.0 * lm * drho_dp
+        ] = np.pi * rotor_radius**2.0 * lm * np.select(conditions, d_rho_d_p, default=0.0)

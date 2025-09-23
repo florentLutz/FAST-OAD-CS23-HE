@@ -26,6 +26,18 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input(
+            "density",
+            shape=number_of_points,
+            val=np.nan,
+            units="kg/m**3",
+        )
+        self.add_input(
+            "dynamic_viscosity",
+            shape=number_of_points,
+            val=np.nan,
+            units="kg/m/s",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
             val=np.nan,
             units="m",
@@ -54,7 +66,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="rpm",
+            wrt=["rpm", "density", "dynamic_viscosity"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -78,56 +90,70 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         rpm = inputs["rpm"]
-        r_rot = (
+        rho_air = inputs["density"]
+        mu_air = inputs["dynamic_viscosity"]
+        rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        e_g = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"]
-        temp = 300.0  # Air temperature [K]
-        pr = 1.0  # Air pressure [atm]
+        airgap_thickness = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"
+        ]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
 
-        # Air properties
-        mu_air = 8.88e-15 * temp**3.0 - 3.23e-11 * temp**2.0 + 6.26e-8 * temp + 2.35e-6
-        rho_air = 1.293 * (273.15 / temp) * pr
-
-        outputs["rotor_end_reynolds_number"] = (rho_air * r_rot**2.0 * omega) / mu_air
-        outputs["airgap_reynolds_number"] = (rho_air * r_rot * e_g * omega) / mu_air
+        outputs["rotor_end_reynolds_number"] = (rho_air * rotor_radius**2.0 * omega) / mu_air
+        outputs["airgap_reynolds_number"] = (
+            rho_air * rotor_radius * airgap_thickness * omega
+        ) / mu_air
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
         rpm = inputs["rpm"]
-        r_rot = (
+        rho_air = inputs["density"]
+        mu_air = inputs["dynamic_viscosity"]
+        rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        e_g = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"]
-        temp = 300.0  # Air temperature [K]
-        pr = 1.0  # Air pressure [atm]
+        airgap_thickness = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"
+        ]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
-
-        # Air properties
-        mu_air = 8.88e-15 * temp**3.0 - 3.23e-11 * temp**2.0 + 6.26e-8 * temp + 2.35e-6
-        rho_air = 1.293 * (273.15 / temp) * pr
 
         partials[
             "airgap_reynolds_number",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = (0.5 * rho_air * e_g * omega) / mu_air
+        ] = (0.5 * rho_air * airgap_thickness * omega) / mu_air
 
         partials[
             "airgap_reynolds_number",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
-        ] = (rho_air * r_rot * omega) / mu_air
+        ] = (rho_air * rotor_radius * omega) / mu_air
 
         partials["airgap_reynolds_number", "rpm"] = (
-            np.ones_like(omega) * (rho_air * r_rot * e_g * np.pi) / (30.0 * mu_air)
+            np.ones_like(omega)
+            * (rho_air * rotor_radius * airgap_thickness * np.pi)
+            / (30.0 * mu_air)
+        )
+
+        partials["airgap_reynolds_number", "density"] = (
+            rotor_radius * airgap_thickness * omega
+        ) / mu_air
+
+        partials["airgap_reynolds_number", "dynamic_viscosity"] = (
+            -(rho_air * rotor_radius * airgap_thickness * omega) / mu_air**2.0
         )
 
         partials[
             "rotor_end_reynolds_number",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = (rho_air * r_rot * omega) / mu_air
+        ] = (rho_air * rotor_radius * omega) / mu_air
 
         partials["rotor_end_reynolds_number", "rpm"] = (
-            np.ones_like(omega) * (rho_air * r_rot**2.0 * np.pi) / (30.0 * mu_air)
+            np.ones_like(omega) * (rho_air * rotor_radius**2.0 * np.pi) / (30.0 * mu_air)
+        )
+
+        partials["rotor_end_reynolds_number", "density"] = (rotor_radius**2.0 * omega) / mu_air
+
+        partials["rotor_end_reynolds_number", "dynamic_viscosity"] = (
+            -(rho_air * rotor_radius**2.0 * omega) / mu_air**2.0
         )

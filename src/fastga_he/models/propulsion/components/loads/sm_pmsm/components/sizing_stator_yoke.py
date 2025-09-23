@@ -26,7 +26,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             desc="Number of the north and south pairs in the PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
             val=np.nan,
         )
         self.add_input(
@@ -74,7 +74,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
         ]
         p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
-        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p"]
+        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
         max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
@@ -91,7 +91,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
         ]
-        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p"]
+        x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
         max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
@@ -108,7 +108,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":ratiox2p",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
         ] = (
             (r / p)
             * ((mu_0 * k_m) ** 2.0 * x2p_ratio)

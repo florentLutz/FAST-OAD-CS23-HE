@@ -62,36 +62,44 @@ class SizingConductorSection(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        s_slot = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section"]
-        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"]
-        k_sc = inputs[
+        slot_section = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section"
+        ]
+        slot_fill_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
+        ]
+        slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
         ]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_section"] = (
-            s_slot * k_sc * k_fill
+            slot_section * slot_conductor_factor * slot_fill_factor
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        s_slot = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section"]
-        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"]
-        k_sc = inputs[
+        slot_section = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section"
+        ]
+        slot_fill_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
+        ]
+        slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
         ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_section",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section",
-        ] = k_fill * k_sc
+        ] = slot_fill_factor * slot_conductor_factor
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_section",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor",
-        ] = s_slot * k_sc
+        ] = slot_section * slot_conductor_factor
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_section",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor",
-        ] = s_slot * k_fill
+        ] = slot_section * slot_fill_factor

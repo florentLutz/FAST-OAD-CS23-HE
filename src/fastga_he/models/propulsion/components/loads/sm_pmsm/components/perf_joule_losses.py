@@ -31,54 +31,45 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
-            val=np.nan,
+            val=np.full(number_of_points, np.nan),
             units="ohm",
         )
 
         self.add_output(
             "joule_power_losses",
-            units="kW",
+            units="W",
             val=0.0,
             shape=number_of_points,
         )
 
         self.declare_partials(
             of="joule_power_losses",
-            wrt=["ac_current_rms_in_one_phase"],
+            wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="joule_power_losses",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
-            ],
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        r_s = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"]
+        resistance = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"]
 
-        outputs["joule_power_losses"] = 3.0 * r_s * i_rms**2.0 / 1000.0
+        outputs["joule_power_losses"] = 3.0 * resistance * i_rms**2.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        r_s = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"]
+        resistance = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"]
 
         partials[
             "joule_power_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
-        ] = 3.0 * i_rms**2.0 / 1000.0
+        ] = 3.0 * i_rms**2.0
 
         partials[
             "joule_power_losses",
             "ac_current_rms_in_one_phase",
-        ] = 6.0 * r_s * i_rms / 1000.0
+        ] = 6.0 * resistance * i_rms

@@ -43,13 +43,10 @@ class SizingActiveLength(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-            method="exact",
-        )
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
+            wrt=[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
+            ],
             method="exact",
         )
 

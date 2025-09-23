@@ -39,8 +39,8 @@ class PerformancesEfficiency(om.ExplicitComponent):
             "efficiency",
             val=np.full(number_of_points, 0.95),
             shape=number_of_points,
-            lower=0.5,
-            upper=1.0,
+            lower=CUTOFF_ETA_MIN,
+            upper=CUTOFF_ETA_MAX,
         )
 
     def setup_partials(self):
@@ -88,13 +88,13 @@ class PerformancesEfficiency(om.ExplicitComponent):
         )
 
         partials["efficiency", "shaft_power_out"] = np.where(
-            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
+            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
             k_eff * loss / (shaft_power + loss) ** 2.0,
             np.full_like(shaft_power, 1e-6),
         )
 
         partials["efficiency", "power_losses"] = np.where(
-            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
+            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
             -(k_eff * shaft_power / (shaft_power + loss) ** 2.0),
             np.full_like(shaft_power, 1e-6),
         )
@@ -102,7 +102,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         partials[
             "efficiency", "settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency"
         ] = np.where(
-            (unclipped_efficiency <= 1.0) & (unclipped_efficiency >= 0.5),
+            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
             shaft_power / (shaft_power + loss),
             np.full_like(shaft_power, 1e-6),
         )

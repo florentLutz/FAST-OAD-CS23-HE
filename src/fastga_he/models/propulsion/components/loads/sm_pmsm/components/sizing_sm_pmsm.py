@@ -14,8 +14,7 @@ from .sizing_slot_section import SizingSlotSection
 from .sizing_conductor_section import SizingConductorSection
 from .sizing_conductor_length import SizingConductorLength
 from .sizing_conductors_number import SizingConductorsNumber
-from .sizing_winding_resistivity import SizingWindingResistivity
-from .sizing_resistance import SizingResistance
+from .sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from .sizing_external_stator_diameter import SizingExtStatorDiameter
 from .sizing_stator_core_weight import SizingStatorCoreWeight
 from .sizing_winding_stator_weight import SizingStatorWindingWeight
@@ -95,15 +94,13 @@ class SizingSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "conductor_length", SizingConductorLength(motor_id=motor_id), promotes=["data:*"]
+            "total_conductor_length", SizingConductorLength(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
-            "winding_resistivity", SizingWindingResistivity(motor_id=motor_id), promotes=["data:*"]
-        )
-
-        self.add_subsystem(
-            "electric_resistance", SizingResistance(motor_id=motor_id), promotes=["data:*"]
+            "pouillet_geometry_factor",
+            SizingPouilletGeometryFactor(motor_id=motor_id),
+            promotes=["data:*"],
         )
 
         self.add_subsystem(

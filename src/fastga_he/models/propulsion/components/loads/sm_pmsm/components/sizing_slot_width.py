@@ -50,32 +50,40 @@ class SizingSlotWidth(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+        bore_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
+        ]
         tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
-        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"]
+        num_conductor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"
+        ]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"] = (
-            (1.0 - tooth_ratio) * np.pi * d / ns
+            (1.0 - tooth_ratio) * np.pi * bore_diameter / num_conductor
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        d = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+        bore_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
+        ]
         tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
-        ns = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"]
+        num_conductor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"
+        ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-        ] = (1.0 - tooth_ratio) * np.pi / ns
+        ] = (1.0 - tooth_ratio) * np.pi / num_conductor
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-        ] = -np.pi * d / ns
+        ] = -np.pi * bore_diameter / num_conductor
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
-        ] = -(1.0 - tooth_ratio) * np.pi * d / ns**2.0
+        ] = -(1.0 - tooth_ratio) * np.pi * bore_diameter / num_conductor**2.0

@@ -71,67 +71,161 @@ class SizingSlotHeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
-        k_w = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density"]
-        j_rms = inputs[
+        winding_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"
+        ]
+        magnetic_flux_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density"
+        ]
+        max_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max"
         ]
-        k_sc = inputs[
+        slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
         ]
-        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"]
-        r_tooth = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
+        slot_fill_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
+        ]
+        tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"] = (
-            np.sqrt(2.0) * sigma / (k_w * b_m * j_rms * k_sc * k_fill * (1.0 - r_tooth))
+            np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor
+                * magnetic_flux_density
+                * max_current_density
+                * slot_conductor_factor
+                * slot_fill_factor
+                * (1.0 - tooth_ratio)
+            )
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
         sigma = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
-        k_w = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density"]
-        j_rms = inputs[
+        winding_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"
+        ]
+        magnetic_flux_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density"
+        ]
+        max_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max"
         ]
-        k_sc = inputs[
+        slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
         ]
-        k_fill = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"]
-        r_tooth = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
+        slot_fill_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
+        ]
+        tooth_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
-        ] = np.sqrt(2.0) / (k_w * b_m * j_rms * k_sc * k_fill * (1.0 - r_tooth))
+        ] = np.sqrt(2.0) / (
+            winding_factor
+            * magnetic_flux_density
+            * max_current_density
+            * slot_conductor_factor
+            * slot_fill_factor
+            * (1.0 - tooth_ratio)
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
-        ] = -np.sqrt(2.0) * sigma / (k_w**2.0 * b_m * j_rms * k_sc * k_fill * (1.0 - r_tooth))
+        ] = (
+            -np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor**2.0
+                * magnetic_flux_density
+                * max_current_density
+                * slot_conductor_factor
+                * slot_fill_factor
+                * (1.0 - tooth_ratio)
+            )
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density",
-        ] = -np.sqrt(2.0) * sigma / (k_w * b_m**2.0 * j_rms * k_sc * k_fill * (1.0 - r_tooth))
+        ] = (
+            -np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor
+                * magnetic_flux_density**2.0
+                * max_current_density
+                * slot_conductor_factor
+                * slot_fill_factor
+                * (1.0 - tooth_ratio)
+            )
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
-        ] = -np.sqrt(2.0) * sigma / (k_w * b_m * j_rms**2.0 * k_sc * k_fill * (1.0 - r_tooth))
+        ] = (
+            -np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor
+                * magnetic_flux_density
+                * max_current_density**2.0
+                * slot_conductor_factor
+                * slot_fill_factor
+                * (1.0 - tooth_ratio)
+            )
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor",
-        ] = -np.sqrt(2.0) * sigma / (k_w * b_m * j_rms * k_sc**2.0 * k_fill * (1.0 - r_tooth))
+        ] = (
+            -np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor
+                * magnetic_flux_density
+                * max_current_density
+                * slot_conductor_factor**2.0
+                * slot_fill_factor
+                * (1.0 - tooth_ratio)
+            )
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor",
-        ] = -np.sqrt(2.0) * sigma / (k_w * b_m * j_rms * k_sc * k_fill**2.0 * (1.0 - r_tooth))
+        ] = (
+            -np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor
+                * magnetic_flux_density
+                * max_current_density
+                * slot_conductor_factor
+                * slot_fill_factor**2.0
+                * (1.0 - tooth_ratio)
+            )
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-        ] = np.sqrt(2.0) * sigma / (k_w * b_m * j_rms * k_sc * k_fill * (1.0 - r_tooth) ** 2.0)
+        ] = (
+            np.sqrt(2.0)
+            * sigma
+            / (
+                winding_factor
+                * magnetic_flux_density
+                * max_current_density
+                * slot_conductor_factor
+                * slot_fill_factor
+                * (1.0 - tooth_ratio) ** 2.0
+            )
+        )

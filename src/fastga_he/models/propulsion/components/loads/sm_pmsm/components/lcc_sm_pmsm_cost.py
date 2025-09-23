@@ -10,6 +10,7 @@ class LCCSMPMSMCost(om.ExplicitComponent):
     """
     Computation of the cost of the motor including the electronics of the powertrain. The PMSM
     regression model obtained based on the price of the products from: https://emrax.com/e-motors/.
+    Currently copied from the original PMSM model, will be modified for better accuracy.
     """
 
     def initialize(self):

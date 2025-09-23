@@ -35,6 +35,7 @@
             <he_power_train>
                 <SM_PMSM>
                     <motor_1>
+                        <pouillet_geometry_factor units="1/m">53384.17</pouillet_geometry_factor>
                         <mass units="kg">225.59</mass>
                         <stator_core_mass units="kg">116.4</stator_core_mass>
                         <stator_winding_mass units="kg">32.69</stator_winding_mass>
@@ -80,7 +81,7 @@
                         <slots_per_poles_phases>2</slots_per_poles_phases>
                         <number_of_phases>3</number_of_phases>
                         <conductors_number>24</conductors_number>
-                        <ratiox2p>16.435</ratiox2p>
+                        <x2p_ratio>16.435</x2p_ratio>
                         <radius_ratio>0.6</radius_ratio>
                         <tooth_ratio>0.4407</tooth_ratio>
                         <winding_factor>0.97</winding_factor>

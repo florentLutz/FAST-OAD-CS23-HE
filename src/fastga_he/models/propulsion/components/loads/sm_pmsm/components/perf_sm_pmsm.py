@@ -4,6 +4,7 @@
 
 import openmdao.api as om
 
+from .perf_air_dynamic_viscosity import PerformancesAirDynamicViscosity
 from .perf_iron_losses import PerformancesIronLosses
 from .perf_joule_losses import PerformancesJouleLosses
 from .perf_windage_reynolds import PerformancesWindageReynolds
@@ -18,6 +19,8 @@ from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms import PerformancesCurrentRMS
 from .perf_maximum import PerformancesMaximum
 from .perf_electrical_frequency import PerformancesElectricalFrequency
+from .perf_winding_resistivity import PerformancesWindingResistivityFixed
+from .perf_resistance import PerformancesResistance
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
@@ -41,6 +44,12 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "torque",
             PerformancesTorque(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "dynamic_viscosity",
+            PerformancesAirDynamicViscosity(number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -79,6 +88,20 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "iron_losses",
             PerformancesIronLosses(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "winding_resistivity",
+            PerformancesWindingResistivityFixed(
+                motor_id=motor_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "electrical_resistance",
+            PerformancesResistance(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 

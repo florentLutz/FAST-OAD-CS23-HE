@@ -10,6 +10,7 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
     """
     Computation of the maintenance cost of the PMSM. For the default value of the average lifespan
     of the motor, the value is taken from :cite:`thonemann:2024` for short term technologies.
+    Currently copied from the original PMSM model, will be modified for better accuracy.
     """
 
     def initialize(self):
