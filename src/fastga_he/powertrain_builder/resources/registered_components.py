@@ -193,10 +193,10 @@ PMSM = {
 SM_PMSM = {
     ID: "fastga_he.pt_component.sm_pmsm",
     CN: "SMPMSM",
-    CN_ID: "pmsm_id",
+    CN_ID: "motor_id",
     CT: "SM_PMSM",
     ATT: None,
-    PT: ["settings:*"],
+    PT: ["settings:*", "density", "altitude"],
     SPT: [],
     PTS: [],
     IN: [

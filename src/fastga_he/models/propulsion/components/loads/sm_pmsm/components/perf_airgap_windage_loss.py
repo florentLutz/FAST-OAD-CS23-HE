@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+from ..constants import DEFAULT_DENSITY
+
 
 class PerformancesAirgapWindageLoss(om.ExplicitComponent):
     """
@@ -28,7 +30,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
         self.add_input(
             "density",
             shape=number_of_points,
-            val=np.full(number_of_points, np.nan),
+            val=DEFAULT_DENSITY,
             units="kg/m**3",
         )
         self.add_input(

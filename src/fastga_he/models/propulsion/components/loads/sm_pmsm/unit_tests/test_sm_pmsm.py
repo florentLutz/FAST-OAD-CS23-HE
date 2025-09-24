@@ -67,7 +67,7 @@ from ..components.cstr_ensure import (
     ConstraintsVoltageEnsure,
 )
 from ..components.cstr_sm_pmsm import ConstraintPMSMPowerRateMission
-from ..constants import POSSIBLE_POSITION, DEFAULT_DENSITY, DEFAULT_DYNAMIC_VISCOSITY
+from ..constants import POSSIBLE_POSITION, DEFAULT_DYNAMIC_VISCOSITY
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
@@ -744,7 +744,6 @@ def test_windage_reynolds():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:airgap_thickness", val=0.0028, units="m"
     )
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-    ivc.add_output("density", DEFAULT_DENSITY * np.ones(NB_POINTS_TEST), units="kg/m**3")
     ivc.add_output(
         "dynamic_viscosity", DEFAULT_DYNAMIC_VISCOSITY * np.ones(NB_POINTS_TEST), units="kg/m/s"
     )
@@ -805,7 +804,6 @@ def test_airgap_windage_loss():
 
     ivc.add_output("airgap_friction_coeff", np.full(NB_POINTS_TEST, 0.001487))
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-    ivc.add_output("density", DEFAULT_DENSITY * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -830,7 +828,6 @@ def test_rotor_windage_loss():
 
     ivc.add_output("rotor_end_friction_coeff", np.full(NB_POINTS_TEST, 0.0094564))
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-    ivc.add_output("density", DEFAULT_DENSITY * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -1037,7 +1034,6 @@ def test_performance_SM_PMSM():
 
     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-    ivc.add_output("density", DEFAULT_DENSITY * np.ones(NB_POINTS_TEST), units="kg/m**3")
     ivc.add_output("altitude", val=np.zeros(NB_POINTS_TEST), units="m")
 
     # Run problem and check obtained value(s) is/(are) correct

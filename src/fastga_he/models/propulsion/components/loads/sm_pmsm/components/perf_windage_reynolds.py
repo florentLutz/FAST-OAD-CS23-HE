@@ -5,10 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
+from ..constants import DEFAULT_DENSITY
+
 
 class PerformancesWindageReynolds(om.ExplicitComponent):
     """
-    Computation of the reynold's numbers for the friction coefficients of motor windage. The
+    Computation of the Reynold's numbers for the friction coefficients of motor windage. The
     formulas are given by equation (II-72) and (II-77) in :cite:`touhami:2020`.
     """
 
@@ -28,7 +30,7 @@ class PerformancesWindageReynolds(om.ExplicitComponent):
         self.add_input(
             "density",
             shape=number_of_points,
-            val=np.nan,
+            val=DEFAULT_DENSITY,
             units="kg/m**3",
         )
         self.add_input(

@@ -39,8 +39,9 @@ class SizingFrameGeometry(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density",
-            val=np.nan,
+            val=2.7,
             units="kg/m**3",
+            desc="Default value set as the density of 6063 aluminum alloy",
         )
 
         self.add_output(
@@ -120,20 +121,19 @@ class SizingFrameGeometry(om.ExplicitComponent):
         ]
         rho_frame = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density"]
 
-        stator_radius_mm = stator_radius * 1000.0
         tau_frame = (
             0.7371 * stator_radius**2 - 0.580 * stator_radius + 1.1599
-            if stator_radius_mm <= 400
+            if stator_radius <= 0.4
             else 1.04
         )
-        d_tau_d_stator_diameter = 0.7371 * stator_radius - 0.29 if stator_radius_mm <= 400 else 0.0
+        d_tau_d_stator_diameter = 0.7371 * stator_radius - 0.29 if stator_radius <= 0.4 else 0.0
         frame_radius = tau_frame * stator_radius
-        drfr_dd = tau_frame / 2.0 + d_tau_d_stator_diameter * stator_radius
+        d_frame_diameter_d_stator_diameter = tau_frame + d_tau_d_stator_diameter * stator_diameter
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
-        ] = 2.0 * drfr_dd
+        ] = d_frame_diameter_d_stator_diameter
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
@@ -142,10 +142,15 @@ class SizingFrameGeometry(om.ExplicitComponent):
             np.pi
             * active_length
             * end_winding_coeff
-            * (2.0 * frame_radius * drfr_dd - stator_radius)
+            * (frame_radius * d_frame_diameter_d_stator_diameter - stator_radius)
             + 2.0 * np.pi * d_tau_d_stator_diameter * stator_radius * frame_radius**2.0
             + 2.0 * np.pi * (tau_frame - 1.0) * 0.5 * frame_radius**2.0
-            + 2.0 * np.pi * (tau_frame - 1.0) * stator_radius * 2.0 * frame_radius * drfr_dd
+            + 2.0
+            * np.pi
+            * (tau_frame - 1.0)
+            * stator_radius
+            * frame_radius
+            * d_frame_diameter_d_stator_diameter
         )
 
         partials[
