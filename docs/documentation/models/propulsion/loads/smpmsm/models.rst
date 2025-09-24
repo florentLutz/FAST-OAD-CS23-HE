@@ -14,7 +14,7 @@ simplicity and having a relative accurate modeling. This figure demonstrate the 
 ***********************
 Performance calculation
 ***********************
-Most of the performance calculations shares a similar approach as the AFPMSM model, except the losses caused by various
+Most of the performance calculations shares a similar approach as the :ref:`AFPMSM <afpmsm>` model, except the losses caused by various
 factors. The three primary sources of loss in the Surface-mounted PMSM as modeled in the HASTECS project :cite:`touhami:2020` are
 presented below.
 

@@ -9,6 +9,5 @@ Here you will find the documentation of the load components available in FAST-OA
 .. toctree::
    :maxdepth: 1
 
+    Axial-flux PMSM <afpmsm/index>
     Surface-mounted PMSM <smpmsm/index>
-
-
