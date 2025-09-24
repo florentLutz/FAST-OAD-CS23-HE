@@ -57,23 +57,19 @@ class ComputeRTAVariable(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
-        atm = AtmosphereWithPartials(cruise_alt, altitude_in_feet=False)
-        atm.mach = inputs["data:TLAR:cruise_mach"]
-        v_tas = atm.true_airspeed
-        unit_reynolds = atm.unitary_reynolds
+        atm_cruise = AtmosphereWithPartials(cruise_alt, altitude_in_feet=False)
+        atm_cruise.mach = inputs["data:TLAR:cruise_mach"]
 
-        low_speed_alt = 0
-        atm2 = AtmosphereWithPartials(low_speed_alt, altitude_in_feet=False)
-        atm2.true_airspeed = inputs["data:TLAR:approach_speed"]
-        unit_Reynolds2 = atm2.unitary_reynolds
+        atm_approach = AtmosphereWithPartials(0.0, altitude_in_feet=False)
+        atm_approach.true_airspeed = inputs["data:TLAR:approach_speed"]
 
-        outputs["data:TLAR:v_cruise"] = V_TAS
+        outputs["data:TLAR:v_cruise"] = atm_cruise.true_airspeed
 
-        outputs["data:aerodynamics:cruise:unit_reynolds"] = unit_Reynolds
+        outputs["data:aerodynamics:cruise:unit_reynolds"] = atm_cruise.unitary_reynolds
 
-        outputs["data:aerodynamics:low_speed:unit_reynolds"] = unit_Reynolds2
+        outputs["data:aerodynamics:low_speed:unit_reynolds"] = atm_approach.unitary_reynolds
 
-        outputs["data:TLAR:luggage_mass_design"] = 20 * inputs["data:TLAR:NPAX_design"]
+        outputs["data:TLAR:luggage_mass_design"] = 20.0 * inputs["data:TLAR:NPAX_design"]
 
         outputs["data:mission:sizing:taxi_in:speed"] = (
             inputs["data:mission:sizing:taxi_in:distance"]

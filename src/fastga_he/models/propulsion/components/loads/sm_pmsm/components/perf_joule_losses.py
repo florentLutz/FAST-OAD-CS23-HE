@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesJouleLosses(om.ExplicitComponent):
     """
-    Computation of the motor joule losses due to ohmic heating in conductors. This is obtained
+    Computation of the motor Joule losses due to ohmic heating in conductors. This is obtained
     from part II.3.1 in :cite:`touhami:2020`
     """
 

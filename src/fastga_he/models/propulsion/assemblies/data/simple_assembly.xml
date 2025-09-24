@@ -454,7 +454,7 @@
                         <pole_pairs_number is_input="True" >2<!--number of pole pairs--> </pole_pairs_number>
                         <number_of_phases is_input="True" >3<!--number of phases--> </number_of_phases>
                         <slots_per_poles_phases  is_input="True" >2<!--number of slots per poles and per phases--> </slots_per_poles_phases>
-                        <airgap_flux_density units="T" is_input="True" >0.9 <!--Bm airgap flux density--> </airgap_flux_density>
+                        <air_gap_flux_density units="T" is_input="True" >0.9 <!--Bm airgap flux density--> </air_gap_flux_density>
                         <cond_twisting_coeff is_input="True" >1.25<!--k_lc--> </cond_twisting_coeff>
                         <end_winding_coeff is_input="True" >1.4<!--k_tb--> </end_winding_coeff>
                         <slot_fill_factor is_input="True" >0.5<!--k_fill--> </slot_fill_factor>
@@ -465,7 +465,7 @@
                         <slot_height units="m" is_input="True" >0.0358<!--hs--> </slot_height>
                         <slot_width units="m" is_input="True" >0.0137<!--ls--> </slot_width>
                         <rotor_diameter units="m" is_input="True" >0.1814<!--D_rot--> </rotor_diameter>
-                        <airgap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </airgap_thickness>
+                        <air_gap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </air_gap_thickness>
                         <rotor_mass units="kg" is_input="True" >56.97<!--k_tb--> </rotor_mass>
                         <torque_constant units="N*m/A" is_input="True" >0.4278<!--k_tb--> </torque_constant>
                         <pouillet_geometry_factor units="1/m">86763.68677</pouillet_geometry_factor>

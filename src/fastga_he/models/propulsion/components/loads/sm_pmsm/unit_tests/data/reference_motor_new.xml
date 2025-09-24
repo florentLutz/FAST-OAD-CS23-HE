@@ -50,7 +50,7 @@
                         <stator_diameter units="m">0.3288</stator_diameter>
                         <slot_width units="m">0.01348</slot_width>
                         <slot_height units="m">0.0358</slot_height>
-                        <airgap_thickness units="m">0.0028</airgap_thickness>
+                        <air_gap_thickness units="m">0.0028</air_gap_thickness>
                         <resistance units="ohm">0.0014608</resistance>
                         <front_length_ratio>0.5</front_length_ratio>
                         <conductor_section units="m**2">0.00024523</conductor_section>
@@ -72,7 +72,7 @@
                         <current_density_ac_max units="A/m**2">8.1e6</current_density_ac_max>
                         <tangential_stress units="N/m**2">50000</tangential_stress>
                         <resistivity units="ohm*m">2.736384e-08</resistivity>
-                        <airgap_flux_density units="T">0.9</airgap_flux_density>
+                        <air_gap_flux_density units="T">0.9</air_gap_flux_density>
                         <yoke_flux_density units="T">1.2</yoke_flux_density>
                         <tooth_flux_density units="T">1.3</tooth_flux_density>
                         <end_winding_coeff>1.4</end_winding_coeff>

@@ -7,10 +7,10 @@ import openmdao.api as om
 import scipy.constants as sc
 
 
-class PerformancesBearingLoss(om.ExplicitComponent):
+class PerformancesBearingLosses(om.ExplicitComponent):
     """
-    Computation of the bearing friction loss result from friction at the contacting surface
-    between the bearing and the motor shaft . This is obtained from equation II.78 in
+    Computation of the bearing friction losses result from friction at the contacting surface
+    between the bearing and the motor shaft. This is obtained from equation II.78 in
     :cite:`touhami:2020`.
     """
 
@@ -34,7 +34,7 @@ class PerformancesBearingLoss(om.ExplicitComponent):
         )
 
         self.add_output(
-            "bearing_friction_loss",
+            "bearing_friction_losses",
             units="W",
             val=0.0,
             shape=number_of_points,
@@ -45,14 +45,14 @@ class PerformancesBearingLoss(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="bearing_friction_loss",
+            of="bearing_friction_losses",
             wrt="rpm",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="bearing_friction_loss",
+            of="bearing_friction_losses",
             wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             method="exact",
             rows=np.arange(number_of_points),
@@ -68,7 +68,7 @@ class PerformancesBearingLoss(om.ExplicitComponent):
         bearing_diameter = 0.03  # Bearing bore diameter [m]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
 
-        outputs["bearing_friction_loss"] = (
+        outputs["bearing_friction_losses"] = (
             0.5 * cf_bearing * rotor_mass * sc.g * bearing_diameter * omega
         )
 
@@ -82,10 +82,10 @@ class PerformancesBearingLoss(om.ExplicitComponent):
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
 
         partials[
-            "bearing_friction_loss",
+            "bearing_friction_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
         ] = 0.5 * cf_bearing * sc.g * bearing_diameter * omega
 
-        partials["bearing_friction_loss", "rpm"] = (
+        partials["bearing_friction_losses", "rpm"] = (
             cf_bearing * rotor_mass * sc.g * bearing_diameter * np.pi / 60.0
         )

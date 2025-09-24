@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingRotorDiameter(om.ExplicitComponent):
     """
-    Computation of the rotor diameter and airgap thickness of a cylindrical PMSM. The formulas
+    Computation of the rotor diameter and air gap thickness of a cylindrical PMSM. The formulas
     are obtained from equation (II-50) and (II-51) in :cite:`touhami:2020`.
     """
 
@@ -38,7 +38,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
             val=0.05,
         )
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             units="m",
             desc="The distance between the rotor and the stator bore",
             val=0.0015,
@@ -64,7 +64,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] = (
             radius_ratio * bore_diameter
         )
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"] = (
             (1.0 - radius_ratio) * bore_diameter / 2.0
         )
 
@@ -82,12 +82,12 @@ class SizingRotorDiameter(om.ExplicitComponent):
         ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
         ] = (-inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]) / 2.0
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
         ] = (
             1.0 - inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"]

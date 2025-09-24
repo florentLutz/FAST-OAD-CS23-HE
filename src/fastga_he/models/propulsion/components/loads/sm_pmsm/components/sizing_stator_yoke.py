@@ -48,7 +48,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             desc="The surface current density of the winding conductor cable",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
             val=np.nan,
             units="T",
             desc="The magnetic flux density provided by the permanent magnets",
@@ -68,7 +68,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         r = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density"]
+        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
         b_sy = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density"]
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
@@ -76,17 +76,17 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
-        max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
+        max_total_air_gap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height"] = (
-            r * max_total_airgap_flux_density / (p * np.abs(b_sy))
+            r * max_total_air_gap_flux_density / (p * np.abs(b_sy))
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
         r = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density"]
+        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
         b_sy = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density"]
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
@@ -94,17 +94,17 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
-        max_total_airgap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
+        max_total_air_gap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-        ] = (1.0 / (2.0 * p)) * max_total_airgap_flux_density / np.abs(b_sy)
+        ] = (1.0 / (2.0 * p)) * max_total_air_gap_flux_density / np.abs(b_sy)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-        ] = -(r / p**2.0) * max_total_airgap_flux_density / np.abs(b_sy)
+        ] = -(r / p**2.0) * max_total_air_gap_flux_density / np.abs(b_sy)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
@@ -112,18 +112,18 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         ] = (
             (r / p)
             * ((mu_0 * k_m) ** 2.0 * x2p_ratio)
-            / (np.abs(b_sy) * max_total_airgap_flux_density)
+            / (np.abs(b_sy) * max_total_air_gap_flux_density)
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_flux_density",
-        ] = (r / p) * b_m / (np.abs(b_sy) * max_total_airgap_flux_density)
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+        ] = (r / p) * b_m / (np.abs(b_sy) * max_total_air_gap_flux_density)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density",
-        ] = -(r / p) * max_total_airgap_flux_density / (b_sy * np.abs(b_sy))
+        ] = -(r / p) * max_total_air_gap_flux_density / (b_sy * np.abs(b_sy))
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
@@ -131,5 +131,5 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         ] = (
             (r / p)
             * ((mu_0 * x2p_ratio) ** 2.0 * k_m)
-            / (np.abs(b_sy) * max_total_airgap_flux_density)
+            / (np.abs(b_sy) * max_total_air_gap_flux_density)
         )

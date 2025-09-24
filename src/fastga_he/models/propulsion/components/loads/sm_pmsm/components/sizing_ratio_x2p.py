@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingRatioX2p(om.ExplicitComponent):
     """
-    Computation of a fraction in the airgap flux density calculation. This ratio consists of the
+    Computation of a fraction in the air gap flux density calculation. This ratio consists of the
     radius ratio and the number of pole pairs. The formula is obtained from equation (
     II-24) and (II-25) in :cite:`touhami:2020`.
     """

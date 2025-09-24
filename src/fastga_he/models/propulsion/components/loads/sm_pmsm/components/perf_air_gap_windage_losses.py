@@ -8,9 +8,9 @@ import openmdao.api as om
 from ..constants import DEFAULT_DENSITY
 
 
-class PerformancesAirgapWindageLoss(om.ExplicitComponent):
+class PerformancesAirGapWindageLosses(om.ExplicitComponent):
     """
-    Computation of the airgap windage loss result from frictions of the airgap between the rotor
+    Computation of the air gap windage losses result from frictions of the air gap between the rotor
     and the stator bore. This is obtained from equation II.70 in :cite:`touhami:2020`.
     """
 
@@ -34,10 +34,10 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
             units="kg/m**3",
         )
         self.add_input(
-            "airgap_friction_coeff",
+            "air_gap_friction_coeff",
             val=np.nan,
             shape=number_of_points,
-            desc="Air friction coefficient of airgap",
+            desc="Air friction coefficient of air gap",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
@@ -57,7 +57,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
         )
 
         self.add_output(
-            "airgap_windage_loss",
+            "air_gap_windage_losses",
             units="W",
             val=0.0,
             shape=number_of_points,
@@ -68,14 +68,14 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="airgap_windage_loss",
-            wrt=["rpm", "airgap_friction_coeff", "density"],
+            of="air_gap_windage_losses",
+            wrt=["rpm", "air_gap_friction_coeff", "density"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="airgap_windage_loss",
+            of="air_gap_windage_losses",
             wrt=[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
@@ -91,7 +91,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         rho_air = inputs["density"]
-        cf_airgap = inputs["airgap_friction_coeff"]
+        cf_air_gap = inputs["air_gap_friction_coeff"]
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
@@ -102,10 +102,10 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
-        airgap_length = active_length * end_winding_coeff
+        air_gap_length = active_length * end_winding_coeff
 
-        outputs["airgap_windage_loss"] = (
-            cf_airgap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * airgap_length
+        outputs["air_gap_windage_losses"] = (
+            cf_air_gap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * air_gap_length
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -113,7 +113,7 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         rho_air = inputs["density"]
-        cf_airgap = inputs["airgap_friction_coeff"]
+        cf_air_gap = inputs["air_gap_friction_coeff"]
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
@@ -124,32 +124,38 @@ class PerformancesAirgapWindageLoss(om.ExplicitComponent):
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
-        airgap_length = active_length * end_winding_coeff
+        air_gap_length = active_length * end_winding_coeff
 
         partials[
-            "airgap_windage_loss",
-            "airgap_friction_coeff",
-        ] = np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * airgap_length
+            "air_gap_windage_losses",
+            "air_gap_friction_coeff",
+        ] = np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * air_gap_length
 
         partials[
-            "airgap_windage_loss",
+            "air_gap_windage_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = cf_airgap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * end_winding_coeff
+        ] = cf_air_gap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * end_winding_coeff
 
         partials[
-            "airgap_windage_loss",
+            "air_gap_windage_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-        ] = cf_airgap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * active_length
+        ] = cf_air_gap * np.pi * rho_air * rotor_radius**4.0 * omega**3.0 * active_length
 
         partials[
-            "airgap_windage_loss",
+            "air_gap_windage_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = 2.0 * cf_airgap * np.pi * rho_air * rotor_radius**3.0 * omega**3.0 * airgap_length
+        ] = 2.0 * cf_air_gap * np.pi * rho_air * rotor_radius**3.0 * omega**3.0 * air_gap_length
 
-        partials["airgap_windage_loss", "rpm"] = (
-            0.1 * cf_airgap * np.pi**2.0 * rho_air * rotor_radius**4.0 * omega**2.0 * airgap_length
+        partials["air_gap_windage_losses", "rpm"] = (
+            0.1
+            * cf_air_gap
+            * np.pi**2.0
+            * rho_air
+            * rotor_radius**4.0
+            * omega**2.0
+            * air_gap_length
         )
 
-        partials["airgap_windage_loss", "density"] = (
-            cf_airgap * np.pi * rotor_radius**4.0 * omega**3.0 * airgap_length
+        partials["air_gap_windage_losses", "density"] = (
+            cf_air_gap * np.pi * rotor_radius**4.0 * omega**3.0 * air_gap_length
         )

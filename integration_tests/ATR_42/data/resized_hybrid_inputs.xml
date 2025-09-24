@@ -204,7 +204,7 @@
         </DC_DC_converter>
         <SM_PMSM>
           <motor_1>
-            <airgap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></airgap_flux_density>
+            <air_gap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></air_gap_flux_density>
             <cond_twisting_coeff is_input="True">1.25<!--The factor to account the conductor wire bunching--></cond_twisting_coeff>
             <conductor_material_density units="kg/m**3" is_input="True">8960.0<!--Electrical conductor material density--></conductor_material_density>
             <current_density_ac_max units="A/m**2" is_input="True">8100000.0</current_density_ac_max>
@@ -236,7 +236,7 @@
             </fairing>
           </motor_1>
           <motor_2>
-            <airgap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></airgap_flux_density>
+            <air_gap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></air_gap_flux_density>
             <cond_twisting_coeff is_input="True">1.25<!--The factor to account the conductor wire bunching--></cond_twisting_coeff>
             <conductor_material_density units="kg/m**3" is_input="True">8960.0<!--Electrical conductor material density--></conductor_material_density>
             <current_density_ac_max units="A/m**2" is_input="True">8100000.0</current_density_ac_max>

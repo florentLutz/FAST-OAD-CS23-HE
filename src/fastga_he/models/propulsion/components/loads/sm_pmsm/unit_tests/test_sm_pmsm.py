@@ -39,9 +39,9 @@ from ..components.perf_joule_losses import PerformancesJouleLosses
 from ..components.perf_air_dynamic_viscosity import PerformancesAirDynamicViscosity
 from ..components.perf_windage_reynolds import PerformancesWindageReynolds
 from ..components.perf_windage_friction_coeff import PerformancesWindageFrictionCoefficient
-from ..components.perf_airgap_windage_loss import PerformancesAirgapWindageLoss
-from ..components.perf_rotor_windage_loss import PerformancesRotorWindageLoss
-from ..components.perf_bearing_friction_loss import PerformancesBearingLoss
+from ..components.perf_air_gap_windage_losses import PerformancesAirGapWindageLosses
+from ..components.perf_rotor_windage_losses import PerformancesRotorWindageLoss
+from ..components.perf_bearing_friction_losses import PerformancesBearingLosses
 from ..components.perf_mechanical_losses import PerformancesMechanicalLosses
 from ..components.perf_power_losses import PerformancesPowerLosses
 from ..components.perf_efficiency import PerformancesEfficiency
@@ -115,7 +115,7 @@ def test_rotor_diameter():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", units="m"
     ) == pytest.approx(0.1814, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:airgap_thickness", units="m"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", units="m"
     ) == pytest.approx(0.0028, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -700,7 +700,7 @@ def test_iron_losses():
 
     ivc.add_output("electrical_frequency", np.full(NB_POINTS_TEST, 532.33), units="s**-1")
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:airgap_flux_density", val=0.9, units="T"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_flux_density", val=0.9, units="T"
     )
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:mass", val=225.59, units="kg")
 
@@ -741,7 +741,7 @@ def test_windage_reynolds():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", val=0.1814, units="m"
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:airgap_thickness", val=0.0028, units="m"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", val=0.0028, units="m"
     )
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
     ivc.add_output(
@@ -753,7 +753,7 @@ def test_windage_reynolds():
         PerformancesWindageReynolds(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("airgap_reynolds_number") == pytest.approx(
+    assert problem.get_val("air_gap_reynolds_number") == pytest.approx(
         np.full(NB_POINTS_TEST, 29075.3), rel=1e-2
     )
     assert problem.get_val("rotor_end_reynolds_number") == pytest.approx(
@@ -774,7 +774,7 @@ def test_windage_friction_coefficient():
         XML_FILE,
     )
 
-    ivc.add_output("airgap_reynolds_number", np.full(NB_POINTS_TEST, 27082.0))
+    ivc.add_output("air_gap_reynolds_number", np.full(NB_POINTS_TEST, 27082.0))
     ivc.add_output("rotor_end_reynolds_number", np.full(NB_POINTS_TEST, 877263.3))
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -783,7 +783,7 @@ def test_windage_friction_coefficient():
         ivc,
     )
 
-    assert problem.get_val("airgap_friction_coeff") == pytest.approx(
+    assert problem.get_val("air_gap_friction_coeff") == pytest.approx(
         np.full(NB_POINTS_TEST, 0.001487), rel=1e-2
     )
     assert problem.get_val("rotor_end_friction_coeff") == pytest.approx(
@@ -793,31 +793,31 @@ def test_windage_friction_coefficient():
     problem.check_partials(compact_print=True)
 
 
-def test_airgap_windage_loss():
+def test_air_gap_windage_losses():
     ivc = get_indep_var_comp(
         list_inputs(
-            PerformancesAirgapWindageLoss(motor_id="motor_1", number_of_points=NB_POINTS_TEST)
+            PerformancesAirGapWindageLosses(motor_id="motor_1", number_of_points=NB_POINTS_TEST)
         ),
         __file__,
         XML_FILE,
     )
 
-    ivc.add_output("airgap_friction_coeff", np.full(NB_POINTS_TEST, 0.001487))
+    ivc.add_output("air_gap_friction_coeff", np.full(NB_POINTS_TEST, 0.001487))
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAirgapWindageLoss(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesAirGapWindageLosses(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("airgap_windage_loss", units="W") == pytest.approx(
+    assert problem.get_val("air_gap_windage_losses", units="W") == pytest.approx(
         790.48 * np.ones(NB_POINTS_TEST), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
 
 
-def test_rotor_windage_loss():
+def test_rotor_windage_losses():
     ivc = get_indep_var_comp(
         list_inputs(
             PerformancesRotorWindageLoss(motor_id="motor_1", number_of_points=NB_POINTS_TEST)
@@ -834,16 +834,16 @@ def test_rotor_windage_loss():
         PerformancesRotorWindageLoss(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("rotor_windage_loss", units="W") == pytest.approx(
+    assert problem.get_val("rotor_windage_losses", units="W") == pytest.approx(
         520.27 * np.ones(NB_POINTS_TEST), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
 
 
-def test_bearing_friction_loss():
+def test_bearing_friction_losses():
     ivc = get_indep_var_comp(
-        list_inputs(PerformancesBearingLoss(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
+        list_inputs(PerformancesBearingLosses(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
         __file__,
         XML_FILE,
     )
@@ -852,10 +852,10 @@ def test_bearing_friction_loss():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesBearingLoss(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+        PerformancesBearingLosses(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("bearing_friction_loss", units="W") == pytest.approx(
+    assert problem.get_val("bearing_friction_losses", units="W") == pytest.approx(
         21.02 * np.ones(NB_POINTS_TEST), rel=1e-2
     )
 
@@ -865,9 +865,9 @@ def test_bearing_friction_loss():
 def test_mechanical_losses():
     ivc = om.IndepVarComp()
 
-    ivc.add_output("airgap_windage_loss", 790.48 * np.ones(NB_POINTS_TEST), units="W")
-    ivc.add_output("rotor_windage_loss", 520.27 * np.ones(NB_POINTS_TEST), units="W")
-    ivc.add_output("bearing_friction_loss", 21.02 * np.ones(NB_POINTS_TEST), units="W")
+    ivc.add_output("air_gap_windage_losses", 790.48 * np.ones(NB_POINTS_TEST), units="W")
+    ivc.add_output("rotor_windage_losses", 520.27 * np.ones(NB_POINTS_TEST), units="W")
+    ivc.add_output("bearing_friction_losses", 21.02 * np.ones(NB_POINTS_TEST), units="W")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PerformancesMechanicalLosses(number_of_points=NB_POINTS_TEST), ivc)

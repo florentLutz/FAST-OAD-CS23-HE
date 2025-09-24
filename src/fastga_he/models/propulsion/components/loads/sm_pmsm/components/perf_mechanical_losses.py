@@ -21,9 +21,9 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("airgap_windage_loss", units="kW", val=np.nan, shape=number_of_points)
-        self.add_input("rotor_windage_loss", units="kW", val=np.nan, shape=number_of_points)
-        self.add_input("bearing_friction_loss", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("air_gap_windage_losses", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("rotor_windage_losses", units="kW", val=np.nan, shape=number_of_points)
+        self.add_input("bearing_friction_losses", units="kW", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "mechanical_power_losses",
@@ -37,7 +37,7 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
 
         self.declare_partials(
             of="mechanical_power_losses",
-            wrt=["rotor_windage_loss", "bearing_friction_loss"],
+            wrt=["rotor_windage_losses", "bearing_friction_losses"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -45,7 +45,7 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
         )
         self.declare_partials(
             of="mechanical_power_losses",
-            wrt="airgap_windage_loss",
+            wrt="air_gap_windage_losses",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -54,7 +54,7 @@ class PerformancesMechanicalLosses(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["mechanical_power_losses"] = (
-            inputs["airgap_windage_loss"]
-            + 2.0 * inputs["rotor_windage_loss"]
-            + 2.0 * inputs["bearing_friction_loss"]
+            inputs["air_gap_windage_losses"]
+            + 2.0 * inputs["rotor_windage_losses"]
+            + 2.0 * inputs["bearing_friction_losses"]
         )

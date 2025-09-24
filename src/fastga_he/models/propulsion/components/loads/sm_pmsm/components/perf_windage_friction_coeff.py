@@ -24,7 +24,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("airgap_reynolds_number", val=np.nan, shape=number_of_points)
+        self.add_input("air_gap_reynolds_number", val=np.nan, shape=number_of_points)
         self.add_input("rotor_end_reynolds_number", val=np.nan, shape=number_of_points)
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
@@ -32,13 +32,13 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             units="m",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             val=np.nan,
             units="m",
             desc="The distance between the rotor and the stator bore",
         )
 
-        self.add_output("airgap_friction_coeff", val=np.zeros(number_of_points))
+        self.add_output("air_gap_friction_coeff", val=np.zeros(number_of_points))
         self.add_output("rotor_end_friction_coeff", val=np.zeros(number_of_points))
 
     def setup_partials(self):
@@ -46,8 +46,8 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="airgap_friction_coeff",
-            wrt="airgap_reynolds_number",
+            of="air_gap_friction_coeff",
+            wrt="air_gap_reynolds_number",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -60,10 +60,10 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="airgap_friction_coeff",
+            of="air_gap_friction_coeff",
             wrt=[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -76,21 +76,21 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        airgap_thickness = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"
+        air_gap_thickness = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"
         ]
-        re_airgap = inputs["airgap_reynolds_number"]
+        re_air_gap = inputs["air_gap_reynolds_number"]
         re_rotor = inputs["rotor_end_reynolds_number"]
 
-        conditions = [(re_airgap > 500.0) & (re_airgap < 1.0e4), re_airgap >= 1.0e4]
+        conditions = [(re_air_gap > 500.0) & (re_air_gap < 1.0e4), re_air_gap >= 1.0e4]
 
         choices = [
-            0.515 * (airgap_thickness / rotor_radius) ** 0.3 * (re_airgap**-0.5),
-            0.0325 * (airgap_thickness / rotor_radius) ** 0.3 * (re_airgap**-0.2),
+            0.515 * (air_gap_thickness / rotor_radius) ** 0.3 * (re_air_gap**-0.5),
+            0.0325 * (air_gap_thickness / rotor_radius) ** 0.3 * (re_air_gap**-0.2),
         ]
 
-        outputs["airgap_friction_coeff"] = np.select(
-            conditions, choices, default=np.zeros_like(re_airgap)
+        outputs["air_gap_friction_coeff"] = np.select(
+            conditions, choices, default=np.zeros_like(re_air_gap)
         )
         outputs["rotor_end_friction_coeff"] = np.where(
             re_rotor < 3.0e5, 3.87 / re_rotor**0.5, 0.146 / re_rotor**0.2
@@ -103,42 +103,44 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"
         ]
         rotor_radius = rotor_diameter / 2.0
-        airgap_thickness = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness"
+        air_gap_thickness = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"
         ]
-        re_airgap = inputs["airgap_reynolds_number"]
+        re_air_gap = inputs["air_gap_reynolds_number"]
         re_rotor = inputs["rotor_end_reynolds_number"]
 
-        conditions = [(re_airgap > 500.0) & (re_airgap < 1.0e4), re_airgap >= 1.0e4]
+        conditions = [(re_air_gap > 500.0) & (re_air_gap < 1.0e4), re_air_gap >= 1.0e4]
 
-        d_cf_airgap_d_re_airgap = [
-            -0.2575 * (airgap_thickness / rotor_radius) ** 0.3 * re_airgap**-1.5,
-            -0.0065 * (airgap_thickness / rotor_radius) ** 0.3 * re_airgap**-1.2,
+        d_cf_airgap_d_re_air_gap = [
+            -0.2575 * (air_gap_thickness / rotor_radius) ** 0.3 * re_air_gap**-1.5,
+            -0.0065 * (air_gap_thickness / rotor_radius) ** 0.3 * re_air_gap**-1.2,
         ]
 
-        d_cf_airgap_d_airgap_thickness = [
-            0.1545 * airgap_thickness**-0.7 * rotor_radius**-0.3 * re_airgap**-0.5,
-            0.00975 * airgap_thickness**-0.7 * rotor_radius**-0.3 * re_airgap**-0.2,
+        d_cf_airgap_d_air_gap_thickness = [
+            0.1545 * air_gap_thickness**-0.7 * rotor_radius**-0.3 * re_air_gap**-0.5,
+            0.00975 * air_gap_thickness**-0.7 * rotor_radius**-0.3 * re_air_gap**-0.2,
         ]
 
         d_cf_airgap_d_rotor_diameter = [
-            -0.1545 * (2.0 * airgap_thickness) ** 0.3 * rotor_diameter**-1.3 * re_airgap**-0.5,
-            -0.00975 * (2.0 * airgap_thickness) ** 0.3 * rotor_diameter**-1.3 * re_airgap**-0.2,
+            -0.1545 * (2.0 * air_gap_thickness) ** 0.3 * rotor_diameter**-1.3 * re_air_gap**-0.5,
+            -0.00975 * (2.0 * air_gap_thickness) ** 0.3 * rotor_diameter**-1.3 * re_air_gap**-0.2,
         ]
 
-        partials["airgap_friction_coeff", "airgap_reynolds_number"] = np.select(
-            conditions, d_cf_airgap_d_re_airgap, default=np.zeros_like(re_airgap)
+        partials["air_gap_friction_coeff", "air_gap_reynolds_number"] = np.select(
+            conditions, d_cf_airgap_d_re_air_gap, default=np.zeros_like(re_air_gap)
         )
 
         partials[
-            "airgap_friction_coeff",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":airgap_thickness",
-        ] = np.select(conditions, d_cf_airgap_d_airgap_thickness, default=np.zeros_like(re_airgap))
+            "air_gap_friction_coeff",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
+        ] = np.select(
+            conditions, d_cf_airgap_d_air_gap_thickness, default=np.zeros_like(re_air_gap)
+        )
 
         partials[
-            "airgap_friction_coeff",
+            "air_gap_friction_coeff",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = np.select(conditions, d_cf_airgap_d_rotor_diameter, default=np.zeros_like(re_airgap))
+        ] = np.select(conditions, d_cf_airgap_d_rotor_diameter, default=np.zeros_like(re_air_gap))
 
         partials["rotor_end_friction_coeff", "rotor_end_reynolds_number"] = np.where(
             re_rotor < 3.0e5, -1.935 / re_rotor**1.5, -0.0292 / re_rotor**1.2

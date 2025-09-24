@@ -9,9 +9,9 @@ from .perf_iron_losses import PerformancesIronLosses
 from .perf_joule_losses import PerformancesJouleLosses
 from .perf_windage_reynolds import PerformancesWindageReynolds
 from .perf_windage_friction_coeff import PerformancesWindageFrictionCoefficient
-from .perf_airgap_windage_loss import PerformancesAirgapWindageLoss
-from .perf_rotor_windage_loss import PerformancesRotorWindageLoss
-from .perf_bearing_friction_loss import PerformancesBearingLoss
+from .perf_air_gap_windage_losses import PerformancesAirGapWindageLosses
+from .perf_rotor_windage_losses import PerformancesRotorWindageLoss
+from .perf_bearing_friction_losses import PerformancesBearingLosses
 from .perf_mechanical_losses import PerformancesMechanicalLosses
 from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency
@@ -112,20 +112,20 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "airgap_windage_loss",
-            PerformancesAirgapWindageLoss(motor_id=motor_id, number_of_points=number_of_points),
+            "air_gap_windage_losses",
+            PerformancesAirGapWindageLosses(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 
         self.add_subsystem(
-            "rotor_windage_loss",
+            "rotor_windage_losses",
             PerformancesRotorWindageLoss(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 
         self.add_subsystem(
-            "bearing_friction_loss",
-            PerformancesBearingLoss(motor_id=motor_id, number_of_points=number_of_points),
+            "bearing_friction_losses",
+            PerformancesBearingLosses(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 

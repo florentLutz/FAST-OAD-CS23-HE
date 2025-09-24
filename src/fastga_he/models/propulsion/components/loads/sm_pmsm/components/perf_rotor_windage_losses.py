@@ -10,7 +10,7 @@ from ..constants import DEFAULT_DENSITY
 
 class PerformancesRotorWindageLoss(om.ExplicitComponent):
     """
-    Computation of the rotor windage loss result from frictions between air at the gap of both ends
+    Computation of the rotor windage losses result from frictions between air at the gap of both ends
     and the rotor. This is obtained from equation II.75 in :cite:`touhami:2020`.
     """
 
@@ -46,7 +46,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         )
 
         self.add_output(
-            "rotor_windage_loss",
+            "rotor_windage_losses",
             units="W",
             val=0.0,
             shape=number_of_points,
@@ -57,14 +57,14 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="rotor_windage_loss",
+            of="rotor_windage_losses",
             wrt=["rpm", "density", "rotor_end_friction_coeff"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="rotor_windage_loss",
+            of="rotor_windage_losses",
             wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
             method="exact",
             rows=np.arange(number_of_points),
@@ -83,7 +83,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
         shaft_radius = rotor_radius / 3.0  # shaft radius
 
-        outputs["rotor_windage_loss"] = (
+        outputs["rotor_windage_losses"] = (
             0.5
             * rotor_end_friction_coeff
             * np.pi
@@ -105,12 +105,12 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         shaft_radius = rotor_radius / 3.0  # shaft radius
 
         partials[
-            "rotor_windage_loss",
+            "rotor_windage_losses",
             "rotor_end_friction_coeff",
         ] = 0.5 * np.pi * rho_air * omega**3.0 * (rotor_radius**5.0 - shaft_radius**5.0)
 
         partials[
-            "rotor_windage_loss",
+            "rotor_windage_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
         ] = (
             1.25
@@ -122,7 +122,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
             * (1.0 - 3.0**-5.0)
         )
 
-        partials["rotor_windage_loss", "rpm"] = (
+        partials["rotor_windage_losses", "rpm"] = (
             0.05
             * rotor_end_friction_coeff
             * np.pi**2.0
@@ -131,7 +131,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
             * (rotor_radius**5.0 - shaft_radius**5.0)
         )
 
-        partials["rotor_windage_loss", "density"] = (
+        partials["rotor_windage_losses", "density"] = (
             0.5
             * rotor_end_friction_coeff
             * np.pi
