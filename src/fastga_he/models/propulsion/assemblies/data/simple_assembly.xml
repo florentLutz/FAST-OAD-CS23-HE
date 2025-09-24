@@ -466,9 +466,9 @@
                         <slot_width units="m" is_input="True" >0.0137<!--ls--> </slot_width>
                         <rotor_diameter units="m" is_input="True" >0.1814<!--D_rot--> </rotor_diameter>
                         <airgap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </airgap_thickness>
-                        <rotor_weight units="kg" is_input="True" >56.97<!--k_tb--> </rotor_weight>
+                        <rotor_mass units="kg" is_input="True" >56.97<!--k_tb--> </rotor_mass>
                         <torque_constant units="N*m/A" is_input="True" >0.4278<!--k_tb--> </torque_constant>
-                        <resistance units="ohm">0.0014633584235073654</resistance>
+                        <pouillet_geometry_factor units="1/m">86763.68677</pouillet_geometry_factor>
                     </motor_1>
                 </SM_PMSM>
                 <PMSM>
