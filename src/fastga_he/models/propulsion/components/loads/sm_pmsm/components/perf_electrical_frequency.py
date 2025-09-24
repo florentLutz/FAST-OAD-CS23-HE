@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesElectricalFrequency(om.ExplicitComponent):
     """
-    Computation of the electrical frequency determines the speed at which the magnetic field
+    Computation of the electrical frequency which is used to determine the speed at which the magnetic field
     rotates inside the motor.
     """
 

@@ -58,11 +58,9 @@ class ComputeRTAVariable(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
         atm = AtmosphereWithPartials(cruise_alt, altitude_in_feet=False)
-        sos = atm.speed_of_sound
-
-        V_TAS = sos * inputs["data:TLAR:cruise_mach"]
-        atm.true_airspeed = V_TAS
-        unit_Reynolds = atm.unitary_reynolds
+        atm.mach = inputs["data:TLAR:cruise_mach"]
+        v_tas = atm.true_airspeed
+        unit_reynolds = atm.unitary_reynolds
 
         low_speed_alt = 0
         atm2 = AtmosphereWithPartials(low_speed_alt, altitude_in_feet=False)

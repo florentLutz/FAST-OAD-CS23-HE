@@ -4,7 +4,7 @@
 Surface-mounted permanent magnet synchronous motor
 ==================================================
 
-This electric load model in FAST-OAD-CS23-HE represents a surface-mounted PMSM that generates mechanical power through
+This electric motor model in FAST-OAD-CS23-HE represents a surface-mounted PMSM that generates mechanical power through
 interaction between the permanent magnets in the rotor and the electromagnets of winded wires. This component can be
 activated through the powertrain configuration file (PT file). The registered installation positions can be found in
 :ref:`options <options-smpmsm>`.

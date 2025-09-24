@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
     """
-    Computation of the friction coefficients resulting from windage in mechanical loss
+    Computation of the windage friction coefficients for use in mechanical losses
     estimation. The conditions are given by equation (II-73) and (II-76) in :cite:`touhami:2020`.
     """
 

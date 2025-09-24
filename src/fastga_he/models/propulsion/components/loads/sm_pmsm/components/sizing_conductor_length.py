@@ -32,12 +32,12 @@ class SizingConductorLength(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
             val=np.nan,
-            desc="The factor to account the conductor wire bunching",
+            desc="The factor to account for the conductor wire bunching",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
             val=np.nan,
-            desc="The factor to account extra length from end winding",
+            desc="The factor to account for extra length at the end of the winding",
         )
 
         self.add_output(

@@ -14,13 +14,13 @@ simplicity and having a relative accurate modeling. This figure demonstrate the 
 ***********************
 Performance calculation
 ***********************
-Most of the performance calculations shares a similar approach as the PMSM model, except the losses caused by various
-factors. The three primary losses of the Surface-mounted PMSM derived by HASTECS project :cite:`touhami:2020` are
-demonstrated below.
+Most of the performance calculations shares a similar approach as the AFPMSM model, except the losses caused by various
+factors. The three primary sources of loss in the Surface-mounted PMSM as modeled in the HASTECS project :cite:`touhami:2020` are
+presented below.
 
-PMSM joule loss
+PMSM Joule losses
 ===============
-Joule loss accounts for most of the PMSM performance loss. It is caused by Ohmic heating in the conductor wires winding
+Joule losses represent the most important sources of losses in the SMPMSM. It is caused by Ohmic heating in the conductor wires winding
 of the PMSM stator. At low operating speeds, the current density is evenly distributed across the wire’s
 cross-section. To calculate the joule loss, the wire resistance must be determined first.
 
@@ -28,11 +28,11 @@ cross-section. To calculate the joule loss, the wire resistance must be determin
     R_s = \frac{N_c}{q} \cdot \rho_{cu}(T_{win}) \\
     \rho_{cu}(T_{win}) = \rho_{cu20^\circ} [1 + \alpha_{th}(T_{win} - 20^\circ)]
 
-Where :math:`N_c` is the number of conductor,  :math:`q` is the number of phase in PMSM, :math:`T_{win}` is the the
+Where :math:`N_c` is the number of conductors,  :math:`q` is the number of phase in PMSM, :math:`T_{win}` is the the
 temperature of the wire windings, :math:`\alpha_{th}` is the electrical resistance coefficient of copper, and
 :math:`\rho_{cu20^\circ}` copper density at :math:`20^{\circ}C`.
 
-With the wire electrical resistance and the rms current (:math:`I_{rms}`), the joule loss can be written as:
+With the wire electrical resistance and the RMS current (:math:`I_{rms}`), the Joule losses can be written as:
 
 .. math::
     P_j = q \cdot R_s \cdot I_{rms}^2
@@ -40,8 +40,8 @@ With the wire electrical resistance and the rms current (:math:`I_{rms}`), the j
 
 PMSM iron loss
 ==============
-As a second largest contributor of the PMSM performance loss, the iron loss arises from eddy current and the continuous
-variation of the magnetic flux. For better capture the behavior of the SM PMSM, a regression model using Least Squared
+As the second largest contributor to the PMSM performance losses, the iron losses arises from eddy current and the continuous
+variation of the magnetic flux. To better capture the behavior of the SM PMSM, a regression model using Least Squared
 Method by HASTECS project :cite:`touhami:2020` is considered.
 
 .. math::
@@ -59,14 +59,14 @@ The iron loss coefficients (:math:`a_{ij}`) are verified with empirical data pro
 
 PMSM mechanical loss
 ====================
-Mechanical losses (:math:`P_{mech}`) are the consequence from various factors, friction between air and rotor or
+Mechanical losses (:math:`P_{mech}`) are the consequence of various phenomenons including, friction between air and rotor or
 friction between a stationary solid and a rotating solid.
 
 .. math::
     P_{mech} = P_{windage} + 2 P_{bf}
 
 The two major windage losses (:math:`P_{windage}`) result from the fluid friction
-between the air between the component gaps and the rotor. The airgap windage loss (:math:`P_{wa}`) occurs from the fluid
+between the air inthe component gaps and the rotor. The airgap windage loss (:math:`P_{wa}`) occurs because of the fluid
 friction between the stator and rotor while rotating. Similarly, the rotor windage loss (:math:`P_{wr}`) arises from the
 space between both ends of the rotor and the motor casing. The rotor radius is denoted as :math:`R_{r}`, the shaft
 radius as :math:`R_{sh}`, the rotation speed as :math:`\Omega`, and the motor length as :math:`L`.
@@ -106,9 +106,8 @@ And the Reynolds numbers for both losses are:
    Re_{a} = \frac{\rho_{air} R_r e_g}{\Omega} \\
    Re_{rt} = \frac{\rho_{air} R_r^2}{\mu_{air}} \Omega
 
-The bearing friction loss is the major contributor of the friction loss between one moving surface and one stationary
-surface. A simplified model for such complex component and the bearing friction coefficient (:math:`C_{fb}`) table for
-various bearing types are provided by the SKF's bearing datasheets :cite:`skf:2016`.
+The bearing friction loss is another major contributor to the friction loss between a moving surface and a stationary 
+surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various bearing type based on SKF's bearing datasheets :cite:`skf:2016`.
 
 .. raw:: html
 
@@ -250,7 +249,7 @@ of :math:`R_{fr}` and :math:`R_{out}`.
 *******************************
 Component Computation Structure
 *******************************
-The following tow links are the N2 diagrams representing the performance and sizing computation in Surface-Mounted PMSM
+The following two links are the N2 diagrams representing the performance and sizing computation for the Surface-Mounted PMSM model.
 (SM PMSM) component.
 
 .. raw:: html
