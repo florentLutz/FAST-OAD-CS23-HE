@@ -74,18 +74,13 @@ model:
 
 submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
-  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
-  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
+  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta # These two are to ensure proper shape input to rta or oad
+  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta # This is required
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
-  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta
-#  service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta
-#  submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
   submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
-#  submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
-#  submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
   submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
   submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
   submodel.propulsion.dc_dc_converter.inductor.inductance: null

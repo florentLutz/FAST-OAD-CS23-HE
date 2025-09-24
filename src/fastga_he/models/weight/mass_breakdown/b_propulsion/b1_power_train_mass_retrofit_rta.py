@@ -7,11 +7,11 @@ import openmdao.api as om
 import fastoad.api as oad
 from ..constants import SERVICE_PROPULSION_MASS
 
-POWERTRAIN_MASS_ENGINE = "fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta"
+POWERTRAIN_MASS = "fastga_he.submodel.weight.mass.propulsion.power_train.retrofit.rta"
 
 
-@oad.RegisterSubmodel(SERVICE_PROPULSION_MASS, POWERTRAIN_MASS_ENGINE)
-class PowerTrainMassEngineRTA(om.ExplicitComponent):
+@oad.RegisterSubmodel(SERVICE_PROPULSION_MASS, POWERTRAIN_MASS)
+class PowerTrainMassRTARetrofit(om.ExplicitComponent):
     def initialize(self):
         # Needed even if it isn't used because the original one has that option ...
         self.options.declare("propulsion_id", default="", types=str)
