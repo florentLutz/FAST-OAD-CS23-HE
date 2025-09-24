@@ -1,6 +1,6 @@
 """FAST - Copyright (c) 2016 ONERA ISAE."""
 #  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
-#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  Copyright (C) 2025  ONERA & ISAE-SUPAERO
 #  FAST is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +40,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         )
 
     def setup(self):
-        empty_weight_naming = (
+        empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
             if self.options["rta_activation"]
             else "data:weight:aircraft_empty:mass"
@@ -54,7 +54,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         self.add_input("data:geometry:cabin:seats:passenger:length", val=np.nan, units="m")
         self.add_input("data:geometry:cabin:seats:passenger:count_by_row", val=np.nan)
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
-        self.add_input(empty_weight_naming, val=np.nan, units="kg")
+        self.add_input(empty_weight_variable_name, val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
         self.add_input(
             "settings:weight:aircraft:payload:design_mass_per_passenger",
@@ -71,13 +71,13 @@ class InFlightCGVariation(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-            wrt=["data:weight:aircraft:payload", empty_weight_naming],
+            wrt=["data:weight:aircraft:payload", empty_weight_variable_name],
             val=1.0,
         )
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             wrt=[
-                empty_weight_naming,
+                empty_weight_variable_name,
                 "data:weight:aircraft_empty:CG:x",
                 "data:weight:aircraft:payload",
             ],
@@ -137,7 +137,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        empty_weight_naming = (
+        empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
             if self.options["rta_activation"]
             else "data:weight:aircraft_empty:mass"
@@ -145,12 +145,12 @@ class InFlightCGVariation(om.ExplicitComponent):
 
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-            empty_weight_naming,
+            empty_weight_variable_name,
         ] = inputs["data:weight:aircraft_empty:CG:x"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft_empty:CG:x",
-        ] = inputs[empty_weight_naming]
+        ] = inputs[empty_weight_variable_name]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft:payload",
@@ -173,14 +173,14 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         )
 
     def setup(self):
-        empty_weight_naming = (
+        empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
             if self.options["rta_activation"]
             else "data:weight:aircraft_empty:mass"
         )
 
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
-        self.add_input(empty_weight_naming, val=np.nan, units="kg")
+        self.add_input(empty_weight_variable_name, val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:payload:CG:x", val=np.nan, units="m")
 
@@ -192,13 +192,13 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-            wrt=["data:weight:aircraft:payload", empty_weight_naming],
+            wrt=["data:weight:aircraft:payload", empty_weight_variable_name],
             val=1.0,
         )
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             wrt=[
-                empty_weight_naming,
+                empty_weight_variable_name,
                 "data:weight:aircraft_empty:CG:x",
                 "data:weight:aircraft:payload",
                 "data:mission:sizing:payload:CG:x",
@@ -226,7 +226,7 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        empty_weight_naming = (
+        empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
             if self.options["rta_activation"]
             else "data:weight:aircraft_empty:mass"
@@ -234,7 +234,7 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
 
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-            empty_weight_naming,
+            empty_weight_variable_name,
         ] = inputs["data:weight:aircraft_empty:CG:x"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
