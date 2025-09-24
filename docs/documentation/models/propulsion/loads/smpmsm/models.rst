@@ -15,14 +15,14 @@ simplicity and having a relative accurate modeling. This figure demonstrate the 
 Performance calculation
 ***********************
 Most of the performance calculations shares a similar approach as the :ref:`AFPMSM <afpmsm>` model, except the losses caused by various
-factors. The three primary sources of loss in the Surface-mounted PMSM as modeled in the HASTECS project :cite:`touhami:2020` are
+factors. The three primary sources of losses in the Surface-mounted PMSM as modeled in the HASTECS project :cite:`touhami:2020` are
 presented below.
 
 PMSM Joule losses
-===============
+=================
 Joule losses represent the most important sources of losses in the SMPMSM. It is caused by Ohmic heating in the conductor wires winding
 of the PMSM stator. At low operating speeds, the current density is evenly distributed across the wire’s
-cross-section. To calculate the joule loss, the wire resistance must be determined first.
+cross-section. To calculate the Joule losses, the wire resistance must be determined first.
 
 .. math::
     R_s = \frac{N_c}{q} \cdot \rho_{cu}(T_{win}) \\
@@ -38,8 +38,8 @@ With the wire electrical resistance and the RMS current (:math:`I_{rms}`), the J
     P_j = q \cdot R_s \cdot I_{rms}^2
 
 
-PMSM iron loss
-==============
+PMSM iron losses
+================
 As the second largest contributor to the PMSM performance losses, the iron losses arises from eddy current and the continuous
 variation of the magnetic flux. To better capture the behavior of the SM PMSM, a regression model using Least Squared
 Method by HASTECS project :cite:`touhami:2020` is considered.
@@ -49,16 +49,16 @@ Method by HASTECS project :cite:`touhami:2020` is considered.
 
 :math:`B_m` is the maximum magnetic flux density and :math:`f` is the magnetic field switching frequency.
 
-.. image:: ../../../../../img/iron_loss.svg
+.. image:: ../../../../../img/iron_losses.svg
     :width: 600
     :align: center
 
-The iron loss coefficients (:math:`a_{ij}`) are verified with empirical data provided by HASTECS project
+The iron losses coefficients (:math:`a_{ij}`) are verified with empirical data provided by HASTECS project
 :cite:`touhami:2020`.
 
 
-PMSM mechanical loss
-====================
+PMSM mechanical losses
+======================
 Mechanical losses (:math:`P_{mech}`) are the consequence of various phenomenons including, friction between air and rotor or
 friction between a stationary solid and a rotating solid.
 
@@ -66,8 +66,8 @@ friction between a stationary solid and a rotating solid.
     P_{mech} = P_{windage} + 2 P_{bf}
 
 The two major windage losses (:math:`P_{windage}`) result from the fluid friction
-between the air inthe component gaps and the rotor. The airgap windage loss (:math:`P_{wa}`) occurs because of the fluid
-friction between the stator and rotor while rotating. Similarly, the rotor windage loss (:math:`P_{wr}`) arises from the
+between the air inthe component gaps and the rotor. The airgap windage losses (:math:`P_{wa}`) occurs because of the fluid
+friction between the stator and rotor while rotating. Similarly, the rotor windage losses (:math:`P_{wr}`) arises from the
 space between both ends of the rotor and the motor casing. The rotor radius is denoted as :math:`R_{r}`, the shaft
 radius as :math:`R_{sh}`, the rotation speed as :math:`\Omega`, and the motor length as :math:`L`.
 
@@ -76,8 +76,8 @@ radius as :math:`R_{sh}`, the rotation speed as :math:`\Omega`, and the motor le
     P_{wa} = k_1 C_{fa} \pi \rho_{air} \Omega^3 R_r^4 L \\
     P_{wr} = \frac{1}{2}C_{fr} \pi \rho_{air} \Omega^3(R_r^5 - R_{sh}^5)
 
-Where the friction coefficient of airgap windage loss (:math:`C_{fa}`) and the friction coefficient of rotor windage
-loss (:math:`C_{fr}`) are:
+Where the friction coefficient of airgap windage losses (:math:`C_{fa}`) and the friction coefficient of rotor windage
+losses (:math:`C_{fr}`) are:
 
 .. math::
     C_{fa} = \begin{cases}
@@ -106,7 +106,7 @@ And the Reynolds numbers for both losses are:
    Re_{a} = \frac{\rho_{air} R_r e_g}{\Omega} \\
    Re_{rt} = \frac{\rho_{air} R_r^2}{\mu_{air}} \Omega
 
-The bearing friction loss is another major contributor to the friction loss between a moving surface and a stationary 
+The bearing friction losses is another major contributor to the friction losses between a moving surface and a stationary
 surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various bearing type based on SKF's bearing datasheets :cite:`skf:2016`.
 
 .. raw:: html
