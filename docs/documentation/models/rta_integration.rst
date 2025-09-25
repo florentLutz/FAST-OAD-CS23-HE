@@ -4,9 +4,10 @@
 RTA integration
 ===============
 `FAST-OAD-RTA <https://github.com/fast-aircraft-design/RTA>`_ is a FAST-OAD plugin for designing and analyzing Regional
-Transport Aircraft. To ensure smooth communication between FAST-OAD-RTA and FAST-OAD-CS23-HE, the models
-and submodels specified in the following ATR aircraft `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_
-template needs to be added.
+Transport Aircraft. To ensure smooth communication between FAST-OAD-RTA and FAST-OAD-CS23-HE when accessing the Overall
+Aircraft Design models tailored for regional aircraft from FAST-OAD-CS23-HE, the models and submodels specified in the
+ATR aircraft `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_
+template are required to be added.
 
 
 .. code:: yaml
@@ -29,5 +30,3 @@ template needs to be added.
       service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
       service.cg.empty_aircraft: fastoad.submodel.weight.cg.empty_aircraft.rta
       service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta
-      # Apply only for retrofitting
-      service.performances.delta_m: fastga_he.submodel.performances.delta_m.set_value.retrofit.rta

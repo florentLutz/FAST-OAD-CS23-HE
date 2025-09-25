@@ -74,8 +74,8 @@ model:
 
 submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
-  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta # These two are to ensure proper shape input to rta or oad
-  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta # This is required
+  service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
+  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce

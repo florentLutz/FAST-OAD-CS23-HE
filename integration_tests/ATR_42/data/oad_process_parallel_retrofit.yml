@@ -77,4 +77,3 @@ submodels:
   submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
   submodel.weight.mass.mzfw_and_mlw: null
   service.performances.delta_m: fastga_he.submodel.performances.delta_m.set_value.retrofit.rta
-#  submodel.performances.cg_variation: fastga_he.submodel.performances.cg_variation.simple

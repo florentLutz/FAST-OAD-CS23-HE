@@ -1,20 +1,25 @@
 ==============================================================
 Surface-mounted permanent magnet synchronous motor computation
 ==============================================================
-The sizing and performance modeling for most electric motor are often inaccurate due to the unconventional design.
-Therefore, the SM PMSM with nonsalient radial flux and supplied with sinewave currents is selected, based on its
-simplicity and having a relative accurate modeling. This figure demonstrate the essential parts of a SM PMSM.
+This model represent a SM PMSM with nonsalient radial flux and supplied with sinewave currents. This choice simplifies
+the modeling process with providing accurate representation of the PMSM characteristic. This figure, provided by one of
+the main thesis of HASTECS project :cite:`touhami:2020`, demonstrates the central part of a SM PMSM. :math:`L_m`
+is the length of the motor’s active electromagnetic part. As in other PMSMs, the stator bore slots between adjacent
+teeth hold the wound cables, served as the electromagnets. Unlike :ref:`AF PMSM <afpmsm>`, the permanent magnets are
+mounted directly on the rotor’s outer surface.
 
 .. image:: ../../../../../img/cylindrical_pmsm.svg
     :width: 600
     :align: center
+
+
 
 .. contents::
 
 ***********************
 Performance calculation
 ***********************
-Most of the performance calculations shares a similar approach as the :ref:`AFPMSM <afpmsm>` model, except the losses caused by various
+Most of the performance calculations shares a similar approach as the :ref:`AF PMSM <afpmsm>` model, except the losses caused by various
 factors. The three primary sources of losses in the Surface-mounted PMSM as modeled in the HASTECS project :cite:`touhami:2020` are
 presented below.
 
@@ -94,11 +99,7 @@ losses (:math:`C_{fr}`) are:
 :math:`e_g` is the airgap thickness.
 
 With the air pressure expressed as :math:`pr`, the air density (:math:`\rho_{air}`) and the air dynamic viscosity
-(:math:`\mu_{air}`) to derive the Reynolds numbers are:
-
-.. math::
-    \rho_{air}(T,pr) = 1.293 \cdot \frac{273.15}{T} \cdot pr \\
-    \mu_{air}(T,1 \ atm) = 8.88 \cdot 10^{−15}T^3 − 3.23 \cdot 10^{−11}T^2 + 6.26 \cdot 10^{−8} T + 2.35 \cdot 10^{−6}
+(:math:`\mu_{air}`).
 
 And the Reynolds numbers for both losses are:
 
@@ -107,7 +108,8 @@ And the Reynolds numbers for both losses are:
    Re_{rt} = \frac{\rho_{air} R_r^2}{\mu_{air}} \Omega
 
 The bearing friction losses is another major contributor to the friction losses between a moving surface and a stationary
-surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various bearing type based on SKF's bearing datasheets :cite:`skf:2016`.
+surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various bearing type
+based on SKF's bearing datasheets :cite:`skf:2016`.
 
 .. raw:: html
 

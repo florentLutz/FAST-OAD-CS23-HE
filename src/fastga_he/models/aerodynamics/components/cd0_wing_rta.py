@@ -14,9 +14,6 @@ from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_WING
 class Cd0Wing(om.Group):
     """
     Computation of form drag for wing.
-
-    See :meth:`~fastoad_cs25.models.aerodynamics.components.utils.cd0_lifting_surface` for
-    used method.
     """
 
     def initialize(self):
