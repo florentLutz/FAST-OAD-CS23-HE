@@ -10,8 +10,8 @@ import scipy.constants as sc
 class PerformancesBearingLosses(om.ExplicitComponent):
     """
     Computation of the bearing friction losses result from friction at the contacting surface
-    between the bearing and the motor shaft. This is obtained from equation II.78 in
-    :cite:`touhami:2020`.
+    between the bearing and the motor shaft. This is obtained from equation (II.78) in
+    :cite:`touhami:2020`. The bearing friction coefficient is given by :cite:`skf:2016`.
     """
 
     def initialize(self):
@@ -27,6 +27,20 @@ class PerformancesBearingLosses(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter",
+            units="m",
+            val=0.03,
+            desc="The motor bearing bore diameter",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":bearing_friction_coefficient",
+            val=0.0015,
+            desc="friction coefficient of the motor that house the shaft, the ball bearing is set "
+            "to default",
+        )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             val=np.nan,
@@ -53,7 +67,13 @@ class PerformancesBearingLosses(om.ExplicitComponent):
         )
         self.declare_partials(
             of="bearing_friction_losses",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
+            wrt=[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:"
+                + motor_id
+                + ":bearing_friction_coefficient",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -64,8 +84,12 @@ class PerformancesBearingLosses(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         rotor_mass = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass"]
-        cf_bearing = 0.0015  # Bearing friction coefficient
-        bearing_diameter = 0.03  # Bearing bore diameter [m]
+        cf_bearing = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_friction_coefficient"
+        ]
+        bearing_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter"
+        ]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
 
         outputs["bearing_friction_losses"] = (
@@ -77,8 +101,12 @@ class PerformancesBearingLosses(om.ExplicitComponent):
 
         rpm = inputs["rpm"]
         rotor_mass = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass"]
-        cf_bearing = 0.0015  # Bearing friction coefficient
-        bearing_diameter = 0.03  # Bearing bore diameter [m]
+        cf_bearing = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_friction_coefficient"
+        ]
+        bearing_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter"
+        ]
         omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
 
         partials[
@@ -89,3 +117,13 @@ class PerformancesBearingLosses(om.ExplicitComponent):
         partials["bearing_friction_losses", "rpm"] = (
             cf_bearing * rotor_mass * sc.g * bearing_diameter * np.pi / 60.0
         )
+
+        partials[
+            "bearing_friction_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter",
+        ] = 0.5 * cf_bearing * rotor_mass * sc.g * omega
+
+        partials[
+            "bearing_friction_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_friction_coefficient",
+        ] = 0.5 * rotor_mass * sc.g * bearing_diameter * omega

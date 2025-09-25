@@ -10,7 +10,7 @@ from ..constants import IRON_LOSSES_COEFF
 
 class PerformancesIronLosses(om.ExplicitComponent):
     """
-    Computation of the iron losses of the PMSM results from constant magnetic flux density
+    Computation of the iron losses of the SM PMSM results from constant magnetic flux density
     variation in magnetic core, obtained from the least square surrogate model (II-67) in
     :cite:`touhami:2020`.
     """
@@ -32,7 +32,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             units="Hz",
             val=np.nan,
             shape=number_of_points,
-            desc="The oscillation frequency of the PMSM AC current",
+            desc="The oscillation frequency of the SM PMSM AC current",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
@@ -51,7 +51,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             units="kW",
             val=0.0,
             shape=number_of_points,
-            desc="Iron losses of the PMSM due to altering magnetic flux",
+            desc="Iron losses of the SM PMSM due to altering magnetic flux",
         )
 
     def setup_partials(self):

@@ -46,14 +46,14 @@
                         <bore_diameter units="m">0.187</bore_diameter>
                         <frame_diameter units="m">0.3564</frame_diameter>
                         <rotor_diameter units="m">0.1814</rotor_diameter>
-                        <conductor_length units="m">0.545475</conductor_length>
+                        <conductor_cable_length units="m">0.545475</conductor_cable_length>
                         <stator_diameter units="m">0.3288</stator_diameter>
                         <slot_width units="m">0.01348</slot_width>
                         <slot_height units="m">0.0358</slot_height>
                         <air_gap_thickness units="m">0.0028</air_gap_thickness>
                         <resistance units="ohm">0.0014608</resistance>
                         <front_length_ratio>0.5</front_length_ratio>
-                        <conductor_section units="m**2">0.00024523</conductor_section>
+                        <conductor_section_area_per_slot units="m**2">0.00024523</conductor_section_area_per_slot>
                         <torque_constant units="N*m/A">0.4312</torque_constant>
                         <torque_max units="N*m">856.6</torque_max>
                         <active_length units="m">0.3117</active_length>
@@ -80,7 +80,7 @@
                         <pole_pairs_number>2</pole_pairs_number>
                         <slots_per_poles_phases>2</slots_per_poles_phases>
                         <number_of_phases>3</number_of_phases>
-                        <conductors_number>24</conductors_number>
+                        <conductor_slot_number>24</conductor_slot_number>
                         <x2p_ratio>16.435</x2p_ratio>
                         <radius_ratio>0.6</radius_ratio>
                         <tooth_ratio>0.4407</tooth_ratio>

@@ -10,7 +10,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPMSMCGY(om.ExplicitComponent):
     """
-     Class that computes the Y-CG of the PMSM based on its position. Will be based on simple
+    Class that computes the Y-CG of the SM PMSM based on its position. Will be based on simple
     geometric ratios, no consideration of volume will be implemented for now.
     """
 
@@ -46,7 +46,7 @@ class SizingPMSMCGY(om.ExplicitComponent):
             self.add_input(
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:y_ratio",
                 val=np.nan,
-                desc="Y position of the PMSM center of gravity as a ratio of the wing half-span",
+                desc="Y position of the SM PMSM center of gravity as a ratio of the wing half-span",
             )
 
     def setup_partials(self):

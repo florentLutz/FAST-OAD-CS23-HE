@@ -28,7 +28,7 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
-            desc="Number of the north and south pole pairs in the PMSM",
+            desc="Number of the north and south pole pairs in the SM PMSM",
         )
 
         self.add_output(
@@ -36,7 +36,7 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
             units="Hz",
             val=0.0,
             shape=number_of_points,
-            desc="The oscillation frequency of the PMSM AC current",
+            desc="The oscillation frequency of the SM PMSM AC current",
         )
 
     def setup_partials(self):

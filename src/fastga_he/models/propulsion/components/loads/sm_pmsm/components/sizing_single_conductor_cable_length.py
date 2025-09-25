@@ -6,10 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingConductorLength(om.ExplicitComponent):
+class SizingSingleConductorCableLength(om.ExplicitComponent):
     """
-    Computation of the conductor wire length. The two coefficient are obtained from part II.2.3a
-    and II.2.5 in :cite:`touhami:2020`.
+    Computation of a single conductor cable length. The two coefficient are obtained from part
+    II.2.3a and II.2.5 in :cite:`touhami:2020`.
     """
 
     def initialize(self):
@@ -27,7 +27,7 @@ class SizingConductorLength(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             val=np.nan,
             units="m",
-            desc="The stator length of PMSM",
+            desc="The length of electromagnetism active part of SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
@@ -41,16 +41,17 @@ class SizingConductorLength(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             units="m",
             val=0.3,
+            desc="Single Conductor cable length in one slot",
         )
 
     def setup_partials(self):
         motor_id = self.options["motor_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
+            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             wrt=[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
@@ -72,9 +73,9 @@ class SizingConductorLength(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
         ]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"] = (
-            active_length * cond_twisting_coeff * end_winding_coeff
-        )
+        outputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length"
+        ] = active_length * cond_twisting_coeff * end_winding_coeff
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -90,16 +91,16 @@ class SizingConductorLength(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
         ] = cond_twisting_coeff * end_winding_coeff
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
         ] = active_length * end_winding_coeff
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
         ] = active_length * cond_twisting_coeff

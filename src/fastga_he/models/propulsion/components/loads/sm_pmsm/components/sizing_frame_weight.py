@@ -6,10 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingFrameGeometry(om.ExplicitComponent):
+class SizingFrameWeight(om.ExplicitComponent):
     """
-    Computation of the frame diameter and weight of the PMSM. The formula is obtained from
-    equation (II-53) and (II-59) respectively in :cite:`touhami:2020`.
+    Computation of the frame diameter and weight of the SM PMSM. The formula is obtained from
+    equation (II-59) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
@@ -21,21 +21,28 @@ class SizingFrameGeometry(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-            val=np.nan,
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
             units="m",
-            desc="The stator length of PMSM",
+            val=np.nan,
+            desc="The motor casing length",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-            val=np.nan,
-            desc="The factor to account extra length from end winding",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter",
+            units="m",
+            val=0.03,
+            desc="The motor bearing bore diameter",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
             val=np.nan,
             units="m",
-            desc="The outer stator diameter of the PMSM",
+            desc="The outer stator diameter of the SM PMSM",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
+            units="m",
+            val=np.nan,
+            desc="The motor casing diameter",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density",
@@ -45,33 +52,14 @@ class SizingFrameGeometry(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
-            units="m",
-            val=0.23,
-        )
-        self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
             units="kg",
             val=6.0,
+            desc="The weight of the motor casing",
         )
 
     def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="*",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
-            method="exact",
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
@@ -79,32 +67,28 @@ class SizingFrameGeometry(om.ExplicitComponent):
         stator_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter"
         ]
-        stator_radius = stator_diameter / 2.0
-        active_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        frame_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter"
         ]
-        end_winding_coeff = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        bearing_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter"
+        ]
+        frame_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length"
         ]
         rho_frame = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density"]
+        thickness = 0.5 * (frame_diameter - stator_diameter)
 
-        tau_frame = (
-            0.7371 * stator_radius**2.0 - 0.580 * stator_radius + 1.1599
-            if (stator_radius <= 0.4)
-            else 1.04
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass"] = (
+            rho_frame
+            * (
+                0.25 * np.pi * (frame_diameter**2.0 - bearing_diameter**2.0) * thickness
+                + 0.25
+                * np.pi
+                * (frame_diameter**2.0 - stator_diameter**2.0)
+                * (frame_length - 2.0 * thickness)
+            )
         )
-        frame_radius = tau_frame * stator_radius
-
-        # Frame weight
-        frame_mass = rho_frame * (
-            np.pi * active_length * end_winding_coeff * (frame_radius**2.0 - stator_radius**2.0)
-            + 2.0 * np.pi * (tau_frame - 1.0) * stator_radius * frame_radius**2.0
-        )
-
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter"] = (
-            tau_frame * stator_diameter
-        )
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass"] = frame_mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -112,61 +96,63 @@ class SizingFrameGeometry(om.ExplicitComponent):
         stator_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter"
         ]
-        stator_radius = stator_diameter / 2.0
-        active_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        frame_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter"
         ]
-        end_winding_coeff = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        bearing_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter"
+        ]
+        frame_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length"
         ]
         rho_frame = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density"]
-
-        tau_frame = (
-            0.7371 * stator_radius**2 - 0.580 * stator_radius + 1.1599
-            if stator_radius <= 0.4
-            else 1.04
-        )
-        d_tau_d_stator_diameter = 0.7371 * stator_radius - 0.29 if stator_radius <= 0.4 else 0.0
-        frame_radius = tau_frame * stator_radius
-        d_frame_diameter_d_stator_diameter = tau_frame + d_tau_d_stator_diameter * stator_diameter
+        thickness = 0.5 * (frame_diameter - stator_diameter)
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
-        ] = d_frame_diameter_d_stator_diameter
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bearing_diameter",
+        ] = rho_frame * np.pi * (stator_diameter - frame_diameter) * bearing_diameter / 4.0
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
-        ] = rho_frame * (
-            np.pi
-            * active_length
-            * end_winding_coeff
-            * (frame_radius * d_frame_diameter_d_stator_diameter - stator_radius)
-            + 2.0 * np.pi * d_tau_d_stator_diameter * stator_radius * frame_radius**2.0
-            + 2.0 * np.pi * (tau_frame - 1.0) * 0.5 * frame_radius**2.0
-            + 2.0
+        ] = (
+            -rho_frame
             * np.pi
-            * (tau_frame - 1.0)
-            * stator_radius
-            * frame_radius
-            * d_frame_diameter_d_stator_diameter
+            * (
+                6.0 * stator_diameter**2.0
+                + 4.0 * (frame_length - frame_diameter) * stator_diameter
+                - frame_diameter**2.0
+                - bearing_diameter**2.0
+            )
+            / 8.0
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = rho_frame * np.pi * end_winding_coeff * (frame_radius**2.0 - stator_radius**2.0)
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
+        ] = (
+            -rho_frame
+            * np.pi
+            * (
+                3.0 * frame_diameter**2.0
+                - (2.0 * stator_diameter + 4.0 * frame_length) * frame_diameter
+                - 2.0 * stator_diameter**2.0
+                + bearing_diameter**2.0
+            )
+            / 8.0
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-        ] = rho_frame * np.pi * active_length * (frame_radius**2.0 - stator_radius**2.0)
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
+        ] = rho_frame * np.pi * (frame_diameter**2.0 - stator_diameter**2.0) / 4.0
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density",
-        ] = (
-            np.pi * active_length * end_winding_coeff * (frame_radius**2.0 - stator_radius**2.0)
-            + 2.0 * np.pi * (tau_frame - 1.0) * stator_radius * frame_radius**2.0
+        ] = 0.25 * np.pi * (
+            frame_diameter**2.0 - bearing_diameter**2.0
+        ) * thickness + 0.25 * np.pi * (frame_diameter**2.0 - stator_diameter**2.0) * (
+            frame_length - 2.0 * thickness
         )

@@ -35,7 +35,7 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
             units="yr",
             val=15.0,
-            desc="Expected lifetime of the PMSM, typically around 15 year",
+            desc="Expected lifetime of the SM PMSM, typically around 15 year",
         )
         self.add_input(
             name="data:TLAR:aircraft_lifespan",
@@ -48,7 +48,7 @@ class PreLCAMotorProdWeightPerFU(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass_per_fu",
             units="kg",
             val=1e-6,
-            desc="Weight of the PMSM required for a functional unit",
+            desc="Weight of the SM PMSM required for a functional unit",
         )
 
     def setup_partials(self):

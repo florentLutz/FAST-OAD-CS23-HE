@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingStatorBoreDiameter(om.ExplicitComponent):
     """
-    Computation of the stator bore diameter of the PMSM. The formula is obtained from equation (
+    Computation of the stator bore diameter of the SM PMSM. The formula is obtained from equation (
     II-43) in :cite:`touhami:2020`.
     """
 
@@ -40,7 +40,7 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             units="m",
-            desc="Stator bore diameter of the PMSM",
+            desc="Stator bore diameter of the SM PMSM",
             val=0.1,
         )
 

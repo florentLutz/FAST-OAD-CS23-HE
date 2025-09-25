@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCSMPMSMOperationalCost(om.ExplicitComponent):
     """
-    Computation of the maintenance cost of the PMSM. For the default value of the average lifespan
+    Computation of the maintenance cost of the SM PMSM. For the default value of the average lifespan
     of the motor, the value is taken from :cite:`thonemann:2024` for short term technologies.
     Currently copied from the original PMSM model, will be modified for better accuracy.
     """
@@ -30,7 +30,7 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
             units="yr",
             val=15.0,
-            desc="Expected lifetime of the PMSM, typically around 15 year",
+            desc="Expected lifetime of the SM PMSM, typically around 15 year",
         )
 
         self.add_output(

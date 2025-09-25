@@ -11,7 +11,7 @@ from ..constants import DEFAULT_DENSITY
 class PerformancesRotorWindageLoss(om.ExplicitComponent):
     """
     Computation of the rotor windage losses result from frictions between air at the gap of both ends
-    and the rotor. This is obtained from equation II.75 in :cite:`touhami:2020`.
+    and the rotor. This is obtained from equation (II.75) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

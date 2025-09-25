@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingActiveLength(om.ExplicitComponent):
     """
-    Computation of the length in the PMSM that is electromagnetically active. The formula is
+    Computation of the length in the SM PMSM that is electromagnetically active. The formula is
     obtained from equation (II-44) in :cite:`touhami:2020`.
     """
 
@@ -24,7 +24,7 @@ class SizingActiveLength(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
-            desc="Stator bore diameter of the PMSM",
+            desc="Stator bore diameter of the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
@@ -34,7 +34,7 @@ class SizingActiveLength(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             units="m",
-            desc="The stator length of PMSM",
+            desc="The length of electromagnetism active part of SM PMSM",
             val=0.169,
         )
 

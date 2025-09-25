@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingStatorYokeHeight(om.ExplicitComponent):
     """
-    Computation of the stator yoke thickness of the PMSM. The formula is obtained from
+    Computation of the stator yoke thickness of the SM PMSM. The formula is obtained from
     equation (II-45) in :cite:`touhami:2020`.
     """
 
@@ -23,7 +23,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
-            desc="Number of the north and south pairs in the PMSM",
+            desc="Number of the north and south pairs in the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
@@ -33,7 +33,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
-            desc="Stator bore diameter of the PMSM",
+            desc="Stator bore diameter of the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density",
@@ -57,7 +57,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             units="m",
-            desc="Stator yoke thickness of the PMSM",
+            desc="Stator yoke thickness of the SM PMSM",
             val=0.02,
         )
 

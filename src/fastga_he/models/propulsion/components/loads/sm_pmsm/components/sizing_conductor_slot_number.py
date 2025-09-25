@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingConductorsNumber(om.ExplicitComponent):
+class SizingConductorSlotNumber(om.ExplicitComponent):
     """
-    Computation of the number of conductor slots. The formula is obtained from
+    Computation of the number of conductor slots on the motor stator. The formula is obtained from
     equation (III-58) in :cite:`touhami:2020`.
     """
 
@@ -26,7 +26,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
-            desc="Number of the north and south pairs in the PMSM",
+            desc="Number of the north and south pairs in the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
@@ -35,8 +35,8 @@ class SizingConductorsNumber(om.ExplicitComponent):
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
-            desc="Number of conductor slots",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
+            desc="Number of conductor slots on the motor stator",
             val=24,
         )
 
@@ -44,7 +44,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
+            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
             wrt=[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
@@ -55,7 +55,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"] = (
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"] = (
             6.0
             * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
             * inputs[
@@ -67,7 +67,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
         ] = (
             6.0
@@ -77,7 +77,7 @@ class SizingConductorsNumber(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
         ] = (
             6.0

@@ -11,7 +11,7 @@ from ..constants import DEFAULT_DENSITY
 class PerformancesAirGapWindageLosses(om.ExplicitComponent):
     """
     Computation of the air gap windage losses result from frictions of the air gap between the rotor
-    and the stator bore. This is obtained from equation II.70 in :cite:`touhami:2020`.
+    and the stator bore. This is obtained from equation (II.70) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
@@ -48,7 +48,7 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             val=np.nan,
             units="m",
-            desc="The stator length of PMSM",
+            desc="The length of electromagnetism active part of SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",

@@ -24,7 +24,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
-            desc="Stator bore diameter of the PMSM",
+            desc="Stator bore diameter of the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",

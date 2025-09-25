@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingStatorCoreWeight(om.ExplicitComponent):
     """
-    Computation of the stator core weight of the PMSM. The formula is obtained from
+    Computation of the stator core weight of the SM PMSM. The formula is obtained from
     equation (II-54) in :cite:`touhami:2020`.
     """
 
@@ -23,7 +23,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
-            desc="Number of the north and south pairs in the PMSM",
+            desc="Number of the north and south pairs in the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
@@ -33,19 +33,19 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             val=np.nan,
             units="m",
-            desc="The stator length of PMSM",
+            desc="The length of electromagnetism active part of SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
-            desc="Stator bore diameter of the PMSM",
+            desc="Stator bore diameter of the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
             val=np.nan,
             units="m",
-            desc="The outer stator diameter of the PMSM",
+            desc="The outer stator diameter of the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
@@ -72,6 +72,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             units="kg",
             val=25.0,
+            desc="The weight of the stator excluding the wire weight",
         )
 
     def setup_partials(self):

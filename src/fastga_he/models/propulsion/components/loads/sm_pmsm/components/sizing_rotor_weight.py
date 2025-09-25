@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingRotorWeight(om.ExplicitComponent):
     """
-    Computation of the rotor weight of the PMSM. The formula and the conditions are obtained
+    Computation of the rotor weight of the SM PMSM. The formula and the conditions are obtained
     from part II.2.6b in :cite:`touhami:2020`.
     """
 
@@ -23,13 +23,13 @@ class SizingRotorWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
-            desc="Number of the north and south pairs in the PMSM",
+            desc="Number of the north and south pairs in the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             val=np.nan,
             units="m",
-            desc="The stator length of PMSM",
+            desc="The length of electromagnetism active part of SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",

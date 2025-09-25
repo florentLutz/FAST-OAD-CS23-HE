@@ -24,7 +24,7 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             val=np.nan,
             units="m",
-            desc="Stator bore diameter of the PMSM",
+            desc="Stator bore diameter of the SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
@@ -36,13 +36,13 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             val=np.nan,
             units="m",
-            desc="Stator yoke thickness of the PMSM",
+            desc="Stator yoke thickness (radial) of the SM PMSM",
         )
 
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
             units="m",
-            desc="The outer stator diameter of the PMSM",
+            desc="The outer stator diameter of the SM PMSM",
             val=0.2,
         )
 

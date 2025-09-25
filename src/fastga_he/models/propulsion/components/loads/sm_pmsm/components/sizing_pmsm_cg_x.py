@@ -10,7 +10,7 @@ from ..constants import POSSIBLE_POSITION
 
 class SizingPMSMCGX(om.ExplicitComponent):
     """
-     Class that computes the X-CG of the PMSM based on its position. Will be based on simple
+    Class that computes the X-CG of the SM PMSM based on its position. Will be based on simple
     geometric ratios and geometric considerations.
     """
 
@@ -37,7 +37,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
                 name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":from_LE",
                 val=np.nan,
                 units="m",
-                desc="Distance between the PMSM front face and the leading edge",
+                desc="Distance between the SM PMSM front face and the leading edge",
             )
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
@@ -45,14 +45,14 @@ class SizingPMSMCGX(om.ExplicitComponent):
                 name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
                 val=np.nan,
                 units="m",
-                desc="The stator length of PMSM",
+                desc="The length of electromagnetism active part of SM PMSM",
             )
 
         else:
             self.add_input(
                 name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":front_length_ratio",
                 val=np.nan,
-                desc="Location of the PMSM CG as a ratio of the aircraft front length",
+                desc="Location of the SM PMSM CG as a ratio of the aircraft front length",
             )
             self.add_input("data:geometry:fuselage:front_length", val=np.nan, units="m")
 
@@ -60,7 +60,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:x",
             units="m",
             val=2.5,
-            desc="X position of the PMSM center of gravity",
+            desc="X position of the SM PMSM center of gravity",
         )
 
     def setup_partials(self):

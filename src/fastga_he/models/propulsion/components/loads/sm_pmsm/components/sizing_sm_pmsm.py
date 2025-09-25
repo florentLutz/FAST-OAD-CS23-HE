@@ -6,24 +6,25 @@ import openmdao.api as om
 
 from .sizing_bore_diameter import SizingStatorBoreDiameter
 from .sizing_active_length import SizingActiveLength
+from .sizing_frame_dimension import SizingFrameDimension
 from .sizing_rotor_diameter import SizingRotorDiameter
 from .sizing_stator_yoke import SizingStatorYokeHeight
 from .sizing_slot_width import SizingSlotWidth
 from .sizing_slot_height import SizingSlotHeight
-from .sizing_slot_section import SizingSlotSection
-from .sizing_conductor_section import SizingConductorSection
-from .sizing_conductor_length import SizingConductorLength
-from .sizing_conductors_number import SizingConductorsNumber
+from .sizing_slot_section_area import SizingSlotSectionArea
+from .sizing_conductor_section_area_per_slot import SizingConductorSectionAreaPerSlot
+from .sizing_single_conductor_cable_length import SizingSingleConductorCableLength
+from .sizing_conductor_slot_number import SizingConductorSlotNumber
 from .sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from .sizing_external_stator_diameter import SizingExtStatorDiameter
 from .sizing_stator_core_weight import SizingStatorCoreWeight
 from .sizing_winding_stator_weight import SizingStatorWindingWeight
 from .sizing_rotor_weight import SizingRotorWeight
-from .sizing_frame_weight import SizingFrameGeometry
+from .sizing_frame_weight import SizingFrameWeight
 from .sizing_pmsm_weight import SizingMotorWeight
 from .sizing_pmsm_cg_x import SizingPMSMCGX
 from .sizing_pmsm_cg_y import SizingPMSMCGY
-from .sizing_pmsm_drag import SizingPMSMDrag
+from .sizing_sm_pmsm_drag import SizingSMPMSMDrag
 from .sizing_ratio_x2p import SizingRatioX2p
 from .sizing_tooth_ratio import SizingToothRatio
 
@@ -76,7 +77,7 @@ class SizingSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "conductor_number", SizingConductorsNumber(motor_id=motor_id), promotes=["data:*"]
+            "conductor_number", SizingConductorSlotNumber(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem("slot_width", SizingSlotWidth(motor_id=motor_id), promotes=["data:*"])
@@ -84,17 +85,19 @@ class SizingSMPMSM(om.Group):
         self.add_subsystem("slot_height", SizingSlotHeight(motor_id=motor_id), promotes=["data:*"])
 
         self.add_subsystem(
-            "slot_cross_section", SizingSlotSection(motor_id=motor_id), promotes=["data:*"]
+            "slot_cross_section", SizingSlotSectionArea(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
             "conductor_cross_section",
-            SizingConductorSection(motor_id=motor_id),
+            SizingConductorSectionAreaPerSlot(motor_id=motor_id),
             promotes=["data:*"],
         )
 
         self.add_subsystem(
-            "total_conductor_length", SizingConductorLength(motor_id=motor_id), promotes=["data:*"]
+            "single_cable_length",
+            SizingSingleConductorCableLength(motor_id=motor_id),
+            promotes=["data:*"],
         )
 
         self.add_subsystem(
@@ -121,7 +124,13 @@ class SizingSMPMSM(om.Group):
             "rotor_weight", SizingRotorWeight(motor_id=motor_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("frame", SizingFrameGeometry(motor_id=motor_id), promotes=["data:*"])
+        self.add_subsystem(
+            "frame_dimension", SizingFrameDimension(motor_id=motor_id), promotes=["data:*"]
+        )
+
+        self.add_subsystem(
+            "frame_weight", SizingFrameWeight(motor_id=motor_id), promotes=["data:*"]
+        )
 
         self.add_subsystem("weight", SizingMotorWeight(motor_id=motor_id), promotes=["data:*"])
 
@@ -135,7 +144,7 @@ class SizingSMPMSM(om.Group):
             system_name = "pmsm_drag_ls" if low_speed_aero else "pmsm_drag_cruise"
             self.add_subsystem(
                 name=system_name,
-                subsys=SizingPMSMDrag(
+                subsys=SizingSMPMSMDrag(
                     motor_id=motor_id,
                     position=position,
                     low_speed_aero=low_speed_aero,

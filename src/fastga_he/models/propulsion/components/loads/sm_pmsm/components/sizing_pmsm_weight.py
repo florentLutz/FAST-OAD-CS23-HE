@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingMotorWeight(om.ExplicitComponent):
     """
-    Computation of the PMSM total weight with summing all the component mass.
+    Computation of the SM PMSM total weight with summing all the component mass.
     """
 
     def initialize(self):
@@ -23,6 +23,7 @@ class SizingMotorWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             val=np.nan,
             units="kg",
+            desc="The weight of the stator excluding the wire weight",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
@@ -38,6 +39,7 @@ class SizingMotorWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
             val=np.nan,
             units="kg",
+            desc="The weight of the motor casing",
         )
 
         self.add_output(

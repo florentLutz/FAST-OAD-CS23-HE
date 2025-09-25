@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingStatorWindingWeight(om.ExplicitComponent):
     """
-    Computation of the stator winding weight of the PMSM. The formula is obtained from
+    Computation of the stator winding weight of the SM PMSM. The formula is obtained from
     equation (II-55) in :cite:`touhami:2020`.
     """
 
@@ -21,7 +21,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
             val=np.nan,
             desc="Number of conductor slots",
         )
@@ -31,10 +31,10 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             desc="The factor describes the conductor material fullness inside the stator slots",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             val=np.nan,
             units="m",
-            desc="Electrical conductor cable length",
+            desc="Single Conductor cable length in one slot",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
@@ -78,8 +78,8 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        conductor_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"
+        conductor_cable_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length"
         ]
         slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
         slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
@@ -92,11 +92,11 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         slot_fill_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
         ]
-        num_conductors = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"
+        num_conductor_slot = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
 
-        winding_volume = conductor_length * slot_height * num_conductors * slot_width
+        winding_volume = conductor_cable_length * slot_height * num_conductor_slot * slot_width
         mat_mix_density = slot_fill_factor * rho_conduct + (1.0 - slot_fill_factor) * rho_insulate
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass"] = (
@@ -106,8 +106,8 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        conductor_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length"
+        conductor_cable_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length"
         ]
         slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
         slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
@@ -120,32 +120,32 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         slot_fill_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor"
         ]
-        num_conductors = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number"
+        num_conductor_slot = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
 
-        winding_volume = conductor_length * slot_height * num_conductors * slot_width
+        winding_volume = conductor_cable_length * slot_height * num_conductor_slot * slot_width
         mat_mix_density = slot_fill_factor * rho_conduct + (1.0 - slot_fill_factor) * rho_insulate
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_length",
-        ] = slot_height * num_conductors * slot_width * mat_mix_density
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
+        ] = slot_height * num_conductor_slot * slot_width * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-        ] = conductor_length * num_conductors * slot_width * mat_mix_density
+        ] = conductor_cable_length * num_conductor_slot * slot_width * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
-        ] = conductor_length * slot_height * num_conductors * mat_mix_density
+        ] = conductor_cable_length * slot_height * num_conductor_slot * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductors_number",
-        ] = conductor_length * slot_height * slot_width * mat_mix_density
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
+        ] = conductor_cable_length * slot_height * slot_width * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",

@@ -8,8 +8,8 @@ import openmdao.api as om
 
 class SizingSlotHeight(om.ExplicitComponent):
     """
-    Computation of single slot height of the PMSM in radial direction. The formula is obtained from
-    equation (II-46) in :cite:`touhami:2020`.
+    Computation of single slot height of the SM PMSM in radial direction. The formula is obtained
+    from equation (II-46) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
@@ -28,6 +28,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
             val=np.nan,
+            desc="The factor considers the cable winding effect in the stator slot",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor",

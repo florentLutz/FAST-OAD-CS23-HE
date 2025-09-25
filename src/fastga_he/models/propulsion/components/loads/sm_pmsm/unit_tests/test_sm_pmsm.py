@@ -16,18 +16,18 @@ from ..components.sizing_slot_width import SizingSlotWidth
 from ..components.sizing_ratio_x2p import SizingRatioX2p
 from ..components.sizing_tooth_ratio import SizingToothRatio
 from ..components.sizing_slot_height import SizingSlotHeight
-from ..components.sizing_slot_section import SizingSlotSection
-from ..components.sizing_conductor_section import SizingConductorSection
-from ..components.sizing_conductor_length import SizingConductorLength
-from ..components.sizing_conductors_number import SizingConductorsNumber
+from ..components.sizing_slot_section_area import SizingSlotSectionArea
+from ..components.sizing_conductor_section_area_per_slot import SizingConductorSectionAreaPerSlot
+from ..components.sizing_single_conductor_cable_length import SizingSingleConductorCableLength
+from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
 from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
 from ..components.sizing_pmsm_cg_x import SizingPMSMCGX
 from ..components.sizing_pmsm_cg_y import SizingPMSMCGY
-from ..components.sizing_pmsm_drag import SizingPMSMDrag
+from ..components.sizing_sm_pmsm_drag import SizingSMPMSMDrag
 from ..components.sizing_stator_core_weight import SizingStatorCoreWeight
 from ..components.sizing_rotor_weight import SizingRotorWeight
-from ..components.sizing_frame_weight import SizingFrameGeometry
+from ..components.sizing_frame_weight import SizingFrameWeight
 from ..components.sizing_winding_stator_weight import SizingStatorWindingWeight
 from ..components.sizing_pmsm_weight import SizingMotorWeight
 from ..components.sizing_sm_pmsm import SizingSMPMSM
@@ -170,7 +170,7 @@ def test_slot_width():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:conductors_number", val=24)
+    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_slot_number", val=24)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:tooth_ratio", val=0.4407)
     ivc.add_output(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
@@ -210,7 +210,7 @@ def test_slot_section():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:slot_width", val=0.0137, units="m"
     )
 
-    problem = run_system(SizingSlotSection(motor_id="motor_1"), ivc)
+    problem = run_system(SizingSlotSectionArea(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:slot_section"
@@ -219,7 +219,7 @@ def test_slot_section():
     problem.check_partials(compact_print=True)
 
 
-def test_conductor_section_area():
+def test_conductor_section_area_per_slot_area():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -229,10 +229,10 @@ def test_conductor_section_area():
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slot_conductor_factor", val=1)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slot_fill_factor", val=0.5)
 
-    problem = run_system(SizingConductorSection(motor_id="motor_1"), ivc)
+    problem = run_system(SizingConductorSectionAreaPerSlot(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_section"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_section_area_per_slot"
     ) == pytest.approx(0.00024523, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -246,16 +246,16 @@ def test_conductor_slot_number():
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slots_per_poles_phases", val=2)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:pole_pairs_number", val=2)
 
-    problem = run_system(SizingConductorsNumber(motor_id="motor_1"), ivc)
+    problem = run_system(SizingConductorSlotNumber(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductors_number"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_slot_number"
     ) == pytest.approx(24, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
-def test_conductor_length():
+def test_single_conductor_cable_length():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -265,10 +265,10 @@ def test_conductor_length():
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:cond_twisting_coeff", val=1.25)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:end_winding_coeff", val=1.4)
 
-    problem = run_system(SizingConductorLength(motor_id="motor_1"), ivc)
+    problem = run_system(SizingSingleConductorCableLength(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_length"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_cable_length"
     ) == pytest.approx(0.545475, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -381,11 +381,9 @@ def test_rotor_weight():
 
 
 def test_frame_weight():
-    ivc = get_indep_var_comp(
-        list_inputs(SizingFrameGeometry(motor_id="motor_1")), __file__, XML_FILE
-    )
+    ivc = get_indep_var_comp(list_inputs(SizingFrameWeight(motor_id="motor_1")), __file__, XML_FILE)
 
-    problem = run_system(SizingFrameGeometry(motor_id="motor_1"), ivc)
+    problem = run_system(SizingFrameWeight(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_mass", units="kg"
@@ -458,14 +456,14 @@ def test_motor_drag():
         for ls_option in [True, False]:
             ivc = get_indep_var_comp(
                 list_inputs(
-                    SizingPMSMDrag(motor_id="motor_1", position=option, low_speed_aero=ls_option)
+                    SizingSMPMSMDrag(motor_id="motor_1", position=option, low_speed_aero=ls_option)
                 ),
                 __file__,
                 XML_FILE,
             )
             # Run problem and check obtained value(s) is/(are) correct
             problem = run_system(
-                SizingPMSMDrag(motor_id="motor_1", position=option, low_speed_aero=ls_option), ivc
+                SizingSMPMSMDrag(motor_id="motor_1", position=option, low_speed_aero=ls_option), ivc
             )
 
             if ls_option:

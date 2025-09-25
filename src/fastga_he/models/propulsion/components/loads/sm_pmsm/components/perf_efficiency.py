@@ -32,7 +32,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
         self.add_input(
             "settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency",
             val=1.0,
-            desc="K factor for the PMSM efficiency",
+            desc="K factor for the SM PMSM efficiency",
         )
 
         self.add_output(

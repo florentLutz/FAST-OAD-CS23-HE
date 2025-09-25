@@ -12,9 +12,9 @@ from ..constants import POSSIBLE_POSITION
 _LOGGER = logging.getLogger(__name__)
 
 
-class SizingPMSMDrag(om.ExplicitComponent):
+class SizingSMPMSMDrag(om.ExplicitComponent):
     """
-     Additional drag coefficient due to the installation of the PMSM depending on the location,
+    Additional drag coefficient due to the installation of the SM PMSM depending on the location,
     inside the nose, it will be computed as not contributing, just like we did it for ICE,
     turboprop, ... If it is on the wing, is will be computed considering it has a fairing going
     beyond the length to avoid having a "pancake" on the wing. Based on the formula from
@@ -47,6 +47,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
             val=np.nan,
             units="m",
+            desc="The motor casing diameter",
         )
 
         if position == "on_the_wing":
@@ -54,7 +55,7 @@ class SizingPMSMDrag(om.ExplicitComponent):
                 name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
                 val=np.nan,
                 units="m",
-                desc="The stator length of PMSM",
+                desc="The length of electromagnetism active part of SM PMSM",
             )
             self.add_input(
                 name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":fairing:fineness",
