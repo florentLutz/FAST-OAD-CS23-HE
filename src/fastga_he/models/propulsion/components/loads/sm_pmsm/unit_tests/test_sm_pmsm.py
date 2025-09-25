@@ -10,6 +10,7 @@ import openmdao.api as om
 
 from ..components.sizing_bore_diameter import SizingStatorBoreDiameter
 from ..components.sizing_active_length import SizingActiveLength
+from ..components.sizing_frame_dimension import SizingFrameDimension
 from ..components.sizing_rotor_diameter import SizingRotorDiameter
 from ..components.sizing_stator_yoke import SizingStatorYokeHeight
 from ..components.sizing_slot_width import SizingSlotWidth
@@ -22,14 +23,14 @@ from ..components.sizing_single_conductor_cable_length import SizingSingleConduc
 from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
 from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
-from ..components.sizing_pmsm_cg_x import SizingPMSMCGX
-from ..components.sizing_pmsm_cg_y import SizingPMSMCGY
+from ..components.sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
+from ..components.sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
 from ..components.sizing_sm_pmsm_drag import SizingSMPMSMDrag
 from ..components.sizing_stator_core_weight import SizingStatorCoreWeight
 from ..components.sizing_rotor_weight import SizingRotorWeight
 from ..components.sizing_frame_weight import SizingFrameWeight
 from ..components.sizing_winding_stator_weight import SizingStatorWindingWeight
-from ..components.sizing_pmsm_weight import SizingMotorWeight
+from ..components.sizing_sm_pmsm_weight import SizingMotorWeight
 from ..components.sizing_sm_pmsm import SizingSMPMSM
 
 from ..components.perf_iron_losses import PerformancesIronLosses
@@ -213,7 +214,7 @@ def test_slot_section():
     problem = run_system(SizingSlotSectionArea(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:slot_section"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:slot_section_area"
     ) == pytest.approx(0.00049046, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -224,7 +225,9 @@ def test_conductor_section_area_per_slot_area():
 
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:slot_section", val=0.00049046, units="m**2"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:slot_section_area",
+        val=0.00049046,
+        units="m**2",
     )
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slot_conductor_factor", val=1)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slot_fill_factor", val=0.5)
@@ -380,6 +383,24 @@ def test_rotor_weight():
     problem.check_partials(compact_print=True)
 
 
+def test_frame_dimension():
+    ivc = get_indep_var_comp(
+        list_inputs(SizingFrameDimension(motor_id="motor_1")), __file__, XML_FILE
+    )
+
+    problem = run_system(SizingFrameDimension(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_length", units="m"
+    ) == pytest.approx(0.473, rel=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_diameter", units="m"
+    ) == pytest.approx(0.3564, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_frame_weight():
     ivc = get_indep_var_comp(list_inputs(SizingFrameWeight(motor_id="motor_1")), __file__, XML_FILE)
 
@@ -387,11 +408,7 @@ def test_frame_weight():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_mass", units="kg"
-    ) == pytest.approx(19.52, rel=1e-2)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_diameter", units="m"
-    ) == pytest.approx(0.3564, rel=1e-2)
+    ) == pytest.approx(21.55, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -403,22 +420,22 @@ def test_SMPMSM_weight():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mass", units="kg"
-    ) == pytest.approx(225.59, rel=1e-2)
+    ) == pytest.approx(227.61, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_motor_cg_x():
-    expected_cg = [2.51, 0.25]
+    expected_cg = [2.59, 0.25]
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         ivc = get_indep_var_comp(
-            list_inputs(SizingPMSMCGX(motor_id="motor_1", position=option)),
+            list_inputs(SizingSMPMSMCGX(motor_id="motor_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingPMSMCGX(motor_id="motor_1", position=option), ivc)
+        problem = run_system(SizingSMPMSMCGX(motor_id="motor_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:SM_PMSM:motor_1:CG:x", units="m"
@@ -432,12 +449,12 @@ def test_motor_cg_y():
 
     for option, expected_value in zip(POSSIBLE_POSITION, expected_cg):
         ivc = get_indep_var_comp(
-            list_inputs(SizingPMSMCGY(motor_id="motor_1", position=option)),
+            list_inputs(SizingSMPMSMCGY(motor_id="motor_1", position=option)),
             __file__,
             XML_FILE,
         )
         # Run problem and check obtained value(s) is/(are) correct
-        problem = run_system(SizingPMSMCGY(motor_id="motor_1", position=option), ivc)
+        problem = run_system(SizingSMPMSMCGY(motor_id="motor_1", position=option), ivc)
 
         assert problem.get_val(
             "data:propulsion:he_power_train:SM_PMSM:motor_1:CG:y", units="m"
@@ -1105,7 +1122,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_mass", units="kg"
-    ) == pytest.approx(19.52, rel=1e-2)
+    ) == pytest.approx(21.55, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_diameter", units="m"
@@ -1114,7 +1131,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mass", units="kg"
-    ) == pytest.approx(190.46, rel=1e-2)
+    ) == pytest.approx(192.64, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 

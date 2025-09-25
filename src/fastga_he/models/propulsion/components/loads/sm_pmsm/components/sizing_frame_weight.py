@@ -46,7 +46,7 @@ class SizingFrameWeight(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density",
-            val=2.7,
+            val=2.7e3,
             units="kg/m**3",
             desc="Default value set as the density of 6063 aluminum alloy",
         )

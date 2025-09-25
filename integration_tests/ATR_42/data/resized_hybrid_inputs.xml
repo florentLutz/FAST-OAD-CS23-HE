@@ -210,7 +210,6 @@
             <current_density_ac_max units="A/m**2" is_input="True">8100000.0</current_density_ac_max>
             <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
             <form_coefficient is_input="True">0.6<!--The fraction of stator bore diameter and active length--></form_coefficient>
-            <frame_density units="kg/m**3" is_input="True">2100.0<!--Default value set as the density of 6063 aluminum alloy--></frame_density>
             <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
             <insulation_material_density units="kg/m**3" is_input="True">1400.0<!--Electrical insulation material density--></insulation_material_density>
             <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material--></magnetic_material_density>
@@ -242,7 +241,6 @@
             <current_density_ac_max units="A/m**2" is_input="True">8100000.0</current_density_ac_max>
             <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
             <form_coefficient is_input="True">0.6<!--The fraction of stator bore diameter and active length--></form_coefficient>
-            <frame_density units="kg/m**3" is_input="True">2100.0<!--Default value set as the density of 6063 aluminum alloy--></frame_density>
             <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
             <insulation_material_density units="kg/m**3" is_input="True">1400.0<!--Electrical insulation material density--></insulation_material_density>
             <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material--></magnetic_material_density>

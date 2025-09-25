@@ -8,7 +8,7 @@ import numpy as np
 from ..constants import POSSIBLE_POSITION
 
 
-class SizingPMSMCGX(om.ExplicitComponent):
+class SizingSMPMSMCGX(om.ExplicitComponent):
     """
     Class that computes the X-CG of the SM PMSM based on its position. Will be based on simple
     geometric ratios and geometric considerations.
@@ -42,10 +42,10 @@ class SizingPMSMCGX(om.ExplicitComponent):
             self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
             self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
             self.add_input(
-                name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-                val=np.nan,
+                name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
                 units="m",
-                desc="The length of electromagnetism active part of SM PMSM",
+                val=np.nan,
+                desc="The motor casing length",
             )
 
         else:
@@ -75,7 +75,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":from_LE"
             ]
             motor_length = inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length"
             ]
             l0_wing = inputs["data:geometry:wing:MAC:length"]
             fa_length = inputs["data:geometry:wing:MAC:at25percent:x"]
@@ -116,7 +116,7 @@ class SizingPMSMCGX(om.ExplicitComponent):
 
             partials[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":CG:x",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
             ] = 0.5
 
         else:

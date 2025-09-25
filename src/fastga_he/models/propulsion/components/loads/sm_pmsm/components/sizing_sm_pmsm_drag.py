@@ -52,7 +52,7 @@ class SizingSMPMSMDrag(om.ExplicitComponent):
 
         if position == "on_the_wing":
             self.add_input(
-                name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+                name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
                 val=np.nan,
                 units="m",
                 desc="The length of electromagnetism active part of SM PMSM",
@@ -101,7 +101,7 @@ class SizingSMPMSMDrag(om.ExplicitComponent):
 
         if position == "on_the_wing":
             motor_length = inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length"
             ]
             fineness = inputs[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":fairing:fineness"

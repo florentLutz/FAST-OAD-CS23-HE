@@ -21,9 +21,9 @@ from .sizing_stator_core_weight import SizingStatorCoreWeight
 from .sizing_winding_stator_weight import SizingStatorWindingWeight
 from .sizing_rotor_weight import SizingRotorWeight
 from .sizing_frame_weight import SizingFrameWeight
-from .sizing_pmsm_weight import SizingMotorWeight
-from .sizing_pmsm_cg_x import SizingPMSMCGX
-from .sizing_pmsm_cg_y import SizingPMSMCGY
+from .sizing_sm_pmsm_weight import SizingMotorWeight
+from .sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
+from .sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
 from .sizing_sm_pmsm_drag import SizingSMPMSMDrag
 from .sizing_ratio_x2p import SizingRatioX2p
 from .sizing_tooth_ratio import SizingToothRatio
@@ -62,7 +62,9 @@ class SizingSMPMSM(om.Group):
             "bore_diameter", SizingStatorBoreDiameter(motor_id=motor_id), promotes=["data:*"]
         )
 
-        self.add_subsystem("length", SizingActiveLength(motor_id=motor_id), promotes=["data:*"])
+        self.add_subsystem(
+            "active_length", SizingActiveLength(motor_id=motor_id), promotes=["data:*"]
+        )
 
         self.add_subsystem(
             "rotor_diameter", SizingRotorDiameter(motor_id=motor_id), promotes=["data:*"]
@@ -117,7 +119,7 @@ class SizingSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "winding_weight", SizingStatorWindingWeight(motor_id=motor_id), promotes=["data:*"]
+            "wire_winding_weight", SizingStatorWindingWeight(motor_id=motor_id), promotes=["data:*"]
         )
 
         self.add_subsystem(
@@ -135,10 +137,10 @@ class SizingSMPMSM(om.Group):
         self.add_subsystem("weight", SizingMotorWeight(motor_id=motor_id), promotes=["data:*"])
 
         self.add_subsystem(
-            "pmsm_cg_x", SizingPMSMCGX(motor_id=motor_id, position=position), promotes=["data:*"]
+            "pmsm_cg_x", SizingSMPMSMCGX(motor_id=motor_id, position=position), promotes=["data:*"]
         )
         self.add_subsystem(
-            "pmsm_cg_y", SizingPMSMCGY(motor_id=motor_id, position=position), promotes=["data:*"]
+            "pmsm_cg_y", SizingSMPMSMCGY(motor_id=motor_id, position=position), promotes=["data:*"]
         )
         for low_speed_aero in [True, False]:
             system_name = "pmsm_drag_ls" if low_speed_aero else "pmsm_drag_cruise"

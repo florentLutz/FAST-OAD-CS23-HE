@@ -62,7 +62,6 @@ class SizingFrameDimension(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
             wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_density",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
             ],
