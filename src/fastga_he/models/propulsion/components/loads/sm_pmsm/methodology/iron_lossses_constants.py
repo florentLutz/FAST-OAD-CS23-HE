@@ -1,3 +1,5 @@
+"""Least Squared regression to obtain the constants for iron losses calculation."""
+
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
