@@ -67,7 +67,6 @@ model:
       use_linesearch: False
       pre_condition_pt: False
       use_apply_nonlinear: False
-      rta_activation: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
       power_train_file_path: ../data/fuel_propulsion.yml
@@ -77,6 +76,7 @@ submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
   service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
   service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
+  service.geometry.wing: rta.submodel.geometry.wing
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
 

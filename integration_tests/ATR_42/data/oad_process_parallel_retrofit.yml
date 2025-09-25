@@ -23,7 +23,6 @@ model:
     power_train_file_path: parallel_hybrid_assembly.yml
     use_linesearch: False
     pre_condition_pt: False
-    rta_activation: True
     sort_component: True
     out_file: ../results/hybrid_atr42_retrofit.csv
 

@@ -10,11 +10,11 @@ import fastoad.api as oad
 from ..constants import SUBMODEL_DELTA_M
 
 oad.RegisterSubmodel.active_models[SUBMODEL_DELTA_M] = (
-    "fastga_he.submodel.performances.delta_m.legacy"
+    "fastga_he.submodel.performances.delta_m.from_x_cg "
 )
 
 
-@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.legacy")
+@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_x_cg ")
 class EquilibriumDeltaM(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 

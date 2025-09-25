@@ -15,8 +15,7 @@ from ..constants import (
 from ..mission.energy_consumption_preparation import PrepareForEnergyConsumption
 from .equilibrium_alpha import EquilibriumAlpha
 from .equilibrium_thrust import EquilibriumThrust
-
-from ..constants import SUBMODEL_DELTA_M
+from .equilibrium_delta_m import EquilibriumDeltaM
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_EQUILIBRIUM, "fastga_he.submodel.performances.equilibrium.legacy")
@@ -112,16 +111,13 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=["*"],
             )
-
-            options_delta_m = {
-                "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"],
-                "low_speed_aero": self.options["low_speed_aero"],
-            }
-
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
-                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=options_delta_m),
+                EquilibriumDeltaM(
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
+                ),
                 promotes=["*"],
             )
             self.add_subsystem(
@@ -176,16 +172,13 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=["*"],
             )
-
-            options_delta_m = {
-                "number_of_points": number_of_points,
-                "flaps_position": self.options["flaps_position"],
-                "low_speed_aero": self.options["low_speed_aero"],
-            }
-
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
-                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=options_delta_m),
+                EquilibriumDeltaM(
+                    number_of_points=number_of_points,
+                    flaps_position=self.options["flaps_position"],
+                    low_speed_aero=self.options["low_speed_aero"],
+                ),
                 promotes=["*"],
             )
             self.add_subsystem(

@@ -16,8 +16,12 @@ import numpy as np
 import openmdao.api as om
 
 import fastoad.api as oad
+import importlib.util
 
 from fastga_he.models.performances.mission_vector.constants import SUBMODEL_CG_VARIATION
+
+RTA_INSTALLED = importlib.util.find_spec("rta") is not None
+
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CG_VARIATION] = (
     "fastga_he.submodel.performances.cg_variation.legacy"
@@ -31,18 +35,13 @@ class InFlightCGVariation(om.ExplicitComponent):
     the DESIGN flight.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="rta_activation",
-            default=False,
-            desc="Boolean to identify whether rta package is used",
-            allow_none=False,
-        )
-
     def setup(self):
         empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
-            if self.options["rta_activation"]
+            if any(
+                s is not None and RTA_INSTALLED and ".rta" in s
+                for s in oad.RegisterSubmodel.active_models.values()
+            )
             else "data:weight:aircraft_empty:mass"
         )
 
@@ -111,7 +110,10 @@ class InFlightCGVariation(om.ExplicitComponent):
         payload = inputs["data:weight:aircraft:payload"]
         m_empty = (
             inputs["data:weight:aircraft:OWE"]
-            if self.options["rta_activation"]
+            if any(
+                s is not None and RTA_INSTALLED and ".rta" in s
+                for s in oad.RegisterSubmodel.active_models.values()
+            )
             else inputs["data:weight:aircraft_empty:mass"]
         )
 
@@ -139,7 +141,10 @@ class InFlightCGVariation(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
-            if self.options["rta_activation"]
+            if any(
+                s is not None and RTA_INSTALLED and ".rta" in s
+                for s in oad.RegisterSubmodel.active_models.values()
+            )
             else "data:weight:aircraft_empty:mass"
         )
 
@@ -164,18 +169,13 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
     the sizing mission assuming a cg of payload as input.
     """
 
-    def initialize(self):
-        self.options.declare(
-            name="rta_activation",
-            default=False,
-            desc="Boolean to identify whether rta package is used",
-            allow_none=False,
-        )
-
     def setup(self):
         empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
-            if self.options["rta_activation"]
+            if any(
+                s is not None and RTA_INSTALLED and ".rta" in s
+                for s in oad.RegisterSubmodel.active_models.values()
+            )
             else "data:weight:aircraft_empty:mass"
         )
 
@@ -209,7 +209,10 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         m_empty = (
             inputs["data:weight:aircraft:OWE"]
-            if self.options["rta_activation"]
+            if any(
+                s is not None and RTA_INSTALLED and ".rta" in s
+                for s in oad.RegisterSubmodel.active_models.values()
+            )
             else inputs["data:weight:aircraft_empty:mass"]
         )
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
@@ -228,7 +231,10 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         empty_weight_variable_name = (
             "data:weight:aircraft:OWE"
-            if self.options["rta_activation"]
+            if any(
+                s is not None and RTA_INSTALLED and ".rta" in s
+                for s in oad.RegisterSubmodel.active_models.values()
+            )
             else "data:weight:aircraft_empty:mass"
         )
 
