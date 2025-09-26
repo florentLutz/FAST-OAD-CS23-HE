@@ -43,8 +43,8 @@ class SizingSlotHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
             val=np.nan,
-            units="N/m**2",
-            desc="The tangential tensile strength of the material",
+            units="Pa",
+            desc="The length of electromagnetism active part of SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
