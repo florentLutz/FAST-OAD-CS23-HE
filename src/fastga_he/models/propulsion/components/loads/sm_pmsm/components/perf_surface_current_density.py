@@ -8,74 +8,154 @@ import openmdao.api as om
 
 class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
     """
-    Computation of the surface current density from the conductors inside the stator slots. The
-    formula is obtained from equation (II-35) in :cite:`touhami:2020`.
+    Computation of the  current density of the SM PMSM. The formula is obtained from
+    equation (II-38) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
 
     def setup(self):
         motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
 
+        self.add_input(
+            "ac_phase_current_density",
+            units="A/m**2",
+            val=np.nan,
+            shape=number_of_points,
+            desc="The phase current density of the SM PMSM",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
+            val=np.nan,
+            desc="Number of wire per stator slot",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
+            val=np.nan,
+            desc="Number of conductor slots on the motor stator",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            units="m",
+            desc="Stator bore diameter of the SM PMSM",
+            val=np.nan,
+        )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
             val=np.nan,
             desc="The factor considers the cable winding effect in the stator slot",
         )
-        self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":linear_current_density_ac_max",
-            units="A/m",
-            val=np.nan,
-            desc="Maximum value of the RMS linear current density flowing through the motor",
-        )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
+            name="surface_current_density",
             val=1.0,
             units="A/m",
+            shape=number_of_points,
             desc="The surface current density of the winding conductor cable",
         )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", method="exact")
+        motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            of="*",
+            wrt=["ac_phase_current_density"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
-        ] = (
+        current_density = inputs["ac_phase_current_density"]
+        num_slot = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
+        ]
+        num_wire = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot"]
+        bore_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
+        ]
+        k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
+
+        outputs["surface_current_density"] = (
             np.sqrt(2.0)
-            * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:"
-                + motor_id
-                + ":linear_current_density_ac_max"
-            ]
-            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
+            * k_winding
+            * num_slot
+            * num_wire
+            * current_density
+            / (np.pi * bore_diameter)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
+
+        current_density = inputs["ac_phase_current_density"]
+        num_slot = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
+        ]
+        num_wire = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot"]
+        bore_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
+        ]
+        k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":linear_current_density_ac_max",
+            "surface_current_density",
+            "ac_phase_current_density",
         ] = (
-            np.sqrt(2.0)
-            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
+            np.full(number_of_points, np.sqrt(2.0))
+            * k_winding
+            * num_slot
+            * num_wire
+            / (np.pi * bore_diameter)
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
+            "surface_current_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
+        ] = np.sqrt(2.0) * k_winding * num_wire * current_density / (np.pi * bore_diameter)
+
+        partials[
+            "surface_current_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
+        ] = np.sqrt(2.0) * k_winding * num_slot * current_density / (np.pi * bore_diameter)
+
+        partials[
+            "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
-        ] = (
+        ] = np.sqrt(2.0) * num_slot * num_wire * current_density / (np.pi * bore_diameter)
+
+        partials[
+            "surface_current_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+        ] = -(
             np.sqrt(2.0)
-            * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:"
-                + motor_id
-                + ":linear_current_density_ac_max"
-            ]
+            * k_winding
+            * num_slot
+            * num_wire
+            * current_density
+            / (np.pi * bore_diameter**2.0)
         )

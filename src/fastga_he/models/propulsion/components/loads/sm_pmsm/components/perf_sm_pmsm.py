@@ -17,10 +17,15 @@ from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency
 from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms import PerformancesCurrentRMS
+from .perf_phase_current_density import PerformancesPhaseCurrentDensity
 from .perf_maximum import PerformancesMaximum
 from .perf_electrical_frequency import PerformancesElectricalFrequency
 from .perf_winding_resistivity import PerformancesWindingResistivityFixed
 from .perf_resistance import PerformancesResistance
+from .perf_tangential_stress import PerformancesTangentialStree
+from .perf_surface_current_density import PerformancesSurfaceCurrentDensity
+from .perf_air_gap_flux_density import PerformancesAirGapFluxDensity
+from .perf_electromagnetic_torque import PerformancesElectromagneticTorque
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
@@ -82,6 +87,12 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "current_rms_one_phase",
             PerformancesCurrentRMS1Phase(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "phase_current_density",
+            PerformancesPhaseCurrentDensity(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -156,6 +167,30 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "apparent_power",
             PerformancesApparentPower(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "electromagnetic_torque",
+            PerformancesElectromagneticTorque(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "tangential_stress",
+            PerformancesTangentialStree(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "surface_current_density",
+            PerformancesSurfaceCurrentDensity(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "air_gap_flux_density",
+            PerformancesAirGapFluxDensity(number_of_points=number_of_points),
             promotes=["*"],
         )
 

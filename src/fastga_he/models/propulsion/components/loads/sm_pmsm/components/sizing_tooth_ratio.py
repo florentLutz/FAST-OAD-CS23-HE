@@ -27,10 +27,10 @@ class SizingToothRatio(om.ExplicitComponent):
             desc="Magnetic flux density at the stator teeth(slot) layer",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
             val=np.nan,
             units="T",
-            desc="The magnetic flux density provided by the permanent magnets",
+            desc="The maximum magnetic flux density provided by the permanent magnets",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
@@ -55,7 +55,9 @@ class SizingToothRatio(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
+        b_m = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
+        ]
         b_st = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density"]
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
@@ -71,7 +73,9 @@ class SizingToothRatio(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
+        b_m = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
+        ]
         b_st = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density"]
         k_m = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
@@ -92,7 +96,7 @@ class SizingToothRatio(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
         ] = 2.0 * b_m / (np.pi * np.abs(b_st) * max_total_air_gap_flux_density)
 
         partials[

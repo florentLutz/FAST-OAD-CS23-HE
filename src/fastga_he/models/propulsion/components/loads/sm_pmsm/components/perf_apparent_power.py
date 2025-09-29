@@ -7,7 +7,10 @@ import openmdao.api as om
 
 
 class PerformancesApparentPower(om.ExplicitComponent):
-    """Computation of the electric apparent power required to run the motor."""
+    """
+    Computation of the electric apparent power required to run the motor, including certain
+    hard-to-estimate losses omitted in the loss calculation.
+    """
 
     def initialize(self):
         self.options.declare(

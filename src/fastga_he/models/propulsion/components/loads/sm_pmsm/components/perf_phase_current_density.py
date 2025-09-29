@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesCurrentDensityRMS(om.ExplicitComponent):
+class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
     """
-    Computation of the RMS current density of the SM PMSM. The formula is obtained from
+    Computation of the phase current density of the SM PMSM. The formula is obtained from
     equation (II-32) in :cite:`touhami:2020`.
     """
 
@@ -31,19 +31,17 @@ class PerformancesCurrentDensityRMS(om.ExplicitComponent):
             desc="Single conductor circular wire cross-section area",
         )
         self.add_input(
-            "ac_current_rms_in",
+            "ac_current_rms_in_one_phase",
             units="A",
-            val=np.nan,
-            shape=number_of_points,
-            desc="RMS current in all the phases of the motor",
+            val=np.full(number_of_points, np.nan),
         )
 
         self.add_output(
-            "ac_current_density_rms",
+            "ac_phase_current_density",
             units="A/m**2",
             val=1.0e4,
             shape=number_of_points,
-            desc="The current density of the SM PMSM",
+            desc="The phase current density of the SM PMSM",
         )
 
     def setup_partials(self):
@@ -51,14 +49,14 @@ class PerformancesCurrentDensityRMS(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="ac_current_density_rms",
-            wrt="ac_current_rms_in",
+            of="ac_phase_current_density",
+            wrt="ac_current_rms_in_one_phase",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="ac_current_density_rms",
+            of="ac_phase_current_density",
             wrt="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":wire_circular_section_area",
@@ -70,8 +68,8 @@ class PerformancesCurrentDensityRMS(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs["ac_current_density_rms"] = (
-            inputs["ac_current_rms_in"]
+        outputs["ac_phase_current_density"] = (
+            inputs["ac_current_rms_in_one_phase"]
             / inputs[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
             ]
@@ -82,17 +80,17 @@ class PerformancesCurrentDensityRMS(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         partials[
-            "ac_current_density_rms",
+            "ac_phase_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
         ] = (
-            inputs["ac_current_rms_in"]
+            inputs["ac_current_rms_in_one_phase"]
             / inputs[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
             ]
             ** 2.0
         )
 
-        partials["ac_current_density_rms", "ac_current_rms_in"] = (
+        partials["ac_phase_current_density", "ac_current_rms_in_one_phase"] = (
             np.ones(number_of_points)
             / inputs[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"

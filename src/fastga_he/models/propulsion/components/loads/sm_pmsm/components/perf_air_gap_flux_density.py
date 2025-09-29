@@ -8,69 +8,61 @@ import openmdao.api as om
 
 class PerformancesAirGapFluxDensity(om.ExplicitComponent):
     """
-    Computation of the air gap magnetic flux density of the mototr. The formula is obtained from
-    equation (II-6) in :cite:`touhami:2020`.
+    Computation of the Maximum air gap magnetic flux density of the mototr. The formula is obtained
+    from equation (II-6) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
         self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-        motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
+            name="tangential_stress",
             units="Pa",
-            desc="The length of electromagnetism active part of SM PMSM",
-            val=np.nan,
+            desc="The surface tangential stress applied by electromagnetism",
+            shape=number_of_points,
+            val=0.169,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
-            val=np.nan,
+            name="surface_current_density",
+            val=1.0,
             units="A/m",
-            desc="The surface current density of the winding conductor cable",
+            shape=number_of_points,
+            desc="The maximum surface current density of the winding conductor cable",
         )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            name="air_gap_flux_density",
             val=1.0,
             units="T",
             desc="The magnetic flux density provided by the permanent magnets",
         )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", method="exact")
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            of="*",
+            wrt="*",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        motor_id = self.options["motor_id"]
-
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"] = (
-            2.0
-            * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
-            ]
-            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
+        outputs["air_gap_flux_density"] = (
+            2.0 * inputs["surface_current_density"] * inputs["tangential_stress"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        motor_id = self.options["motor_id"]
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
-        ] = (
-            2.0
-            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"]
+        partials["air_gap_flux_density", "surface_current_density"] = (
+            2.0 * inputs["tangential_stress"]
         )
 
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
-        ] = (
-            2.0
-            * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
-            ]
+        partials["air_gap_flux_density", "tangential_stress"] = (
+            2.0 * inputs["surface_current_density"]
         )

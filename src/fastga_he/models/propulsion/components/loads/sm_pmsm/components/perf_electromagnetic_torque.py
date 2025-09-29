@@ -19,12 +19,7 @@ class PerformancesElectromagneticTorque(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input(
-            "angular_speed",
-            units="rad/s",
-            val=np.nan,
-            shape=number_of_points,
-        )
+        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("active_power", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
@@ -47,4 +42,11 @@ class PerformancesElectromagneticTorque(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["electromagnetic_torque"] = inputs["active_power"] / inputs["angular_speed"]
+        outputs["electromagnetic_torque"] = 30.0 * inputs["active_power"] * np.pi / inputs["rpm"]
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        partials["electromagnetic_torque", "active_power"] = 30.0 * np.pi / inputs["rpm"]
+
+        partials["electromagnetic_torque", "rpm"] = (
+            -30.0 * inputs["active_power"] * np.pi / inputs["rpm"] ** 2.0
+        )

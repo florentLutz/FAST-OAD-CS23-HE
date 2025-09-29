@@ -16,10 +16,21 @@ class PerformancesTangentialStree(om.ExplicitComponent):
         self.options.declare(
             name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
         )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
 
     def setup(self):
         motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
 
+        self.add_input(
+            "electromagnetic_torque",
+            units="N*m",
+            val=np.nan,
+            shape=number_of_points,
+            desc="Total electromechanical torque from the motor",
+        )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             units="m",
@@ -31,23 +42,37 @@ class PerformancesTangentialStree(om.ExplicitComponent):
             units="m",
             val=np.nan,
         )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":max_electromagnetic_torque",
-            units="N*m",
-            val=np.nan,
-        )
 
         self.add_output(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
+            name="tangential_stress",
             units="Pa",
-            desc="The length of electromagnetism active part of SM PMSM",
+            desc="The surface tangential stress applied by electromagnetism",
+            shape=number_of_points,
             val=0.169,
         )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", method="exact")
+        motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            of="*",
+            wrt=["electromagnetic_torque"],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
+        self.declare_partials(
+            of="*",
+            wrt=[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
@@ -55,37 +80,38 @@ class PerformancesTangentialStree(om.ExplicitComponent):
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
-        d_rotor = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]
-        max_torque_em = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":max_electromagnetic_torque"
+        rotor_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"
         ]
+        electromagnetic_torque = inputs["electromagnetic_torque"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress"] = (
-            2.0 * max_torque_em / (np.pi * d_rotor**2.0 * active_length)
+        outputs["tangential_stress"] = (
+            2.0 * electromagnetic_torque / (np.pi * rotor_diameter**2.0 * active_length)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
+        number_of_points = self.options["number_of_points"]
 
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
-        d_rotor = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]
-        max_torque_em = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":max_electromagnetic_torque"
+        rotor_diameter = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"
         ]
+        electromagnetic_torque = inputs["electromagnetic_torque"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":max_electromagnetic_torque",
-        ] = 2.0 / (np.pi * d_rotor**2.0 * active_length)
+            "tangential_stress",
+            "electromagnetic_torque",
+        ] = np.full(number_of_points, 2.0) / (np.pi * rotor_diameter**2.0 * active_length)
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
+            "tangential_stress",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = -2.0 * max_torque_em / (np.pi * d_rotor**2.0 * active_length**2.0)
+        ] = -2.0 * electromagnetic_torque / (np.pi * rotor_diameter**2.0 * active_length**2.0)
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
+            "tangential_stress",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = -4.0 * max_torque_em / (np.pi * d_rotor**3.0 * active_length)
+        ] = -4.0 * electromagnetic_torque / (np.pi * rotor_diameter**3.0 * active_length)
