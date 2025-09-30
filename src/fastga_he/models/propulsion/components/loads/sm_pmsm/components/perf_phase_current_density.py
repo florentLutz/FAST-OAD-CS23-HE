@@ -83,7 +83,7 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
             "ac_phase_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
         ] = (
-            inputs["ac_current_rms_in_one_phase"]
+            -inputs["ac_current_rms_in_one_phase"]
             / inputs[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
             ]

@@ -28,6 +28,7 @@ from .sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
 from .sizing_sm_pmsm_drag import SizingSMPMSMDrag
 from .sizing_ratio_x2p import SizingRatioX2p
 from .sizing_tooth_ratio import SizingToothRatio
+from .sizing_conductor_wire_section_area import SizingConductorWireSectionArea
 
 from .cstr_sm_pmsm import ConstraintsSMPMSM
 
@@ -110,6 +111,12 @@ class SizingSMPMSM(om.Group):
         self.add_subsystem(
             "pouillet_geometry_factor",
             SizingPouilletGeometryFactor(motor_id=motor_id),
+            promotes=["data:*"],
+        )
+
+        self.add_subsystem(
+            "wire_section_area",
+            SizingConductorWireSectionArea(motor_id=motor_id),
             promotes=["data:*"],
         )
 

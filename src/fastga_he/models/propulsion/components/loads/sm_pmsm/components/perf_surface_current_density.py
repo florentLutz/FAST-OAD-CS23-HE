@@ -25,11 +25,9 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "ac_phase_current_density",
-            units="A/m**2",
-            val=np.nan,
-            shape=number_of_points,
-            desc="The phase current density of the SM PMSM",
+            "ac_current_rms_in_one_phase",
+            units="A",
+            val=np.full(number_of_points, np.nan),
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
@@ -67,7 +65,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt=["ac_phase_current_density"],
+            wrt=["ac_current_rms_in_one_phase"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -89,7 +87,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        current_density = inputs["ac_phase_current_density"]
+        i_rms = inputs["ac_current_rms_in_one_phase"]
         num_slot = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
@@ -100,19 +98,14 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
         k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
 
         outputs["surface_current_density"] = (
-            np.sqrt(2.0)
-            * k_winding
-            * num_slot
-            * num_wire
-            * current_density
-            / (np.pi * bore_diameter)
+            np.sqrt(2.0) * k_winding * num_slot * num_wire * i_rms / (np.pi * bore_diameter)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        current_density = inputs["ac_phase_current_density"]
+        i_rms = inputs["ac_current_rms_in_one_phase"]
         num_slot = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
@@ -124,7 +117,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
 
         partials[
             "surface_current_density",
-            "ac_phase_current_density",
+            "ac_current_rms_in_one_phase",
         ] = (
             np.full(number_of_points, np.sqrt(2.0))
             * k_winding
@@ -136,26 +129,19 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-        ] = np.sqrt(2.0) * k_winding * num_wire * current_density / (np.pi * bore_diameter)
+        ] = np.sqrt(2.0) * k_winding * num_wire * i_rms / (np.pi * bore_diameter)
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
-        ] = np.sqrt(2.0) * k_winding * num_slot * current_density / (np.pi * bore_diameter)
+        ] = np.sqrt(2.0) * k_winding * num_slot * i_rms / (np.pi * bore_diameter)
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
-        ] = np.sqrt(2.0) * num_slot * num_wire * current_density / (np.pi * bore_diameter)
+        ] = np.sqrt(2.0) * num_slot * num_wire * i_rms / (np.pi * bore_diameter)
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-        ] = -(
-            np.sqrt(2.0)
-            * k_winding
-            * num_slot
-            * num_wire
-            * current_density
-            / (np.pi * bore_diameter**2.0)
-        )
+        ] = -(np.sqrt(2.0) * k_winding * num_slot * num_wire * i_rms / (np.pi * bore_diameter**2.0))

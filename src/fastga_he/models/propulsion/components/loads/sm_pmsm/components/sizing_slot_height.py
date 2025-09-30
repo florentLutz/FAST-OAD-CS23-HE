@@ -23,7 +23,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
-            + ":surface_current_density_caliber",
+            + ":current_density_ac_caliber",
             val=np.nan,
             units="A/m**2",
         )
@@ -85,9 +85,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
         ]
         max_current_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":surface_current_density_caliber"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber"
         ]
         slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
@@ -123,9 +121,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
         ]
         max_current_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":surface_current_density_caliber"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber"
         ]
         slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
@@ -181,9 +177,7 @@ class SizingSlotHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-            "data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":surface_current_density_caliber",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber",
         ] = (
             -np.sqrt(2.0)
             * sigma
