@@ -9,7 +9,7 @@ from .sizing_active_length import SizingActiveLength
 from .sizing_frame_dimension import SizingFrameDimension
 from .sizing_rotor_diameter import SizingRotorDiameter
 from .sizing_radius_ratio import SizingRadiusRatio
-from .sizing_stator_yoke import SizingStatorYokeHeight
+from .sizing_stator_yoke_height import SizingStatorYokeHeight
 from .sizing_slot_width import SizingSlotWidth
 from .sizing_slot_height import SizingSlotHeight
 from .sizing_slot_section_area import SizingSlotSectionArea
@@ -27,7 +27,6 @@ from .sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
 from .sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
 from .sizing_sm_pmsm_drag import SizingSMPMSMDrag
 from .sizing_ratio_x2p import SizingRatioX2p
-from .sizing_tooth_ratio import SizingToothRatio
 from .sizing_conductor_wire_section_area import SizingConductorWireSectionArea
 
 from .cstr_sm_pmsm import ConstraintsSMPMSM
@@ -77,8 +76,6 @@ class SizingSMPMSM(om.Group):
         )
 
         self.add_subsystem("ratio_x2p", SizingRatioX2p(motor_id=motor_id), promotes=["data:*"])
-
-        self.add_subsystem("tooth_ratio", SizingToothRatio(motor_id=motor_id), promotes=["data:*"])
 
         self.add_subsystem(
             "yoke_height", SizingStatorYokeHeight(motor_id=motor_id), promotes=["data:*"]

@@ -44,7 +44,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":youngs_modules",
-            units="MPa",
+            units="Pa",
             val=np.nan,
             desc="Young's modules of the rotor material",
         )
@@ -148,9 +148,9 @@ class SizingRotorDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_material_density",
         ] = (
             0.25
-            * e_rotor
+            * rpm_rating
             * np.pi
             * active_length**2.0
             * end_winding_coeff**2.0
-            / (2.0 * rho_rotor**2.0 * np.sqrt(30.0) * np.sqrt(e_rotor / rho_rotor) ** 3.0)
+            / (2.0 * np.sqrt(30.0 * e_rotor * rho_rotor))
         )
