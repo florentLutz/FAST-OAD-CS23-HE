@@ -100,6 +100,30 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
+            "electromagnetic_torque",
+            PerformancesElectromagneticTorque(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "tangential_stress",
+            PerformancesTangentialStress(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "surface_current_density",
+            PerformancesSurfaceCurrentDensity(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "air_gap_flux_density",
+            PerformancesAirGapFluxDensity(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
             "iron_losses",
             PerformancesIronLosses(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
@@ -170,30 +194,6 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "apparent_power",
             PerformancesApparentPower(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "electromagnetic_torque",
-            PerformancesElectromagneticTorque(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "tangential_stress",
-            PerformancesTangentialStress(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "surface_current_density",
-            PerformancesSurfaceCurrentDensity(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "air_gap_flux_density",
-            PerformancesAirGapFluxDensity(number_of_points=number_of_points),
             promotes=["*"],
         )
 

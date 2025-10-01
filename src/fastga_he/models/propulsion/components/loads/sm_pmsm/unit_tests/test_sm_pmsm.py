@@ -801,18 +801,18 @@ def test_electromagnetic_torque():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "apparent_power",
+        "torque_out",
         np.array([32.5, 37.1, 41.7, 46.3, 50.9, 55.5, 60.2, 64.7, 69.4, 74.0]),
-        units="kW",
+        units="N*m",
     )
 
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesElectromagneticTorque(number_of_points=NB_POINTS_TEST), ivc)
+    problem = run_system(
+        PerformancesElectromagneticTorque(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+    )
 
     assert problem.get_val("electromagnetic_torque", units="N*m") == pytest.approx(
-        np.array([191.8, 219.0, 246.1, 273.2, 300.4, 327.5, 355.3, 381.8, 409.6, 436.7]), rel=1e-2
+        np.array([34.2, 39.1, 43.9, 48.7, 53.6, 58.4, 63.4, 68.1, 73.1, 77.9]), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

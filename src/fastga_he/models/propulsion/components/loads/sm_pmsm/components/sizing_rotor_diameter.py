@@ -40,13 +40,14 @@ class SizingRotorDiameter(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_material_density",
             units="kg/m**3",
-            val=np.nan,
+            val=7850.0,
+            desc="The rotor material density, 4340 steel alloy is set to default",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":youngs_modules",
             units="Pa",
-            val=np.nan,
-            desc="Young's modules of the rotor material",
+            val=19.0e10,
+            desc="Young's modules of the rotor material, 4340 steel alloy is set to default",
         )
 
         self.add_output(

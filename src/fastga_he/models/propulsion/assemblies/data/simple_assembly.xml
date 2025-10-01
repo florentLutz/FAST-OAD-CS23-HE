@@ -453,7 +453,11 @@
                     <motor_1>
                         <pole_pairs_number is_input="True" >2<!--number of pole pairs--> </pole_pairs_number>
                         <number_of_phases is_input="True" >3<!--number of phases--> </number_of_phases>
+                        <tooth_ratio>0.45</tooth_ratio>
+                        <wire_per_slot>6</wire_per_slot>
+                        <conductor_slot_number>24</conductor_slot_number>
                         <slots_per_poles_phases  is_input="True" >2<!--number of slots per poles and per phases--> </slots_per_poles_phases>
+                        <wire_circular_section_area units="m**2">4.09e-05</wire_circular_section_area>
                         <air_gap_flux_density units="T" is_input="True" >0.9 <!--Bm airgap flux density--> </air_gap_flux_density>
                         <cond_twisting_coeff is_input="True" >1.25<!--k_lc--> </cond_twisting_coeff>
                         <end_winding_coeff is_input="True" >1.4<!--k_tb--> </end_winding_coeff>
@@ -464,6 +468,10 @@
                         <active_length units="m" is_input="True" >0.3117<!--Lm--> </active_length>
                         <slot_height units="m" is_input="True" >0.0358<!--hs--> </slot_height>
                         <slot_width units="m" is_input="True" >0.0137<!--ls--> </slot_width>
+                        <x2p_ratio>16.435</x2p_ratio>
+                        <winding_factor>0.97</winding_factor>
+                        <bore_diameter unit="m">0.187</bore_diameter>
+                        <stator_yoke_height unit="m">0.0351</stator_yoke_height>
                         <rotor_diameter units="m" is_input="True" >0.1814<!--D_rot--> </rotor_diameter>
                         <air_gap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </air_gap_thickness>
                         <rotor_mass units="kg" is_input="True" >56.97<!--k_tb--> </rotor_mass>
