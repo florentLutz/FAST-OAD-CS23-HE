@@ -2,13 +2,20 @@
 # Electric Aircraft.
 # Copyright (C) 2024 ISAE-SUPAERO
 
+import time
+import pathlib
+
 import pandas as pd
 import numpy as np
 
 from plotly.colors import DEFAULT_PLOTLY_COLORS as COLS
 import plotly.graph_objects as go
+import plotly.io as pio
 
 MARKER_DICTIONARY = ["circle-open", "square", "diamond", "cross"]
+
+RESULTS_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results"
+
 
 if __name__ == "__main__":
     # Data will be provided in the following order:
@@ -33,10 +40,10 @@ if __name__ == "__main__":
         "Piston 2 engine 1-6 seats",
         "Piston 2 engine 7+ seats",
         "Piston 2 engine total",
-        "TP 1 engine total",
-        "TP 2 engines 1-12 seats",
-        "TP 2 engines 13+ seats",
-        "TP 2 engines total",
+        "Turboprop 1 engine total",
+        "Turboprop 2 engines 1-12 seats",
+        "Turboprop 2 engines 13+ seats",
+        "Turboprop 2 engines total",
     ]
 
     af_hours_2004 = [2796.8, 3371.0, 3178.6, 3752.5, 7615.0, 4098.1, 3278.5, 5285.4, 6653.7, 5501.9]
@@ -116,8 +123,8 @@ if __name__ == "__main__":
     data_to_show = [
         "Piston 1 engine total",
         "Piston 2 engine total",
-        "TP 1 engine total",
-        "TP 2 engines total",
+        "Turboprop 1 engine total",
+        "Turboprop 2 engines total",
     ]
 
     count = 0
@@ -157,7 +164,7 @@ if __name__ == "__main__":
                     + str(np.round(mean, 1))
                     + " hours, std: "
                     + str(np.round(std, 1)),
-                    showlegend=True,
+                    showlegend=False,
                     legendgroup=group_name,
                     line=dict(color=COLS[count], dash="dot"),
                 )
@@ -165,7 +172,6 @@ if __name__ == "__main__":
             count += 1
 
     fig.update_layout(
-        title_text="Average airframe hours per category",
         xaxis_title="Year [-]",
         yaxis_title="Average airframe hours [h]",
         title_x=0.5,
@@ -175,6 +181,7 @@ if __name__ == "__main__":
         title_font=dict(size=20),
         legend_font=dict(size=20),
         legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        margin=dict(l=5, r=5, t=60, b=5),
     )
     fig.update_xaxes(
         mirror=True,
@@ -196,3 +203,13 @@ if __name__ == "__main__":
         side="right",
     )
     fig.show()
+
+    pdf_path = RESULTS_FOLDER_PATH / "average_airframe_hours.pdf"
+
+    write = True
+
+    if write:
+        fig.update_layout(title=None)
+        pio.write_image(fig, pdf_path, width=1600, height=900)
+        time.sleep(3)
+        pio.write_image(fig, pdf_path, width=1600, height=900)

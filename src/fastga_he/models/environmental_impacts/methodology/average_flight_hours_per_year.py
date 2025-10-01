@@ -2,11 +2,18 @@
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
 
+import time
+import pathlib
+
 import pandas as pd
 import numpy as np
 
 from plotly.colors import DEFAULT_PLOTLY_COLORS as COLS
 import plotly.graph_objects as go
+import plotly.io as pio
+
+RESULTS_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "results"
+MARKER_DICTIONARY = ["circle-open", "square", "diamond", "cross"]
 
 
 if __name__ == "__main__":
@@ -32,10 +39,10 @@ if __name__ == "__main__":
         "Piston 2 engine 1-6 seats",
         "Piston 2 engine 7+ seats",
         "Piston 2 engine total",
-        "TP 1 engine total",
-        "TP 2 engines 1-12 seats",
-        "TP 2 engines 13+ seats",
-        "TP 2 engines total",
+        "Turboprop 1 engine total",
+        "Turboprop 2 engines 1-12 seats",
+        "Turboprop 2 engines 13+ seats",
+        "Turboprop 2 engines total",
     ]
 
     flt_hrs_2004 = [093.5, 108.9, 104.8, 131.3, 193.6, 149.7, 307.7, 225.3, 314.6, 238.0]
@@ -103,56 +110,101 @@ if __name__ == "__main__":
         ],
     )
 
+    data_to_show = [
+        "Piston 1 engine total",
+        "Piston 2 engine total",
+        "Turboprop 1 engine total",
+        "Turboprop 2 engines total",
+    ]
+
     fig = go.Figure()
 
     abscissa = list(df.index)
     abscissa = [int(x) for x in abscissa]
 
+    count = 0
     for idx, column_name in enumerate(list(df.columns)):
-        group_name = " ".join(column_name.split(" ")[0:2])
+        if column_name in data_to_show:
+            group_name = " ".join(column_name.split(" ")[0:2])
 
-        local_data = df[column_name].values
+            local_data = df[column_name].values
 
-        fig.add_trace(
-            go.Scatter(
-                x=abscissa,
-                y=local_data,
-                mode="lines+markers",
-                name=column_name,
-                showlegend=True,
-                legendgroup=group_name,
-                line=dict(color=COLS[idx]),
+            fig.add_trace(
+                go.Scatter(
+                    x=abscissa,
+                    y=local_data,
+                    mode="lines+markers",
+                    name=column_name,
+                    showlegend=True,
+                    legendgroup=group_name,
+                    line=dict(color=COLS[count]),
+                    marker=dict(symbol=MARKER_DICTIONARY[count], color=COLS[count], size=10),
+                )
             )
-        )
 
-        index_2010 = abscissa.index(2010)
-        index_2020 = abscissa.index(2020)
+            index_2010 = abscissa.index(2010)
+            index_2020 = abscissa.index(2020)
 
-        x_for_regression = abscissa[index_2010:index_2020]
-        y_for_regression = local_data[index_2010:index_2020]
+            x_for_regression = abscissa[index_2010:index_2020]
+            y_for_regression = local_data[index_2010:index_2020]
 
-        mean = np.mean(np.array(y_for_regression))
-        std = np.std(np.array(y_for_regression)) / mean * 100.0
-        fig.add_trace(
-            go.Scatter(
-                x=[abscissa[0], abscissa[-1]],
-                y=[mean, mean],
-                mode="lines",
-                name="Mean: "
-                + str(np.round(mean, 1))
-                + " hours, std: "
-                + str(np.round(std, 1))
-                + " %",
-                showlegend=True,
-                legendgroup=group_name,
-                line=dict(color=COLS[idx], dash="dot"),
+            mean = np.mean(np.array(y_for_regression))
+            std = np.std(np.array(y_for_regression)) / mean * 100.0
+            fig.add_trace(
+                go.Scatter(
+                    x=[abscissa[0], abscissa[-1]],
+                    y=[mean, mean],
+                    mode="lines",
+                    name="Mean: "
+                    + str(np.round(mean, 1))
+                    + " hours, std: "
+                    + str(np.round(std, 1))
+                    + " %",
+                    showlegend=False,
+                    legendgroup=group_name,
+                    line=dict(color=COLS[idx], dash="dot"),
+                )
             )
-        )
+            count += 1
 
     fig.update_layout(
-        title_text="Average flight hours per year per category",
         xaxis_title="Year [-]",
-        yaxis_title="Average flight hours [h]",
-        title_x=0.5,
+        yaxis_title="Average flight hours per year [h]",
+        height=800.0,
+        width=1600.0,
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01),
+        margin=dict(l=5, r=5, t=60, b=5),
+    )
+    fig.update_xaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+    )
+    fig.update_yaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        side="right",
     )
     fig.show()
+
+    pdf_path = RESULTS_FOLDER_PATH / "average_yearly_hours_used.pdf"
+
+    write = True
+
+    if write:
+        fig.update_layout(title=None)
+        pio.write_image(fig, pdf_path, width=1600, height=900)
+        time.sleep(3)
+        pio.write_image(fig, pdf_path, width=1600, height=900)
