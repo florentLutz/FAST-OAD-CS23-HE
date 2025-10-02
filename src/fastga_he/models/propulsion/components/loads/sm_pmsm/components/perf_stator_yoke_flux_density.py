@@ -51,7 +51,7 @@ class PerformancesStatorYokeFluxDensity(om.ExplicitComponent):
 
         self.add_output(
             name="yoke_flux_density",
-            val=1.1,
+            val=1.2,
             units="T",
             shape=number_of_points,
             desc="Mean magnetic flux density in the stator yoke layer",

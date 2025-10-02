@@ -34,7 +34,7 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
         self.add_output(
             "electrical_frequency",
             units="Hz",
-            val=0.0,
+            val=1000.0,
             shape=number_of_points,
             desc="The oscillation frequency of the SM PMSM AC current",
         )
