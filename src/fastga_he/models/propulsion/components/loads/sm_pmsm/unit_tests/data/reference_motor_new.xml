@@ -49,6 +49,7 @@
                         <rotor_diameter units="m">0.1814</rotor_diameter>
                         <conductor_cable_length units="m">0.545475</conductor_cable_length>
                         <stator_diameter units="m">0.3288</stator_diameter>
+                        <mechanical_stress_max units="MPa">250.0</mechanical_stress_max>
                         <slot_width units="m">0.01348</slot_width>
                         <slot_height units="m">0.0358</slot_height>
                         <air_gap_thickness units="m">0.0028</air_gap_thickness>

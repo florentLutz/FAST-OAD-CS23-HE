@@ -67,13 +67,13 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_max",
             units="N*m",
-            val=500.0,
+            val=200.0,
             desc="Maximum value of the torque the motor has to provide",
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
             units="N*m",
-            val=500.0,
+            val=200.0,
             desc="Maximum value of the electromagnetic torque the motor has to provide",
         )
         self.add_output(
@@ -95,12 +95,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
             units="MPa",
-            val=50.0,
+            val=0.05,
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
             units="T",
-            val=1.0,
+            val=0.9,
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
@@ -110,12 +110,12 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
             units="T",
-            val=1.0,
+            val=1.1,
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_max",
             units="T",
-            val=1.0,
+            val=1.2,
         )
 
     def setup_partials(self):
