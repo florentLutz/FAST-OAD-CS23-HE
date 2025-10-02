@@ -59,7 +59,7 @@ from ..components.perf_stator_yoke_flux_density import PerformancesStatorYokeFlu
 from ..components.perf_stator_tooth_flux_density import PerformancesStatorToothFluxDensity
 from ..components.perf_electromagnetic_torque import PerformancesElectromagneticTorque
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.perf_mechanical_stress import PerformancesMaxMechanicalStress
+from ..components.perf_max_mechanical_stress import PerformancesMaxMechanicalStress
 from ..components.perf_sm_pmsm import PerformancesSMPMSM
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
