@@ -45,7 +45,7 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             units="m",
             desc="Stator bore diameter of the SM PMSM",
-            val=0.115,
+            val=0.114,
         )
 
     def setup_partials(self):

@@ -54,7 +54,7 @@ class SizingMotorWeight(om.ExplicitComponent):
         self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
             wrt="*",
-            val=1.0,
+            val=69.5,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

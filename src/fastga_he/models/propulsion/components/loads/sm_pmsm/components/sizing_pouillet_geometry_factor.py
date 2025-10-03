@@ -43,7 +43,7 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
             units="m**-1",
-            val=5.2e4,
+            val=53477.82,
             desc="Total length of the conductor wire divided by the wire cross-sectional area",
         )
 

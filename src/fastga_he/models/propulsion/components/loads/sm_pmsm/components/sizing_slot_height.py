@@ -73,7 +73,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
             units="m",
             desc="Single stator slot height (radial)",
-            val=0.03,
+            val=0.036,
         )
 
     def setup_partials(self):

@@ -43,7 +43,7 @@ class SizingSingleConductorCableLength(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
             units="m",
-            val=0.3,
+            val=0.332,
             desc="Single Conductor cable length in one slot",
         )
 

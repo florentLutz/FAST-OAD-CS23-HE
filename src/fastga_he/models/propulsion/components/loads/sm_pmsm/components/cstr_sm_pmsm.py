@@ -90,7 +90,7 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_rating",
             units="MW",
-            val=1.4326,
+            val=0.289,
             desc="Value of the maximum power the SM PMSM can provide, used for sizing",
         )
 

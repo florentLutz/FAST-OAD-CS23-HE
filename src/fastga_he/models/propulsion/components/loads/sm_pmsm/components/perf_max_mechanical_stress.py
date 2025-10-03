@@ -53,7 +53,7 @@ class PerformancesMaxMechanicalStress(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
             units="Pa",
             desc="The maximum rotor mechanical stress",
-            val=74.0e7,
+            val=29.3e3,
         )
 
     def setup_partials(self):
@@ -81,7 +81,7 @@ class PerformancesMaxMechanicalStress(om.ExplicitComponent):
         )
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max"] = (
-            sigma_mec if sigma_mec >= sigma_yield else sigma_yield
+            np.array(sigma_mec if sigma_mec < sigma_yield else sigma_yield)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -108,40 +108,40 @@ class PerformancesMaxMechanicalStress(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_poissons_ratio",
-        ] = (
+        ] = np.array(
             rho_rotor * rotor_diameter**2.0 * np.pi * rpm_max**2.0 / 480.0
-            if (sigma_mec >= sigma_yield)
+            if (sigma_mec < sigma_yield)
             else 0.0
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_material_density",
-        ] = (
+        ] = np.array(
             (3.0 + poissons_rotor) * rotor_diameter**2.0 * np.pi * rpm_max**2.0 / 480.0
-            if (sigma_mec >= sigma_yield)
+            if (sigma_mec < sigma_yield)
             else 0.0
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = (
+        ] = np.array(
             (3.0 + poissons_rotor) * rho_rotor * rotor_diameter * np.pi * rpm_max**2.0 / 240.0
-            if (sigma_mec >= sigma_yield)
+            if (sigma_mec < sigma_yield)
             else 0.0
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max",
-        ] = (
+        ] = np.array(
             (3.0 + poissons_rotor) * rho_rotor * rotor_diameter**2.0 * np.pi * rpm_max / 240.0
-            if (sigma_mec >= sigma_yield)
+            if (sigma_mec < sigma_yield)
             else 0.0
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_yield_stress",
-        ] = 0.0 if (sigma_mec >= sigma_yield) else 1.0
+        ] = np.array(0.0 if (sigma_mec < sigma_yield) else 1.0)

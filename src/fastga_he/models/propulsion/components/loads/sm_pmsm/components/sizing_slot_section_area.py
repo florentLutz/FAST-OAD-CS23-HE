@@ -36,7 +36,7 @@ class SizingSlotSectionArea(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area",
             units="m**2",
-            val=0.00021,
+            val=0.000298,
             desc="Single stator slot section area",
         )
 

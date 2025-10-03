@@ -56,7 +56,7 @@ class ConstraintsTorqueEnforce(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
             units="N*m",
-            val=250.0,
+            val=200.0,
             desc="Max continuous torque of the motor",
         )
 
@@ -105,7 +105,7 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating",
             units="min**-1",
-            val=5000.0,
+            val=14300.0,
             desc="Max continuous rpm of the motor",
         )
 
@@ -154,7 +154,7 @@ class ConstraintsCurrentDensityEnforce(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber",
             units="A/m**2",
-            val=1.0e4,
+            val=8.1e6,
             desc="Max phase current density of the motor",
         )
 
@@ -203,7 +203,7 @@ class ConstraintsTangentialStressEnforce(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber",
             units="MPa",
-            val=50.0,
+            val=0.05,
             desc="Max tangential stress of the rotor",
         )
 

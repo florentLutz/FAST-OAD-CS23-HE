@@ -43,7 +43,7 @@ class SizingExtStatorDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_diameter",
             units="m",
             desc="The outer stator diameter of the SM PMSM",
-            val=0.2,
+            val=0.228,
         )
 
     def setup_partials(self):

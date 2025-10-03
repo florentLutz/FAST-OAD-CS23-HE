@@ -119,7 +119,7 @@
             <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
             <losses_max units="W" is_input="False">6063.757483628889</losses_max>
             <mass units="kg" is_input="True">225.64</mass>
-            <mechanical_stress_max units="Pa" is_input="False">740000000.0<!--The maximum rotor mechanical stress--></mechanical_stress_max>
+            <mechanical_stress_max units="Pa" is_input="False">22248910.386478517<!--The maximum rotor mechanical stress--></mechanical_stress_max>
             <pole_pairs_number is_input="True">2.0<!--Number of the north and south pole pairs in the SM PMSM--></pole_pairs_number>
             <pouillet_geometry_factor units="1/m" is_input="True">86763.68677<!--Total length of the conductor wire divided by the wire cross-sectional area--></pouillet_geometry_factor>
             <resistance units="ohm" is_input="False">[0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397]</resistance>

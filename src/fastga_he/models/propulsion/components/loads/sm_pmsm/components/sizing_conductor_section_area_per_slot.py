@@ -45,7 +45,7 @@ class SizingConductorSectionAreaPerSlot(om.ExplicitComponent):
             + motor_id
             + ":conductor_section_area_per_slot",
             units="m**2",
-            val=0.0001,
+            val=0.00015,
             desc="Conductor wires section area per stator slot",
         )
 

@@ -11,15 +11,15 @@ from fastoad.module_management.constants import ModelDomain
 
 
 @oad.RegisterOpenMDAOSystem(
-    "fastga_he.handling_qualities.fixed_tail_sizing", domain=ModelDomain.HANDLING_QUALITIES
+    "fastga_he.handling_qualities.fixed_tail_sizing", domain=ModelDomain.GEOMETRY
 )
-class ComputeTailAreas(om.ExplicitComponent):
+class TailAreasFromVolume(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
         self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
-        self.add_input("data:geometry:horizontal_tail:volumetric_coefficient", val=np.nan)
-        self.add_input("data:geometry:vertical_tail:volumetric_coefficient", val=np.nan)
+        self.add_input("data:geometry:horizontal_tail:volume_coefficient", val=np.nan)
+        self.add_input("data:geometry:vertical_tail:volume_coefficient", val=np.nan)
         self.add_input(
             "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25", val=np.nan, units="m"
         )
@@ -36,7 +36,7 @@ class ComputeTailAreas(om.ExplicitComponent):
             wrt=[
                 "data:geometry:wing:area",
                 "data:geometry:wing:MAC:length",
-                "data:geometry:horizontal_tail:volumetric_coefficient",
+                "data:geometry:horizontal_tail:volume_coefficient",
                 "data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25",
             ],
         )
@@ -45,7 +45,7 @@ class ComputeTailAreas(om.ExplicitComponent):
             wrt=[
                 "data:geometry:wing:area",
                 "data:geometry:wing:span",
-                "data:geometry:vertical_tail:volumetric_coefficient",
+                "data:geometry:vertical_tail:volume_coefficient",
                 "data:geometry:vertical_tail:MAC:at25percent:x:from_wingMAC25",
             ],
         )
@@ -56,8 +56,8 @@ class ComputeTailAreas(om.ExplicitComponent):
         mac_wing = inputs["data:geometry:wing:MAC:length"]
         l_ht = inputs["data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25"]
         l_vt = inputs["data:geometry:vertical_tail:MAC:at25percent:x:from_wingMAC25"]
-        vc_ht = inputs["data:geometry:horizontal_tail:volumetric_coefficient"]
-        vc_vt = inputs["data:geometry:vertical_tail:volumetric_coefficient"]
+        vc_ht = inputs["data:geometry:horizontal_tail:volume_coefficient"]
+        vc_vt = inputs["data:geometry:vertical_tail:volume_coefficient"]
 
         outputs["data:geometry:horizontal_tail:area"] = vc_ht * s_wing * mac_wing / l_ht
         outputs["data:geometry:vertical_tail:area"] = vc_vt * s_wing * b_wing / l_vt
@@ -68,8 +68,8 @@ class ComputeTailAreas(om.ExplicitComponent):
         mac_wing = inputs["data:geometry:wing:MAC:length"]
         l_ht = inputs["data:geometry:horizontal_tail:MAC:at25percent:x:from_wingMAC25"]
         l_vt = inputs["data:geometry:vertical_tail:MAC:at25percent:x:from_wingMAC25"]
-        vc_ht = inputs["data:geometry:horizontal_tail:volumetric_coefficient"]
-        vc_vt = inputs["data:geometry:vertical_tail:volumetric_coefficient"]
+        vc_ht = inputs["data:geometry:horizontal_tail:volume_coefficient"]
+        vc_vt = inputs["data:geometry:vertical_tail:volume_coefficient"]
 
         partials["data:geometry:horizontal_tail:area", "data:geometry:wing:area"] = (
             vc_ht * mac_wing / l_ht
@@ -81,7 +81,7 @@ class ComputeTailAreas(om.ExplicitComponent):
 
         partials[
             "data:geometry:horizontal_tail:area",
-            "data:geometry:horizontal_tail:volumetric_coefficient",
+            "data:geometry:horizontal_tail:volume_coefficient",
         ] = s_wing * mac_wing / l_ht
 
         partials[
@@ -98,7 +98,7 @@ class ComputeTailAreas(om.ExplicitComponent):
         )
 
         partials[
-            "data:geometry:vertical_tail:area", "data:geometry:vertical_tail:volumetric_coefficient"
+            "data:geometry:vertical_tail:area", "data:geometry:vertical_tail:volume_coefficient"
         ] = s_wing * b_wing / l_vt
 
         partials[
