@@ -36,7 +36,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="Peak line to neutral voltage at the input of the motor",
         )
         self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
-        self.add_input("electromagnetic_torque", units="N*m", val=np.nan, shape=number_of_points)
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
         self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
@@ -69,12 +68,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             units="N*m",
             val=200.0,
             desc="Maximum value of the torque the motor has to provide",
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
-            units="N*m",
-            val=200.0,
-            desc="Maximum value of the electromagnetic torque the motor has to provide",
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max",
@@ -151,13 +144,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
-            wrt="electromagnetic_torque",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max",
             wrt="rpm",
             method="exact",
@@ -229,9 +215,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_max"] = np.max(
             inputs["torque_out"]
         )
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
-        ] = np.max(inputs["electromagnetic_torque"])
+
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max"] = np.max(
             inputs["rpm"]
         )
@@ -286,13 +270,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_max", "torque_out"
         ] = np.where(inputs["torque_out"] == np.max(inputs["torque_out"]), 1.0, 0.0)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
-            "electromagnetic_torque",
-        ] = np.where(
-            inputs["electromagnetic_torque"] == np.max(inputs["electromagnetic_torque"]), 1.0, 0.0
-        )
 
         partials["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max", "rpm"] = (
             np.where(inputs["rpm"] == np.max(inputs["rpm"]), 1.0, 0.0)

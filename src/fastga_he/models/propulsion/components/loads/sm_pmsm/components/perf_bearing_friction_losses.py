@@ -50,7 +50,7 @@ class PerformancesBearingLosses(om.ExplicitComponent):
         self.add_output(
             "bearing_friction_losses",
             units="W",
-            val=0.0,
+            val=0.014,
             shape=number_of_points,
         )
 

@@ -81,10 +81,12 @@ class PerformancesTotalFluxDensity(om.ExplicitComponent):
         surface_current_density = inputs["surface_current_density"]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
 
-        outputs["total_flux_density"] = np.sqrt(
+        unclipped_flux_density = np.sqrt(
             air_gap_flux_density**2.0
             + (MAGNETIC_PERMEABILITY * surface_current_density * x2p_ratio) ** 2.0
         )
+
+        outputs["total_flux_density"] = np.clip(unclipped_flux_density, 0.5, 2.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -96,22 +98,29 @@ class PerformancesTotalFluxDensity(om.ExplicitComponent):
             air_gap_flux_density**2.0
             + (MAGNETIC_PERMEABILITY * surface_current_density * x2p_ratio) ** 2.0
         )
+        clipped_flux_density = np.clip(total_flux_density, 0.5, 2.0)
 
-        partials["total_flux_density", "air_gap_flux_density"] = (
-            air_gap_flux_density / total_flux_density
+        partials["total_flux_density", "air_gap_flux_density"] = np.where(
+            total_flux_density == clipped_flux_density,
+            air_gap_flux_density / total_flux_density,
+            1e-6,
         )
 
-        partials["total_flux_density", "surface_current_density"] = (
+        partials["total_flux_density", "surface_current_density"] = np.where(
+            total_flux_density == clipped_flux_density,
             (MAGNETIC_PERMEABILITY * x2p_ratio) ** 2.0
             * surface_current_density
-            / total_flux_density
+            / total_flux_density,
+            1e-6,
         )
 
         partials[
             "total_flux_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
-        ] = (
+        ] = np.where(
+            total_flux_density == clipped_flux_density,
             (MAGNETIC_PERMEABILITY * surface_current_density) ** 2.0
             * x2p_ratio
-            / total_flux_density
+            / total_flux_density,
+            1e-6,
         )

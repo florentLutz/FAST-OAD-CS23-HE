@@ -38,9 +38,12 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         self.add_output(
             "joule_power_losses",
             units="W",
-            val=0.0,
+            val=166.2,
             shape=number_of_points,
         )
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
             of="joule_power_losses",

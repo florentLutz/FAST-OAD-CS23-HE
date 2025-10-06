@@ -34,11 +34,14 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             desc="The maximum surface tangential stress applied on rotor by electromagnetism",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":electromagnetic_torque_max",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
             val=np.nan,
             units="N*m",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
+            val=0.95,
+            desc="The ratio of the electromagnetic torque converted to output torque",
         )
 
         self.add_output(
@@ -60,12 +63,16 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         sigma = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber"
         ]
-        electromagnetic_torque_max = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
+        torque_rating = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
+        ]
+        conversion_rate = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
         ]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] = 2.0 * (
-            ((form_coefficient / (4.0 * np.pi * sigma)) * electromagnetic_torque_max) ** (1.0 / 3.0)
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] = (
+            2.0
+            * np.cbrt((form_coefficient * torque_rating / (4.0 * np.pi * sigma * conversion_rate)))
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -77,17 +84,33 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         sigma = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber"
         ]
-        electromagnetic_torque_max = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
+        torque_rating = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating"
         ]
+        conversion_rate = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
+        ]
+
+        partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
+        ] = (
+            -2.0
+            * np.cbrt(
+                (form_coefficient * torque_rating / (4.0 * np.pi * sigma * conversion_rate**4.0))
+            )
+            / 3.0
+        )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
         ] = (
             2.0
-            * (electromagnetic_torque_max ** (1.0 / 3.0) * (np.pi * sigma) ** (2.0 / 3.0))
-            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * sigma * form_coefficient ** (2.0 / 3.0))
+            * np.cbrt(
+                (torque_rating / (4.0 * np.pi * sigma * conversion_rate * form_coefficient**2.0))
+            )
+            / 3.0
         )
 
         partials[
@@ -95,25 +118,19 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber",
         ] = (
             -2.0
-            * (
-                form_coefficient ** (1.0 / 3.0)
-                * electromagnetic_torque_max ** (1.0 / 3.0)
-                * (np.pi * sigma) ** (2.0 / 3.0)
+            * np.cbrt(
+                (form_coefficient * torque_rating / (4.0 * np.pi * sigma**4.0 * conversion_rate))
             )
-            / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * sigma**2.0)
+            / 3.0
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",
         ] = (
             2.0
-            * (form_coefficient ** (1.0 / 3.0) * (np.pi * sigma) ** (2.0 / 3.0))
-            / (
-                3.0
-                * (2.0 ** (2.0 / 3.0))
-                * np.pi
-                * sigma
-                * electromagnetic_torque_max ** (2.0 / 3.0)
+            * np.cbrt(
+                (form_coefficient / (4.0 * np.pi * sigma * conversion_rate * torque_rating**2.0))
             )
+            / 3.0
         )

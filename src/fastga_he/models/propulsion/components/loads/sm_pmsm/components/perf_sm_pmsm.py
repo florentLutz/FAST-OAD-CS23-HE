@@ -28,7 +28,6 @@ from .perf_air_gap_flux_density import PerformancesAirGapFluxDensity
 from .perf_total_flux_density import PerformancesTotalFluxDensity
 from .perf_stator_yoke_flux_density import PerformancesStatorYokeFluxDensity
 from .perf_stator_tooth_flux_density import PerformancesStatorToothFluxDensity
-from .perf_electromagnetic_torque import PerformancesElectromagneticTorque
 from .perf_max_mechanical_stress import PerformancesMaxMechanicalStress
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
@@ -97,12 +96,6 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "phase_current_density",
             PerformancesPhaseCurrentDensity(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "electromagnetic_torque",
-            PerformancesElectromagneticTorque(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 
