@@ -22,7 +22,6 @@ from ..components.sizing_single_conductor_cable_length import SizingSingleConduc
 from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
 from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
-from ..components.sizing_radius_ratio import SizingRadiusRatio
 from ..components.sizing_conductor_wire_section_area import SizingConductorWireSectionArea
 from ..components.sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
 from ..components.sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
@@ -55,10 +54,8 @@ from ..components.perf_surface_current_density import PerformancesSurfaceCurrent
 from ..components.perf_tangential_stress import PerformancesTangentialStress
 from ..components.perf_air_gap_flux_density import PerformancesAirGapFluxDensity
 from ..components.perf_total_flux_density import PerformancesTotalFluxDensity
-from ..components.perf_stator_yoke_flux_density import PerformancesStatorYokeFluxDensity
-from ..components.perf_stator_tooth_flux_density import PerformancesStatorToothFluxDensity
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.perf_max_mechanical_stress import PerformancesMaxMechanicalStress
+from ..components.perf_mechanical_stress_factor import PerformancesMechanicalStressFactor
 from ..components.perf_sm_pmsm import PerformancesSMPMSM
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
@@ -71,12 +68,14 @@ from ..components.cstr_enforce import (
     ConstraintsRPMEnforce,
     ConstraintsTangentialStressEnforce,
     ConstraintsCurrentDensityEnforce,
+    ConstraintsElectromagneticTorqueEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsTorqueEnsure,
     ConstraintsRPMEnsure,
     ConstraintsTangentialStressEnsure,
     ConstraintsCurrentDensityEnsure,
+    ConstraintsElectromagneticTorqueEnsure,
 )
 from ..components.cstr_sm_pmsm import ConstraintPMSMPowerRateMission
 from ..constants import POSSIBLE_POSITION, DEFAULT_DYNAMIC_VISCOSITY
@@ -97,8 +96,8 @@ def test_bore_diameter():
         units="N/m**2",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:torque_rating",
-        val=856.6,
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_rating",
+        val=901.7,
         units="N*m",
     )
     # Run problem and check obtained value(s) is/(are) correct
@@ -121,32 +120,7 @@ def test_rotor_diameter():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", units="m"
-    ) == pytest.approx(0.162, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_radius_ratio():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", val=0.16, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
-        val=0.19,
-        units="m",
-    )
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingRadiusRatio(motor_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:radius_ratio"
-    ) == pytest.approx(0.842, rel=1e-2)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", units="m"
-    ) == pytest.approx(0.015, rel=1e-2)
+    ) == pytest.approx(0.175, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -550,6 +524,24 @@ def test_constraints_torque_enforce():
     problem.check_partials(compact_print=True)
 
 
+def test_constraints_electromagnetic_torque_enforce():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_max",
+        val=856.6,
+        units="N*m",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsElectromagneticTorqueEnforce(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_rating", units="N*m"
+    ) == pytest.approx(856.63, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_constraints_rpm_enforce():
     ivc = om.IndepVarComp()
 
@@ -616,6 +608,30 @@ def test_constraints_torque_ensure():
 
     assert problem.get_val(
         "constraints:propulsion:he_power_train:SM_PMSM:motor_1:torque_rating", units="N*m"
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_constraints_electromagnetic_torque_ensure():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_max",
+        val=856.6,
+        units="N*m",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_rating",
+        val=856.6,
+        units="N*m",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(ConstraintsElectromagneticTorqueEnsure(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "constraints:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_rating",
+        units="N*m",
     ) == pytest.approx(0.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -807,8 +823,8 @@ def test_tangential_stress():
     )
 
     ivc.add_output(
-        "torque_out",
-        np.array([191.8, 219.0, 246.1, 273.2, 300.4, 327.5, 355.3, 381.8, 409.6, 436.7]),
+        "electromagnetic_torque",
+        np.array([201.89, 230.53, 259.05, 287.58, 316.21, 344.74, 374.00, 402.95, 431.16, 459.68]),
         units="N*m",
     )
 
@@ -818,7 +834,7 @@ def test_tangential_stress():
     )
 
     assert problem.get_val("tangential_stress", units="MPa") == pytest.approx(
-        np.array([0.0159, 0.0181, 0.0203, 0.0226, 0.0248, 0.0271, 0.0294, 0.0316, 0.0339, 0.0361]),
+        np.array([0.0169, 0.0181, 0.0203, 0.0226, 0.0248, 0.0271, 0.0294, 0.0316, 0.0339, 0.0361]),
         rel=1e-2,
     )
 
@@ -840,7 +856,7 @@ def test_air_gap_flux_density():
     problem = run_system(PerformancesAirGapFluxDensity(number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val("air_gap_flux_density", units="T") == pytest.approx(
-        np.array([0.92, 1.05, 1.18, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2]),
+        np.array([0.91, 1.05, 1.17, 1.31, 1.44, 1.57, 1.7, 1.83, 1.96, 2.09]),
         rel=1e-2,
     )
 
@@ -912,57 +928,6 @@ def test_total_flux_density():
 
     assert problem.get_val("total_flux_density", units="T") == pytest.approx(
         np.array([0.93, 1.06, 1.18, 1.31, 1.44, 1.57, 1.70, 1.83, 1.96, 2.00]),
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_yoke_flux_density():
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesStatorYokeFluxDensity(motor_id="motor_1", number_of_points=NB_POINTS_TEST)
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    ivc.add_output(
-        "total_flux_density",
-        np.array([0.93, 1.06, 1.18, 1.31, 1.44, 1.57, 1.70, 1.83, 1.96, 2.00]),
-        units="T",
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesStatorYokeFluxDensity(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("yoke_flux_density", units="T") == pytest.approx(
-        np.array([1.12, 1.27, 1.42, 1.57, 1.73, 1.88, 2.04, 2.2, 2.35, 2.4]),
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_tooth_flux_density():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output(
-        "total_flux_density",
-        np.array([0.93, 1.06, 1.18, 1.31, 1.44, 1.57, 1.70, 1.83, 1.96, 2.00]),
-        units="T",
-    )
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:tooth_ratio", val=0.4407)
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesStatorToothFluxDensity(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("tooth_flux_density", units="T") == pytest.approx(
-        np.array([1.34, 1.53, 1.71, 1.89, 2.08, 2.27, 2.46, 2.64, 2.83, 2.89]),
         rel=1e-2,
     )
 
@@ -1252,6 +1217,11 @@ def test_maximum():
         np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
         units="N*m",
     )
+    ivc.add_output(
+        "electromagnetic_torque",
+        np.array([82.0, 91.0, 100.0, 108.0, 116.0, 123.0, 130.0, 136.0, 143.0, 149.0]),
+        units="N*m",
+    )
     ivc.add_output("rpm", np.linspace(3500, 4500, NB_POINTS_TEST), units="min**-1")
     ivc.add_output(
         "ac_voltage_peak_in",
@@ -1295,6 +1265,9 @@ def test_maximum():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:torque_max", units="N*m"
     ) == pytest.approx(149.0, rel=1e-2)
     assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_torque_max", units="N*m"
+    ) == pytest.approx(149.0, rel=1e-2)
+    assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rpm_max", units="min**-1"
     ) == pytest.approx(4500.0, rel=1e-2)
     assert problem.get_val(
@@ -1325,15 +1298,15 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
-def test_max_mechanical_stress():
+def test_mechanical_stress_factor():
     ivc = get_indep_var_comp(
-        list_inputs(PerformancesMaxMechanicalStress(motor_id="motor_1")),
+        list_inputs(PerformancesMechanicalStressFactor(motor_id="motor_1")),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesMaxMechanicalStress(motor_id="motor_1"), ivc)
+    problem = run_system(PerformancesMechanicalStressFactor(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mechanical_stress_max", units="MPa"
@@ -1388,7 +1361,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", units="m"
-    ) == pytest.approx(0.163, rel=1e-2)
+    ) == pytest.approx(0.175, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:active_length", units="m"
@@ -1420,7 +1393,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_mass", units="kg"
-    ) == pytest.approx(46.55, rel=1e-2)
+    ) == pytest.approx(53.76, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_mass", units="kg"
@@ -1433,7 +1406,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mass", units="kg"
-    ) == pytest.approx(246.44, rel=1e-2)
+    ) == pytest.approx(253.65, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 

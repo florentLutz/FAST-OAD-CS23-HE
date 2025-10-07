@@ -28,7 +28,7 @@ class SizingRatioX2p(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
-            val=np.nan,
+            val=0.97,
             desc="the radius ratio of the rotor radius and the stator bore radius",
         )
 

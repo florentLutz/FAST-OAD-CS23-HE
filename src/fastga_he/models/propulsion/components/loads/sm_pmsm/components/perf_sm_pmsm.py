@@ -13,6 +13,7 @@ from .perf_air_gap_windage_losses import PerformancesAirGapWindageLosses
 from .perf_rotor_windage_losses import PerformancesRotorWindageLoss
 from .perf_bearing_friction_losses import PerformancesBearingLosses
 from .perf_mechanical_losses import PerformancesMechanicalLosses
+from .perf_electromagnetic_torque import PerformancesElectromagneticTorque
 from .perf_power_losses import PerformancesPowerLosses
 from .perf_efficiency import PerformancesEfficiency
 from .perf_apparent_power import PerformancesApparentPower
@@ -26,9 +27,7 @@ from .perf_tangential_stress import PerformancesTangentialStress
 from .perf_surface_current_density import PerformancesSurfaceCurrentDensity
 from .perf_air_gap_flux_density import PerformancesAirGapFluxDensity
 from .perf_total_flux_density import PerformancesTotalFluxDensity
-from .perf_stator_yoke_flux_density import PerformancesStatorYokeFluxDensity
-from .perf_stator_tooth_flux_density import PerformancesStatorToothFluxDensity
-from .perf_max_mechanical_stress import PerformancesMaxMechanicalStress
+from .perf_mechanical_stress_factor import PerformancesMechanicalStressFactor
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
@@ -72,6 +71,36 @@ class PerformancesSMPMSM(om.Group):
             PerformancesWindageFrictionCoefficient(
                 motor_id=motor_id, number_of_points=number_of_points
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "air_gap_windage_losses",
+            PerformancesAirGapWindageLosses(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "rotor_windage_losses",
+            PerformancesRotorWindageLoss(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "bearing_friction_losses",
+            PerformancesBearingLosses(motor_id=motor_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "mechanical_losses",
+            PerformancesMechanicalLosses(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "electromagnetic_torque",
+            PerformancesElectromagneticTorque(number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -144,30 +173,6 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "air_gap_windage_losses",
-            PerformancesAirGapWindageLosses(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "rotor_windage_losses",
-            PerformancesRotorWindageLoss(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "bearing_friction_losses",
-            PerformancesBearingLosses(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "mechanical_losses",
-            PerformancesMechanicalLosses(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
             "power_losses",
             PerformancesPowerLosses(number_of_points=number_of_points),
             promotes=["*"],
@@ -198,20 +203,6 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "yoke_flux_density",
-            PerformancesStatorYokeFluxDensity(motor_id=motor_id, number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "tooth_flux_density",
-            PerformancesStatorToothFluxDensity(
-                motor_id=motor_id, number_of_points=number_of_points
-            ),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
             "voltage_rms",
             PerformancesVoltageRMS(number_of_points=number_of_points),
             promotes=["*"],
@@ -230,7 +221,7 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "max_mechanical_stress",
-            PerformancesMaxMechanicalStress(motor_id=motor_id),
+            "mechanical_stress_factor",
+            PerformancesMechanicalStressFactor(motor_id=motor_id),
             promotes=["*"],
         )

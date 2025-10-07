@@ -5,6 +5,9 @@ from stdatm import AtmosphereWithPartials
 
 SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE = "submodel.propulsion.constraints.sm_pmsm.torque"
 SUBMODEL_CONSTRAINTS_SM_PMSM_RPM = "submodel.propulsion.constraints.sm_pmsm.rpm"
+SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE = (
+    "submodel.propulsion.constraints.sm_pmsm.electromagnetic_torque"
+)
 SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS = (
     "submodel.propulsion.constraints.sm_pmsm.tangential_stress"
 )

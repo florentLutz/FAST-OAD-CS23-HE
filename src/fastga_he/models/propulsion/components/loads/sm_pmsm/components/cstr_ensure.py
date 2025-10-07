@@ -7,6 +7,7 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
     SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY,
     SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS,
+    SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE,
 )
 
 import openmdao.api as om
@@ -134,6 +135,88 @@ class ConstraintsRPMEnsure(om.ExplicitComponent):
         outputs["constraints:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"] = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max"]
             - inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"]
+        )
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE,
+    "fastga_he.submodel.propulsion.constraints.sm_pmsm.electromagnetic_torque.ensure",
+)
+class ConstraintsElectromagneticTorqueEnsure(om.ExplicitComponent):
+    """
+    Class that computes the difference between the maximum electromagnetic torque seen by the motor
+    during the mission and the value used for sizing, ensuring each component works below its
+    maximum.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+        )
+
+    def setup(self):
+        motor_id = self.options["motor_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
+            units="N*m",
+            val=np.nan,
+            desc="Maximum value of the electromagnetic torque the motor has to provide",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_rating",
+            units="N*m",
+            val=np.nan,
+            desc="Max electromagnetic torque of the motor",
+        )
+
+        self.add_output(
+            "constraints:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":electromagnetic_torque_rating",
+            units="N*m",
+            val=0.0,
+            desc="Respected if <0",
+        )
+
+    def setup_partials(self):
+        motor_id = self.options["motor_id"]
+
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":electromagnetic_torque_rating",
+            wrt="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":electromagnetic_torque_max",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="constraints:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":electromagnetic_torque_rating",
+            wrt="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":electromagnetic_torque_rating",
+            val=-1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        motor_id = self.options["motor_id"]
+
+        outputs[
+            "constraints:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":electromagnetic_torque_rating"
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
+            ]
+            - inputs[
+                "data:propulsion:he_power_train:SM_PMSM:"
+                + motor_id
+                + ":electromagnetic_torque_rating"
+            ]
         )
 
 

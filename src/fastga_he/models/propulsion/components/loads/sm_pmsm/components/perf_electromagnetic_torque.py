@@ -15,20 +15,13 @@ class PerformancesElectromagneticTorque(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
-        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        motor_id = self.options["motor_id"]
 
-        self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
-        self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
-            val=0.95,
-            desc="The ratio of the electromagnetic torque converted to output torque",
-        )
+        self.add_input("shaft_power_out", units="W", val=np.nan, shape=number_of_points)
+        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input("mechanical_power_losses", units="W", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "electromagnetic_torque",
@@ -40,50 +33,29 @@ class PerformancesElectromagneticTorque(om.ExplicitComponent):
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
-        motor_id = self.options["motor_id"]
 
         self.declare_partials(
             of="electromagnetic_torque",
-            wrt="torque_out",
+            wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
-        self.declare_partials(
-            of="electromagnetic_torque",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        motor_id = self.options["motor_id"]
+        rpm = inputs["rpm"]
+        power = inputs["shaft_power_out"] + inputs["mechanical_power_losses"]
+        omega = rpm * 2.0 * np.pi / 60
 
-        outputs["electromagnetic_torque"] = (
-            inputs["torque_out"]
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
-            ]
-        )
+        outputs["electromagnetic_torque"] = power / omega
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        motor_id = self.options["motor_id"]
+        rpm = inputs["rpm"]
+        power = inputs["shaft_power_out"] + inputs["mechanical_power_losses"]
+        omega = rpm * 2.0 * np.pi / 60
 
-        partials["electromagnetic_torque", "torque_out"] = (
-            1.0
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
-            ]
-        )
+        partials["electromagnetic_torque", "shaft_power_out"] = 1.0 / omega
 
-        partials[
-            "electromagnetic_torque",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
-        ] = (
-            -inputs["torque_out"]
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
-            ]
-            ** 2.0
-        )
+        partials["electromagnetic_torque", "mechanical_power_losses"] = 1.0 / omega
+
+        partials["electromagnetic_torque", "rpm"] = -power / omega**2.0 * 2.0 * np.pi / 60

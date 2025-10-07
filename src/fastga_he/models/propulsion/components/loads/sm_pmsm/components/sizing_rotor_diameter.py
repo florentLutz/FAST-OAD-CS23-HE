@@ -2,7 +2,6 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
 
 
@@ -21,37 +20,21 @@ class SizingRotorDiameter(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
+            val=0.97,
+            desc="the radius ratio of the rotor radius and the stator bore radius",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             units="m",
-            desc="The length of electromagnetism active part of SM PMSM",
-            val=np.nan,
+            desc="The distance between the rotor and the stator bore",
+            val=0.00075,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_poissons_ratio",
-            val=0.29,
-            desc="The rotor material Poisson's ratio, 4340 steel alloy is set to default",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
-            units="Pa",
-            val=np.nan,
-            desc="The maximum rotor mechanical stress",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_youngs_modules",
-            units="Pa",
-            val=19.0e10,
-            desc="Young's modules of the rotor material, 4340 steel alloy is set to default",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":safety_factor",
-            val=1.5,
-            desc="Safety factor for rotor diameter",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-            val=np.nan,
-            desc="The factor to account extra length from end winding",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor",
+            desc="Remain at 1.0 if the maximum mechanical stress is within the range of yield "
+            "stress",
+            val=1.0,
         )
 
         self.add_output(
@@ -66,99 +49,44 @@ class SizingRotorDiameter(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        end_winding_coeff = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        mechanical_stress_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor"
         ]
-        active_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        air_gap_thickness = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"
         ]
-        sigma_mec = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max"
+        radius_ratio = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
         ]
-        e_rotor = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_youngs_modules"
-        ]
-        poissons_rotor = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_poissons_ratio"
-        ]
-        sf_rotor = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":safety_factor"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] = (
-            active_length
-            * end_winding_coeff
-            * (30.0 * sigma_mec * sf_rotor / (e_rotor * (3.0 + poissons_rotor))) ** 0.25
+            2.0 * air_gap_thickness * radius_ratio * mechanical_stress_factor / (1.0 - radius_ratio)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        end_winding_coeff = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        mechanical_stress_factor = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor"
         ]
-        active_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        air_gap_thickness = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"
         ]
-        sigma_mec = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max"
+        radius_ratio = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
         ]
-        e_rotor = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_youngs_modules"
-        ]
-        poissons_rotor = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_poissons_ratio"
-        ]
-        sf_rotor = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":safety_factor"]
-
-        common_denominator = (e_rotor * (3.0 + poissons_rotor)) ** 0.25 * (
-            30.0 * sigma_mec * sf_rotor
-        ) ** 0.75
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-        ] = (
-            active_length
-            * (30.0 * sigma_mec * sf_rotor / (e_rotor * (3.0 + poissons_rotor))) ** 0.25
-        )
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
+        ] = 2.0 * air_gap_thickness * mechanical_stress_factor / (1.0 - radius_ratio) ** 2.0
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = (
-            end_winding_coeff
-            * (30.0 * sigma_mec * sf_rotor / (e_rotor * (3.0 + poissons_rotor))) ** 0.25
-        )
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
+        ] = 2.0 * radius_ratio * mechanical_stress_factor / (1.0 - radius_ratio)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_max",
-        ] = active_length * end_winding_coeff * 7.5 * sf_rotor / common_denominator
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":safety_factor",
-        ] = active_length * end_winding_coeff * 7.5 * sigma_mec / common_denominator
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_youngs_modules",
-        ] = (
-            -active_length
-            * end_winding_coeff
-            * 7.5
-            * sigma_mec
-            * sf_rotor
-            / (e_rotor * common_denominator)
-        )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_poissons_ratio",
-        ] = (
-            -active_length
-            * end_winding_coeff
-            * 7.5
-            * sigma_mec
-            * sf_rotor
-            / ((3.0 + poissons_rotor) * common_denominator)
-        )
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor",
+        ] = 2.0 * air_gap_thickness * radius_ratio / (1.0 - radius_ratio)

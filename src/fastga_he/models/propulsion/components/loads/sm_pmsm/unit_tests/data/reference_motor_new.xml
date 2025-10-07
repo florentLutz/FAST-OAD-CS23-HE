@@ -61,7 +61,8 @@
                         <torque_max units="N*m">856.6</torque_max>
                         <active_length units="m">0.3167</active_length>
                         <torque_rating units="N*m">856.6</torque_rating>
-                        <electromagnetic_torque_max unit="N*m">856.6</electromagnetic_torque_max>
+                        <electromagnetic_torque_rating units="N*m">901.7</electromagnetic_torque_rating>
+                        <electromagnetic_torque_max unit="N*m">901.7</electromagnetic_torque_max>
                         <voltage_caliber units="V">700.0</voltage_caliber>
                         <rpm_rating units="min**-1">15970</rpm_rating>
                         <rpm_max units="min**-1">15970</rpm_max>
