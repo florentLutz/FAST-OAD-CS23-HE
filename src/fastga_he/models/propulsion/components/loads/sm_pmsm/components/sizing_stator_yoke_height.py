@@ -33,7 +33,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_ratio",
-            val=1.2,
+            val=1.33,
             desc="Maximum mean yoke magnetic flux density divided by the maximum air gap flux "
             "density",
         )

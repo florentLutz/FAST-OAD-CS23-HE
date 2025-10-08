@@ -55,8 +55,8 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             + ":magnetic_material_density",
             val=8.12e3,
             units="kg/m**3",
-            desc="The density of soft magnetic material. Default value obtained from the iron "
-            "cobaly alloy from Vacuumschmelze materials",
+            desc="The density of soft magnetic material. Vacoflux 48 alloy from Vacuumschmelze materials is set to "
+            "default",
         )
 
         self.add_output(

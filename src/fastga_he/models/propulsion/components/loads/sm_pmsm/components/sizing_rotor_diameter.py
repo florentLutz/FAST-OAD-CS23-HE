@@ -3,6 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import openmdao.api as om
+import numpy as np
 
 
 class SizingRotorDiameter(om.ExplicitComponent):
@@ -20,21 +21,15 @@ class SizingRotorDiameter(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
-            val=0.97,
-            desc="the radius ratio of the rotor radius and the stator bore radius",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            units="m",
+            val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             units="m",
             desc="The distance between the rotor and the stator bore",
             val=0.00075,
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor",
-            desc="Remain at 1.0 if the maximum mechanical stress is within the range of yield "
-            "stress",
-            val=1.0,
         )
 
         self.add_output(
@@ -44,49 +39,24 @@ class SizingRotorDiameter(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", method="exact")
+        motor_id = self.options["motor_id"]
+
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
+            val=1.0,
+        )
+        self.declare_partials(
+            of="*",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
+            val=-2.0,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        mechanical_stress_factor = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor"
-        ]
-        air_gap_thickness = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"
-        ]
-        radius_ratio = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
-        ]
-
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] = (
-            2.0 * air_gap_thickness * radius_ratio * mechanical_stress_factor / (1.0 - radius_ratio)
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"]
+            - 2.0
+            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"]
         )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        motor_id = self.options["motor_id"]
-
-        mechanical_stress_factor = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor"
-        ]
-        air_gap_thickness = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness"
-        ]
-        radius_ratio = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
-        ]
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
-        ] = 2.0 * air_gap_thickness * mechanical_stress_factor / (1.0 - radius_ratio) ** 2.0
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
-        ] = 2.0 * radius_ratio * mechanical_stress_factor / (1.0 - radius_ratio)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_stress_factor",
-        ] = 2.0 * air_gap_thickness * radius_ratio / (1.0 - radius_ratio)

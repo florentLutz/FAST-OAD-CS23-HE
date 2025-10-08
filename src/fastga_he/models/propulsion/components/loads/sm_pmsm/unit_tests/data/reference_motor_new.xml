@@ -43,17 +43,17 @@
                         <frame_mass units="kg">23.9</frame_mass>
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
-                        <bore_diameter units="m">0.19</bore_diameter>
+                        <bore_diameter units="m">0.3</bore_diameter>
                         <frame_diameter units="m">0.376</frame_diameter>
                         <frame_length units="m">0.48</frame_length>
-                        <rotor_diameter units="m">0.16</rotor_diameter>
+                        <rotor_diameter units="m">0.2985</rotor_diameter>
                         <slot_section_area units="m**2">0.000545</slot_section_area>
                         <conductor_cable_length units="m">0.554225</conductor_cable_length>
                         <stator_diameter units="m">0.3476</stator_diameter>
                         <mechanical_stress_max units="MPa">250.0</mechanical_stress_max>
                         <slot_width units="m">0.0139</slot_width>
                         <slot_height units="m">0.0392</slot_height>
-                        <air_gap_thickness units="m">0.015</air_gap_thickness>
+                        <air_gap_thickness units="m">0.00075</air_gap_thickness>
                         <resistance units="ohm">0.0014608</resistance>
                         <front_length_ratio>0.5</front_length_ratio>
                         <conductor_section_area_per_slot units="m**2">0.0002725</conductor_section_area_per_slot>
@@ -93,7 +93,7 @@
                         <number_of_phases>3</number_of_phases>
                         <conductor_slot_number>24</conductor_slot_number>
                         <x2p_ratio>3.021</x2p_ratio>
-                        <radius_ratio>0.842</radius_ratio>
+                        <radius_ratio>0.995</radius_ratio>
                         <tooth_ratio>0.4407</tooth_ratio>
                         <winding_factor>0.97</winding_factor>
                         <slot_conductor_factor>1</slot_conductor_factor>

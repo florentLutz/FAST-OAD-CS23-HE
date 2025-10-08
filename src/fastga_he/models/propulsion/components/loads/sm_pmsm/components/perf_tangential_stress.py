@@ -81,7 +81,7 @@ class PerformancesTangentialStress(om.ExplicitComponent):
 
         unclipped_sigma_t = 2.0 * torque_em / (np.pi * rotor_diameter**2.0 * active_length)
 
-        outputs["tangential_stress"] = np.clip(unclipped_sigma_t, 17000.0, 148500)
+        outputs["tangential_stress"] = np.clip(unclipped_sigma_t, 1700.0, 148500)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -96,7 +96,7 @@ class PerformancesTangentialStress(om.ExplicitComponent):
         torque_em = inputs["electromagnetic_torque"]
 
         unclipped_sigma_t = 2.0 * torque_em / (np.pi * rotor_diameter**2.0 * active_length)
-        clipped_sigma_t = np.clip(unclipped_sigma_t, 17000.0, 148500)
+        clipped_sigma_t = np.clip(unclipped_sigma_t, 1700.0, 148500)
 
         partials[
             "tangential_stress",

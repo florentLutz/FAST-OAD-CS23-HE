@@ -60,24 +60,36 @@ class PerformancesElectricalFrequency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
-
-        outputs["electrical_frequency"] = (
+        unclipped_frequency = (
             inputs["rpm"]
             * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
             / 60.0
         )
 
+        outputs["electrical_frequency"] = np.clip(unclipped_frequency, 0.0, 5000.0)
+
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
+        unclipped_frequency = (
+            inputs["rpm"]
+            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
+            / 60.0
+        )
+        clipped_frequency = np.clip(unclipped_frequency, 0.0, 5000.0)
+
         partials[
             "electrical_frequency",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-        ] = inputs["rpm"] / 60.0
+        ] = np.where(unclipped_frequency == clipped_frequency, inputs["rpm"] / 60.0, 1.0e-6)
 
-        partials["electrical_frequency", "rpm"] = np.full(
-            number_of_points,
-            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
-            / 60.0,
+        partials["electrical_frequency", "rpm"] = np.where(
+            unclipped_frequency == clipped_frequency,
+            np.full(
+                number_of_points,
+                inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
+                / 60.0,
+            ),
+            1.0e-6,
         )

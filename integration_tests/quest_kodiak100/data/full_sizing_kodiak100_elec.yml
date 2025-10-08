@@ -50,6 +50,8 @@ model:
             sort_component: True
         mtow:
             id: fastga.loop.mtow
+#        tail_sizing:
+#            id: fastga_he.handling_qualities.fixed_tail_sizing
         hq:
             tail_sizing:
                 id: fastga.handling_qualities.tail_sizing
