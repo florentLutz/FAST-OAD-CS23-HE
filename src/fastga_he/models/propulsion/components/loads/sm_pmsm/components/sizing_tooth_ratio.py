@@ -9,6 +9,7 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class SizingToothRatio(om.ExplicitComponent):
     """
     Computation of the ratio between the circumference of the stator bore and the total teeth
@@ -65,9 +66,7 @@ class SizingToothRatio(om.ExplicitComponent):
         ]
 
         if 0 < 2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio) < 1.0:
-            _LOGGER.info(
-                msg="Tooth ratio set to 0.5, please check tooth flux ratio."
-            )
+            _LOGGER.info(msg="Tooth ratio set to 0.5, please check tooth flux ratio.")
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"] = (
             2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio)
