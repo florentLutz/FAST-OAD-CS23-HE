@@ -26,7 +26,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
 
         self.add_input(
             "ac_current_rms_in_one_phase",
-            units="A",
+            units="kA",
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
@@ -53,8 +53,8 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
 
         self.add_output(
             name="surface_current_density",
-            val=1.1e5,
-            units="A/m",
+            val=50.0,
+            units="kA/m",
             shape=number_of_points,
             desc="The surface current density of the winding conductor cable",
         )
@@ -96,10 +96,11 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
         ]
         k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
-
-        outputs["surface_current_density"] = (
-            np.sqrt(2.0) * k_winding * num_slot * num_wire * i_rms / (np.pi * bore_diameter)
+        linear_current_density = np.clip(
+            num_slot * num_wire * i_rms / (np.pi * bore_diameter), 1.0, 110
         )
+
+        outputs["surface_current_density"] = np.sqrt(2.0) * k_winding * linear_current_density
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -113,35 +114,51 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
         bore_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
         ]
+        unclipped_linear_current_density = num_slot * num_wire * i_rms / (np.pi * bore_diameter)
+        clipped_linear_current_density = np.clip(unclipped_linear_current_density, 1.0, 110.0)
         k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
 
         partials[
             "surface_current_density",
             "ac_current_rms_in_one_phase",
-        ] = (
+        ] = np.where(
+            unclipped_linear_current_density == clipped_linear_current_density,
             np.full(number_of_points, np.sqrt(2.0))
             * k_winding
             * num_slot
             * num_wire
-            / (np.pi * bore_diameter)
+            / (np.pi * bore_diameter),
+            1.0e-6,
         )
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-        ] = np.sqrt(2.0) * k_winding * num_wire * i_rms / (np.pi * bore_diameter)
+        ] = np.where(
+            unclipped_linear_current_density == clipped_linear_current_density,
+            (np.sqrt(2.0) * k_winding * num_wire * i_rms / (np.pi * bore_diameter)),
+            1.0e-6,
+        )
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
-        ] = np.sqrt(2.0) * k_winding * num_slot * i_rms / (np.pi * bore_diameter)
+        ] = np.where(
+            unclipped_linear_current_density == clipped_linear_current_density,
+            np.sqrt(2.0) * k_winding * num_slot * i_rms / (np.pi * bore_diameter),
+            1.0e-6,
+        )
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
-        ] = np.sqrt(2.0) * num_slot * num_wire * i_rms / (np.pi * bore_diameter)
+        ] = np.sqrt(2.0) * clipped_linear_current_density
 
         partials[
             "surface_current_density",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-        ] = -(np.sqrt(2.0) * k_winding * num_slot * num_wire * i_rms / (np.pi * bore_diameter**2.0))
+        ] = np.where(
+            unclipped_linear_current_density == clipped_linear_current_density,
+            -np.sqrt(2.0) * k_winding * num_slot * num_wire * i_rms / (np.pi * bore_diameter**2.0),
+            1.0e-6,
+        )

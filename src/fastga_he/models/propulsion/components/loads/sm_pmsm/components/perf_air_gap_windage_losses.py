@@ -59,7 +59,7 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
         self.add_output(
             "air_gap_windage_losses",
             units="W",
-            val=0.0007,
+            val=844.0,
             shape=number_of_points,
         )
 

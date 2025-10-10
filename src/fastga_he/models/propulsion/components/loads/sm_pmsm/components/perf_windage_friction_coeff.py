@@ -38,7 +38,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
             desc="The distance between the rotor and the stator bore",
         )
 
-        self.add_output("air_gap_friction_coeff", val=np.full(number_of_points, 0.008))
+        self.add_output("air_gap_friction_coeff", val=np.full(number_of_points, 0.0013))
         self.add_output("rotor_end_friction_coeff", val=np.full(number_of_points, 0.009))
 
     def setup_partials(self):

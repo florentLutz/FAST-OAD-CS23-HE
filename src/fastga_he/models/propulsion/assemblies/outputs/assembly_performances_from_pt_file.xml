@@ -3,7 +3,7 @@
   <density units="kg/m**3" is_input="True">[1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817, 1.2249908312142817]</density>
   <exterior_temperature units="degK" is_input="True">[288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15, 288.15]<!--temperature outside of the cable--></exterior_temperature>
   <fuel_consumed_t_econ units="kg" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]<!--fuel consumed at each time step--></fuel_consumed_t_econ>
-  <non_consumable_energy_t_econ units="W*h" is_input="False">[26728.24714780678, 26855.8668020978, 26981.13962532086, 27104.043760409477, 27224.583608663535, 27342.78187545122, 27458.66130416102, 27572.227306023924, 27683.43988266541, 27792.09408193011]<!--Non consumable energy at each time step--></non_consumable_energy_t_econ>
+  <non_consumable_energy_t_econ units="W*h" is_input="False">[26006.97175132374, 26131.520429501146, 26254.06853887815, 26374.5762227209, 26493.028356383824, 26609.428052995154, 26723.780499804478, 26836.07763376208, 26946.278076857594, 27054.219964776614]<!--Non consumable energy at each time step--></non_consumable_energy_t_econ>
   <thrust units="N" is_input="True">[1550.0, 1538.888888888889, 1527.7777777777778, 1516.6666666666667, 1505.5555555555557, 1494.4444444444443, 1483.3333333333333, 1472.2222222222222, 1461.111111111111, 1450.0]</thrust>
   <time_step units="s" is_input="True">[500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0, 500.0]</time_step>
   <true_airspeed units="m/s" is_input="True">[81.8, 82.76666666666667, 83.73333333333333, 84.7, 85.66666666666667, 86.63333333333333, 87.6, 88.56666666666666, 89.53333333333333, 90.5]</true_airspeed>
@@ -13,21 +13,21 @@
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <DC_DC_converter>
           <dc_dc_converter_1>
-            <current_in_max units="A" is_input="False">387.6088026022111</current_in_max>
-            <dc_power_in_max units="kW" is_input="False">200.10310860381813</dc_power_in_max>
+            <current_in_max units="A" is_input="False">375.17127177405666</current_in_max>
+            <dc_power_in_max units="kW" is_input="False">194.78989624584784</dc_power_in_max>
             <efficiency_mission is_input="True">0.988<!--Efficiency of the DC/DC converter for the points--></efficiency_mission>
-            <losses_max units="W" is_input="False">3380.9062341444933</losses_max>
+            <losses_max units="W" is_input="False">3239.811043918369</losses_max>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
-            <voltage_in_max units="V" is_input="False">606.920551225745</voltage_in_max>
+            <voltage_in_max units="V" is_input="False">607.2249403722001</voltage_in_max>
             <voltage_out_max units="V" is_input="False">850.0</voltage_out_max>
             <voltage_out_target_mission units="V" is_input="True">850.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <capacitor>
-              <current_max units="A" is_input="False">298.44974703555147</current_max>
+              <current_max units="A" is_input="False">289.6979904239812</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </capacitor>
             <diode>
-              <current_max units="A" is_input="False">378.378861470429</current_max>
+              <current_max units="A" is_input="False">367.67988895172897</current_max>
               <gate_voltage units="V" is_input="True">1.3</gate_voltage>
               <resistance units="ohm" is_input="True">0.002805</resistance>
             </diode>
@@ -47,52 +47,52 @@
               <c is_input="True">-3.005e-08</c>
             </energy_rr>
             <igbt>
-              <current_max units="A" is_input="False">485.5189965303793</current_max>
+              <current_max units="A" is_input="False">470.4472273548673</current_max>
               <resistance units="ohm" is_input="True">0.002265</resistance>
             </igbt>
             <inductor>
-              <current_max units="A" is_input="False">615.5479337951875</current_max>
+              <current_max units="A" is_input="False">597.0838253255887</current_max>
               <resistance units="ohm" is_input="True">0.0014</resistance>
             </inductor>
           </dc_dc_converter_1>
         </DC_DC_converter>
         <DC_SSPC>
           <dc_sspc_1337>
-            <current_max units="A" is_input="False">232.59043682420275<!--Maximum current flowing through the SSPC--></current_max>
+            <current_max units="A" is_input="False">226.41460881282075<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
             <voltage_max units="V" is_input="False">850.0<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_1337>
           <dc_sspc_1>
-            <current_max units="A" is_input="False">232.59043682420275<!--Maximum current flowing through the SSPC--></current_max>
+            <current_max units="A" is_input="False">226.41460881282075<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <voltage_max units="V" is_input="False">824.0312111054978<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <voltage_max units="V" is_input="False">824.0507199807721<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_1>
           <dc_sspc_2>
-            <current_max units="A" is_input="False">232.59043682419403<!--Maximum current flowing through the SSPC--></current_max>
+            <current_max units="A" is_input="False">226.41460881282208<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
-            <voltage_max units="V" is_input="False">832.354758692422<!--Maximum voltage at the terminals SSPC--></voltage_max>
+            <voltage_max units="V" is_input="False">832.3744646270426<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_2>
           <dc_sspc_412>
-            <current_max units="A" is_input="False">232.59043682419403<!--Maximum current flowing through the SSPC--></current_max>
+            <current_max units="A" is_input="False">226.41460881282208<!--Maximum current flowing through the SSPC--></current_max>
             <efficiency is_input="True">0.99<!--Value of the SSPC efficiency, assumed constant during operations (eases convergence)--></efficiency>
             <voltage_max units="V" is_input="False">841.5<!--Maximum voltage at the terminals SSPC--></voltage_max>
           </dc_sspc_412>
         </DC_SSPC>
         <DC_bus>
           <dc_bus_1>
-            <current_max units="A" is_input="False">232.59043682420275</current_max>
-            <voltage_max units="V" is_input="False">824.0312111054978</voltage_max>
+            <current_max units="A" is_input="False">226.41460881282075</current_max>
+            <voltage_max units="V" is_input="False">824.0507199807721</voltage_max>
           </dc_bus_1>
           <dc_bus_2>
-            <current_max units="A" is_input="False">232.59043682420275</current_max>
+            <current_max units="A" is_input="False">226.41460881282075</current_max>
             <voltage_max units="V" is_input="False">841.5</voltage_max>
           </dc_bus_2>
         </DC_bus>
         <DC_cable_harness>
           <harness_1>
             <cable_temperature_mission units="degK" is_input="True">288.15<!--Performances of the cable will be computed assuming it has a constant temperature of that value, other submodels exist for steady state and dynamic temperature profile--></cable_temperature_mission>
-            <current_max units="A" is_input="False">232.59043682419403<!--Maximum current flowing through the harness, all cables included--></current_max>
-            <losses_max units="W" is_input="False">176.60748068499583<!--Maximum losses in one cable of the harness--></losses_max>
+            <current_max units="A" is_input="False">226.41460881282208<!--Maximum current flowing through the harness, all cables included--></current_max>
+            <losses_max units="W" is_input="False">167.3532986254396<!--Maximum losses in one cable of the harness--></losses_max>
             <number_cables is_input="True">1.0</number_cables>
             <temperature_max units="degK" is_input="False">288.15</temperature_max>
             <voltage_max units="V" is_input="False">833.085</voltage_max>
@@ -107,60 +107,59 @@
         <SM_PMSM>
           <motor_1>
             <active_length units="m" is_input="True">0.3117<!--The length of electromagnetism active part of SM PMSM--></active_length>
-            <air_gap_flux_density_max units="T" is_input="False">0.4738398553558508</air_gap_flux_density_max>
+            <air_gap_flux_density_max units="T" is_input="False">0.6737830651842921</air_gap_flux_density_max>
             <air_gap_thickness units="m" is_input="True">0.0028<!--The distance between the rotor and the stator bore--></air_gap_thickness>
             <bearing_diameter units="m" is_input="True">0.03<!--The motor bearing bore diameter--></bearing_diameter>
             <bearing_friction_coefficient is_input="True">0.0015<!--friction coefficient of the motor that house the shaft, the ball bearing is set to default--></bearing_friction_coefficient>
             <bore_diameter is_input="True">0.187<!--Stator bore diameter of the SM PMSM--></bore_diameter>
             <conductor_slot_number is_input="True">24.0<!--Number of conductor slots on the motor stator--></conductor_slot_number>
             <current_ac_max units="A" is_input="False">638.1331080321245<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
-            <current_density_ac_max units="A/m**2" is_input="False">15602276.480003044<!--Maximum value of the RMS current flowing through one phase of the motor--></current_density_ac_max>
+            <current_density_ac_max units="kA/m**2" is_input="False">10000.0<!--Maximum value of the RMS current flowing through one phase of the motor--></current_density_ac_max>
+            <electromagnetic_factor is_input="False">1.0<!--Remain at 1.0 if the maximum air gap flux density is within the range--></electromagnetic_factor>
             <electromagnetic_torque_max units="N*m" is_input="False">819.0317876550217<!--Maximum value of the electromagnetic torque the motor has to provide--></electromagnetic_torque_max>
             <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
-            <losses_max units="W" is_input="False">7206.924179085838</losses_max>
+            <losses_max units="W" is_input="False">2465.3348029308077</losses_max>
+            <magnetic_material_density units="kg/m**3" is_input="True">8120.0<!--The density of soft magnetic material. Vacoflux 48 alloy from Vacuumschmelze materials is set to default--></magnetic_material_density>
             <mass units="kg" is_input="True">225.64</mass>
-            <mechanical_stress_max units="Pa" is_input="False">22248910.386478517<!--The maximum rotor mechanical stress--></mechanical_stress_max>
+            <mechanical_factor is_input="False">1.0<!--Remain at 1.0 if the maximum mechanical stress is within the range--></mechanical_factor>
+            <poissons_ratio is_input="True">0.29<!--The rotor material Poisson's ratio--></poissons_ratio>
             <pole_pairs_number is_input="True">2.0<!--Number of the north and south pole pairs in the SM PMSM--></pole_pairs_number>
             <pouillet_geometry_factor units="1/m" is_input="True">86763.68677<!--Total length of the conductor wire divided by the wire cross-sectional area--></pouillet_geometry_factor>
             <resistance units="ohm" is_input="False">[0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397, 0.002374187642584397]</resistance>
             <resistivity units="ohm*m" is_input="False">[2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08, 2.736384e-08]<!--Copper electrical resistivity--></resistivity>
             <rotor_diameter units="m" is_input="True">0.1814</rotor_diameter>
             <rotor_mass units="kg" is_input="True">56.97</rotor_mass>
-            <rotor_material_density units="kg/m**3" is_input="True">7850.0<!--The rotor material density, 4340 steel alloy is set to default--></rotor_material_density>
-            <rotor_poissons_ratio is_input="True">0.29<!--The rotor material Poisson's ratio, 4340 steel alloy is set to default--></rotor_poissons_ratio>
             <rpm_max units="1/min" is_input="False">2000.0<!--Maximum value of the motor rpm--></rpm_max>
+            <safety_factor is_input="True">1.5<!--Safety factor for rotor sizing--></safety_factor>
             <shaft_power_max units="kW" is_input="False">171.52677655667767</shaft_power_max>
-            <stator_yoke_height is_input="True">0.0351<!--Stator yoke thickness of the SM PMSM--></stator_yoke_height>
             <tangential_stress_max units="MPa" is_input="False">0.05083578249279821</tangential_stress_max>
-            <tooth_flux_density_max units="T" is_input="False">6.304995544313277</tooth_flux_density_max>
-            <tooth_ratio is_input="True">0.45<!--The fraction between overall tooth length and stator bore circumference--></tooth_ratio>
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
             <torque_max units="N*m" is_input="False">818.9800308484286<!--Maximum value of the torque the motor has to provide--></torque_max>
-            <total_flux_density_max units="T" is_input="False">4.456738728659468</total_flux_density_max>
-            <voltage_ac_max units="V" is_input="False">114.38454555439475<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
+            <total_flux_density_max units="T" is_input="False">3.188446599980705</total_flux_density_max>
+            <voltage_ac_max units="V" is_input="False">111.31217158722062<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
             <winding_factor is_input="True">0.97<!--The factor considers the cable winding effect in the stator slot--></winding_factor>
             <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
             <wire_circular_section_area units="m**2" is_input="True">4.09e-05<!--Single conductor circular wire cross-section area--></wire_circular_section_area>
             <wire_per_slot is_input="True">6.0<!--Number of wire per stator slot--></wire_per_slot>
             <x2p_ratio is_input="True">16.435</x2p_ratio>
-            <yoke_flux_density_max units="T" is_input="False">5.935969674211686</yoke_flux_density_max>
+            <yield_stress units="Pa" is_input="True">190000000.0<!--The yield stress of the rotor yoke material, Vacoflux 48 alloy from Vacuumschmelze materials is set to default--></yield_stress>
           </motor_1>
         </SM_PMSM>
         <battery_pack>
           <battery_pack_1>
-            <SOC_min units="percent" is_input="False">34.2573530750104<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
+            <SOC_min units="percent" is_input="False">36.25135961269853<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <SOC_mission_start units="percent" is_input="True">100.0<!--State-of-Charge of the battery at the start of the mission--></SOC_mission_start>
             <average_cell_temperature units="degK" is_input="False">288.15<!--Time step averaged temperature of the cell during the mission--></average_cell_temperature>
-            <c_rate_max units="1/h" is_input="False">0.5785206008988225<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
+            <c_rate_max units="1/h" is_input="False">0.5599571220508308<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">288.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
-            <energy_consumed_mission units="W*h" is_input="False">272743.08539453015<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
+            <energy_consumed_mission units="W*h" is_input="False">265429.9495270037<!--Energy drawn from the battery for the mission--></energy_consumed_mission>
             <number_modules is_input="True">200.0<!--Number of modules in parallel inside the battery pack--></number_modules>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <cell>
               <capacity units="A*h" is_input="False">3.35<!--Capacity of the cell used for the assembly of the battery pack--></capacity>
-              <losses_max units="W" is_input="False">0.18435425034470967<!--Minimum state-of-charge of the battery during the mission--></losses_max>
-              <voltage_max units="V" is_input="False">4.046136862502547<!--Maximum voltage needed by the cells during the mission--></voltage_max>
-              <voltage_min units="V" is_input="False">3.441667235049103<!--Minimum voltage provided by the cells during the mission--></voltage_min>
+              <losses_max units="W" is_input="False">0.16486606825328884<!--Minimum state-of-charge of the battery during the mission--></losses_max>
+              <voltage_max units="V" is_input="False">4.048166123867274<!--Maximum voltage needed by the cells during the mission--></voltage_max>
+              <voltage_min units="V" is_input="False">3.461359267111871<!--Minimum voltage provided by the cells during the mission--></voltage_min>
             </cell>
             <module>
               <number_cells is_input="True">150.0<!--Number of cells in series inside one battery module--></number_cells>
@@ -169,21 +168,21 @@
         </battery_pack>
         <inverter>
           <inverter_1>
-            <ac_power_out_max units="kW" is_input="False">178.73370073576353<!--Maximum value of the output side--></ac_power_out_max>
+            <ac_power_out_max units="kW" is_input="False">173.99211135960846<!--Maximum value of the output side--></ac_power_out_max>
             <current_ac_max units="A" is_input="False">638.1331080321245<!--Maximum RMS current flowing through one arm of the inverter--></current_ac_max>
-            <current_dc_max units="A" is_input="False">232.59043682420275<!--Maximum value of the current at the input of the inverter--></current_dc_max>
+            <current_dc_max units="A" is_input="False">226.41460881282075<!--Maximum value of the current at the input of the inverter--></current_dc_max>
             <efficiency_mission is_input="True">0.942<!--Efficiency of the inverter for the points--></efficiency_mission>
             <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
             <junction_temperature_mission units="degK" is_input="True">305.0<!--Junction temperature of the inverter for the performances computation--></junction_temperature_mission>
-            <losses_max units="W" is_input="False">15227.120509433249</losses_max>
-            <modulation_idx_max is_input="False">0.14021306734095598<!--Maximum modulation index during the mission--></modulation_idx_max>
+            <losses_max units="W" is_input="False">15228.326131780495</losses_max>
+            <modulation_idx_max is_input="False">0.1364483976497081<!--Maximum modulation index during the mission--></modulation_idx_max>
             <power_factor is_input="True">1.0</power_factor>
             <switching_frequency_max units="Hz" is_input="False">12000.0</switching_frequency_max>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
-            <voltage_ac_max units="V" is_input="False">114.38454555439475<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
-            <voltage_dc_max units="V" is_input="False">815.7908989944428<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
+            <voltage_ac_max units="V" is_input="False">111.31217158722062<!--Maximum value of the peak voltage at the output of the inverter (AC side)--></voltage_ac_max>
+            <voltage_dc_max units="V" is_input="False">815.8102127809644<!--Maximum value of the voltage at the input of the inverter (DC side)--></voltage_dc_max>
             <casing>
-              <temperature_max units="degK" is_input="False">338.9070683647775</temperature_max>
+              <temperature_max units="degK" is_input="False">338.91108710593494</temperature_max>
               <thermal_resistance units="degK/W" is_input="True">0.01<!--Thermal resistance between the casing and the heat sink--></thermal_resistance>
             </casing>
             <diode>

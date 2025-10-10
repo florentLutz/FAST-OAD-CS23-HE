@@ -48,7 +48,7 @@ class PerformancesTotalFluxDensity(om.ExplicitComponent):
 
         self.add_output(
             name="total_flux_density",
-            val=0.89,
+            val=1.0,
             units="T",
             shape=number_of_points,
             desc="The total magnetic flux density in air gap including electromagnetism",

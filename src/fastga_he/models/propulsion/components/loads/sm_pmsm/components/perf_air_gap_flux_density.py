@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+from ..constants import DEFAULT_MAX_AIR_GAP_FLUX_DENSITY
+
 
 class PerformancesAirGapFluxDensity(om.ExplicitComponent):
     """
@@ -15,6 +17,11 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            "design_airgap_flux_density",
+            default=DEFAULT_MAX_AIR_GAP_FLUX_DENSITY,
+            desc="Maximum air gap magentic flux density [T]",
         )
 
     def setup(self):
@@ -42,6 +49,12 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
             shape=number_of_points,
             desc="The magnetic flux density provided by the permanent magnets",
         )
+        self.add_output(
+            name="flux_geometry_factor",
+            val=1.0,
+            shape=number_of_points,
+            desc="The ratio between the actual flux density and its upper limit",
+        )
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
@@ -55,15 +68,49 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["air_gap_flux_density"] = (
-            2.0 * inputs["tangential_stress"] / inputs["surface_current_density"]
+        max_flux_density = self.options["design_airgap_flux_density"]
+
+        outputs["air_gap_flux_density"] = np.clip(
+            2.0 * inputs["tangential_stress"] / inputs["surface_current_density"],
+            0.01,
+            max_flux_density,
+        )
+
+        outputs["flux_geometry_factor"] = (
+            2.0
+            * inputs["tangential_stress"]
+            / (inputs["surface_current_density"] * self.options["design_airgap_flux_density"])
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["air_gap_flux_density", "surface_current_density"] = (
-            -2.0 * inputs["tangential_stress"] / inputs["surface_current_density"] ** 2.0
+        unclipped_flux_density = (
+            2.0 * inputs["tangential_stress"] / inputs["surface_current_density"]
+        )
+        clipped_flux_density = np.clip(
+            2.0 * inputs["tangential_stress"] / inputs["surface_current_density"], 0.01, 1.05
         )
 
-        partials["air_gap_flux_density", "tangential_stress"] = (
-            2.0 / inputs["surface_current_density"]
+        partials["air_gap_flux_density", "surface_current_density"] = np.where(
+            unclipped_flux_density == clipped_flux_density,
+            -2.0 * inputs["tangential_stress"] / inputs["surface_current_density"] ** 2.0,
+            1.0e-6,
+        )
+
+        partials["air_gap_flux_density", "tangential_stress"] = np.where(
+            unclipped_flux_density == clipped_flux_density,
+            2.0 / inputs["surface_current_density"],
+            1.0e-6,
+        )
+
+        partials["flux_geometry_factor", "surface_current_density"] = (
+            -2.0
+            * inputs["tangential_stress"]
+            / (
+                inputs["surface_current_density"] ** 2.0
+                * self.options["design_airgap_flux_density"]
+            )
+        )
+
+        partials["flux_geometry_factor", "tangential_stress"] = 2.0 / (
+            inputs["surface_current_density"] * self.options["design_airgap_flux_density"]
         )

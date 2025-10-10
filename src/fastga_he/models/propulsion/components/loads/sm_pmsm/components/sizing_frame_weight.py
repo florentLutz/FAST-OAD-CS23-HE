@@ -54,7 +54,7 @@ class SizingFrameWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_mass",
             units="kg",
-            val=8.0,
+            val=25.8,
             desc="The weight of the motor casing",
         )
 

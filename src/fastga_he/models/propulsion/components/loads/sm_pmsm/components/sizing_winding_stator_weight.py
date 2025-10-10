@@ -37,16 +37,10 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             desc="Single Conductor cable length in one slot",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area",
+            units="m**2",
             val=np.nan,
-            units="m",
-            desc="Single stator slot height (radial)",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
-            val=np.nan,
-            units="m",
-            desc="Single stator slot width (along the circumference)",
+            desc="Single stator slot section area",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"
@@ -69,7 +63,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             units="kg",
             desc="The winding cable weight in the stator slots of PMSM",
-            val=12.3,
+            val=41.13,
         )
 
     def setup_partials(self):
@@ -81,8 +75,9 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         conductor_cable_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length"
         ]
-        slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
-        slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
+        slot_area = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area"
+        ]
         rho_conduct = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_material_density"
         ]
@@ -96,7 +91,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
 
-        winding_volume = conductor_cable_length * slot_height * num_conductor_slot * slot_width
+        winding_volume = conductor_cable_length * num_conductor_slot * slot_area
         mat_mix_density = slot_fill_factor * rho_conduct + (1.0 - slot_fill_factor) * rho_insulate
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass"] = (
@@ -109,8 +104,9 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
         conductor_cable_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length"
         ]
-        slot_height = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height"]
-        slot_width = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width"]
+        slot_area = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area"
+        ]
         rho_conduct = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_material_density"
         ]
@@ -124,28 +120,23 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
 
-        winding_volume = conductor_cable_length * slot_height * num_conductor_slot * slot_width
+        winding_volume = conductor_cable_length * num_conductor_slot * slot_area
         mat_mix_density = slot_fill_factor * rho_conduct + (1.0 - slot_fill_factor) * rho_insulate
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
-        ] = slot_height * num_conductor_slot * slot_width * mat_mix_density
+        ] = num_conductor_slot * slot_area * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-        ] = conductor_cable_length * num_conductor_slot * slot_width * mat_mix_density
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_width",
-        ] = conductor_cable_length * slot_height * num_conductor_slot * mat_mix_density
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area",
+        ] = conductor_cable_length * num_conductor_slot * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-        ] = conductor_cable_length * slot_height * slot_width * mat_mix_density
+        ] = conductor_cable_length * slot_area * mat_mix_density
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",

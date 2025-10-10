@@ -27,7 +27,7 @@ class PerformancesMaximum(om.ExplicitComponent):
 
         self.add_input("ac_current_rms_in_one_phase", units="A", val=np.nan, shape=number_of_points)
         self.add_input(
-            "ac_phase_current_density", units="A/m**2", val=np.nan, shape=number_of_points
+            "ac_phase_current_density", units="kA/m**2", val=np.nan, shape=number_of_points
         )
         self.add_input(
             "ac_voltage_peak_in",
@@ -52,8 +52,8 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
-            units="A/m**2",
-            val=8.1e6,
+            units="kA/m**2",
+            val=8.1e3,
             desc="Maximum value of the RMS current flowing through one phase of the motor",
         )
         self.add_output(

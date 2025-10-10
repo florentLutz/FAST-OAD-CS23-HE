@@ -38,7 +38,7 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         self.add_output(
             "joule_power_losses",
             units="W",
-            val=166.2,
+            val=15.6e3,
             shape=number_of_points,
         )
 

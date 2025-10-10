@@ -54,7 +54,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             units="m",
             desc="Stator yoke thickness of the SM PMSM",
-            val=0.0213,
+            val=0.0397,
         )
 
     def setup_partials(self):

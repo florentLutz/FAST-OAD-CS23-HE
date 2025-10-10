@@ -28,6 +28,7 @@ from .perf_surface_current_density import PerformancesSurfaceCurrentDensity
 from .perf_air_gap_flux_density import PerformancesAirGapFluxDensity
 from .perf_total_flux_density import PerformancesTotalFluxDensity
 from .perf_mechanical_factor import PerformancesMechanicalFactor
+from .perf_electromagnetic_factor import PerformancesElectromagneticFactor
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
@@ -223,5 +224,11 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "mechanical_factor",
             PerformancesMechanicalFactor(motor_id=motor_id),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "electromagnetic_factor",
+            PerformancesElectromagneticFactor(number_of_points=number_of_points, motor_id=motor_id),
             promotes=["*"],
         )

@@ -26,7 +26,7 @@ class PerformancesElectromagneticTorque(om.ExplicitComponent):
         self.add_output(
             "electromagnetic_torque",
             units="N*m",
-            val=200.0,
+            val=600.0,
             shape=number_of_points,
             desc="Total electromechanical torque from the motor",
         )
