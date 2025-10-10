@@ -18,11 +18,6 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            "design_airgap_flux_density",
-            default=DEFAULT_MAX_AIR_GAP_FLUX_DENSITY,
-            desc="Maximum air gap magentic flux density [T]",
-        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -68,18 +63,16 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        max_flux_density = self.options["design_airgap_flux_density"]
-
         outputs["air_gap_flux_density"] = np.clip(
             2.0 * inputs["tangential_stress"] / inputs["surface_current_density"],
             0.01,
-            max_flux_density,
+            DEFAULT_MAX_AIR_GAP_FLUX_DENSITY,
         )
 
         outputs["flux_geometry_factor"] = (
             2.0
             * inputs["tangential_stress"]
-            / (inputs["surface_current_density"] * self.options["design_airgap_flux_density"])
+            / (inputs["surface_current_density"] * DEFAULT_MAX_AIR_GAP_FLUX_DENSITY)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -105,12 +98,9 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
         partials["flux_geometry_factor", "surface_current_density"] = (
             -2.0
             * inputs["tangential_stress"]
-            / (
-                inputs["surface_current_density"] ** 2.0
-                * self.options["design_airgap_flux_density"]
-            )
+            / (inputs["surface_current_density"] ** 2.0 * DEFAULT_MAX_AIR_GAP_FLUX_DENSITY)
         )
 
         partials["flux_geometry_factor", "tangential_stress"] = 2.0 / (
-            inputs["surface_current_density"] * self.options["design_airgap_flux_density"]
+            inputs["surface_current_density"] * DEFAULT_MAX_AIR_GAP_FLUX_DENSITY
         )

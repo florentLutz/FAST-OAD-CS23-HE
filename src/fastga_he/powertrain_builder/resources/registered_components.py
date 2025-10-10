@@ -210,10 +210,13 @@ SM_PMSM = {
         {"efficiency": None},
         {"torque_out": "N*m"},
         {"ac_current_rms_in": "A"},
+        {"ac_phase_current_density": "kA/m**2"},
+        {"surface_current_density": "kA/m"},
         {"ac_voltage_rms_in": "V"},
         {"joule_power_losses": "kW"},
         {"iron_power_losses": "kW"},
         {"mechanical_power_losses": "kW"},
+        {"air_gap_flux_density": "T"},
     ],
     SMP: [
         {"delta_Cd": None},

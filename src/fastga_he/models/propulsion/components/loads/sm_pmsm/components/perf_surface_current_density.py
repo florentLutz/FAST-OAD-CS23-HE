@@ -97,7 +97,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
         ]
         k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
         linear_current_density = np.clip(
-            num_slot * num_wire * i_rms / (np.pi * bore_diameter), 1.0, 110
+            num_slot * num_wire * i_rms / (np.pi * bore_diameter), 1.0, 80.0
         )
 
         outputs["surface_current_density"] = np.sqrt(2.0) * k_winding * linear_current_density
@@ -115,7 +115,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
         ]
         unclipped_linear_current_density = num_slot * num_wire * i_rms / (np.pi * bore_diameter)
-        clipped_linear_current_density = np.clip(unclipped_linear_current_density, 1.0, 110.0)
+        clipped_linear_current_density = np.clip(unclipped_linear_current_density, 1.0, 80.0)
         k_winding = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"]
 
         partials[

@@ -63,13 +63,13 @@ class PerformancesElectromagneticFactor(om.ExplicitComponent):
 
         if np.max(inputs["flux_geometry_factor"]) > 1.0:
             _LOGGER.info(
-                msg="Maximum design air dap flux density exceeded. Increase rotor diameter to stay "
+                msg="Maximum design air gap flux density exceeded. Increase rotor diameter to stay "
                 "within acceptable range."
             )
 
         outputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor"
-        ] = np.cbrt(flux_factor)
+        ] = np.sqrt(flux_factor)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -85,6 +85,6 @@ class PerformancesElectromagneticFactor(om.ExplicitComponent):
             "flux_geometry_factor",
         ] = np.where(
             (flux_factor > 1.0) & (inputs["flux_geometry_factor"] == flux_factor),
-            1.0 / (3.0 * np.cbrt(flux_factor**2.0)),
+            0.5 / np.sqrt(flux_factor),
             0.0,
         )
