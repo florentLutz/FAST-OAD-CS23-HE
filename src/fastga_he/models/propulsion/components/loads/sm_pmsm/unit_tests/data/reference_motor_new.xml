@@ -85,7 +85,8 @@
                         <end_winding_coeff>1.4</end_winding_coeff>
                         <cond_twisting_coeff>1.25</cond_twisting_coeff>
                         <pole_pairs_number>2</pole_pairs_number>
-                        <wire_per_slot>6</wire_per_slot>
+                        <series_per_slot>6</series_per_slot>
+                        <parallel_per_slot>1</parallel_per_slot>
                         <youngs_modules units="GPa">150.0</youngs_modules>
                         <slots_per_pole_per_phase>2</slots_per_pole_per_phase>
                         <number_of_phases>3</number_of_phases>

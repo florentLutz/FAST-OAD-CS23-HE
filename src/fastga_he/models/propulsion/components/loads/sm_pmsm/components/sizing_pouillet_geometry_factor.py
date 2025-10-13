@@ -32,6 +32,11 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
             desc="Single Conductor cable length in one slot",
         )
         self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
+            val=np.nan,
+            desc="Number of series wire turns in parallel per stator slot",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":conductor_section_area_per_slot",
@@ -64,10 +69,13 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
         num_conductor_slot = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
+        num_parallel = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot"
+        ]
 
         outputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor"
-        ] = num_conductor_slot * wire_length / conductor_section_area_per_slot
+        ] = num_conductor_slot * wire_length / (conductor_section_area_per_slot * num_parallel)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -83,20 +91,36 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
         num_conductor_slot = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
+        num_parallel = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot"
+        ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-        ] = wire_length / conductor_section_area_per_slot
+        ] = wire_length / (conductor_section_area_per_slot * num_parallel)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
-        ] = num_conductor_slot / conductor_section_area_per_slot
+        ] = num_conductor_slot / (conductor_section_area_per_slot * num_parallel)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
             "data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":conductor_section_area_per_slot",
-        ] = -num_conductor_slot * wire_length / conductor_section_area_per_slot**2.0
+        ] = (
+            -num_conductor_slot
+            * wire_length
+            / (conductor_section_area_per_slot**2.0 * num_parallel)
+        )
+
+        partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
+        ] = (
+            -num_conductor_slot
+            * wire_length
+            / (conductor_section_area_per_slot * num_parallel**2.0)
+        )

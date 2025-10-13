@@ -33,6 +33,11 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
             desc="Single conductor circular wire cross-section area",
         )
         self.add_input(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
+            val=np.nan,
+            desc="Number of series wire turns in parallel per stator slot",
+        )
+        self.add_input(
             "ac_current_rms_in_one_phase",
             units="kA",
             val=np.full(number_of_points, np.nan),
@@ -70,6 +75,7 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
                 + motor_id
                 + ":wire_circular_section_area",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -79,29 +85,39 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
+        i_one_phase = inputs["ac_current_rms_in_one_phase"]
+        area = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
+        ]
+        num_parallel = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot"
+        ]
+        design_current_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density"
+        ]
+
         outputs["ac_phase_current_density"] = np.clip(
-            inputs["ac_current_rms_in_one_phase"]
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
-            ],
+            i_one_phase / (num_parallel * area),
             0.0,
-            inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density"
-            ],
+            design_current_density,
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
+        i_one_phase = inputs["ac_current_rms_in_one_phase"]
+
+        area = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
+        ]
+        num_parallel = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot"
+        ]
         design_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density"
         ]
-        unclipped_current_density = (
-            inputs["ac_current_rms_in_one_phase"]
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
-            ]
-        )
+
+        unclipped_current_density = i_one_phase / (area * num_parallel)
         clipped_current_density = np.clip(unclipped_current_density, 1.0e-3, design_current_density)
 
         partials[
@@ -109,20 +125,22 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
         ] = np.where(
             unclipped_current_density == clipped_current_density,
-            -inputs["ac_current_rms_in_one_phase"]
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
-            ]
-            ** 2.0,
+            -i_one_phase / (num_parallel * area**2.0),
+            1.0e-6,
+        )
+
+        partials[
+            "ac_phase_current_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
+        ] = np.where(
+            unclipped_current_density == clipped_current_density,
+            -i_one_phase / (num_parallel**2.0 * area),
             1.0e-6,
         )
 
         partials["ac_phase_current_density", "ac_current_rms_in_one_phase"] = np.where(
             unclipped_current_density == clipped_current_density,
-            np.ones(number_of_points)
-            / inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
-            ],
+            np.ones(number_of_points) / (num_parallel * area),
             1.0e-6,
         )
 

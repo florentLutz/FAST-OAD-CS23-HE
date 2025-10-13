@@ -62,7 +62,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_core_mass",
             units="kg",
-            val=131.4,
+            val=20.0,
             desc="The weight of the stator excluding the wire weight",
         )
 
