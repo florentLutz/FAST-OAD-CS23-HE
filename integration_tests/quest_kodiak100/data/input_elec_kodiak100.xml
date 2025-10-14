@@ -153,8 +153,10 @@
         </DC_splitter>
         <SM_PMSM>
           <motor_1>
+            <airgap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></airgap_flux_density>
             <cond_twisting_coeff is_input="True">1.25<!--The factor to account the conductor wire bunching--></cond_twisting_coeff>
             <conductor_material_density units="kg/m**3" is_input="True">8960.0<!--Electrical conductor material density--></conductor_material_density>
+            <current_density_ac_max units="A/m**2" is_input="True">8100000.0</current_density_ac_max>
             <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
             <form_coefficient is_input="True">0.6<!--The fraction of stator bore diameter and active length--></form_coefficient>
             <frame_density units="kg/m**3" is_input="True">2100.0</frame_density>
@@ -167,10 +169,14 @@
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_pole_per_phase is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_pole_per_phase>
+            <surface_current_density units="A/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
+            <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
+            <tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></tooth_flux_density>
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
             <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
+            <yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></yoke_flux_density>
             <wire_per_slot>6</wire_per_slot>
             <tooth_ratio>0.45</tooth_ratio>
           </motor_1>

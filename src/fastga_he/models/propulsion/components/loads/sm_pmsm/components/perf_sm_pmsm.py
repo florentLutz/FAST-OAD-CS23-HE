@@ -29,7 +29,7 @@ from .perf_total_flux_density import PerformancesTotalFluxDensity
 from .perf_stator_yoke_flux_density import PerformancesStatorYokeFluxDensity
 from .perf_stator_tooth_flux_density import PerformancesStatorToothFluxDensity
 from .perf_electromagnetic_torque import PerformancesElectromagneticTorque
-from .perf_max_mechanical_stress import PerformancesMaxMechanicalStress
+from .perf_mechanical_stress import PerformancesMaxMechanicalStress
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
