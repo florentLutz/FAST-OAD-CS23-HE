@@ -87,14 +87,11 @@ class PerformancesIronLosses(om.ExplicitComponent):
         f_powers = np.sqrt(f) ** np.arange(1, 5)[:, np.newaxis]
         bm_powers = np.sqrt(bm) ** np.arange(1, 5)
 
-        # IRON_LOSSES_COEFF needs to be reshaped for broadcasting
-        IRON_LOSSES_COEFF_np = np.array(IRON_LOSSES_COEFF)
-
         # Broadcasting automatically handles the multiplication
         outputs["iron_power_losses"] = (
             mass
             * np.sum(
-                IRON_LOSSES_COEFF_np[:, :, np.newaxis]
+                np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_powers[:, np.newaxis, :]
                 * bm_powers[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
@@ -111,9 +108,6 @@ class PerformancesIronLosses(om.ExplicitComponent):
         sqrt_f = np.sqrt(f)
         sqrt_bm = np.sqrt(bm)
 
-        # Create coefficient matrix with extra dimension for broadcasting
-        IRON_LOSSES_COEFF_np = np.array(IRON_LOSSES_COEFF)
-
         # Since bm is scalar, we can compute its powers once
         bm_powers = sqrt_bm ** np.arange(1, 5)
         bm_derivs = np.arange(1, 5) * 0.5 * (bm ** (np.arange(4) * 0.5 - 0.5))
@@ -129,7 +123,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
         ] = (
             np.sum(
-                IRON_LOSSES_COEFF_np[:, :, np.newaxis]
+                np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_powers[:, np.newaxis, :]
                 * bm_powers[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
@@ -143,7 +137,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
         ] = (
             mass
             * np.sum(
-                IRON_LOSSES_COEFF_np[:, :, np.newaxis]
+                np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_derivs[:, np.newaxis, :]
                 * bm_powers[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
@@ -157,7 +151,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
         ] = (
             mass
             * np.sum(
-                IRON_LOSSES_COEFF_np[:, :, np.newaxis]
+                np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_powers[:, np.newaxis, :]
                 * bm_derivs[np.newaxis, :, np.newaxis],
                 axis=(0, 1),

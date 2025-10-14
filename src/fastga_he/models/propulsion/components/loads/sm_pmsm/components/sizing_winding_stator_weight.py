@@ -52,17 +52,17 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":conductor_material_density",
-            val=np.nan,
+            val=8960.0,
             units="kg/m**3",
-            desc="Electrical conductor material density",
+            desc="Electrical conductor material density, copper is et to default",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":insulation_material_density",
-            val=np.nan,
+            val=1420.0,
             units="kg/m**3",
-            desc="Electrical insulation material density",
+            desc="Electrical insulation material density, kapton is set to default",
         )
 
         self.add_output(

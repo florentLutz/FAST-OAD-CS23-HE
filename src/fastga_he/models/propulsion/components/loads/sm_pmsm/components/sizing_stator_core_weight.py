@@ -63,9 +63,10 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":magnetic_material_density",
-            val=np.nan,
+            val=8120.0,
             units="kg/m**3",
-            desc="The density of soft magnetic material",
+            desc="The density of soft magnetic material, VACOFLUX 48 from Vacuumschmelze is set "
+                 "as default",
         )
 
         self.add_output(
