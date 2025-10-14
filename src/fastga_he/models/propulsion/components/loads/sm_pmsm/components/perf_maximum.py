@@ -41,10 +41,10 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
         self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
         self.add_input(name="tangential_stress", units="MPa", val=np.nan, shape=number_of_points)
+        self.add_input(
+            name="surface_current_density", units="A/m", val=np.nan, shape=number_of_points
+        )
         self.add_input(name="air_gap_flux_density", units="T", val=np.nan, shape=number_of_points)
-        self.add_input(name="total_flux_density", units="T", val=np.nan, shape=number_of_points)
-        self.add_input(name="yoke_flux_density", units="T", val=np.nan, shape=number_of_points)
-        self.add_input(name="tooth_flux_density", units="T", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_ac_max",
@@ -98,22 +98,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=50.0,
         )
         self.add_output(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max",
+            units="A/m",
+            val=1.0,
+        )
+        self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
-            units="T",
-            val=1.0,
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
-            units="T",
-            val=1.0,
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
-            units="T",
-            val=1.0,
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_max",
             units="T",
             val=1.0,
         )
@@ -186,29 +176,17 @@ class PerformancesMaximum(om.ExplicitComponent):
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
+            of="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":surface_current_density_max",
+            wrt="surface_current_density",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
             wrt="air_gap_flux_density",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
-            wrt="total_flux_density",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
-            wrt="yoke_flux_density",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_max",
-            wrt="tooth_flux_density",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
@@ -245,17 +223,11 @@ class PerformancesMaximum(om.ExplicitComponent):
             np.max(inputs["tangential_stress"])
         )
         outputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max"
+        ] = np.max(inputs["surface_current_density"])
+        outputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
         ] = np.max(inputs["air_gap_flux_density"])
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max"
-        ] = np.max(inputs["total_flux_density"])
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max"] = (
-            np.max(inputs["yoke_flux_density"])
-        )
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_max"
-        ] = np.max(inputs["tooth_flux_density"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -313,23 +285,15 @@ class PerformancesMaximum(om.ExplicitComponent):
         ] = np.where(inputs["tangential_stress"] == np.max(inputs["tangential_stress"]), 1.0, 0.0)
 
         partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max",
+            "surface_current_density",
+        ] = np.where(
+            inputs["surface_current_density"] == np.max(inputs["surface_current_density"]), 1.0, 0.0
+        )
+
+        partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
             "air_gap_flux_density",
         ] = np.where(
             inputs["air_gap_flux_density"] == np.max(inputs["air_gap_flux_density"]), 1.0, 0.0
         )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
-            "total_flux_density",
-        ] = np.where(inputs["total_flux_density"] == np.max(inputs["total_flux_density"]), 1.0, 0.0)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
-            "yoke_flux_density",
-        ] = np.where(inputs["yoke_flux_density"] == np.max(inputs["yoke_flux_density"]), 1.0, 0.0)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_max",
-            "tooth_flux_density",
-        ] = np.where(inputs["tooth_flux_density"] == np.max(inputs["tooth_flux_density"]), 1.0, 0.0)

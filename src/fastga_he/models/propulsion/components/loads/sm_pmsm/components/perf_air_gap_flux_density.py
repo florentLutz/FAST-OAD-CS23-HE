@@ -39,7 +39,6 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
             name="air_gap_flux_density",
             val=1.0,
             units="T",
-            shape=number_of_points,
             desc="The magnetic flux density provided by the permanent magnets",
         )
 
@@ -56,14 +55,14 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["air_gap_flux_density"] = (
-            2.0 * inputs["tangential_stress"] / inputs["surface_current_density"]
+            2.0 * inputs["surface_current_density"] * inputs["tangential_stress"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials["air_gap_flux_density", "surface_current_density"] = (
-            -2.0 * inputs["tangential_stress"] / inputs["surface_current_density"] ** 2.0
+            2.0 * inputs["tangential_stress"]
         )
 
         partials["air_gap_flux_density", "tangential_stress"] = (
-            2.0 / inputs["surface_current_density"]
+            2.0 * inputs["surface_current_density"]
         )

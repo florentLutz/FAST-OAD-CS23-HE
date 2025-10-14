@@ -77,9 +77,7 @@ class SizingRotorWeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        active_length = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
-        ]
+        lm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"]
         num_pole_pairs = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
         ]
@@ -103,14 +101,9 @@ class SizingRotorWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = np.pi * rotor_radius * active_length * np.select(conditions, rho_rotor, default=1600.0)
+        ] = np.pi * rotor_radius * lm * np.select(conditions, rho_rotor, default=1600.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-        ] = (
-            np.pi
-            * rotor_radius**2.0
-            * active_length
-            * np.select(conditions, d_rho_d_p, default=0.0)
-        )
+        ] = np.pi * rotor_radius**2.0 * lm * np.select(conditions, d_rho_d_p, default=0.0)

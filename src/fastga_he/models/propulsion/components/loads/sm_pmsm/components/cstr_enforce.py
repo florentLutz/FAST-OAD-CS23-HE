@@ -23,9 +23,6 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_RPM] = (
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY] = (
     "fastga_he.submodel.propulsion.constraints.sm_pmsm.current_density.enforce"
 )
-oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS] = (
-    "fastga_he.submodel.propulsion.constraints.sm_pmsm.tangential_stress.enforce"
-)
 
 
 @oad.RegisterSubmodel(

@@ -43,43 +43,25 @@ class SizingRatioX2p(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        radius_ratio = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
-        ]
-        num_pole_pairs = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
-        ]
+        x = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"]
+        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"] = (
-            1.0 + radius_ratio ** (2.0 * num_pole_pairs)
-        ) / (1.0 - radius_ratio ** (2.0 * num_pole_pairs))
+            1.0 + x ** (2.0 * p)
+        ) / (1.0 - x ** (2.0 * p))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        radius_ratio = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"
-        ]
-        num_pole_pairs = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
-        ]
+        x = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio"]
+        p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
-        ] = (
-            4.0
-            * num_pole_pairs
-            * radius_ratio ** (2.0 * num_pole_pairs - 1.0)
-            / (radius_ratio ** (2.0 * num_pole_pairs) - 1.0) ** 2.0
-        )
+        ] = 4.0 * p * x ** (2.0 * p - 1.0) / (x ** (2.0 * p) - 1.0) ** 2.0
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-        ] = (
-            4.0
-            * radius_ratio ** (2.0 * num_pole_pairs)
-            * np.log(radius_ratio)
-            / (radius_ratio ** (2.0 * num_pole_pairs) - 1.0) ** 2.0
-        )
+        ] = 4.0 * x ** (2.0 * p) * np.log(x) / (x ** (2.0 * p) - 1.0) ** 2.0

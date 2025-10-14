@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesTangentialStress(om.ExplicitComponent):
+class PerformancesTangentialStree(om.ExplicitComponent):
     """
     Computation of the rotor surface tangential stress due to electromagnetism. The formula is
     obtained from equation (II-4) in :cite:`touhami:2020`.

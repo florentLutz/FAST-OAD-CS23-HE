@@ -104,7 +104,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         mass = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass"]
-        bm = inputs["air_gap_flux_density"]
+        bm = inputs["gap_flux_density"]
         f = inputs["electrical_frequency"]
         sqrt_f = np.sqrt(f)
         sqrt_bm = np.sqrt(bm)
