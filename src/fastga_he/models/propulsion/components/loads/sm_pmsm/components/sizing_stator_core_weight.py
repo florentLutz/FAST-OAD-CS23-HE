@@ -63,10 +63,9 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":magnetic_material_density",
-            val=8.12e3,
+            val=np.nan,
             units="kg/m**3",
-            desc="The density of soft magnetic material. Default value obtained from the iron "
-            "cobaly alloy from Vacuumschmelze materials",
+            desc="The density of soft magnetic material",
         )
 
         self.add_output(

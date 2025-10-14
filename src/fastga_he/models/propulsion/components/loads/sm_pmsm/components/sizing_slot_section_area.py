@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingSlotSectionArea(om.ExplicitComponent):
     """
-    Computation of single slot cross-section area of the SM PMSM. The formula is obtained from
+    Computation of single slot cross-section ares of the SM PMSM. The formula is obtained from
     equation (II-33) in :cite:`touhami:2020`.
     """
 
