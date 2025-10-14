@@ -168,7 +168,7 @@
             <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
-            <slots_per_pole_per_phase is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_pole_per_phase>
+            <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
             <surface_current_density units="A/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
             <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
             <tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></tooth_flux_density>
@@ -177,8 +177,6 @@
             <winding_factor is_input="True">0.97</winding_factor>
             <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
             <yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></yoke_flux_density>
-            <wire_per_slot>6</wire_per_slot>
-            <tooth_ratio>0.45</tooth_ratio>
           </motor_1>
         </SM_PMSM>
         <battery_pack>

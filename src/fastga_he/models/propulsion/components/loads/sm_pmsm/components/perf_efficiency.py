@@ -8,7 +8,7 @@ import openmdao.api as om
 # There is a problem with that model in that if the input shaft power goes to 0 so does the
 # efficiency which then cause the apparent power to not be 0, cutting off too small value
 # should solve the problem
-CUTOFF_ETA_MIN = 0.5
+CUTOFF_ETA_MIN = 1.0e-3
 CUTOFF_ETA_MAX = 1.0
 
 
