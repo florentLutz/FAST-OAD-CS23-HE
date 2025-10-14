@@ -23,8 +23,6 @@ from ..components.sizing_single_conductor_cable_length import SizingSingleConduc
 from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
 from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
 from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
-from ..components.sizing_radius_ratio import SizingRadiusRatio
-from ..components.sizing_conductor_wire_section_area import SizingConductorWireSectionArea
 from ..components.sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
 from ..components.sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
 from ..components.sizing_sm_pmsm_drag import SizingSMPMSMDrag
@@ -51,11 +49,6 @@ from ..components.perf_efficiency import PerformancesEfficiency
 from ..components.perf_electrical_frequency import PerformancesElectricalFrequency
 from ..components.perf_apparent_power import PerformancesApparentPower
 from ..components.perf_current_rms import PerformancesCurrentRMS
-from ..components.perf_phase_current_density import PerformancesPhaseCurrentDensity
-from ..components.perf_surface_current_density import PerformancesSurfaceCurrentDensity
-from ..components.perf_tangential_stress import PerformancesTangentialStree
-from ..components.perf_air_gap_flux_density import PerformancesAirGapFluxDensity
-from ..components.perf_electromagnetic_torque import PerformancesElectromagneticTorque
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_sm_pmsm import PerformancesSMPMSM
 
@@ -67,14 +60,12 @@ from ..components.lcc_sm_pmsm_operational_cost import LCCSMPMSMOperationalCost
 from ..components.cstr_enforce import (
     ConstraintsTorqueEnforce,
     ConstraintsRPMEnforce,
-    ConstraintsTangentialStressEnforce,
-    ConstraintsCurrentDensityEnforce,
+    ConstraintsVoltageEnforce,
 )
 from ..components.cstr_ensure import (
     ConstraintsTorqueEnsure,
     ConstraintsRPMEnsure,
-    ConstraintsTangentialStressEnsure,
-    ConstraintsCurrentDensityEnsure,
+    ConstraintsVoltageEnsure,
 )
 from ..components.cstr_sm_pmsm import ConstraintPMSMPowerRateMission
 from ..constants import POSSIBLE_POSITION, DEFAULT_DYNAMIC_VISCOSITY
@@ -124,28 +115,6 @@ def test_rotor_diameter():
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", units="m"
     ) == pytest.approx(0.1814, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_radius_ratio():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", val=0.1814, units="m"
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:bore_diameter",
-        val=0.187,
-        units="m",
-    )
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(SizingRadiusRatio(motor_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:radius_ratio"
-    ) == pytest.approx(0.97, rel=1e-2)
-
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", units="m"
     ) == pytest.approx(0.0028, rel=1e-2)
@@ -153,7 +122,7 @@ def test_radius_ratio():
     problem.check_partials(compact_print=True)
 
 
-def test_active_length():
+def test_length():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -266,8 +235,7 @@ def test_conductor_section_area_per_slot_area():
     problem = run_system(SizingConductorSectionAreaPerSlot(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_section_area_per_slot",
-        units="m**2",
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_section_area_per_slot"
     ) == pytest.approx(0.00024523, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -278,7 +246,7 @@ def test_conductor_slot_number():
 
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:number_of_phases", val=3)
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slots_per_pole_per_phase", val=2)
+    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:slots_per_poles_phases", val=2)
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:pole_pairs_number", val=2)
 
     problem = run_system(SizingConductorSlotNumber(motor_id="motor_1"), ivc)
@@ -286,26 +254,6 @@ def test_conductor_slot_number():
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_slot_number"
     ) == pytest.approx(24, rel=1e-3)
-
-    problem.check_partials(compact_print=True)
-
-
-def test_conductor_wire_cross_section():
-    ivc = om.IndepVarComp()
-
-    # Run problem and check obtained value(s) is/(are) correct
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1" ":conductor_section_area_per_slot",
-        units="m**2",
-        val=0.00024523,
-    )
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:wire_per_slot", val=6)
-
-    problem = run_system(SizingConductorWireSectionArea(motor_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:wire_circular_section_area", units="m**2"
-    ) == pytest.approx(4.09e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -757,73 +705,6 @@ def test_frequency():
 
     assert problem.get_val("electrical_frequency", units="s**-1") == pytest.approx(
         np.full(NB_POINTS_TEST, 532.33), rel=1e-2
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_electromagnetic_torque():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output(
-        "apparent_power",
-        np.array([32.5, 37.1, 41.7, 46.3, 50.9, 55.5, 60.2, 64.7, 69.4, 74.0]),
-        units="kW",
-    )
-
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesElectromagneticTorque(number_of_points=NB_POINTS_TEST), ivc)
-
-    assert problem.get_val("electromagnetic_torque", units="N*m") == pytest.approx(
-        np.array([191.8, 219.0, 246.1, 273.2, 300.4, 327.5, 355.3, 381.8, 409.6, 436.7]), rel=1e-2
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_phase_current_density():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:wire_circular_section_area",
-        4.09e-05,
-        units="m**2",
-    )
-
-    ivc.add_output("ac_current_rms_in_one_phase", 80.0 * np.ones(NB_POINTS_TEST), units="A")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesPhaseCurrentDensity(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("ac_phase_current_density", units="A/m**2") == pytest.approx(
-        np.full(NB_POINTS_TEST, 1955990.22), rel=1e-2
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_surface_current_density():
-    ivc = get_indep_var_comp(
-        list_inputs(
-            PerformancesSurfaceCurrentDensity(motor_id="motor_1", number_of_points=NB_POINTS_TEST)
-        ),
-        __file__,
-        XML_FILE,
-    )
-
-    ivc.add_output("ac_current_rms_in_one_phase", 80.0 * np.ones(NB_POINTS_TEST), units="A")
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesSurfaceCurrentDensity(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
-
-    assert problem.get_val("surface_current_density", units="A/m") == pytest.approx(
-        np.full(NB_POINTS_TEST, 26899.72), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

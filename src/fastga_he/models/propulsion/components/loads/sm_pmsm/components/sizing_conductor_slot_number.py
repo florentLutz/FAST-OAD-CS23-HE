@@ -26,12 +26,12 @@ class SizingConductorSlotNumber(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
             val=np.nan,
-            desc="Number of the north and south pairs on the rotor",
+            desc="Number of the north and south pairs in the SM PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_pole_per_phase",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
             val=np.nan,
-            desc="The number of conductor slots per pole and per phase",
+            desc="The number of conductor slots per poles and per phases",
         )
 
         self.add_output(
@@ -47,7 +47,7 @@ class SizingConductorSlotNumber(om.ExplicitComponent):
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
             wrt=[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_pole_per_phase",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
             ],
             method="exact",
         )
@@ -59,7 +59,7 @@ class SizingConductorSlotNumber(om.ExplicitComponent):
             6.0
             * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
             * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_pole_per_phase"
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases"
             ]
         )
 
@@ -72,13 +72,13 @@ class SizingConductorSlotNumber(om.ExplicitComponent):
         ] = (
             6.0
             * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_pole_per_phase"
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases"
             ]
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_pole_per_phase",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
         ] = (
             6.0
             * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
