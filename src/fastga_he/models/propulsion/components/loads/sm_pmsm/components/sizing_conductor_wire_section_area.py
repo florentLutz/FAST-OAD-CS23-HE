@@ -29,20 +29,15 @@ class SizingConductorWireSectionArea(om.ExplicitComponent):
             desc="Conductor wires section area per stator slot",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":series_per_slot",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
             val=np.nan,
-            desc="Number of wire in series per stator slot",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
-            val=np.nan,
-            desc="Number of series wire turns in parallel per stator slot",
+            desc="Number of wire per stator slot",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
             units="m**2",
-            val=1.0e-07,
+            val=1.0e-05,
             desc="Single conductor circular wire cross-section area",
         )
 
@@ -57,16 +52,11 @@ class SizingConductorWireSectionArea(om.ExplicitComponent):
             + motor_id
             + ":conductor_section_area_per_slot"
         ]
-        num_series = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":series_per_slot"
-        ]
-        num_parallel = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot"
-        ]
+        num_wire = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot"]
 
         outputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
-        ] = conductor_area_per_slot / (num_series * num_parallel)
+        ] = conductor_area_per_slot / num_wire
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -76,26 +66,16 @@ class SizingConductorWireSectionArea(om.ExplicitComponent):
             + motor_id
             + ":conductor_section_area_per_slot"
         ]
-        num_series = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":series_per_slot"
-        ]
-        num_parallel = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot"
-        ]
+        num_wire = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot"]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
             "data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":conductor_section_area_per_slot",
-        ] = 1.0 / (num_series * num_parallel)
+        ] = 1.0 / num_wire
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":series_per_slot",
-        ] = -conductor_area_per_slot / (num_series**2.0 * num_parallel)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":parallel_per_slot",
-        ] = -conductor_area_per_slot / (num_series * num_parallel**2.0)
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_per_slot",
+        ] = -conductor_area_per_slot / num_wire**2.0

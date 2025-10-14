@@ -277,8 +277,7 @@ def test_conductor_wire_cross_section():
         units="m**2",
         val=0.0002985,
     )
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:series_per_slot", val=30)
-    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:parallel_per_slot", val=1)
+    ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:wire_per_slot", val=30)
 
     problem = run_system(SizingConductorWireSectionArea(motor_id="motor_1"), ivc)
 
@@ -911,10 +910,7 @@ def test_phase_current_density():
         10000,
         units="kA/m**2",
     )
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:parallel_per_slot",
-        1.0,
-    )
+
     ivc.add_output("ac_current_rms_in_one_phase", 80.0 * np.ones(NB_POINTS_TEST), units="A")
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1355,10 +1351,6 @@ def test_electromagnetic_factor():
     ivc.add_output(
         "flux_geometry_factor",
         np.array([1.32, 0.37, 0.41, 0.46, 0.504, 0.55, 0.6, 0.64, 0.69, 0.73]),
-    )
-    ivc.add_output(
-        "current_density_geometry_factor",
-        np.array([0.32, 0.37, 0.41, 0.46, 0.504, 0.55, 0.6, 0.64, 0.69, 0.73]),
     )
 
     # Run problem and check obtained value(s) is/(are) correct

@@ -63,7 +63,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_winding_mass",
             units="kg",
             desc="The winding cable weight in the stator slots of PMSM",
-            val=10.0,
+            val=41.13,
         )
 
     def setup_partials(self):

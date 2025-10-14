@@ -42,6 +42,11 @@ class SizingToothRatio(om.ExplicitComponent):
             desc="Maximum mean tooth magnetic flux density divided by the maximum air gap flux "
             "density",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor",
+            desc="Remain at 1.0 if the maximum air gap flux density is within the range",
+            val=1.0,
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
@@ -64,14 +69,25 @@ class SizingToothRatio(om.ExplicitComponent):
         tooth_flux_ratio = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_ratio"
         ]
+        k_elec = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor"
+        ]
 
-        unclipped_ratio = 2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio)
-
-        if (unclipped_ratio < 0) | (unclipped_ratio > 1.0):
+        if (
+            0
+            < 2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+            < 1.0
+        ):
             _LOGGER.info(msg="Tooth ratio set to 0.5, please check tooth flux ratio.")
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"] = (
-            unclipped_ratio if (0 < unclipped_ratio < 1.0) else 0.5
+            2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+            if (
+                0
+                < 2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+                < 1.0
+            )
+            else 0.5
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -86,13 +102,20 @@ class SizingToothRatio(om.ExplicitComponent):
         tooth_flux_ratio = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_ratio"
         ]
+        k_elec = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor"
+        ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
         ] = (
-            2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
-            if (0 < 2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio) < 1.0)
+            2.0 * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+            if (
+                0
+                < 2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+                < 1.0
+            )
             else 0.0
         )
 
@@ -100,8 +123,12 @@ class SizingToothRatio(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
         ] = (
-            -2.0 * max_total_flux / (np.pi * max_air_gap_flux**2.0 * tooth_flux_ratio)
-            if (0 < 2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio) < 1.0)
+            -2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux**2.0 * tooth_flux_ratio)
+            if (
+                0
+                < 2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+                < 1.0
+            )
             else 0.0
         )
 
@@ -109,8 +136,12 @@ class SizingToothRatio(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_ratio",
         ] = (
-            -2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio**2.0)
-            if (0 < 2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio) < 1.0)
+            -2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio**2.0)
+            if (
+                0
+                < 2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+                < 1.0
+            )
             else 0.0
         )
 
@@ -118,7 +149,11 @@ class SizingToothRatio(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor",
         ] = (
-            4.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio)
-            if (0 < 2.0 * max_total_flux / (np.pi * max_air_gap_flux * tooth_flux_ratio) < 1.0)
+            4.0 * max_total_flux * k_elec / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+            if (
+                0
+                < 2.0 * max_total_flux * k_elec**2.0 / (np.pi * max_air_gap_flux * tooth_flux_ratio)
+                < 1.0
+            )
             else 0.0
         )

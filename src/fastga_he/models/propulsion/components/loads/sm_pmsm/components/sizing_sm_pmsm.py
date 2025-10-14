@@ -11,6 +11,7 @@ from .sizing_radius_ratio import SizingRadiusRatio
 from .sizing_rotor_diameter import SizingRotorDiameter
 from .sizing_tooth_ratio import SizingToothRatio
 from .sizing_stator_yoke_height import SizingStatorYokeHeight
+from .sizing_slot_width import SizingSlotWidth
 from .sizing_slot_height import SizingSlotHeight
 from .sizing_slot_section_area import SizingSlotSectionArea
 from .sizing_conductor_section_area_per_slot import SizingConductorSectionAreaPerSlot
