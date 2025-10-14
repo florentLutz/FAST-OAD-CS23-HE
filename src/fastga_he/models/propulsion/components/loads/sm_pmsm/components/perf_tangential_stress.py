@@ -24,7 +24,12 @@ class PerformancesTangentialStress(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("electromagnetic_torque", units="N*m", val=np.nan, shape=number_of_points)
+        self.add_input("torque_out", units="N*m", val=np.nan, shape=number_of_points)
+        self.add_input(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
+            val=0.95,
+            desc="The ratio of the electromagnetic torque converted to output torque",
+        )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             units="m",
@@ -51,7 +56,7 @@ class PerformancesTangentialStress(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt=["electromagnetic_torque"],
+            wrt=["torque_out"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -62,6 +67,7 @@ class PerformancesTangentialStress(om.ExplicitComponent):
             wrt=[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -77,11 +83,14 @@ class PerformancesTangentialStress(om.ExplicitComponent):
         rotor_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"
         ]
-        torque_em = inputs["electromagnetic_torque"]
+        torque_out = inputs["torque_out"]
+        conversion_rate = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
+        ]
 
-        unclipped_sigma_t = 2.0 * torque_em / (np.pi * rotor_diameter**2.0 * active_length)
-
-        outputs["tangential_stress"] = np.clip(unclipped_sigma_t, 17000.0, 148500)
+        outputs["tangential_stress"] = (
+            2.0 * torque_out / (conversion_rate * np.pi * rotor_diameter**2.0 * active_length)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -93,34 +102,29 @@ class PerformancesTangentialStress(om.ExplicitComponent):
         rotor_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"
         ]
-        torque_em = inputs["electromagnetic_torque"]
-
-        unclipped_sigma_t = 2.0 * torque_em / (np.pi * rotor_diameter**2.0 * active_length)
-        clipped_sigma_t = np.clip(unclipped_sigma_t, 17000.0, 148500)
+        torque_out = inputs["torque_out"]
+        conversion_rate = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate"
+        ]
 
         partials[
             "tangential_stress",
-            "electromagnetic_torque",
-        ] = np.where(
-            clipped_sigma_t == unclipped_sigma_t,
-            np.full(number_of_points, 2.0) / (np.pi * rotor_diameter**2.0 * active_length),
-            1.0e-6,
+            "torque_out",
+        ] = np.full(number_of_points, 2.0) / (
+            conversion_rate * np.pi * rotor_diameter**2.0 * active_length
         )
+
+        partials[
+            "tangential_stress",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_conversion_rate",
+        ] = -2.0 * torque_out / (conversion_rate**2.0 * np.pi * rotor_diameter**2.0 * active_length)
 
         partials[
             "tangential_stress",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = np.where(
-            clipped_sigma_t == unclipped_sigma_t,
-            -2.0 * torque_em / (np.pi * rotor_diameter**2.0 * active_length**2.0),
-            1.0e-6,
-        )
+        ] = -2.0 * torque_out / (conversion_rate * np.pi * rotor_diameter**2.0 * active_length**2.0)
 
         partials[
             "tangential_stress",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = np.where(
-            clipped_sigma_t == unclipped_sigma_t,
-            -4.0 * torque_em / (np.pi * rotor_diameter**3.0 * active_length),
-            1.0e-6,
-        )
+        ] = -4.0 * torque_out / (conversion_rate * np.pi * rotor_diameter**3.0 * active_length)

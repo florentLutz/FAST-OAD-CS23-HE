@@ -7,7 +7,6 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
     SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY,
     SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS,
-    SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE,
 )
 
 import openmdao.api as om
@@ -17,9 +16,6 @@ import fastoad.api as oad
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE] = (
     "fastga_he.submodel.propulsion.constraints.sm_pmsm.torque.enforce"
-)
-oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE] = (
-    "fastga_he.submodel.propulsion.constraints.sm_pmsm.electromagnetic_torque.enforce"
 )
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_RPM] = (
     "fastga_he.submodel.propulsion.constraints.sm_pmsm.rpm.enforce"
@@ -127,61 +123,6 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating"] = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max"
-        ]
-
-
-@oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE,
-    "fastga_he.submodel.propulsion.constraints.sm_pmsm.electromagnetic_torque.enforce",
-)
-class ConstraintsElectromagneticTorqueEnforce(om.ExplicitComponent):
-    """
-    Class that enforces that the maximum electromagnetic torque seen by the motor during the
-    mission is used for the sizing, ensuring a fitted design for the torque of each component.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
-        )
-
-    def setup(self):
-        motor_id = self.options["motor_id"]
-
-        self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max",
-            units="N*m",
-            val=np.nan,
-            desc="Maximum value of the electromagnetic torque the motor has to provide",
-        )
-
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_rating",
-            units="N*m",
-            val=210.0,
-            desc="Max electromagnetic torque of the motor",
-        )
-
-    def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":electromagnetic_torque_rating",
-            wrt="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":electromagnetic_torque_max",
-            val=1.0,
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        motor_id = self.options["motor_id"]
-
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_rating"
-        ] = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
         ]
 
 

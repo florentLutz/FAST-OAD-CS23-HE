@@ -12,7 +12,6 @@ from ..constants import (
     SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
     SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY,
     SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS,
-    SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE,
 )
 
 
@@ -56,13 +55,6 @@ class ConstraintsSMPMSM(om.Group):
             name="constraints_tangential_stress_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
                 SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS, options=option_motor_id
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="constraints_electromagnetic_torque_pmsm",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_SM_PMSM_ELECTROMAGNETIC_TORQUE, options=option_motor_id
             ),
             promotes=["*"],
         )

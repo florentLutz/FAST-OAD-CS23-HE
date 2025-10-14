@@ -32,16 +32,10 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             desc="Stator bore diameter of the SM PMSM",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_ratio",
-            val=1.2,
-            desc="Maximum mean yoke magnetic flux density divided by the maximum air gap flux "
-            "density",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
             val=np.nan,
             units="T",
-            desc="Maximum magnetic flux density provided by the permanent magnets",
+            desc="Maximum mean magnetic flux density at the stator yoke layer",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
@@ -66,23 +60,18 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         bore_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
         ]
-        air_gap_flux_density_max = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
-        ]
         max_total_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max"
         ]
-        yoke_flux_density_ratio = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_ratio"
+        max_yoke_flux_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max"
         ]
         num_pole_pairs = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
         ]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height"] = (
-            bore_diameter
-            * max_total_flux_density
-            / (2.0 * num_pole_pairs * air_gap_flux_density_max * yoke_flux_density_ratio)
+            bore_diameter * max_total_flux_density / (2.0 * num_pole_pairs * max_yoke_flux_density)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -91,14 +80,11 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         bore_diameter = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"
         ]
-        air_gap_flux_density_max = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
-        ]
         max_total_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max"
         ]
-        yoke_flux_density_ratio = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_ratio"
+        max_yoke_flux_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max"
         ]
         num_pole_pairs = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
@@ -107,9 +93,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-        ] = max_total_flux_density / (
-            2.0 * num_pole_pairs * air_gap_flux_density_max * yoke_flux_density_ratio
-        )
+        ] = max_total_flux_density / (2.0 * num_pole_pairs * max_yoke_flux_density)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
@@ -117,30 +101,19 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         ] = (
             -bore_diameter
             * max_total_flux_density
-            / (2.0 * num_pole_pairs**2.0 * air_gap_flux_density_max * yoke_flux_density_ratio)
+            / (2.0 * num_pole_pairs**2.0 * max_yoke_flux_density)
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
-        ] = bore_diameter / (
-            2.0 * num_pole_pairs * air_gap_flux_density_max * yoke_flux_density_ratio
-        )
+        ] = bore_diameter / (2.0 * num_pole_pairs * max_yoke_flux_density)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_ratio",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
         ] = (
             -bore_diameter
             * max_total_flux_density
-            / (2.0 * num_pole_pairs * air_gap_flux_density_max * yoke_flux_density_ratio**2.0)
-        )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
-        ] = (
-            -bore_diameter
-            * max_total_flux_density
-            / (2.0 * num_pole_pairs * air_gap_flux_density_max**2.0 * yoke_flux_density_ratio)
+            / (2.0 * num_pole_pairs * max_yoke_flux_density**2.0)
         )

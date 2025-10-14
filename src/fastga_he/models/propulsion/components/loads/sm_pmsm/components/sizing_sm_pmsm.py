@@ -8,6 +8,7 @@ from .sizing_bore_diameter import SizingStatorBoreDiameter
 from .sizing_active_length import SizingActiveLength
 from .sizing_frame_dimension import SizingFrameDimension
 from .sizing_rotor_diameter import SizingRotorDiameter
+from .sizing_radius_ratio import SizingRadiusRatio
 from .sizing_stator_yoke_height import SizingStatorYokeHeight
 from .sizing_slot_width import SizingSlotWidth
 from .sizing_slot_height import SizingSlotHeight
@@ -58,13 +59,15 @@ class SizingSMPMSM(om.Group):
             promotes=["*"],
         )
 
-        self.add_subsystem("rotor_diameter", SizingRotorDiameter(motor_id=motor_id), promotes=["*"])
-
         self.add_subsystem(
             "bore_diameter", SizingStatorBoreDiameter(motor_id=motor_id), promotes=["*"]
         )
 
         self.add_subsystem("active_length", SizingActiveLength(motor_id=motor_id), promotes=["*"])
+
+        self.add_subsystem("rotor_diameter", SizingRotorDiameter(motor_id=motor_id), promotes=["*"])
+
+        self.add_subsystem("radius_ratio", SizingRadiusRatio(motor_id=motor_id), promotes=["*"])
 
         self.add_subsystem("ratio_x2p", SizingRatioX2p(motor_id=motor_id), promotes=["*"])
 
