@@ -410,7 +410,7 @@
           </descent>
           <reserve>
             <altitude units="ft" is_input="True">10000.0</altitude>
-            <duration units="min" is_input="True">10.0<!--reserve fuel to extend cruise phase duration--></duration>
+            <duration units="min" is_input="True">20.0<!--reserve fuel to extend cruise phase duration--></duration>
           </reserve>
         </main_route>
       </sizing>

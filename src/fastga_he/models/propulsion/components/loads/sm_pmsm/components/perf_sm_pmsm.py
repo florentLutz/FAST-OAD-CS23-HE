@@ -27,7 +27,7 @@ from .perf_tangential_stress import PerformancesTangentialStress
 from .perf_surface_current_density import PerformancesSurfaceCurrentDensity
 from .perf_air_gap_flux_density import PerformancesAirGapFluxDensity
 from .perf_total_flux_density import PerformancesTotalFluxDensity
-from .perf_mechanical_factor import PerformancesMechanicalFactor
+from .perf_mechanical_stress_factor import PerformancesMechanicalStressFactor
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
@@ -221,7 +221,7 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "mechanical_factor",
-            PerformancesMechanicalFactor(motor_id=motor_id),
+            "mechanical_stress_factor",
+            PerformancesMechanicalStressFactor(motor_id=motor_id),
             promotes=["*"],
         )
