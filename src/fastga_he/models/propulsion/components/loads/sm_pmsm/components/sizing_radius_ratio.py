@@ -34,14 +34,14 @@ class SizingRadiusRatio(om.ExplicitComponent):
 
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":radius_ratio",
-            val=0.97,
+            val=0.09,
             desc="the radius ratio of the rotor radius and the stator bore radius",
         )
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_thickness",
             units="m",
             desc="The distance between the rotor and the stator bore",
-            val=0.0017,
+            val=0.052,
         )
 
     def setup_partials(self):

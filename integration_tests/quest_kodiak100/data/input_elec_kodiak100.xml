@@ -3,7 +3,7 @@
     <TLAR>
       <NPAX_design is_input="True">4.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">72.0</luggage_mass_design>
-      <range units="NM" is_input="True">40.0<!--top-level requirement: design range--></range>
+      <range units="NM" is_input="True">60.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">78.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
@@ -30,7 +30,6 @@
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
         <taper_ratio is_input="True">1.0<!--taper ratio of horizontal tail--></taper_ratio>
         <thickness_ratio is_input="True">0.12<!--thickness ratio of horizontal tail--></thickness_ratio>
-        <volume_coefficient is_input="False">0.8503071585854957<!--volume coefficient of horizontal tail--></volume_coefficient>
         <MAC>
           <at25percent>
             <x>
@@ -50,7 +49,6 @@
         <sweep_25 units="deg" is_input="True">25.0<!--sweep angle at 25% chord of vertical tail--></sweep_25>
         <taper_ratio is_input="True">0.5<!--taper ratio of vertical tail--></taper_ratio>
         <thickness_ratio is_input="True">0.12<!--thickness ratio of vertical tail--></thickness_ratio>
-        <volume_coefficient is_input="False">0.04404<!--volume coefficient of vertical tail--></volume_coefficient>
         <max_thickness>
           <x_ratio is_input="True">0.3<!--position of the point of maximum thickness as a ratio of vertical tail chord--></x_ratio>
         </max_thickness>
@@ -174,7 +172,7 @@
             <winding_factor is_input="True">0.97</winding_factor>
             <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
             <wire_per_slot>6</wire_per_slot>
-            <tooth_ratio>0.44</tooth_ratio>
+            <tooth_ratio>0.45</tooth_ratio>
           </motor_1>
         </SM_PMSM>
         <battery_pack>
@@ -355,7 +353,6 @@
       </wing>
     </aerodynamics>
     <handling_qualities>
-      <stick_fixed_static_margin>0.2</stick_fixed_static_margin>
       <static_margin>
         <target is_input="True">0.2<!--aircraft static margin--></target>
       </static_margin>

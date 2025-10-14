@@ -4,31 +4,7 @@
             <wing>
                 <area units="m**2">9.0</area>
                 <target_span units="m">12.0</target_span>
-                <span units="m" is_input="False">12.0<!--wing span--></span>
-                <MAC>
-                  <length units="m" is_input="False">1.6591651149475446<!--length of mean aerodynamic chord of wing--></length>
-                </MAC>
             </wing>
-            <horizontal_tail>
-                <volume_coefficient is_input="False">0.8503071585854957<!--volume coefficient of horizontal tail--></volume_coefficient>
-                <MAC>
-                  <at25percent>
-                    <x>
-                      <from_wingMAC25 units="m" is_input="True">5.12<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></from_wingMAC25>
-                    </x>
-                  </at25percent>
-                </MAC>
-            </horizontal_tail>
-            <vertical_tail>
-                <volume_coefficient is_input="False">0.133<!--volume coefficient of horizontal tail--></volume_coefficient>
-                <MAC>
-                  <at25percent>
-                    <x>
-                      <from_wingMAC25 units="m" is_input="True">5.0<!--distance along X between 25% MAC of wing and 25% MAC of vertical tail--></from_wingMAC25>
-                    </x>
-                  </at25percent>
-                </MAC>
-            </vertical_tail>
         </geometry>
     </data>
 </FASTOAD_model>

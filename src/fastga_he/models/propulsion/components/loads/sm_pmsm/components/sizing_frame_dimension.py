@@ -41,13 +41,13 @@ class SizingFrameDimension(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_diameter",
             units="m",
-            val=0.252,
+            val=0.25,
             desc="The motor casing diameter",
         )
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":frame_length",
             units="m",
-            val=0.293,
+            val=0.3,
             desc="The motor casing length",
         )
 

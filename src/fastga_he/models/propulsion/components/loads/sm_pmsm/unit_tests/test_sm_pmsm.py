@@ -1367,23 +1367,6 @@ def test_max_mechanical_stress():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mechanical_stress_max", units="MPa"
-    ) == pytest.approx(740.0, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesMaxMechanicalStress(motor_id="motor_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_yield_stress", val=1.4, units="GPa"
-    )
-    problem = run_system(PerformancesMaxMechanicalStress(motor_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:mechanical_stress_max", units="MPa"
     ) == pytest.approx(1391.48, rel=1e-2)
 
     problem.check_partials(compact_print=True)

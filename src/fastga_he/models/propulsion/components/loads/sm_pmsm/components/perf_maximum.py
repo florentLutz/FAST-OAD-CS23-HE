@@ -49,13 +49,13 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_ac_max",
             units="A",
-            val=150.0,
+            val=500.0,
             desc="Maximum value of the RMS current flowing through one phase of the motor",
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
             units="A/m**2",
-            val=8.1e6,
+            val=1.0e4,
             desc="Maximum value of the RMS current flowing through one phase of the motor",
         )
         self.add_output(
@@ -79,18 +79,18 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_max",
             units="min**-1",
-            val=14300.0,
+            val=5000.0,
             desc="Maximum value of the motor rpm",
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":losses_max",
             units="W",
-            val=1247.4,
+            val=4200.0,
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max",
             units="kW",
-            val=289.16,
+            val=4.20,
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
@@ -105,7 +105,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":total_flux_density_max",
             units="T",
-            val=0.01,
+            val=1.0,
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density_max",
