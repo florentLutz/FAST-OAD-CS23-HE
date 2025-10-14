@@ -48,7 +48,7 @@ class PerformancesTangentialStress(om.ExplicitComponent):
             units="Pa",
             desc="The surface tangential stress applied by electromagnetism",
             shape=number_of_points,
-            val=50.0e3,
+            val=0.169,
         )
 
     def setup_partials(self):

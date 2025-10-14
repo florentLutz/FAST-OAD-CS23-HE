@@ -25,11 +25,11 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
             units="Pa",
             desc="The surface tangential stress applied by electromagnetism",
             shape=number_of_points,
-            val=np.nan,
+            val=0.169,
         )
         self.add_input(
             name="surface_current_density",
-            val=np.nan,
+            val=1.0,
             units="A/m",
             shape=number_of_points,
             desc="The maximum surface current density of the winding conductor cable",
@@ -37,7 +37,7 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
 
         self.add_output(
             name="air_gap_flux_density",
-            val=0.9,
+            val=1.0,
             units="T",
             shape=number_of_points,
             desc="The magnetic flux density provided by the permanent magnets",

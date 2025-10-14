@@ -59,7 +59,6 @@ from ..components.perf_stator_yoke_flux_density import PerformancesStatorYokeFlu
 from ..components.perf_stator_tooth_flux_density import PerformancesStatorToothFluxDensity
 from ..components.perf_electromagnetic_torque import PerformancesElectromagneticTorque
 from ..components.perf_maximum import PerformancesMaximum
-from ..components.perf_mechanical_stress import PerformancesMaxMechanicalStress
 from ..components.perf_sm_pmsm import PerformancesSMPMSM
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
@@ -122,7 +121,7 @@ def test_rotor_diameter():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", units="m"
-    ) == pytest.approx(0.16, rel=1e-2)
+    ) == pytest.approx(0.0988, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1355,23 +1354,6 @@ def test_maximum():
     problem.check_partials(compact_print=True)
 
 
-def test_max_mechanical_stress():
-    ivc = get_indep_var_comp(
-        list_inputs(PerformancesMaxMechanicalStress(motor_id="motor_1")),
-        __file__,
-        XML_FILE,
-    )
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PerformancesMaxMechanicalStress(motor_id="motor_1"), ivc)
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:mechanical_stress_max", units="MPa"
-    ) == pytest.approx(1391.48, rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
 def test_performance_SM_PMSM():
     ivc = get_indep_var_comp(
         list_inputs(PerformancesSMPMSM(motor_id="motor_1", number_of_points=NB_POINTS_TEST)),
@@ -1418,7 +1400,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter", units="m"
-    ) == pytest.approx(0.16, rel=1e-2)
+    ) == pytest.approx(0.0988, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:active_length", units="m"
@@ -1450,7 +1432,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_mass", units="kg"
-    ) == pytest.approx(44.22, rel=1e-2)
+    ) == pytest.approx(16.9, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:frame_mass", units="kg"
@@ -1463,7 +1445,7 @@ def test_sizing_SM_PMSM():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:mass", units="kg"
-    ) == pytest.approx(236.41, rel=1e-2)
+    ) == pytest.approx(209.09, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 

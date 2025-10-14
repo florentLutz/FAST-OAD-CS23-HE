@@ -38,7 +38,7 @@ class PerformancesWindingResistivityFixed(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistivity",
             units="ohm*m",
             desc="Copper electrical resistivity",
-            val=3.0e-8,
+            val=0.0015,
             shape=number_of_points,
         )
 
