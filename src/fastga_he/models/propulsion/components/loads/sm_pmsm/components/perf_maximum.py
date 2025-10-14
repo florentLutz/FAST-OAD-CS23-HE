@@ -25,9 +25,24 @@ class PerformancesMaximum(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("ac_current_rms_in_one_phase", units="A", val=np.nan, shape=number_of_points)
         self.add_input(
-            "ac_phase_current_density", units="A/m**2", val=np.nan, shape=number_of_points
+            "ac_current_rms_in_one_phase",
+            units="A",
+            val=np.full(number_of_points, np.nan),
+        )
+        self.add_input(
+            "ac_linear_current_density_rms",
+            units="A/m",
+            val=np.full(number_of_points, np.nan),
+        )
+        self.add_input(
+            "ac_current_density_rms",
+            units="A/m**2",
+            val=np.full(number_of_points, np.nan),
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":number_of_phases",
+            val=3.0,
         )
         self.add_input(
             "ac_voltage_peak_in",
@@ -40,11 +55,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
         self.add_input("power_losses", units="W", val=np.nan, shape=number_of_points)
         self.add_input("shaft_power_out", units="kW", val=np.nan, shape=number_of_points)
-        self.add_input(name="tangential_stress", units="MPa", val=np.nan, shape=number_of_points)
-        self.add_input(
-            name="surface_current_density", units="A/m", val=np.nan, shape=number_of_points
-        )
-        self.add_input(name="air_gap_flux_density", units="T", val=np.nan, shape=number_of_points)
 
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_ac_max",
@@ -53,10 +63,16 @@ class PerformancesMaximum(om.ExplicitComponent):
             desc="Maximum value of the RMS current flowing through one phase of the motor",
         )
         self.add_output(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":linear_current_density_ac_max",
+            units="A/m",
+            val=500.0,
+            desc="Maximum value of the RMS linear current density flowing through the motor",
+        )
+        self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
             units="A/m**2",
-            val=1.0e4,
-            desc="Maximum value of the RMS current flowing through one phase of the motor",
+            val=500.0,
+            desc="Maximum value of the RMS current density flowing through the motor",
         )
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_ac_max",
@@ -92,21 +108,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             units="kW",
             val=4.20,
         )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
-            units="MPa",
-            val=50.0,
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max",
-            units="A/m",
-            val=1.0,
-        )
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
-            units="T",
-            val=1.0,
-        )
 
     def setup_partials(self):
         motor_id = self.options["motor_id"]
@@ -120,8 +121,17 @@ class PerformancesMaximum(om.ExplicitComponent):
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
+            of="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":linear_current_density_ac_max",
+            wrt="ac_linear_current_density_rms",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
             of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
-            wrt="ac_phase_current_density",
+            wrt="ac_current_density_rms",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
@@ -168,29 +178,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
         )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
-            wrt="tangential_stress",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":surface_current_density_max",
-            wrt="surface_current_density",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
-            wrt="air_gap_flux_density",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
@@ -199,8 +186,11 @@ class PerformancesMaximum(om.ExplicitComponent):
             inputs["ac_current_rms_in_one_phase"]
         )
         outputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":linear_current_density_ac_max"
+        ] = np.max(inputs["ac_linear_current_density_rms"])
+        outputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max"
-        ] = np.max(inputs["ac_phase_current_density"])
+        ] = np.max(inputs["ac_current_density_rms"])
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_ac_max"] = np.max(
             inputs["ac_voltage_peak_in"]
         )
@@ -219,15 +209,6 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max"] = np.max(
             inputs["shaft_power_out"]
         )
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max"] = (
-            np.max(inputs["tangential_stress"])
-        )
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max"
-        ] = np.max(inputs["surface_current_density"])
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
-        ] = np.max(inputs["air_gap_flux_density"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -242,10 +223,20 @@ class PerformancesMaximum(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
-            "ac_phase_current_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":linear_current_density_max",
+            "ac_linear_current_density_rms",
         ] = np.where(
-            inputs["ac_phase_current_density"] == np.max(inputs["ac_phase_current_density"]),
+            inputs["ac_linear_current_density_rms"]
+            == np.max(inputs["ac_linear_current_density_rms"]),
+            1.0,
+            0.0,
+        )
+
+        partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
+            "ac_current_density_rms",
+        ] = np.where(
+            inputs["ac_current_density_rms"] == np.max(inputs["ac_current_density_rms"]),
             1.0,
             0.0,
         )
@@ -278,22 +269,3 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max",
             "shaft_power_out",
         ] = np.where(inputs["shaft_power_out"] == np.max(inputs["shaft_power_out"]), 1.0, 0.0)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
-            "tangential_stress",
-        ] = np.where(inputs["tangential_stress"] == np.max(inputs["tangential_stress"]), 1.0, 0.0)
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max",
-            "surface_current_density",
-        ] = np.where(
-            inputs["surface_current_density"] == np.max(inputs["surface_current_density"]), 1.0, 0.0
-        )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
-            "air_gap_flux_density",
-        ] = np.where(
-            inputs["air_gap_flux_density"] == np.max(inputs["air_gap_flux_density"]), 1.0, 0.0
-        )

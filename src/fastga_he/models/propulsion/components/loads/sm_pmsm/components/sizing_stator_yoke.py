@@ -42,18 +42,16 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             desc="Magnetic flux density at the stator yoke layer",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":surface_current_density_max",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
             val=np.nan,
             units="A/m",
-            desc="The maximum surface current density of the winding conductor cable",
+            desc="The surface current density of the winding conductor cable",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
             val=np.nan,
             units="T",
-            desc="The maximum magnetic flux density provided by the permanent magnets",
+            desc="The magnetic flux density provided by the permanent magnets",
         )
 
         self.add_output(
@@ -70,12 +68,10 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         r = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
-        b_m = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
-        ]
+        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
         b_sy = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density"]
         k_m = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
         ]
         p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
@@ -90,12 +86,10 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         r = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] / 2.0
-        b_m = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max"
-        ]
+        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
         b_sy = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":yoke_flux_density"]
         k_m = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         p = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"]
@@ -123,7 +117,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density_max",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
         ] = (r / p) * b_m / (np.abs(b_sy) * max_total_air_gap_flux_density)
 
         partials[
@@ -133,7 +127,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density_max",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
         ] = (
             (r / p)
             * ((mu_0 * x2p_ratio) ** 2.0 * k_m)

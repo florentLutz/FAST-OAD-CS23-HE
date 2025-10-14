@@ -10,8 +10,7 @@ import fastoad.api as oad
 from ..constants import (
     SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE,
     SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
-    SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY,
-    SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS,
+    SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE,
 )
 
 
@@ -45,16 +44,9 @@ class ConstraintsSMPMSM(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            name="constraints_current_density_pmsm",
+            name="constraints_voltage_pmsm",
             subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY, options=option_motor_id
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="constraints_tangential_stress_pmsm",
-            subsys=oad.RegisterSubmodel.get_submodel(
-                SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS, options=option_motor_id
+                SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE, options=option_motor_id
             ),
             promotes=["*"],
         )

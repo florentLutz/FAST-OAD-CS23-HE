@@ -5,8 +5,7 @@
 from ..constants import (
     SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE,
     SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
-    SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY,
-    SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS,
+    SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE,
 )
 
 import openmdao.api as om
@@ -19,9 +18,6 @@ oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE] = (
 )
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_RPM] = (
     "fastga_he.submodel.propulsion.constraints.sm_pmsm.rpm.enforce"
-)
-oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY] = (
-    "fastga_he.submodel.propulsion.constraints.sm_pmsm.current_density.enforce"
 )
 
 
@@ -124,13 +120,13 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_SM_PMSM_CURRENT_DENSITY,
-    "fastga_he.submodel.propulsion.constraints.sm_pmsm.current_density.enforce",
+    SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE,
+    "fastga_he.submodel.propulsion.constraints.sm_pmsm.voltage.enforce",
 )
-class ConstraintsCurrentDensityEnforce(om.ExplicitComponent):
+class ConstraintsVoltageEnforce(om.ExplicitComponent):
     """
-    Class that enforces that the maximum phase current density seen by the motor during the
-    mission is used for the sizing, ensuring a fitted design of each component.
+    Class that enforces that the maximum voltage seen by the motor during the mission is used for
+    the sizing, ensuring a fitted design for each component.
     """
 
     def initialize(self):
@@ -142,80 +138,31 @@ class ConstraintsCurrentDensityEnforce(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
-            units="A/m**2",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_ac_max",
+            units="V",
             val=np.nan,
-            desc="Maximum value of the motor phase current density during the mission",
+            desc="Maximum value of the peak voltage at the input of the motor",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber",
-            units="A/m**2",
-            val=1.0e4,
-            desc="Max phase current density of the motor",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_caliber",
+            val=800.0,
+            units="V",
+            desc="Max voltage of the motor",
         )
 
     def setup_partials(self):
         motor_id = self.options["motor_id"]
 
         self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
+            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_caliber",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_ac_max",
             val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber"
-        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max"]
-
-
-@oad.RegisterSubmodel(
-    SUBMODEL_CONSTRAINTS_SM_PMSM_TANGENTIAL_STRESS,
-    "fastga_he.submodel.propulsion.constraints.sm_pmsm.tangential_stress.enforce",
-)
-class ConstraintsTangentialStressEnforce(om.ExplicitComponent):
-    """
-    Class that enforces that the maximum tangential stress applied on the rotor during the
-    mission is used for the sizing, ensuring a fitted design of each component.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
-        )
-
-    def setup(self):
-        motor_id = self.options["motor_id"]
-
-        self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
-            units="MPa",
-            val=np.nan,
-            desc="Maximum value of the rotor tangential stress during the mission",
-        )
-
-        self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber",
-            units="MPa",
-            val=50.0,
-            desc="Max tangential stress of the rotor",
-        )
-
-    def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max",
-            val=1.0,
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        motor_id = self.options["motor_id"]
-
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_caliber"
-        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress_max"]
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_caliber"] = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":voltage_ac_max"
+        ]
