@@ -3,7 +3,7 @@
     <TLAR>
       <NPAX_design is_input="True">4.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">72.0</luggage_mass_design>
-      <range units="NM" is_input="True">40.0<!--top-level requirement: design range--></range>
+      <range units="NM" is_input="True">60.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">78.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
@@ -209,7 +209,7 @@
             <stator_yoke_height units="m" is_input="False">0.1391082991531088<!--Stator yoke thickness of the SM PMSM--></stator_yoke_height>
             <tangential_stress_caliber units="MPa" is_input="False">0.10516220121352907<!--Max tangential stress of the rotor--></tangential_stress_caliber>
             <tangential_stress_max units="MPa" is_input="False">0.10971914350670123<!--Maximum value of the rotor tangential stress during the mission--></tangential_stress_max>
-            <tooth_flux_density_ratio is_input="True">1.9<!--Maximum mean tooth magnetic flux density divided by the maximum air gap flux density--></tooth_flux_density_ratio>
+            <tooth_flux_density_ratio is_input="True">1.7<!--Maximum mean tooth magnetic flux density divided by the maximum air gap flux density--></tooth_flux_density_ratio>
             <tooth_ratio is_input="False">0.4999997730878056<!--The fraction between overall tooth length and stator bore circumference--></tooth_ratio>
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
             <torque_max units="N*m" is_input="False">360.1525304218239<!--Maximum value of the torque the motor has to provide--></torque_max>
@@ -219,10 +219,10 @@
             <winding_factor is_input="True">0.97<!--The factor considers the cable winding effect in the stator slot--></winding_factor>
             <winding_temperature units="degK" is_input="True">453.15<!--The temperature of the winding conductor cable--></winding_temperature>
             <wire_circular_section_area units="m**2" is_input="False">2.311650981235005e-05<!--Single conductor circular wire cross-section area--></wire_circular_section_area>
-            <wire_per_slot is_input="True">60.0<!--Number of wire per stator slot--></wire_per_slot>
+            <wire_per_slot is_input="True">10.0<!--Number of wire per stator slot--></wire_per_slot>
             <x2p_ratio is_input="False">36.042004183232294</x2p_ratio>
             <yield_stress units="Pa" is_input="True">190000000.0<!--The yield stress of the rotor yoke material, Vacoflux 48 alloy from Vacuumschmelze materials is set to default--></yield_stress>
-            <yoke_flux_density_ratio is_input="True">1.42<!--Maximum mean yoke magnetic flux density divided by the maximum air gap flux density--></yoke_flux_density_ratio>
+            <yoke_flux_density_ratio is_input="True">1.3<!--Maximum mean yoke magnetic flux density divided by the maximum air gap flux density--></yoke_flux_density_ratio>
             <CG>
               <x units="m" is_input="False">0.5750009855999999<!--X position of the SM PMSM center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>

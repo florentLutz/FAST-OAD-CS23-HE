@@ -21,6 +21,11 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "design_current_density",
+            default=DEFAULT_MAX_CURRENT_DENSITY,
+            desc="Maximum current density [kA/m^2]",
+        )
 
     def setup(self):
         motor_id = self.options["motor_id"]
@@ -36,12 +41,6 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
             "ac_current_rms_in_one_phase",
             units="kA",
             val=np.full(number_of_points, np.nan),
-        )
-        self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density",
-            units="kA/m**2",
-            val=DEFAULT_MAX_CURRENT_DENSITY,
-            desc="Upper limit of the current density for air cooling PMSM ",
         )
 
         self.add_output(
@@ -65,12 +64,9 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
         )
         self.declare_partials(
             of="*",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:"
-                + motor_id
-                + ":wire_circular_section_area",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density",
-            ],
+            wrt="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":wire_circular_section_area",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -85,24 +81,21 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
             ],
             0.0,
-            inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density"
-            ],
+            DEFAULT_MAX_CURRENT_DENSITY,
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
-        design_current_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density"
-        ]
         unclipped_current_density = (
             inputs["ac_current_rms_in_one_phase"]
             / inputs[
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
             ]
         )
-        clipped_current_density = np.clip(unclipped_current_density, 1.0e-3, design_current_density)
+        clipped_current_density = np.clip(
+            unclipped_current_density, 1.0e-3, DEFAULT_MAX_CURRENT_DENSITY
+        )
 
         partials[
             "ac_phase_current_density",
@@ -124,13 +117,4 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area"
             ],
             1.0e-6,
-        )
-
-        partials[
-            "ac_phase_current_density",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_current_density",
-        ] = np.where(
-            unclipped_current_density == clipped_current_density,
-            np.zeros(number_of_points),
-            1.0,
         )

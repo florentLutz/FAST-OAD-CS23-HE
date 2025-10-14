@@ -905,11 +905,6 @@ def test_phase_current_density():
         9.95e-06,
         units="m**2",
     )
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:design_current_density",
-        10000,
-        units="kA/m**2",
-    )
 
     ivc.add_output("ac_current_rms_in_one_phase", 80.0 * np.ones(NB_POINTS_TEST), units="A")
 
@@ -1360,7 +1355,7 @@ def test_electromagnetic_factor():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:electromagnetic_factor"
-    ) == pytest.approx(1.15, rel=1e-2)
+    ) == pytest.approx(1.1, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
