@@ -4,7 +4,7 @@
 
 import os
 import os.path as pth
-from shutil import rmtree, copy
+from shutil import rmtree
 import logging
 
 
@@ -118,11 +118,11 @@ def test_sizing_kodiak_100_full_electric():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3446.45, rel=1e-2
+        3394.82, rel=1e-2
     )
     # Actual value is 3290 kg
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2887.84, rel=1e-2
+        2842.82, rel=1e-2
     )
 
 

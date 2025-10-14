@@ -35,7 +35,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
             units="m",
-            val=0.1885,
+            val=0.11,
         )
 
     def setup_partials(self):

@@ -38,14 +38,14 @@ class SizingToothRatio(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density_ratio",
-            val=1.5,
+            val=1.4,
             desc="Maximum mean tooth magnetic flux density divided by the maximum air gap flux "
             "density",
         )
 
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-            val=0.47,
+            val=0.44,
             desc="The fraction between overall tooth length and stator bore circumference",
         )
 

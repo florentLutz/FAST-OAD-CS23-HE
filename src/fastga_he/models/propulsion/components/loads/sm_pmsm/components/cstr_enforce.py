@@ -205,15 +205,15 @@ class ConstraintsCurrentDensityEnforce(om.ExplicitComponent):
 
         self.add_input(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
-            units="kA/m**2",
+            units="A/m**2",
             val=np.nan,
             desc="Maximum value of the motor phase current density during the mission",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_caliber",
-            units="kA/m**2",
-            val=8.1e3,
+            units="A/m**2",
+            val=8.1e6,
             desc="Max phase current density of the motor",
         )
 

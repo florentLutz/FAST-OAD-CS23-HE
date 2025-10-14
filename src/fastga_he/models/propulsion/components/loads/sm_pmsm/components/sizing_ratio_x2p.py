@@ -34,7 +34,7 @@ class SizingRatioX2p(om.ExplicitComponent):
 
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
-            val=62.3,
+            val=16.436,
         )
 
     def setup_partials(self):

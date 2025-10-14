@@ -31,7 +31,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         self.add_output(
             "ac_current_rms_in",
             units="A",
-            val=np.full(number_of_points, 300.0),
+            val=np.full(number_of_points, 10.0),
             shape=number_of_points,
             desc="RMS current in all the phases of the motor",
         )

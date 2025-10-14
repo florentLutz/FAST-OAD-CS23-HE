@@ -37,7 +37,7 @@ class SizingConductorWireSectionArea(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":wire_circular_section_area",
             units="m**2",
-            val=1.0e-05,
+            val=2.48e-05,
             desc="Single conductor circular wire cross-section area",
         )
 

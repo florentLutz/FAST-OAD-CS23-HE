@@ -3,7 +3,7 @@
     <TLAR>
       <NPAX_design is_input="True">4.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">72.0</luggage_mass_design>
-      <range units="NM" is_input="True">60.0<!--top-level requirement: design range--></range>
+      <range units="NM" is_input="True">30.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">78.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
@@ -156,83 +156,26 @@
         </DC_splitter>
         <SM_PMSM>
           <motor_1>
-            <active_length units="m" is_input="False">0.18141671365247614<!--The length of electromagnetism active part of SM PMSM--></active_length>
-            <air_gap_flux_density_max units="T" is_input="False">1.049998604064697<!--Maximum magnetic flux density provided by the permanent magnets--></air_gap_flux_density_max>
-            <air_gap_thickness units="m" is_input="True">0.00075<!--The distance between the rotor and the stator bore--></air_gap_thickness>
-            <bearing_diameter units="m" is_input="True">0.03<!--The motor bearing bore diameter--></bearing_diameter>
-            <bearing_friction_coefficient is_input="True">0.0015<!--friction coefficient of the motor that house the shaft, the ball bearing is set to default--></bearing_friction_coefficient>
-            <bore_diameter units="m" is_input="False">0.10885002828364568<!--Stator bore diameter of the SM PMSM--></bore_diameter>
-            <cond_twisting_coeff is_input="True">1.25<!--The factor to account for the conductor wire bunching--></cond_twisting_coeff>
-            <conductor_cable_length units="m" is_input="False">0.3174792489046332<!--Single Conductor cable length in one slot--></conductor_cable_length>
+            <cond_twisting_coeff is_input="True">1.25<!--The factor to account the conductor wire bunching--></cond_twisting_coeff>
             <conductor_material_density units="kg/m**3" is_input="True">8960.0<!--Electrical conductor material density--></conductor_material_density>
-            <conductor_section_area_per_slot units="m**2" is_input="False">0.00020804855083275046<!--Conductor wires section area per stator slot--></conductor_section_area_per_slot>
-            <conductor_slot_number is_input="False">24.0<!--Number of conductor slots on the motor stator--></conductor_slot_number>
-            <current_ac_max units="A" is_input="False">280.6237545480317<!--Maximum value of the RMS current flowing through one phase of the motor--></current_ac_max>
-            <current_density_ac_caliber units="kA/m**2" is_input="False">9999.786508433303<!--Max phase current density of the motor--></current_density_ac_caliber>
-            <current_density_ac_max units="kA/m**2" is_input="False">9999.99348038854<!--Maximum value of the RMS current flowing through one phase of the motor--></current_density_ac_max>
-            <electromagnetic_torque_max units="N*m" is_input="False">360.25023829372367<!--Maximum value of the electromagnetic torque the motor has to provide--></electromagnetic_torque_max>
-            <electromagnetic_torque_rating units="N*m" is_input="False">354.99149030786947<!--Max electromagnetic torque of the motor--></electromagnetic_torque_rating>
-            <end_winding_coeff is_input="True">1.4<!--The factor to account for extra length at the end of the winding--></end_winding_coeff>
+            <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
             <form_coefficient is_input="True">0.6<!--The fraction of stator bore diameter and active length--></form_coefficient>
-            <frame_density units="kg/m**3" is_input="True">2100.0<!--Default value set as the density of 6063 aluminum alloy--></frame_density>
-            <frame_diameter units="m" is_input="False">0.534404671974097<!--The motor casing diameter--></frame_diameter>
-            <frame_length units="m" is_input="False">0.2693647223514856<!--The motor casing length--></frame_length>
-            <frame_mass units="kg" is_input="False">19.64608686285204<!--The weight of the motor casing--></frame_mass>
-            <front_length_ratio is_input="True">0.25<!--Location of the SM PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
+            <frame_density units="kg/m**3" is_input="True">2100.0</frame_density>
+            <front_length_ratio is_input="True">0.25<!--Location of the PMSM CG as a ratio of the aircraft front length--></front_length_ratio>
             <insulation_material_density units="kg/m**3" is_input="True">1400.0<!--Electrical insulation material density--></insulation_material_density>
-            <losses_max units="W" is_input="False">6111.7630652198295</losses_max>
-            <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material. Vacoflux 48 alloy from Vacuumschmelze materials is set to default--></magnetic_material_density>
-            <mass units="kg" is_input="False">313.99852177771197</mass>
-            <mechanical_factor is_input="False">1.0<!--Remain at 1.0 if the maximum mechanical stress is within the range--></mechanical_factor>
-            <poissons_ratio is_input="True">0.29<!--The rotor material Poisson's ratio--></poissons_ratio>
-            <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the SM PMSM--></pole_pairs_number>
-            <pouillet_geometry_factor units="1/m" is_input="False">36638.53527513502<!--Total length of the conductor wire divided by the wire cross-sectional area--></pouillet_geometry_factor>
-            <radius_ratio is_input="False">0.9862193411299196<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
-            <resistance units="ohm" is_input="False">[0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936, 0.0010033382678635936]</resistance>
-            <resistivity units="ohm*m" is_input="False">[2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08, 2.7363841349713922e-08]<!--Copper electrical resistivity--></resistivity>
-            <rotor_diameter units="m" is_input="False">0.10735002700364568</rotor_diameter>
-            <rotor_mass units="kg" is_input="False">11.607308866037071</rotor_mass>
-            <rpm_max units="1/min" is_input="False">14999.9996416<!--Maximum value of the motor rpm--></rpm_max>
-            <rpm_rating units="1/min" is_input="False">14999.986739200001<!--Max continuous rpm of the motor--></rpm_rating>
-            <safety_factor is_input="True">1.5<!--Safety factor for rotor sizing--></safety_factor>
-            <shaft_power_max units="kW" is_input="False">565.7262590728644</shaft_power_max>
-            <shaft_power_rating units="MW" is_input="False">0.5574589954337426<!--Value of the maximum power the SM PMSM can provide, used for sizing--></shaft_power_rating>
+            <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material--></magnetic_material_density>
+            <number_of_phases is_input="True">3.0</number_of_phases>
+            <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
+            <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
-            <slot_height units="m" is_input="False">0.05841117823291684<!--Single stator slot height (radial)--></slot_height>
-            <slot_section_area units="m**2" is_input="False">0.0004160971006415009<!--Single stator slot section area--></slot_section_area>
-            <slot_width units="m" is_input="False">0.00712422107897244<!--Single stator slot width (along the circumference)--></slot_width>
-            <slots_per_pole_per_phase is_input="True">2.0<!--The number of conductor slots per pole and per phase--></slots_per_pole_per_phase>
-            <stator_core_mass units="kg" is_input="False">266.3233812634547<!--The weight of the stator excluding the wire weight--></stator_core_mass>
-            <stator_diameter units="m" is_input="False">0.503888946908497<!--The outer stator diameter of the SM PMSM--></stator_diameter>
-            <stator_winding_mass units="kg" is_input="False">16.421752214488208<!--The winding cable weight in the stator slots of PMSM--></stator_winding_mass>
-            <stator_yoke_height units="m" is_input="False">0.1391082991531088<!--Stator yoke thickness of the SM PMSM--></stator_yoke_height>
-            <tangential_stress_caliber units="MPa" is_input="False">0.10516220121352907<!--Max tangential stress of the rotor--></tangential_stress_caliber>
-            <tangential_stress_max units="MPa" is_input="False">0.10971914350670123<!--Maximum value of the rotor tangential stress during the mission--></tangential_stress_max>
-            <tooth_flux_density_ratio is_input="True">1.7<!--Maximum mean tooth magnetic flux density divided by the maximum air gap flux density--></tooth_flux_density_ratio>
-            <tooth_ratio is_input="False">0.4999997730878056<!--The fraction between overall tooth length and stator bore circumference--></tooth_ratio>
+            <slots_per_pole_per_phase is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_pole_per_phase>
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
-            <torque_max units="N*m" is_input="False">360.1525304218239<!--Maximum value of the torque the motor has to provide--></torque_max>
-            <torque_rating units="N*m" is_input="False">354.88972032370594<!--Max continuous torque of the motor--></torque_rating>
-            <total_flux_density_max units="T" is_input="False">6.9145488788832985<!--Maximum total magnetic flux density in air gap including electromagnetism--></total_flux_density_max>
-            <voltage_ac_max units="V" is_input="False">1245.509745442889<!--Maximum value of the peak voltage at the input of the motor--></voltage_ac_max>
-            <winding_factor is_input="True">0.97<!--The factor considers the cable winding effect in the stator slot--></winding_factor>
-            <winding_temperature units="degK" is_input="True">453.15<!--The temperature of the winding conductor cable--></winding_temperature>
-            <wire_circular_section_area units="m**2" is_input="False">2.311650981235005e-05<!--Single conductor circular wire cross-section area--></wire_circular_section_area>
-            <wire_per_slot is_input="True">10.0<!--Number of wire per stator slot--></wire_per_slot>
-            <x2p_ratio is_input="False">36.042004183232294</x2p_ratio>
-            <yield_stress units="Pa" is_input="True">190000000.0<!--The yield stress of the rotor yoke material, Vacoflux 48 alloy from Vacuumschmelze materials is set to default--></yield_stress>
-            <yoke_flux_density_ratio is_input="True">1.3<!--Maximum mean yoke magnetic flux density divided by the maximum air gap flux density--></yoke_flux_density_ratio>
-            <CG>
-              <x units="m" is_input="False">0.5750009855999999<!--X position of the SM PMSM center of gravity--></x>
-              <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
-            </CG>
-            <cruise>
-              <CD0 is_input="False">0.0</CD0>
-            </cruise>
-            <low_speed>
-              <CD0 is_input="False">0.0</CD0>
-            </low_speed>
+            <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
+            <winding_factor is_input="True">0.97</winding_factor>
+            <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
+            <wire_per_slot>6</wire_per_slot>
+            <tooth_ratio>0.44</tooth_ratio>
           </motor_1>
         </SM_PMSM>
         <battery_pack>
@@ -467,7 +410,7 @@
           </descent>
           <reserve>
             <altitude units="ft" is_input="True">10000.0</altitude>
-            <duration units="min" is_input="True">20.0<!--reserve fuel to extend cruise phase duration--></duration>
+            <duration units="min" is_input="True">10.0<!--reserve fuel to extend cruise phase duration--></duration>
           </reserve>
         </main_route>
       </sizing>

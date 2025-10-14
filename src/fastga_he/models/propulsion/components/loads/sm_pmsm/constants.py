@@ -25,5 +25,3 @@ IRON_LOSSES_COEFF = [
 
 DEFAULT_DENSITY = AtmosphereWithPartials(0).density  # [kg/m^3]
 DEFAULT_DYNAMIC_VISCOSITY = AtmosphereWithPartials(0).dynamic_viscosity  # [kg/m/s]
-DEFAULT_MAX_AIR_GAP_FLUX_DENSITY = 1.05  # [T]
-DEFAULT_MAX_CURRENT_DENSITY = 10000.0  # [kA/^2]

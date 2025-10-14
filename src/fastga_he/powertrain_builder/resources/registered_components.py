@@ -195,7 +195,7 @@ SM_PMSM = {
     CN: "SMPMSM",
     CN_ID: "motor_id",
     CT: "SM_PMSM",
-    ATT: ["design_current_density", "air_gap_flux_density"],
+    ATT: None,
     PT: ["settings:*", "density", "altitude"],
     SPT: [],
     PTS: [],

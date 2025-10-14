@@ -45,17 +45,12 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             desc="Remain at 1.0 if the maximum mechanical stress is within the range",
             val=1.0,
         )
-        self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor",
-            desc="Remain at 1.0 if the maximum air gap flux density is within the range",
-            val=1.0,
-        )
 
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             units="m",
             desc="Stator bore diameter of the SM PMSM",
-            val=0.19,
+            val=0.114,
         )
 
     def setup_partials(self):
@@ -74,14 +69,10 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
         ]
         k_mec = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_factor"]
-        k_elec = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor"
-        ]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter"] = (
             2.0
             * k_mec
-            * k_elec
             * np.cbrt((form_coefficient / (4.0 * np.pi * sigma)) * electromagnetic_torque_max)
         )
 
@@ -98,9 +89,6 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_torque_max"
         ]
         k_mec = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_factor"]
-        k_elec = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor"
-        ]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
@@ -108,7 +96,6 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         ] = (
             2.0
             * k_mec
-            * k_elec
             * (electromagnetic_torque_max ** (1.0 / 3.0) * (np.pi * sigma) ** (2.0 / 3.0))
             / (3.0 * (2.0 ** (2.0 / 3.0)) * np.pi * sigma * form_coefficient ** (2.0 / 3.0))
         )
@@ -119,7 +106,6 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         ] = (
             -2.0
             * k_mec
-            * k_elec
             * (
                 form_coefficient ** (1.0 / 3.0)
                 * electromagnetic_torque_max ** (1.0 / 3.0)
@@ -134,7 +120,6 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         ] = (
             2.0
             * k_mec
-            * k_elec
             * (form_coefficient ** (1.0 / 3.0) * (np.pi * sigma) ** (2.0 / 3.0))
             / (
                 3.0
@@ -148,17 +133,4 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_factor",
-        ] = (
-            2.0
-            * k_elec
-            * np.cbrt((form_coefficient / (4.0 * np.pi * sigma)) * electromagnetic_torque_max)
-        )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":electromagnetic_factor",
-        ] = (
-            2.0
-            * k_mec
-            * np.cbrt((form_coefficient / (4.0 * np.pi * sigma)) * electromagnetic_torque_max)
-        )
+        ] = 2.0 * np.cbrt((form_coefficient / (4.0 * np.pi * sigma)) * electromagnetic_torque_max)

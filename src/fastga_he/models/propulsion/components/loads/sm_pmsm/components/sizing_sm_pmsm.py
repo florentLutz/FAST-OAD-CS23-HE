@@ -80,7 +80,7 @@ class SizingSMPMSM(om.Group):
 
         self.add_subsystem("tooth_ratio", SizingToothRatio(motor_id=motor_id), promotes=["*"])
 
-        # self.add_subsystem("slot_width", SizingSlotWidth(motor_id=motor_id), promotes=["*"])
+        self.add_subsystem("slot_width", SizingSlotWidth(motor_id=motor_id), promotes=["*"])
 
         self.add_subsystem("slot_height", SizingSlotHeight(motor_id=motor_id), promotes=["*"])
 

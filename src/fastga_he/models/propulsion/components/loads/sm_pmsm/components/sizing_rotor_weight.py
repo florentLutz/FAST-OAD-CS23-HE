@@ -40,7 +40,7 @@ class SizingRotorWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             units="kg",
-            val=63.45,
+            val=12.85,
         )
 
     def setup_partials(self):
