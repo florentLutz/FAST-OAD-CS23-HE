@@ -4,9 +4,6 @@
 
 import numpy as np
 import openmdao.api as om
-import logging
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class PerformancesMechanicalFactor(om.ExplicitComponent):
@@ -88,12 +85,6 @@ class PerformancesMechanicalFactor(om.ExplicitComponent):
         rpm_mec = 60.0 * np.sqrt(
             8.0 * sigma / (rho_mag * np.pi**2.0 * rotor_diameter**2.0 * (3.0 + poissons))
         )
-
-        if (rpm * sf) > rpm_mec:
-            _LOGGER.info(
-                msg="Maximum mechanical RPM exceeded. Reduce rotor diameter to stay within "
-                "acceptable range."
-            )
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mechanical_factor"] = (
             np.where((rpm * sf) > rpm_mec, rpm_mec / (rpm * sf), 1.0)
