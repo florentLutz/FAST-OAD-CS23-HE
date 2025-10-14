@@ -39,7 +39,7 @@ class PerformancesPhaseCurrentDensity(om.ExplicitComponent):
         self.add_output(
             "ac_phase_current_density",
             units="A/m**2",
-            val=8.1e6,
+            val=1.0e4,
             shape=number_of_points,
             desc="The phase current density of the SM PMSM",
         )

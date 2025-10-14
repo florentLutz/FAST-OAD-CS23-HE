@@ -53,7 +53,7 @@ class PerformancesSurfaceCurrentDensity(om.ExplicitComponent):
 
         self.add_output(
             name="surface_current_density",
-            val=1.1e5,
+            val=1.0,
             units="A/m",
             shape=number_of_points,
             desc="The surface current density of the winding conductor cable",

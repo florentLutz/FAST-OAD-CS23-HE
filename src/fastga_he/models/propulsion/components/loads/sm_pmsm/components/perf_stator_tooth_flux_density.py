@@ -39,7 +39,7 @@ class PerformancesStatorToothFluxDensity(om.ExplicitComponent):
 
         self.add_output(
             name="tooth_flux_density",
-            val=1.3,
+            val=1.2,
             units="T",
             shape=number_of_points,
             desc="Mean magnetic flux density in the stator teeth",

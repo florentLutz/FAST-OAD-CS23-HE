@@ -37,7 +37,7 @@ class PerformancesEfficiency(om.ExplicitComponent):
 
         self.add_output(
             "efficiency",
-            val=np.full(number_of_points, 0.98),
+            val=np.full(number_of_points, 0.95),
             shape=number_of_points,
             lower=CUTOFF_ETA_MIN,
             upper=CUTOFF_ETA_MAX,
