@@ -55,26 +55,15 @@ class PerformancesAirGapFluxDensity(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        unclipped_flux_density = (
+        outputs["air_gap_flux_density"] = (
             2.0 * inputs["tangential_stress"] / inputs["surface_current_density"]
         )
-
-        outputs["air_gap_flux_density"] = np.clip(unclipped_flux_density, 0.5, 1.2)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        unclipped_flux_density = (
-            2.0 * inputs["tangential_stress"] / inputs["surface_current_density"]
-        )
-        clipped_flux_density = np.clip(unclipped_flux_density, 0.5, 1.2)
-
-        partials["air_gap_flux_density", "surface_current_density"] = np.where(
-            unclipped_flux_density == clipped_flux_density,
-            -2.0 * inputs["tangential_stress"] / inputs["surface_current_density"] ** 2.0,
-            1e-6,
+        partials["air_gap_flux_density", "surface_current_density"] = (
+            -2.0 * inputs["tangential_stress"] / inputs["surface_current_density"] ** 2.0
         )
 
-        partials["air_gap_flux_density", "tangential_stress"] = np.where(
-            unclipped_flux_density == clipped_flux_density,
-            2.0 / inputs["surface_current_density"],
-            1e-6,
+        partials["air_gap_flux_density", "tangential_stress"] = (
+            2.0 / inputs["surface_current_density"]
         )

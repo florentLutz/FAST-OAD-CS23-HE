@@ -42,7 +42,7 @@ class PerformancesResistance(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
             units="ohm",
             shape=number_of_points,
-            val=1.5,
+            val=0.0015,
         )
 
     def setup_partials(self):

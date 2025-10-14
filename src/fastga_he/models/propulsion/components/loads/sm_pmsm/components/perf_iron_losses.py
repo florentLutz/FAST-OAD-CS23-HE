@@ -50,7 +50,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
         self.add_output(
             "iron_power_losses",
             units="kW",
-            val=0.9,
+            val=0.0,
             shape=number_of_points,
             desc="Iron losses of the SM PMSM due to altering magnetic flux",
         )

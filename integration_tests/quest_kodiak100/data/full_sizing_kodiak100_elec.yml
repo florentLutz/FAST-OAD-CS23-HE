@@ -50,9 +50,10 @@ model:
             sort_component: True
         mtow:
             id: fastga.loop.mtow
-        tail_sizing:
-            id: fastga_he.handling_qualities.fixed_tail_sizing
         hq:
+            tail_sizing:
+                id: fastga.handling_qualities.tail_sizing
+                propulsion_id: fastga.wrapper.propulsion.basicTurboprop
             static_margin:
                 id: fastga.handling_qualities.static_margin
         wing_position:
@@ -72,7 +73,7 @@ submodels:
     submodel.geometry.vertical_tail.position.fd: null
     submodel.performances.mission_vector.descent_speed: null
     submodel.performances.mission_vector.climb_speed: null
-    submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.constant
+    submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state
     submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
     submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one

@@ -35,31 +35,30 @@
             <he_power_train>
                 <SM_PMSM>
                     <motor_1>
-                        <pouillet_geometry_factor units="1/m">48812.48</pouillet_geometry_factor>
-                        <mass units="kg">262.91</mass>
-                        <stator_core_mass units="kg">138.0</stator_core_mass>
-                        <stator_winding_mass units="kg">37.54</stator_winding_mass>
-                        <rotor_mass units="kg">63.47</rotor_mass>
-                        <frame_mass units="kg">23.9</frame_mass>
+                        <pouillet_geometry_factor units="1/m">53384.17</pouillet_geometry_factor>
+                        <mass units="kg">225.59</mass>
+                        <stator_core_mass units="kg">116.4</stator_core_mass>
+                        <stator_winding_mass units="kg">32.69</stator_winding_mass>
+                        <rotor_mass units="kg">56.97</rotor_mass>
+                        <frame_mass units="kg">21.55</frame_mass>
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
-                        <bore_diameter units="m">0.19</bore_diameter>
-                        <frame_diameter units="m">0.376</frame_diameter>
-                        <frame_length units="m">0.48</frame_length>
-                        <rotor_diameter units="m">0.16</rotor_diameter>
-                        <slot_section_area units="m**2">0.000545</slot_section_area>
-                        <conductor_cable_length units="m">0.554225</conductor_cable_length>
-                        <stator_diameter units="m">0.3476</stator_diameter>
+                        <bore_diameter units="m">0.187</bore_diameter>
+                        <frame_diameter units="m">0.3564</frame_diameter>
+                        <frame_length units="m">0.473</frame_length>
+                        <rotor_diameter units="m">0.1814</rotor_diameter>
+                        <conductor_cable_length units="m">0.545475</conductor_cable_length>
+                        <stator_diameter units="m">0.3288</stator_diameter>
                         <mechanical_stress_max units="MPa">250.0</mechanical_stress_max>
-                        <slot_width units="m">0.0139</slot_width>
-                        <slot_height units="m">0.0392</slot_height>
-                        <air_gap_thickness units="m">0.015</air_gap_thickness>
+                        <slot_width units="m">0.01348</slot_width>
+                        <slot_height units="m">0.0358</slot_height>
+                        <air_gap_thickness units="m">0.0028</air_gap_thickness>
                         <resistance units="ohm">0.0014608</resistance>
                         <front_length_ratio>0.5</front_length_ratio>
-                        <conductor_section_area_per_slot units="m**2">0.0002725</conductor_section_area_per_slot>
+                        <conductor_section_area_per_slot units="m**2">0.00024523</conductor_section_area_per_slot>
                         <torque_constant units="N*m/A">0.4312</torque_constant>
                         <torque_max units="N*m">856.6</torque_max>
-                        <active_length units="m">0.3167</active_length>
+                        <active_length units="m">0.3117</active_length>
                         <torque_rating units="N*m">856.6</torque_rating>
                         <electromagnetic_torque_max unit="N*m">856.6</electromagnetic_torque_max>
                         <voltage_caliber units="V">700.0</voltage_caliber>
@@ -69,7 +68,7 @@
                         <voltage_ac_max units="V">156.2</voltage_ac_max>
                         <current_ac_max units="A">1986</current_ac_max>
                         <magnetic_material_density units="kg/m**3">8150</magnetic_material_density>
-                        <wire_circular_section_area units="m**2">4.54e-05</wire_circular_section_area>
+                        <wire_circular_section_area units="m**2">4.09e-05</wire_circular_section_area>
                         <conductor_material_density units="kg/m**3">8960</conductor_material_density>
                         <insulation_material_density units="kg/m**3">1400</insulation_material_density>
                         <rotor_material_density units="kg/m**3">7700</rotor_material_density>
@@ -91,14 +90,14 @@
                         <slots_per_pole_per_phase>2</slots_per_pole_per_phase>
                         <number_of_phases>3</number_of_phases>
                         <conductor_slot_number>24</conductor_slot_number>
-                        <x2p_ratio>3.021</x2p_ratio>
-                        <radius_ratio>0.842</radius_ratio>
+                        <x2p_ratio>16.435</x2p_ratio>
+                        <radius_ratio>0.6</radius_ratio>
                         <tooth_ratio>0.4407</tooth_ratio>
                         <winding_factor>0.97</winding_factor>
                         <slot_conductor_factor>1</slot_conductor_factor>
                         <slot_fill_factor>0.5</slot_fill_factor>
                         <form_coefficient>0.6</form_coefficient>
-                        <stator_yoke_height unit="m">0.0396</stator_yoke_height>
+                        <stator_yoke_height unit="m">0.0351</stator_yoke_height>
                         <winding_temperature units="degC">180</winding_temperature>
                         <loss_coefficient>
                             <alpha units="W/N**2/m**2">0.025</alpha>

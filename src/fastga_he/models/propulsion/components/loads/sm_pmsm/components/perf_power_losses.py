@@ -42,7 +42,7 @@ class PerformancesPowerLosses(om.ExplicitComponent):
         self.add_output(
             "power_losses",
             units="kW",
-            val=1.066,
+            val=0.0,
             shape=number_of_points,
         )
 

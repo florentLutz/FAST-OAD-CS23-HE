@@ -48,7 +48,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         self.add_output(
             "rotor_windage_losses",
             units="W",
-            val=7.8e-06,
+            val=0.0,
             shape=number_of_points,
         )
 

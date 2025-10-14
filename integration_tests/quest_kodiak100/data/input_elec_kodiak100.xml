@@ -3,7 +3,7 @@
     <TLAR>
       <NPAX_design is_input="True">4.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">72.0</luggage_mass_design>
-      <range units="NM" is_input="True">30.0<!--top-level requirement: design range--></range>
+      <range units="NM" is_input="True">40.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">78.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
@@ -134,7 +134,6 @@
           <harness_1>
             <material is_input="True">1.0<!--1.0 for copper, 0.0 for aluminium--></material>
             <number_cables is_input="True">1</number_cables>
-            <cable_temperature_mission units="degK">300.0</cable_temperature_mission>
             <conductor>
               <k_factor_radius is_input="True">1.0<!--K-factor to increase the radius of the conducting core--></k_factor_radius>
             </conductor>
