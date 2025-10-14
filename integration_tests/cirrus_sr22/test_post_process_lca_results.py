@@ -9,7 +9,10 @@ import pytest
 
 import plotly.io as pio
 
-from fastga_he.gui.lca_impact import lca_impacts_bar_chart_with_contributors, lca_impacts_bar_chart_simple
+from fastga_he.gui.lca_impact import (
+    lca_impacts_bar_chart_with_contributors,
+    lca_impacts_bar_chart_simple,
+)
 
 RESULT_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 PICTURE_FOLDER_PATH = pathlib.Path(__file__).parent / "results_figures"
@@ -35,7 +38,7 @@ def test_lca_bar_chart_relative_contribution_ref_cirrus_sr22():
             ],
             "AvGas combustion": ["ice_1: operation"],
             "AvGas production": ["gasoline_for_mission: operation"],
-            "Airframe production": ["airframe: production"]
+            "Airframe production": ["airframe: production"],
         },
         impact_step="normalized",
         impact_filter_list=[
@@ -63,12 +66,28 @@ def test_lca_bar_chart_relative_contribution_ref_cirrus_sr22():
         ],
     )
 
-    fig.update_layout(height=800, width=1600, title=None, margin=dict(l=5, r=5, t=60, b=5),)
-    pio.write_image(fig, PICTURE_FOLDER_PATH / "ref_cirrus_sr22_relative_contribution.pdf",  width=1600, height=900)
+    fig.update_layout(
+        height=800,
+        width=1600,
+        title=None,
+        margin=dict(l=5, r=5, t=60, b=5),
+    )
+    pio.write_image(
+        fig,
+        PICTURE_FOLDER_PATH / "ref_cirrus_sr22_relative_contribution.pdf",
+        width=1600,
+        height=900,
+    )
     time.sleep(3)
-    pio.write_image(fig, PICTURE_FOLDER_PATH / "ref_cirrus_sr22_relative_contribution.pdf",  width=1600, height=900)
+    pio.write_image(
+        fig,
+        PICTURE_FOLDER_PATH / "ref_cirrus_sr22_relative_contribution.pdf",
+        width=1600,
+        height=900,
+    )
 
     fig.show()
+
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_relative_contribution_cirrus_esr22():
@@ -97,7 +116,7 @@ def test_lca_bar_chart_relative_contribution_cirrus_esr22():
             ],
             "Electricity production": ["electricity_for_mission: operation"],
             "Airframe production": ["airframe: production"],
-            "Battery production": ["battery_pack_1: production", "battery_pack_2: production"]
+            "Battery production": ["battery_pack_1: production", "battery_pack_2: production"],
         },
         impact_step="normalized",
         impact_filter_list=[
@@ -126,15 +145,18 @@ def test_lca_bar_chart_relative_contribution_cirrus_esr22():
     )
 
     fig.update_layout(height=800, width=1600, title=None, margin=dict(l=5, r=5, t=60, b=5))
-    pio.write_image(fig, PICTURE_FOLDER_PATH / "cirrus_esr22_relative_contribution.pdf",  width=1600, height=900)
+    pio.write_image(
+        fig, PICTURE_FOLDER_PATH / "cirrus_esr22_relative_contribution.pdf", width=1600, height=900
+    )
     time.sleep(3)
-    pio.write_image(fig, PICTURE_FOLDER_PATH / "cirrus_esr22_relative_contribution.pdf",  width=1600, height=900)
+    pio.write_image(
+        fig, PICTURE_FOLDER_PATH / "cirrus_esr22_relative_contribution.pdf", width=1600, height=900
+    )
 
     fig.show()
 
 
 def test_compare_normalized_endpoints():
-
     fig = lca_impacts_bar_chart_simple(
         [
             RESULT_FOLDER_PATH / "full_sizing_out_with_lca.xml",
