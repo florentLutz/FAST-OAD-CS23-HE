@@ -86,7 +86,10 @@ def test_sizing_kodiak_100():
 
 
 def test_sizing_kodiak_100_full_electric():
-    """Test the overall aircraft design process with wing positioning."""
+    """
+    Test the overall aircraft design process for the fully electric variant, with the mission range
+    reduced to 60 NM to align with the original aircraft.
+    """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -118,11 +121,11 @@ def test_sizing_kodiak_100_full_electric():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3394.82, rel=1e-2
+        3634.0, rel=1e-2
     )
     # Actual value is 3290 kg
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        2842.82, rel=1e-2
+        3082.0, rel=1e-2
     )
 
 

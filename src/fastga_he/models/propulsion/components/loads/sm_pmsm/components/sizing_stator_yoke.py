@@ -44,7 +44,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
             val=np.nan,
-            units="A/m",
+            units="kA/m",
             desc="The surface current density of the winding conductor cable",
         )
         self.add_input(

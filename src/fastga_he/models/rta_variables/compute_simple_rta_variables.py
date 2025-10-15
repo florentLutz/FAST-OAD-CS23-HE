@@ -22,10 +22,6 @@ class ComputeRTAVariable(om.ExplicitComponent):
         self.add_input("data:mission:sizing:taxi_in:duration", val=np.nan, units="s")
         self.add_input("data:mission:sizing:taxi_out:distance", val=np.nan, units="m")
         self.add_input("data:mission:sizing:taxi_out:duration", val=np.nan, units="s")
-        self.add_input("data:propulsion:L1_engine:hpc:hpc_pressure_ratio", val=np.nan)
-        self.add_input("data:propulsion:L1_engine:lpc:lpc_pressure_ratio", val=np.nan)
-        self.add_input("data:propulsion:Design_Thermo_Power", val=np.nan, units="W")
-        self.add_input("data:propulsion:RTO_power", val=np.nan, units="W")
 
         self.add_output("data:TLAR:luggage_mass_design", units="kg")
         self.add_output("data:aerodynamics:cruise:unit_reynolds", units="1/m")
@@ -34,25 +30,29 @@ class ComputeRTAVariable(om.ExplicitComponent):
         self.add_output("data:mission:sizing:taxi_in:speed", units="m/s")
         self.add_output("data:mission:sizing:taxi_out:speed", units="m/s")
 
+    def setup_partials(self):
         self.declare_partials(
             of="data:TLAR:luggage_mass_design", wrt="data:TLAR:NPAX_design", val=20
         )
         self.declare_partials(
-            of="data:TLAR:v_cruise", wrt="data:mission:sizing:main_route:cruise:altitude"
-        )
-
-        self.declare_partials(
-            of="data:mission:sizing:taxi_in:speed", wrt="data:mission:sizing:taxi_in:distance"
+            of="data:aerodynamics:low_speed:unit_reynolds",
+            wrt="data:TLAR:approach_speed",
+            method="exact",
         )
         self.declare_partials(
-            of="data:mission:sizing:taxi_in:speed", wrt="data:mission:sizing:taxi_in:duration"
-        )
-
-        self.declare_partials(
-            of="data:mission:sizing:taxi_out:speed", wrt="data:mission:sizing:taxi_out:distance"
+            of=["data:TLAR:v_cruise", "data:aerodynamics:cruise:unit_reynolds"],
+            wrt=["data:mission:sizing:main_route:cruise:altitude", "data:TLAR:cruise_mach"],
+            method="exact",
         )
         self.declare_partials(
-            of="data:mission:sizing:taxi_out:speed", wrt="data:mission:sizing:taxi_out:duration"
+            of="data:mission:sizing:taxi_in:speed",
+            wrt=["data:mission:sizing:taxi_in:distance", "data:mission:sizing:taxi_in:duration"],
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:mission:sizing:taxi_out:speed",
+            wrt=["data:mission:sizing:taxi_out:distance", "data:mission:sizing:taxi_out:duration"],
+            method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -82,16 +82,48 @@ class ComputeRTAVariable(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
+        atm_cruise = AtmosphereWithPartials(cruise_alt, altitude_in_feet=False)
+
+        atm_approach = AtmosphereWithPartials(0.0, altitude_in_feet=False)
+
         partials["data:mission:sizing:taxi_in:speed", "data:mission:sizing:taxi_in:distance"] = (
             1.0 / inputs["data:mission:sizing:taxi_in:duration"]
         )
+
         partials["data:mission:sizing:taxi_in:speed", "data:mission:sizing:taxi_in:duration"] = -(
             inputs["data:mission:sizing:taxi_in:distance"]
         ) / (inputs["data:mission:sizing:taxi_in:duration"] ** 2.0)
 
         partials["data:mission:sizing:taxi_out:speed", "data:mission:sizing:taxi_out:distance"] = (
-            1.0 / inputs["data:mission:sizing:taxi_in:duration"]
+            1.0 / inputs["data:mission:sizing:taxi_out:duration"]
         )
+
         partials["data:mission:sizing:taxi_out:speed", "data:mission:sizing:taxi_out:duration"] = -(
             inputs["data:mission:sizing:taxi_out:distance"]
         ) / (inputs["data:mission:sizing:taxi_out:duration"] ** 2.0)
+
+        partials["data:aerodynamics:low_speed:unit_reynolds", "data:TLAR:approach_speed"] = (
+            1.0 / atm_approach.kinematic_viscosity
+        )
+
+        partials["data:TLAR:v_cruise", "data:TLAR:cruise_mach"] = atm_cruise.speed_of_sound
+
+        partials["data:TLAR:v_cruise", "data:mission:sizing:main_route:cruise:altitude"] = (
+            inputs["data:TLAR:cruise_mach"] * atm_cruise.partial_speed_of_sound_altitude
+        )
+
+        partials["data:aerodynamics:cruise:unit_reynolds", "data:TLAR:cruise_mach"] = (
+            atm_cruise.speed_of_sound
+        ) / atm_cruise.kinematic_viscosity
+
+        partials[
+            "data:aerodynamics:cruise:unit_reynolds",
+            "data:mission:sizing:main_route:cruise:altitude",
+        ] = inputs["data:TLAR:cruise_mach"] * (
+            (
+                atm_cruise.partial_speed_of_sound_altitude * atm_cruise.kinematic_viscosity
+                - atm_cruise.speed_of_sound * atm_cruise.partial_kinematic_viscosity_altitude
+            )
+            / atm_cruise.kinematic_viscosity**2.0
+        )

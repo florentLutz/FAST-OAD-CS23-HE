@@ -9,6 +9,10 @@ import openmdao.api as om
 from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_WING
 
+from fastga_he.models.aerodynamics.components.flat_plate_friction_drag_coeff import (
+    FlatPlateFrictionDragCoefficient,
+)
+
 
 @RegisterSubmodel(SERVICE_CD0_WING, "fastoad.submodel.aerodynamics.CD0.wing.rta")
 class Cd0Wing(om.Group):
@@ -24,7 +28,7 @@ class Cd0Wing(om.Group):
 
         self.add_subsystem(
             "plate_friction_coeff_" + ls_tag,
-            _FlatPlateFrictionDragCoefficient(low_speed_aero=self.options["low_speed_aero"]),
+            FlatPlateFrictionDragCoefficient(low_speed_aero=self.options["low_speed_aero"]),
             promotes=["data:*"],
         )
         self.add_subsystem(
@@ -60,75 +64,6 @@ class Cd0Wing(om.Group):
             "wing_camber_" + ls_tag + ".camber_contribution", "cd0_wing.camber_contribution"
         )
         self.connect("wing_sweep_25_" + ls_tag + ".sweep_correction", "cd0_wing.sweep_correction")
-
-
-class _FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
-    """
-    Computation of the flat plate friction drag coefficient.
-    """
-
-    def initialize(self):
-        self.options.declare("low_speed_aero", default=False, types=bool)
-
-    def setup(self):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
-        mach_variable = (
-            "data:aerodynamics:aircraft:takeoff:mach"
-            if self.options["low_speed_aero"]
-            else "data:TLAR:cruise_mach"
-        )
-
-        self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
-        self.add_input("data:aerodynamics:wing:" + ls_tag + ":reynolds", val=np.nan)
-        self.add_input(mach_variable, val=np.nan)
-
-        self.add_output("plate_drag_friction_coeff")
-
-    def setup_partials(self):
-        self.declare_partials("plate_drag_friction_coeff", "*", method="exact")
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
-        mach_variable = (
-            "data:aerodynamics:aircraft:takeoff:mach"
-            if self.options["low_speed_aero"]
-            else "data:TLAR:cruise_mach"
-        )
-
-        length = inputs["data:geometry:wing:MAC:length"]
-        mach = inputs[mach_variable]
-        reynolds = inputs["data:aerodynamics:wing:" + ls_tag + ":reynolds"]
-
-        outputs["plate_drag_friction_coeff"] = 0.455 / (
-            (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log10(reynolds * length) ** 2.58
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
-        mach_variable = (
-            "data:aerodynamics:aircraft:takeoff:mach"
-            if self.options["low_speed_aero"]
-            else "data:TLAR:cruise_mach"
-        )
-
-        length = inputs["data:geometry:wing:MAC:length"]
-        mach = inputs[mach_variable]
-        reynolds = inputs["data:aerodynamics:wing:" + ls_tag + ":reynolds"]
-
-        partials["plate_drag_friction_coeff", mach_variable] = (
-            -0.085176
-            * mach
-            / ((1.0 + 0.144 * mach**2.0) ** 1.65 * np.log10(reynolds * length) ** 2.58)
-        )
-
-        partials["plate_drag_friction_coeff", "data:geometry:wing:MAC:length"] = -10.095959 / (
-            (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * length
-        )
-
-        partials["plate_drag_friction_coeff", "data:aerodynamics:wing:" + ls_tag + ":reynolds"] = (
-            -10.095959
-            / ((1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * reynolds)
-        )
 
 
 class _RelativeThicknessContribution(om.ExplicitComponent):

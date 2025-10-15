@@ -5,6 +5,8 @@
 import openmdao.api as om
 import numpy as np
 
+NB_POINTS = 100
+
 
 class AeroApproximation(om.Group):
     """
@@ -28,12 +30,12 @@ class AeroApproximation(om.Group):
         )
         self.add_subsystem(
             "cl_ref",
-            _Cl_Ref(),
+            ClRef(),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "induced_drag_ratio",
-            _Induced_Drag_Coefficient(),
+            InducedDragCoefficient(),
             promotes=["data:*"],
         )
 
@@ -51,72 +53,75 @@ class _LengthVector(om.ExplicitComponent):
         self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
         self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
 
-        self.add_output("half_wing_coordinate", shape=100)
-        self.add_output("chord_vector", shape=100)
+        self.add_output("half_wing_coordinate", shape=NB_POINTS)
+        self.add_output("chord_vector", shape=NB_POINTS)
 
     def setup_partials(self):
         self.declare_partials(
             "half_wing_coordinate",
             "data:geometry:wing:b_50",
-            val=np.linspace(0.0, 0.5, 100),
+            val=np.linspace(0.0, 0.5, NB_POINTS),
             method="exact",
-            rows=np.arange(100),
-            cols=np.zeros(100),
+            rows=np.arange(NB_POINTS),
+            cols=np.zeros(NB_POINTS),
         )
         self.declare_partials(
             "chord_vector",
             "data:geometry:wing:tip:chord",
-            val=np.linspace(0.0, 1.0, 100),
+            val=np.linspace(0.0, 1.0, NB_POINTS),
             method="exact",
-            rows=np.arange(100),
-            cols=np.zeros(100),
+            rows=np.arange(NB_POINTS),
+            cols=np.zeros(NB_POINTS),
         )
         self.declare_partials(
             "chord_vector",
             "data:geometry:wing:root:chord",
-            val=np.linspace(1.0, 0.0, 100),
+            val=np.linspace(1.0, 0.0, NB_POINTS),
             method="exact",
-            rows=np.arange(100),
-            cols=np.zeros(100),
+            rows=np.arange(NB_POINTS),
+            cols=np.zeros(NB_POINTS),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["half_wing_coordinate"] = np.linspace(
-            0, inputs["data:geometry:wing:b_50"].item() / 2.0, 100
+            0, inputs["data:geometry:wing:b_50"].item() / 2.0, NB_POINTS
         )
 
         outputs["chord_vector"] = np.linspace(
             inputs["data:geometry:wing:root:chord"].item(),
             inputs["data:geometry:wing:tip:chord"].item(),
-            100,
+            NB_POINTS,
         )
 
 
 class _Ly(om.ExplicitComponent):
-    """Computation of the cl_ref based on an elliptic distribution assumption."""
+    """Computation of the lift distribution based on an elliptic distribution assumption."""
 
     def setup(self):
-        self.add_input("half_wing_coordinate", val=np.nan, shape=100)
+        self.add_input("half_wing_coordinate", val=np.nan, shape=NB_POINTS)
         self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
 
-        self.add_output("l_y", shape=100)
+        self.add_output("l_y", shape=NB_POINTS)
 
     def setup_partials(self):
         self.declare_partials(
-            "l_y", "half_wing_coordinate", method="exact", rows=np.arange(100), cols=np.arange(100)
+            "l_y",
+            "half_wing_coordinate",
+            method="exact",
+            rows=np.arange(NB_POINTS),
+            cols=np.arange(NB_POINTS),
         )
         self.declare_partials(
             "l_y",
             "data:geometry:wing:b_50",
             method="exact",
-            rows=np.arange(100),
-            cols=np.zeros(100),
+            rows=np.arange(NB_POINTS),
+            cols=np.zeros(NB_POINTS),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["l_y"] = (
-            np.ones(100)
-            - (2.0 * inputs["half_wing_coordinate"] / inputs["data:geometry:wing:b_50"]) ** 2.0
+            1.0 - (2.0 * inputs["half_wing_coordinate"] / inputs["data:geometry:wing:b_50"]) ** 2.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -133,13 +138,15 @@ class _VectorProduct(om.ExplicitComponent):
     """Computation of the vector product in cl_ref."""
 
     def setup(self):
-        self.add_input("l_y", val=np.nan, shape=100)
-        self.add_input("chord_vector", val=np.nan, shape=100)
+        self.add_input("l_y", val=np.nan, shape=NB_POINTS)
+        self.add_input("chord_vector", val=np.nan, shape=NB_POINTS)
 
-        self.add_output("vector_product", shape=100)
+        self.add_output("vector_product", shape=NB_POINTS)
 
     def setup_partials(self):
-        self.declare_partials("*", "*", method="exact", rows=np.arange(100), cols=np.arange(100))
+        self.declare_partials(
+            "*", "*", method="exact", rows=np.arange(NB_POINTS), cols=np.arange(NB_POINTS)
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["vector_product"] = inputs["l_y"] * inputs["chord_vector"]
@@ -150,11 +157,11 @@ class _VectorProduct(om.ExplicitComponent):
         partials["vector_product", "l_y"] = inputs["chord_vector"]
 
 
-class _Cl_Ref(om.ExplicitComponent):
+class ClRef(om.ExplicitComponent):
     """Computation of the cl_ref based on an elliptic distribution assumption."""
 
     def setup(self):
-        self.add_input("vector_product", val=np.nan, shape=100)
+        self.add_input("vector_product", val=np.nan, shape=NB_POINTS)
         self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
@@ -190,7 +197,7 @@ class _Cl_Ref(om.ExplicitComponent):
         ) / (0.5 * s_w)
 
 
-class _Induced_Drag_Coefficient(om.ExplicitComponent):
+class InducedDragCoefficient(om.ExplicitComponent):
     """Computation of the induced drag coefficient in cruise."""
 
     def setup(self):

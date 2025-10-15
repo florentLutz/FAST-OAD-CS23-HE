@@ -4,15 +4,15 @@
 
 
 import openmdao.api as om
-
 import fastoad.api as oad
-from .correct_rta_variable_naming import CorrectRTANaming
-from .compute_simple_rta_variables import ComputeRTAVariable
-from .set_rta_variables import SetRTAVariable
+
 from fastga.models.aerodynamics.components.elevator_aero import ComputeDeltaElevator
 from fastga.models.aerodynamics.components.fuselage.compute_cm_alpha_fus import (
     ComputeCmAlphaFuselage,
 )
+from .correct_rta_variable_naming import CorrectRTANaming
+from .compute_simple_rta_variables import ComputeRTAVariable
+from .set_rta_variables import SetRTAVariable
 from .rta_aero_approximation import AeroApproximation
 
 

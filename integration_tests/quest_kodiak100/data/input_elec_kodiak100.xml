@@ -169,10 +169,10 @@
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
-            <surface_current_density units="A/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
+            <surface_current_density units="kA/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
             <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
             <tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></tooth_flux_density>
-            <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
+            <torque_constant units="N*m/A" is_input="True">0.1426</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
             <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>

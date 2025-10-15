@@ -20,6 +20,9 @@
             <length units="m" is_input="True">0.762<!--length of economical class seats--></length>
             <width units="m" is_input="True">0.4572<!--width of economical class seats--></width>
           </economical>
+          <pilot>
+            <length units="m" is_input="True">1.05<!--pilot seats length--></length>
+          </pilot>
         </seats>
       </cabin>
       <flap>
@@ -32,6 +35,7 @@
         <sweep_25 units="deg" is_input="True">7.42<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
         <taper_ratio is_input="True">0.58<!--taper ratio of horizontal tail--></taper_ratio>
         <thickness_ratio is_input="True">0.12<!--thickness ratio of horizontal tail--></thickness_ratio>
+        <elevator_chord_ratio>0.384</elevator_chord_ratio>
       </horizontal_tail>
       <propulsion>
         <layout is_input="True">1.0<!--position of engines (1=under the wing / 2=rear fuselage)--></layout>
@@ -219,10 +223,10 @@
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
-            <surface_current_density units="A/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
+            <surface_current_density units="kA/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
             <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
             <tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></tooth_flux_density>
-            <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
+            <torque_constant units="N*m/A" is_input="True">0.1426</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
             <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
@@ -250,7 +254,7 @@
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
-            <surface_current_density units="A/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
+            <surface_current_density units="kA/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></surface_current_density>
             <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
             <tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></tooth_flux_density>
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
@@ -445,7 +449,7 @@
           <planetary_gear_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">1563.0<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">1570.0<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -454,7 +458,7 @@
           <planetary_gear_2>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">1563.0<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">1570.0<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -762,9 +766,11 @@
     <mission>
       <sizing>
         <initial_climb>
+          <energy units="W*h" is_input="True">0.0</energy>
           <fuel units="kg" is_input="True">22.283855199555546</fuel>
         </initial_climb>
         <takeoff>
+          <energy units="W*h" is_input="True">0.0</energy>
           <flap_angle units="deg" is_input="True">15.0<!--position of the flaps during takeoff--></flap_angle>
           <fuel units="kg" is_input="True">30.0</fuel>
           <slat_angle units="deg" is_input="True">0.0</slat_angle>
@@ -778,10 +784,25 @@
           <duration units="s" is_input="True">360.0<!--duration of taxi out phase--></duration>
         </taxi_out>
         <main_route>
+          <climb>
+            <climb_rate>
+              <cruise_level units="m/s" is_input="True">4.0<!--target climb rate at the end of climb--></cruise_level>
+              <sea_level units="m/s" is_input="True">9.0<!--target climb rate at sea level--></sea_level>
+            </climb_rate>
+          </climb>
           <cruise>
             <altitude units="m" is_input="True">6096.0<!--main route cruise phase altitude--></altitude>
           </cruise>
+          <descent>
+            <descent_rate units="m/s" is_input="True">-5.08<!--target descent rate for the aircraft--></descent_rate>
+          </descent>
+          <reserve>
+            <duration units="s" is_input="True">3600.0<!--duration of the reserve segment--></duration>
+          </reserve>
         </main_route>
+        <landing>
+          <elevator_angle units="rad">-0.6363323129985824</elevator_angle>
+        </landing>
       </sizing>
     </mission>
   </data>
@@ -1166,10 +1187,16 @@
             </winglet_effect>
           </CL>
           <CD>
+            <k is_input="True">1.0<!--correction ratio to apply to computed drag coefficient in cruise conditions--></k>
+            <offset is_input="True">0.0<!--correction offset to apply to computed drag coefficient in cruise conditions--></offset>
             <compressibility>
               <characteristic_mach_increment is_input="True">0.0<!--increment to apply to the computed characteristic Mach (where compressibility drag is 20 d.c.)--></characteristic_mach_increment>
               <max_value is_input="True">0.5<!--maximum authorized value for compressibility drag. Allows to prevent the model from overestimating the compressibility effect, especially for aircraft models after year 2000.--></max_value>
             </compressibility>
+            <winglet_effect>
+              <k is_input="True">0.9473<!--correction ratio to apply to computed induced drag coefficient in cruise conditions--></k>
+              <offset is_input="True">0.0<!--correction ratio to apply to computed drag coefficient in cruise conditions--></offset>
+            </winglet_effect>
           </CD>
         </cruise>
       </aircraft>

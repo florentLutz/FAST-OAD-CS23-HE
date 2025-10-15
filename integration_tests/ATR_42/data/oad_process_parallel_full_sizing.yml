@@ -74,9 +74,10 @@ model:
 submodels:
   service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
   service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
-  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.rta
+  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.legacy
   service.geometry.wing: rta.submodel.geometry.wing
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.engine.power_train.rta
   submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
   submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
   submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce

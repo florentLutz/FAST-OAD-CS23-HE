@@ -9,7 +9,7 @@ RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 
 def test_sizing_atr_72():
-    """Test the overall aircraft design process with wing positioning."""
+    """Test the overall aircraft design process for a thermal-powered ATR 72."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True

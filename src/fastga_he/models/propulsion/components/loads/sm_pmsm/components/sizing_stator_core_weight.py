@@ -66,7 +66,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             val=8120.0,
             units="kg/m**3",
             desc="The density of soft magnetic material, VACOFLUX 48 from Vacuumschmelze is set "
-                 "as default",
+            "as default",
         )
 
         self.add_output(

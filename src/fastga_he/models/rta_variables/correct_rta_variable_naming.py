@@ -47,6 +47,7 @@ class CorrectRTANaming(om.ExplicitComponent):
         self.add_output("data:aerodynamics:wing:low_speed:induced_drag_coefficient")
         self.add_output("data:aerodynamics:wing:low_speed:CL_max_clean")
 
+    def setup_partials(self):
         self.declare_partials(of="data:TLAR:NPAX_design", wrt="data:TLAR:NPAX", val=1.0)
         self.declare_partials(
             of="data:geometry:cabin:seats:passenger:count_by_row",
@@ -125,13 +126,13 @@ class CorrectRTANaming(om.ExplicitComponent):
             "data:mission:sizing:main_route:cruise:altitude"
         ]
 
-        outputs["data:aerodynamics:wing:cruise:CL0_clean"] = (
-            inputs["data:aerodynamics:aircraft:cruise:CL0"] * 1.0
-        )  # da correggere
+        outputs["data:aerodynamics:wing:cruise:CL0_clean"] = inputs[
+            "data:aerodynamics:aircraft:cruise:CL0"
+        ]
 
-        outputs["data:aerodynamics:wing:low_speed:CL0_clean"] = (
-            inputs["data:aerodynamics:aircraft:low_speed:CL0"] * 1.0
-        )
+        outputs["data:aerodynamics:wing:low_speed:CL0_clean"] = inputs[
+            "data:aerodynamics:aircraft:low_speed:CL0"
+        ]
 
         outputs["data:aerodynamics:wing:cruise:CL_alpha"] = inputs[
             "data:aerodynamics:aircraft:cruise:CL_alpha"

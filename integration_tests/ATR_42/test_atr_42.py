@@ -17,7 +17,7 @@ def cleanup():
 
 
 def test_sizing_atr_42_turboshaft():
-    """Test the overall aircraft design process with wing positioning."""
+    """Test the overall aircraft design process for a thermal-powered ATR 42."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -64,7 +64,11 @@ def test_sizing_atr_42_turboshaft():
 
 
 def test_sizing_atr_42_retrofit_hybrid():
-    """Test the overall aircraft design process with wing positioning."""
+    """
+    Test the overall aircraft design process with retrofitting the parallel hybrid powertrain in
+    the ATR 42. In this configuration, the electrical component of the powertrain supplies power
+    only during the climb phase of the flight mission.
+    """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -101,7 +105,11 @@ def test_sizing_atr_42_retrofit_hybrid():
 
 
 def test_hybrid_atr_42_full_sizing():
-    """Test the overall aircraft design process with wing positioning."""
+    """
+    Test the overall aircraft design process for parallel hybrid configuration. In this
+    configuration, the electrical component of the powertrain supplies power only during the climb
+    phase of the flight mission.
+    """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True

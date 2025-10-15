@@ -68,7 +68,7 @@
                         <magnetic_material_density units="kg/m**3">8150</magnetic_material_density>
                         <conductor_material_density units="kg/m**3">8960</conductor_material_density>
                         <insulation_material_density units="kg/m**3">1400</insulation_material_density>
-                        <surface_current_density units="A/m">111.100</surface_current_density>
+                        <surface_current_density units="kA/m">111.100</surface_current_density>
                         <current_density_ac_max units="A/m**2">8.1e6</current_density_ac_max>
                         <tangential_stress units="N/m**2">50000</tangential_stress>
                         <resistivity units="ohm*m">2.736384e-08</resistivity>
