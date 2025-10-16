@@ -45,11 +45,7 @@ class SizingRotorDiameter(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials(
-            of="*",
-            wrt="*",
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]

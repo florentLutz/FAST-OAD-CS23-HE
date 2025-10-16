@@ -715,7 +715,9 @@ def test_iron_losses():
 
     ivc.add_output("electrical_frequency", np.full(NB_POINTS_TEST, 532.33), units="s**-1")
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_flux_density", val=0.9, units="T"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:design_air_gap_flux_density",
+        val=0.9,
+        units="T",
     )
     ivc.add_output("data:propulsion:he_power_train:SM_PMSM:motor_1:mass", val=225.59, units="kg")
 

@@ -10,9 +10,8 @@ from ..constants import IRON_LOSSES_COEFF
 
 class PerformancesIronLosses(om.ExplicitComponent):
     """
-    Computation of the iron losses of the SM PMSM results from constant magnetic flux density
-    variation in magnetic core, obtained from the least square surrogate model (II-67) in
-    :cite:`touhami:2020`.
+    Computation of the iron losses of the SM PMSM results from design air gap magnetic flux density
+    , obtained from the least square surrogate model (II-67) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
@@ -35,10 +34,12 @@ class PerformancesIronLosses(om.ExplicitComponent):
             desc="The oscillation frequency of the SM PMSM AC current",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_air_gap_flux_density",
             val=np.nan,
             units="T",
-            desc="The magnetic flux density provided by the permanent magnets",
+            desc="The design air gap magnetic flux density",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
@@ -68,7 +69,9 @@ class PerformancesIronLosses(om.ExplicitComponent):
         self.declare_partials(
             of="iron_power_losses",
             wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+                "data:propulsion:he_power_train:SM_PMSM:"
+                + motor_id
+                + ":design_air_gap_flux_density",
                 "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
             ],
             method="exact",
@@ -80,12 +83,14 @@ class PerformancesIronLosses(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         mass = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass"]
-        bm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
+        air_gap_flux_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
+        ]
         f = inputs["electrical_frequency"]
 
         # Pre-calculate common terms
         f_powers = np.sqrt(f) ** np.arange(1, 5)[:, np.newaxis]
-        bm_powers = np.sqrt(bm) ** np.arange(1, 5)
+        air_gap_flux_density_powers = np.sqrt(air_gap_flux_density) ** np.arange(1, 5)
 
         # Broadcasting automatically handles the multiplication
         outputs["iron_power_losses"] = (
@@ -93,7 +98,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             * np.sum(
                 np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_powers[:, np.newaxis, :]
-                * bm_powers[np.newaxis, :, np.newaxis],
+                * air_gap_flux_density_powers[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
             )
             / 1000.0
@@ -103,17 +108,19 @@ class PerformancesIronLosses(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         mass = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass"]
-        bm = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
+        air_gap_flux_density = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
+        ]
         f = inputs["electrical_frequency"]
-        sqrt_f = np.sqrt(f)
-        sqrt_bm = np.sqrt(bm)
 
-        # Since bm is scalar, we can compute its powers once
-        bm_powers = sqrt_bm ** np.arange(1, 5)
-        bm_derivs = np.arange(1, 5) * 0.5 * (bm ** (np.arange(4) * 0.5 - 0.5))
+        # Since air_gap_flux_density is scalar, we can compute its powers once
+        air_gap_flux_density_powers = np.sqrt(air_gap_flux_density) ** np.arange(1, 5)
+        air_gap_flux_density_derivs = (
+            np.arange(1, 5) * 0.5 * (air_gap_flux_density ** (np.arange(4) * 0.5 - 0.5))
+        )
 
         # f is an array, so compute its powers for each i
-        f_powers = sqrt_f ** np.arange(1, 5)[:, np.newaxis]
+        f_powers = np.sqrt(f) ** np.arange(1, 5)[:, np.newaxis]
         f_derivs = (np.arange(1, 5) * 0.5)[:, np.newaxis] * (
             f ** (np.arange(4) * 0.5 - 0.5)[:, np.newaxis]
         )
@@ -125,7 +132,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             np.sum(
                 np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_powers[:, np.newaxis, :]
-                * bm_powers[np.newaxis, :, np.newaxis],
+                * air_gap_flux_density_powers[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
             )
             / 1000.0
@@ -139,7 +146,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             * np.sum(
                 np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_derivs[:, np.newaxis, :]
-                * bm_powers[np.newaxis, :, np.newaxis],
+                * air_gap_flux_density_powers[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
             )
             / 1000.0
@@ -147,13 +154,13 @@ class PerformancesIronLosses(om.ExplicitComponent):
 
         partials[
             "iron_power_losses",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density",
         ] = (
             mass
             * np.sum(
                 np.array(IRON_LOSSES_COEFF)[:, :, np.newaxis]
                 * f_powers[:, np.newaxis, :]
-                * bm_derivs[np.newaxis, :, np.newaxis],
+                * air_gap_flux_density_derivs[np.newaxis, :, np.newaxis],
                 axis=(0, 1),
             )
             / 1000.0

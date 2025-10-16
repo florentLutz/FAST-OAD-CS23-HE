@@ -48,17 +48,7 @@ class SizingSingleConductorCableLength(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]

@@ -41,16 +41,7 @@ class SizingConductorSlotNumber(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]

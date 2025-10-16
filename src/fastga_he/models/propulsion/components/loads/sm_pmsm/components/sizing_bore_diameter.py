@@ -29,7 +29,7 @@ class SizingStatorBoreDiameter(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
-            desc="The tangential tensile strength of the material",
+            desc="The rotor surface tangential stress limit",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_rating",

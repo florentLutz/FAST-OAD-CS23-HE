@@ -21,22 +21,28 @@ class SizingToothRatio(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_tooth_flux_density",
             val=np.nan,
             units="T",
-            desc="Magnetic flux density at the stator teeth(slot) layer",
+            desc="The design magnetic flux density at the stator teeth section",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_air_gap_flux_density",
             val=np.nan,
             units="T",
-            desc="The magnetic flux density provided by the permanent magnets",
+            desc="The design air gap magnetic flux density",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_surface_current_density",
             val=np.nan,
             units="kA/m",
-            desc="The surface current density of the winding conductor cable",
+            desc="The design surface current density of the motor",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
@@ -55,57 +61,57 @@ class SizingToothRatio(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
-        b_st = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density"]
+        b_m = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
+        ]
+        b_st = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_tooth_flux_density"
+        ]
         k_m = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_surface_current_density"
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         mu_0 = 4.0 * np.pi * 1.0e-7  # Magnetic permeability [H/m]
-        max_total_air_gap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
+        total_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"] = (
-            2.0 * max_total_air_gap_flux_density / (np.pi * np.abs(b_st))
+            2.0 * total_flux_density / (np.pi * np.abs(b_st))
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        b_m = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"]
-        b_st = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density"]
+        b_m = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
+        ]
+        b_st = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_tooth_flux_density"
+        ]
         k_m = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_surface_current_density"
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
-        max_total_air_gap_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
+        total_flux_density = np.sqrt((mu_0 * k_m * x2p_ratio) ** 2.0 + b_m**2.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
-        ] = (
-            2.0
-            * (mu_0 * k_m) ** 2.0
-            * x2p_ratio
-            / (np.pi * np.abs(b_st) * max_total_air_gap_flux_density)
-        )
+        ] = 2.0 * (mu_0 * k_m) ** 2.0 * x2p_ratio / (np.pi * np.abs(b_st) * total_flux_density)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
-        ] = 2.0 * b_m / (np.pi * np.abs(b_st) * max_total_air_gap_flux_density)
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density",
+        ] = 2.0 * b_m / (np.pi * np.abs(b_st) * total_flux_density)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_flux_density",
-        ] = -2.0 * max_total_air_gap_flux_density / (np.pi * b_st * np.abs(b_st))
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_tooth_flux_density",
+        ] = -2.0 * total_flux_density / (np.pi * b_st * np.abs(b_st))
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":surface_current_density",
-        ] = (
-            2.0
-            * (mu_0 * x2p_ratio) ** 2.0
-            * k_m
-            / (np.pi * np.abs(b_st) * max_total_air_gap_flux_density)
-        )
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_surface_current_density",
+        ] = 2.0 * (mu_0 * x2p_ratio) ** 2.0 * k_m / (np.pi * np.abs(b_st) * total_flux_density)

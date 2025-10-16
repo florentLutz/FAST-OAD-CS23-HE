@@ -50,19 +50,7 @@ class SizingConductorSectionAreaPerSlot(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:"
-            + motor_id
-            + ":conductor_section_area_per_slot",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]

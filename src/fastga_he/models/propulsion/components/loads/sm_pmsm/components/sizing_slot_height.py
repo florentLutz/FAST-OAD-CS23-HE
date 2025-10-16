@@ -21,9 +21,12 @@ class SizingSlotHeight(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_phase_current_density",
             val=np.nan,
             units="A/m**2",
+            desc="The design phase current density of each wire",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor",
@@ -44,13 +47,15 @@ class SizingSlotHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
             val=np.nan,
             units="N/m**2",
-            desc="The tangential tensile strength of the material",
+            desc="The rotor surface tangential stress limit",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            name="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":design_air_gap_flux_density",
             val=np.nan,
             units="T",
-            desc="The magnetic flux density provided by the permanent magnets",
+            desc="The design air gap magnetic flux density",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
@@ -76,10 +81,10 @@ class SizingSlotHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"
         ]
         magnetic_flux_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
         max_current_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_phase_current_density"
         ]
         slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
@@ -110,10 +115,10 @@ class SizingSlotHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":winding_factor"
         ]
         magnetic_flux_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
         max_current_density = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max"
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_phase_current_density"
         ]
         slot_conductor_factor = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor"
@@ -153,7 +158,7 @@ class SizingSlotHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":air_gap_flux_density",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density",
         ] = (
             -np.sqrt(2.0)
             * sigma
@@ -169,7 +174,7 @@ class SizingSlotHeight(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_height",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":current_density_ac_max",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_phase_current_density",
         ] = (
             -np.sqrt(2.0)
             * sigma
