@@ -5,8 +5,6 @@
 import openmdao.api as om
 import numpy as np
 
-NB_POINTS = 100
-
 
 class AeroApproximation(om.Group):
     """
@@ -14,20 +12,6 @@ class AeroApproximation(om.Group):
     """
 
     def setup(self):
-        self.add_subsystem(
-            "length_vector",
-            _LengthVector(),
-            promotes=["data:*"],
-        )
-        self.add_subsystem(
-            "l_y",
-            _Ly(),
-            promotes=["data:*"],
-        )
-        self.add_subsystem(
-            "vector_product",
-            _VectorProduct(),
-        )
         self.add_subsystem(
             "cl_ref",
             ClRef(),
@@ -39,129 +23,13 @@ class AeroApproximation(om.Group):
             promotes=["data:*"],
         )
 
-        self.connect("length_vector.half_wing_coordinate", "l_y.half_wing_coordinate")
-        self.connect("length_vector.chord_vector", "vector_product.chord_vector")
-        self.connect("l_y.l_y", "vector_product.l_y")
-        self.connect("vector_product.vector_product", "cl_ref.vector_product")
-
-
-class _LengthVector(om.ExplicitComponent):
-    """Computation to construct half wing coordinate and chord vector array."""
-
-    def setup(self):
-        self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
-
-        self.add_output("half_wing_coordinate", shape=NB_POINTS)
-        self.add_output("chord_vector", shape=NB_POINTS)
-
-    def setup_partials(self):
-        self.declare_partials(
-            "half_wing_coordinate",
-            "data:geometry:wing:b_50",
-            val=np.linspace(0.0, 0.5, NB_POINTS),
-            method="exact",
-            rows=np.arange(NB_POINTS),
-            cols=np.zeros(NB_POINTS),
-        )
-        self.declare_partials(
-            "chord_vector",
-            "data:geometry:wing:tip:chord",
-            val=np.linspace(0.0, 1.0, NB_POINTS),
-            method="exact",
-            rows=np.arange(NB_POINTS),
-            cols=np.zeros(NB_POINTS),
-        )
-        self.declare_partials(
-            "chord_vector",
-            "data:geometry:wing:root:chord",
-            val=np.linspace(1.0, 0.0, NB_POINTS),
-            method="exact",
-            rows=np.arange(NB_POINTS),
-            cols=np.zeros(NB_POINTS),
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["half_wing_coordinate"] = np.linspace(
-            0, inputs["data:geometry:wing:b_50"].item() / 2.0, NB_POINTS
-        )
-
-        outputs["chord_vector"] = np.linspace(
-            inputs["data:geometry:wing:root:chord"].item(),
-            inputs["data:geometry:wing:tip:chord"].item(),
-            NB_POINTS,
-        )
-
-
-class _Ly(om.ExplicitComponent):
-    """Computation of the lift distribution based on an elliptic distribution assumption."""
-
-    def setup(self):
-        self.add_input("half_wing_coordinate", val=np.nan, shape=NB_POINTS)
-        self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
-
-        self.add_output("l_y", shape=NB_POINTS)
-
-    def setup_partials(self):
-        self.declare_partials(
-            "l_y",
-            "half_wing_coordinate",
-            method="exact",
-            rows=np.arange(NB_POINTS),
-            cols=np.arange(NB_POINTS),
-        )
-        self.declare_partials(
-            "l_y",
-            "data:geometry:wing:b_50",
-            method="exact",
-            rows=np.arange(NB_POINTS),
-            cols=np.zeros(NB_POINTS),
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["l_y"] = (
-            1.0 - (2.0 * inputs["half_wing_coordinate"] / inputs["data:geometry:wing:b_50"]) ** 2.0
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["l_y", "half_wing_coordinate"] = (
-            -8.0 * inputs["half_wing_coordinate"] / inputs["data:geometry:wing:b_50"] ** 2.0
-        )
-
-        partials["l_y", "data:geometry:wing:b_50"] = (
-            8.0 * inputs["half_wing_coordinate"] ** 2.0 / inputs["data:geometry:wing:b_50"] ** 3.0
-        )
-
-
-class _VectorProduct(om.ExplicitComponent):
-    """Computation of the vector product in cl_ref."""
-
-    def setup(self):
-        self.add_input("l_y", val=np.nan, shape=NB_POINTS)
-        self.add_input("chord_vector", val=np.nan, shape=NB_POINTS)
-
-        self.add_output("vector_product", shape=NB_POINTS)
-
-    def setup_partials(self):
-        self.declare_partials(
-            "*", "*", method="exact", rows=np.arange(NB_POINTS), cols=np.arange(NB_POINTS)
-        )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["vector_product"] = inputs["l_y"] * inputs["chord_vector"]
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["vector_product", "chord_vector"] = inputs["l_y"]
-
-        partials["vector_product", "l_y"] = inputs["chord_vector"]
-
 
 class ClRef(om.ExplicitComponent):
     """Computation of the cl_ref based on an elliptic distribution assumption."""
 
     def setup(self):
-        self.add_input("vector_product", val=np.nan, shape=NB_POINTS)
+        self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
+        self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
         self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
@@ -172,29 +40,35 @@ class ClRef(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         s_w = inputs["data:geometry:wing:area"]
-        product = inputs["vector_product"]
         b = inputs["data:geometry:wing:b_50"]
+        c_r = inputs["data:geometry:wing:root:chord"]
+        c_t = inputs["data:geometry:wing:tip:chord"]
 
-        outputs["data:aerodynamics:wing:low_speed:CL_ref"] = np.trapz(product, dx=b / 198.0) / (
-            0.5 * s_w
+        outputs["data:aerodynamics:wing:low_speed:CL_ref"] = (
+            b * (3.0 * c_t + 5.0 * c_r) / (12.0 * s_w)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         s_w = inputs["data:geometry:wing:area"]
-        product = inputs["vector_product"]
         b = inputs["data:geometry:wing:b_50"]
+        c_r = inputs["data:geometry:wing:root:chord"]
+        c_t = inputs["data:geometry:wing:tip:chord"]
 
-        partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:area"] = -np.trapz(
-            product, dx=b / 198.0
-        ) / (0.5 * s_w**2.0)
-
-        partials["data:aerodynamics:wing:low_speed:CL_ref", "vector_product"] = (
-            np.array([b / 198.0] + [b / 99.0] * 98 + [b / 198.0]) / s_w
+        partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:area"] = (
+            -b * (3.0 * c_t + 5.0 * c_r) / (12.0 * s_w**2.0)
         )
 
-        partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:b_50"] = np.trapz(
-            product, dx=1.0 / 198.0
-        ) / (0.5 * s_w)
+        partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:root:chord"] = (
+            5.0 * b / (12.0 * s_w)
+        )
+
+        partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:tip:chord"] = b / (
+            4.0 * s_w
+        )
+
+        partials["data:aerodynamics:wing:low_speed:CL_ref", "data:geometry:wing:b_50"] = (
+            3.0 * c_t + 5.0 * c_r
+        ) / (12.0 * s_w)
 
 
 class InducedDragCoefficient(om.ExplicitComponent):

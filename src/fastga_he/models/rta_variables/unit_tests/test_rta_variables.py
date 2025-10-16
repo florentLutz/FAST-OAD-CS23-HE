@@ -1,12 +1,8 @@
 import numpy as np
 import pytest
 import os.path as pth
-import openmdao.api as om
 
 from ..rta_aero_approximation import (
-    _LengthVector,
-    _Ly,
-    _VectorProduct,
     ClRef,
     InducedDragCoefficient,
     AeroApproximation,
@@ -19,58 +15,6 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 XML_FILE = "data.xml"
-
-
-def test_length_vector():
-    ivc = get_indep_var_comp(list_inputs(_LengthVector()), __file__, XML_FILE)
-
-    problem = run_system(_LengthVector(), ivc)
-
-    assert problem.get_val("half_wing_coordinate") == pytest.approx(
-        np.linspace(0.0, 13.5335, 100),
-        rel=1e-3,
-    )
-    assert problem.get_val("chord_vector") == pytest.approx(
-        np.linspace(2.6555, 1.6998, 100),
-        rel=1e-3,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_l_y():
-    ivc = get_indep_var_comp(list_inputs(_Ly()), __file__, XML_FILE)
-
-    ivc.add_output("half_wing_coordinate", np.linspace(0.0, 13.5335, 100))
-
-    problem = run_system(_Ly(), ivc)
-
-    assert problem.get_val("l_y") == pytest.approx(
-        np.ones(100) - np.linspace(0.0, 0.999993876, 100) ** 2.0,
-        rel=1e-3,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
-def test_vector_product():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output("chord_vector", np.linspace(2.6555, 1.6998, 100))
-    ivc.add_output(
-        "l_y",
-        np.ones(100) - np.linspace(0.0, 0.999993876, 100) ** 2.0,
-    )
-
-    problem = run_system(_VectorProduct(), ivc)
-
-    assert problem.get_val("vector_product") == pytest.approx(
-        np.linspace(2.6555, 1.6998, 100)
-        * (np.ones(100) - np.linspace(0.0, 0.999993876, 100) ** 2.0),
-        rel=1e-3,
-    )
-
-    problem.check_partials(compact_print=True)
 
 
 def test_cl_ref():
