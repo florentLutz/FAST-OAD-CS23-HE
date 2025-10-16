@@ -1,17 +1,17 @@
 ==============================================================
 Surface-mounted permanent magnet synchronous motor computation
 ==============================================================
-This model represent a SM PMSM with nonsalient radial flux and supplied with sinewave currents. This choice simplifies
-the modeling process with providing accurate representation of the PMSM characteristic. This figure, provided by one of
-the main thesis of HASTECS project :cite:`touhami:2020`, demonstrates the central part of a SM PMSM. :math:`L_m`
-is the length of the motor’s active electromagnetic part. As in other PMSMs, the stator bore slots between adjacent
-teeth hold the wound cables, served as the electromagnets. Unlike :ref:`AF PMSM <afpmsm>`, the permanent magnets are
-mounted directly on the rotor’s outer surface.
+This model represent a SM PMSM with non-salient radial flux and supplied with sinewave currents. This choice simplifies
+the modeling process with providing accurate representation of the PMSM characteristic. As in other PMSMs, the stator
+bore slots between adjacent teeth hold the wound cables, served as the electromagnets. Unlike :ref:`AF PMSM <afpmsm>`,
+the permanent magnets are mounted directly on the rotor’s outer surface rather than embedded within it.
 
 .. image:: ../../../../../img/cylindrical_pmsm.svg
     :width: 600
     :align: center
 
+This figure, provided by one of the main thesis of HASTECS project :cite:`touhami:2020`, demonstrates the essential
+geometric parameters of a SM PMSM. :math:`L_m` is the length of the motor’s active electromagnetic part.
 
 
 .. contents::
@@ -19,15 +19,15 @@ mounted directly on the rotor’s outer surface.
 ***********************
 Performance calculation
 ***********************
-Most of the performance calculations shares a similar approach as the :ref:`AF PMSM <afpmsm>` model, except the losses caused by various
-factors. The three primary sources of losses in the Surface-mounted PMSM as modeled in the HASTECS project :cite:`touhami:2020` are
-presented below.
+Most of the performance calculations shares a similar approach as the :ref:`AF PMSM <afpmsm>` model, except the losses
+caused by various factors. The three primary sources of losses in the Surface-mounted PMSM as modeled in the HASTECS
+project :cite:`touhami:2020` are presented below.
 
 PMSM Joule losses
 =================
-Joule losses represent the most important sources of losses in the SMPMSM. It is caused by Ohmic heating in the conductor wires winding
-of the PMSM stator. At low operating speeds, the current density is evenly distributed across the wire’s
-cross-section. To calculate the Joule losses, the wire resistance must be determined first.
+Joule losses represent the most important sources of losses in the SMPMSM. It is caused by Ohmic heating in the
+conductor wires winding of the PMSM stator. At low operating speeds, the current density is evenly distributed across
+the wire’s cross-section. To calculate the Joule losses, the wire resistance must be determined first.
 
 .. math::
     R_s = \frac{N_c}{q} \cdot \rho_{cu}(T_{win}) \\
@@ -45,9 +45,9 @@ With the wire electrical resistance and the RMS current (:math:`I_{rms}`), the J
 
 PMSM iron losses
 ================
-As the second largest contributor to the PMSM performance losses, the iron losses arises from eddy current and the continuous
-variation of the magnetic flux. To better capture the behavior of the SM PMSM, a regression model using Least Squared
-Method by HASTECS project :cite:`touhami:2020` is considered.
+As the second largest contributor to the PMSM performance losses, the iron losses arises from eddy current and the
+continuous variation of the magnetic flux. To better capture the behavior of the SM PMSM, a regression model using Least
+Squared Method by HASTECS project :cite:`touhami:2020` is considered.
 
 .. math::
     P_{ir} = \sum_{i=1}^{i=4}\sum_{j=1}^{j=4} a_{ij}(\sqrt{B_m})^j(\sqrt{f})^i
@@ -64,8 +64,8 @@ The iron losses coefficients (:math:`a_{ij}`) are verified with empirical data p
 
 PMSM mechanical losses
 ======================
-Mechanical losses (:math:`P_{mech}`) are the consequence of various phenomenons including, friction between air and rotor or
-friction between a stationary solid and a rotating solid.
+Mechanical losses (:math:`P_{mech}`) are the consequence of various phenomenons including, friction between air and
+rotor or friction between a stationary solid and a rotating solid.
 
 .. math::
     P_{mech} = P_{windage} + 2 P_{bf}
@@ -107,9 +107,9 @@ And the Reynolds numbers for both losses are:
    Re_{a} = \frac{\rho_{air} R_r e_g}{\Omega} \\
    Re_{rt} = \frac{\rho_{air} R_r^2}{\mu_{air}} \Omega
 
-The bearing friction losses is another major contributor to the friction losses between a moving surface and a stationary
-surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various bearing type
-based on SKF's bearing datasheets :cite:`skf:2016`.
+The bearing friction losses is another major contributor to the friction losses between a moving surface and a
+stationary surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various
+bearing type based on SKF's bearing datasheets :cite:`skf:2016`.
 
 .. raw:: html
 
@@ -148,6 +148,10 @@ constant.
 ******************
 Sizing calculation
 ******************
+In this sizing process, several geometry parameters related to electromagnetism of the PMSM are simplified for better
+convergence. The rotor is modeled as a single solid rod, omitting the bore layer and surface magnet sheets, with its
+material density defined according to the Etel TMB and TMK electric motor dataset from the HASTECS project
+:cite:`touhami:2020`. The slot geometry is modeled as a rectangle with no radial taper and without fillets.
 
 SM PMSM dimension calculation
 =============================
@@ -197,8 +201,9 @@ Variable                               Explanation
 
 SM PMSM weight calculation
 ==========================
-The weight of the SM PMSM is the sum of the weights of all fundamental components, the stator core weight (:math:`W_{stc}`),
-the stator winding weight (:math:`W_{stw}`), the rotor weight (:math:`W_{rt}`) , and the frame weight (:math:`W_{f}`).
+The weight of the SM PMSM is the sum of the weights of all fundamental components, the stator core weight
+(:math:`W_{stc}`), the stator winding weight (:math:`W_{stw}`), the rotor weight (:math:`W_{rt}`) , and the frame weight
+(:math:`W_{f}`).
 
 .. math::
     W_{stc} = [\pi \cdot L_m (R_{out}^2-R^2) - (h_s \cdot L_m \cdot N_s \cdot l_s)] \rho_{stc}
@@ -251,8 +256,8 @@ of :math:`R_{fr}` and :math:`R_{out}`.
 *******************************
 Component Computation Structure
 *******************************
-The following two links are the N2 diagrams representing the performance and sizing computation for the Surface-Mounted PMSM model.
-(SM PMSM) component.
+The following two links are the N2 diagrams representing the performance and sizing computation for the Surface-Mounted
+PMSM model.
 
 .. raw:: html
 
