@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+from ..constants import VACUUM_MAGNETIC_PERMEABILITY
+
 
 class SizingStatorYokeHeight(om.ExplicitComponent):
     """
@@ -87,9 +89,10 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
-        mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
+
         total_flux_density = np.sqrt(
-            (mu_0 * surface_current_density * x2p_ratio) ** 2.0 + air_gap_flux_density**2.0
+            (VACUUM_MAGNETIC_PERMEABILITY * surface_current_density * x2p_ratio) ** 2.0
+            + air_gap_flux_density**2.0
         )
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":stator_yoke_height"] = (
@@ -115,9 +118,9 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         num_pole_pairs = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
         ]
-        mu_0 = 4.0 * np.pi * 1e-7  # Magnetic permeability [H/m]
         total_flux_density = np.sqrt(
-            (mu_0 * surface_current_density * x2p_ratio) ** 2.0 + air_gap_flux_density**2.0
+            (VACUUM_MAGNETIC_PERMEABILITY * surface_current_density * x2p_ratio) ** 2.0
+            + air_gap_flux_density**2.0
         )
 
         partials[
@@ -135,7 +138,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
         ] = (
             (bore_radius / num_pole_pairs)
-            * ((mu_0 * surface_current_density) ** 2.0 * x2p_ratio)
+            * ((VACUUM_MAGNETIC_PERMEABILITY * surface_current_density) ** 2.0 * x2p_ratio)
             / (np.abs(yoke_flux_density) * total_flux_density)
         )
 
@@ -164,6 +167,6 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             + ":design_surface_current_density",
         ] = (
             (bore_radius / num_pole_pairs)
-            * ((mu_0 * x2p_ratio) ** 2.0 * surface_current_density)
+            * ((VACUUM_MAGNETIC_PERMEABILITY * x2p_ratio) ** 2.0 * surface_current_density)
             / (np.abs(yoke_flux_density) * total_flux_density)
         )

@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 from stdatm import AtmosphereWithPartials
+import numpy as np
 
 SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE = "submodel.propulsion.constraints.sm_pmsm.torque"
 SUBMODEL_CONSTRAINTS_SM_PMSM_RPM = "submodel.propulsion.constraints.sm_pmsm.rpm"
@@ -17,3 +18,4 @@ IRON_LOSSES_COEFF = [
 
 DEFAULT_DENSITY = AtmosphereWithPartials(0).density  # [kg/m^3]
 DEFAULT_DYNAMIC_VISCOSITY = AtmosphereWithPartials(0).dynamic_viscosity  # [kg/m/s]
+VACUUM_MAGNETIC_PERMEABILITY = 4.0 * np.pi * 1e-7  # [H/m]
