@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesPowerLosses(om.ExplicitComponent):
     """
-    Computation of the total motor power losses as sum of the mechanical, iron, and joule
+    Computation of the total motor power losses as sum of the mechanical, iron, and Joule
     losses.
     """
 

@@ -74,8 +74,6 @@ power_train_components:
     id: fastga_he.pt_component.battery_pack
     position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
 
-
-
   fuel_system_1:
     id: fastga_he.pt_component.fuel_system
     options:
@@ -124,8 +122,6 @@ component_connections:
 
   - source: dc_dc_converter_1
     target: battery_pack_1
-
-
 
   - source: propeller_2
     target: [planetary_gear_2, 1]

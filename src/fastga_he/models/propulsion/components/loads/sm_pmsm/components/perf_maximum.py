@@ -31,10 +31,6 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":number_of_phases",
-            val=3.0,
-        )
-        self.add_input(
             "ac_voltage_peak_in",
             units="V",
             val=np.full(number_of_points, np.nan),

@@ -56,7 +56,7 @@ class SizingRotorWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
         ]
         rotor_radius = (
-            (inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]) / 2.0
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
 
         conditions = [num_pole_pairs <= 10.0, 10.0 < num_pole_pairs <= 50.0]
@@ -82,7 +82,7 @@ class SizingRotorWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pole_pairs_number"
         ]
         rotor_radius = (
-            (inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"]) / 2.0
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
 
         conditions = [num_pole_pairs <= 10.0, 10.0 < num_pole_pairs <= 50.0]
