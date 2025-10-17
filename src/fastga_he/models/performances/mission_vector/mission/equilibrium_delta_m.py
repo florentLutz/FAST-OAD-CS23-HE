@@ -5,6 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
+
 class EquilibriumDeltaM(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 
