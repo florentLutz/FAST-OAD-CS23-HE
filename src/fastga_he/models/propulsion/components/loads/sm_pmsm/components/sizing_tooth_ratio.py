@@ -63,39 +63,41 @@ class SizingToothRatio(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        b_m = inputs[
+        air_gap_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
-        b_st = inputs[
+        tooth_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_tooth_flux_density"
         ]
-        k_m = inputs[
+        surface_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_surface_current_density"
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         total_flux_density = np.sqrt(
-            (VACUUM_MAGNETIC_PERMEABILITY * k_m * x2p_ratio) ** 2.0 + b_m**2.0
+            (VACUUM_MAGNETIC_PERMEABILITY * surface_current_density * x2p_ratio) ** 2.0
+            + air_gap_flux_density**2.0
         )
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio"] = (
-            2.0 * total_flux_density / (np.pi * np.abs(b_st))
+            2.0 * total_flux_density / (np.pi * tooth_flux_density)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        b_m = inputs[
+        air_gap_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
-        b_st = inputs[
+        tooth_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_tooth_flux_density"
         ]
-        k_m = inputs[
+        surface_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_surface_current_density"
         ]
         x2p_ratio = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio"]
         total_flux_density = np.sqrt(
-            (VACUUM_MAGNETIC_PERMEABILITY * k_m * x2p_ratio) ** 2.0 + b_m**2.0
+            (VACUUM_MAGNETIC_PERMEABILITY * surface_current_density * x2p_ratio) ** 2.0
+            + air_gap_flux_density**2.0
         )
 
         partials[
@@ -103,20 +105,20 @@ class SizingToothRatio(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":x2p_ratio",
         ] = (
             2.0
-            * (VACUUM_MAGNETIC_PERMEABILITY * k_m) ** 2.0
+            * (VACUUM_MAGNETIC_PERMEABILITY * surface_current_density) ** 2.0
             * x2p_ratio
-            / (np.pi * np.abs(b_st) * total_flux_density)
+            / (np.pi * tooth_flux_density * total_flux_density)
         )
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density",
-        ] = 2.0 * b_m / (np.pi * np.abs(b_st) * total_flux_density)
+        ] = 2.0 * air_gap_flux_density / (np.pi * tooth_flux_density * total_flux_density)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_tooth_flux_density",
-        ] = -2.0 * total_flux_density / (np.pi * b_st * np.abs(b_st))
+        ] = -2.0 * total_flux_density / (np.pi * tooth_flux_density**2.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tooth_ratio",
@@ -126,6 +128,6 @@ class SizingToothRatio(om.ExplicitComponent):
         ] = (
             2.0
             * (VACUUM_MAGNETIC_PERMEABILITY * x2p_ratio) ** 2.0
-            * k_m
-            / (np.pi * np.abs(b_st) * total_flux_density)
+            * surface_current_density
+            / (np.pi * tooth_flux_density * total_flux_density)
         )
