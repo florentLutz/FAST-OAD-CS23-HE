@@ -751,13 +751,13 @@
       </systems>
       <propulsion>
         <engine>
-          <mass units="kg" is_input="True">779.1788430737936<!--Mass of the propulsion system_inp_data:weight:propulsion:engine:mass--></mass>
+          <mass units="kg" is_input="True">880.0<!--Mass of the propulsion system_inp_data:weight:propulsion:engine:mass--></mass>
         </engine>
         <engine_controls_instrumentation>
-          <mass units="kg" is_input="True">31.274473647728<!--Mass of the propulsion system_inp_data:weight:propulsion:engine_controls_instrumentation:mass--></mass>
+          <mass units="kg" is_input="True">0.0<!--Mass of the propulsion system_inp_data:weight:propulsion:engine_controls_instrumentation:mass--></mass>
         </engine_controls_instrumentation>
         <fuel_lines>
-          <mass units="kg" is_input="True">185.4747362014734<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
+          <mass units="kg" is_input="True">0.0<!--Mass of the propulsion system_inp_data:weight:propulsion:fuel_lines:mass--></mass>
         </fuel_lines>
         <propeller>
           <mass units="kg" is_input="True">307.42287816198314<!--Mass of the propulsion system_inp_data:weight:propulsion:propeller:mass--></mass>
