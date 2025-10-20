@@ -1,6 +1,5 @@
 import os.path as pth
 import logging
-import openmdao.api as om
 from fastoad import api
 from utils.filter_residuals import filter_residuals
 
@@ -21,7 +20,6 @@ def test_sizing_atr_72():
 
     # Create inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, "inputs_full_sizing.xml")
-    n2_path = pth.join(RESULTS_FOLDER_PATH, "n2_ATR72.html")
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -32,8 +30,6 @@ def test_sizing_atr_72():
     problem.set_val("data:weight:aircraft:OWE", units="kg", val=10000.0)
     problem.set_val("data:weight:aircraft:MZFW", units="kg", val=20000.0)
     problem.set_val("data:weight:aircraft:MLW", units="kg", val=21850.0)
-
-    om.n2(problem, show_browser=False, outfile=n2_path)
 
     problem.run_model()
 
