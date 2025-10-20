@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import os.path as pth
 
+from ..rta_propulsion_weight import RTAPropulsionWeight
 from ..rta_aero_approximation import (
     ClRef,
     InducedDragCoefficient,
@@ -15,6 +16,52 @@ DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 
 XML_FILE = "data.xml"
+
+
+def test_rta_propulsion_weight():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "fuel_propulsion.yml")
+    ivc = get_indep_var_comp(
+        list_inputs(RTAPropulsionWeight(power_train_file_path=sample_power_train_file_path)),
+        __file__,
+        XML_FILE,
+    )
+
+    problem = run_system(
+        RTAPropulsionWeight(power_train_file_path=sample_power_train_file_path), ivc
+    )
+
+    assert problem.get_val("data:weight:propulsion:engine:CG:x", units="m") == pytest.approx(
+        9.355,
+        rel=1e-3,
+    )
+    assert problem.get_val("data:weight:propulsion:engine:mass", units="kg") == pytest.approx(
+        992.66,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "hybrid_propulsion.yml")
+    ivc = get_indep_var_comp(
+        list_inputs(RTAPropulsionWeight(power_train_file_path=sample_power_train_file_path)),
+        __file__,
+        "data_hybrid.xml",
+    )
+
+    problem = run_system(
+        RTAPropulsionWeight(power_train_file_path=sample_power_train_file_path), ivc
+    )
+
+    assert problem.get_val("data:weight:propulsion:engine:CG:x", units="m") == pytest.approx(
+        10.367,
+        rel=1e-3,
+    )
+    assert problem.get_val("data:weight:propulsion:engine:mass", units="kg") == pytest.approx(
+        600.0,
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_cl_ref():

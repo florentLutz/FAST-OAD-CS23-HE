@@ -238,61 +238,133 @@
     </load_case>
     <propulsion>
       <he_power_train>
-        <turboshaft>
-          <turboshaft_1>
-            <power_rating units="kW" is_input="True">2050.0<!--Flat rating of the turboshaft--></power_rating>
-            <shaft_power_rating units="kW" is_input="True">2050.0<!--Value of the maximum power the turboshaft can provide used for power rate--></shaft_power_rating>
-            <design_point>
-              <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
-              <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.3<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
-            </design_point>
-            <limit>
-              <ITT is_input="True">1100.0<!--Limit ITT of the turboshaft!!!!--></ITT>
-              <OPR is_input="True">15.7<!--Limit OPR of the turboshaft--></OPR>
-            </limit>
-          </turboshaft_1>
-          <turboshaft_2>
-            <power_rating units="kW" is_input="True">2050.0<!--Flat rating of the turboshaft--></power_rating>
-            <shaft_power_rating units="kW" is_input="True">2050.0<!--Value of the maximum power the turboshaft can provide used for power rate--></shaft_power_rating>
-            <design_point>
-              <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
-              <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.3<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
-            </design_point>
-            <limit>
-              <ITT is_input="True">1100.0<!--Limit ITT of the turboshaft!!!!--></ITT>
-              <OPR is_input="True">15.7<!--Limit OPR of the turboshaft--></OPR>
-            </limit>
-          </turboshaft_2>
-        </turboshaft>
+        <mass units="kg" is_input="False">1522.8445331796788</mass>
+        <thrust_distribution is_input="True">[1.0, 1.0]</thrust_distribution>
+        <CG>
+          <x units="m" is_input="False">9.35476939898713</x>
+        </CG>
+        <cruise>
+          <CD0 is_input="False">0.0008148378354149034</CD0>
+        </cruise>
+        <low_speed>
+          <CD0 is_input="False">0.0008727655517554956</CD0>
+        </low_speed>
+        <fuel_system>
+          <fuel_system_1>
+            <connected_volume units="m**3" is_input="False">3.3485928756625016<!--Capacity of the connected tank in terms of volume--></connected_volume>
+            <fuel_distribution is_input="True">[1.0, 1.0]</fuel_distribution>
+            <fuel_type is_input="True">3.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="lbm" is_input="False">353.8419342747725<!--Weight of the fuel system--></mass>
+            <number_engine is_input="False">2.0<!--Number of engine connected to this fuel system--></number_engine>
+            <total_fuel_flowed units="kg" is_input="False">2692.2686720326515<!--Total amount of fuel that flowed through the system--></total_fuel_flowed>
+            <CG>
+              <x units="m" is_input="False">4.9859096<!--X position of the fuel system center of gravity--></x>
+              <y units="m" is_input="False">0.0<!--Y position of the ICE center of gravity--></y>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
+          </fuel_system_1>
+        </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
+            <capacity units="kg" is_input="False">1359.595679376489<!--Capacity of the tank in terms of weight--></capacity>
+            <fuel_consumed_main_route units="kg" is_input="False">1057.0933622330467<!--Amount of fuel from that tank which will be consumed during the main route (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
+            <fuel_consumed_mission units="kg" is_input="False">1346.1343360163257<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_total_mission units="kg" is_input="False">1359.595679376489<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
+            <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="kg" is_input="False">13.461343360163257<!--Weight of the fuel tanks--></mass>
+            <unusable_fuel_mission units="kg" is_input="False">13.461343360163257<!--Amount of trapped fuel in the tank--></unusable_fuel_mission>
+            <volume units="m**3" is_input="False">1.6910394022095634<!--Capacity of the tank in terms of volume--></volume>
             <CG>
-              <x units="m" is_input="False">12.859796706942976<!--X position of the battery center of gravity!!!--></x>
+              <x units="m" is_input="False">12.81352397154271<!--X position of the battery center of gravity--></x>
+              <y units="m" is_input="False">5.189743796193497<!--Y position of the fuel tank center of gravity--></y>
+              <y_ratio is_input="True">0.365<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.28503875663587164<!--Value of the length of the tank in the z-direction, computed differently based on the location of the tank--></height>
+              <length units="m" is_input="False">1.463516916074986<!--Value of the length of the tank in the x-direction, computed differently based on the location of the tank--></length>
+              <ref_chord units="m" is_input="False">2.2515644862692095<!--Reference wing chord for the tank--></ref_chord>
+              <width units="m" is_input="False">4.053704298974046<!--Value of the length of the tank in the y-direction, computed differently based on the location of the tank--></width>
+            </dimension>
+            <distributed_tanks>
+              <chord_slope is_input="False">0.0<!--When tank is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
+              <start_chord units="m" is_input="False">2.289655355336346<!--When tank is considered as a distributed mass, the chord at the start--></start_chord>
+              <y_ratio_end is_input="False">0.5075505889337701<!--When tank is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
+              <y_ratio_start is_input="False">0.22244941106622979<!--When tank is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
+            </distributed_tanks>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
           </fuel_tank_1>
           <fuel_tank_2>
+            <capacity units="kg" is_input="False">1359.595679376489<!--Capacity of the tank in terms of weight--></capacity>
+            <fuel_consumed_main_route units="kg" is_input="False">1057.0933622330467<!--Amount of fuel from that tank which will be consumed during the main route (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
+            <fuel_consumed_mission units="kg" is_input="False">1346.1343360163257<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
+            <fuel_total_mission units="kg" is_input="False">1359.595679376489<!--Total amount of fuel loaded in the tank for the mission--></fuel_total_mission>
+            <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <mass units="kg" is_input="False">13.461343360163257<!--Weight of the fuel tanks--></mass>
+            <unusable_fuel_mission units="kg" is_input="False">13.461343360163257<!--Amount of trapped fuel in the tank--></unusable_fuel_mission>
+            <volume units="m**3" is_input="False">1.6910394022095634<!--Capacity of the tank in terms of volume--></volume>
             <CG>
-              <x units="m" is_input="False">12.859796706942976<!--X position of the battery center of gravity!!!--></x>
+              <x units="m" is_input="False">12.81352397154271<!--X position of the battery center of gravity--></x>
+              <y units="m" is_input="False">5.189743796193497<!--Y position of the fuel tank center of gravity--></y>
+              <y_ratio is_input="True">0.365<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
+            <cruise>
+              <CD0 is_input="False">0.0</CD0>
+            </cruise>
+            <dimension>
+              <height units="m" is_input="False">0.28503875663587164<!--Value of the length of the tank in the z-direction, computed differently based on the location of the tank--></height>
+              <length units="m" is_input="False">1.463516916074986<!--Value of the length of the tank in the x-direction, computed differently based on the location of the tank--></length>
+              <ref_chord units="m" is_input="False">2.2515644862692095<!--Reference wing chord for the tank--></ref_chord>
+              <width units="m" is_input="False">4.053704298974046<!--Value of the length of the tank in the y-direction, computed differently based on the location of the tank--></width>
+            </dimension>
+            <distributed_tanks>
+              <chord_slope is_input="False">0.0<!--When tank is considered as a distributed mass, the rate at which the chord varies--></chord_slope>
+              <start_chord units="m" is_input="False">2.289655355336346<!--When tank is considered as a distributed mass, the chord at the start--></start_chord>
+              <y_ratio_end is_input="False">0.5075505889337701<!--When tank is considered as a distributed mass, the position of the end as a ratio of the half-span--></y_ratio_end>
+              <y_ratio_start is_input="False">0.22244941106622979<!--When tank is considered as a distributed mass, the position of the start as a ratio of the half-span--></y_ratio_start>
+            </distributed_tanks>
+            <low_speed>
+              <CD0 is_input="False">0.0</CD0>
+            </low_speed>
           </fuel_tank_2>
         </fuel_tank>
         <propeller>
           <propeller_1>
             <activity_factor is_input="True">10.6<!--Activity factor of the propeller--></activity_factor>
-            <advance_ratio_max is_input="False">1<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
-            <blade_twist units="rad" is_input="True">0.61066860685499065<!--Twist between the propeller blade root and tip--></blade_twist>
+            <advance_ratio_max is_input="False">1.9764808500218365<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
+            <blade_twist units="rad" is_input="True">0.6106686068549907<!--Twist between the propeller blade root and tip--></blade_twist>
             <cl_clean_ref is_input="False">0.0<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
-            <diameter units="cm" is_input="True">392.6226153997489<!--3.926226153997489Diameter of the propeller--></diameter>
+            <depth units="cm" is_input="False">59.4<!--Depth of the propeller--></depth>
+            <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
+            <diameter units="cm" is_input="True">396.0<!--Diameter of the propeller--></diameter>
+            <diameter_to_chord_ratio is_input="False">1.4915254237288136<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_span_ratio is_input="False">0.2785108584859531<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
             <flapped_ratio is_input="False">0.0<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
-            <from_wing_LE_ratio is_input="False">1.613728620523854<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
+            <from_wing_AC units="m" is_input="False">12.210611210019728<!--Distance between the propeller and the wing aerodynamic center--></from_wing_AC>
+            <from_wing_LE_ratio is_input="False">4.599100267427393<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <mass units="kg" is_input="False">171.37888410650692</mass>
+            <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
+            <number_blades is_input="True">6.0<!--Number of blades on the propeller--></number_blades>
+            <rpm_max units="1/min" is_input="False">1100.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">1100.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_rating units="1/min" is_input="False">1100.0<!--The propeller RPM rating used for the sizing--></rpm_rating>
             <solidity is_input="True">0.3<!--Solidity of the propeller--></solidity>
-            <wing_chord_ref units="m" is_input="False">2.4660462088555264<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+            <tip_mach_max is_input="False">0.7269991641218182<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
+            <torque_max units="N*m" is_input="False">19313.27752811941<!--Maximum value of the propeller torque--></torque_max>
+            <torque_rating units="N*m" is_input="False">19313.27752811941<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
+            <wing_chord_ref units="m" is_input="False">2.655<!--Value of the wing chord behind the propeller--></wing_chord_ref>
             <CG>
-              <x units="m" is_input="False">0.1485<!--X position of the propeller center of gravity--></x>
+              <x units="m" is_input="False">0.297<!--X position of the propeller center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <cruise>
@@ -304,18 +376,31 @@
           </propeller_1>
           <propeller_2>
             <activity_factor is_input="True">10.6<!--Activity factor of the propeller--></activity_factor>
-            <advance_ratio_max is_input="False">1<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
-            <blade_twist units="rad" is_input="True">0.61066860685499065<!--Twist between the propeller blade root and tip--></blade_twist>
+            <advance_ratio_max is_input="False">1.9764808500218365<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
+            <blade_twist units="rad" is_input="True">0.6106686068549907<!--Twist between the propeller blade root and tip--></blade_twist>
             <cl_clean_ref is_input="False">0.0<!--Value of the clean lift coefficient of the section behind the propeller for reference wing lift coefficient--></cl_clean_ref>
-            <diameter units="cm" is_input="True">392.6226153997489<!--3.926226153997489Diameter of the propeller--></diameter>
+            <depth units="cm" is_input="False">59.4<!--Depth of the propeller--></depth>
+            <depth_to_diameter_ratio is_input="True">0.15<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
+            <diameter units="cm" is_input="True">396.0<!--Diameter of the propeller--></diameter>
+            <diameter_to_chord_ratio is_input="False">1.4915254237288136<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></diameter_to_chord_ratio>
+            <diameter_to_span_ratio is_input="False">0.2785108584859531<!--Diameter of the propeller as a ratio of the wing half span--></diameter_to_span_ratio>
             <flapped_ratio is_input="False">0.0<!--Portion of the span, downstream of the propeller, which has flaps--></flapped_ratio>
-            <from_wing_LE_ratio is_input="False">1.613728620523854<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
+            <from_wing_AC units="m" is_input="False">12.210611210019728<!--Distance between the propeller and the wing aerodynamic center--></from_wing_AC>
+            <from_wing_LE_ratio is_input="False">4.599100267427393<!--Distance between the propeller and the wing leading edge as a ratio of the reference chord behind the propeller--></from_wing_LE_ratio>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <mass units="kg" is_input="False">171.37888410650692</mass>
+            <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
+            <number_blades is_input="True">6.0<!--Number of blades on the propeller--></number_blades>
+            <rpm_max units="1/min" is_input="False">1100.0<!--Maximum value of the propeller rpm--></rpm_max>
             <rpm_mission units="1/min" is_input="True">1100.0<!--RPM of the propeller for the points--></rpm_mission>
+            <rpm_rating units="1/min" is_input="False">1100.0<!--The propeller RPM rating used for the sizing--></rpm_rating>
             <solidity is_input="True">0.3<!--Solidity of the propeller--></solidity>
-            <wing_chord_ref units="m" is_input="False">2.4660462088555264<!--Value of the wing chord behind the propeller--></wing_chord_ref>
+            <tip_mach_max is_input="False">0.7269991641218182<!--Maximum value of the propeller tip mach Number--></tip_mach_max>
+            <torque_max units="N*m" is_input="False">19313.27752811941<!--Maximum value of the propeller torque--></torque_max>
+            <torque_rating units="N*m" is_input="False">19313.27752811941<!--Maximum value of the propeller torque used for the sizing--></torque_rating>
+            <wing_chord_ref units="m" is_input="False">2.655<!--Value of the wing chord behind the propeller--></wing_chord_ref>
             <CG>
-              <x units="m" is_input="False">0.1485<!--X position of the propeller center of gravity--></x>
+              <x units="m" is_input="False">0.297<!--X position of the propeller center of gravity--></x>
               <y units="m" is_input="False">0.0<!--Y position of the DC bus center of gravity--></y>
             </CG>
             <cruise>
@@ -326,6 +411,104 @@
             </low_speed>
           </propeller_2>
         </propeller>
+        <turboshaft>
+          <turboshaft_1>
+            <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <mass units="kg" is_input="False">496.33203833663015<!--Installed weight of the turboshaft--></mass>
+            <power_max units="kW" is_input="False">2224.729862632962<!--Maximum power the turboshaft has to provide--></power_max>
+            <power_offtake units="kW" is_input="True">0.0<!--Mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
+            <power_rating units="kW" is_input="False">2224.729862632962<!--Maximum power the turboshaft can provide--></power_rating>
+            <shaft_power_rating units="kW" is_input="False">2224.729862632962<!--Value of the maximum power the turboshaft can provide used for power rate--></shaft_power_rating>
+            <uninstalled_mass units="kg" is_input="False">413.6100319471918<!--Uninstalled weight of the turboshaft--></uninstalled_mass>
+            <CG>
+              <x units="m" is_input="False">13.094910651441856<!--X position of the turboshaft center of gravity--></x>
+              <y units="m" is_input="False">4.181653836878103<!--Y position of the turboshaft center of gravity--></y>
+              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0004074189177074517</CD0>
+            </cruise>
+            <design_point>
+              <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
+              <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
+              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+            </design_point>
+            <emission_index>
+              <CO units="g/kg" is_input="True">5.0</CO>
+              <CO2 units="g/kg" is_input="True">3155.0</CO2>
+              <H2O units="g/kg" is_input="True">1237.0</H2O>
+              <HC units="g/kg" is_input="True">0.5</HC>
+              <NOx units="g/kg" is_input="True">11.4</NOx>
+              <SOx units="g/kg" is_input="True">0.8</SOx>
+            </emission_index>
+            <engine>
+              <height units="mm" is_input="False">363.9342970374551<!--Height of the turboshaft--></height>
+              <length units="mm" is_input="False">2676.2122029451093<!--Length of the turboshaft--></length>
+              <width units="mm" is_input="False">363.9342970374551<!--Width of the turboshaft--></width>
+            </engine>
+            <limit>
+              <ITT units="degK" is_input="True">1100.0<!--Limit ITT of the turboshaft--></ITT>
+              <OPR is_input="True">15.7<!--Limit OPR of the turboshaft--></OPR>
+            </limit>
+            <low_speed>
+              <CD0 is_input="False">0.0004363827758777478</CD0>
+            </low_speed>
+            <nacelle>
+              <height units="m" is_input="False">0.40032772674120065<!--Height of the turboshaft nacelle--></height>
+              <length units="m" is_input="False">5.352424405890218<!--Length of the turboshaft nacelle--></length>
+              <wet_area units="m**2" is_input="False">8.57089557985661<!--Wet area of the turboshaft nacelle--></wet_area>
+              <width units="m" is_input="False">0.40032772674120065<!--Width of the turboshaft nacelle--></width>
+            </nacelle>
+          </turboshaft_1>
+          <turboshaft_2>
+            <from_LE units="m" is_input="True">1.189<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <mass units="kg" is_input="False">496.33203833663015<!--Installed weight of the turboshaft--></mass>
+            <power_max units="kW" is_input="False">2224.729862632962<!--Maximum power the turboshaft has to provide--></power_max>
+            <power_offtake units="kW" is_input="True">0.0<!--Mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
+            <power_rating units="kW" is_input="False">2224.729862632962<!--Maximum power the turboshaft can provide--></power_rating>
+            <shaft_power_rating units="kW" is_input="False">2224.729862632962<!--Value of the maximum power the turboshaft can provide used for power rate--></shaft_power_rating>
+            <uninstalled_mass units="kg" is_input="False">413.6100319471918<!--Uninstalled weight of the turboshaft--></uninstalled_mass>
+            <CG>
+              <x units="m" is_input="False">13.094910651441856<!--X position of the turboshaft center of gravity--></x>
+              <y units="m" is_input="False">4.181653836878103<!--Y position of the turboshaft center of gravity--></y>
+              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cruise>
+              <CD0 is_input="False">0.0004074189177074517</CD0>
+            </cruise>
+            <design_point>
+              <OPR is_input="True">14.7<!--OPR of the turboshaft at the design point--></OPR>
+              <T41t units="degK" is_input="True">1526.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
+              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+            </design_point>
+            <emission_index>
+              <CO units="g/kg" is_input="True">5.0</CO>
+              <CO2 units="g/kg" is_input="True">3155.0</CO2>
+              <H2O units="g/kg" is_input="True">1237.0</H2O>
+              <HC units="g/kg" is_input="True">0.5</HC>
+              <NOx units="g/kg" is_input="True">11.4</NOx>
+              <SOx units="g/kg" is_input="True">0.8</SOx>
+            </emission_index>
+            <engine>
+              <height units="mm" is_input="False">363.9342970374551<!--Height of the turboshaft--></height>
+              <length units="mm" is_input="False">2676.2122029451093<!--Length of the turboshaft--></length>
+              <width units="mm" is_input="False">363.9342970374551<!--Width of the turboshaft--></width>
+            </engine>
+            <limit>
+              <ITT units="degK" is_input="True">1100.0<!--Limit ITT of the turboshaft--></ITT>
+              <OPR is_input="True">15.7<!--Limit OPR of the turboshaft--></OPR>
+            </limit>
+            <low_speed>
+              <CD0 is_input="False">0.0004363827758777478</CD0>
+            </low_speed>
+            <nacelle>
+              <height units="m" is_input="False">0.40032772674120065<!--Height of the turboshaft nacelle--></height>
+              <length units="m" is_input="False">5.352424405890218<!--Length of the turboshaft nacelle--></length>
+              <wet_area units="m**2" is_input="False">8.57089557985661<!--Wet area of the turboshaft nacelle--></wet_area>
+              <width units="m" is_input="False">0.40032772674120065<!--Width of the turboshaft nacelle--></width>
+            </nacelle>
+          </turboshaft_2>
+        </turboshaft>
       </he_power_train>
       <Design_Thermo_Power units="W" is_input="True">2497648.194206328<!--Power used to compute the gas turbine mass flow rate--></Design_Thermo_Power>
       <Power_Offtake units="W" is_input="True">7500.0</Power_Offtake>

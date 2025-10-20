@@ -123,6 +123,7 @@
       </electric_systems>
       <he_power_train>
         <mass units="kg">2421.3</mass>
+        <base_model_engine_mass units="kg">880.292</base_model_engine_mass>
         <thrust_distribution is_input="True">[1.0, 1.0]</thrust_distribution>
         <DC_DC_converter>
           <dc_dc_converter_1>

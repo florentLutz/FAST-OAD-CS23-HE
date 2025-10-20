@@ -10,7 +10,8 @@ from stdatm import AtmosphereWithPartials
 
 class ComputeRTAVariable(om.ExplicitComponent):
     """
-    Simple computation to obtain FAST-GA-HE Performances inputs from RTA outputs.
+    Simple computation to obtain FAST-GA-HE Performances inputs from RTA outputs and set
+    variables that doesn't exist in FAST-OAD-RTA or requires complex computation.
     """
 
     def setup(self):
@@ -23,6 +24,9 @@ class ComputeRTAVariable(om.ExplicitComponent):
         self.add_input("data:mission:sizing:taxi_out:distance", val=np.nan, units="m")
         self.add_input("data:mission:sizing:taxi_out:duration", val=np.nan, units="s")
 
+        self.add_output("data:aerodynamics:horizontal_tail:cruise:CL0")
+        self.add_output("data:aerodynamics:horizontal_tail:airfoil:CL_alpha", units="1/rad")
+        self.add_output("data:aerodynamics:wing:cruise:CM0_clean")
         self.add_output("data:TLAR:luggage_mass_design", units="kg")
         self.add_output("data:aerodynamics:cruise:unit_reynolds", units="1/m")
         self.add_output("data:aerodynamics:low_speed:unit_reynolds", units="1/m")
@@ -80,6 +84,12 @@ class ComputeRTAVariable(om.ExplicitComponent):
             inputs["data:mission:sizing:taxi_out:distance"]
             / inputs["data:mission:sizing:taxi_out:duration"]
         )
+
+        outputs["data:aerodynamics:horizontal_tail:cruise:CL0"] = -0.0068437669175491515
+
+        outputs["data:aerodynamics:horizontal_tail:airfoil:CL_alpha"] = 6.28
+
+        outputs["data:aerodynamics:wing:cruise:CM0_clean"] = -0.02413516654351498
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
