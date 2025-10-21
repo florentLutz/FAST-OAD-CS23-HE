@@ -191,6 +191,8 @@ class FASTGAHEPowerTrainConfigurator:
         # an attribute to avoid having to recompute everything
         self._voltage_at_each_node = None
 
+        self._connection_check = False
+
         if power_train_file_path:
             self.load(power_train_file_path)
 
@@ -544,6 +546,11 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
+        if self._connection_list != connections_list:
+            self._check_connection(connections_list)
+            # _LOGGER.info("Connection checked !!")
+
+
     def _check_connection(self, connections_list):
         """
         This function ensures all the connections respect the component connection limits and
@@ -564,13 +571,13 @@ class FASTGAHEPowerTrainConfigurator:
         niso_component = [
             comp
             for comp, type in zip(self._components_name, self._components_type_class)
-            if type == "tanks" or type == "source"
+            if type == "tank" or type == "source"
         ]
 
         siso_component = [
             comp
             for comp, type in zip(self._components_name, self._components_type_class)
-            if type == "load" or type == "propulsive_load"
+            if type == "load" or type == "propulsive_load" or "propulsive_load" in type
         ]
 
         (
@@ -592,94 +599,59 @@ class FASTGAHEPowerTrainConfigurator:
             _LOGGER.error("Storage tank or battery missing!")
 
         # Check connections definition
-
-        for comp in sino_component:
+        for comp in self._components_name:
             if not any(
-                connection["source"] == comp and connection["target"]
+                connection.get("target") == comp
+                or connection.get("source") == comp
+                or comp in connection.get("target")
+                or comp in connection.get("source")
                 for connection in connections_list
-            ):
-                _LOGGER.error("Propulsor is/are not connected!")
-
-        for comp in niso_component:
-            if not any(
-                connection["target"] == comp and connection["source"]
-                for connection in connections_list
-            ):
-                _LOGGER.error("Storage tank or battery is/are not connected!")
-
-        for comp in siso_component:
-            if (
-                not any(
-                    connection["target"] == comp and connection["source"]
-                    for connection in connections_list
-                )
-            ) or (
-                not any(
-                    connection["source"] == comp and connection["target"]
-                    for connection in connections_list
-                )
             ):
                 _LOGGER.error("Component is/are not properly connected!")
 
         if miso_component:
-            for comp in miso_component:
+            for comp, input_count in zip(miso_component, miso_input_count):
                 input_count_defined = 0
 
-                if not any(
-                    connection["target"] == comp and connection["source"]
-                    for connection in connections_list
-                ):
-                    _LOGGER.error("Connector component is/are not connected!")
-
                 input_count_defined += sum(
-                    1
-                    for connection in connections_list
-                    if connection["source"][0] == comp and connection["target"]
+                    1 for connection in connections_list if comp in connection.get("source")
                 )
 
-                if int(input_count_defined) != int(miso_input_count):
+                if int(input_count_defined) != int(input_count):
                     _LOGGER.error("Connector component is/are not connected!")
 
         if simo_component:
-            for comp in simo_component:
+            for comp, output_count in zip(simo_component, simo_output_count):
                 output_count_defined = 0
 
-                if not any(
-                    connection["source"] == comp and connection["target"]
-                    for connection in connections_list
-                ):
-                    _LOGGER.error("Connector component is/are not connected!")
-
                 output_count_defined += sum(
-                    1
-                    for connection in connections_list
-                    if connection["target"][0] == comp and connection["source"]
+                    1 for connection in connections_list if comp in connection.get("target")
                 )
 
-                if int(output_count_defined) != int(simo_output_count):
+                if int(output_count_defined) != int(output_count):
                     _LOGGER.error("Connector component is/are not connected!")
 
         if mimo_component:
-            for comp in mimo_component:
+            for comp, input_count, output_count in zip(
+                mimo_component, mimo_input_count, mimo_output_count
+            ):
                 input_count_defined = 0
                 output_count_defined = 0
 
                 input_count_defined += sum(
-                    1
-                    for connection in connections_list
-                    if connection["source"][0] == comp and connection["target"]
+                    1 for connection in connections_list if comp in connection.get("source")
                 )
 
                 output_count_defined += sum(
-                    1
-                    for connection in connections_list
-                    if connection["target"][0] == comp and connection["source"]
+                    1 for connection in connections_list if comp in connection.get("target")
                 )
 
-                if (int(input_count_defined) != int(mimo_input_count)) or (
-                    int(output_count_defined) != int(mimo_output_count)
+                if (int(input_count_defined) != int(input_count)) or (
+                    int(output_count_defined) != int(output_count)
                 ):
                     _LOGGER.error("Connector component is/are not connected!")
+
+        self._connection_check = True
 
     def _categorize_connectors(self, siso_component):
         connector_names = [
@@ -692,10 +664,16 @@ class FASTGAHEPowerTrainConfigurator:
             for option, type in zip(self._components_options, self._components_type_class)
             if type == "connector"
         ]
-        connector_perf_watchers = [
-            pf_watcher
-            for pf_watcher, type in zip(self._components_perf_watchers, self._components_type_class)
-            if type == "connector"
+        connector_variable = [
+            input
+            for name in connector_names
+            for input in self._components_connection_inputs
+            if name in input
+        ] + [
+            output
+            for name in connector_names
+            for output in self._components_connection_outputs
+            if name in output
         ]
 
         # m: multiple, s: single, i:input, o: output
@@ -703,48 +681,60 @@ class FASTGAHEPowerTrainConfigurator:
         simo_component = []
         miso_component = []
         mimo_component = []
+        miso_input_count = []
+        simo_output_count = []
+        mimo_input_count = []
+        mimo_output_count = []
 
-        for name, options, perf_watchers in zip(
-            connector_names, connector_options, connector_perf_watchers
-        ):
-            miso_input_count = []
-            simo_output_count = []
-            mimo_input_count = []
-            mimo_output_count = []
+        for name, options in zip(connector_names, connector_options):
+            variable_list = [var for var in connector_variable if name in var]
 
             # Check MIMO component
-            if not any(key.startswith("number_of_") for key in options.keys()):
+            if options is None or not any(key.startswith("number_of_") for key in options.keys()):
+                # This is for the connectors without given input or output numbers from pt file
                 siso = True
                 mi = False
                 mo = False
                 max_num_input = 0
                 max_num_output = 0
 
-                # Check component
-                for var in perf_watchers:
-                    if "_in_" in list(var.keys()[0]):
+                for var in variable_list:
+                    integer = re.search(r"_(\d+)$", var)
+                    if not integer:
+                        continue
+
+                    if "_in_" in var:
                         siso = False
                         mi = True
-                        max_num_input = max(max_num_input, int(list(var.keys())[-1]))
-                    elif "_out_" in list(var.keys()[0]):
+                        max_num_input = (
+                            int(integer.group(1))
+                            if int(integer.group(1)) > max_num_input
+                            else max_num_input
+                        )
+                    elif "_out_" in var:
                         siso = False
                         mo = True
-                        max_num_output = max(max_num_output, int(list(var.keys())[-1]))
+                        max_num_output = (
+                            int(integer.group(1))
+                            if int(integer.group(1)) > max_num_output
+                            else max_num_output
+                        )
 
                 if siso:
-                    siso_component = siso_component + connector_names
+                    siso_component.append(name)
                 elif mi and mo:
-                    mimo_component = mimo_component + connector_names
+                    mimo_component.append(name)
                     mimo_input_count.append(max_num_input)
                     mimo_output_count.append(max_num_output)
                 elif mi:
-                    miso_component = miso_component + connector_names
+                    miso_component.append(name)
                     miso_input_count.append(max_num_input)
                 elif mo:
-                    simo_component = simo_component + connector_names
+                    simo_component.append(name)
                     simo_output_count.append(max_num_output)
 
             else:
+                # This is for the connectors having given input and output numbers from pt file
                 num_connections = [
                     v
                     for k, v in zip(options.keys(), options.values())
@@ -753,34 +743,37 @@ class FASTGAHEPowerTrainConfigurator:
 
                 if any(num > 1 for num in num_connections):
                     if all(num > 1 for num in num_connections):
-                        mimo_component = mimo_component + connector_names
+                        # check if it is mimo
+                        mimo_component = mimo_component.append(name)
                         mimo_input_count.append(
-                            int(
-                                options["number_of_inputs"]
-                                or options["number_of_power_sources"]
-                                or options["number_of_engines"]
-                            )
+                            int(options.get("number_of_inputs") or options.get("number_of_tanks"))
                         )
                         mimo_output_count.append(
-                            int((options["number_of_outputs"] or options["number_of_tanks"]))
+                            int(
+                                (
+                                    options.get("number_of_outputs")
+                                    or options.get("number_of_power_sources")
+                                    or options.get("number_of_engines")
+                                )
+                            )
                         )
 
-                    elif (options["number_of_outputs"] or options["number_of_tanks"]) > 1:
-                        simo_component = simo_component + connector_names
-                        simo_output_count.append(
-                            int(options["number_of_outputs"] or options["number_of_tanks"])
+                    elif (options.get("number_of_inputs") or options.get("number_of_tanks")) > 1:
+                        miso_component.append(name)
+                        miso_input_count.append(
+                            int(options.get("number_of_inputs") or options.get("number_of_tanks"))
                         )
                     else:
-                        miso_component = miso_component + connector_names
-                        miso_input_count.append(
+                        simo_component.append(name)
+                        simo_output_count.append(
                             int(
-                                options["number_of_inputs"]
-                                or options["number_of_power_sources"]
-                                or options["number_of_engines"]
+                                options.get("number_of_outputs")
+                                or options.get("number_of_power_sources")
+                                or options.get("number_of_engines")
                             )
                         )
                 else:
-                    siso_component = siso_component + connector_names
+                    siso_component.append(name)
 
         return (
             siso_component,
@@ -842,7 +835,7 @@ class FASTGAHEPowerTrainConfigurator:
 
             # This case will correspond to ICE/turbomachinery
             elif "propulsive_load" in component_type_class:
-                # Check whether or not at least one neighbor is a propulsor
+                # Check wheather or not at least one neighbor is a propulsor
                 neighbors = list(graph.neighbors(component_name))
                 if set(neighbors).intersection(propulsor_name):
                     propulsive_load_names.append(component_name)
