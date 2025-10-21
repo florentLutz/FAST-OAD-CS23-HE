@@ -5,8 +5,8 @@
 
 import numpy as np
 import openmdao.api as om
-from fastoad.module_management.service_registry import RegisterSubmodel
 
+from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_SUM
 
 

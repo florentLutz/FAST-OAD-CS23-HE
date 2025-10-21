@@ -18,11 +18,11 @@ template are required to be added.
         ⋮
         rta_integration:
           id: fastga_he.rta_variables
+          power_train_file_path: pt_file.yml
 
         performances:
           id: fastga_he.performances.mission_vector
-          ⋮
-          rta_activation: True
+
 
     submodels:
       service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta

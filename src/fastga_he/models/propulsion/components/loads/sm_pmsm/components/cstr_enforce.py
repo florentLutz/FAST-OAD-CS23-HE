@@ -2,16 +2,15 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
+import numpy as np
+import openmdao.api as om
+import fastoad.api as oad
+
 from ..constants import (
     SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE,
     SUBMODEL_CONSTRAINTS_SM_PMSM_RPM,
     SUBMODEL_CONSTRAINTS_SM_PMSM_VOLTAGE,
 )
-
-import openmdao.api as om
-import numpy as np
-
-import fastoad.api as oad
 
 oad.RegisterSubmodel.active_models[SUBMODEL_CONSTRAINTS_SM_PMSM_TORQUE] = (
     "fastga_he.submodel.propulsion.constraints.sm_pmsm.torque.enforce"

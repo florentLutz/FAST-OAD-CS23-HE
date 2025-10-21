@@ -71,11 +71,11 @@ rotor or friction between a stationary solid and a rotating solid.
     P_{mech} = P_{windage} + 2 P_{bf}
 
 The two major windage losses (:math:`P_{windage}`) result from the fluid friction
-between the air in the component gaps and the rotor. The airgap windage losses (:math:`P_{wa}`) occurs because of the fluid
-friction between the stator and rotor while rotating. Similarly, the rotor windage losses (:math:`P_{wr}`) arises from the
-space between both ends of the rotor and the motor casing. The rotor radius is denoted as :math:`R_{r}`, the shaft
-radius as :math:`R_{sh}`, the rotation speed as :math:`\Omega`, the air density as :math:`\rho_{air}`, and the motor
-length as :math:`L`.
+between the air in the component gaps and the rotor. The airgap windage losses (:math:`P_{wa}`) occurs because of the
+fluid friction between the stator and rotor while rotating. Similarly, the rotor windage losses (:math:`P_{wr}`) arises
+from the space between both ends of the rotor and the motor casing. The rotor radius is denoted as :math:`R_{r}`, the
+shaft radius as :math:`R_{sh}`, the rotation speed as :math:`\Omega`, the air density as :math:`\rho_{air}`, and the
+motor length as :math:`L`.
 
 .. math::
     P_{windage} = P_{wa} + 2P_{wr} \\
@@ -109,7 +109,7 @@ And the Reynolds numbers for both losses are:
    Re_{rt} = \frac{\rho_{air} R_r^2}{\mu_{air}} \Omega
 
 The bearing friction losses is another major contributor to the friction losses between a moving surface and a
-stationary surface. A simplified model for  the bearing friction coefficient (:math:`C_{fb}`) is provided for various
+stationary surface. A simplified model for the bearing friction coefficient (:math:`C_{fb}`) is provided for various
 bearing type based on SKF's bearing datasheets :cite:`skf:2016`.
 
 .. raw:: html

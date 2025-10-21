@@ -40,6 +40,7 @@ class LCCSMPMSMCost(om.ExplicitComponent):
             desc="Unit purchase cost of the PMS motor",
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

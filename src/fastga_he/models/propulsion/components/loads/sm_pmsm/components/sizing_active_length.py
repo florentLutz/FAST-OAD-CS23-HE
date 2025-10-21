@@ -39,16 +39,7 @@ class SizingActiveLength(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        motor_id = self.options["motor_id"]
-
-        self.declare_partials(
-            of="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-            wrt=[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":form_coefficient",
-            ],
-            method="exact",
-        )
+        self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]

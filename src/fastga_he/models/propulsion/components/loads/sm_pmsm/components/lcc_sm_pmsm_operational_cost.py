@@ -39,6 +39,7 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
             val=1.0e3,
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

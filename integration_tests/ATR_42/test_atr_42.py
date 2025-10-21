@@ -108,8 +108,7 @@ def test_hybrid_atr_42_full_sizing():
     """
     Test the overall aircraft design process for parallel hybrid configuration. In this
     configuration, the electrical component of the powertrain supplies power only during the climb
-    phase of the flight mission. This is achieved by adjusting the masses and CGs of engines and
-    propellers to match the result from the powertrain computation.
+    phase of the flight mission.
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True

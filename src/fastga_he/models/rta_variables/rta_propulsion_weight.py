@@ -33,8 +33,8 @@ class RTAPropulsionWeight(om.ExplicitComponent):
         self.add_input("data:propulsion:he_power_train:mass", val=np.nan, units="kg")
 
         (
-            propulsive_load_names,
-            propulsive_load_types,
+            self.propulsive_load_names,
+            self.propulsive_load_types,
         ) = self.configurator.get_propulsive_element_list()
 
         if any(
@@ -46,7 +46,9 @@ class RTAPropulsionWeight(om.ExplicitComponent):
             )
 
         else:
-            for component_type, component_name in zip(propulsive_load_types, propulsive_load_names):
+            for component_type, component_name in zip(
+                self.propulsive_load_types, self.propulsive_load_names
+            ):
                 if component_type != "PMSM" or "SM_PMSM":
                     self.add_input(
                         "data:propulsion:he_power_train:"
@@ -91,11 +93,9 @@ class RTAPropulsionWeight(om.ExplicitComponent):
                 val=-1.0,
             )
         else:
-            (
-                propulsive_load_names,
-                propulsive_load_types,
-            ) = self.configurator.get_propulsive_element_list()
-            for component_type, component_name in zip(propulsive_load_types, propulsive_load_names):
+            for component_type, component_name in zip(
+                self.propulsive_load_types, self.propulsive_load_names
+            ):
                 if component_type != "PMSM" or "SM_PMSM":
                     self.declare_partials(
                         "data:weight:propulsion:engine:mass",
@@ -128,11 +128,9 @@ class RTAPropulsionWeight(om.ExplicitComponent):
             engine_weight = inputs["data:propulsion:he_power_train:base_model_engine_mass"]
 
         else:
-            (
-                propulsive_load_names,
-                propulsive_load_types,
-            ) = self.configurator.get_propulsive_element_list()
-            for component_type, component_name in zip(propulsive_load_types, propulsive_load_names):
+            for component_type, component_name in zip(
+                self.propulsive_load_types, self.propulsive_load_names
+            ):
                 if component_type != "PMSM" or "SM_PMSM":
                     engine_weight += inputs[
                         "data:propulsion:he_power_train:"

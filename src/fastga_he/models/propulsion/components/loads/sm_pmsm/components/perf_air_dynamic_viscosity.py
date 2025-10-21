@@ -31,6 +31,9 @@ class PerformancesAirDynamicViscosity(om.ExplicitComponent):
             val=np.full(number_of_points, DEFAULT_DYNAMIC_VISCOSITY),
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="*",
             wrt="*",
