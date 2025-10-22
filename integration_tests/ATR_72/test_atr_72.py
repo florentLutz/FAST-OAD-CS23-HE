@@ -13,9 +13,7 @@ def test_sizing_atr_72():
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-    configurator = api.FASTOADProblemConfigurator(
-        DATA_FOLDER_PATH / "atr_72_full_sizing.yml"
-    )
+    configurator = api.FASTOADProblemConfigurator(DATA_FOLDER_PATH / "atr_72_full_sizing.yml")
     problem = configurator.get_problem()
 
     problem.write_needed_inputs(DATA_FOLDER_PATH / "inputs_full_sizing.xml")

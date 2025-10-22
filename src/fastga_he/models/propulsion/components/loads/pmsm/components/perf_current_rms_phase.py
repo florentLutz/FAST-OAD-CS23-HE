@@ -29,7 +29,7 @@ class PerformancesCurrentRMS1Phase(om.ExplicitComponent):
         self.add_output(
             "ac_current_rms_in_one_phase",
             units="A",
-            val= 3.33,
+            val=3.33,
             shape=number_of_points,
         )
 

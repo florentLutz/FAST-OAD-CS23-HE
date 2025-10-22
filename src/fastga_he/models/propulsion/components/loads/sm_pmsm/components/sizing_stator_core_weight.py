@@ -81,8 +81,9 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
-        slot_section_area = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id +
-                         ":slot_section_area"]
+        slot_section_area = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area"
+        ]
         rho_magnet = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":magnetic_material_density"
         ]
@@ -110,8 +111,9 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
         active_length = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
         ]
-        slot_section_area = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id +
-                                   ":slot_section_area"]
+        slot_section_area = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_section_area"
+        ]
         rho_magnet = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":magnetic_material_density"
         ]
