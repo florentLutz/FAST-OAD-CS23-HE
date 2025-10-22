@@ -72,6 +72,8 @@ class FASTGAHEPowerTrainConfigurator:
     :param power_train_file_path: if provided, power train will be read directly from it
     """
 
+    _last_mod_time = 0
+
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
 
@@ -190,8 +192,6 @@ class FASTGAHEPowerTrainConfigurator:
         # Contains the results of the function that sets the voltage in the graphs, is declared as
         # an attribute to avoid having to recompute everything
         self._voltage_at_each_node = None
-
-        self._connection_check = False
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -546,10 +546,12 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
-        if self._connection_list != connections_list:
+        if FASTGAHEPowerTrainConfigurator._last_mod_time == 0:
+            FASTGAHEPowerTrainConfigurator._last_mod_time = (
+                pathlib.Path(self._power_train_file).lstat().st_mtime
+            )
             self._check_connection(connections_list)
-            # _LOGGER.info("Connection checked !!")
-
+            _LOGGER.info("Connection checked !!")
 
     def _check_connection(self, connections_list):
         """
