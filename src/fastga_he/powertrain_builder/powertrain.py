@@ -832,7 +832,7 @@ class FASTGAHEPowerTrainConfigurator:
 
             # This case will correspond to ICE/turbomachinery
             elif "propulsive_load" in component_type_class:
-                # Check wheather or not at least one neighbor is a propulsor
+                # Check whether or not at least one neighbor is a propulsor
                 neighbors = list(graph.neighbors(component_name))
                 if set(neighbors).intersection(propulsor_name):
                     propulsive_load_names.append(component_name)
