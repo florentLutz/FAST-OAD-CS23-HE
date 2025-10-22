@@ -595,10 +595,10 @@ class FASTGAHEPowerTrainConfigurator:
 
         # Check critical component(s) existence
         if not sino_component:
-            _LOGGER.error("Propulsor missing!")
+            raise ValueError("Propulsor missing!")
 
         if not niso_component:
-            _LOGGER.error("Storage tank or battery missing!")
+            raise ValueError("Storage tank or battery missing!")
 
         # Check connections definition
         for comp in self._components_name:
@@ -609,7 +609,7 @@ class FASTGAHEPowerTrainConfigurator:
                 or comp in connection.get("source")
                 for connection in connections_list
             ):
-                _LOGGER.error("Component is/are not properly connected!")
+                raise ValueError("Component is/are not properly connected!")
 
         if miso_component:
             for comp, input_count in zip(miso_component, miso_input_count):
@@ -620,7 +620,7 @@ class FASTGAHEPowerTrainConfigurator:
                 )
 
                 if int(input_count_defined) != int(input_count):
-                    _LOGGER.error("Connector component is/are not connected!")
+                    raise ValueError("Connector component is/are not properly connected!")
 
         if simo_component:
             for comp, output_count in zip(simo_component, simo_output_count):
@@ -631,7 +631,7 @@ class FASTGAHEPowerTrainConfigurator:
                 )
 
                 if int(output_count_defined) != int(output_count):
-                    _LOGGER.error("Connector component is/are not connected!")
+                    raise ValueError("Connector component is/are not properly connected!")
 
         if mimo_component:
             for comp, input_count, output_count in zip(
@@ -651,7 +651,7 @@ class FASTGAHEPowerTrainConfigurator:
                 if (int(input_count_defined) != int(input_count)) or (
                     int(output_count_defined) != int(output_count)
                 ):
-                    _LOGGER.error("Connector component is/are not connected!")
+                    raise ValueError("Connector component is/are not properly connected!")
 
         self._connection_check = True
 

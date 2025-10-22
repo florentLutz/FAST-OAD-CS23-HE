@@ -166,6 +166,47 @@ def test_power_train_file_connections():
         print("[" + om_output + ", " + om_input + "]")
 
 
+def test_power_train_file_no_propeller():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_propeller.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(ValueError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Propulsor missing!"
+
+
+def test_power_train_file_connection_missing():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "connection_missing.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(ValueError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Component is/are not properly connected!"
+
+
+def test_power_train_file_connector_connection_error():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "connector_connection_error.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(ValueError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Connector component is/are not properly connected!"
+
+
 def test_power_train_file_direct_bus_battery_connection():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_direct_battery_bus_connection.yml"
