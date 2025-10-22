@@ -25,7 +25,9 @@ RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 WORKDIR_FOLDER_PATH = pathlib.Path(__file__).parent / "workdir"
 FIGURE_FOLDER_PATH = pathlib.Path(__file__).parent / "results" / "figures"
 RESULTS_SENSITIVITY_FOLDER_PATH = pathlib.Path(__file__).parent / "results" / "lifespan_sensitivity"
-RESULTS_SENSITIVITY_FOLDER_PATH_REF = pathlib.Path(__file__).parent / "results" / "lifespan_sensitivity_ref"
+RESULTS_SENSITIVITY_FOLDER_PATH_REF = (
+    pathlib.Path(__file__).parent / "results" / "lifespan_sensitivity_ref"
+)
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -481,7 +483,7 @@ def test_lca_bar_chart_absolute_phase_hybrid():
             "turboshaft: operation": "kerosene combustion",
             "kerosene for mission: operation": "kerosene production",
         },
-        cutoff_criteria=1.0
+        cutoff_criteria=1.0,
     )
     fig.update_layout(title_text=None)
 
