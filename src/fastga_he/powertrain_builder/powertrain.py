@@ -565,39 +565,38 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         # m: multiple, n: no, s: single, i:input, o: output
-        sino_component = [
+        single_input_component = [
             comp
             for comp, type in zip(self._components_name, self._components_type_class)
             if type == "propulsor"
         ]
-        niso_component = [
+        single_output_component = [
             comp
             for comp, type in zip(self._components_name, self._components_type_class)
             if type == "tank" or type == "source"
         ]
-
-        siso_component = [
+        one_to_one_component = [
             comp
             for comp, type in zip(self._components_name, self._components_type_class)
             if type == "load" or type == "propulsive_load" or "propulsive_load" in type
         ]
 
         (
-            siso_component,
-            simo_component,
-            miso_component,
-            mimo_component,
-            mimo_input_count,
-            mimo_output_count,
-            miso_input_count,
-            simo_output_count,
-        ) = self._categorize_connectors(siso_component)
+            one_to_one_component,
+            one_to_many_component,
+            many_to_one_component,
+            many_to_many_component,
+            many_to_many_input_count,
+            many_to_many_output_count,
+            many_to_one_input_count,
+            one_to_many_output_count,
+        ) = self._categorize_connectors(one_to_one_component)
 
         # Check critical component(s) existence
-        if not sino_component:
+        if not single_input_component:
             raise ValueError("Propulsor missing!")
 
-        if not niso_component:
+        if not single_output_component:
             raise ValueError("Storage tank or battery missing!")
 
         # Check connections definition
@@ -611,8 +610,8 @@ class FASTGAHEPowerTrainConfigurator:
             ):
                 raise ValueError("Component is/are not properly connected!")
 
-        if miso_component:
-            for comp, input_count in zip(miso_component, miso_input_count):
+        if many_to_one_component:
+            for comp, input_count in zip(many_to_one_component, many_to_one_input_count):
                 input_count_defined = 0
 
                 input_count_defined += sum(
@@ -622,8 +621,8 @@ class FASTGAHEPowerTrainConfigurator:
                 if int(input_count_defined) != int(input_count):
                     raise ValueError("Connector component is/are not properly connected!")
 
-        if simo_component:
-            for comp, output_count in zip(simo_component, simo_output_count):
+        if one_to_many_component:
+            for comp, output_count in zip(one_to_many_component, one_to_many_output_count):
                 output_count_defined = 0
 
                 output_count_defined += sum(
@@ -633,9 +632,9 @@ class FASTGAHEPowerTrainConfigurator:
                 if int(output_count_defined) != int(output_count):
                     raise ValueError("Connector component is/are not properly connected!")
 
-        if mimo_component:
+        if many_to_many_component:
             for comp, input_count, output_count in zip(
-                mimo_component, mimo_input_count, mimo_output_count
+                many_to_many_component, many_to_many_input_count, many_to_many_output_count
             ):
                 input_count_defined = 0
                 output_count_defined = 0
@@ -653,9 +652,7 @@ class FASTGAHEPowerTrainConfigurator:
                 ):
                     raise ValueError("Connector component is/are not properly connected!")
 
-        self._connection_check = True
-
-    def _categorize_connectors(self, siso_component):
+    def _categorize_connectors(self, one_to_one_component):
         connector_names = [
             comp
             for comp, type in zip(self._components_name, self._components_type_class)
@@ -678,25 +675,23 @@ class FASTGAHEPowerTrainConfigurator:
             if name in output
         ]
 
-        # m: multiple, s: single, i:input, o: output
-
-        simo_component = []
-        miso_component = []
-        mimo_component = []
-        miso_input_count = []
-        simo_output_count = []
-        mimo_input_count = []
-        mimo_output_count = []
+        one_to_many_component = []
+        many_to_one_component = []
+        many_to_many_component = []
+        many_to_one_input_count = []
+        one_to_many_output_count = []
+        many_to_many_input_count = []
+        many_to_many_output_count = []
 
         for name, options in zip(connector_names, connector_options):
             variable_list = [var for var in connector_variable if name in var]
 
-            # Check MIMO component
+            # Check many-to-many component
             if options is None or not any(key.startswith("number_of_") for key in options.keys()):
                 # This is for the connectors without given input or output numbers from pt file
-                siso = True
-                mi = False
-                mo = False
+                one_to_one = True
+                multi_input = False
+                multi_output = False
                 max_num_input = 0
                 max_num_output = 0
 
@@ -706,34 +701,34 @@ class FASTGAHEPowerTrainConfigurator:
                         continue
 
                     if "_in_" in var:
-                        siso = False
-                        mi = True
+                        one_to_one = False
+                        multi_input = True
                         max_num_input = (
                             int(integer.group(1))
                             if int(integer.group(1)) > max_num_input
                             else max_num_input
                         )
                     elif "_out_" in var:
-                        siso = False
-                        mo = True
+                        one_to_one = False
+                        multi_output = True
                         max_num_output = (
                             int(integer.group(1))
                             if int(integer.group(1)) > max_num_output
                             else max_num_output
                         )
 
-                if siso:
-                    siso_component.append(name)
-                elif mi and mo:
-                    mimo_component.append(name)
-                    mimo_input_count.append(max_num_input)
-                    mimo_output_count.append(max_num_output)
-                elif mi:
-                    miso_component.append(name)
-                    miso_input_count.append(max_num_input)
-                elif mo:
-                    simo_component.append(name)
-                    simo_output_count.append(max_num_output)
+                if one_to_one:
+                    one_to_one_component.append(name)
+                elif multi_input and multi_output:
+                    many_to_many_component.append(name)
+                    many_to_many_input_count.append(max_num_input)
+                    many_to_many_output_count.append(max_num_output)
+                elif multi_input:
+                    many_to_one_component.append(name)
+                    many_to_one_input_count.append(max_num_input)
+                elif multi_output:
+                    one_to_many_component.append(name)
+                    one_to_many_output_count.append(max_num_output)
 
             else:
                 # This is for the connectors having given input and output numbers from pt file
@@ -746,11 +741,11 @@ class FASTGAHEPowerTrainConfigurator:
                 if any(num > 1 for num in num_connections):
                     if all(num > 1 for num in num_connections):
                         # check if it is mimo
-                        mimo_component = mimo_component.append(name)
-                        mimo_input_count.append(
+                        many_to_many_component = many_to_many_component.append(name)
+                        many_to_many_input_count.append(
                             int(options.get("number_of_inputs") or options.get("number_of_tanks"))
                         )
-                        mimo_output_count.append(
+                        many_to_many_output_count.append(
                             int(
                                 (
                                     options.get("number_of_outputs")
@@ -761,13 +756,13 @@ class FASTGAHEPowerTrainConfigurator:
                         )
 
                     elif (options.get("number_of_inputs") or options.get("number_of_tanks")) > 1:
-                        miso_component.append(name)
-                        miso_input_count.append(
+                        many_to_one_component.append(name)
+                        many_to_one_input_count.append(
                             int(options.get("number_of_inputs") or options.get("number_of_tanks"))
                         )
                     else:
-                        simo_component.append(name)
-                        simo_output_count.append(
+                        one_to_many_component.append(name)
+                        one_to_many_output_count.append(
                             int(
                                 options.get("number_of_outputs")
                                 or options.get("number_of_power_sources")
@@ -775,17 +770,17 @@ class FASTGAHEPowerTrainConfigurator:
                             )
                         )
                 else:
-                    siso_component.append(name)
+                    one_to_one_component.append(name)
 
         return (
-            siso_component,
-            simo_component,
-            miso_component,
-            mimo_component,
-            mimo_input_count,
-            mimo_output_count,
-            miso_input_count,
-            simo_output_count,
+            one_to_one_component,
+            one_to_many_component,
+            many_to_one_component,
+            many_to_many_component,
+            many_to_many_input_count,
+            many_to_many_output_count,
+            many_to_one_input_count,
+            one_to_many_output_count,
         )
 
     def _construct_connection_graph(self):
