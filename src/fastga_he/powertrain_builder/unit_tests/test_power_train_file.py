@@ -167,6 +167,9 @@ def test_power_train_file_connections():
 
 
 def test_power_train_file_no_propeller():
+    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
+        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_propeller.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -180,6 +183,9 @@ def test_power_train_file_no_propeller():
 
 
 def test_power_train_file_connection_missing():
+    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
+        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "connection_missing.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -193,6 +199,9 @@ def test_power_train_file_connection_missing():
 
 
 def test_power_train_file_connector_connection_error():
+    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
+        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "connector_connection_error.yml"
     )
