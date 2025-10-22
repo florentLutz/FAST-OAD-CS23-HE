@@ -11,7 +11,7 @@ from stdatm import AtmosphereWithPartials
 class ComputeRTAVariable(om.ExplicitComponent):
     """
     Simple computation to obtain FAST-GA-HE Performances inputs from RTA outputs and set
-    variables that doesn't exist in FAST-OAD-RTA or requires complex computation.
+    variables that doesn't exist in RTA or requires complex computation.
     """
 
     def setup(self):

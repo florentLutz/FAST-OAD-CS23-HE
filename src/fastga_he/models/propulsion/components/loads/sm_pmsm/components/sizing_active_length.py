@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingActiveLength(om.ExplicitComponent):
     """
     Computation of the length in the SM PMSM that is electromagnetically active. The formula is
-    obtained from equation (II-44) in :cite:`touhami:2020`.
+    taken from equation (II-44) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

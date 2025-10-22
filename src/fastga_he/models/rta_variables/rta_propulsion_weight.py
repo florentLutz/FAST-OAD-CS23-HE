@@ -10,7 +10,7 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 class RTAPropulsionWeight(om.ExplicitComponent):
     """
-    Define propulsion mass variables from FAST-GA-HE to FAST-OAD-RTA.
+    Adapts propulsion mass variables from FAST-GA-HE to RTA.
     """
 
     def __init__(self, **kwargs):

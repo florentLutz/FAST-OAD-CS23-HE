@@ -10,8 +10,8 @@ from ..constants import IRON_LOSSES_COEFF
 
 class PerformancesIronLosses(om.ExplicitComponent):
     """
-    Computation of the iron losses of the SM PMSM results from design air gap magnetic flux density
-    , obtained from the least square surrogate model (II-67) in :cite:`touhami:2020`.
+    Computation of the iron losses of the SM PMSM results from design air gap magnetic flux 
+    density, obtained from the least square surrogate model (II-67) in :cite:`touhami:2020`.
     """
 
     def initialize(self):

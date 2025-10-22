@@ -55,7 +55,7 @@ class SizingStatorWindingWeight(om.ExplicitComponent):
             + ":conductor_material_density",
             val=8960.0,
             units="kg/m**3",
-            desc="Electrical conductor material density, copper is et to default",
+            desc="Electrical conductor material density, copper is set as default",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"

@@ -24,7 +24,7 @@ class SizingStatorCoreWeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
             val=np.nan,
             units="m",
-            desc="The length of electromagnetism active part of SM PMSM",
+            desc="The length of electromagnetically active part of SM PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":bore_diameter",
