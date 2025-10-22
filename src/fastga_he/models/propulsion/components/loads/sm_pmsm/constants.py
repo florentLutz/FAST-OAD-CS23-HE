@@ -16,6 +16,5 @@ IRON_LOSSES_COEFF = [
     [-4.35714286e-3, 1.35660947e-2, -1.35585345e-2, 4.25562126e-3],
 ]
 
-DEFAULT_DENSITY = AtmosphereWithPartials(0).density  # [kg/m^3]
 DEFAULT_DYNAMIC_VISCOSITY = AtmosphereWithPartials(0).dynamic_viscosity  # [kg/m/s]
 VACUUM_MAGNETIC_PERMEABILITY = 4.0 * np.pi * 1e-7  # [H/m]

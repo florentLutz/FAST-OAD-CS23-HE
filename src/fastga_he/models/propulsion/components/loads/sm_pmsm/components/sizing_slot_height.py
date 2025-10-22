@@ -40,8 +40,9 @@ class SizingSlotHeight(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor",
-            val=np.nan,
-            desc="The factor describes the conductor material fullness inside the stator slots",
+            val=0.5,
+            desc="The factor describes the conductor material fullness inside the stator slots, "
+            "average value across several conductor shapes is set as default",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
@@ -83,7 +84,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         magnetic_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
-        max_current_density = inputs[
+        phase_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_phase_current_density"
         ]
         slot_conductor_factor = inputs[
@@ -100,7 +101,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor
                 * magnetic_flux_density
-                * max_current_density
+                * phase_current_density
                 * slot_conductor_factor
                 * slot_fill_factor
                 * (1.0 - tooth_ratio)
@@ -117,7 +118,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         magnetic_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
-        max_current_density = inputs[
+        phase_current_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_phase_current_density"
         ]
         slot_conductor_factor = inputs[
@@ -134,7 +135,7 @@ class SizingSlotHeight(om.ExplicitComponent):
         ] = np.sqrt(2.0) / (
             winding_factor
             * magnetic_flux_density
-            * max_current_density
+            * phase_current_density
             * slot_conductor_factor
             * slot_fill_factor
             * (1.0 - tooth_ratio)
@@ -149,7 +150,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor**2.0
                 * magnetic_flux_density
-                * max_current_density
+                * phase_current_density
                 * slot_conductor_factor
                 * slot_fill_factor
                 * (1.0 - tooth_ratio)
@@ -165,7 +166,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor
                 * magnetic_flux_density**2.0
-                * max_current_density
+                * phase_current_density
                 * slot_conductor_factor
                 * slot_fill_factor
                 * (1.0 - tooth_ratio)
@@ -181,7 +182,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor
                 * magnetic_flux_density
-                * max_current_density**2.0
+                * phase_current_density**2.0
                 * slot_conductor_factor
                 * slot_fill_factor
                 * (1.0 - tooth_ratio)
@@ -197,7 +198,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor
                 * magnetic_flux_density
-                * max_current_density
+                * phase_current_density
                 * slot_conductor_factor**2.0
                 * slot_fill_factor
                 * (1.0 - tooth_ratio)
@@ -213,7 +214,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor
                 * magnetic_flux_density
-                * max_current_density
+                * phase_current_density
                 * slot_conductor_factor
                 * slot_fill_factor**2.0
                 * (1.0 - tooth_ratio)
@@ -229,7 +230,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             / (
                 winding_factor
                 * magnetic_flux_density
-                * max_current_density
+                * phase_current_density
                 * slot_conductor_factor
                 * slot_fill_factor
                 * (1.0 - tooth_ratio) ** 2.0

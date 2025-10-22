@@ -22,7 +22,9 @@ from ..components.sizing_conductor_section_area_per_slot import SizingConductorS
 from ..components.sizing_single_conductor_cable_length import SizingSingleConductorCableLength
 from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
 from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
-from ..components.sizing_external_stator_diameter import SizingExtStatorDiameter
+from ..components.sizing_external_stator_diameter import (
+    SizingExtStatorDSizingExternalStatorDiameter,
+)
 from ..components.sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
 from ..components.sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
 from ..components.sizing_sm_pmsm_drag import SizingSMPMSMDrag
@@ -325,7 +327,7 @@ def test_external_stator_diameter():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:stator_yoke_height", val=0.0351, units="m"
     )
 
-    problem = run_system(SizingExtStatorDiameter(motor_id="motor_1"), ivc)
+    problem = run_system(SizingExtStatorDSizingExternalStatorDiameter(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:stator_diameter"
@@ -761,6 +763,7 @@ def test_windage_reynolds():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", val=0.0028, units="m"
     )
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
     ivc.add_output(
         "dynamic_viscosity", DEFAULT_DYNAMIC_VISCOSITY * np.ones(NB_POINTS_TEST), units="kg/m/s"
     )
@@ -821,6 +824,7 @@ def test_air_gap_windage_losses():
 
     ivc.add_output("air_gap_friction_coeff", np.full(NB_POINTS_TEST, 0.001487))
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -845,6 +849,7 @@ def test_rotor_windage_losses():
 
     ivc.add_output("rotor_end_friction_coeff", np.full(NB_POINTS_TEST, 0.0094564))
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -1052,6 +1057,7 @@ def test_performance_SM_PMSM():
     ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
     ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
     ivc.add_output("altitude", val=np.zeros(NB_POINTS_TEST), units="m")
+    ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

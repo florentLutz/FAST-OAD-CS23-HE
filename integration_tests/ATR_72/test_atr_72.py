@@ -1,10 +1,10 @@
-import os.path as pth
+from pathlib import Path
 import logging
 from fastoad import api
 from utils.filter_residuals import filter_residuals
 
-DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
-RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
+DATA_FOLDER_PATH = Path(__file__).parent / "data"
+RESULTS_FOLDER_PATH = Path(__file__).parent / "results"
 
 
 def test_sizing_atr_72():
@@ -14,14 +14,11 @@ def test_sizing_atr_72():
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     configurator = api.FASTOADProblemConfigurator(
-        pth.join(DATA_FOLDER_PATH, "atr_72_full_sizing.yml")
+        DATA_FOLDER_PATH / "atr_72_full_sizing.yml"
     )
     problem = configurator.get_problem()
 
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, "inputs_full_sizing.xml")
-
-    problem.write_needed_inputs(ref_inputs)
+    problem.write_needed_inputs(DATA_FOLDER_PATH / "inputs_full_sizing.xml")
     problem.read_inputs()
     problem.setup()
 

@@ -1,14 +1,14 @@
 import os
 from shutil import rmtree, copy
 import logging
-import os.path as pth
+from pathlib import Path
 import pytest
 from fastoad import api
 
 from utils.filter_residuals import filter_residuals
 
-DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
-RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
+DATA_FOLDER_PATH = Path(__file__).parent / "data"
+RESULTS_FOLDER_PATH = Path(__file__).parent / "results"
 
 
 @pytest.fixture(scope="module")
@@ -22,17 +22,10 @@ def test_sizing_atr_42_turboshaft():
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
-    # Define used files depending on options
-    xml_file_name = "atr42_inputs.xml"
-    process_file_name = "atr42_turboshaft.yml"
-
-    configurator = api.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    configurator = api.FASTOADProblemConfigurator(DATA_FOLDER_PATH / "atr42_turboshaft.yml")
     problem = configurator.get_problem()
 
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-
-    problem.write_needed_inputs(ref_inputs)
+    problem.write_needed_inputs(DATA_FOLDER_PATH / "atr42_inputs.xml")
     problem.read_inputs()
 
     problem.setup()
@@ -74,14 +67,11 @@ def test_sizing_atr_42_retrofit_hybrid():
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     configurator = api.FASTOADProblemConfigurator(
-        pth.join(DATA_FOLDER_PATH, "oad_process_parallel_retrofit.yml")
+        DATA_FOLDER_PATH / "oad_process_parallel_retrofit.yml"
     )
     problem = configurator.get_problem()
 
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, "hybrid_atr_inputs_retrofit.xml")
-
-    problem.write_needed_inputs(ref_inputs)
+    problem.write_needed_inputs(DATA_FOLDER_PATH / "hybrid_atr_inputs_retrofit.xml")
     problem.read_inputs()
 
     problem.model_options["*"] = {
@@ -115,14 +105,14 @@ def test_hybrid_atr_42_full_sizing():
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     configurator = api.FASTOADProblemConfigurator(
-        pth.join(DATA_FOLDER_PATH, "oad_process_parallel_full_sizing.yml")
+        DATA_FOLDER_PATH / "oad_process_parallel_full_sizing.yml"
     )
     problem = configurator.get_problem()
 
-    # Create inputs
+    # Load inputs
     copy(
-        pth.join(DATA_FOLDER_PATH, "resized_hybrid_inputs.xml"),
-        pth.join(RESULTS_FOLDER_PATH, "resized_hybrid_inputs.xml"),
+        DATA_FOLDER_PATH / "resized_hybrid_inputs.xml",
+        RESULTS_FOLDER_PATH / "resized_hybrid_inputs.xml",
     )
 
     problem.read_inputs()

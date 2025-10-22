@@ -5,15 +5,15 @@
 
 import numpy as np
 import openmdao.api as om
+import fastoad.api as oad
 
-from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_WING
 from fastga_he.models.aerodynamics.components.flat_plate_friction_drag_coeff import (
     FlatPlateFrictionDragCoefficient,
 )
 
 
-@RegisterSubmodel(SERVICE_CD0_WING, "fastoad.submodel.aerodynamics.CD0.wing.rta")
+@oad.RegisterSubmodel(SERVICE_CD0_WING, "fastoad.submodel.aerodynamics.CD0.wing.rta")
 class Cd0Wing(om.Group):
     """
     Computation of form drag for wing.
@@ -73,7 +73,7 @@ class _RelativeThicknessContribution(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:geometry:wing:thickness_ratio", val=np.nan)
 
-        self.add_output("thickness_contribution")
+        self.add_output("thickness_contribution", val=0.5)
 
     def setup_partials(self):
         self.declare_partials(
@@ -110,7 +110,7 @@ class _CamberContribution(om.ExplicitComponent):
             val=np.nan,
         )
 
-        self.add_output("camber_contribution")
+        self.add_output("camber_contribution", val=0.5)
 
     def setup_partials(self):
         self.declare_partials("camber_contribution", "*", method="exact")
@@ -163,7 +163,7 @@ class _SweepCorrection(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:geometry:wing:sweep_25", val=np.nan, units="rad")
 
-        self.add_output("sweep_correction")
+        self.add_output("sweep_correction", val=1.0)
 
     def setup_partials(self):
         self.declare_partials("sweep_correction", "data:geometry:wing:sweep_25", method="exact")
@@ -202,7 +202,7 @@ class _Cd0Wing(om.ExplicitComponent):
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:wing:wetted_area", val=np.nan, units="m**2")
 
-        self.add_output("data:aerodynamics:wing:" + ls_tag + ":CD0")
+        self.add_output("data:aerodynamics:wing:" + ls_tag + ":CD0", val=0.01)
 
     def setup_partials(self):
         self.declare_partials("*", "*", method="exact")

@@ -74,7 +74,7 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
 
         self.add_input(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max",
-            units="kW",
+            units="MW",
             val=np.nan,
         )
 
@@ -86,12 +86,11 @@ class ConstraintPMSMPowerRateMission(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", val=0.001)
+        self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_rating"] = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max"]
-            / 1000.0
         )

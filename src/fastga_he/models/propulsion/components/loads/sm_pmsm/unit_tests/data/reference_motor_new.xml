@@ -51,6 +51,7 @@
                         <stator_diameter units="m">0.3288</stator_diameter>
                         <slot_width units="m">0.01348</slot_width>
                         <slot_height units="m">0.0358</slot_height>
+                        <slot_section_area units="m**2">0.000482584</slot_section_area>
                         <air_gap_thickness units="m">0.0028</air_gap_thickness>
                         <resistance units="ohm">0.0014608</resistance>
                         <front_length_ratio>0.5</front_length_ratio>

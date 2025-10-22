@@ -9,7 +9,9 @@ import openmdao.api as om
 class SizingRotorWeight(om.ExplicitComponent):
     """
     Computation of the rotor weight of the SM PMSM. The formula and the conditions are obtained
-    from part II.2.6b in :cite:`touhami:2020`.
+    from part II.2.6b in :cite:`touhami:2020`. The rotor density in the calculation is considered as
+    the average density with respect to the volume. This is given by the regression model from
+    equation II-57 in :cite:`touhami:2020`, based on TMB and TMK electric motors.
     """
 
     def initialize(self):
@@ -61,7 +63,7 @@ class SizingRotorWeight(om.ExplicitComponent):
 
         conditions = [num_pole_pairs <= 10.0, 10.0 < num_pole_pairs <= 50.0]
 
-        rho_rotor = [
+        rho_rotor_avg = [
             -431.67 * num_pole_pairs + 7932.0,
             1.09 * num_pole_pairs**2.0 - 117.45 * num_pole_pairs + 4681.0,
         ]
@@ -71,7 +73,7 @@ class SizingRotorWeight(om.ExplicitComponent):
             np.pi
             * rotor_radius**2.0
             * active_length
-            * np.select(conditions, rho_rotor, default=1600.0)
+            * np.select(conditions, rho_rotor_avg, default=1600.0)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -87,7 +89,7 @@ class SizingRotorWeight(om.ExplicitComponent):
 
         conditions = [num_pole_pairs <= 10.0, 10.0 < num_pole_pairs <= 50.0]
 
-        rho_rotor = [
+        rho_rotor_avg = [
             -431.67 * num_pole_pairs + 7932.0,
             1.09 * num_pole_pairs**2.0 - 117.45 * num_pole_pairs + 4681.0,
         ]
@@ -96,12 +98,12 @@ class SizingRotorWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
-        ] = np.pi * rotor_radius**2.0 * np.select(conditions, rho_rotor, default=1600.0)
+        ] = np.pi * rotor_radius**2.0 * np.select(conditions, rho_rotor_avg, default=1600.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = np.pi * rotor_radius * lm * np.select(conditions, rho_rotor, default=1600.0)
+        ] = np.pi * rotor_radius * lm * np.select(conditions, rho_rotor_avg, default=1600.0)
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_mass",

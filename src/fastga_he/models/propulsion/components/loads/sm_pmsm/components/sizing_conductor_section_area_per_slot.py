@@ -31,8 +31,9 @@ class SizingConductorSectionAreaPerSlot(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_fill_factor",
-            val=np.nan,
-            desc="The factor describes the conductor material fullness inside the stator slots",
+            val=0.5,
+            desc="The factor describes the conductor material fullness inside the stator slots, "
+            "average value across several conductor shapes is set as default",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slot_conductor_factor",

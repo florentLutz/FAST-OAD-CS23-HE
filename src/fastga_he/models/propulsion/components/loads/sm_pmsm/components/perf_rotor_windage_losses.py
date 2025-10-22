@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import DEFAULT_DENSITY
-
 
 class PerformancesRotorWindageLoss(om.ExplicitComponent):
     """
@@ -30,7 +28,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         self.add_input(
             "density",
             shape=number_of_points,
-            val=DEFAULT_DENSITY,
+            val=np.nan,
             units="kg/m**3",
         )
         self.add_input(

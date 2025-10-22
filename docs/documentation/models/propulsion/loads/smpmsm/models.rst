@@ -136,15 +136,12 @@ Hybrid bearings                       --
 
    </div>
 
-
-
 .. math::
     P_{bf} = \frac{1}{2}C_{fb} \cdot P \cdot d_{bb} \cdot \Omega \\
     P = W_{rt} \cdot g
 
 :math:`W_{rt}` is the rotor weight, :math:`d_{bb}` is the bearing bore diameter and the :math:`g` is the gravitational
 constant.
-
 
 ******************
 Sizing calculation
@@ -264,8 +261,3 @@ PMSM model.
 
    <a href="../../../../../../../n2/n2_performance_sm_pmsm.html" target="_blank">SM PMSM performance N2 diagram</a><br>
    <a href="../../../../../../../n2/n2_sizing_sm_pmsm.html" target="_blank">SM PMSM sizing N2 diagram</a>
-
-
-
-
-

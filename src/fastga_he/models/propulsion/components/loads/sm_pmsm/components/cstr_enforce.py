@@ -97,7 +97,7 @@ class ConstraintsRPMEnforce(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating",
             units="min**-1",
-            val=5000.0,
+            val=15000.0,
             desc="Max continuous rpm of the motor",
         )
 

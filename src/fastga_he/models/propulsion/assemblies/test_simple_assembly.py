@@ -509,11 +509,6 @@ def test_performances_from_pt_file_sm_pmsm():
         abs=1,
     )
 
-    write_outputs(
-        pth.join(outputs.__path__[0], "assembly_performances_from_pt_file.xml"),
-        problem,
-    )
-
 
 def test_performances_from_pt_file_aux_load():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_assembly_load.yml")

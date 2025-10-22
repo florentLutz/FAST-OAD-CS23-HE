@@ -5,12 +5,12 @@
 
 import numpy as np
 import openmdao.api as om
+import fastoad.api as oad
 
-from fastoad.module_management.service_registry import RegisterSubmodel
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_SUM
 
 
-@RegisterSubmodel(SERVICE_CD0_SUM, "fastoad.submodel.aerodynamics.CD0.sum.rta")
+@oad.RegisterSubmodel(SERVICE_CD0_SUM, "fastoad.submodel.aerodynamics.CD0.sum.rta")
 class Cd0Total(om.Group):
     """Computes the sum of form drags from aircraft components."""
 
@@ -58,8 +58,8 @@ class _TotalCd0ParasiticFactor(om.ExplicitComponent):
             val=np.nan,
         )
 
-        self.add_output("k_parasitic")
-        self.add_output("CD0_fuselage")
+        self.add_output("k_parasitic", val=0.1)
+        self.add_output("CD0_fuselage", val=0.0005)
 
     def setup_partials(self):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
@@ -115,15 +115,9 @@ class _AircraftCd0(om.ExplicitComponent):
         self.add_input("data:aerodynamics:vertical_tail:" + ls_tag + ":CD0", val=np.nan)
         self.add_input("data:aerodynamics:nacelles:" + ls_tag + ":CD0", val=np.nan)
 
-        self.add_output(
-            "data:aerodynamics:aircraft:" + ls_tag + ":CD0",
-        )
-        self.add_output(
-            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:clean",
-        )
-        self.add_output(
-            "data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic",
-        )
+        self.add_output("data:aerodynamics:aircraft:" + ls_tag + ":CD0", val=0.022)
+        self.add_output("data:aerodynamics:aircraft:" + ls_tag + ":CD0:clean", val=0.02)
+        self.add_output("data:aerodynamics:aircraft:" + ls_tag + ":CD0:parasitic", val=0.002)
 
     def setup_partials(self):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
