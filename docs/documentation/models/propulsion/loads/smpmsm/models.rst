@@ -2,8 +2,8 @@
 Surface-mounted permanent magnet synchronous motor computation
 ==============================================================
 This model represent a SM PMSM with non-salient radial flux and supplied with sinewave currents. This choice simplifies
-the modeling process with providing accurate representation of the PMSM characteristic. As in other PMSMs, the stator
-bore slots between adjacent teeth hold the wound cables, served as the electromagnets. Unlike :ref:`AF PMSM <afpmsm>`,
+the modeling process while providing accurate representation of the PMSM characteristic. As in other PMSMs, the stator
+bore slots between adjacent teeth hold the wound cables, serving as the electromagnets. Unlike :ref:`AF PMSM <afpmsm>`,
 the permanent magnets are mounted directly on the rotor’s outer surface rather than embedded within it.
 
 .. image:: ../../../../../img/cylindrical_pmsm.svg
@@ -149,8 +149,8 @@ constant.
 ******************
 Sizing calculation
 ******************
-In this sizing process, several geometry parameters related to electromagnetism of the PMSM are simplified for better
-convergence. The rotor is modeled as a single solid rod, omitting the bore layer and surface magnet sheets, with its
+In this sizing process, several geometry parameters related to the electromagnetic parts of the PMSM are simplified for a simpler model.
+The rotor is modeled as a single solid rod, omitting the bore layer and surface magnet sheets, with its
 material density defined according to the Etel TMB and TMK electric motor dataset from the HASTECS project
 :cite:`touhami:2020`. The slot geometry is modeled as a rectangle with no radial taper and without fillets.
 

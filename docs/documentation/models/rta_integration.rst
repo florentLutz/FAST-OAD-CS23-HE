@@ -4,8 +4,7 @@
 RTA integration
 ===============
 `FAST-OAD-RTA <https://github.com/fast-aircraft-design/RTA>`_ is a FAST-OAD plugin for designing and analyzing Regional
-Transport Aircraft. To ensure smooth communication between FAST-OAD-RTA and FAST-OAD-CS23-HE when accessing the Overall
-Aircraft Design models tailored for regional aircraft from FAST-OAD-CS23-HE, the models and submodels specified in the
+Transport Aircraft. To ensure smooth communication between the OAD models from RTA and the powertrain models from FAST-OAD-CS23-HE, the models and submodels specified in the
 ATR aircraft `configuration file <https://fast-oad.readthedocs.io/en/stable/documentation/usage.html#problem-definition>`_
 template are required to be added.
 

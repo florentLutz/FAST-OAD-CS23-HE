@@ -20,8 +20,8 @@ Still a work in progress
 *******************************
 Component Computation Structure
 *******************************
-The following two links are the N2 diagrams representing the performance and sizing computation for the Surface-Mounted PMSM model.
-(SM PMSM) component.
+The following two links are the N2 diagrams representing the performance and sizing computation for the Axial Flux PMSM model.
+(AF PMSM) component.
 
 .. raw:: html
 
