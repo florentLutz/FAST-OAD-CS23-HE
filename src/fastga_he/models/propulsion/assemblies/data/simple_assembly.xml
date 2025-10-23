@@ -459,7 +459,7 @@
                         <end_winding_coeff is_input="True" >1.4<!--k_tb--> </end_winding_coeff>
                         <slot_fill_factor is_input="True" >0.5<!--k_fill--> </slot_fill_factor>
                         <slot_conductor_factor is_input="True" >1<!--k_sc--> </slot_conductor_factor>
-                        <winding_temperature units="degC" is_input="True" >180<!--T_win--> </winding_temperature>
+                        <conductor_temperature_mission units="degC" is_input="True" >180<!--T_win--> </conductor_temperature_mission>
                         <mass units="kg" is_input="True" > 225.64 <!--total pmsm weight--> </mass>
                         <active_length units="m" is_input="True" >0.3117<!--Lm--> </active_length>
                         <slot_height units="m" is_input="True" >0.0358<!--hs--> </slot_height>
@@ -468,7 +468,7 @@
                         <air_gap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </air_gap_thickness>
                         <rotor_mass units="kg" is_input="True" >56.97<!--k_tb--> </rotor_mass>
                         <torque_constant units="N*m/A" is_input="True" >0.4278<!--k_tb--> </torque_constant>
-                        <pouillet_geometry_factor units="1/m">86763.68677</pouillet_geometry_factor>
+                        <reference_resistance units="ohm">0.000897</reference_resistance>
                     </motor_1>
                 </SM_PMSM>
                 <PMSM>

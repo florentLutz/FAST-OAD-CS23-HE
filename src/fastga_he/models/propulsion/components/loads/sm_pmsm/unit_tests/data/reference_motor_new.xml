@@ -35,7 +35,7 @@
             <he_power_train>
                 <SM_PMSM>
                     <motor_1>
-                        <pouillet_geometry_factor units="1/m">53384.17</pouillet_geometry_factor>
+                        <reference_resistance units="ohm">0.000897</reference_resistance>
                         <mass units="kg">225.59</mass>
                         <stator_core_mass units="kg">116.4</stator_core_mass>
                         <stator_winding_mass units="kg">32.69</stator_winding_mass>
@@ -89,7 +89,7 @@
                         <slot_conductor_factor>1</slot_conductor_factor>
                         <slot_fill_factor>0.5</slot_fill_factor>
                         <form_coefficient>0.6</form_coefficient>
-                        <winding_temperature units="degC">180</winding_temperature>
+                        <conductor_temperature_mission units="degC">180</conductor_temperature_mission>
                         <loss_coefficient>
                             <alpha units="W/N**2/m**2">0.025</alpha>
                             <beta units="W*s/rad">3.38</beta>

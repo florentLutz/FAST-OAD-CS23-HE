@@ -219,6 +219,7 @@
             <insulation_material_density units="kg/m**3" is_input="True">1400.0<!--Electrical insulation material density--></insulation_material_density>
             <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material--></magnetic_material_density>
             <number_of_phases is_input="True">3.0</number_of_phases>
+            <reference_resistance units="ohm" is_input="False">0.0008984273228802588<!--The conductor's reference electric resistance at 293.15K--></reference_resistance>
             <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
             <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
@@ -230,7 +231,7 @@
             <torque_constant units="N*m/A" is_input="True">0.1426</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
-            <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
+            <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
             <design_yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></design_yoke_flux_density>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -252,6 +253,7 @@
             <number_of_phases is_input="True">3.0</number_of_phases>
             <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
             <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
+            <reference_resistance units="ohm" is_input="False">0.0008984273228802588<!--The conductor's reference electric resistance at 293.15K--></reference_resistance>
             <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
             <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
             <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
@@ -261,7 +263,7 @@
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
-            <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
+            <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
             <design_yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></design_yoke_flux_density>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>

@@ -6,10 +6,13 @@ import numpy as np
 import openmdao.api as om
 
 
+COPPER_TEMPERATURE_COEFF = 0.00393  # Temperature coefficient for copper [1/K]
+
+
 class PerformancesResistance(om.ExplicitComponent):
     """
-    Computation of the electrical resistance (all phases). The formula is obtained from equation (
-    II-64) in :cite:`touhami:2020`.
+    Computation of the copper electrical resistivity of a fixed temperature. The formula is
+    obtained from equation (II-64) in :cite:`touhami:2020`.
     """
 
     def initialize(self):
@@ -25,24 +28,24 @@ class PerformancesResistance(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
+            name="winding_temperature",
             val=np.nan,
-            units="m**-1",
-            desc="Total length of the conductor wire divided by the wire cross-sectional area",
+            units="degK",
+            shape=number_of_points,
+            desc="The temperature of the winding conductor cable",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistivity",
-            shape=number_of_points,
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            units="ohm",
             val=np.nan,
-            units="ohm*m",
-            desc="Copper electrical resistivity",
+            desc="The conductor's reference electric resistance at 293.15K",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
+            "conductor_resistance",
             units="ohm",
+            val=1.0e-4,
             shape=number_of_points,
-            val=0.0,
         )
 
     def setup_partials(self):
@@ -50,45 +53,36 @@ class PerformancesResistance(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="*",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
-        )
-        self.declare_partials(
-            of="*",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistivity",
+            of="conductor_resistance",
+            wrt="winding_temperature",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="conductor_resistance",
+            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"] = (
-            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistivity"]
-            * inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor"
-            ]
-        )
+        outputs["conductor_resistance"] = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance"
+        ] * (1.0 + COPPER_TEMPERATURE_COEFF * (inputs["winding_temperature"] - 293.15))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
-        number_of_points = self.options["number_of_points"]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistivity",
-        ] = np.full(
-            number_of_points,
-            inputs[
-                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor"
-            ],
+            "conductor_resistance",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+        ] = 1.0 + COPPER_TEMPERATURE_COEFF * (inputs["winding_temperature"] - 293.15)
+
+        partials["conductor_resistance", "winding_temperature"] = (
+            COPPER_TEMPERATURE_COEFF
+            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance"]
         )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
-        ] = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistivity"]

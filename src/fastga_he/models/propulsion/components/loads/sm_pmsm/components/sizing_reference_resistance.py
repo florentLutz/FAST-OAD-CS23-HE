@@ -5,10 +5,12 @@
 import numpy as np
 import openmdao.api as om
 
+COPPER_RESISTIVITY = 1.68e-8  # Copper resistivity at 293.15K [Ohm·m]
 
-class SizingPouilletGeometryFactor(om.ExplicitComponent):
+
+class SizingReferenceResistance(om.ExplicitComponent):
     """
-    Computation of conductor geometry factor for Pouillet's law for the SM PMSM. The formula is
+    Computation of conductor reference resistance of the SM PMSM at 293.15K. The formula is
     obtained from equation (II-64) in :cite:`touhami:2020`.
     """
 
@@ -41,10 +43,10 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
-            units="m**-1",
-            val=5.3e4,
-            desc="Total length of the conductor wire divided by the wire cross-sectional area",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            units="ohm",
+            val=9e-4,
+            desc="The conductor's reference electric resistance at 293.15K",
         )
 
     def setup_partials(self):
@@ -65,9 +67,9 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
 
-        outputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor"
-        ] = num_conductor_slot * wire_length / conductor_section_area_per_slot
+        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance"] = (
+            COPPER_RESISTIVITY * num_conductor_slot * wire_length / conductor_section_area_per_slot
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -85,18 +87,23 @@ class SizingPouilletGeometryFactor(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
-        ] = wire_length / conductor_section_area_per_slot
+        ] = COPPER_RESISTIVITY * wire_length / conductor_section_area_per_slot
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
-        ] = num_conductor_slot / conductor_section_area_per_slot
+        ] = COPPER_RESISTIVITY * num_conductor_slot / conductor_section_area_per_slot
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":pouillet_geometry_factor",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
             "data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":conductor_section_area_per_slot",
-        ] = -num_conductor_slot * wire_length / conductor_section_area_per_slot**2.0
+        ] = (
+            -COPPER_RESISTIVITY
+            * num_conductor_slot
+            * wire_length
+            / conductor_section_area_per_slot**2.0
+        )

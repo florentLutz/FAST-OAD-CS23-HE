@@ -14,14 +14,10 @@ class PerformancesJouleLosses(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
-        )
-        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
-        motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
@@ -30,7 +26,7 @@ class PerformancesJouleLosses(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
+            name="conductor_resistance",
             val=np.full(number_of_points, np.nan),
             units="ohm",
         )
@@ -42,6 +38,9 @@ class PerformancesJouleLosses(om.ExplicitComponent):
             shape=number_of_points,
         )
 
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="joule_power_losses",
             wrt="*",
@@ -51,22 +50,18 @@ class PerformancesJouleLosses(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        motor_id = self.options["motor_id"]
-
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        resistance = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"]
+        resistance = inputs["conductor_resistance"]
 
         outputs["joule_power_losses"] = 3.0 * resistance * i_rms**2.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        motor_id = self.options["motor_id"]
-
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        resistance = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance"]
+        resistance = inputs["conductor_resistance"]
 
         partials[
             "joule_power_losses",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":resistance",
+            "conductor_resistance",
         ] = 3.0 * i_rms**2.0
 
         partials[

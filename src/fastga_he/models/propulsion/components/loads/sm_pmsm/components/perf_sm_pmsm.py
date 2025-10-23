@@ -19,8 +19,8 @@ from .perf_apparent_power import PerformancesApparentPower
 from .perf_current_rms import PerformancesCurrentRMS
 from .perf_maximum import PerformancesMaximum
 from .perf_electrical_frequency import PerformancesElectricalFrequency
-from .perf_winding_resistivity import PerformancesWindingResistivityFixed
 from .perf_resistance import PerformancesResistance
+from .perf_temperature_constant import PerformancesTemperatureConstant
 from ...pmsm.components.perf_torque import PerformancesTorque
 from ...pmsm.components.perf_active_power import PerformancesActivePower
 from ...pmsm.components.perf_current_rms_phase import PerformancesCurrentRMS1Phase
@@ -92,10 +92,8 @@ class PerformancesSMPMSM(om.Group):
         )
 
         self.add_subsystem(
-            "winding_resistivity",
-            PerformancesWindingResistivityFixed(
-                motor_id=motor_id, number_of_points=number_of_points
-            ),
+            "conductor_temperature",
+            PerformancesTemperatureConstant(motor_id=motor_id, number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -107,7 +105,7 @@ class PerformancesSMPMSM(om.Group):
 
         self.add_subsystem(
             "joule_losses",
-            PerformancesJouleLosses(motor_id=motor_id, number_of_points=number_of_points),
+            PerformancesJouleLosses(number_of_points=number_of_points),
             promotes=["*"],
         )
 

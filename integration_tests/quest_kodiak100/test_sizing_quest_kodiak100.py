@@ -101,7 +101,7 @@ def test_sizing_kodiak_100_full_electric():
     configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
     problem = configurator.get_problem()
 
-    # Create inputs
+    # Load inputs
     ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
 
     problem.write_needed_inputs(ref_inputs)

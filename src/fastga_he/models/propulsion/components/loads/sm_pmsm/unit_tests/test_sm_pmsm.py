@@ -21,7 +21,7 @@ from ..components.sizing_slot_section_area import SizingSlotSectionArea
 from ..components.sizing_conductor_section_area_per_slot import SizingConductorSectionAreaPerSlot
 from ..components.sizing_single_conductor_cable_length import SizingSingleConductorCableLength
 from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
-from ..components.sizing_pouillet_geometry_factor import SizingPouilletGeometryFactor
+from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_external_stator_diameter import (
     SizingExtStatorDSizingExternalStatorDiameter,
 )
@@ -36,7 +36,6 @@ from ..components.sizing_sm_pmsm_weight import SizingMotorWeight
 from ..components.sizing_sm_pmsm import SizingSMPMSM
 
 from ..components.perf_iron_losses import PerformancesIronLosses
-from ..components.perf_winding_resistivity import PerformancesWindingResistivityFixed
 from ..components.perf_resistance import PerformancesResistance
 from ..components.perf_joule_losses import PerformancesJouleLosses
 from ..components.perf_air_dynamic_viscosity import PerformancesAirDynamicViscosity
@@ -53,6 +52,7 @@ from ..components.perf_apparent_power import PerformancesApparentPower
 from ..components.perf_current_rms import PerformancesCurrentRMS
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_sm_pmsm import PerformancesSMPMSM
+from ..components.perf_temperature_constant import PerformancesTemperatureConstant
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 
@@ -279,18 +279,18 @@ def test_single_conductor_cable_length():
     problem.check_partials(compact_print=True)
 
 
-def test_pouillet_geometry_factor():
+def test_reference_resistance():
     ivc = get_indep_var_comp(
-        list_inputs(SizingPouilletGeometryFactor(motor_id="motor_1")),
+        list_inputs(SizingReferenceResistance(motor_id="motor_1")),
         __file__,
         XML_FILE,
     )
 
-    problem = run_system(SizingPouilletGeometryFactor(motor_id="motor_1"), ivc)
+    problem = run_system(SizingReferenceResistance(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:pouillet_geometry_factor", units="m**-1"
-    ) == pytest.approx(53384.17, rel=1e-3)
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:reference_resistance", units="ohm"
+    ) == pytest.approx(0.000897, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -619,23 +619,25 @@ def test_constraint_power_for_power_rate():
     problem.check_partials(compact_print=True)
 
 
-def test_resistivity_fixed():
+def test_constant_temperature_profile():
     ivc = om.IndepVarComp()
 
     # Run problem and check obtained value(s) is/(are) correct
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:winding_temperature", val=180, units="degC"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:conductor_temperature_mission",
+        val=180,
+        units="degC",
     )
 
     problem = run_system(
-        PerformancesWindingResistivityFixed(motor_id="motor_1", number_of_points=NB_POINTS_TEST),
+        PerformancesTemperatureConstant(motor_id="motor_1", number_of_points=NB_POINTS_TEST),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistivity",
-        units="ohm*m",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 2.736384e-08), rel=1e-3)
+        "winding_temperature",
+        units="degK",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 453.15), rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -644,15 +646,14 @@ def test_resistance():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:pouillet_geometry_factor",
-        val=53384.17,
-        units="m**-1",
+        "winding_temperature",
+        val=np.full(NB_POINTS_TEST, 453.15),
+        units="degK",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistivity",
-        val=2.736384e-08,
-        units="ohm*m",
-        shape=NB_POINTS_TEST,
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:reference_resistance",
+        val=0.000897,
+        units="ohm",
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -660,9 +661,7 @@ def test_resistance():
         PerformancesResistance(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistance", units="ohm"
-    ) == pytest.approx(
+    assert problem.get_val("conductor_resistance", units="ohm") == pytest.approx(
         np.full(NB_POINTS_TEST, 0.0014608),
         rel=1e-2,
     )
@@ -674,7 +673,7 @@ def test_joule_losses():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:resistance",
+        "conductor_resistance",
         val=np.full(NB_POINTS_TEST, 0.0014608),
         units="ohm",
     )
@@ -682,9 +681,7 @@ def test_joule_losses():
     ivc.add_output("ac_current_rms_in_one_phase", 1970.84 * np.ones(NB_POINTS_TEST), units="A")
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesJouleLosses(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
-    )
+    problem = run_system(PerformancesJouleLosses(number_of_points=NB_POINTS_TEST), ivc)
 
     assert problem.get_val("joule_power_losses", units="W") == pytest.approx(
         17022 * np.ones(NB_POINTS_TEST), rel=1e-2
