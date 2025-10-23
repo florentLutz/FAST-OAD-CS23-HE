@@ -117,7 +117,7 @@ def test_aero_approx():
     problem.check_partials(compact_print=True)
 
 
-def test_simple_rta_variable():
+def test_rta_variable():
     ivc = get_indep_var_comp(list_inputs(ComputeRTAVariable()), __file__, XML_FILE)
 
     problem = run_system(ComputeRTAVariable(), ivc)

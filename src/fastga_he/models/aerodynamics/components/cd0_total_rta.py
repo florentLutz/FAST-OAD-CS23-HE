@@ -6,9 +6,6 @@
 import numpy as np
 import openmdao.api as om
 import fastoad.api as oad
-import importlib.util
-if importlib.util.find_spec("rta") is None:
-    raise ImportError("RTA needs to be installed before using RTA translation components")
 
 from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_SUM
 

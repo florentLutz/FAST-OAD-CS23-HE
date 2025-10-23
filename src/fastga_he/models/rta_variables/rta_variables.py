@@ -5,6 +5,7 @@
 
 import openmdao.api as om
 import fastoad.api as oad
+import importlib.util
 
 from fastga.models.aerodynamics.components.elevator_aero import ComputeDeltaElevator
 from fastga.models.aerodynamics.components.fuselage.compute_cm_alpha_fus import (
@@ -23,6 +24,9 @@ class RTAVariables(om.Group):
     """
 
     def initialize(self):
+        if importlib.util.find_spec("rta") is None:
+            raise ImportError("RTA needs to be installed before using RTA translation components")
+
         self.options.declare(
             name="power_train_file_path",
             default=None,

@@ -104,7 +104,7 @@ class PerformancesWindageFrictionCoefficient(om.ExplicitComponent):
         re_air_gap = inputs["air_gap_reynolds_number"]
         re_rotor = inputs["rotor_end_reynolds_number"]
 
-        partials["air_gap_friction_coeff", "air_gap_reynolds_number"] =np.where(
+        partials["air_gap_friction_coeff", "air_gap_reynolds_number"] = np.where(
             re_air_gap >= 1.0e4,
             -0.0065 * (air_gap_thickness / rotor_radius) ** 0.3 * re_air_gap**-1.2,
             -0.2575 * (air_gap_thickness / rotor_radius) ** 0.3 * re_air_gap**-1.5,
