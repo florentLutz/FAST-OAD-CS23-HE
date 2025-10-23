@@ -53,6 +53,7 @@ from ..components.perf_current_rms import PerformancesCurrentRMS
 from ..components.perf_maximum import PerformancesMaximum
 from ..components.perf_sm_pmsm import PerformancesSMPMSM
 from ..components.perf_temperature_constant import PerformancesTemperatureConstant
+from ..components.perf_angular_speed import PerformancesAngularSpeed
 
 from ..components.pre_lca_prod_weight_per_fu import PreLCAMotorProdWeightPerFU
 
@@ -750,6 +751,20 @@ def test_air_dynamic_viscosity():
     problem.check_partials(compact_print=True)
 
 
+def test_angular_speed():
+    ivc = om.IndepVarComp()
+    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesAngularSpeed(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("angular_speed", units="rad/s") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1672.375), rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
+
+
 def test_windage_reynolds():
     ivc = om.IndepVarComp()
 
@@ -759,7 +774,7 @@ def test_windage_reynolds():
     ivc.add_output(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", val=0.0028, units="m"
     )
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("angular_speed", 1672.375 * np.ones(NB_POINTS_TEST), units="rad/s")
     ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
     ivc.add_output(
         "dynamic_viscosity", DEFAULT_DYNAMIC_VISCOSITY * np.ones(NB_POINTS_TEST), units="kg/m/s"
@@ -820,7 +835,7 @@ def test_air_gap_windage_losses():
     )
 
     ivc.add_output("air_gap_friction_coeff", np.full(NB_POINTS_TEST, 0.001487))
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("angular_speed", 1672.375 * np.ones(NB_POINTS_TEST), units="rad/s")
     ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -845,7 +860,7 @@ def test_rotor_windage_losses():
     )
 
     ivc.add_output("rotor_end_friction_coeff", np.full(NB_POINTS_TEST, 0.0094564))
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("angular_speed", 1672.375 * np.ones(NB_POINTS_TEST), units="rad/s")
     ivc.add_output("density", 1.225 * np.ones(NB_POINTS_TEST), units="kg/m**3")
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -867,7 +882,7 @@ def test_bearing_friction_losses():
         XML_FILE,
     )
 
-    ivc.add_output("rpm", 15970 * np.ones(NB_POINTS_TEST), units="min**-1")
+    ivc.add_output("angular_speed", 1672.375 * np.ones(NB_POINTS_TEST), units="rad/s")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(

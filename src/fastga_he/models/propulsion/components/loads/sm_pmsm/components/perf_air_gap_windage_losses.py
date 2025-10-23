@@ -24,7 +24,7 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input("angular_speed", units="rad/s", val=np.nan, shape=number_of_points)
         self.add_input(
             "density",
             shape=number_of_points,
@@ -67,7 +67,7 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
 
         self.declare_partials(
             of="air_gap_windage_losses",
-            wrt=["rpm", "air_gap_friction_coeff", "density"],
+            wrt=["angular_speed", "air_gap_friction_coeff", "density"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -87,7 +87,7 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        rpm = inputs["rpm"]
+        omega = inputs["angular_speed"]
         rho_air = inputs["density"]
         cf_air_gap = inputs["air_gap_friction_coeff"]
         active_length = inputs[
@@ -99,7 +99,6 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
         air_gap_length = active_length * end_winding_coeff
 
         outputs["air_gap_windage_losses"] = (
@@ -109,7 +108,7 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        rpm = inputs["rpm"]
+        omega = inputs["angular_speed"]
         rho_air = inputs["density"]
         cf_air_gap = inputs["air_gap_friction_coeff"]
         active_length = inputs[
@@ -121,7 +120,6 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
         air_gap_length = active_length * end_winding_coeff
 
         partials[
@@ -144,14 +142,8 @@ class PerformancesAirGapWindageLosses(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
         ] = 2.0 * cf_air_gap * np.pi * rho_air * rotor_radius**3.0 * omega**3.0 * air_gap_length
 
-        partials["air_gap_windage_losses", "rpm"] = (
-            0.1
-            * cf_air_gap
-            * np.pi**2.0
-            * rho_air
-            * rotor_radius**4.0
-            * omega**2.0
-            * air_gap_length
+        partials["air_gap_windage_losses", "angular_speed"] = (
+            3.0 * cf_air_gap * np.pi * rho_air * rotor_radius**4.0 * omega**2.0 * air_gap_length
         )
 
         partials["air_gap_windage_losses", "density"] = (

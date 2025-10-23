@@ -24,7 +24,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         motor_id = self.options["motor_id"]
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("rpm", units="min**-1", val=np.nan, shape=number_of_points)
+        self.add_input("angular_speed", units="rad/s", val=np.nan, shape=number_of_points)
         self.add_input(
             "density",
             shape=number_of_points,
@@ -56,7 +56,7 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
 
         self.declare_partials(
             of="rotor_windage_losses",
-            wrt=["rpm", "density", "rotor_end_friction_coeff"],
+            wrt=["angular_speed", "density", "rotor_end_friction_coeff"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -72,13 +72,12 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        rpm = inputs["rpm"]
+        omega = inputs["angular_speed"]
         rho_air = inputs["density"]
         rotor_end_friction_coeff = inputs["rotor_end_friction_coeff"]
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
         shaft_radius = rotor_radius / 3.0  # shaft radius
 
         outputs["rotor_windage_losses"] = (
@@ -93,13 +92,12 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        rpm = inputs["rpm"]
+        omega = inputs["angular_speed"]
         rho_air = inputs["density"]
         rotor_end_friction_coeff = inputs["rotor_end_friction_coeff"]
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        omega = 2.0 * np.pi * rpm / 60.0  # Mechanical angular speed [rad/s]
         shaft_radius = rotor_radius / 3.0  # shaft radius
 
         partials[
@@ -120,10 +118,10 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
             * (1.0 - 3.0**-5.0)
         )
 
-        partials["rotor_windage_losses", "rpm"] = (
-            0.05
+        partials["rotor_windage_losses", "angular_speed"] = (
+            1.5
             * rotor_end_friction_coeff
-            * np.pi**2.0
+            * np.pi
             * rho_air
             * omega**2.0
             * (rotor_radius**5.0 - shaft_radius**5.0)

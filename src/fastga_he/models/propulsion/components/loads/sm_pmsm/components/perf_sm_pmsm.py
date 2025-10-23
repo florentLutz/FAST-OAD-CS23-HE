@@ -7,6 +7,7 @@ import openmdao.api as om
 from .perf_air_dynamic_viscosity import PerformancesAirDynamicViscosity
 from .perf_iron_losses import PerformancesIronLosses
 from .perf_joule_losses import PerformancesJouleLosses
+from .perf_angular_speed import PerformancesAngularSpeed
 from .perf_windage_reynolds import PerformancesWindageReynolds
 from .perf_windage_friction_coeff import PerformancesWindageFrictionCoefficient
 from .perf_air_gap_windage_losses import PerformancesAirGapWindageLosses
@@ -50,6 +51,12 @@ class PerformancesSMPMSM(om.Group):
         self.add_subsystem(
             "dynamic_viscosity",
             PerformancesAirDynamicViscosity(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "angular_speed",
+            PerformancesAngularSpeed(number_of_points=number_of_points),
             promotes=["*"],
         )
 
