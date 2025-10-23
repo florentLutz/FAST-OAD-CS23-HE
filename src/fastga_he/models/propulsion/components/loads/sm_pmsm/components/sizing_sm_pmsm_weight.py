@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingMotorWeight(om.ExplicitComponent):
     """
-    Computation of the SM PMSM total weight with summing all the component mass.
+    Computation of the SM PMSM total weight by summing all the component mass.
     """
 
     def initialize(self):
