@@ -8,8 +8,9 @@ import openmdao.api as om
 
 class PerformancesIronLosses(om.ExplicitComponent):
     """
-    Computation of the iron losses of the SM PMSM results from design air gap magnetic flux
-    density, obtained from the least square surrogate model (II-67) in :cite:`touhami:2020`.
+    Computation of the iron losses of the SM PMSM results from design air gap magnetic flux density, obtained from the
+    least square surrogate model (II-67) in :cite:`touhami:2020`. The default value is obtained
+    from :cite:`pyrhonen:2013`.
     """
 
     def initialize(self):
@@ -35,7 +36,7 @@ class PerformancesIronLosses(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_air_gap_flux_density",
-            val=np.nan,
+            val=0.9,
             units="T",
             desc="The design air gap magnetic flux density",
         )

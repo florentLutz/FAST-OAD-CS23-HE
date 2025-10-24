@@ -11,7 +11,7 @@ from ..constants import VACUUM_MAGNETIC_PERMEABILITY
 class SizingToothRatio(om.ExplicitComponent):
     """
     Computation of the ratio between tooth length to bore radius. The formula is obtained from
-    equation (II-48) in :cite:`touhami:2020`.
+    equation (II-48) in :cite:`touhami:2020`. The default values are obtained from :cite:`pyrhonen:2013`.
     """
 
     def initialize(self):
@@ -26,15 +26,16 @@ class SizingToothRatio(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_tooth_flux_density",
-            val=np.nan,
+            val=1.5,
             units="T",
-            desc="The design magnetic flux density at the stator teeth section",
+            desc="The design magnetic flux density at the stator teeth section, this should be "
+            "always the largest in PMSM",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_air_gap_flux_density",
-            val=np.nan,
+            val=0.9,
             units="T",
             desc="The design air gap magnetic flux density",
         )
@@ -42,7 +43,7 @@ class SizingToothRatio(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_surface_current_density",
-            val=np.nan,
+            val=80.0,
             units="kA/m",
             desc="The design surface current density of the motor",
         )

@@ -9,7 +9,7 @@ import openmdao.api as om
 class SizingSlotHeight(om.ExplicitComponent):
     """
     Computation of single slot height of the SM PMSM in radial direction. The formula is obtained
-    from equation (II-46) in :cite:`touhami:2020`.
+    from equation (II-46) in :cite:`touhami:2020`. The default values are obtained from :cite:`pyrhonen:2013`.
     """
 
     def initialize(self):
@@ -24,7 +24,7 @@ class SizingSlotHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_phase_current_density",
-            val=np.nan,
+            val=5.0e6,
             units="A/m**2",
             desc="The design phase current density of each wire",
         )
@@ -46,15 +46,15 @@ class SizingSlotHeight(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":tangential_stress",
-            val=np.nan,
-            units="N/m**2",
+            val=59500.0,
+            units="Pa",
             desc="The rotor surface tangential stress limit",
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_air_gap_flux_density",
-            val=np.nan,
+            val=0.9,
             units="T",
             desc="The design air gap magnetic flux density",
         )

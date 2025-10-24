@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 import os.path as pth
 
@@ -66,12 +65,6 @@ def test_rta_propulsion_weight():
 
 def test_cl_ref():
     ivc = get_indep_var_comp(list_inputs(ClRef()), __file__, XML_FILE)
-
-    ivc.add_output(
-        "vector_product",
-        np.linspace(2.6555, 1.6998, 100)
-        * (np.ones(100) - np.linspace(0.0, 0.999993876, 100) ** 2.0),
-    )
 
     problem = run_system(ClRef(), ivc)
 

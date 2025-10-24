@@ -11,7 +11,7 @@ from ..constants import VACUUM_MAGNETIC_PERMEABILITY
 class SizingStatorYokeHeight(om.ExplicitComponent):
     """
     Computation of the stator yoke thickness of the SM PMSM. The formula is obtained from
-    equation (II-45) in :cite:`touhami:2020`.
+    equation (II-45) in :cite:`touhami:2020`. The default values are obtained from :cite:`pyrhonen:2013`.
     """
 
     def initialize(self):
@@ -39,7 +39,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_yoke_flux_density",
-            val=np.nan,
+            val=1.2,
             units="T",
             desc="The design magnetic flux density in the stator yoke layer",
         )
@@ -47,7 +47,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_surface_current_density",
-            val=np.nan,
+            val=80.0,
             units="kA/m",
             desc="The design surface current density of the motor",
         )
@@ -55,7 +55,7 @@ class SizingStatorYokeHeight(om.ExplicitComponent):
             name="data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":design_air_gap_flux_density",
-            val=np.nan,
+            val=0.9,
             units="T",
             desc="The design air gap magnetic flux density",
         )
