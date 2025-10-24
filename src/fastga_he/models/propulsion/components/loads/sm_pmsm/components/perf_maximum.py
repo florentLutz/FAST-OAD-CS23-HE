@@ -73,7 +73,7 @@ class PerformancesMaximum(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_power_max",
             units="kW",
-            val=4.20,
+            val=300.0,
         )
 
     def setup_partials(self):

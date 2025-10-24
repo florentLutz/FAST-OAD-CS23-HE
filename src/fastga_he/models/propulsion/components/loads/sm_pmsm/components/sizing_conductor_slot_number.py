@@ -30,8 +30,9 @@ class SizingConductorSlotNumber(om.ExplicitComponent):
         )
         self.add_input(
             name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":slots_per_poles_phases",
-            val=np.nan,
-            desc="The number of conductor slots per poles and per phases",
+            val=2.0,
+            desc="The number of conductor slots per poles and per phases, typical > 1 for "
+            "conventional distributed winding",
         )
 
         self.add_output(
