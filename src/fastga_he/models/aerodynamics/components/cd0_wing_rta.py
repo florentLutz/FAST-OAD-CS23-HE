@@ -13,7 +13,7 @@ from fastga_he.models.aerodynamics.components.flat_plate_friction_drag_coeff imp
 )
 
 
-@oad.RegisterSubmodel(SERVICE_CD0_WING, "fastoad.submodel.aerodynamics.CD0.wing.rta")
+@oad.RegisterSubmodel(SERVICE_CD0_WING, "fastga_he.submodel.aerodynamics.wing.cd0.rta")
 class Cd0Wing(om.Group):
     """
     Computation of form drag for wing.

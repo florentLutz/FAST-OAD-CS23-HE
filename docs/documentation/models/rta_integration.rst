@@ -24,8 +24,8 @@ template are required to be added.
 
 
     submodels:
-      service.aerodynamics.CD0.sum: fastoad.submodel.aerodynamics.CD0.sum.rta
-      service.aerodynamics.CD0.wing: fastoad.submodel.aerodynamics.CD0.wing.rta
+      service.aerodynamics.CD0.sum: fastga_he.submodel.aerodynamics.sum.cd0.rta
+      service.aerodynamics.CD0.wing: fastga_he.submodel.aerodynamics.wing.cd0.rta
       service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.legacy
       service.cg.propulsion: fastga_he.submodel.weight.cg.nacelle.rta
       service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train.rta
