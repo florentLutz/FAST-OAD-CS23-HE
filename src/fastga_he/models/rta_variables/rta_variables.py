@@ -25,7 +25,9 @@ class RTAVariables(om.Group):
 
     def initialize(self):
         if importlib.util.find_spec("rta") is None:
-            raise ImportError("RTA needs to be installed before using RTA translation components")
+            raise PermissionError(
+                "RTA needs to be installed before using RTA translation components"
+            )
 
         self.options.declare(
             name="power_train_file_path",

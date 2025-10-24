@@ -10,7 +10,13 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 class RTAPropulsionWeight(om.ExplicitComponent):
     """
-    Adapts propulsion mass variables from FAST-GA-HE to RTA.
+    This component adapts propulsion mass variables for CG computation from FAST-GA-HE to RTA. To
+    prevent variable conflicts caused by shared outputs in the powertrain mass computation within
+    RTA, the `PowerTrainMassRTA` component under `mass_breakdown` must be added to the configuration
+    file to replace the original computation. To ensure the correct CG of the powertrain in the
+    aircraft CG calculation, the propeller mass is set to represent the additional weight from the
+    original engine. Meanwhile, the engine weight is kept unchanged to ensure overall weight
+    consistency for other cabin systems.
     """
 
     def __init__(self, **kwargs):

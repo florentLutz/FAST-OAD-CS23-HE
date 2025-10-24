@@ -12,6 +12,10 @@ POWERTRAIN_MASS = "fastga_he.submodel.weight.mass.propulsion.power_train.rta"
 
 @oad.RegisterSubmodel(SERVICE_PROPULSION_MASS, POWERTRAIN_MASS)
 class PowerTrainMassRTA(om.Group):
+    """
+    This submodel serves to prevent variable conflicts of the masses related to the powertrain.
+    """
+
     def initialize(self):
         # Needed even if it isn't used because the original one has that option ...
         self.options.declare("propulsion_id", default="", types=str)
