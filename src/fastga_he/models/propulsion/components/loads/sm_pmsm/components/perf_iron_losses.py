@@ -85,27 +85,27 @@ class PerformancesIronLosses(om.ExplicitComponent):
         air_gap_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
-        f = inputs["electrical_frequency"]
+        electrical_frequency = inputs["electrical_frequency"]
 
         outputs["iron_power_losses"] = (
             mass
             * (
-                530.850444 * f**0.5 * air_gap_flux_density**0.5
-                - 1660.22877 * f**0.5 * air_gap_flux_density
-                + 1676.66819 * f**0.5 * air_gap_flux_density**1.5
-                - 540.045900 * f**0.5 * air_gap_flux_density**2.0
-                - 40.4065802 * f * air_gap_flux_density**0.5
-                + 126.706523 * f * air_gap_flux_density
-                - 127.987721 * f * air_gap_flux_density**1.5
-                + 41.0664456 * f * air_gap_flux_density**2.0
-                + 0.843378999 * f**1.5 * air_gap_flux_density**0.5
-                - 2.63865343 * f**1.5 * air_gap_flux_density
-                + 2.65237021 * f**1.5 * air_gap_flux_density**1.5
-                - 0.840175850 * f**1.5 * air_gap_flux_density**2.0
-                - 0.00435714286 * f**2.0 * air_gap_flux_density**0.5
-                + 0.0135660947 * f**2.0 * air_gap_flux_density
-                - 0.0135585345 * f**2.0 * air_gap_flux_density**1.5
-                + 0.00425562126 * f**2.0 * air_gap_flux_density**2.0
+                530.850444 * electrical_frequency **0.5 * air_gap_flux_density**0.5
+                - 1660.22877 * electrical_frequency **0.5 * air_gap_flux_density
+                + 1676.66819 * electrical_frequency **0.5 * air_gap_flux_density**1.5
+                - 540.045900 * electrical_frequency **0.5 * air_gap_flux_density**2.0
+                - 40.4065802 * electrical_frequency  * air_gap_flux_density**0.5
+                + 126.706523 * electrical_frequency  * air_gap_flux_density
+                - 127.987721 * electrical_frequency  * air_gap_flux_density**1.5
+                + 41.0664456 * electrical_frequency  * air_gap_flux_density**2.0
+                + 0.843378999 * electrical_frequency **1.5 * air_gap_flux_density**0.5
+                - 2.63865343 * electrical_frequency **1.5 * air_gap_flux_density
+                + 2.65237021 * electrical_frequency **1.5 * air_gap_flux_density**1.5
+                - 0.840175850 * electrical_frequency **1.5 * air_gap_flux_density**2.0
+                - 0.00435714286 * electrical_frequency **2.0 * air_gap_flux_density**0.5
+                + 0.0135660947 * electrical_frequency **2.0 * air_gap_flux_density
+                - 0.0135585345 * electrical_frequency **2.0 * air_gap_flux_density**1.5
+                + 0.00425562126 * electrical_frequency **2.0 * air_gap_flux_density**2.0
             )
             / 1000.0
         )
@@ -117,28 +117,28 @@ class PerformancesIronLosses(om.ExplicitComponent):
         air_gap_flux_density = inputs[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":design_air_gap_flux_density"
         ]
-        f = inputs["electrical_frequency"]
+        electrical_frequency = inputs["electrical_frequency"]
 
         partials[
             "iron_power_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":mass",
         ] = (
-            530.850444 * f**0.5 * air_gap_flux_density**0.5
-            - 1660.22877 * f**0.5 * air_gap_flux_density
-            + 1676.66819 * f**0.5 * air_gap_flux_density**1.5
-            - 540.045900 * f**0.5 * air_gap_flux_density**2.0
-            - 40.4065802 * f * air_gap_flux_density**0.5
-            + 126.706523 * f * air_gap_flux_density
-            - 127.987721 * f * air_gap_flux_density**1.5
-            + 41.0664456 * f * air_gap_flux_density**2.0
-            + 0.843378999 * f**1.5 * air_gap_flux_density**0.5
-            - 2.63865343 * f**1.5 * air_gap_flux_density
-            + 2.65237021 * f**1.5 * air_gap_flux_density**1.5
-            - 0.840175850 * f**1.5 * air_gap_flux_density**2.0
-            - 0.00435714286 * f**2.0 * air_gap_flux_density**0.5
-            + 0.0135660947 * f**2.0 * air_gap_flux_density
-            - 0.0135585345 * f**2.0 * air_gap_flux_density**1.5
-            + 0.00425562126 * f**2.0 * air_gap_flux_density**2.0
+            530.850444 * electrical_frequency **0.5 * air_gap_flux_density**0.5
+            - 1660.22877 * electrical_frequency **0.5 * air_gap_flux_density
+            + 1676.66819 * electrical_frequency **0.5 * air_gap_flux_density**1.5
+            - 540.045900 * electrical_frequency **0.5 * air_gap_flux_density**2.0
+            - 40.4065802 * electrical_frequency  * air_gap_flux_density**0.5
+            + 126.706523 * electrical_frequency  * air_gap_flux_density
+            - 127.987721 * electrical_frequency  * air_gap_flux_density**1.5
+            + 41.0664456 * electrical_frequency  * air_gap_flux_density**2.0
+            + 0.843378999 * electrical_frequency **1.5 * air_gap_flux_density**0.5
+            - 2.63865343 * electrical_frequency **1.5 * air_gap_flux_density
+            + 2.65237021 * electrical_frequency **1.5 * air_gap_flux_density**1.5
+            - 0.840175850 * electrical_frequency **1.5 * air_gap_flux_density**2.0
+            - 0.00435714286 * electrical_frequency **2.0 * air_gap_flux_density**0.5
+            + 0.0135660947 * electrical_frequency **2.0 * air_gap_flux_density
+            - 0.0135585345 * electrical_frequency **2.0 * air_gap_flux_density**1.5
+            + 0.00425562126 * electrical_frequency **2.0 * air_gap_flux_density**2.0
         ) / 1000.0
 
         partials[
@@ -147,22 +147,22 @@ class PerformancesIronLosses(om.ExplicitComponent):
         ] = (
             mass
             * (
-                265.425222 * f**-0.5 * air_gap_flux_density**0.5
-                - 830.114385 * f**-0.5 * air_gap_flux_density
-                + 838.334095 * f**-0.5 * air_gap_flux_density**1.5
-                - 270.02295 * f**-0.5 * air_gap_flux_density**2.0
+                265.425222 * electrical_frequency **-0.5 * air_gap_flux_density**0.5
+                - 830.114385 * electrical_frequency **-0.5 * air_gap_flux_density
+                + 838.334095 * electrical_frequency **-0.5 * air_gap_flux_density**1.5
+                - 270.02295 * electrical_frequency **-0.5 * air_gap_flux_density**2.0
                 - 40.4065802 * air_gap_flux_density**0.5
                 + 126.706523 * air_gap_flux_density
                 - 127.987721 * air_gap_flux_density**1.5
                 + 41.0664456 * air_gap_flux_density**2.0
-                + 1.2650684985 * f**0.5 * air_gap_flux_density**0.5
-                - 3.957980145 * f**0.5 * air_gap_flux_density
-                + 3.978555315 * f**0.5 * air_gap_flux_density**1.5
-                - 1.260263775 * f**0.5 * air_gap_flux_density**2.0
-                - 0.00871428572 * f * air_gap_flux_density**0.5
-                + 0.0271321894 * f * air_gap_flux_density
-                - 0.027117069 * f * air_gap_flux_density**1.5
-                + 0.00851124252 * f * air_gap_flux_density**2.0
+                + 1.2650684985 * electrical_frequency **0.5 * air_gap_flux_density**0.5
+                - 3.957980145 * electrical_frequency **0.5 * air_gap_flux_density
+                + 3.978555315 * electrical_frequency **0.5 * air_gap_flux_density**1.5
+                - 1.260263775 * electrical_frequency **0.5 * air_gap_flux_density**2.0
+                - 0.00871428572 * electrical_frequency  * air_gap_flux_density**0.5
+                + 0.0271321894 * electrical_frequency  * air_gap_flux_density
+                - 0.027117069 * electrical_frequency  * air_gap_flux_density**1.5
+                + 0.00851124252 * electrical_frequency  * air_gap_flux_density**2.0
             )
             / 1000.0
         )
@@ -173,22 +173,22 @@ class PerformancesIronLosses(om.ExplicitComponent):
         ] = (
             mass
             * (
-                265.425222 * f**0.5 * air_gap_flux_density**-0.5
-                - 1660.22877 * f**0.5
-                + 2515.002285 * f**0.5 * air_gap_flux_density**0.5
-                - 1080.0918 * f**0.5 * air_gap_flux_density
-                - 20.2032901 * f * air_gap_flux_density**-0.5
-                + 126.706523 * f
-                - 191.9815815 * f * air_gap_flux_density**0.5
-                + 82.1328912 * f * air_gap_flux_density
-                + 0.4216894995 * f**1.5 * air_gap_flux_density**-0.5
-                - 2.63865343 * f**1.5
-                + 3.978555315 * f**1.5 * air_gap_flux_density**0.5
-                - 1.6803517 * f**1.5 * air_gap_flux_density
-                - 0.00217857143 * f**2.0 * air_gap_flux_density**-0.5
-                + 0.0135660947 * f**2.0
-                - 0.02033780175 * f**2.0 * air_gap_flux_density**0.5
-                + 0.00851124252 * f**2.0 * air_gap_flux_density
+                265.425222 * electrical_frequency **0.5 * air_gap_flux_density**-0.5
+                - 1660.22877 * electrical_frequency **0.5
+                + 2515.002285 * electrical_frequency **0.5 * air_gap_flux_density**0.5
+                - 1080.0918 * electrical_frequency **0.5 * air_gap_flux_density
+                - 20.2032901 * electrical_frequency  * air_gap_flux_density**-0.5
+                + 126.706523 * electrical_frequency
+                - 191.9815815 * electrical_frequency  * air_gap_flux_density**0.5
+                + 82.1328912 * electrical_frequency  * air_gap_flux_density
+                + 0.4216894995 * electrical_frequency **1.5 * air_gap_flux_density**-0.5
+                - 2.63865343 * electrical_frequency **1.5
+                + 3.978555315 * electrical_frequency **1.5 * air_gap_flux_density**0.5
+                - 1.6803517 * electrical_frequency**1.5 * air_gap_flux_density
+                - 0.00217857143 * electrical_frequency **2.0 * air_gap_flux_density**-0.5
+                + 0.0135660947 * electrical_frequency **2.0
+                - 0.02033780175 * electrical_frequency **2.0 * air_gap_flux_density**0.5
+                + 0.00851124252 * electrical_frequency **2.0 * air_gap_flux_density
             )
             / 1000.0
         )
