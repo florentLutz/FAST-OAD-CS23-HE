@@ -12,7 +12,7 @@ from fastoad_cs25.models.aerodynamics.constants import SERVICE_CD0_SUM
 
 @oad.RegisterSubmodel(SERVICE_CD0_SUM, "fastga_he.submodel.aerodynamics.sum.cd0.rta")
 class Cd0Total(om.Group):
-    """Computes the sum of form drags from aircraft components."""
+    """Computes the aircraft form drag."""
 
     def initialize(self):
         self.options.declare("low_speed_aero", default=False, types=bool)
