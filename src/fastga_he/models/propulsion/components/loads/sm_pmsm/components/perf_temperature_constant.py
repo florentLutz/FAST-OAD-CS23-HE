@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesTemperatureConstant(om.ExplicitComponent):
     """
-    Computation of assigning conductor temperature for resistance calculation.
+    Shaping of the temperature control parameter for the mission.
     """
 
     def initialize(self):
