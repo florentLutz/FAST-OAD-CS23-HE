@@ -214,6 +214,7 @@ SM_PMSM = {
         {"joule_power_losses": "kW"},
         {"iron_power_losses": "kW"},
         {"mechanical_power_losses": "kW"},
+        {"winding_temperature": "degK"},
     ],
     SMP: [
         {"delta_Cd": None},
