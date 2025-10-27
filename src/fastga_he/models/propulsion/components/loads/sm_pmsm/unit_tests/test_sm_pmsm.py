@@ -12,6 +12,7 @@ from ..components.sizing_bore_diameter import SizingStatorBoreDiameter
 from ..components.sizing_active_length import SizingActiveLength
 from ..components.sizing_frame_dimension import SizingFrameDimension
 from ..components.sizing_rotor_diameter import SizingRotorDiameter
+from ..components.sizing_shaft_diameter import SizingShaftDiameter
 from ..components.sizing_stator_yoke import SizingStatorYokeHeight
 from ..components.sizing_slot_width import SizingSlotWidth
 from ..components.sizing_ratio_x2p import SizingRatioX2p
@@ -121,6 +122,46 @@ def test_rotor_diameter():
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:air_gap_thickness", units="m"
     ) == pytest.approx(0.0028, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_shaft_diameter():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:rpm_rating", val=15000.0, units="min**-1"
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter",
+        val=0.1814,
+        units="m",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingShaftDiameter(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:shaft_diameter", units="m"
+    ) == pytest.approx(0.0605, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:rpm_rating", val=500000.0, units="min**-1"
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:rotor_diameter",
+        val=0.1814,
+        units="m",
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingShaftDiameter(motor_id="motor_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:shaft_diameter", units="m"
+    ) == pytest.approx(0.0183, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -662,7 +703,7 @@ def test_resistance():
         PerformancesResistance(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("conductor_resistance", units="ohm") == pytest.approx(
+    assert problem.get_val("reference_conductor_resistance", units="ohm") == pytest.approx(
         np.full(NB_POINTS_TEST, 0.0014608),
         rel=1e-2,
     )
@@ -674,7 +715,7 @@ def test_joule_losses():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "conductor_resistance",
+        "reference_conductor_resistance",
         val=np.full(NB_POINTS_TEST, 0.0014608),
         units="ohm",
     )

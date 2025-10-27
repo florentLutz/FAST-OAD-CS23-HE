@@ -42,6 +42,11 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+            val=np.nan,
+            units="m",
+        )
 
         self.add_output(
             "rotor_windage_losses",
@@ -63,7 +68,10 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         )
         self.declare_partials(
             of="rotor_windage_losses",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
+            wrt=[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -78,7 +86,9 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        shaft_radius = rotor_radius / 3.0  # shaft radius
+        shaft_radius = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter"] / 2.0
+        )
 
         outputs["rotor_windage_losses"] = (
             0.5
@@ -98,7 +108,9 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         rotor_radius = (
             inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter"] / 2.0
         )
-        shaft_radius = rotor_radius / 3.0  # shaft radius
+        shaft_radius = (
+            inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter"] / 2.0
+        )
 
         partials[
             "rotor_windage_losses",
@@ -108,15 +120,12 @@ class PerformancesRotorWindageLoss(om.ExplicitComponent):
         partials[
             "rotor_windage_losses",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = (
-            1.25
-            * rotor_end_friction_coeff
-            * np.pi
-            * rho_air
-            * omega**3.0
-            * rotor_radius**4.0
-            * (1.0 - 3.0**-5.0)
-        )
+        ] = 1.25 * rotor_end_friction_coeff * np.pi * rho_air * omega**3.0 * rotor_radius**4.0
+
+        partials[
+            "rotor_windage_losses",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+        ] = -1.25 * rotor_end_friction_coeff * np.pi * rho_air * omega**3.0 * shaft_radius**4.0
 
         partials["rotor_windage_losses", "angular_speed"] = (
             1.5

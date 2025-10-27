@@ -47,6 +47,7 @@
                         <frame_diameter units="m">0.3564</frame_diameter>
                         <frame_length units="m">0.473</frame_length>
                         <rotor_diameter units="m">0.1814</rotor_diameter>
+                        <shaft_diameter units="m">0.0605</shaft_diameter>
                         <conductor_cable_length units="m">0.545475</conductor_cable_length>
                         <stator_diameter units="m">0.3288</stator_diameter>
                         <slot_width units="m">0.01348</slot_width>

@@ -465,6 +465,7 @@
                         <slot_height units="m" is_input="True" >0.0358<!--hs--> </slot_height>
                         <slot_width units="m" is_input="True" >0.0137<!--ls--> </slot_width>
                         <rotor_diameter units="m" is_input="True" >0.1814<!--D_rot--> </rotor_diameter>
+                        <shaft_diameter units="m" is_input="True" >0.0605<!--D_rot--> </shaft_diameter>
                         <air_gap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </air_gap_thickness>
                         <rotor_mass units="kg" is_input="True" >56.97<!--k_tb--> </rotor_mass>
                         <torque_constant units="N*m/A" is_input="True" >0.4278<!--k_tb--> </torque_constant>
