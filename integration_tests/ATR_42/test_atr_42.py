@@ -51,7 +51,7 @@ def test_sizing_atr_42_turboshaft():
     residuals = filter_residuals(residuals)
 
     # Create the folder if it doesn't exist
-    os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
+    Path(RESULTS_FOLDER_PATH).mkdir(parents=True, exist_ok=True)
 
     problem.write_outputs()
 
@@ -89,7 +89,7 @@ def test_sizing_atr_42_retrofit_hybrid():
     residuals = filter_residuals(residuals)
 
     # Create the folder if it doesn't exist
-    os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
+    Path(RESULTS_FOLDER_PATH).mkdir(parents=True, exist_ok=True)
 
     problem.write_outputs()
 
@@ -132,6 +132,6 @@ def test_hybrid_atr_42_full_sizing():
     residuals = filter_residuals(residuals)
 
     # Create the folder if it doesn't exist
-    os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
+    Path(RESULTS_FOLDER_PATH).mkdir(parents=True, exist_ok=True)
 
     problem.write_outputs()
