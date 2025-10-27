@@ -5,6 +5,8 @@
 import openmdao.api as om
 import numpy as np
 
+DEFAULT_VECTOR_SIZE = 100
+
 
 class AeroApproximation(om.Group):
     """
@@ -20,6 +22,11 @@ class AeroApproximation(om.Group):
         self.add_subsystem(
             "induced_drag_ratio",
             InducedDragCoefficient(),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "wing_low_speed_vector",
+            WingLowSpeedVectors(),
             promotes=["data:*"],
         )
 
@@ -115,4 +122,63 @@ class InducedDragCoefficient(om.ExplicitComponent):
                 * inputs["data:aerodynamics:aircraft:cruise:oswald_coefficient"] ** 2.0
             )
             ** -1.0
+        )
+
+
+class WingLowSpeedVectors(om.ExplicitComponent):
+    """
+    Defining the low speed vectors for other computations based on an elliptic distribution
+    assumption.
+    """
+
+    def setup(self):
+        self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
+        self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
+        self.add_input("data:geometry:wing:b_50", val=np.nan, units="m")
+
+        self.add_output(
+            "data:aerodynamics:wing:low_speed:Y_vector",
+            val=np.linspace(0.0, 5.0, DEFAULT_VECTOR_SIZE),
+            units="m",
+        )
+        self.add_output(
+            "data:aerodynamics:wing:low_speed:chord_vector",
+            val=np.linspace(2.0, 1.0, DEFAULT_VECTOR_SIZE),
+            units="m",
+        )
+        self.add_output(
+            "data:aerodynamics:wing:low_speed:CL_vector",
+            val=np.full(DEFAULT_VECTOR_SIZE, 0.5),
+        )
+
+    def setup_partials(self):
+        self.declare_partials(
+            "data:aerodynamics:wing:low_speed:Y_vector",
+            "data:geometry:wing:b_50",
+            val=np.linspace(0, 0.5, DEFAULT_VECTOR_SIZE),
+        )
+        self.declare_partials(
+            "data:aerodynamics:wing:low_speed:chord_vector",
+            "data:geometry:wing:tip:chord",
+            val=np.linspace(0, 1.0, DEFAULT_VECTOR_SIZE),
+        )
+        self.declare_partials(
+            "data:aerodynamics:wing:low_speed:chord_vector",
+            "data:geometry:wing:root:chord",
+            val=np.linspace(1.0, 0.0, DEFAULT_VECTOR_SIZE),
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        b = inputs["data:geometry:wing:b_50"]
+        c_r = inputs["data:geometry:wing:root:chord"]
+        c_t = inputs["data:geometry:wing:tip:chord"]
+
+        outputs["data:aerodynamics:wing:low_speed:Y_vector"] = np.linspace(
+            0, b / 2.0, DEFAULT_VECTOR_SIZE
+        )
+        outputs["data:aerodynamics:wing:low_speed:chord_vector"] = np.linspace(
+            c_r, c_t, DEFAULT_VECTOR_SIZE
+        )
+        outputs["data:aerodynamics:wing:low_speed:CL_vector"] = (
+            1.0 - np.linspace(0, 1.0, DEFAULT_VECTOR_SIZE) ** 2.0
         )
