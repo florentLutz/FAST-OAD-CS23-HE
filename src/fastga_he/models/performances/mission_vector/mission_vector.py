@@ -80,8 +80,6 @@ class MissionVector(om.Group):
                 "fastga.submodel.geometry.wing.legacy"
             )
 
-            _LOGGER.warning("FAST-OAD RTA is installed in this local machine !")
-
     def initialize(self):
         self.options.declare("out_file", default="", types=str)
         self.options.declare(

@@ -1,4 +1,3 @@
-import os
 from shutil import rmtree, copy
 import logging
 from pathlib import Path
