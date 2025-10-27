@@ -23,7 +23,7 @@ from ..components.sizing_single_conductor_cable_length import SizingSingleConduc
 from ..components.sizing_conductor_slot_number import SizingConductorSlotNumber
 from ..components.sizing_reference_resistance import SizingReferenceResistance
 from ..components.sizing_external_stator_diameter import (
-    SizingExtStatorDSizingExternalStatorDiameter,
+    SizingExternalStatorDiameter,
 )
 from ..components.sizing_sm_pmsm_cg_x import SizingSMPMSMCGX
 from ..components.sizing_sm_pmsm_cg_y import SizingSMPMSMCGY
@@ -328,7 +328,7 @@ def test_external_stator_diameter():
         "data:propulsion:he_power_train:SM_PMSM:motor_1:stator_yoke_height", val=0.0351, units="m"
     )
 
-    problem = run_system(SizingExtStatorDSizingExternalStatorDiameter(motor_id="motor_1"), ivc)
+    problem = run_system(SizingExternalStatorDiameter(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:stator_diameter"

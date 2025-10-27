@@ -16,7 +16,7 @@ from .sizing_conductor_section_area_per_slot import SizingConductorSectionAreaPe
 from .sizing_single_conductor_cable_length import SizingSingleConductorCableLength
 from .sizing_conductor_slot_number import SizingConductorSlotNumber
 from .sizing_reference_resistance import SizingReferenceResistance
-from .sizing_external_stator_diameter import SizingExtStatorDSizingExternalStatorDiameter
+from .sizing_external_stator_diameter import SizingExternalStatorDiameter
 from .sizing_stator_core_weight import SizingStatorCoreWeight
 from .sizing_winding_stator_weight import SizingStatorWindingWeight
 from .sizing_rotor_weight import SizingRotorWeight
@@ -104,7 +104,7 @@ class SizingSMPMSM(om.Group):
 
         self.add_subsystem(
             "stator_external_diameter",
-            SizingExtStatorDSizingExternalStatorDiameter(motor_id=motor_id),
+            SizingExternalStatorDiameter(motor_id=motor_id),
             promotes=["*"],
         )
 
