@@ -35,7 +35,7 @@
             <he_power_train>
                 <SM_PMSM>
                     <motor_1>
-                        <reference_resistance units="ohm">0.000897</reference_resistance>
+                        <reference_conductor_resistance units="ohm">0.000897</reference_conductor_resistance>
                         <mass units="kg">225.59</mass>
                         <stator_core_mass units="kg">116.4</stator_core_mass>
                         <stator_winding_mass units="kg">32.69</stator_winding_mass>

@@ -26,7 +26,7 @@ class PerformancesJouleLosses(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
         )
         self.add_input(
-            name="reference_conductor_resistance",
+            name="resistance",
             val=np.full(number_of_points, np.nan),
             units="ohm",
         )
@@ -51,17 +51,17 @@ class PerformancesJouleLosses(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        resistance = inputs["reference_conductor_resistance"]
+        resistance = inputs["resistance"]
 
         outputs["joule_power_losses"] = 3.0 * resistance * i_rms**2.0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         i_rms = inputs["ac_current_rms_in_one_phase"]
-        resistance = inputs["reference_conductor_resistance"]
+        resistance = inputs["resistance"]
 
         partials[
             "joule_power_losses",
-            "reference_conductor_resistance",
+            "resistance",
         ] = 3.0 * i_rms**2.0
 
         partials[

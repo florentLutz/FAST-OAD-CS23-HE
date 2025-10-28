@@ -331,7 +331,7 @@ def test_reference_resistance():
     problem = run_system(SizingReferenceResistance(motor_id="motor_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:reference_resistance", units="ohm"
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:reference_conductor_resistance", units="ohm"
     ) == pytest.approx(0.000897, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -693,7 +693,7 @@ def test_resistance():
         units="degK",
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:reference_resistance",
+        "data:propulsion:he_power_train:SM_PMSM:motor_1:reference_conductor_resistance",
         val=0.000897,
         units="ohm",
     )
@@ -703,7 +703,7 @@ def test_resistance():
         PerformancesResistance(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
     )
 
-    assert problem.get_val("reference_conductor_resistance", units="ohm") == pytest.approx(
+    assert problem.get_val("resistance", units="ohm") == pytest.approx(
         np.full(NB_POINTS_TEST, 0.0014608),
         rel=1e-2,
     )
@@ -715,7 +715,7 @@ def test_joule_losses():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "reference_conductor_resistance",
+        "resistance",
         val=np.full(NB_POINTS_TEST, 0.0014608),
         units="ohm",
     )

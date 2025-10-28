@@ -469,7 +469,7 @@
                         <air_gap_thickness units="m" is_input="True" >0.0028<!--k_tb--> </air_gap_thickness>
                         <rotor_mass units="kg" is_input="True" >56.97<!--k_tb--> </rotor_mass>
                         <torque_constant units="N*m/A" is_input="True" >0.4278<!--k_tb--> </torque_constant>
-                        <reference_resistance units="ohm">0.000897</reference_resistance>
+                        <reference_conductor_resistance units="ohm">0.000897</reference_conductor_resistance>
                     </motor_1>
                 </SM_PMSM>
                 <PMSM>

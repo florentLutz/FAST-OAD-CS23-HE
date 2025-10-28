@@ -35,14 +35,16 @@ class PerformancesResistance(om.ExplicitComponent):
             desc="The temperature of the winding conductor cable",
         )
         self.add_input(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
             units="ohm",
             val=np.nan,
             desc="The conductor's reference electric resistance at 293.15K",
         )
 
         self.add_output(
-            "reference_conductor_resistance",
+            "resistance",
             units="ohm",
             val=1.0e-4,
             shape=number_of_points,
@@ -53,15 +55,17 @@ class PerformancesResistance(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="reference_conductor_resistance",
+            of="resistance",
             wrt="winding_temperature",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="reference_conductor_resistance",
-            wrt="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            of="resistance",
+            wrt="data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -70,19 +74,25 @@ class PerformancesResistance(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        outputs["reference_conductor_resistance"] = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance"
+        outputs["resistance"] = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_conductor_resistance"
         ] * (1.0 + COPPER_TEMPERATURE_COEFF * (inputs["winding_temperature"] - 293.15))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
         partials[
-            "reference_conductor_resistance",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            "resistance",
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
         ] = 1.0 + COPPER_TEMPERATURE_COEFF * (inputs["winding_temperature"] - 293.15)
 
-        partials["reference_conductor_resistance", "winding_temperature"] = (
+        partials["resistance", "winding_temperature"] = (
             COPPER_TEMPERATURE_COEFF
-            * inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance"]
+            * inputs[
+                "data:propulsion:he_power_train:SM_PMSM:"
+                + motor_id
+                + ":reference_conductor_resistance"
+            ]
         )

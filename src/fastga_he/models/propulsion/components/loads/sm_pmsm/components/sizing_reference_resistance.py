@@ -43,7 +43,9 @@ class SizingReferenceResistance(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
             units="ohm",
             val=9e-4,
             desc="The conductor's reference electric resistance at 293.15K",
@@ -67,9 +69,9 @@ class SizingReferenceResistance(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number"
         ]
 
-        outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance"] = (
-            COPPER_RESISTIVITY * num_conductor_slot * wire_length / conductor_section_area_per_slot
-        )
+        outputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_conductor_resistance"
+        ] = COPPER_RESISTIVITY * num_conductor_slot * wire_length / conductor_section_area_per_slot
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -87,17 +89,23 @@ class SizingReferenceResistance(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_slot_number",
         ] = COPPER_RESISTIVITY * wire_length / conductor_section_area_per_slot
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
         ] = COPPER_RESISTIVITY * num_conductor_slot / conductor_section_area_per_slot
 
         partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":reference_resistance",
+            "data:propulsion:he_power_train:SM_PMSM:"
+            + motor_id
+            + ":reference_conductor_resistance",
             "data:propulsion:he_power_train:SM_PMSM:"
             + motor_id
             + ":conductor_section_area_per_slot",
