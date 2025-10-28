@@ -103,59 +103,53 @@ class SizingShaftDiameter(om.ExplicitComponent):
             2.0 * sigma_yield / (rho_shaft * rpm**2.0 * np.pi**2.0 * (3.0 + poissons_ratio))
         )
 
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
-        ] = 1.0 / 3.0 if rotor_diameter / 3.0 <= mechanical_limit_diameter else 0.0
+        if rotor_diameter / 3.0 <= mechanical_limit_diameter:
+            partials[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rotor_diameter",
+            ] = 1.0 / 3.0
 
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_yield_stress",
-        ] = (
-            0.0
-            if rotor_diameter / 3.0 <= mechanical_limit_diameter
-            else 120.0
-            / np.sqrt(
+        else:
+            partials[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_yield_stress",
+            ] = 120.0 / np.sqrt(
                 2.0 * sigma_yield * (3.0 + poissons_ratio) * rho_shaft * rpm**2.0 * np.pi**2.0
             )
-        )
 
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_material_density",
-        ] = (
-            0.0
-            if rotor_diameter / 3.0 <= mechanical_limit_diameter
-            else -120.0
-            * sigma_yield
-            / np.sqrt(
-                2.0 * sigma_yield * (3.0 + poissons_ratio) * rho_shaft**3.0 * rpm**2.0 * np.pi**2.0
-            )
-        )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating",
-        ] = (
-            0.0
-            if rotor_diameter / 3.0 <= mechanical_limit_diameter
-            else -mechanical_limit_diameter / rpm
-        )
-
-        partials[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_poissons_ratio",
-        ] = (
-            0.0
-            if rotor_diameter / 3.0 <= mechanical_limit_diameter
-            else -120.0
-            * sigma_yield
-            / np.sqrt(
-                2.0
+            partials[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_material_density",
+            ] = (
+                -120.0
                 * sigma_yield
-                * (3.0 + poissons_ratio) ** 3.0
-                * rho_shaft
-                * rpm**2.0
-                * np.pi**2.0
+                / np.sqrt(
+                    2.0
+                    * sigma_yield
+                    * (3.0 + poissons_ratio)
+                    * rho_shaft**3.0
+                    * rpm**2.0
+                    * np.pi**2.0
+                )
             )
-        )
+
+            partials[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":rpm_rating",
+            ] = -mechanical_limit_diameter / rpm
+
+            partials[
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_diameter",
+                "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":shaft_poissons_ratio",
+            ] = (
+                -120.0
+                * sigma_yield
+                / np.sqrt(
+                    2.0
+                    * sigma_yield
+                    * (3.0 + poissons_ratio) ** 3.0
+                    * rho_shaft
+                    * rpm**2.0
+                    * np.pi**2.0
+                )
+            )
