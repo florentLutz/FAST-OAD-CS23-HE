@@ -555,7 +555,9 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _check_connection(self, connections_list):
         """
-        This function ensures that all the connections defined in the powertrain respect the components connection limit. It also checks that no components are left unconnected and ensure at least one propulsor is defined.
+        This function ensures that all the connections defined in the powertrain respect the
+        components connection limit. It also checks that no components are left unconnected and
+        ensure at least one propulsor is defined.
 
         The _get_components method must be run beforehand.
         """
@@ -563,22 +565,33 @@ class FASTGAHEPowerTrainConfigurator:
         # This should do nothing if it has already been run.
         self._get_components()
 
-        # m: multiple, n: no, s: single, i:input, o: output
-        single_input_component = [
-            comp
-            for comp, type in zip(self._components_name, self._components_type_class)
-            if type == "propulsor"
-        ]
-        single_output_component = [
-            comp
-            for comp, type in zip(self._components_name, self._components_type_class)
-            if type == "tank" or type == "source"
-        ]
-        one_to_one_component = [
-            comp
-            for comp, type in zip(self._components_name, self._components_type_class)
-            if type == "load" or type == "propulsive_load" or "propulsive_load" in type
-        ]
+        propulsor_component = []
+        energy_storage_component = []
+        one_to_one_component = []
+        connector_component = []
+        connector_option = []
+
+        for comp, option, type in zip(
+            self._components_name, self._components_options, self._components_type_class
+        ):
+            if type == "propulsor":
+                propulsor_component.append(comp)
+
+            elif type == "tank" or type == "source":
+                energy_storage_component.append(comp)
+
+            elif type == "load" or type == "propulsive_load" or "propulsive_load" in type:
+                one_to_one_component.append(comp)
+
+            elif type == "connector":
+                connector_component.append(comp)
+                connector_option.append(option)
+
+        if not propulsor_component:
+            raise ComponentConnectionError("Propulsor missing!")
+
+        if not energy_storage_component:
+            raise ComponentConnectionError("Storage tank or battery missing!")
 
         (
             one_to_one_component,
@@ -589,14 +602,7 @@ class FASTGAHEPowerTrainConfigurator:
             many_to_many_output_count,
             many_to_one_input_count,
             one_to_many_output_count,
-        ) = self._categorize_connectors(one_to_one_component)
-
-        # Check critical component(s) existence
-        if not single_input_component:
-            raise ValueError("Propulsor missing!")
-
-        if not single_output_component:
-            raise ValueError("Storage tank or battery missing!")
+        ) = self._categorize_connectors(one_to_one_component, connector_component, connector_option)
 
         # Check connections definition
         for comp in self._components_name:
@@ -607,7 +613,7 @@ class FASTGAHEPowerTrainConfigurator:
                 or comp in connection.get("source")
                 for connection in connections_list
             ):
-                raise ValueError("Component is/are not properly connected!")
+                raise ComponentConnectionError("Component is/are not properly connected!")
 
         if many_to_one_component:
             for comp, input_count in zip(many_to_one_component, many_to_one_input_count):
@@ -618,7 +624,9 @@ class FASTGAHEPowerTrainConfigurator:
                 )
 
                 if int(input_count_defined) != int(input_count):
-                    raise ValueError("Connector component is/are not properly connected!")
+                    raise ComponentConnectionError(
+                        "Connector component is/are not properly connected!"
+                    )
 
         if one_to_many_component:
             for comp, output_count in zip(one_to_many_component, one_to_many_output_count):
@@ -629,7 +637,9 @@ class FASTGAHEPowerTrainConfigurator:
                 )
 
                 if int(output_count_defined) != int(output_count):
-                    raise ValueError("Connector component is/are not properly connected!")
+                    raise ComponentConnectionError(
+                        "Connector component is/are not properly connected!"
+                    )
 
         if many_to_many_component:
             for comp, input_count, output_count in zip(
@@ -649,29 +659,16 @@ class FASTGAHEPowerTrainConfigurator:
                 if (int(input_count_defined) != int(input_count)) or (
                     int(output_count_defined) != int(output_count)
                 ):
-                    raise ValueError("Connector component is/are not properly connected!")
+                    raise ComponentConnectionError(
+                        "Connector component is/are not properly connected!"
+                    )
 
-    def _categorize_connectors(self, one_to_one_component):
-        connector_names = [
-            comp
-            for comp, type in zip(self._components_name, self._components_type_class)
-            if type == "connector"
-        ]
-        connector_options = [
-            option
-            for option, type in zip(self._components_options, self._components_type_class)
-            if type == "connector"
-        ]
+    def _categorize_connectors(self, one_to_one_component, connector_names, connector_options):
         connector_variable = [
-            input
+            variable
             for name in connector_names
-            for input in self._components_connection_inputs
-            if name in input
-        ] + [
-            output
-            for name in connector_names
-            for output in self._components_connection_outputs
-            if name in output
+            for variable in self._components_connection_inputs + self._components_connection_outputs
+            if name in variable
         ]
 
         one_to_many_component = []
@@ -2957,6 +2954,12 @@ class _YAMLSerializer(ABC):
         yaml.default_flow_style = False
         with open(file_path, "w") as file:
             yaml.dump(self._data, file)
+
+
+class ComponentConnectionError(Exception):
+    """Error type only for component connections in powertrain configuration file"""
+
+    pass
 
 
 def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:

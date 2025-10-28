@@ -12,7 +12,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from ..powertrain import FASTGAHEPowerTrainConfigurator
+from ..powertrain import FASTGAHEPowerTrainConfigurator, ComponentConnectionError
 from ..exceptions import FASTGAHESingleSSPCAtEndOfLine, FASTGAHEImpossiblePair
 
 YML_FILE = "sample_power_train_file.yml"
@@ -176,7 +176,7 @@ def test_power_train_file_no_propeller():
     )
 
     power_train_configurator._get_components()
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ComponentConnectionError) as exc_info:
         power_train_configurator._get_connections()
 
     assert str(exc_info.value) == "Propulsor missing!"
@@ -192,7 +192,7 @@ def test_power_train_file_connection_missing():
     )
 
     power_train_configurator._get_components()
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ComponentConnectionError) as exc_info:
         power_train_configurator._get_connections()
 
     assert str(exc_info.value) == "Component is/are not properly connected!"
@@ -210,7 +210,7 @@ def test_power_train_file_connector_connection_error():
     )
 
     power_train_configurator._get_components()
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ComponentConnectionError) as exc_info:
         power_train_configurator._get_connections()
 
     assert str(exc_info.value) == "Connector component is/are not properly connected!"
