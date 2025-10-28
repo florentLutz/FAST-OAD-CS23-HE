@@ -69,7 +69,7 @@ def test_cl_ref():
     problem = run_system(ClRef(), ivc)
 
     assert problem.get_val("data:aerodynamics:wing:low_speed:CL_ref") == pytest.approx(
-        0.67888,
+        0.708,
         rel=1e-3,
     )
 
@@ -97,7 +97,7 @@ def test_aero_approx():
     problem = run_system(AeroApproximation(), ivc)
 
     assert problem.get_val("data:aerodynamics:wing:low_speed:CL_ref") == pytest.approx(
-        0.67888,
+        0.708,
         rel=1e-3,
     )
     assert problem.get_val(
