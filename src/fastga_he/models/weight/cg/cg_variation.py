@@ -34,15 +34,19 @@ class InFlightCGVariation(om.ExplicitComponent):
     the DESIGN flight.
     """
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.empty_weight_variable_name = None
+
     def setup(self):
         if RTA_INSTALLED:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
+            self.empty_weight_variable_name = "data:weight:aircraft_empty:mass"
             for submodel in oad.RegisterSubmodel.active_models.values():
                 if submodel is not None and ".rta" in submodel:
-                    empty_weight_variable_name = "data:weight:aircraft:OWE"
+                    self.empty_weight_variable_name = "data:weight:aircraft:OWE"
                     break
         else:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
+            self.empty_weight_variable_name = "data:weight:aircraft_empty:mass"
         # Check whether RTA is installed and if the user intends to use it
 
         self.add_input("data:TLAR:NPAX_design", val=np.nan)
@@ -53,7 +57,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         self.add_input("data:geometry:cabin:seats:passenger:length", val=np.nan, units="m")
         self.add_input("data:geometry:cabin:seats:passenger:count_by_row", val=np.nan)
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
-        self.add_input(empty_weight_variable_name, val=np.nan, units="kg")
+        self.add_input(self.empty_weight_variable_name, val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
         self.add_input(
             "settings:weight:aircraft:payload:design_mass_per_passenger",
@@ -70,13 +74,13 @@ class InFlightCGVariation(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-            wrt=["data:weight:aircraft:payload", empty_weight_variable_name],
+            wrt=["data:weight:aircraft:payload", self.empty_weight_variable_name],
             val=1.0,
         )
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             wrt=[
-                empty_weight_variable_name,
+                self.empty_weight_variable_name,
                 "data:weight:aircraft_empty:CG:x",
                 "data:weight:aircraft:payload",
             ],
@@ -108,16 +112,7 @@ class InFlightCGVariation(om.ExplicitComponent):
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
         lav = inputs["data:geometry:fuselage:front_length"]
         payload = inputs["data:weight:aircraft:payload"]
-        if RTA_INSTALLED:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-            for submodel in oad.RegisterSubmodel.active_models.values():
-                if submodel is not None and ".rta" in submodel:
-                    empty_weight_variable_name = "data:weight:aircraft:OWE"
-                    break
-        else:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-        # Check whether RTA is installed and if the user intends to use it
-        m_empty = inputs[empty_weight_variable_name]
+        m_empty = inputs[self.empty_weight_variable_name]
 
         l_instr = 0.7
         # Seats and passengers gravity center (hypothesis of 2 pilots)
@@ -141,24 +136,14 @@ class InFlightCGVariation(om.ExplicitComponent):
         outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        if RTA_INSTALLED:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-            for submodel in oad.RegisterSubmodel.active_models.values():
-                if submodel is not None and ".rta" in submodel:
-                    empty_weight_variable_name = "data:weight:aircraft:OWE"
-                    break
-        else:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-        # Check whether RTA is installed and if the user intends to use it
-
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-            empty_weight_variable_name,
+            self.empty_weight_variable_name,
         ] = inputs["data:weight:aircraft_empty:CG:x"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft_empty:CG:x",
-        ] = inputs[empty_weight_variable_name]
+        ] = inputs[self.empty_weight_variable_name]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             "data:weight:aircraft:payload",
@@ -172,19 +157,23 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
     the sizing mission assuming a cg of payload as input.
     """
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.empty_weight_variable_name = None
+
     def setup(self):
         if RTA_INSTALLED:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
+            self.empty_weight_variable_name = "data:weight:aircraft_empty:mass"
             for submodel in oad.RegisterSubmodel.active_models.values():
                 if submodel is not None and ".rta" in submodel:
-                    empty_weight_variable_name = "data:weight:aircraft:OWE"
+                    self.empty_weight_variable_name = "data:weight:aircraft:OWE"
                     break
         else:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
+            self.empty_weight_variable_name = "data:weight:aircraft_empty:mass"
         # Check whether RTA is installed and if the user intends to use it
 
         self.add_input("data:weight:aircraft_empty:CG:x", val=np.nan, units="m")
-        self.add_input(empty_weight_variable_name, val=np.nan, units="kg")
+        self.add_input(self.empty_weight_variable_name, val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:payload", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:payload:CG:x", val=np.nan, units="m")
 
@@ -196,13 +185,13 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
 
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass",
-            wrt=["data:weight:aircraft:payload", empty_weight_variable_name],
+            wrt=["data:weight:aircraft:payload", self.empty_weight_variable_name],
             val=1.0,
         )
         self.declare_partials(
             of="data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
             wrt=[
-                empty_weight_variable_name,
+                self.empty_weight_variable_name,
                 "data:weight:aircraft_empty:CG:x",
                 "data:weight:aircraft:payload",
                 "data:mission:sizing:payload:CG:x",
@@ -211,16 +200,7 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if RTA_INSTALLED:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-            for submodel in oad.RegisterSubmodel.active_models.values():
-                if submodel is not None and ".rta" in submodel:
-                    empty_weight_variable_name = "data:weight:aircraft:OWE"
-                    break
-        else:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-        # Check whether RTA is installed and if the user intends to use it
-        m_empty = inputs[empty_weight_variable_name]
+        m_empty = inputs[self.empty_weight_variable_name]
         x_cg_plane_aft = inputs["data:weight:aircraft_empty:CG:x"]
 
         payload = inputs["data:weight:aircraft:payload"]
@@ -235,19 +215,9 @@ class InFlightCGVariationSimple(om.ExplicitComponent):
         outputs["data:weight:aircraft:in_flight_variation:fixed_mass_comp:mass"] = mass
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        if RTA_INSTALLED:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-            for submodel in oad.RegisterSubmodel.active_models.values():
-                if submodel is not None and ".rta" in submodel:
-                    empty_weight_variable_name = "data:weight:aircraft:OWE"
-                    break
-        else:
-            empty_weight_variable_name = "data:weight:aircraft_empty:mass"
-        # Check whether RTA is installed and if the user intends to use it
-
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
-            empty_weight_variable_name,
+            self.empty_weight_variable_name,
         ] = inputs["data:weight:aircraft_empty:CG:x"]
         partials[
             "data:weight:aircraft:in_flight_variation:fixed_mass_comp:equivalent_moment",
