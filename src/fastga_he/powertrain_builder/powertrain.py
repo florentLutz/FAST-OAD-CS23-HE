@@ -551,12 +551,11 @@ class FASTGAHEPowerTrainConfigurator:
                 pathlib.Path(self._power_train_file).lstat().st_mtime
             )
             self._check_connection(connections_list)
-            _LOGGER.info("Connection checked !!")
+            _LOGGER.info("Powertrain components' connections checked.")
 
     def _check_connection(self, connections_list):
         """
-        This function ensures all the connections respect the component connection limits and
-        no connection slop is left un connected once defined.
+        This function ensures that all the connections defined in the powertrain respect the components connection limit. It also checks that no components are left unconnected and ensure at least one propulsor is defined.
 
         The _get_components method must be run beforehand.
         """
