@@ -602,7 +602,9 @@ class FASTGAHEPowerTrainConfigurator:
             many_to_many_output_count,
             many_to_one_input_count,
             one_to_many_output_count,
-        ) = self._categorize_connectors(one_to_one_component, connector_component, connector_option)
+        ) = self._categorize_connector_type_component(
+            one_to_one_component, connector_component, connector_option
+        )
 
         # Check connections definition
         for comp in self._components_name:
@@ -663,7 +665,14 @@ class FASTGAHEPowerTrainConfigurator:
                         "Connector component is/are not properly connected!"
                     )
 
-    def _categorize_connectors(self, one_to_one_component, connector_names, connector_options):
+    def _categorize_connector_type_component(
+        self, one_to_one_component, connector_names, connector_options
+    ):
+        """
+        This function categorizes the components in the connector component type class according
+        to their number of input and output connections. This only applies in the
+        _check_connection function.
+        """
         connector_variable = [
             variable
             for name in connector_names
@@ -692,10 +701,12 @@ class FASTGAHEPowerTrainConfigurator:
                 max_num_output = 0
 
                 for var in variable_list:
+                    # This is to check if there is any multi-connection variable
                     integer = re.search(r"_(\d+)$", var)
                     if not integer:
                         continue
 
+                    # This is for finding the highest input connection port
                     if "_in_" in var:
                         one_to_one = False
                         multi_input = True
@@ -704,6 +715,7 @@ class FASTGAHEPowerTrainConfigurator:
                             if int(integer.group(1)) > max_num_input
                             else max_num_input
                         )
+                    # This is for finding the highest output connection port
                     elif "_out_" in var:
                         one_to_one = False
                         multi_output = True
@@ -712,7 +724,7 @@ class FASTGAHEPowerTrainConfigurator:
                             if int(integer.group(1)) > max_num_output
                             else max_num_output
                         )
-
+                # This part is to assign the connector type component to its catagory
                 if one_to_one:
                     one_to_one_component.append(name)
                 elif multi_input and multi_output:
@@ -729,14 +741,15 @@ class FASTGAHEPowerTrainConfigurator:
             else:
                 # This is for the connectors having given input and output numbers from pt file
                 num_connections = [
-                    v
-                    for k, v in zip(options.keys(), options.values())
-                    if k.startswith("number_of_")
+                    num
+                    for option, num in zip(options.keys(), options.values())
+                    if option.startswith("number_of_")
                 ]
 
+                # First check if there is any side having multiple connection
                 if any(num > 1 for num in num_connections):
+                    # This is to identify many-to-many component
                     if all(num > 1 for num in num_connections):
-                        # check if it is mimo
                         many_to_many_component = many_to_many_component.append(name)
                         many_to_many_input_count.append(
                             int(options.get("number_of_inputs") or options.get("number_of_tanks"))
@@ -751,11 +764,13 @@ class FASTGAHEPowerTrainConfigurator:
                             )
                         )
 
+                    # This is to identify many-to-one component
                     elif (options.get("number_of_inputs") or options.get("number_of_tanks")) > 1:
                         many_to_one_component.append(name)
                         many_to_one_input_count.append(
                             int(options.get("number_of_inputs") or options.get("number_of_tanks"))
                         )
+                    # This is to identify one-to-many component
                     else:
                         one_to_many_component.append(name)
                         one_to_many_output_count.append(
