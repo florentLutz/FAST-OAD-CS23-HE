@@ -4,6 +4,7 @@
 
 import openmdao.api as om
 import fastoad.api as oad
+
 from fastoad_cs25.models.weight.mass_breakdown.constants import SERVICE_PROPULSION_MASS
 from .b1_power_train_mass import PowerTrainMass
 

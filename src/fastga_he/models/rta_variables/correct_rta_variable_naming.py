@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import openmdao.api as om
 import numpy as np
+import openmdao.api as om
 
 
 class CorrectRTANaming(om.ExplicitComponent):
@@ -17,9 +17,7 @@ class CorrectRTANaming(om.ExplicitComponent):
         self.add_input("data:geometry:cabin:seats:economical:length", val=np.nan, units="m")
         self.add_input("data:geometry:wing:wetted_area", val=np.nan, units="m**2")
         self.add_input("data:aerodynamics:aircraft:takeoff:mach", val=np.nan)
-        self.add_input(
-            "data:aerodynamics:aircraft:cruise:CL_alpha", val=np.nan, units="1/rad"
-        )  # to correct
+        self.add_input("data:aerodynamics:aircraft:cruise:CL_alpha", val=np.nan, units="1/rad")
         self.add_input("data:weight:fuel_tank:CG:x", val=np.nan, units="m")
         self.add_input("data:mission:sizing:main_route:cruise:altitude", val=np.nan, units="m")
         self.add_input("data:aerodynamics:aircraft:cruise:CL0", val=np.nan)

@@ -11,7 +11,8 @@ from ..constants import VACUUM_MAGNETIC_PERMEABILITY
 class SizingToothRatio(om.ExplicitComponent):
     """
     Computation of the ratio between tooth length to bore radius. The formula is obtained from
-    equation (II-48) in :cite:`touhami:2020`. The default values are obtained from :cite:`pyrhonen:2013`.
+    equation (II-48) in :cite:`touhami:2020`. The default values are obtained
+    from :cite:`pyrhonen:2013`.
     """
 
     def initialize(self):

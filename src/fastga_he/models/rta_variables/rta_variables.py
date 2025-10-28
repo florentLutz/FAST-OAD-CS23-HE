@@ -2,10 +2,9 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-
+import importlib.util
 import openmdao.api as om
 import fastoad.api as oad
-import importlib.util
 
 from fastga.models.aerodynamics.components.elevator_aero import ComputeDeltaElevator
 from fastga.models.aerodynamics.components.fuselage.compute_cm_alpha_fus import (

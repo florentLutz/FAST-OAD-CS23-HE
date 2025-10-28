@@ -13,10 +13,9 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
-import openmdao.api as om
-
-import fastoad.api as oad
 import importlib.util
+import openmdao.api as om
+import fastoad.api as oad
 
 from fastga_he.models.performances.mission_vector.constants import SUBMODEL_CG_VARIATION
 

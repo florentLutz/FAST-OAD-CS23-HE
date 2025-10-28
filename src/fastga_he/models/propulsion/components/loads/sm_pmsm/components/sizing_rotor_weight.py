@@ -11,7 +11,7 @@ class SizingRotorWeight(om.ExplicitComponent):
     Computation of the rotor weight of the SM PMSM. The formula and the conditions are obtained
     from part II.2.6b in :cite:`touhami:2020`. The rotor density in the calculation is considered as
     the average density with respect to the volume. This is given by the regression model from
-    equation II-57 in :cite:`touhami:2020`, based on TMB and TMK electric motors.
+    equation (II-57) in :cite:`touhami:2020`, based on TMB and TMK electric motors.
     """
 
     def initialize(self):

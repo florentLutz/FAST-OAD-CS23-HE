@@ -71,6 +71,7 @@ class PerformancesCurrentRMS(om.ExplicitComponent):
         k_t = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_constant"]
 
         partials["ac_current_rms_in", "torque_out"] = np.ones(number_of_points) / k_t
+
         partials[
             "ac_current_rms_in",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":torque_constant",
