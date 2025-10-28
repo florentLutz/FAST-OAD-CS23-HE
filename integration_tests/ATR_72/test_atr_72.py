@@ -31,6 +31,4 @@ def test_sizing_atr_72():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
-    Path(RESULTS_FOLDER_PATH).mkdir(parents=True, exist_ok=True)
-
     problem.write_outputs()
