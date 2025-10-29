@@ -85,6 +85,14 @@ from .loads.pmsm import (
     LCCPMSMCost,
     LCCPMSMOperationalCost,
 )
+from .loads.sm_pmsm import (
+    SizingSMPMSM,
+    PerformancesSMPMSM,
+    SlipstreamSMPMSM,
+    PreLCASMPMSM,
+    LCCSMPMSMCost,
+    LCCSMPMSMOperationalCost,
+)
 from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
 from .propulsor.propeller import (
     SizingPropeller,

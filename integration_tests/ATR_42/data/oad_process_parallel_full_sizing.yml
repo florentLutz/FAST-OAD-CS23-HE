@@ -1,0 +1,90 @@
+title: Resized ATR 42 with parallel hybrid powertrain
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/resized_hybrid_inputs.xml
+output_file: ../results/resized_hybrid_outputs.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+# Definition of OpenMDAO model
+# Although "model" is a mandatory name for the top level of the model, its
+# sub-components can be freely named by user
+model:
+
+  #  Solvers are defined assuming the OpenMDAO convention "import openmdao.api as om"
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=20, rtol=1e-5)
+  linear_solver: om.DirectSolver()
+
+
+  # Components can be put in sub-groups
+  subgroup:
+
+    # A group can be set with its own solvers.
+    # Uncomment the 2 next lines for using the performance module with "mission_file_path:sizing_mission"
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=30, rtol=1e-5, iprint=2)
+    linear_solver: om.DirectSolver()
+
+    geometry:
+      id: fastoad.geometry.legacy
+    propeller:
+      id: rta.propulsion.propeller_sizing
+    weight:
+      id: fastoad.weight.legacy
+      payload_from_npax: false
+    mtow:
+      id: fastoad.mass_performances.compute_MTOW
+    aerodynamics_highspeed:
+      id: fastoad.aerodynamics.highspeed.legacy
+    aerodynamics_lowspeed:
+      id: fastoad.aerodynamics.lowspeed.legacy
+    aerodynamics_takeoff:
+      id: rta.aerodynamics.takeoff
+    hq_tail_sizing:
+      id: fastoad.handling_qualities.tail_sizing
+    hq_static_margin:
+      id: fastoad.handling_qualities.static_margin
+    wing_position:
+      id: fastoad.loop.wing_position
+    wing_area:
+      id: fastoad.loop.wing_area
+
+    rta_integration:
+      id: fastga_he.rta_variables
+      power_train_file_path: parallel_hybrid_assembly.yml
+
+    performances:
+      id: fastga_he.performances.mission_vector
+      number_of_points_climb: 30
+      number_of_points_cruise: 30
+      number_of_points_descent: 20
+      number_of_points_reserve: 10
+      power_train_file_path: parallel_hybrid_assembly.yml
+      out_file: ../results/full_sized_hybrid_propulsion.csv
+      use_linesearch: False
+      pre_condition_pt: False
+      sort_component: True
+      use_apply_nonlinear: True
+    power_train_sizing:
+      id: fastga_he.power_train.sizing
+      power_train_file_path: parallel_hybrid_assembly.yml
+
+submodels:
+  service.aerodynamics.CD0.sum: fastga_he.submodel.aerodynamics.sum.cd0.rta
+  service.aerodynamics.CD0.wing: fastga_he.submodel.aerodynamics.wing.cd0.rta
+  service.cg.propulsion: fastga_he.submodel.weight.cg.nacelle.rta
+  service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.legacy
+  service.geometry.wing: rta.submodel.geometry.wing
+  submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
+  service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train.rta
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+  submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
+  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
+  submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
+  submodel.propulsion.dc_dc_converter.inductor.inductance: null
+  submodel.propulsion.dc_dc_converter.weight: null

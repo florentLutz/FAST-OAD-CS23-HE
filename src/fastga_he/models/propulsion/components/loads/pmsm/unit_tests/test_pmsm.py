@@ -805,6 +805,7 @@ def test_cost():
         150.0,
         units="N*m",
     )
+
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
 
