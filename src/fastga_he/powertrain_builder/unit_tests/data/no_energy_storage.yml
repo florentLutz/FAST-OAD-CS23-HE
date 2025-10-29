@@ -30,10 +30,12 @@ power_train_components:
       number_of_outputs: 1
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
-  battery_pack_1:
-    id: fastga_he.pt_component.battery_pack
+
 
 component_connections:
+  - source: propeller_1
+    target: motor_1
+
   - source: motor_1
     target: inverter_1
 
@@ -58,7 +60,6 @@ component_connections:
   - source: [dc_bus_2, 1]
     target: dc_dc_converter_1
 
-  - source: dc_dc_converter_1
-    target: battery_pack_1
 
 watcher_file_path:
+

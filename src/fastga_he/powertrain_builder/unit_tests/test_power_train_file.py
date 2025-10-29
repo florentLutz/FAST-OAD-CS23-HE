@@ -182,6 +182,54 @@ def test_power_train_file_no_propeller():
     assert str(exc_info.value) == "Propulsor missing!"
 
 
+def test_power_train_file_no_energy_storage():
+    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
+        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_energy_storage.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(ComponentConnectionError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Storage tank or battery missing!"
+
+
+def test_power_train_file_input_error():
+    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
+        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "input_error.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(ComponentConnectionError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Having 1 inputs but expected 2 for fuel_system_1"
+
+
+def test_power_train_file_output_error():
+    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
+        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "output_error.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(ComponentConnectionError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Having 1 outputs but expected 2 for fuel_system_1"
+
+
 def test_power_train_file_connection_missing():
     if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
         FASTGAHEPowerTrainConfigurator._last_mod_time = 0
@@ -195,15 +243,13 @@ def test_power_train_file_connection_missing():
     with pytest.raises(ComponentConnectionError) as exc_info:
         power_train_configurator._get_connections()
 
-    assert str(exc_info.value) == "Component is/are not properly connected!"
+    assert str(exc_info.value) == "propeller_1 is not properly connected!"
 
-
-def test_power_train_file_connector_connection_error():
     if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
         FASTGAHEPowerTrainConfigurator._last_mod_time = 0
 
     sample_power_train_file_path = pth.join(
-        pth.dirname(__file__), "data", "connector_connection_error.yml"
+        pth.dirname(__file__), "data", "redundant_component.yml"
     )
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -213,7 +259,7 @@ def test_power_train_file_connector_connection_error():
     with pytest.raises(ComponentConnectionError) as exc_info:
         power_train_configurator._get_connections()
 
-    assert str(exc_info.value) == "Connector component is/are not properly connected!"
+    assert str(exc_info.value) == "fuel_tank_2 is not properly connected!"
 
 
 def test_power_train_file_direct_bus_battery_connection():

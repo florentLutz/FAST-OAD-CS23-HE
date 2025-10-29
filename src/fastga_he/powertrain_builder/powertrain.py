@@ -606,7 +606,53 @@ class FASTGAHEPowerTrainConfigurator:
             one_to_one_component, connector_component, connector_option
         )
 
-        # Check connections definition
+        if many_to_one_component:
+            for comp, input_count_defined in zip(many_to_one_component, many_to_one_input_count):
+                input_count = sum(
+                    1 for connection in connections_list if comp in connection.get("source")
+                )
+
+                if int(input_count_defined) != int(input_count):
+                    raise InputCountError(
+                        f"Having {input_count} inputs but expected {input_count_defined} for {comp}"
+                    )
+
+        if one_to_many_component:
+            for comp, output_count_defined in zip(one_to_many_component, one_to_many_output_count):
+                output_count = sum(
+                    1 for connection in connections_list if comp in connection.get("target")
+                )
+
+                if int(output_count_defined) != int(output_count):
+                    raise OutputCountError(
+                        f"Having {output_count} outputs but expected {output_count_defined} "
+                        f"for {comp}"
+                    )
+
+        if many_to_many_component:
+            for comp, input_count_defined, output_count_defined in zip(
+                many_to_many_component, many_to_many_input_count, many_to_many_output_count
+            ):
+                input_count = sum(
+                    1 for connection in connections_list if comp in connection.get("source")
+                )
+
+                output_count = sum(
+                    1 for connection in connections_list if comp in connection.get("target")
+                )
+
+                if int(input_count_defined) != int(input_count):
+                    raise InputCountError(
+                        f"Having {input_count} inputs but expected {input_count_defined} for {comp}"
+                    )
+
+                elif int(output_count_defined) != int(output_count):
+                    raise OutputCountError(
+                        f"Having {output_count} outputs but expected {output_count_defined} "
+                        f"for {comp}"
+                    )
+
+        # Check one-to-one connections definition
         for comp in self._components_name:
             if not any(
                 connection.get("target") == comp
@@ -615,63 +661,16 @@ class FASTGAHEPowerTrainConfigurator:
                 or comp in connection.get("source")
                 for connection in connections_list
             ):
-                raise ComponentConnectionError("Component is/are not properly connected!")
-
-        if many_to_one_component:
-            for comp, input_count in zip(many_to_one_component, many_to_one_input_count):
-                input_count_defined = 0
-
-                input_count_defined += sum(
-                    1 for connection in connections_list if comp in connection.get("source")
-                )
-
-                if int(input_count_defined) != int(input_count):
-                    raise ComponentConnectionError(
-                        "Connector component is/are not properly connected!"
-                    )
-
-        if one_to_many_component:
-            for comp, output_count in zip(one_to_many_component, one_to_many_output_count):
-                output_count_defined = 0
-
-                output_count_defined += sum(
-                    1 for connection in connections_list if comp in connection.get("target")
-                )
-
-                if int(output_count_defined) != int(output_count):
-                    raise ComponentConnectionError(
-                        "Connector component is/are not properly connected!"
-                    )
-
-        if many_to_many_component:
-            for comp, input_count, output_count in zip(
-                many_to_many_component, many_to_many_input_count, many_to_many_output_count
-            ):
-                input_count_defined = 0
-                output_count_defined = 0
-
-                input_count_defined += sum(
-                    1 for connection in connections_list if comp in connection.get("source")
-                )
-
-                output_count_defined += sum(
-                    1 for connection in connections_list if comp in connection.get("target")
-                )
-
-                if (int(input_count_defined) != int(input_count)) or (
-                    int(output_count_defined) != int(output_count)
-                ):
-                    raise ComponentConnectionError(
-                        "Connector component is/are not properly connected!"
-                    )
+                raise ComponentConnectionError(f"{comp} is not properly connected!")
 
     def _categorize_connector_type_component(
         self, one_to_one_component, connector_names, connector_options
     ):
         """
         This function categorizes the components in the connector component type class according
-        to their number of input and output connections. This only applies in the
-        _check_connection function.
+        to their number of input and output connections, the generator and turbo_generator are
+        exceptions that are energy source component but categorized as connector for the
+        powertrain component registry. This only applies in the _check_connection function.
         """
         connector_variable = [
             variable
@@ -690,55 +689,11 @@ class FASTGAHEPowerTrainConfigurator:
 
         for name, options in zip(connector_names, connector_options):
             variable_list = [var for var in connector_variable if name in var]
+            defined_multi_connection_exists = options is not None and any(
+                key.startswith("number_of_") for key in options.keys()
+            )
 
-            # Check many-to-many component
-            if options is None or not any(key.startswith("number_of_") for key in options.keys()):
-                # This is for the connectors without given input or output numbers from pt file
-                one_to_one = True
-                multi_input = False
-                multi_output = False
-                max_num_input = 0
-                max_num_output = 0
-
-                for var in variable_list:
-                    # This is to check if there is any multi-connection variable
-                    integer = re.search(r"_(\d+)$", var)
-                    if not integer:
-                        continue
-
-                    # This is for finding the highest input connection port
-                    if "_in_" in var:
-                        one_to_one = False
-                        multi_input = True
-                        max_num_input = (
-                            int(integer.group(1))
-                            if int(integer.group(1)) > max_num_input
-                            else max_num_input
-                        )
-                    # This is for finding the highest output connection port
-                    elif "_out_" in var:
-                        one_to_one = False
-                        multi_output = True
-                        max_num_output = (
-                            int(integer.group(1))
-                            if int(integer.group(1)) > max_num_output
-                            else max_num_output
-                        )
-                # This part is to assign the connector type component to its catagory
-                if one_to_one:
-                    one_to_one_component.append(name)
-                elif multi_input and multi_output:
-                    many_to_many_component.append(name)
-                    many_to_many_input_count.append(max_num_input)
-                    many_to_many_output_count.append(max_num_output)
-                elif multi_input:
-                    many_to_one_component.append(name)
-                    many_to_one_input_count.append(max_num_input)
-                elif multi_output:
-                    one_to_many_component.append(name)
-                    one_to_many_output_count.append(max_num_output)
-
-            else:
+            if defined_multi_connection_exists:
                 # This is for the connectors having given input and output numbers from pt file
                 num_connections = [
                     num
@@ -750,7 +705,7 @@ class FASTGAHEPowerTrainConfigurator:
                 if any(num > 1 for num in num_connections):
                     # This is to identify many-to-many component
                     if all(num > 1 for num in num_connections):
-                        many_to_many_component = many_to_many_component.append(name)
+                        many_to_many_component.append(name)
                         many_to_many_input_count.append(
                             int(options.get("number_of_inputs") or options.get("number_of_tanks"))
                         )
@@ -782,6 +737,48 @@ class FASTGAHEPowerTrainConfigurator:
                         )
                 else:
                     one_to_one_component.append(name)
+
+            else:
+                # This is for the connectors without given input or output numbers from pt file
+                one_to_one = True
+                multi_input = False
+                multi_output = False
+                max_num_input = 0
+                max_num_output = 0
+
+                for var in variable_list:
+                    # This is to check if there is any multi-connection variable
+                    integer = re.search(r"_(\d+)$", var)
+                    if not integer:
+                        continue
+
+                    # This is for finding the highest input connection port
+                    if "_in_" in var:
+                        one_to_one = False
+                        multi_input = True
+                        max_num_input = (
+                            int(integer.group(1))
+                            if int(integer.group(1)) > max_num_input
+                            else max_num_input
+                        )
+                    # This is for finding the highest output connection port
+                    elif "_out_" in var:
+                        one_to_one = False
+                        multi_output = True
+                        max_num_output = (
+                            int(integer.group(1))
+                            if int(integer.group(1)) > max_num_output
+                            else max_num_output
+                        )
+                # This part is to assign the connector type component to its category
+                if one_to_one:
+                    one_to_one_component.append(name)
+                elif multi_input:
+                    many_to_one_component.append(name)
+                    many_to_one_input_count.append(max_num_input)
+                elif multi_output:
+                    one_to_many_component.append(name)
+                    one_to_many_output_count.append(max_num_output)
 
         return (
             one_to_one_component,
@@ -2973,6 +2970,18 @@ class _YAMLSerializer(ABC):
 
 class ComponentConnectionError(Exception):
     """Error type only for component connections in powertrain configuration file"""
+
+    pass
+
+
+class InputCountError(ComponentConnectionError):
+    """Error caused by input number inconsistency"""
+
+    pass
+
+
+class OutputCountError(ComponentConnectionError):
+    """Error caused by output number inconsistency"""
 
     pass
 
