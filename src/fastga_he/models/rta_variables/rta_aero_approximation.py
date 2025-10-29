@@ -246,7 +246,7 @@ class WingLowSpeedVectors(om.ExplicitComponent):
         b = inputs["data:geometry:wing:b_50"]
         c_r = inputs["data:geometry:wing:root:chord"]
         c_t = inputs["data:geometry:wing:tip:chord"]
-        before_kink_point = int(inputs["data:geometry:wing:kink:span_ratio"] * 50)
+        before_kink_point = int(inputs["data:geometry:wing:kink:span_ratio"].item() * SPAN_MESH_POINT)
 
         outputs["data:aerodynamics:wing:low_speed:Y_vector"] = np.linspace(
             0, b / 2.0, SPAN_MESH_POINT
@@ -260,7 +260,7 @@ class WingLowSpeedVectors(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        before_kink_point = int(inputs["data:geometry:wing:kink:span_ratio"] * 50)
+        before_kink_point = int(inputs["data:geometry:wing:kink:span_ratio"].item() * SPAN_MESH_POINT)
 
         partials[
             "data:aerodynamics:wing:low_speed:chord_vector", "data:geometry:wing:tip:chord"

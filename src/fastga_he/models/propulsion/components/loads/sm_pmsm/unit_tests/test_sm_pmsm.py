@@ -1000,6 +1000,20 @@ def test_efficiency():
 
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("shaft_power_out", 1432.6 * np.ones(NB_POINTS_TEST), units="kW")
+    ivc.add_output("power_losses", 1500.0 * np.ones(NB_POINTS_TEST), units="kW")
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesEfficiency(motor_id="motor_1", number_of_points=NB_POINTS_TEST), ivc
+    )
+
+    assert problem.get_val("efficiency") == pytest.approx(0.5 * np.ones(NB_POINTS_TEST), rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
 
 def test_apparent_power():
     ivc = om.IndepVarComp()
