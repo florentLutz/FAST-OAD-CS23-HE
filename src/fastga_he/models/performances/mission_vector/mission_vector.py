@@ -15,6 +15,8 @@ from fastoad.module_management.constants import ModelDomain
 from stdatm import Atmosphere
 from typing import Tuple
 
+import importlib.util
+
 from .initialization.initialize import Initialize
 from .mission.mission_core import MissionCore
 from .to_csv import ToCSV
@@ -46,6 +48,7 @@ _LOGGER = logging.getLogger(__name__)
 DENSITY_SL = Atmosphere(0.0).density
 DUMMY_FUEL_CONSUMED = 200.0
 DUMMY_ENERGY_CONSUMED = 200e3
+RTA_INSTALLED = importlib.util.find_spec("rta") is not None
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.performances.mission_vector", domain=ModelDomain.OTHER)
@@ -70,6 +73,12 @@ class MissionVector(om.Group):
         # Will be used to register an large amplitude in the change in mtow which might make it
         # worth while to rerun the non linear guesses
         self._last_mtow = 0.0
+
+        # TODO: Change the service name in FAST-GA so that this is not necessary anymore
+        if RTA_INSTALLED:
+            oad.RegisterSubmodel.active_models["service.geometry.wing"] = (
+                "fastga.submodel.geometry.wing.legacy"
+            )
 
     def initialize(self):
         self.options.declare("out_file", default="", types=str)

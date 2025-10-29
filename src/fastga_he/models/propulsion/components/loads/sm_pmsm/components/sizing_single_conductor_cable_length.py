@@ -1,0 +1,96 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2025 ISAE-SUPAERO
+
+import numpy as np
+import openmdao.api as om
+
+
+class SizingSingleConductorCableLength(om.ExplicitComponent):
+    """
+    Computation of a single conductor cable length. The two coefficient are obtained from part
+    II.2.3a and II.2.5 in :cite:`touhami:2020`.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="motor_id", default=None, desc="Identifier of the motor", allow_none=False
+        )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
+    def setup(self):
+        motor_id = self.options["motor_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+            val=np.nan,
+            units="m",
+            desc="The length of electromagnetism active part of SM PMSM",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
+            val=np.nan,
+            desc="The factor to account for the conductor wire bunching",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
+            val=np.nan,
+            desc="The factor to account for extra length at the end of the winding",
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
+            units="m",
+            val=0.3,
+            desc="Single Conductor cable length in one slot",
+        )
+
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        motor_id = self.options["motor_id"]
+
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        cond_twisting_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff"
+        ]
+        end_winding_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        ]
+
+        outputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length"
+        ] = active_length * cond_twisting_coeff * end_winding_coeff
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        motor_id = self.options["motor_id"]
+
+        active_length = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length"
+        ]
+        cond_twisting_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff"
+        ]
+        end_winding_coeff = inputs[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff"
+        ]
+
+        partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":active_length",
+        ] = cond_twisting_coeff * end_winding_coeff
+
+        partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":cond_twisting_coeff",
+        ] = active_length * end_winding_coeff
+
+        partials[
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":conductor_cable_length",
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":end_winding_coeff",
+        ] = active_length * cond_twisting_coeff

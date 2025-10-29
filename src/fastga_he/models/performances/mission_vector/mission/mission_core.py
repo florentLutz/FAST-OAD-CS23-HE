@@ -60,7 +60,8 @@ class MissionCore(om.Group):
         self.options.declare(
             name="sort_component",
             default=False,
-            desc="Boolean to enable automatic sorting to improve robustness of the convergence by ensuring components are executed in the right order",
+            desc="Boolean to enable automatic sorting to improve robustness of the convergence by "
+            "ensuring components are executed in the right order",
             allow_none=False,
         )
 
