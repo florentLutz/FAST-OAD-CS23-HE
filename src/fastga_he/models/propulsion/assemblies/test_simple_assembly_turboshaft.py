@@ -176,14 +176,16 @@ def test_simple_turboshaft_assembly():
 def test_assembly_via_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_turboshaft_assembly.yml")
 
+    powertrain_performance = PowerTrainPerformancesFromFile(
+        power_train_file_path=pt_file_path,
+        number_of_points=NB_POINTS_TEST,
+        pre_condition_pt=True,
+    )
+
+    powertrain_performance.configurator._cache["skip_test"] = True
+
     ivc = get_indep_var_comp(
-        list_inputs(
-            PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path,
-                number_of_points=NB_POINTS_TEST,
-                pre_condition_pt=True,
-            )
-        ),
+        list_inputs(powertrain_performance),
         __file__,
         XML_FILE,
     )
@@ -196,11 +198,7 @@ def test_assembly_via_pt_file():
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
 
     problem = run_system(
-        PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path,
-            number_of_points=NB_POINTS_TEST,
-            pre_condition_pt=True,
-        ),
+        powertrain_performance,
         ivc,
     )
 
@@ -273,3 +271,5 @@ def test_assembly_via_pt_file():
         ),
         abs=1e-2,
     )
+
+    powertrain_performance.configurator._cache["skip_test"] = False
