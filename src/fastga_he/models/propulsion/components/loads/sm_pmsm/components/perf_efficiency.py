@@ -39,8 +39,6 @@ class PerformancesEfficiency(om.ExplicitComponent):
             "efficiency",
             val=np.full(number_of_points, 0.95),
             shape=number_of_points,
-            lower=CUTOFF_ETA_MIN,
-            upper=CUTOFF_ETA_MAX,
         )
 
     def setup_partials(self):
@@ -68,12 +66,14 @@ class PerformancesEfficiency(om.ExplicitComponent):
         losses = inputs["power_losses"]
         shaft_power = inputs["shaft_power_out"]
 
-        outputs["efficiency"] = np.divide(
+        unclipped_efficiency = np.divide(
             k_eff * shaft_power,
             shaft_power + losses,
             out=np.ones_like(shaft_power),
             where=shaft_power != 0,
         )
+
+        outputs["efficiency"] = np.clip(unclipped_efficiency, CUTOFF_ETA_MIN, CUTOFF_ETA_MAX)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
@@ -88,14 +88,22 @@ class PerformancesEfficiency(om.ExplicitComponent):
             where=shaft_power != 0,
         )
 
-        partials["efficiency", "shaft_power_out"] = np.divide(
-            k_eff * losses, (shaft_power + losses) * 2.0, out=np.ones_like(shaft_power)
+        partials["efficiency", "shaft_power_out"] = np.where(
+            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
+            k_eff * losses / (shaft_power + losses) ** 2.0,
+            np.full_like(shaft_power, 1e-6),
         )
 
-        partials["efficiency", "power_losses"] = np.divide(
-            -k_eff * shaft_power, (shaft_power + losses) ** 2.0, out=np.ones_like(shaft_power)
+        partials["efficiency", "power_losses"] = np.where(
+            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
+            -(k_eff * shaft_power / (shaft_power + losses) ** 2.0),
+            np.full_like(shaft_power, 1e-6),
         )
 
         partials[
             "efficiency", "settings:propulsion:he_power_train:SM_PMSM:" + motor_id + ":k_efficiency"
-        ] = np.divide(shaft_power, (shaft_power + losses), out=np.ones_like(shaft_power))
+        ] = np.where(
+            (unclipped_efficiency <= CUTOFF_ETA_MAX) & (unclipped_efficiency >= CUTOFF_ETA_MIN),
+            shaft_power / (shaft_power + losses),
+            np.full_like(shaft_power, 1e-6),
+        )
