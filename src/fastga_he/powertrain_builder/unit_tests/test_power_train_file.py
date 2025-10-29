@@ -110,6 +110,7 @@ def test_power_train_file_components_performances_sspc_last():
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
+    power_train_configurator._cache["skip_test"] = True
 
     (
         cp_name,
@@ -148,6 +149,8 @@ def test_power_train_file_components_performances_sspc_last():
         "dc_sspc_id",
     ]
 
+    power_train_configurator._cache["skip_test"] = False
+
 
 def test_power_train_file_connections():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
@@ -166,10 +169,23 @@ def test_power_train_file_connections():
         print("[" + om_output + ", " + om_input + "]")
 
 
-def test_power_train_file_no_propeller():
-    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
-        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
+def test_power_train_file_cache():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
 
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    last_mod_time = power_train_configurator._cache.get("last_mod_time")
+
+    power_train_configurator._get_connections()
+
+    assert power_train_configurator._cache.get("last_mod_time") == last_mod_time
+
+
+def test_power_train_file_no_propeller():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_propeller.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -183,9 +199,6 @@ def test_power_train_file_no_propeller():
 
 
 def test_power_train_file_no_energy_storage():
-    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
-        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_energy_storage.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -199,9 +212,6 @@ def test_power_train_file_no_energy_storage():
 
 
 def test_power_train_file_input_error():
-    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
-        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "input_error.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -215,9 +225,6 @@ def test_power_train_file_input_error():
 
 
 def test_power_train_file_output_error():
-    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
-        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "output_error.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -231,9 +238,6 @@ def test_power_train_file_output_error():
 
 
 def test_power_train_file_connection_missing():
-    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
-        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
-
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "connection_missing.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -244,9 +248,6 @@ def test_power_train_file_connection_missing():
         power_train_configurator._get_connections()
 
     assert str(exc_info.value) == "propeller_1 is not properly connected!"
-
-    if FASTGAHEPowerTrainConfigurator._last_mod_time > 0:
-        FASTGAHEPowerTrainConfigurator._last_mod_time = 0
 
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "redundant_component.yml"
@@ -1004,6 +1005,7 @@ def test_propulsor_connection():
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
+    power_train_configurator._cache["skip_test"] = True
 
     are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
 
@@ -1017,6 +1019,7 @@ def test_propulsor_connection():
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
+    power_train_configurator._cache["skip_test"] = True
 
     are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
 
@@ -1031,6 +1034,7 @@ def test_propulsor_connection():
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
+    power_train_configurator._cache["skip_test"] = True
 
     are_propulsor_connected = power_train_configurator.are_propulsor_connected_to_source()
 

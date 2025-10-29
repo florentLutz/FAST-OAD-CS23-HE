@@ -72,7 +72,7 @@ class FASTGAHEPowerTrainConfigurator:
     :param power_train_file_path: if provided, power train will be read directly from it
     """
 
-    _last_mod_time = 0
+    _cache = {"power_train_path": "", "last_mod_time": 0, "skip_test": False}
 
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
@@ -546,10 +546,15 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
-        if FASTGAHEPowerTrainConfigurator._last_mod_time == 0:
-            FASTGAHEPowerTrainConfigurator._last_mod_time = (
+        if not FASTGAHEPowerTrainConfigurator._cache.get("skip_test") and (
+            FASTGAHEPowerTrainConfigurator._cache.get("last_mod_time") == 0
+            or FASTGAHEPowerTrainConfigurator._cache.get("power_train_path")
+            != self._power_train_file
+        ):
+            FASTGAHEPowerTrainConfigurator._cache["last_mod_time"] = (
                 pathlib.Path(self._power_train_file).lstat().st_mtime
             )
+            FASTGAHEPowerTrainConfigurator._cache["power_train_path"] = self._power_train_file
             self._check_connection(connections_list)
             _LOGGER.info("Powertrain components' connections checked.")
 
