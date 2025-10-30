@@ -72,7 +72,7 @@ class FASTGAHEPowerTrainConfigurator:
     :param power_train_file_path: if provided, power train will be read directly from it
     """
 
-    _cache = {"power_train_path": "", "last_mod_time": 0, "skip_test": False}
+    _cache = {}
 
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
@@ -546,15 +546,8 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
-        if not FASTGAHEPowerTrainConfigurator._cache.get("skip_test") and (
-            FASTGAHEPowerTrainConfigurator._cache.get("last_mod_time") == 0
-            or FASTGAHEPowerTrainConfigurator._cache.get("power_train_path")
-            != self._power_train_file
-        ):
-            FASTGAHEPowerTrainConfigurator._cache["last_mod_time"] = (
-                pathlib.Path(self._power_train_file).lstat().st_mtime
-            )
-            FASTGAHEPowerTrainConfigurator._cache["power_train_path"] = self._power_train_file
+        if not self._check_existing_instance(self._power_train_file):
+            self._add_cache_instance(self._power_train_file)
             self._check_connection(connections_list)
             _LOGGER.info("Powertrain components' connections checked.")
 
@@ -575,9 +568,13 @@ class FASTGAHEPowerTrainConfigurator:
         one_to_one_component = []
         connector_component = []
         connector_option = []
+        connector_type = []
 
-        for comp, option, type in zip(
-            self._components_name, self._components_options, self._components_type_class
+        for comp, option, type, comp_type in zip(
+            self._components_name,
+            self._components_options,
+            self._components_type_class,
+            self._components_type,
         ):
             if type == "propulsor":
                 propulsor_component.append(comp)
@@ -591,6 +588,7 @@ class FASTGAHEPowerTrainConfigurator:
             elif type == "connector":
                 connector_component.append(comp)
                 connector_option.append(option)
+                connector_type.append(comp_type)
 
         if not propulsor_component:
             raise ComponentConnectionError("Propulsor missing!")
@@ -608,7 +606,7 @@ class FASTGAHEPowerTrainConfigurator:
             many_to_one_input_count,
             one_to_many_output_count,
         ) = self._categorize_connector_type_component(
-            one_to_one_component, connector_component, connector_option
+            one_to_one_component, connector_component, connector_option, connector_type
         )
 
         if many_to_one_component:
@@ -659,17 +657,20 @@ class FASTGAHEPowerTrainConfigurator:
 
         # Check one-to-one connections definition
         for comp in self._components_name:
-            if not any(
-                connection.get("target") == comp
-                or connection.get("source") == comp
-                or comp in connection.get("target")
-                or comp in connection.get("source")
+            if comp not in propulsor_component and not any(
+                connection.get("target") == comp or comp in connection.get("target")
                 for connection in connections_list
             ):
-                raise ComponentConnectionError(f"{comp} is not properly connected!")
+                raise ComponentConnectionError(f"{comp} is missing as target!")
+
+            if comp not in energy_storage_component and not any(
+                connection.get("source") == comp or comp in connection.get("source")
+                for connection in connections_list
+            ):
+                raise ComponentConnectionError(f"{comp} is missing as source!")
 
     def _categorize_connector_type_component(
-        self, one_to_one_component, connector_names, connector_options
+        self, one_to_one_component, connector_names, connector_options, connector_type
     ):
         """
         This function categorizes the components in the connector component type class according
@@ -692,7 +693,7 @@ class FASTGAHEPowerTrainConfigurator:
         many_to_many_input_count = []
         many_to_many_output_count = []
 
-        for name, options in zip(connector_names, connector_options):
+        for name, options, type in zip(connector_names, connector_options, connector_type):
             variable_list = [var for var in connector_variable if name in var]
             defined_multi_connection_exists = options is not None and any(
                 key.startswith("number_of_") for key in options.keys()
@@ -744,46 +745,34 @@ class FASTGAHEPowerTrainConfigurator:
                     one_to_one_component.append(name)
 
             else:
-                # This is for the connectors without given input or output numbers from pt file
-                one_to_one = True
-                multi_input = False
-                multi_output = False
-                max_num_input = 0
-                max_num_output = 0
-
-                for var in variable_list:
-                    # This is to check if there is any multi-connection variable
-                    integer = re.search(r"_(\d+)$", var)
-                    if not integer:
-                        continue
-
-                    # This is for finding the highest input connection port
-                    if "_in_" in var:
-                        one_to_one = False
-                        multi_input = True
-                        max_num_input = (
-                            int(integer.group(1))
-                            if int(integer.group(1)) > max_num_input
-                            else max_num_input
-                        )
-                    # This is for finding the highest output connection port
-                    elif "_out_" in var:
-                        one_to_one = False
-                        multi_output = True
-                        max_num_output = (
-                            int(integer.group(1))
-                            if int(integer.group(1)) > max_num_output
-                            else max_num_output
-                        )
-                # This part is to assign the connector type component to its category
-                if one_to_one:
-                    one_to_one_component.append(name)
-                elif multi_input:
+                if type == "DC_splitter" or type == "planetary_gear":
                     many_to_one_component.append(name)
-                    many_to_one_input_count.append(max_num_input)
-                elif multi_output:
-                    one_to_many_component.append(name)
-                    one_to_many_output_count.append(max_num_output)
+                    many_to_one_input_count.append(2)
+
+                elif type == "gearbox":
+                    max_num_output = 1
+                    for var in variable_list:
+                        # This is to check if there is any multi-connection variable
+                        integer = re.search(r"_(\d+)$", var)
+                        if not integer:
+                            continue
+
+                        # This is for finding the highest output connection port
+                        if "_out_" in var:
+                            max_num_output = (
+                                int(integer.group(1))
+                                if int(integer.group(1)) > max_num_output
+                                else max_num_output
+                            )
+
+                    if max_num_output == 1:
+                        one_to_one_component.append(name)
+                    else:
+                        one_to_many_component.append(name)
+                        one_to_many_output_count.append(2)
+
+                else:
+                    one_to_one_component.append(name)
 
         return (
             one_to_one_component,
@@ -2920,6 +2909,52 @@ class FASTGAHEPowerTrainConfigurator:
                 clean_dict[component_name] = clean_lines
 
         return clean_dict, list(set(species_list))
+
+    @staticmethod
+    def _check_existing_instance(power_train_file):
+        """
+        Checks the cache to see if an instance of the cache already exists and is usable. Usable
+        means there was no modification to the LCA configuration file.
+        """
+
+        # If cache is empty, no instance is usable
+        if not FASTGAHEPowerTrainConfigurator._cache:
+            return False
+
+        key = str(power_train_file)
+
+        # If the powertrain configuration file is a temporary copy or dedicated for a test,
+        # the connection test will be omitted
+        if key.endswith("_temp_copy.yml") or key.endswith("_test.yml"):
+            return True
+
+        # If cache is not empty but there is no instance of that particular configuration file, no
+        # instance is usable.
+        if key not in FASTGAHEPowerTrainConfigurator._cache:
+            return False
+
+        # Finally, if an instance exists, but it has been modified since, no instance is usable.
+        if (
+            FASTGAHEPowerTrainConfigurator._cache[key]["last_mod_time"]
+            < pathlib.Path(power_train_file).lstat().st_mtime
+        ):
+            return False
+
+        return True
+
+    @staticmethod
+    def _add_cache_instance(power_train_file):
+        """
+        In the case where no instance were usable and the compilation needed to be redone, we add
+        said compilation to the cache.
+        """
+
+        key = str(power_train_file)
+
+        cache_instance = {
+            "last_mod_time": pathlib.Path(power_train_file).lstat().st_mtime,
+        }
+        FASTGAHEPowerTrainConfigurator._cache[key] = cache_instance
 
     @staticmethod
     def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:
