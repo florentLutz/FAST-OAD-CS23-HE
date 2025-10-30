@@ -110,7 +110,6 @@ def test_power_train_file_components_performances_sspc_last():
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
-    power_train_configurator._cache["skip_test"] = True
 
     (
         cp_name,
@@ -148,8 +147,6 @@ def test_power_train_file_components_performances_sspc_last():
         "dc_sspc_id",
         "dc_sspc_id",
     ]
-
-    power_train_configurator._cache["skip_test"] = False
 
 
 def test_power_train_file_connections():

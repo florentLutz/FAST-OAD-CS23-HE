@@ -182,8 +182,6 @@ def test_assembly_via_pt_file():
         pre_condition_pt=True,
     )
 
-    powertrain_performance.configurator._cache["skip_test"] = True
-
     ivc = get_indep_var_comp(
         list_inputs(powertrain_performance),
         __file__,
@@ -271,5 +269,3 @@ def test_assembly_via_pt_file():
         ),
         abs=1e-2,
     )
-
-    powertrain_performance.configurator._cache["skip_test"] = False

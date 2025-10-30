@@ -564,6 +564,7 @@ class FASTGAHEPowerTrainConfigurator:
         self._get_components()
 
         propulsor_component = []
+        aux_load_component = []
         energy_storage_component = []
         one_to_one_component = []
         connector_component = []
@@ -582,8 +583,11 @@ class FASTGAHEPowerTrainConfigurator:
             elif type == "tank" or type == "source":
                 energy_storage_component.append(comp)
 
-            elif type == "load" or type == "propulsive_load" or "propulsive_load" in type:
+            elif type == "propulsive_load" or "propulsive_load" in type:
                 one_to_one_component.append(comp)
+
+            elif type == "load":
+                aux_load_component.append(comp)
 
             elif type == "connector":
                 connector_component.append(comp)
@@ -657,7 +661,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         # Check one-to-one connections definition
         for comp in self._components_name:
-            if comp not in propulsor_component and not any(
+            if comp not in propulsor_component + aux_load_component and not any(
                 connection.get("target") == comp or comp in connection.get("target")
                 for connection in connections_list
             ):
@@ -2914,7 +2918,7 @@ class FASTGAHEPowerTrainConfigurator:
     def _check_existing_instance(power_train_file):
         """
         Checks the cache to see if an instance of the cache already exists and is usable. Usable
-        means there was no modification to the LCA configuration file.
+        means there was no modification to the powertrain configuration file.
         """
 
         # If cache is empty, no instance is usable
