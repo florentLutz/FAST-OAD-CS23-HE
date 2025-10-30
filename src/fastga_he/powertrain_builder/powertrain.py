@@ -72,6 +72,8 @@ class FASTGAHEPowerTrainConfigurator:
     :param power_train_file_path: if provided, power train will be read directly from it
     """
 
+    _cache = {}
+
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
 
@@ -232,7 +234,7 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _get_components(self):
         # We will work under the assumption that is one list is empty, all are hence only one if
-        # statement. This allows us to know whether retriggering the identification of
+        # statement. This allows us to know whether re-triggering the identification of
         # components is necessary
 
         if self._components_id is None:
@@ -543,6 +545,245 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
+
+        if not self._check_existing_instance(self._power_train_file):
+            self._add_cache_instance(self._power_train_file)
+            self._check_connection(connections_list)
+            _LOGGER.info("Powertrain components' connections checked.")
+
+    def _check_connection(self, connections_list):
+        """
+        This function ensures that all the connections defined in the powertrain respect the
+        components connection limit. It also checks that no components are left unconnected and
+        ensure at least one propulsor and one energy storing device is defined.
+
+        The _get_components method must be run beforehand.
+        """
+
+        # This should do nothing if it has already been run.
+        self._get_components()
+
+        propulsor_component = []
+        energy_storage_component = []
+        one_to_one_component = []
+        connector_component = []
+        connector_option = []
+        connector_type = []
+
+        for comp, option, type, comp_type in zip(
+            self._components_name,
+            self._components_options,
+            self._components_type_class,
+            self._components_type,
+        ):
+            if type == "propulsor":
+                propulsor_component.append(comp)
+
+            elif type == "tank" or type == "source":
+                energy_storage_component.append(comp)
+
+            elif type == "load" or type == "propulsive_load" or "propulsive_load" in type:
+                one_to_one_component.append(comp)
+
+            elif type == "connector":
+                connector_component.append(comp)
+                connector_option.append(option)
+                connector_type.append(comp_type)
+
+        if not propulsor_component:
+            raise ComponentConnectionError("Propulsor missing!")
+
+        if not energy_storage_component:
+            raise ComponentConnectionError("Storage tank or battery missing!")
+
+        (
+            one_to_one_component,
+            one_to_many_component,
+            many_to_one_component,
+            many_to_many_component,
+            many_to_many_input_count,
+            many_to_many_output_count,
+            many_to_one_input_count,
+            one_to_many_output_count,
+        ) = self._categorize_connector_type_component(
+            one_to_one_component, connector_component, connector_option, connector_type
+        )
+
+        if many_to_one_component:
+            for comp, input_count_defined in zip(many_to_one_component, many_to_one_input_count):
+                input_count = sum(
+                    1 for connection in connections_list if comp in connection.get("source")
+                )
+
+                if int(input_count_defined) != int(input_count):
+                    raise InputCountError(
+                        f"Having {input_count} inputs but expected {input_count_defined} for {comp}"
+                    )
+
+        if one_to_many_component:
+            for comp, output_count_defined in zip(one_to_many_component, one_to_many_output_count):
+                output_count = sum(
+                    1 for connection in connections_list if comp in connection.get("target")
+                )
+
+                if int(output_count_defined) != int(output_count):
+                    raise OutputCountError(
+                        f"Having {output_count} outputs but expected {output_count_defined} "
+                        f"for {comp}"
+                    )
+
+        if many_to_many_component:
+            for comp, input_count_defined, output_count_defined in zip(
+                many_to_many_component, many_to_many_input_count, many_to_many_output_count
+            ):
+                input_count = sum(
+                    1 for connection in connections_list if comp in connection.get("source")
+                )
+
+                output_count = sum(
+                    1 for connection in connections_list if comp in connection.get("target")
+                )
+
+                if int(input_count_defined) != int(input_count):
+                    raise InputCountError(
+                        f"Having {input_count} inputs but expected {input_count_defined} for {comp}"
+                    )
+
+                elif int(output_count_defined) != int(output_count):
+                    raise OutputCountError(
+                        f"Having {output_count} outputs but expected {output_count_defined} "
+                        f"for {comp}"
+                    )
+
+        # Check one-to-one connections definition
+        for comp in self._components_name:
+            if comp not in propulsor_component and not any(
+                connection.get("target") == comp or comp in connection.get("target")
+                for connection in connections_list
+            ):
+                raise ComponentConnectionError(f"{comp} is missing as target!")
+
+            if comp not in energy_storage_component and not any(
+                connection.get("source") == comp or comp in connection.get("source")
+                for connection in connections_list
+            ):
+                raise ComponentConnectionError(f"{comp} is missing as source!")
+
+    def _categorize_connector_type_component(
+        self, one_to_one_component, connector_names, connector_options, connector_type
+    ):
+        """
+        This function categorizes the components in the connector component type class according
+        to their number of input and output connections, the generator and turbo_generator are
+        exceptions that are energy source component but categorized as connector for the
+        powertrain component registry. This only applies in the _check_connection function.
+        """
+        connector_variable = [
+            variable
+            for name in connector_names
+            for variable in self._components_connection_inputs + self._components_connection_outputs
+            if name in variable
+        ]
+
+        one_to_many_component = []
+        many_to_one_component = []
+        many_to_many_component = []
+        many_to_one_input_count = []
+        one_to_many_output_count = []
+        many_to_many_input_count = []
+        many_to_many_output_count = []
+
+        for name, options, type in zip(connector_names, connector_options, connector_type):
+            variable_list = [var for var in connector_variable if name in var]
+            defined_multi_connection_exists = options is not None and any(
+                key.startswith("number_of_") for key in options.keys()
+            )
+
+            if defined_multi_connection_exists:
+                # This is for the connectors having given input and output numbers from pt file
+                num_connections = [
+                    num
+                    for option, num in zip(options.keys(), options.values())
+                    if option.startswith("number_of_")
+                ]
+
+                # First check if there is any side having multiple connection
+                if any(num > 1 for num in num_connections):
+                    # This is to identify many-to-many component
+                    if all(num > 1 for num in num_connections):
+                        many_to_many_component.append(name)
+                        many_to_many_input_count.append(
+                            int(options.get("number_of_inputs") or options.get("number_of_tanks"))
+                        )
+                        many_to_many_output_count.append(
+                            int(
+                                (
+                                    options.get("number_of_outputs")
+                                    or options.get("number_of_power_sources")
+                                    or options.get("number_of_engines")
+                                )
+                            )
+                        )
+
+                    # This is to identify many-to-one component
+                    elif (options.get("number_of_inputs") or options.get("number_of_tanks")) > 1:
+                        many_to_one_component.append(name)
+                        many_to_one_input_count.append(
+                            int(options.get("number_of_inputs") or options.get("number_of_tanks"))
+                        )
+                    # This is to identify one-to-many component
+                    else:
+                        one_to_many_component.append(name)
+                        one_to_many_output_count.append(
+                            int(
+                                options.get("number_of_outputs")
+                                or options.get("number_of_power_sources")
+                                or options.get("number_of_engines")
+                            )
+                        )
+                else:
+                    one_to_one_component.append(name)
+
+            else:
+                if type == "DC_splitter" or type == "planetary_gear":
+                    many_to_one_component.append(name)
+                    many_to_one_input_count.append(2)
+
+                elif type == "gearbox":
+                    max_num_output = 1
+                    for var in variable_list:
+                        # This is to check if there is any multi-connection variable
+                        integer = re.search(r"_(\d+)$", var)
+                        if not integer:
+                            continue
+
+                        # This is for finding the highest output connection port
+                        if "_out_" in var:
+                            max_num_output = (
+                                int(integer.group(1))
+                                if int(integer.group(1)) > max_num_output
+                                else max_num_output
+                            )
+
+                    if max_num_output == 1:
+                        one_to_one_component.append(name)
+                    else:
+                        one_to_many_component.append(name)
+                        one_to_many_output_count.append(2)
+
+                else:
+                    one_to_one_component.append(name)
+
+        return (
+            one_to_one_component,
+            one_to_many_component,
+            many_to_one_component,
+            many_to_many_component,
+            many_to_many_input_count,
+            many_to_many_output_count,
+            many_to_one_input_count,
+            one_to_many_output_count,
+        )
 
     def _construct_connection_graph(self):
         graph = nx.Graph()
@@ -2670,6 +2911,52 @@ class FASTGAHEPowerTrainConfigurator:
         return clean_dict, list(set(species_list))
 
     @staticmethod
+    def _check_existing_instance(power_train_file):
+        """
+        Checks the cache to see if an instance of the cache already exists and is usable. Usable
+        means there was no modification to the LCA configuration file.
+        """
+
+        # If cache is empty, no instance is usable
+        if not FASTGAHEPowerTrainConfigurator._cache:
+            return False
+
+        key = str(power_train_file)
+
+        # If the powertrain configuration file is a temporary copy or dedicated for a test,
+        # the connection test will be omitted
+        if key.endswith("_temp_copy.yml") or key.endswith("_test.yml"):
+            return True
+
+        # If cache is not empty but there is no instance of that particular configuration file, no
+        # instance is usable.
+        if key not in FASTGAHEPowerTrainConfigurator._cache:
+            return False
+
+        # Finally, if an instance exists, but it has been modified since, no instance is usable.
+        if (
+            FASTGAHEPowerTrainConfigurator._cache[key]["last_mod_time"]
+            < pathlib.Path(power_train_file).lstat().st_mtime
+        ):
+            return False
+
+        return True
+
+    @staticmethod
+    def _add_cache_instance(power_train_file):
+        """
+        In the case where no instance were usable and the compilation needed to be redone, we add
+        said compilation to the cache.
+        """
+
+        key = str(power_train_file)
+
+        cache_instance = {
+            "last_mod_time": pathlib.Path(power_train_file).lstat().st_mtime,
+        }
+        FASTGAHEPowerTrainConfigurator._cache[key] = cache_instance
+
+    @staticmethod
     def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:
         """
         Utility function to detect if the line is part of the definition of a custom attribute.
@@ -2719,6 +3006,24 @@ class _YAMLSerializer(ABC):
         yaml.default_flow_style = False
         with open(file_path, "w") as file:
             yaml.dump(self._data, file)
+
+
+class ComponentConnectionError(Exception):
+    """Error type only for component connections in powertrain configuration file"""
+
+    pass
+
+
+class InputCountError(ComponentConnectionError):
+    """Error caused by input number inconsistency"""
+
+    pass
+
+
+class OutputCountError(ComponentConnectionError):
+    """Error caused by output number inconsistency"""
+
+    pass
 
 
 def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:

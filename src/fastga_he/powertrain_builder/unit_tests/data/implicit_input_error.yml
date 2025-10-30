@@ -58,7 +58,14 @@ power_train_components:
     position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
   battery_pack_2:
     id: fastga_he.pt_component.battery_pack
-    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"  
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
+
+  dc_dc_converter_3:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+  battery_pack_3:
+    id: fastga_he.pt_component.battery_pack
+    position: inside_the_wing  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
 
 component_connections:
   - source: propeller_1
@@ -102,5 +109,11 @@ component_connections:
 
   - source: dc_dc_converter_2
     target: battery_pack_2
+
+  - source: [dc_splitter_0, 3]
+    target: dc_dc_converter_3
+
+  - source: dc_dc_converter_3
+    target: battery_pack_3
 
 watcher_file_path:
