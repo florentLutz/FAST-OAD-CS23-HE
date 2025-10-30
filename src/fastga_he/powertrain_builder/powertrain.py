@@ -555,7 +555,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
         This function ensures that all the connections defined in the powertrain respect the
         components connection limit. It also checks that no components are left unconnected and
-        ensure at least one propulsor is defined.
+        ensure at least one propulsor and one energy storing device is defined.
 
         The _get_components method must be run beforehand.
         """
