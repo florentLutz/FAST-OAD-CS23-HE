@@ -26,6 +26,11 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            "cut_off_propeller_efficiency",
+            default=0.5,
+            desc="Limit lower value of the efficiency for the Cp computation",
+        )
 
     def setup(self):
         propeller_id = self.options["propeller_id"]
@@ -145,7 +150,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         # ever look at energy recuperation, it might need to be changed. To compute the upper
         # bound, instead of having a fixed value we will assume a very low efficiency and compute
         # it from there
-        lower_efficiency = 0.5
+        lower_efficiency = self.options["cut_off_propeller_efficiency"]
         cp = np.clip(cp, 0.0, j * ct / lower_efficiency)
 
         # Also as discussed if the ct is low enough (no thrust, the cp will be cutoff)

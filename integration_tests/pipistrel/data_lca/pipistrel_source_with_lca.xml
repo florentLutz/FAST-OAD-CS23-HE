@@ -312,8 +312,9 @@
               <y_ratio>0.5</y_ratio>
             </CG>
             <cell>
-              <voltage_max_SOC units="V">3.0</voltage_max_SOC>
-              <voltage_min_SOC units="V">1.0</voltage_min_SOC>
+              <voltage_max_SOC units="V">2.2</voltage_max_SOC>
+              <voltage_min_SOC units="V">1.3</voltage_min_SOC>
+              <resistance units="ohm">0.7e-3</resistance>
             </cell>
           </battery_pack_1>
           <battery_pack_2>
@@ -333,8 +334,9 @@
               <y_ratio>0.5</y_ratio>
             </CG>
             <cell>
-              <voltage_max_SOC units="V">3.0</voltage_max_SOC>
-              <voltage_min_SOC units="V">1.0</voltage_min_SOC>
+              <voltage_max_SOC units="V">2.2</voltage_max_SOC>
+              <voltage_min_SOC units="V">1.3</voltage_min_SOC>
+              <resistance units="ohm">0.7e-3</resistance>
             </cell>
           </battery_pack_2>
         </battery_pack>

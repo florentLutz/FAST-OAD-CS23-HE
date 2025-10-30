@@ -71,7 +71,6 @@ model:
     normalization: true
     weighting: true
     ecoinvent_version: 3.9.1
-    impact_assessment_method: EF v3.1
 
 submodels:
   submodel.propulsion.constraints.pmsm.rpm: fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure

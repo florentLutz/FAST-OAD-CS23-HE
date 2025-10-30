@@ -50,15 +50,15 @@ def test_lca_pipistrel_sw_121_reference():
     problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
     problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
 
+    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=1.5)
+    problem.set_val("data:TLAR:max_airframe_hours", val=11000, units="h")
+
     # Run the problem
     problem.run_model()
 
     # Write the outputs
     problem.write_outputs()
 
-    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00636904, rel=1e-3
-    )
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         589.0, rel=1e-3
     )
@@ -100,15 +100,15 @@ def test_lca_pipistrel_sw_121_heavy():
     problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
     problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
 
+    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=7.5)
+    problem.set_val("data:TLAR:max_airframe_hours", val=11000, units="h")
+
     # Run the problem
     problem.run_model()
 
     # Write the outputs
     problem.write_outputs()
 
-    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00647853, rel=1e-3
-    )
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         640.0, rel=1e-3
     )

@@ -62,6 +62,7 @@ def test_lca_pipistrel_reference_cell():
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=700.0
     )
+    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=1.5)
 
     # Run the problem
     problem.run_model()
@@ -72,7 +73,7 @@ def test_lca_pipistrel_reference_cell():
     assert problem.get_val("data:weight:aircraft:MTOW") == pytest.approx(600, rel=1e-3)
     assert problem.get_val("data:weight:aircraft:OWE") == pytest.approx(428, rel=1e-3)
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00374279, rel=1e-3
+        0.00387437, rel=1e-3
     )
 
 
@@ -198,6 +199,7 @@ def test_lca_pipistrel_high_energy_density_cell():
         val=4.0,
         units="h**-1",
     )
+    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=1.5)
 
     # Run the problem
     problem.run_model()
@@ -216,7 +218,7 @@ def test_lca_pipistrel_high_energy_density_cell():
     ) == pytest.approx(38.8, rel=1e-2)
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00789594, rel=1e-3
+        0.00800477, rel=1e-3
     )
 
 
@@ -323,12 +325,15 @@ def test_lca_pipistrel_long_lifespan_cell():
     # (https://www.skeletontech.com/superbattery) for the sole reason that the mass diverges. This
     # is actually the closest we can get without divergence so we are very optimistic on the
     # battery energy density but even then the single is greater than the reference case.
+    # We tke data from the D60 cell
     problem.model_options["*"] = {
-        "cell_capacity_ref": 2.30,
-        "cell_weight_ref": 53.5e-3,
+        "cell_capacity_ref": 3.3,
+        "cell_weight_ref": 0.09
+        / 1.1363636363636365,  # 0.09 Corresponds to the reference conditions for the D60
         "reference_curve_current": [100.0, 10000.0, 30000.0, 46000.0],
         "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
         "cut_off_voltage": 1.0,
+        "cut_off_propeller_efficiency": 0.75,
     }
 
     problem.setup()
@@ -359,17 +364,6 @@ def test_lca_pipistrel_long_lifespan_cell():
         val=20.0,
         units="h**-1",
     )
-
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:resistance",
-        val=0.3e-3,
-        units="ohm",
-    )
-    problem.set_val(
-        "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:resistance",
-        val=0.3e-3,
-        units="ohm",
-    )
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:module:number_cells", val=150.0
     )
@@ -384,6 +378,7 @@ def test_lca_pipistrel_long_lifespan_cell():
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=20.0
     )
+    problem.set_val("data:environmental_impact:buy_to_fly:composite", val=1.5)
 
     # Run the problem
     problem.run_model()

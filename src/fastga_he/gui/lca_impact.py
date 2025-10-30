@@ -950,6 +950,7 @@ def lca_impacts_bar_chart_simple(
     names_aircraft: Union[str, List[str]] = None,
     impact_step: str = "weighted",
     graph_title: str = None,
+    impact_filter_list: list = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiples aircraft designs across all categories. This comparison
@@ -962,6 +963,8 @@ def lca_impacts_bar_chart_simple(
     can also be "normalized" or "raw" results.
     :param graph_title: title of the graph, if None are specified one is created based on the
     aircraft names
+    :param impact_filter_list: filter to only show impact in the list in output graph. By default
+    everything is plotted.
     """
 
     fig = go.Figure()
@@ -984,7 +987,20 @@ def lca_impacts_bar_chart_simple(
             impact_scores.append(impact_score / reference_value[impact_name] * 100.0)
             beautified_impact_names.append(beautified_impact_name)
 
-        bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
+        if impact_filter_list:
+            filtered_impact_names = []
+            filtered_impact_scores = []
+            for tl_impact in impact_filter_list:
+                if tl_impact in beautified_impact_names:
+                    filtered_impact_names.append(tl_impact)
+                    filtered_impact_scores.append(
+                        impact_scores[beautified_impact_names.index(tl_impact)]
+                    )
+        else:
+            filtered_impact_names = beautified_impact_names
+            filtered_impact_scores = impact_scores
+
+        bar_chart = go.Bar(name=name_aircraft, x=filtered_impact_names, y=filtered_impact_scores)
         fig.add_trace(bar_chart)
 
     if graph_title:
@@ -1371,6 +1387,7 @@ def lca_raw_impact_comparison_advanced(
 def lca_impacts_bar_chart_normalised_weighted(
     aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
     names_aircraft: Union[str, List[str]] = None,
+    impact_filter_list: list = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiples aircraft designs across all categories. This comparison
@@ -1379,6 +1396,8 @@ def lca_impacts_bar_chart_normalised_weighted(
 
     :param aircraft_file_paths: paths to the output file that contains the impacts.
     :param names_aircraft: names of the aircraft.
+    :param impact_filter_list: filter to only show impact in the list in output graph. By default
+    everything is plotted.
     """
 
     fig = go.Figure()
@@ -1393,7 +1412,20 @@ def lca_impacts_bar_chart_normalised_weighted(
             impact_scores.append(impact_score)
             beautified_impact_names.append(beautified_impact_name)
 
-        bar_chart = go.Bar(name=name_aircraft, x=beautified_impact_names, y=impact_scores)
+        if impact_filter_list:
+            filtered_impact_names = []
+            filtered_impact_scores = []
+            for tl_impact in impact_filter_list:
+                if tl_impact in beautified_impact_names:
+                    filtered_impact_names.append(tl_impact)
+                    filtered_impact_scores.append(
+                        impact_scores[beautified_impact_names.index(tl_impact)]
+                    )
+        else:
+            filtered_impact_names = beautified_impact_names
+            filtered_impact_scores = impact_scores
+
+        bar_chart = go.Bar(name=name_aircraft, x=filtered_impact_names, y=filtered_impact_scores)
         fig.add_trace(bar_chart)
 
     if len(names_aircraft) == 1:
