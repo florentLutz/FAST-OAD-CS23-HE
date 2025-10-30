@@ -18,6 +18,6 @@ simple powertrain templates.
 
 .. note::
 
-   Avoid ending PT file names with ``_test`` or ``_temp_copy``.
+   Avoid ending PT file names with ``_temp_copy``.
    Using these suffixes may interfere with several powertrain syntax checks.
 

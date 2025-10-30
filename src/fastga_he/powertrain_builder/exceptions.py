@@ -47,3 +47,19 @@ class FASTGAHEImpossiblePair(FastError):
     """
     Class for managing errors that result from trying to pair with a component that does not exist.
     """
+
+
+class FASTGAHEComponentConnectionError(FastError):
+    """Error type only for component connections in powertrain configuration file"""
+
+
+class FASTGAHECriticalComponentMissingError(FastError):
+    """Error type only for component connections in powertrain configuration file"""
+
+
+class FASTGAHEInputCountError(FastError):
+    """Error caused by input number inconsistency"""
+
+
+class FASTGAHEOutputCountError(FastError):
+    """Error caused by output number inconsistency"""

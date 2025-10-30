@@ -31,6 +31,10 @@ from .exceptions import (
     FASTGAHESingleSSPCAtEndOfLine,
     FASTGAHEIncoherentVoltage,
     FASTGAHEImpossiblePair,
+    FASTGAHEComponentConnectionError,
+    FASTGAHECriticalComponentMissingError,
+    FASTGAHEInputCountError,
+    FASTGAHEOutputCountError,
 )
 
 from . import resources
@@ -571,34 +575,37 @@ class FASTGAHEPowerTrainConfigurator:
         connector_option = []
         connector_type = []
 
-        for comp, option, type, comp_type in zip(
+        for components_name, components_options, components_type_class, components_type in zip(
             self._components_name,
             self._components_options,
             self._components_type_class,
             self._components_type,
         ):
-            if type == "propulsor":
-                propulsor_component.append(comp)
+            if components_type_class == "propulsor":
+                propulsor_component.append(components_name)
 
-            elif type == "tank" or type == "source":
-                energy_storage_component.append(comp)
+            elif components_type_class == "tank" or components_type_class == "source":
+                energy_storage_component.append(components_name)
 
-            elif type == "propulsive_load" or "propulsive_load" in type:
-                one_to_one_component.append(comp)
+            elif (
+                components_type_class == "propulsive_load"
+                or "propulsive_load" in components_type_class
+            ):
+                one_to_one_component.append(components_name)
 
-            elif type == "load":
-                aux_load_component.append(comp)
+            elif components_type_class == "load":
+                aux_load_component.append(components_name)
 
-            elif type == "connector":
-                connector_component.append(comp)
-                connector_option.append(option)
-                connector_type.append(comp_type)
+            elif components_type_class == "connector":
+                connector_component.append(components_name)
+                connector_option.append(components_options)
+                connector_type.append(components_type)
 
         if not propulsor_component:
-            raise ComponentConnectionError("Propulsor missing!")
+            raise FASTGAHECriticalComponentMissingError("Propulsor missing!")
 
         if not energy_storage_component:
-            raise ComponentConnectionError("Storage tank or battery missing!")
+            raise FASTGAHECriticalComponentMissingError("Storage tank or battery missing!")
 
         (
             one_to_one_component,
@@ -613,65 +620,85 @@ class FASTGAHEPowerTrainConfigurator:
             one_to_one_component, connector_component, connector_option, connector_type
         )
 
+        # Check component existance
         if many_to_one_component:
-            for comp, input_count_defined in zip(many_to_one_component, many_to_one_input_count):
-                input_count = sum(
-                    1 for connection in connections_list if comp in connection.get("source")
-                )
+            for components_name, input_count_defined in zip(
+                many_to_one_component, many_to_one_input_count
+            ):
+                # counter reset
+                input_count = 0
+
+                for connection in connections_list:
+                    if components_name in connection.get("source"):
+                        input_count += 1
 
                 if int(input_count_defined) != int(input_count):
-                    raise InputCountError(
-                        f"Having {input_count} inputs but expected {input_count_defined} for {comp}"
+                    raise FASTGAHEInputCountError(
+                        f"Components {components_name} expects {input_count_defined} from the "
+                        f"option definition but the connection section lists {input_count} inputs"
                     )
 
+        # Check component existance
         if one_to_many_component:
-            for comp, output_count_defined in zip(one_to_many_component, one_to_many_output_count):
-                output_count = sum(
-                    1 for connection in connections_list if comp in connection.get("target")
-                )
+            for components_name, output_count_defined in zip(
+                one_to_many_component, one_to_many_output_count
+            ):
+                # counter reset
+                output_count = 0
+
+                for connection in connections_list:
+                    if components_name in connection.get("target"):
+                        output_count += 1
 
                 if int(output_count_defined) != int(output_count):
-                    raise OutputCountError(
-                        f"Having {output_count} outputs but expected {output_count_defined} "
-                        f"for {comp}"
+                    raise FASTGAHEOutputCountError(
+                        f"Components {components_name} expects {output_count_defined} from the "
+                        f"option definition but the connection section lists {output_count} outputs"
                     )
 
+        # Check component existance
         if many_to_many_component:
-            for comp, input_count_defined, output_count_defined in zip(
+            for components_name, input_count_defined, output_count_defined in zip(
                 many_to_many_component, many_to_many_input_count, many_to_many_output_count
             ):
-                input_count = sum(
-                    1 for connection in connections_list if comp in connection.get("source")
-                )
+                # counter reset
+                input_count = 0
+                output_count = 0
 
-                output_count = sum(
-                    1 for connection in connections_list if comp in connection.get("target")
-                )
+                for connection in connections_list:
+                    if components_name in connection.get("source"):
+                        input_count += 1
+
+                    elif components_name in connection.get("target"):
+                        output_count += 1
 
                 if int(input_count_defined) != int(input_count):
-                    raise InputCountError(
-                        f"Having {input_count} inputs but expected {input_count_defined} for {comp}"
+                    raise FASTGAHEInputCountError(
+                        f"Components {components_name} expects {input_count_defined} from the "
+                        f"option definition but the connection section lists {input_count} inputs"
                     )
 
                 elif int(output_count_defined) != int(output_count):
-                    raise OutputCountError(
-                        f"Having {output_count} outputs but expected {output_count_defined} "
-                        f"for {comp}"
+                    raise FASTGAHEOutputCountError(
+                        f"Components {components_name} expects {output_count_defined} from the "
+                        f"option definition but the connection section lists {output_count} outputs"
                     )
 
         # Check one-to-one connections definition
-        for comp in self._components_name:
-            if comp not in propulsor_component + aux_load_component and not any(
-                connection.get("target") == comp or comp in connection.get("target")
+        for components_name in self._components_name:
+            if components_name not in propulsor_component + aux_load_component and not any(
+                connection.get("target") == components_name
+                or components_name in connection.get("target")
                 for connection in connections_list
             ):
-                raise ComponentConnectionError(f"{comp} is missing as target!")
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as target!")
 
-            if comp not in energy_storage_component and not any(
-                connection.get("source") == comp or comp in connection.get("source")
+            if components_name not in energy_storage_component and not any(
+                connection.get("source") == components_name
+                or components_name in connection.get("source")
                 for connection in connections_list
             ):
-                raise ComponentConnectionError(f"{comp} is missing as source!")
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as source!")
 
     def _categorize_connector_type_component(
         self, one_to_one_component, connector_names, connector_options, connector_type
@@ -682,12 +709,6 @@ class FASTGAHEPowerTrainConfigurator:
         exceptions that are energy source component but categorized as connector for the
         powertrain component registry. This only applies in the _check_connection function.
         """
-        connector_variable = [
-            variable
-            for name in connector_names
-            for variable in self._components_connection_inputs + self._components_connection_outputs
-            if name in variable
-        ]
 
         one_to_many_component = []
         many_to_one_component = []
@@ -698,7 +719,6 @@ class FASTGAHEPowerTrainConfigurator:
         many_to_many_output_count = []
 
         for name, options, type in zip(connector_names, connector_options, connector_type):
-            variable_list = [var for var in connector_variable if name in var]
             defined_multi_connection_exists = options is not None and any(
                 key.startswith("number_of_") for key in options.keys()
             )
@@ -754,26 +774,8 @@ class FASTGAHEPowerTrainConfigurator:
                     many_to_one_input_count.append(2)
 
                 elif type == "gearbox":
-                    max_num_output = 1
-                    for var in variable_list:
-                        # This is to check if there is any multi-connection variable
-                        integer = re.search(r"_(\d+)$", var)
-                        if not integer:
-                            continue
-
-                        # This is for finding the highest output connection port
-                        if "_out_" in var:
-                            max_num_output = (
-                                int(integer.group(1))
-                                if int(integer.group(1)) > max_num_output
-                                else max_num_output
-                            )
-
-                    if max_num_output == 1:
-                        one_to_one_component.append(name)
-                    else:
-                        one_to_many_component.append(name)
-                        one_to_many_output_count.append(2)
+                    one_to_many_component.append(name)
+                    one_to_many_output_count.append(2)
 
                 else:
                     one_to_one_component.append(name)
@@ -2929,7 +2931,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         # If the powertrain configuration file is a temporary copy or dedicated for a test,
         # the connection test will be omitted
-        if key.endswith("_temp_copy.yml") or key.endswith("_test.yml"):
+        if key.endswith("_temp_copy.yml"):
             return True
 
         # If cache is not empty but there is no instance of that particular configuration file, no
@@ -3010,24 +3012,6 @@ class _YAMLSerializer(ABC):
         yaml.default_flow_style = False
         with open(file_path, "w") as file:
             yaml.dump(self._data, file)
-
-
-class ComponentConnectionError(Exception):
-    """Error type only for component connections in powertrain configuration file"""
-
-    pass
-
-
-class InputCountError(ComponentConnectionError):
-    """Error caused by input number inconsistency"""
-
-    pass
-
-
-class OutputCountError(ComponentConnectionError):
-    """Error caused by output number inconsistency"""
-
-    pass
 
 
 def format_to_array(input_array: np.ndarray, number_of_points: int) -> np.ndarray:
