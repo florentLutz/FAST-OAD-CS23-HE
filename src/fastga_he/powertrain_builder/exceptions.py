@@ -19,6 +19,13 @@ class FASTGAHEUnknownOption(FastError):
     """
 
 
+class FASTGAHEInvalidOptionDefinition(FastError):
+    """
+    Class for managing errors that result from trying to add a component to the power train with
+    invalid option definition.
+    """
+
+
 class FASTGAHEComponentsNotIdentified(FastError):
     """
     Class for managing errors that result from trying to run the _get_connection method before

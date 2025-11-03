@@ -28,6 +28,7 @@ import networkx as nx
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
+    FASTGAHEInvalidOptionDefinition,
     FASTGAHESingleSSPCAtEndOfLine,
     FASTGAHEImpossiblePair,
     FASTGAHEIncoherentVoltage,
@@ -692,7 +693,7 @@ class FASTGAHEPowerTrainConfigurator:
                         f"connection section"
                     )
 
-                elif int(output_count_defined) != int(output_count):
+                if int(output_count_defined) != int(output_count):
                     raise FASTGAHEOutputCountError(
                         f"Component {components_name} defines {output_count_defined} outputs from "
                         f"the option definition, but {output_count} output(s) is/are listed in the "
@@ -742,48 +743,51 @@ class FASTGAHEPowerTrainConfigurator:
 
             if defined_multi_connection_exists:
                 # This is for the connectors having given input and output numbers from pt file
-                num_connections = [
-                    num
-                    for option, num in zip(options.keys(), options.values())
-                    if option.startswith("number_of_")
+                input_options = ["number_of_inputs", "number_of_tanks"]
+                output_options = [
+                    "number_of_outputs",
+                    "number_of_engines",
+                    "number_of_power_sources",
                 ]
 
-                # First check if there is any side having multiple connection
-                if any(num > 1 for num in num_connections):
-                    # This is to identify many-to-many component
-                    if all(num > 1 for num in num_connections):
-                        many_to_many_component.append(name)
-                        many_to_many_input_count.append(
-                            int(options.get("number_of_inputs") or options.get("number_of_tanks"))
-                        )
-                        many_to_many_output_count.append(
-                            int(
-                                (
-                                    options.get("number_of_outputs")
-                                    or options.get("number_of_power_sources")
-                                    or options.get("number_of_engines")
-                                )
+                num_input = 0
+                num_output = 0
+
+                for option, num in zip(options.keys(), options.values()):
+                    if option in input_options:
+                        num_input = int(num)
+                        if num_input < num or num_input <= 0:
+                            raise FASTGAHEInvalidOptionDefinition(
+                                f"{num} is invalid as input option value, only positive integers "
+                                f"are allowed"
                             )
-                        )
+
+                    elif option in output_options:
+                        num_output = int(num)
+                        if num_output < num or num_output <= 0:
+                            raise FASTGAHEInvalidOptionDefinition(
+                                f"{num} is invalid as output option value, only positive integers "
+                                f"are allowed"
+                            )
+
+                # First check if there is any side having multiple connection
+                if num_input > 1 or num_output > 1:
+                    # This is to identify many-to-many component
+                    if num_input > 1 and num_output > 1:
+                        many_to_many_component.append(name)
+                        many_to_many_input_count.append(num_input)
+                        many_to_many_output_count.append(num_output)
 
                     # This is to identify many-to-one component
-                    elif (options.get("number_of_inputs") or options.get("number_of_tanks")) > 1:
+                    elif num_input > 1:
                         many_to_one_component.append(name)
-                        many_to_one_input_count.append(
-                            int(options.get("number_of_inputs") or options.get("number_of_tanks"))
-                        )
+                        many_to_one_input_count.append(num_input)
                         option_defined_many_to_one.append(True)
 
                     # This is to identify one-to-many component
                     else:
                         one_to_many_component.append(name)
-                        one_to_many_output_count.append(
-                            int(
-                                options.get("number_of_outputs")
-                                or options.get("number_of_power_sources")
-                                or options.get("number_of_engines")
-                            )
-                        )
+                        one_to_many_output_count.append(num_output)
                         option_defined_one_to_many.append(True)
                 else:
                     one_to_one_component.append(name)

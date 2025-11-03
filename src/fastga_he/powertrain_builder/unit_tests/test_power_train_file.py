@@ -20,6 +20,7 @@ from ..exceptions import (
     FASTGAHECriticalComponentMissingError,
     FASTGAHEInputCountError,
     FASTGAHEOutputCountError,
+    FASTGAHEInvalidOptionDefinition,
 )
 
 YML_FILE = "sample_power_train_file.yml"
@@ -306,6 +307,23 @@ def test_power_train_file_connection_missing():
         power_train_configurator._get_connections()
 
     assert str(exc_info.value) == "fuel_tank_2 is missing as target!"
+
+
+def test_power_train_file_invalid_connection_definition():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "invalid_option_definition.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEInvalidOptionDefinition) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == (
+        "0 is invalid as output option value, only positive integers are allowed"
+    )
 
 
 def test_power_train_file_direct_bus_battery_connection():
