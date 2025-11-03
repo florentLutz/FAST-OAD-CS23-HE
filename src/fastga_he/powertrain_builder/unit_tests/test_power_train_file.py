@@ -295,7 +295,7 @@ def test_power_train_file_connection_missing():
     assert str(exc_info.value) == "propeller_1 is missing as source!"
 
     sample_power_train_file_path = pth.join(
-        pth.dirname(__file__), "data", "redundant_component.yml"
+        pth.dirname(__file__), "data", "extranumerary_component.yml"
     )
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path

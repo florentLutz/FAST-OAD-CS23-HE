@@ -4,6 +4,7 @@ power_train_components:
   propeller_1:
     id: fastga_he.pt_component.propeller
     position: in_the_nose
+
   turboshaft_1:
     id: fastga_he.pt_component.turboshaft
     position: on_the_wing
@@ -11,10 +12,10 @@ power_train_components:
   propeller_2:
     id: fastga_he.pt_component.propeller
     position: in_the_nose
+
   turboshaft_2:
     id: fastga_he.pt_component.turboshaft
     position: on_the_wing
-
 
   fuel_system_1:
     id: fastga_he.pt_component.fuel_system
@@ -26,6 +27,7 @@ power_train_components:
   fuel_tank_1:
     id: fastga_he.pt_component.fuel_tank
     position: inside_the_wing
+
   fuel_tank_2:
     id: fastga_he.pt_component.fuel_tank
     position: inside_the_wing
