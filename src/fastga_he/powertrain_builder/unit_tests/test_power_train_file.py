@@ -226,8 +226,10 @@ def test_power_train_file_input_error():
     with pytest.raises(FASTGAHEInputCountError) as exc_info:
         power_train_configurator._get_connections()
 
-    assert str(exc_info.value) == ("Component fuel_system_1 defines 2 inputs from the option "
-                                   "definition, but 1 input(s) is/are listed in the connection section")
+    assert str(exc_info.value) == (
+        "Component fuel_system_1 defines 2 inputs from the option "
+        "definition, but 1 input(s) is/are listed in the connection section"
+    )
 
 
 def test_power_train_file_output_error():
@@ -240,8 +242,10 @@ def test_power_train_file_output_error():
     with pytest.raises(FASTGAHEOutputCountError) as exc_info:
         power_train_configurator._get_connections()
 
-    assert str(exc_info.value) == ("Component fuel_system_1 defines 2 outputs from the option "
-                                   "definition, but 1 output(s) is/are listed in the connection section")
+    assert str(exc_info.value) == (
+        "Component fuel_system_1 defines 2 outputs from the option "
+        "definition, but 1 output(s) is/are listed in the connection section"
+    )
 
 
 def test_power_train_file_implicit_error():
@@ -256,8 +260,10 @@ def test_power_train_file_implicit_error():
     with pytest.raises(FASTGAHEInputCountError) as exc_info:
         power_train_configurator._get_connections()
 
-    assert str(exc_info.value) == ("Component dc_splitter_0 defines 2 inputs, but 3 input(s) is/are "
-                                   "listed in the connection section")
+    assert str(exc_info.value) == (
+        "Component dc_splitter_0 defines 2 inputs, but 3 input(s) is/are "
+        "listed in the connection section"
+    )
 
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "implicit_output_error.yml"
@@ -270,8 +276,10 @@ def test_power_train_file_implicit_error():
     with pytest.raises(FASTGAHEOutputCountError) as exc_info:
         power_train_configurator._get_connections()
 
-    assert str(exc_info.value) == ("Component gearbox_1 defines 2 outputs, but 3 output(s) is/are "
-                                   "listed in the connection section")
+    assert str(exc_info.value) == (
+        "Component gearbox_1 defines 2 outputs, but 3 output(s) is/are "
+        "listed in the connection section"
+    )
 
 
 def test_power_train_file_connection_missing():

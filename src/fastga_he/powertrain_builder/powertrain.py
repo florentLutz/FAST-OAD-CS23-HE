@@ -411,7 +411,7 @@ class FASTGAHEPowerTrainConfigurator:
             _LOGGER.info("Powertrain components' connections checked.")
 
         elif self._skip_test:
-            self._add_cache_instance(self._power_train_file,skip_test=True)
+            self._add_cache_instance(self._power_train_file, skip_test=True)
 
         self._connection_list = connections_list
 
@@ -561,7 +561,6 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
 
-
     def _check_connection(self, connections_list):
         """
         This function ensures that all the connections defined in the powertrain respect the
@@ -642,11 +641,10 @@ class FASTGAHEPowerTrainConfigurator:
                         input_count += 1
 
                 if int(input_count_defined) != int(input_count):
-
                     raise FASTGAHEInputCountError(
                         f"Component {components_name} defines {input_count_defined} inputs"
-                         + option_defined_string +
-                        f", but "
+                        + option_defined_string
+                        + f", but "
                         f"{input_count} input(s) is/are listed in the connection section"
                     )
 
@@ -666,8 +664,8 @@ class FASTGAHEPowerTrainConfigurator:
                 if int(output_count_defined) != int(output_count):
                     raise FASTGAHEOutputCountError(
                         f"Component {components_name} defines {output_count_defined} outputs"
-                         + option_defined_string +
-                        f", but "
+                        + option_defined_string
+                        + f", but "
                         f"{output_count} output(s) is/are listed in the connection section"
                     )
 
@@ -2988,7 +2986,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         cache_instance = {
             "last_mod_time": pathlib.Path(power_train_file).lstat().st_mtime,
-            "skip_test": skip_test
+            "skip_test": skip_test,
         }
         FASTGAHEPowerTrainConfigurator._cache[key] = cache_instance
 
