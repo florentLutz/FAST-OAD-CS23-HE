@@ -659,7 +659,7 @@ def test_performances_sizing_from_pt_with_sizing_options():
         "fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure"
     )
 
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_sizing_option_test.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_sizing_option.yml")
 
     ivc = get_indep_var_comp(
         list_inputs(

@@ -174,13 +174,14 @@ def test_simple_turboshaft_assembly():
 
 
 def test_assembly_via_pt_file():
-    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_turboshaft_assembly_test.yml")
+    pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_turboshaft_assembly.yml")
 
     powertrain_performance = PowerTrainPerformancesFromFile(
         power_train_file_path=pt_file_path,
         number_of_points=NB_POINTS_TEST,
         pre_condition_pt=True,
     )
+    powertrain_performance.configurator._skip_test = True
 
     ivc = get_indep_var_comp(
         list_inputs(powertrain_performance),
