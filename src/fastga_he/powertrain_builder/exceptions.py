@@ -50,16 +50,22 @@ class FASTGAHEImpossiblePair(FastError):
 
 
 class FASTGAHEComponentConnectionError(FastError):
-    """Error type only for component connections in powertrain configuration file"""
+    """
+    Class for managing errors that result from component connections in powertrain configuration
+    file.
+    """
 
 
 class FASTGAHECriticalComponentMissingError(FastError):
-    """Error type only for component connections in powertrain configuration file"""
+    """
+    Class for managing errors that result from missing critical components aucha as proplusor
+    or energy storage device in the powertrain configuration file.
+    """
 
 
 class FASTGAHEInputCountError(FastError):
-    """Error caused by input number inconsistency"""
+    """Class for managing errors that result from inconsistency of input number definition."""
 
 
 class FASTGAHEOutputCountError(FastError):
-    """Error caused by output number inconsistency"""
+    """Class for managing errors that result from inconsistency of output number definition."""
