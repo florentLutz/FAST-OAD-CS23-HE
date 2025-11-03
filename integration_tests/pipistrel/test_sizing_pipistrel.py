@@ -268,30 +268,27 @@ def test_pipistrel_velis_electro_with_lca_varying_start_soc():
     xml_file_name = "pipistrel_source_with_lca.xml"
     process_file_name = "pipistrel_configuration_with_lca.yml"
 
-    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
-    problem = configurator.get_problem()
-
-    # Create inputs
-    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
-    # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
-
-    problem.write_needed_inputs(ref_inputs)
-    problem.read_inputs()
-    problem.setup()
-
-    # Give good initial guess on a few key value to reduce the time it takes to converge
-    problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
-    problem.set_val("data:weight:aircraft:OWE", units="kg", val=400.0)
-    problem.set_val("data:weight:aircraft:MZFW", units="kg", val=600.0)
-    problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
-    problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
-
-    # Run the problem
-    problem.run_model()
-
     # Now we change the SOC start a little
-    soc_start_array = np.linspace(100.0, 80.0, 10)
+    soc_start_array = np.linspace(100.0, 80.0, 11)
     for soc_start in soc_start_array:
+        configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+        problem = configurator.get_problem()
+
+        # Create inputs
+        ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+        # api.list_modules(pth.join(DATA_FOLDER_PATH, process_file_name), force_text_output=True)
+
+        problem.write_needed_inputs(ref_inputs)
+        problem.read_inputs()
+        problem.setup()
+
+        # Give good initial guess on a few key value to reduce the time it takes to converge
+        problem.set_val("data:weight:aircraft:MTOW", units="kg", val=600.0)
+        problem.set_val("data:weight:aircraft:OWE", units="kg", val=400.0)
+        problem.set_val("data:weight:aircraft:MZFW", units="kg", val=600.0)
+        problem.set_val("data:weight:aircraft:ZFW", units="kg", val=600.0)
+        problem.set_val("data:weight:aircraft:MLW", units="kg", val=600.0)
+
         problem.set_val(
             "data:propulsion:he_power_train:battery_pack:battery_pack_1:SOC_mission_start",
             units="percent",
@@ -352,35 +349,76 @@ def test_post_process_results():
         x=sorted_socs_start,
         y=np.array(sorted_single_scores) / sorted_single_scores[-1],
         mode="lines+markers",
-        name="Single score variation",
+        name="Single score",
+        marker=dict(color="black", size=15, symbol="circle"),
+        line=dict(color="black", width=3),
     )
     fig.add_trace(scatter)
     scatter_2 = go.Scatter(
         x=sorted_socs_start,
         y=np.array(sorted_battery_mass_per_fu) / sorted_battery_mass_per_fu[-1],
         mode="lines+markers",
-        name="Battery mass per FU variation",
+        name="Battery mass per functional unit",
+        marker=dict(color="red", size=15, symbol="diamond"),
+        line=dict(color="red", width=3),
     )
     fig.add_trace(scatter_2)
     scatter_3 = go.Scatter(
         x=sorted_socs_start,
         y=np.array(sorted_generic_list) / sorted_generic_list[-1],
         mode="lines+markers",
-        name="Battery lifespan variation",
+        name="Battery lifespan",
+        marker=dict(color="grey", size=15, symbol="cross"),
+        line=dict(color="grey", width=3),
     )
     fig.add_trace(scatter_3)
 
     fig.update_layout(
-        title_text="Evolution of single score",
-        title_x=0.5,
-        xaxis_title="Initial SoC [%]",
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
         height=800,
         width=1600,
-        font_size=18,
+        margin=dict(l=5, r=5, t=60, b=5),
+        legend=dict(yanchor="top", y=0.98, xanchor="right", x=0.98),
     )
-    fig.update_yaxes(title="Variation with respect to 100% SOC case")
+    fig.update_xaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        title="Initial SoC on the design mission [%]",
+    )
+    fig.update_yaxes(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        title="Variation with respect to 100% SoC case",
+    )
+
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
     fig.show()
+
+    write = True
+
+    if write:
+        fig.update_layout(title=None)
+        pdf_path = "results/pipistrel_soc_start_variation.pdf"
+
+        pio.write_image(fig, pdf_path, width=1900, height=900)
+        time.sleep(3)
+        pio.write_image(fig, pdf_path, width=1900, height=900)
 
 
 def test_pipistrel_heavy_velis_electro():
