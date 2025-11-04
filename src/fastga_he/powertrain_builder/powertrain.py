@@ -703,18 +703,16 @@ class FASTGAHEPowerTrainConfigurator:
         # Check one-to-one connections definition
         for components_name in self._components_name:
             if components_name not in propulsor_component + aux_load_component and not any(
-                connection.get("target") == components_name
-                or components_name in connection.get("target")
+                components_name in connection.get("target")
                 for connection in connections_list
             ):
-                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as target!")
+                raise FASTGAHEComponentConnectionError(f"{components_name} has no connected output!")
 
             if components_name not in energy_storage_component and not any(
-                connection.get("source") == components_name
-                or components_name in connection.get("source")
+                components_name in connection.get("source")
                 for connection in connections_list
             ):
-                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as source!")
+                raise FASTGAHEComponentConnectionError(f"{components_name} has no connected input!")
 
     def _categorize_connector_type_component(
         self, one_to_one_component, connector_names, connector_options, connector_type
