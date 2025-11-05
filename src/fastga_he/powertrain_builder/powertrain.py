@@ -692,18 +692,6 @@ class FASTGAHEPowerTrainConfigurator:
                         f"connection section"
                     )
 
-        # Check if there is any component missing in connection
-        for components_name in self._components_name:
-            if components_name not in propulsor_component + aux_load_component and not any(
-                components_name in connection.get("target") for connection in connections_list
-            ):
-                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as output!")
-
-            if components_name not in energy_storage_component and not any(
-                components_name in connection.get("source") for connection in connections_list
-            ):
-                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as input!")
-
         # Check typo or undefined component
         for connection in connections_list:
             source_name = (
@@ -719,9 +707,25 @@ class FASTGAHEPowerTrainConfigurator:
 
             if source_name not in self._components_name or target_name not in self._components_name:
                 if source_name not in self._components_name:
-                    raise FASTGAHEComponentsNotIdentified(f"{source_name} is not defined!")
+                    raise FASTGAHEComponentsNotIdentified(
+                        f"{source_name} is not defined as a component!"
+                    )
                 else:
-                    raise FASTGAHEComponentsNotIdentified(f"{target_name} is not defined!")
+                    raise FASTGAHEComponentsNotIdentified(
+                        f"{target_name} is not defined as a component!"
+                    )
+
+        # Check if there is any component missing in connection
+        for components_name in self._components_name:
+            if components_name not in propulsor_component + aux_load_component and not any(
+                components_name in connection.get("target") for connection in connections_list
+            ):
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as output!")
+
+            if components_name not in energy_storage_component and not any(
+                components_name in connection.get("source") for connection in connections_list
+            ):
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as input!")
 
     def _categorize_connector_type_component(
         self, one_to_one_component, connector_names, connector_options, connector_type
