@@ -21,8 +21,8 @@ class FASTGAHEUnknownOption(FastError):
 
 class FASTGAHEInvalidOptionDefinition(FastError):
     """
-    Class for managing errors that result from trying to add a component to the power train with
-    invalid option definition.
+    Class for managing errors that result from invalid value definitions for recognized
+    component options.
     """
 
 

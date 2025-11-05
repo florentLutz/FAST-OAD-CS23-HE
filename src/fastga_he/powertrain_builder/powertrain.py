@@ -36,6 +36,7 @@ from .exceptions import (
     FASTGAHECriticalComponentMissingError,
     FASTGAHEInputCountError,
     FASTGAHEOutputCountError,
+    FASTGAHEComponentsNotIdentified,
 )
 
 from . import resources
@@ -77,7 +78,7 @@ class FASTGAHEPowerTrainConfigurator:
     :param power_train_file_path: if provided, power train will be read directly from it
     """
 
-    _cache = {}
+    _connection_check_cache = {}
 
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
@@ -197,8 +198,6 @@ class FASTGAHEPowerTrainConfigurator:
         # Contains the results of the function that sets the voltage in the graphs, is declared as
         # an attribute to avoid having to recompute everything
         self._voltage_at_each_node = None
-
-        self._skip_test = False
 
         if power_train_file_path:
             self.load(power_train_file_path)
@@ -398,7 +397,7 @@ class FASTGAHEPowerTrainConfigurator:
         This function inspects all the connections detected in the power train file and prepare
         the list necessary to do the connections in the performance file.
 
-        The _get_components method must be run before hand.
+        The _get_components method must be run beforehand.
         """
 
         # This should do nothing if it has already been run.
@@ -406,13 +405,10 @@ class FASTGAHEPowerTrainConfigurator:
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
 
-        if not self._check_existing_instance(self._power_train_file) and not self._skip_test:
-            self._add_cache_instance(self._power_train_file)
+        if not self._check_existing_instance(self._power_train_file):
             self._check_connection(connections_list)
+            self._add_connection_check_cache_instance(self._power_train_file)
             _LOGGER.info("Powertrain components' connections checked.")
-
-        elif self._skip_test:
-            self._add_cache_instance(self._power_train_file, skip_test=True)
 
         self._connection_list = connections_list
 
@@ -594,10 +590,7 @@ class FASTGAHEPowerTrainConfigurator:
             elif components_type_class == "tank" or components_type_class == "source":
                 energy_storage_component.append(components_name)
 
-            elif (
-                components_type_class == "propulsive_load"
-                or "propulsive_load" in components_type_class
-            ):
+            elif "propulsive_load" in components_type_class:
                 one_to_one_component.append(components_name)
 
             elif components_type_class == "load":
@@ -641,7 +634,7 @@ class FASTGAHEPowerTrainConfigurator:
                     if components_name in connection.get("source"):
                         input_count += 1
 
-                if int(input_count_defined) != int(input_count):
+                if int(input_count_defined) != input_count:
                     raise FASTGAHEInputCountError(
                         f"Component {components_name} defines {input_count_defined} inputs"
                         + option_defined_string
@@ -662,7 +655,7 @@ class FASTGAHEPowerTrainConfigurator:
                     if components_name in connection.get("target"):
                         output_count += 1
 
-                if int(output_count_defined) != int(output_count):
+                if int(output_count_defined) != output_count:
                     raise FASTGAHEOutputCountError(
                         f"Component {components_name} defines {output_count_defined} outputs"
                         + option_defined_string
@@ -675,7 +668,6 @@ class FASTGAHEPowerTrainConfigurator:
             for components_name, input_count_defined, output_count_defined in zip(
                 many_to_many_component, many_to_many_input_count, many_to_many_output_count
             ):
-                # counter reset
                 input_count = 0
                 output_count = 0
 
@@ -686,33 +678,50 @@ class FASTGAHEPowerTrainConfigurator:
                     elif components_name in connection.get("target"):
                         output_count += 1
 
-                if int(input_count_defined) != int(input_count):
+                if int(input_count_defined) != input_count:
                     raise FASTGAHEInputCountError(
                         f"Component {components_name} defines {input_count_defined} inputs from "
                         f"the option definition, but {output_count} input(s) is/are listed in the "
                         f"connection section"
                     )
 
-                if int(output_count_defined) != int(output_count):
+                if int(output_count_defined) != output_count:
                     raise FASTGAHEOutputCountError(
                         f"Component {components_name} defines {output_count_defined} outputs from "
                         f"the option definition, but {output_count} output(s) is/are listed in the "
                         f"connection section"
                     )
 
-        # Check one-to-one connections definition
+        # Check if there is any component missing in connection
         for components_name in self._components_name:
             if components_name not in propulsor_component + aux_load_component and not any(
-                components_name in connection.get("target")
-                for connection in connections_list
+                components_name in connection.get("target") for connection in connections_list
             ):
-                raise FASTGAHEComponentConnectionError(f"{components_name} has no connected output!")
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as output!")
 
             if components_name not in energy_storage_component and not any(
-                components_name in connection.get("source")
-                for connection in connections_list
+                components_name in connection.get("source") for connection in connections_list
             ):
-                raise FASTGAHEComponentConnectionError(f"{components_name} has no connected input!")
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as input!")
+
+        # Check typo or undefined component
+        for connection in connections_list:
+            source_name = (
+                connection["source"][0]
+                if type(connection["source"]) is list
+                else connection.get("source")
+            )
+            target_name = (
+                connection["target"][0]
+                if type(connection["target"]) is list
+                else connection.get("target")
+            )
+
+            if source_name not in self._components_name or target_name not in self._components_name:
+                if source_name not in self._components_name:
+                    raise FASTGAHEComponentsNotIdentified(f"{source_name} is not defined!")
+                else:
+                    raise FASTGAHEComponentsNotIdentified(f"{target_name} is not defined!")
 
     def _categorize_connector_type_component(
         self, one_to_one_component, connector_names, connector_options, connector_type
@@ -741,15 +750,14 @@ class FASTGAHEPowerTrainConfigurator:
 
             if defined_multi_connection_exists:
                 # This is for the connectors having given input and output numbers from pt file
+                # TODO: A concise way to define the input/output number option list
+
                 input_options = ["number_of_inputs", "number_of_tanks"]
                 output_options = [
                     "number_of_outputs",
                     "number_of_engines",
                     "number_of_power_sources",
                 ]
-
-                num_input = 0
-                num_output = 0
 
                 for option, num in zip(options.keys(), options.values()):
                     if option in input_options:
@@ -2950,7 +2958,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         # If cache is empty, no instance is usable
-        if not FASTGAHEPowerTrainConfigurator._cache:
+        if not FASTGAHEPowerTrainConfigurator._connection_check_cache:
             return False
 
         key = str(power_train_file)
@@ -2962,15 +2970,15 @@ class FASTGAHEPowerTrainConfigurator:
 
         # If cache is not empty but there is no instance of that particular configuration file, no
         # instance is usable.
-        if key not in FASTGAHEPowerTrainConfigurator._cache:
+        if key not in FASTGAHEPowerTrainConfigurator._connection_check_cache:
             return False
 
-        if FASTGAHEPowerTrainConfigurator._cache[key]["skip_test"]:
+        if FASTGAHEPowerTrainConfigurator._connection_check_cache[key]["skip_test"]:
             return True
 
         # Finally, if an instance exists, but it has been modified since, no instance is usable.
         if (
-            FASTGAHEPowerTrainConfigurator._cache[key]["last_mod_time"]
+            FASTGAHEPowerTrainConfigurator._connection_check_cache[key]["last_mod_time"]
             < pathlib.Path(power_train_file).lstat().st_mtime
         ):
             return False
@@ -2978,7 +2986,7 @@ class FASTGAHEPowerTrainConfigurator:
         return True
 
     @staticmethod
-    def _add_cache_instance(power_train_file, skip_test=False):
+    def _add_connection_check_cache_instance(power_train_file):
         """
         In the case where no instance were usable and the compilation needed to be redone, we add
         said compilation to the cache.
@@ -2988,9 +2996,9 @@ class FASTGAHEPowerTrainConfigurator:
 
         cache_instance = {
             "last_mod_time": pathlib.Path(power_train_file).lstat().st_mtime,
-            "skip_test": skip_test,
+            "skip_test": False,
         }
-        FASTGAHEPowerTrainConfigurator._cache[key] = cache_instance
+        FASTGAHEPowerTrainConfigurator._connection_check_cache[key] = cache_instance
 
     @staticmethod
     def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:
