@@ -1,0 +1,19 @@
+x0                                 0.16407
+x1                                 0.69671
+x2                                 0.07308
+x0^2                               0.0018331
+x0*x1                              0.0014698
+x0*x2                              0.0010256
+x1^2                               0.061632
+x1*x2                              0.00012146
+x2^2                               6.148e-05
+
+
+Total Sobols
+   Total Sobol data:TLAR:range = 0.1684
+   Total Sobol data:TLAR:v_approach = 0.75993
+   Total Sobol data:TLAR:luggage_mass_design = 0.074289
+Rescaled Total Sobols
+   Total Sobol data:TLAR:range = 0.16796
+   Total Sobol data:TLAR:v_approach = 0.75795
+   Total Sobol data:TLAR:luggage_mass_design = 0.074095

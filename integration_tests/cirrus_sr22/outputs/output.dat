@@ -1,0 +1,23 @@
+###  UQPCE v1.0.0 Output
+###  Analysis of case: None
+###  Analysis started: 2025-11-06 15:25:01.090500
+###  Analysis finished: 2025-11-06 15:32:42.175359
+###  Total compute time: 0:07:41.084859
+--------------------------------------------------------------------------------
+
+Mean of response 1560.6
+Variance of response 422.22
+Mean error of surrogate 0.37002
+Signal to noise ratio 1141.1
+95.0% Confidence Interval on Response [1525.6 , 1607.0]
+Shapiro-Wilks test statistic is 0.91293, P-value is 0.15015
+
+Insufficient evidence to infer errors are not from a normal distribution
+
+--------------------------------------------------------------------------------
+
+The settings used to generate these results are:
+--------------------------------------------------------------------------------
+
+
+There was no input file used
