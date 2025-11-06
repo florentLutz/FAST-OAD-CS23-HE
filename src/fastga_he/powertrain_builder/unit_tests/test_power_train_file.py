@@ -187,11 +187,7 @@ def test_power_train_file_connection_check_cache():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    old_connection_check_cache = power_train_configurator._connection_check_cache
-
-    power_train_configurator._get_connections()
-
-    assert power_train_configurator._connection_check_cache == old_connection_check_cache
+    assert power_train_configurator._check_existing_instance(sample_power_train_file_path)
 
 
 def test_power_train_file_no_propeller():
@@ -252,7 +248,7 @@ def test_power_train_file_output_error():
     )
 
 
-def test_power_train_file_implicit_error():
+def test_power_train_file_implicit_input_error():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "implicit_input_error.yml"
     )
@@ -269,6 +265,8 @@ def test_power_train_file_implicit_error():
         "listed in the connection section"
     )
 
+
+def test_power_train_file_implicit_output_error():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "implicit_output_error.yml"
     )
@@ -286,7 +284,7 @@ def test_power_train_file_implicit_error():
     )
 
 
-def test_power_train_file_connection_missing():
+def test_power_train_file_source_missing():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "connection_missing.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -298,6 +296,8 @@ def test_power_train_file_connection_missing():
 
     assert str(exc_info.value) == "propeller_1 is missing as input!"
 
+
+def test_power_train_file_target_missing():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "extranumerary_component.yml"
     )
@@ -312,7 +312,7 @@ def test_power_train_file_connection_missing():
     assert str(exc_info.value) == "fuel_tank_2 is missing as output!"
 
 
-def test_power_train_file_invalid_connection_definition():
+def test_power_train_file_invalid_value_connection_definition():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "invalid_option_definition.yml"
     )
@@ -328,6 +328,8 @@ def test_power_train_file_invalid_connection_definition():
         "0 is invalid as output option value, only positive integers are allowed"
     )
 
+
+def test_power_train_file_unknown_component():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "unknown_component.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
