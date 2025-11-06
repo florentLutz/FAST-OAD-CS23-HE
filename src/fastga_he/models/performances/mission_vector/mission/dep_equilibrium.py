@@ -11,11 +11,11 @@ from ..constants import (
     HE_SUBMODEL_DEP_EFFECT,
     HE_SUBMODEL_EQUILIBRIUM,
     HE_SUBMODEL_ENERGY_CONSUMPTION,
+    SUBMODEL_DELTA_M,
 )
 from ..mission.energy_consumption_preparation import PrepareForEnergyConsumption
 from .equilibrium_alpha import EquilibriumAlpha
 from .equilibrium_thrust import EquilibriumThrust
-from .equilibrium_delta_m import EquilibriumDeltaM
 
 
 @oad.RegisterSubmodel(HE_SUBMODEL_EQUILIBRIUM, "fastga_he.submodel.performances.equilibrium.legacy")
@@ -111,14 +111,16 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=["*"],
             )
+            option_delta_m = {
+                "number_of_points": number_of_points,
+                "flaps_position": self.options["flaps_position"],
+                "low_speed_aero": self.options["low_speed_aero"],
+            }
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
-                EquilibriumDeltaM(
-                    number_of_points=number_of_points,
-                    flaps_position=self.options["flaps_position"],
-                    low_speed_aero=self.options["low_speed_aero"],
-                ),
-                promotes=["*"],
+                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=option_delta_m),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
             )
             self.add_subsystem(
                 "preparation_for_energy_consumption",
@@ -172,14 +174,16 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=["*"],
             )
+            option_delta_m = {
+                "number_of_points": number_of_points,
+                "flaps_position": self.options["flaps_position"],
+                "low_speed_aero": self.options["low_speed_aero"],
+            }
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
-                EquilibriumDeltaM(
-                    number_of_points=number_of_points,
-                    flaps_position=self.options["flaps_position"],
-                    low_speed_aero=self.options["low_speed_aero"],
-                ),
-                promotes=["*"],
+                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=option_delta_m),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
             )
             self.add_subsystem(
                 "preparation_for_energy_consumption",

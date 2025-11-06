@@ -8,7 +8,9 @@ import fastoad.api as oad
 
 from ..constants import SUBMODEL_DELTA_M
 
-oad.RegisterSubmodel.active_models[SUBMODEL_DELTA_M] = "fastga_he.submodel.performances.delta_m.from_x_cg "
+oad.RegisterSubmodel.active_models[SUBMODEL_DELTA_M] = (
+    "fastga_he.submodel.performances.delta_m.from_x_cg "
+)
 
 
 @oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_x_cg ")
@@ -17,7 +19,7 @@ class EquilibriumDeltaM(om.ImplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be " "treated"
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
             "flaps_position",
@@ -239,11 +241,9 @@ class EquilibriumDeltaM(om.ImplicitComponent):
         )
 
 
-@oad.RegisterSubmodel(
-    SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.constant"
-)
-class EquilibriumDeltaMSetValue(om.ExplicitComponent):
-    """Find the conditions necessary for the ATR retrofit aircraft equilibrium."""
+@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.constant")
+class EquilibriumDeltaMConstant(om.ExplicitComponent):
+    """Find the conditions for retrofit aircraft equilibrium."""
 
     def initialize(self):
         self.options.declare(
@@ -263,106 +263,25 @@ class EquilibriumDeltaMSetValue(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
-        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
+        self.add_input("data:mission:average_delta_m", val=np.nan, units="deg")
 
         self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
 
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if self.options["number_of_points"] == 1:
-            outputs["delta_m"] = np.array([-27.00])
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        if number_of_points == 1:
+            self.declare_partials("*", "*", val=1.0)
         else:
-            outputs["delta_m"] = np.array(
-                [
-                    -26.98,
-                    -27.00,
-                    -27.03,
-                    -27.05,
-                    -27.07,
-                    -27.09,
-                    -27.11,
-                    -27.13,
-                    -27.15,
-                    -27.17,
-                    -27.19,
-                    -27.21,
-                    -27.22,
-                    -27.24,
-                    -27.25,
-                    -27.27,
-                    -27.28,
-                    -27.29,
-                    -27.30,
-                    -27.31,
-                    -27.32,
-                    -27.33,
-                    -27.34,
-                    -27.35,
-                    -27.36,
-                    -27.36,
-                    -27.37,
-                    -27.37,
-                    -27.38,
-                    -27.38,
-                    -9.58,
-                    -9.55,
-                    -9.51,
-                    -9.48,
-                    -9.44,
-                    -9.41,
-                    -9.37,
-                    -9.34,
-                    -9.31,
-                    -9.27,
-                    -9.24,
-                    -9.20,
-                    -9.17,
-                    -9.13,
-                    -9.10,
-                    -9.06,
-                    -9.03,
-                    -9.00,
-                    -8.96,
-                    -8.93,
-                    -8.89,
-                    -8.86,
-                    -8.82,
-                    -8.79,
-                    -8.76,
-                    -8.72,
-                    -8.69,
-                    -8.65,
-                    -8.62,
-                    -8.58,
-                    -12.54,
-                    -12.54,
-                    -12.53,
-                    -12.52,
-                    -12.52,
-                    -12.51,
-                    -12.51,
-                    -12.50,
-                    -12.49,
-                    -12.49,
-                    -12.48,
-                    -12.48,
-                    -12.47,
-                    -12.46,
-                    -12.46,
-                    -12.45,
-                    -12.44,
-                    -12.44,
-                    -12.43,
-                    -12.42,
-                    -27.70,
-                    -27.63,
-                    -27.55,
-                    -27.47,
-                    -27.39,
-                    -27.31,
-                    -27.23,
-                    -27.15,
-                    -27.07,
-                    -26.99,
-                ]
+            self.declare_partials(
+                of="*",
+                wrt="*",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.zeros(number_of_points),
+                val=1.0,
             )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        outputs["delta_m"] = np.full(
+            self.options["number_of_points"], inputs["data:mission:average_delta_m"]
+        )
