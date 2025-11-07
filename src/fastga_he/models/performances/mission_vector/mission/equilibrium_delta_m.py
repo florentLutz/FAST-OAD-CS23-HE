@@ -263,7 +263,7 @@ class EquilibriumDeltaMConstant(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        self.add_input("data:mission:average_delta_m", val=np.nan, units="deg")
+        self.add_input("data:mission:sizing:average_delta_m", val=np.nan, units="deg")
         self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
         self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
@@ -272,11 +272,11 @@ class EquilibriumDeltaMConstant(om.ExplicitComponent):
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
         if number_of_points == 1:
-            self.declare_partials("*", "data:mission:average_delta_m", val=1.0)
+            self.declare_partials("*", "data:mission:sizing:average_delta_m", val=1.0)
         else:
             self.declare_partials(
                 of="*",
-                wrt="data:mission:average_delta_m",
+                wrt="data:mission:sizing:average_delta_m",
                 method="exact",
                 rows=np.arange(number_of_points),
                 cols=np.zeros(number_of_points),
@@ -285,5 +285,5 @@ class EquilibriumDeltaMConstant(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["delta_m"] = np.full(
-            self.options["number_of_points"], inputs["data:mission:average_delta_m"]
+            self.options["number_of_points"], inputs["data:mission:sizing:average_delta_m"]
         )
