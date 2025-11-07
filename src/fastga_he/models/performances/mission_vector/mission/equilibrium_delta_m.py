@@ -3,15 +3,27 @@
 # Copyright (C) 2025 ISAE-SUPAERO.
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
+import fastoad.api as oad
+
+from fastga_he.exceptions import ControlParameterInconsistentShapeError
+from ..constants import SUBMODEL_DELTA_M
+
+oad.RegisterSubmodel.active_models[SUBMODEL_DELTA_M] = (
+    "fastga_he.submodel.performances.delta_m.from_pitching_moment_balance"
+)
 
 
+@oad.RegisterSubmodel(
+    SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_pitching_moment_balance"
+)
 class EquilibriumDeltaM(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be " "treated"
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare(
             "flaps_position",
@@ -231,3 +243,66 @@ class EquilibriumDeltaM(om.ImplicitComponent):
             + (x_cg - x_htp) * cl_htp
             + (cm0_wing + delta_cm + delta_cm_flaps + cm_alpha_fus * alpha) * l0_wing
         )
+
+
+@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.constant")
+class EquilibriumDeltaMConstant(om.ExplicitComponent):
+    """Define constant condition for retrofit aircraft equilibrium."""
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            "flaps_position",
+            default="cruise",
+            desc="position of the flaps for the computation of the equilibrium",
+        )
+        self.options.declare(
+            "low_speed_aero",
+            default=False,
+            desc="Boolean to consider low speed aerodynamics",
+            types=bool,
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        self.add_input(
+            "data:mission:sizing:defined_delta_m", val=np.nan, units="deg", shape_by_conn=True
+        )
+        self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
+
+        self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
+
+    def setup_partials(self):
+        self.declare_partials("*", "data:mission:sizing:defined_delta_m", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        number_of_points = self.options["number_of_points"]
+        delta_m = inputs["data:mission:sizing:defined_delta_m"]
+
+        if len(delta_m) == 1:
+            outputs["delta_m"] = np.full(number_of_points, delta_m)
+
+        elif len(delta_m) == number_of_points:
+            outputs["delta_m"] = delta_m
+
+        else:
+            raise ControlParameterInconsistentShapeError(
+                "The shape of input data:mission:sizing:defined_delta_m should be 1 or equal to "
+                "the number of points"
+            )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        number_of_points = self.options["number_of_points"]
+        delta_m = inputs["data:mission:sizing:defined_delta_m"]
+
+        if len(delta_m) == 1:
+            partials["delta_m", "data:mission:sizing:defined_delta_m"] = np.full(
+                number_of_points, 1.0
+            )
+
+        else:
+            partials["delta_m", "data:mission:sizing:defined_delta_m"] = sp.sparse.eye(
+                number_of_points, format="csc"
+            )
