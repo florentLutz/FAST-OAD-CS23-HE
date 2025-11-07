@@ -3,18 +3,20 @@
 # Copyright (C) 2025 ISAE-SUPAERO.
 
 import numpy as np
+import scipy as sp
 import openmdao.api as om
 import fastoad.api as oad
 
+from fastga_he.exceptions import ControlParameterInconsistentShapeError
 from ..constants import SUBMODEL_DELTA_M
 
 oad.RegisterSubmodel.active_models[SUBMODEL_DELTA_M] = (
-    "fastga_he.submodel.performances.delta_m.from_pitching_balance"
+    "fastga_he.submodel.performances.delta_m.from_pitching_moment_balance"
 )
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_pitching_balance"
+    SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_pitching_moment_balance"
 )
 class EquilibriumDeltaM(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
@@ -273,13 +275,34 @@ class EquilibriumDeltaMConstant(om.ExplicitComponent):
         self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
 
     def setup_partials(self):
-        self.declare_partials("*", "data:mission:sizing:defined_delta_m", val=1.0)
+        self.declare_partials("*", "data:mission:sizing:defined_delta_m", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        if len(inputs["data:mission:sizing:defined_delta_m"]) == self.options["number_of_points"]:
-            outputs["delta_m"] = inputs["data:mission:sizing:defined_delta_m"]
+        number_of_points = self.options["number_of_points"]
+        delta_m = inputs["data:mission:sizing:defined_delta_m"]
+
+        if len(delta_m) == 1:
+            outputs["delta_m"] = np.full(number_of_points, delta_m)
+
+        elif len(delta_m) == number_of_points:
+            outputs["delta_m"] = delta_m
 
         else:
-            outputs["delta_m"] = np.full(
-                self.options["number_of_points"], inputs["data:mission:sizing:defined_delta_m"][0]
+            raise ControlParameterInconsistentShapeError(
+                "The shape of input data:mission:sizing:defined_delta_m should be 1 or equal to "
+                "the number of points"
+            )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        number_of_points = self.options["number_of_points"]
+        delta_m = inputs["data:mission:sizing:defined_delta_m"]
+
+        if len(delta_m) == 1:
+            partials["delta_m", "data:mission:sizing:defined_delta_m"] = np.full(
+                number_of_points, 1.0
+            )
+
+        else:
+            partials["delta_m", "data:mission:sizing:defined_delta_m"] = sp.sparse.eye(
+                number_of_points, format="csc"
             )
