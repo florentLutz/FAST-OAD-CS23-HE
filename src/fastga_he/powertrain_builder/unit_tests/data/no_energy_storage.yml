@@ -1,0 +1,32 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+
+  motor_1:
+    id: fastga_he.pt_component.pmsm
+
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+
+  dc_line_1:
+    id: fastga_he.pt_component.dc_line
+
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+
+component_connections:
+  - source: propeller_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: dc_line_1
+
+  - source: dc_line_1
+    target: dc_dc_converter_1
+
+watcher_file_path:

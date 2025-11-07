@@ -28,9 +28,15 @@ import networkx as nx
 from .exceptions import (
     FASTGAHEUnknownComponentID,
     FASTGAHEUnknownOption,
+    FASTGAHEInvalidOptionDefinition,
     FASTGAHESingleSSPCAtEndOfLine,
-    FASTGAHEIncoherentVoltage,
     FASTGAHEImpossiblePair,
+    FASTGAHEIncoherentVoltage,
+    FASTGAHEComponentConnectionError,
+    FASTGAHECriticalComponentMissingError,
+    FASTGAHEInputCountError,
+    FASTGAHEOutputCountError,
+    FASTGAHEComponentsNotIdentified,
 )
 
 from . import resources
@@ -71,6 +77,8 @@ class FASTGAHEPowerTrainConfigurator:
 
     :param power_train_file_path: if provided, power train will be read directly from it
     """
+
+    _connection_check_cache = {}
 
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
@@ -232,7 +240,7 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _get_components(self):
         # We will work under the assumption that is one list is empty, all are hence only one if
-        # statement. This allows us to know whether retriggering the identification of
+        # statement. This allows us to know whether re-triggering the identification of
         # components is necessary
 
         if self._components_id is None:
@@ -389,13 +397,19 @@ class FASTGAHEPowerTrainConfigurator:
         This function inspects all the connections detected in the power train file and prepare
         the list necessary to do the connections in the performance file.
 
-        The _get_components method must be run before hand.
+        The _get_components method must be run beforehand.
         """
 
         # This should do nothing if it has already been run.
         self._get_components()
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
+
+        if not self._check_existing_instance(self._power_train_file):
+            self._check_connection(connections_list)
+            self._add_connection_check_cache_instance(self._power_train_file)
+            _LOGGER.info("Powertrain components' connections checked.")
+
         self._connection_list = connections_list
 
         # Create a dictionary to translate component name back to component_id to identify
@@ -543,6 +557,277 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
+
+    def _check_connection(self, connections_list):
+        """
+        This function ensures that all the connections defined in the powertrain respect the
+        components connection limit. It also checks that no components are left unconnected and
+        ensure at least one propulsor and one energy storing device is defined.
+
+        The _get_components method must be run beforehand.
+        """
+
+        # This should do nothing if it has already been run.
+        self._get_components()
+
+        propulsor_component = []
+        aux_load_component = []
+        energy_storage_component = []
+        one_to_one_component = []
+        connector_component = []
+        connector_option = []
+        connector_type = []
+
+        for components_name, components_options, components_type_class, components_type in zip(
+            self._components_name,
+            self._components_options,
+            self._components_type_class,
+            self._components_type,
+        ):
+            if components_type_class == "propulsor":
+                propulsor_component.append(components_name)
+
+            elif components_type_class == "tank" or components_type_class == "source":
+                energy_storage_component.append(components_name)
+
+            elif "propulsive_load" in components_type_class:
+                one_to_one_component.append(components_name)
+
+            elif components_type_class == "load":
+                aux_load_component.append(components_name)
+
+            elif components_type_class == "connector":
+                connector_component.append(components_name)
+                connector_option.append(components_options)
+                connector_type.append(components_type)
+
+        if not propulsor_component:
+            raise FASTGAHECriticalComponentMissingError("Propulsor missing!")
+
+        if not energy_storage_component:
+            raise FASTGAHECriticalComponentMissingError("Storage tank or battery missing!")
+
+        (
+            one_to_one_component,
+            one_to_many_component,
+            many_to_one_component,
+            many_to_many_component,
+            many_to_many_input_count,
+            many_to_many_output_count,
+            many_to_one_input_count,
+            one_to_many_output_count,
+            option_defined_many_to_one,
+            option_defined_one_to_many,
+        ) = self._categorize_connector_type_component(
+            one_to_one_component, connector_component, connector_option, connector_type
+        )
+
+        # Check component existence
+        if many_to_one_component:
+            for components_name, input_count_defined, option_defined in zip(
+                many_to_one_component, many_to_one_input_count, option_defined_many_to_one
+            ):
+                # counter reset
+                input_count = 0
+                option_defined_string = " from the option definition" if option_defined else ""
+                for connection in connections_list:
+                    if components_name in connection.get("source"):
+                        input_count += 1
+
+                if int(input_count_defined) != input_count:
+                    raise FASTGAHEInputCountError(
+                        f"Component {components_name} defines {input_count_defined} inputs"
+                        + option_defined_string
+                        + f", but "
+                        f"{input_count} input(s) is/are listed in the connection section"
+                    )
+
+        # Check component existence
+        if one_to_many_component:
+            for components_name, output_count_defined, option_defined in zip(
+                one_to_many_component, one_to_many_output_count, option_defined_one_to_many
+            ):
+                # counter reset
+                output_count = 0
+                option_defined_string = " from the option definition" if option_defined else ""
+
+                for connection in connections_list:
+                    if components_name in connection.get("target"):
+                        output_count += 1
+
+                if int(output_count_defined) != output_count:
+                    raise FASTGAHEOutputCountError(
+                        f"Component {components_name} defines {output_count_defined} outputs"
+                        + option_defined_string
+                        + f", but "
+                        f"{output_count} output(s) is/are listed in the connection section"
+                    )
+
+        # Check component existence
+        if many_to_many_component:
+            for components_name, input_count_defined, output_count_defined in zip(
+                many_to_many_component, many_to_many_input_count, many_to_many_output_count
+            ):
+                input_count = 0
+                output_count = 0
+
+                for connection in connections_list:
+                    if components_name in connection.get("source"):
+                        input_count += 1
+
+                    elif components_name in connection.get("target"):
+                        output_count += 1
+
+                if int(input_count_defined) != input_count:
+                    raise FASTGAHEInputCountError(
+                        f"Component {components_name} defines {input_count_defined} inputs from "
+                        f"the option definition, but {output_count} input(s) is/are listed in the "
+                        f"connection section"
+                    )
+
+                if int(output_count_defined) != output_count:
+                    raise FASTGAHEOutputCountError(
+                        f"Component {components_name} defines {output_count_defined} outputs from "
+                        f"the option definition, but {output_count} output(s) is/are listed in the "
+                        f"connection section"
+                    )
+
+        # Check typo or undefined component
+        for connection in connections_list:
+            source_name = (
+                connection["source"][0]
+                if type(connection["source"]) is list
+                else connection.get("source")
+            )
+            target_name = (
+                connection["target"][0]
+                if type(connection["target"]) is list
+                else connection.get("target")
+            )
+
+            if source_name not in self._components_name or target_name not in self._components_name:
+                if source_name not in self._components_name:
+                    raise FASTGAHEComponentsNotIdentified(
+                        f"{source_name} is not defined as a component!"
+                    )
+                else:
+                    raise FASTGAHEComponentsNotIdentified(
+                        f"{target_name} is not defined as a component!"
+                    )
+
+        # Check if there is any component missing in connection
+        for components_name in self._components_name:
+            if components_name not in propulsor_component + aux_load_component and not any(
+                components_name in connection.get("target") for connection in connections_list
+            ):
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as output!")
+
+            if components_name not in energy_storage_component and not any(
+                components_name in connection.get("source") for connection in connections_list
+            ):
+                raise FASTGAHEComponentConnectionError(f"{components_name} is missing as input!")
+
+    def _categorize_connector_type_component(
+        self, one_to_one_component, connector_names, connector_options, connector_type
+    ):
+        """
+        This function categorizes the components in the connector component type class according
+        to their number of input and output connections, the generator and turbo_generator are
+        exceptions that are energy source component but categorized as connector for the
+        powertrain component registry. This only applies in the _check_connection function.
+        """
+
+        one_to_many_component = []
+        many_to_one_component = []
+        many_to_many_component = []
+        many_to_one_input_count = []
+        one_to_many_output_count = []
+        many_to_many_input_count = []
+        many_to_many_output_count = []
+        option_defined_one_to_many = []
+        option_defined_many_to_one = []
+
+        for name, options, type in zip(connector_names, connector_options, connector_type):
+            defined_multi_connection_exists = options is not None and any(
+                key.startswith("number_of_") for key in options.keys()
+            )
+
+            if defined_multi_connection_exists:
+                # This is for the connectors having given input and output numbers from pt file
+                # TODO: A concise way to define the input/output number option list
+
+                input_options = ["number_of_inputs", "number_of_tanks"]
+                output_options = [
+                    "number_of_outputs",
+                    "number_of_engines",
+                    "number_of_power_sources",
+                ]
+
+                for option, num in zip(options.keys(), options.values()):
+                    if option in input_options:
+                        num_input = int(num)
+                        if num_input < num or num_input <= 0:
+                            raise FASTGAHEInvalidOptionDefinition(
+                                f"{num} is invalid as input option value, only positive integers "
+                                f"are allowed"
+                            )
+
+                    elif option in output_options:
+                        num_output = int(num)
+                        if num_output < num or num_output <= 0:
+                            raise FASTGAHEInvalidOptionDefinition(
+                                f"{num} is invalid as output option value, only positive integers "
+                                f"are allowed"
+                            )
+
+                # First check if there is any side having multiple connection
+                if num_input > 1 or num_output > 1:
+                    # This is to identify many-to-many component
+                    if num_input > 1 and num_output > 1:
+                        many_to_many_component.append(name)
+                        many_to_many_input_count.append(num_input)
+                        many_to_many_output_count.append(num_output)
+
+                    # This is to identify many-to-one component
+                    elif num_input > 1:
+                        many_to_one_component.append(name)
+                        many_to_one_input_count.append(num_input)
+                        option_defined_many_to_one.append(True)
+
+                    # This is to identify one-to-many component
+                    else:
+                        one_to_many_component.append(name)
+                        one_to_many_output_count.append(num_output)
+                        option_defined_one_to_many.append(True)
+                else:
+                    one_to_one_component.append(name)
+
+            else:
+                if type == "DC_splitter" or type == "planetary_gear":
+                    many_to_one_component.append(name)
+                    many_to_one_input_count.append(2)
+                    option_defined_many_to_one.append(False)
+
+                elif type == "gearbox":
+                    one_to_many_component.append(name)
+                    one_to_many_output_count.append(2)
+                    option_defined_one_to_many.append(False)
+
+                else:
+                    one_to_one_component.append(name)
+
+        return (
+            one_to_one_component,
+            one_to_many_component,
+            many_to_one_component,
+            many_to_many_component,
+            many_to_many_input_count,
+            many_to_many_output_count,
+            many_to_one_input_count,
+            one_to_many_output_count,
+            option_defined_many_to_one,
+            option_defined_one_to_many,
+        )
 
     def _construct_connection_graph(self):
         graph = nx.Graph()
@@ -2668,6 +2953,56 @@ class FASTGAHEPowerTrainConfigurator:
                 clean_dict[component_name] = clean_lines
 
         return clean_dict, list(set(species_list))
+
+    @staticmethod
+    def _check_existing_instance(power_train_file):
+        """
+        Checks the cache to see if an instance of the cache already exists and is usable. Usable
+        means there was no modification to the powertrain configuration file.
+        """
+
+        # If cache is empty, no instance is usable
+        if not FASTGAHEPowerTrainConfigurator._connection_check_cache:
+            return False
+
+        key = str(power_train_file)
+
+        # If the powertrain configuration file is a temporary copy or dedicated for a test,
+        # the connection test will be omitted
+        if key.endswith("_temp_copy.yml"):
+            return True
+
+        # If cache is not empty but there is no instance of that particular configuration file, no
+        # instance is usable.
+        if key not in FASTGAHEPowerTrainConfigurator._connection_check_cache:
+            return False
+
+        if FASTGAHEPowerTrainConfigurator._connection_check_cache[key]["skip_test"]:
+            return True
+
+        # Finally, if an instance exists, but it has been modified since, no instance is usable.
+        if (
+            FASTGAHEPowerTrainConfigurator._connection_check_cache[key]["last_mod_time"]
+            < pathlib.Path(power_train_file).lstat().st_mtime
+        ):
+            return False
+
+        return True
+
+    @staticmethod
+    def _add_connection_check_cache_instance(power_train_file):
+        """
+        In the case where no instance were usable and the compilation needed to be redone, we add
+        said compilation to the cache.
+        """
+
+        key = str(power_train_file)
+
+        cache_instance = {
+            "last_mod_time": pathlib.Path(power_train_file).lstat().st_mtime,
+            "skip_test": False,
+        }
+        FASTGAHEPowerTrainConfigurator._connection_check_cache[key] = cache_instance
 
     @staticmethod
     def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:

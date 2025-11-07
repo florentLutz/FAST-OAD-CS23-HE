@@ -19,6 +19,13 @@ class FASTGAHEUnknownOption(FastError):
     """
 
 
+class FASTGAHEInvalidOptionDefinition(FastError):
+    """
+    Class for managing errors that result from invalid value definitions for recognized
+    component options.
+    """
+
+
 class FASTGAHEComponentsNotIdentified(FastError):
     """
     Class for managing errors that result from trying to run the _get_connection method before
@@ -47,3 +54,25 @@ class FASTGAHEImpossiblePair(FastError):
     """
     Class for managing errors that result from trying to pair with a component that does not exist.
     """
+
+
+class FASTGAHEComponentConnectionError(FastError):
+    """
+    Class for managing errors that result from component connections in powertrain configuration
+    file.
+    """
+
+
+class FASTGAHECriticalComponentMissingError(FastError):
+    """
+    Class for managing errors that result from missing critical components aucha as proplusor
+    or energy storage device in the powertrain configuration file.
+    """
+
+
+class FASTGAHEInputCountError(FastError):
+    """Class for managing errors that result from inconsistency of input number definition."""
+
+
+class FASTGAHEOutputCountError(FastError):
+    """Class for managing errors that result from inconsistency of output number definition."""

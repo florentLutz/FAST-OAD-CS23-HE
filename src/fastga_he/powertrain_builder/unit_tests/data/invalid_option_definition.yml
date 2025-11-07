@@ -1,0 +1,34 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+    position: in_the_nose
+
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+    position: on_the_wing
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+    options:
+      number_of_engines: 0
+      number_of_tanks: 1
+    position: in_the_front
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+    position: inside_the_wing
+
+
+component_connections:
+  - source: propeller_1
+    target: turboshaft_1
+
+  - source: turboshaft_1
+    target: [fuel_system_1, 0]
+
+  - source: [fuel_system_1, 1]
+    target: fuel_tank_1
+
+watcher_file_path:

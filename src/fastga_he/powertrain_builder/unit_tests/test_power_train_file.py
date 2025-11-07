@@ -13,7 +13,16 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from ..powertrain import FASTGAHEPowerTrainConfigurator
-from ..exceptions import FASTGAHESingleSSPCAtEndOfLine, FASTGAHEImpossiblePair
+from ..exceptions import (
+    FASTGAHESingleSSPCAtEndOfLine,
+    FASTGAHEImpossiblePair,
+    FASTGAHEComponentConnectionError,
+    FASTGAHECriticalComponentMissingError,
+    FASTGAHEInputCountError,
+    FASTGAHEOutputCountError,
+    FASTGAHEInvalidOptionDefinition,
+    FASTGAHEComponentsNotIdentified,
+)
 
 YML_FILE = "sample_power_train_file.yml"
 
@@ -107,6 +116,9 @@ def test_power_train_file_components_performances_sspc_last():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_sspc_last.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -166,6 +178,170 @@ def test_power_train_file_connections():
         print("[" + om_output + ", " + om_input + "]")
 
 
+def test_power_train_file_connection_check_cache():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    assert power_train_configurator._check_existing_instance(sample_power_train_file_path)
+
+
+def test_power_train_file_no_propeller():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_propeller.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHECriticalComponentMissingError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Propulsor missing!"
+
+
+def test_power_train_file_no_energy_storage():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "no_energy_storage.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHECriticalComponentMissingError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "Storage tank or battery missing!"
+
+
+def test_power_train_file_input_error():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "input_error.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEInputCountError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == (
+        "Component fuel_system_1 defines 2 inputs from the option "
+        "definition, but 1 input(s) is/are listed in the connection section"
+    )
+
+
+def test_power_train_file_output_error():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "output_error.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEOutputCountError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == (
+        "Component fuel_system_1 defines 2 outputs from the option "
+        "definition, but 1 output(s) is/are listed in the connection section"
+    )
+
+
+def test_power_train_file_implicit_input_error():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "implicit_input_error.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEInputCountError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == (
+        "Component dc_splitter_0 defines 2 inputs, but 3 input(s) is/are "
+        "listed in the connection section"
+    )
+
+
+def test_power_train_file_implicit_output_error():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "implicit_output_error.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEOutputCountError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == (
+        "Component gearbox_1 defines 2 outputs, but 3 output(s) is/are "
+        "listed in the connection section"
+    )
+
+
+def test_power_train_file_source_missing():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "connection_missing.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEComponentConnectionError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "propeller_1 is missing as input!"
+
+
+def test_power_train_file_target_missing():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "extranumerary_component.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEComponentConnectionError) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == "fuel_tank_2 is missing as output!"
+
+
+def test_power_train_file_invalid_value_connection_definition():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "invalid_option_definition.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEInvalidOptionDefinition) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == (
+        "0 is invalid as output option value, only positive integers are allowed"
+    )
+
+
+def test_power_train_file_unknown_component():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "unknown_component.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    with pytest.raises(FASTGAHEComponentsNotIdentified) as exc_info:
+        power_train_configurator._get_connections()
+
+    assert str(exc_info.value) == ("propeller_ is not defined as a component!")
+
+
 def test_power_train_file_direct_bus_battery_connection():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_direct_battery_bus_connection.yml"
@@ -197,6 +373,9 @@ def test_power_train_file_connections_splitter():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -263,6 +442,9 @@ def test_distance_from_propulsive_load():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -342,6 +524,9 @@ def test_independent_voltage_subgraph():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -375,6 +560,9 @@ def test_voltage_setter_list():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -612,6 +800,9 @@ def test_get_power_on_each_node():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -918,6 +1109,9 @@ def test_propulsor_connection():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_one_unconnected.yml"
     )
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
+        "skip_test": True
+    }
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )

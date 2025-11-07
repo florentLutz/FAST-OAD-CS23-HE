@@ -13,6 +13,7 @@ import fastoad.api as oad
 
 from stdatm import Atmosphere
 
+from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 from ..components.propulsor.propeller import PerformancesPropeller
 from ..components.source.turboshaft import PerformancesTurboshaft
 from ..assemblers.performances_from_pt_file import PowerTrainPerformancesFromFile
@@ -176,14 +177,15 @@ def test_simple_turboshaft_assembly():
 def test_assembly_via_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "simple_turboshaft_assembly.yml")
 
+    FASTGAHEPowerTrainConfigurator._connection_check_cache[pt_file_path] = {"skip_test": True}
+    powertrain_performance = PowerTrainPerformancesFromFile(
+        power_train_file_path=pt_file_path,
+        number_of_points=NB_POINTS_TEST,
+        pre_condition_pt=False,
+    )
+
     ivc = get_indep_var_comp(
-        list_inputs(
-            PowerTrainPerformancesFromFile(
-                power_train_file_path=pt_file_path,
-                number_of_points=NB_POINTS_TEST,
-                pre_condition_pt=True,
-            )
-        ),
+        list_inputs(powertrain_performance),
         __file__,
         XML_FILE,
     )
@@ -196,11 +198,7 @@ def test_assembly_via_pt_file():
     ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
 
     problem = run_system(
-        PowerTrainPerformancesFromFile(
-            power_train_file_path=pt_file_path,
-            number_of_points=NB_POINTS_TEST,
-            pre_condition_pt=True,
-        ),
+        powertrain_performance,
         ivc,
     )
 

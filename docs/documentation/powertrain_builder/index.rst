@@ -15,3 +15,9 @@ simple powertrain templates.
     Component Constraints and ID <constraints>
     PT file visualization <pt_visual>
     PT file templates <templates>
+
+.. note::
+
+   Avoid ending PT file names with ``_temp_copy``.
+   Using these suffixes may interfere with several powertrain syntax checks.
+
