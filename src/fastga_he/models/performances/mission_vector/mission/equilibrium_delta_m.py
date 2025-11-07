@@ -9,11 +9,13 @@ import fastoad.api as oad
 from ..constants import SUBMODEL_DELTA_M
 
 oad.RegisterSubmodel.active_models[SUBMODEL_DELTA_M] = (
-    "fastga_he.submodel.performances.delta_m.from_x_cg "
+    "fastga_he.submodel.performances.delta_m.from_pitching_balance"
 )
 
 
-@oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_x_cg ")
+@oad.RegisterSubmodel(
+    SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.from_pitching_balance"
+)
 class EquilibriumDeltaM(om.ImplicitComponent):
     """Find the conditions necessary for the aircraft equilibrium."""
 
@@ -243,7 +245,7 @@ class EquilibriumDeltaM(om.ImplicitComponent):
 
 @oad.RegisterSubmodel(SUBMODEL_DELTA_M, "fastga_he.submodel.performances.delta_m.constant")
 class EquilibriumDeltaMConstant(om.ExplicitComponent):
-    """Find the conditions for retrofit aircraft equilibrium."""
+    """Define constant condition for retrofit aircraft equilibrium."""
 
     def initialize(self):
         self.options.declare(
@@ -263,27 +265,21 @@ class EquilibriumDeltaMConstant(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        self.add_input("data:mission:sizing:average_delta_m", val=np.nan, units="deg")
+        self.add_input(
+            "data:mission:sizing:defined_delta_m", val=np.nan, units="deg", shape_by_conn=True
+        )
         self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
-        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
 
     def setup_partials(self):
-        number_of_points = self.options["number_of_points"]
-        if number_of_points == 1:
-            self.declare_partials("*", "data:mission:sizing:average_delta_m", val=1.0)
-        else:
-            self.declare_partials(
-                of="*",
-                wrt="data:mission:sizing:average_delta_m",
-                method="exact",
-                rows=np.arange(number_of_points),
-                cols=np.zeros(number_of_points),
-                val=1.0,
-            )
+        self.declare_partials("*", "data:mission:sizing:defined_delta_m", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["delta_m"] = np.full(
-            self.options["number_of_points"], inputs["data:mission:sizing:average_delta_m"]
-        )
+        if len(inputs["data:mission:sizing:defined_delta_m"]) == self.options["number_of_points"]:
+            outputs["delta_m"] = inputs["data:mission:sizing:defined_delta_m"]
+
+        else:
+            outputs["delta_m"] = np.full(
+                self.options["number_of_points"], inputs["data:mission:sizing:defined_delta_m"][0]
+            )

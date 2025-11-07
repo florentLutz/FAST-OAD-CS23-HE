@@ -737,7 +737,7 @@
     </weight>
     <mission>
       <sizing>
-        <average_delta_m units="deg">-17.88</average_delta_m>
+        <defined_delta_m units="deg">-17.88</defined_delta_m>
         <initial_climb>
           <energy units="W*h" is_input="True">0.0</energy>
           <fuel units="kg" is_input="True">22.283855199555546</fuel>

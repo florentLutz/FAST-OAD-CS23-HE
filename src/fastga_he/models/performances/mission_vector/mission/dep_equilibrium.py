@@ -111,14 +111,14 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=["*"],
             )
-            option_delta_m = {
+            options_delta_m = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
                 "low_speed_aero": self.options["low_speed_aero"],
             }
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
-                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=option_delta_m),
+                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=options_delta_m),
                 promotes=["*"],
             )
             self.add_subsystem(
@@ -173,14 +173,14 @@ class DEPEquilibrium(om.Group):
                 ),
                 promotes=["*"],
             )
-            option_delta_m = {
+            options_delta_m = {
                 "number_of_points": number_of_points,
                 "flaps_position": self.options["flaps_position"],
                 "low_speed_aero": self.options["low_speed_aero"],
             }
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
-                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=option_delta_m),
+                oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=options_delta_m),
                 promotes=["*"],
             )
             self.add_subsystem(
