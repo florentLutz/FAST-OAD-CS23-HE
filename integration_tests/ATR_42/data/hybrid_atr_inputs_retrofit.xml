@@ -283,7 +283,7 @@
             <torque_constant units="N*m/A" is_input="True">0.1426</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
-            <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
+            <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
             <design_yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></design_yoke_flux_density>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -315,7 +315,7 @@
             <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
-            <winding_temperature units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></winding_temperature>
+            <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
             <design_yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></design_yoke_flux_density>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>

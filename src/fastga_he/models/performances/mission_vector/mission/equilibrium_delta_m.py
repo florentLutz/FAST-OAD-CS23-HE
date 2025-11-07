@@ -264,17 +264,19 @@ class EquilibriumDeltaMConstant(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
         self.add_input("data:mission:average_delta_m", val=np.nan, units="deg")
+        self.add_input("x_cg", val=np.full(number_of_points, 5.0), units="m")
+        self.add_input("data:geometry:wing:MAC:at25percent:x", val=np.nan, units="m")
 
         self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
         if number_of_points == 1:
-            self.declare_partials("*", "*", val=1.0)
+            self.declare_partials("*", "data:mission:average_delta_m", val=1.0)
         else:
             self.declare_partials(
                 of="*",
-                wrt="*",
+                wrt="data:mission:average_delta_m",
                 method="exact",
                 rows=np.arange(number_of_points),
                 cols=np.zeros(number_of_points),

@@ -119,8 +119,7 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
                 oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=option_delta_m),
-                promotes_inputs=["*"],
-                promotes_outputs=["*"],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "preparation_for_energy_consumption",
@@ -182,8 +181,7 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_equilibrium_delta_m",
                 oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_M, options=option_delta_m),
-                promotes_inputs=["*"],
-                promotes_outputs=["*"],
+                promotes=["*"],
             )
             self.add_subsystem(
                 "preparation_for_energy_consumption",
