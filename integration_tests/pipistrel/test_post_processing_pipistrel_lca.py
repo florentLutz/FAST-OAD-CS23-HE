@@ -22,6 +22,7 @@ from fastga_he.gui.lca_impact import (
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_lca"
+ORIG_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 SENSITIVITY_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_sensitivity_2"
 SENSITIVITY_CELLS_RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results_sensitivity_lca"
 
@@ -462,3 +463,38 @@ def test_lca_sensitivity_analysis_high_lifespan_cell():
     fig.add_vline(x=4000.0, line_width=3, line_dash="dash", line_color="red")
     fig.update_xaxes(domain=[0, 0.95])
     fig.show()
+
+
+def test_compare_impacts_with_and_without_aging():
+    fig = lca_impacts_bar_chart_simple(
+        [
+            ORIG_RESULTS_FOLDER_PATH / "pipistrel_out_with_lca.xml",
+            RESULTS_FOLDER_PATH / "pipistrel_out_with_lca_proper_aging_with_econ.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel without aging consideration",
+            "Pipistrel with aging consideration",
+        ],
+    )
+
+    fig.update_layout(
+        title=None,
+        showlegend=True,
+        margin=dict(l=5, r=5, t=60, b=5),
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+    )
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
+
+    fig.show()
+    write = True
+
+    if write:
+        pdf_path = "results/effect_aging_on_lca.pdf"
+
+        pio.write_image(fig, pdf_path, width=1900, height=900)
+        time.sleep(3)
+        pio.write_image(fig, pdf_path, width=1900, height=900)
