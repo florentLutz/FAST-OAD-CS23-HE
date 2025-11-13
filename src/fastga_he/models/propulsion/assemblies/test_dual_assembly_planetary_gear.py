@@ -15,7 +15,6 @@ from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
     PowerTrainPerformancesFromFile,
 )
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
-from fastga_he.gui.power_train_network_viewer_hv import power_train_network_viewer_hv
 
 
 from ..components.loads.pmsm import PerformancesPMSM
@@ -426,7 +425,7 @@ def test_assembly_from_pt_file():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "dual_assembly.yml")
     network_file_path = pth.join(OUT_FOLDER_PATH, "dual_assembly.html")
 
-    power_train_network_viewer_hv(pt_file_path, network_file_path)
+    power_train_network_viewer(pt_file_path, network_file_path)
 
     ivc = get_indep_var_comp(
         list_inputs(
