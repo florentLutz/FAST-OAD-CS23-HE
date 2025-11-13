@@ -2483,6 +2483,7 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_name,
             curated_connection_list,
             self._components_type_class,
+            self._components_om_type,
             icons_name,
             icons_size,
         )

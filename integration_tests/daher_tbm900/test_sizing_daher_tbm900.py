@@ -19,6 +19,7 @@ from fastga.utils.postprocessing.analysis_and_plots import (
 from utils.filter_residuals import filter_residuals
 
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+from fastga_he.gui.power_train_network_viewer_hv import power_train_network_viewer_hv
 from fastga_he.gui.power_train_weight_breakdown import power_train_mass_breakdown
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
@@ -119,8 +120,8 @@ def test_ecopulse_powertrain_network():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "turbo_electric_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "turbo_electric_propulsion.html")
 
-    if not pth.exists(network_file_path):
-        power_train_network_viewer(pt_file_path, network_file_path)
+    # if not pth.exists(network_file_path):
+    power_train_network_viewer_hv(pt_file_path, network_file_path, orientation="LR")
 
 
 def test_retrofit_ecopulse():

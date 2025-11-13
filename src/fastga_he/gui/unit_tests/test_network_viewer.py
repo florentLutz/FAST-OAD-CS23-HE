@@ -8,6 +8,7 @@ from shutil import rmtree
 import pytest
 
 from ..power_train_network_viewer import power_train_network_viewer
+from ..power_train_network_viewer_hv import power_train_network_viewer_hv
 
 DATA_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "results")
@@ -27,7 +28,7 @@ def test_pt_network_viewer(cleanup):
     os.makedirs(RESULTS_FOLDER_PATH)
 
     # No real way to verify the plot, we wil just check that it is created.
-    power_train_network_viewer(
+    power_train_network_viewer_hv(
         os.path.join(DATA_FOLDER_PATH, "simple_assembly.yml"),
         os.path.join(RESULTS_FOLDER_PATH, "network.html"),
     )
@@ -47,7 +48,7 @@ def test_pt_network_viewer_tri_prop(cleanup):
     os.makedirs(RESULTS_FOLDER_PATH)
 
     # No real way to verify the plot, we wil just check that it is created.
-    power_train_network_viewer(
+    power_train_network_viewer_hv(
         os.path.join(DATA_FOLDER_PATH, "simple_assembly_tri_prop.yml"),
         os.path.join(RESULTS_FOLDER_PATH, "network.html"),
     )
@@ -67,7 +68,7 @@ def test_pt_network_viewer_tri_prop_two_chainz(cleanup):
     os.makedirs(RESULTS_FOLDER_PATH)
 
     # No real way to verify the plot, we wil just check that it is created.
-    power_train_network_viewer(
+    power_train_network_viewer_hv(
         os.path.join(DATA_FOLDER_PATH, "simple_assembly_tri_prop_two_chainz.yml"),
         os.path.join(RESULTS_FOLDER_PATH, "network.html"),
     )
@@ -75,4 +76,5 @@ def test_pt_network_viewer_tri_prop_two_chainz(cleanup):
     assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
 
     # Cleanup to avoid any overclogging
-    # rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+    rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+
