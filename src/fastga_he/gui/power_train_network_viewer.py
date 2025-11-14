@@ -42,11 +42,46 @@ icons_dict = {
 }
 BACKGROUND_COLOR_CODE = "#bebebe"
 
+
 def power_train_network_viewer(
-        power_train_file_path: str,
-        network_file_path: str,
-        layout_prog: str = "dot",
-        orientation: str = "TB",
+    power_train_file_path: str,
+    network_file_path: str,
+    layout_prog: str = "dot",
+    orientation: str = "TB",
+    static: bool = True,
+):
+    """
+    Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
+
+    Args:
+        power_train_file_path: Path to the power train configuration file
+        network_file_path: Path where the HTML output will be saved
+        layout_prog: Graphviz layout program ('dot', 'neato', 'fdp', 'sfdp', 'circo')
+        "dot" - Hierarchical layout
+        "neato" - Spring model layout
+        "fdp" - Force-directed placement
+        "sfdp" - Scalable force-directed placement
+        "circo" - Circular layout
+    """
+
+    plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
+        _create_network_plot(
+            power_train_file_path=power_train_file_path,
+            layout_prog=layout_prog,
+            orientation=orientation,
+            static=static,
+        )
+    )
+
+    if static:
+        _save_static_html(plot, network_file_path)
+
+
+def _create_network_plot(
+    power_train_file_path: str,
+    layout_prog: str = "dot",
+    orientation: str = "TB",
+    static: bool = True,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
@@ -81,9 +116,12 @@ def power_train_network_viewer(
     node_types = {}
     node_om_types = {}
     node_icons = {}
+    # For animation purposes
+    node_image_sequences = {}
+    propeller_rotation_sequences = {}
 
     for component_name, component_type, om_type, icon_name, icon_size in zip(
-            names, components_type, components_type_om, icons_name, icons_size
+        names, components_type, components_type_om, icons_name, icons_size
     ):
         graph.add_node(component_name)
         node_sizes[component_name] = icon_size
@@ -146,7 +184,7 @@ def power_train_network_viewer(
         pos = {
             node: (
                 ((p[0] - x_min) / x_range * scale * x_factor + x_orientation_offset),
-                ((p[1] - y_min) / y_range * scale * y_factor + y_orientation_offset)
+                ((p[1] - y_min) / y_range * scale * y_factor + y_orientation_offset),
             )
             for node, p in pos.items()
         }
@@ -159,7 +197,7 @@ def power_train_network_viewer(
         y_range=(-50, y_range_max),
         toolbar_location="above",
         background_fill_color=BACKGROUND_COLOR_CODE,
-        title=get_file_name(power_train_file_path),
+        title=_get_file_name(power_train_file_path),
     )
     plot.xgrid.visible = False
     plot.ygrid.visible = False
@@ -171,12 +209,13 @@ def power_train_network_viewer(
     node_x = [pos[node][0] for node in node_indices]
     node_y = [pos[node][1] for node in node_indices]
     node_image_urls = [icons_dict[node_icons[node]] for node in node_indices]
-    node_sizes_list = [node_sizes[node]*icon_factor for node in node_indices]
+    node_sizes_list = [node_sizes[node] * icon_factor for node in node_indices]
     node_types_list = [node_types[node] for node in node_indices]
     node_om_types_list = [node_om_types[node] for node in node_indices]
 
-    # Convert file paths to file:// URLs for local images
-    node_image_urls = ["file://" + str(Path(url).resolve()) for url in node_image_urls]
+    if static:
+        # Convert file paths to file:// URLs for local images
+        node_image_urls = ["file://" + str(Path(url).resolve()) for url in node_image_urls]
 
     # Create edge data
     edge_start_x = []
@@ -192,20 +231,23 @@ def power_train_network_viewer(
         edge_end_y.append(pos[end][1])
 
     # Draw edges
-    edge_source = ColumnDataSource(
-        data=dict(
-            xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
-            ys=[[sy, ey] for sy, ey in zip(edge_start_y, edge_end_y)],
-            line_color=["gray"]*len(edge_start_x)
+    if static:
+        edge_source = ColumnDataSource(
+            data=dict(
+                xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
+                ys=[[sy, ey] for sy, ey in zip(edge_start_y, edge_end_y)],
+                line_color=["gray"] * len(edge_start_x),
+                line_alpha=[0.5] * len(edge_start_x),
+            )
         )
-    )
+
     plot.multi_line(
         xs="xs",
         ys="ys",
         source=edge_source,
         line_color="line_color",
-        line_width=2,
-        line_alpha=0.5,
+        line_width=3,
+        line_alpha="line_alpha",
     )
 
     # Draw nodes as images
@@ -214,7 +256,7 @@ def power_train_network_viewer(
             x=node_x,
             y=node_y,
             url=node_image_urls,
-            w=[s*icon_width_factor for s in node_sizes_list],
+            w=[s * icon_width_factor for s in node_sizes_list],
             h=[s for s in node_sizes_list],
             name=node_indices,
             type=node_types_list,
@@ -267,12 +309,12 @@ def power_train_network_viewer(
     cleaned_node_types = []
     cleaned_node_om_types = []
     for node_type, node_om_type in zip(node_types_list, node_om_types_list):
-        if type(node_type) == str:
-            cleaned_node_types.append(string_clean_up(node_type.capitalize()))
+        if isinstance(node_type, str):
+            cleaned_node_types.append(_string_clean_up(node_type.capitalize()))
         else:
-            cleaned_node_types.append(string_clean_up(node_type))
+            cleaned_node_types.append(_string_clean_up(node_type))
 
-        cleaned_node_om_types.append(string_clean_up(node_om_type))
+        cleaned_node_om_types.append(_string_clean_up(node_om_type))
 
     # Define list info
     hover_source = ColumnDataSource(
@@ -283,7 +325,7 @@ def power_train_network_viewer(
             h=[s for s in node_sizes_list],
             name=node_indices,
             type=cleaned_node_types,
-            component_type = cleaned_node_om_types,
+            component_type=cleaned_node_om_types,
         )
     )
 
@@ -308,44 +350,48 @@ def power_train_network_viewer(
     )
     plot.add_tools(hover, BoxSelectTool())
 
+    return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
+
+
+def _string_clean_up(old_string):
+    # In case for list type definition
+    if isinstance(old_string, list):
+        old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
+
+    # Replace underscore with space
+    new_string = re.sub(r"[_:/]+", " ", old_string)
+
+    # Add a space after 'DC' if followed immediately by a letter or number
+    new_string = re.sub(r"\bDC(?=[A-Za-z0-9])", "DC ", new_string)
+    new_string = re.sub(r"\bDC DC(?=[A-Za-z0-9])", "DC-DC ", new_string)
+
+    # Add space before a capital letter preceded by a lowercase letter
+    new_string = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", new_string)
+
+    # Remove extra spaces
+    new_string = re.sub(r"\s+", " ", new_string).strip()
+
+    return new_string
+
+
+def _get_file_name(file_path):
+    match_html = re.search(r"[^/\\]+\.yml$", str(file_path))
+
+    if match_html:
+        filename = match_html.group()
+        filename = re.sub(r"\.yml$", "", filename)
+        filename = re.sub(r"[_:/]+", " ", filename).capitalize()
+
+        return f"{filename} powertrain network"
+
+
+def _save_static_html(plot, file_path):
     # Create directory if it doesn't exist
-    directory_to_save_graph = os.path.dirname(network_file_path)
+    directory_to_save_graph = os.path.dirname(file_path)
+
     if directory_to_save_graph and not os.path.exists(directory_to_save_graph):
         os.makedirs(directory_to_save_graph)
 
     # Save the plot
-    output_file(network_file_path)
+    output_file(file_path)
     save(plot)
-
-    return plot
-
-
-def string_clean_up(old_string):
-    # In case for list type definition
-    if type(old_string) == list:
-        old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
-
-    # Replace underscore with space
-    new_string = re.sub(r'[_:/]+', ' ', old_string)
-
-    # Add a space after 'DC' if followed immediately by a letter or number
-    new_string = re.sub(r'\bDC(?=[A-Za-z0-9])', 'DC ', new_string)
-    new_string = re.sub(r'\bDC DC(?=[A-Za-z0-9])','DC-DC ',new_string)
-
-    # Add space before a capital letter preceded by a lowercase letter
-    new_string = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', new_string)
-
-    # Remove extra spaces
-    new_string = re.sub(r'\s+', ' ', new_string).strip()
-
-    return new_string
-
-def get_file_name(file_path):
-    match_html = re.search(r'[^/\\]+\.yml$', str(file_path))
-
-    if match_html:
-        filename = match_html.group()
-        filename = re.sub(r'\.yml$', '', filename)
-        filename = re.sub(r'[_:/]+', ' ', filename).capitalize()
-
-        return  f"{filename} powertrain network"
