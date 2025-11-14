@@ -30,12 +30,7 @@ icons_dict = {
     "generator": pth.join(icons.__path__[0], "generator.png"),
     "ice": pth.join(icons.__path__[0], "ice.png"),
     "switch": pth.join(icons.__path__[0], "switch.png"),
-    "propeller": [
-        pth.join(icons.__path__[0], "propeller_1.png"),
-        pth.join(icons.__path__[0], "propeller_2.png"),
-        pth.join(icons.__path__[0], "propeller_3.png"),
-        pth.join(icons.__path__[0], "propeller_4.png"),
-    ],
+    "propeller": pth.join(icons.__path__[0], "propeller.png"),
     "splitter": pth.join(icons.__path__[0], "splitter.png"),
     "rectifier": pth.join(icons.__path__[0], "AC_DC.png"),
     "dc_converter": pth.join(icons.__path__[0], "DC_DC.png"),
@@ -45,6 +40,150 @@ icons_dict = {
     "turbine": pth.join(icons.__path__[0], "turbine.png"),
     "gearbox": pth.join(icons.__path__[0], "gears.png"),
 }
+
+
+def get_monitor_refresh_rate():
+    """
+    Detect monitor refresh rate from system settings.
+
+    Returns:
+        refresh_rate (int): Monitor refresh rate in Hz (default 60 if detection fails)
+    """
+    try:
+        import platform
+        system = platform.system()
+
+        if system == "Windows":
+            try:
+                import subprocess
+                # Use wmic to get refresh rate on Windows
+                result = subprocess.run(
+                    ["wmic", "path", "win32_videocontroller", "get", "currentrefreshrate"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                lines = result.stdout.strip().split('\n')
+                if len(lines) > 1:
+                    rate = int(lines[1].strip())
+                    if rate > 0:
+                        print(f"✓ Detected monitor refresh rate: {rate} Hz")
+                        return rate
+            except Exception as e:
+                print(f"✗ Error detecting refresh rate: {e}")
+
+        elif system == "Darwin":  # macOS
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ["system_profiler", "SPDisplaysDataType"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                if "120 Hz" in result.stdout:
+                    print("✓ Detected monitor refresh rate: 120 Hz")
+                    return 120
+                elif "144 Hz" in result.stdout:
+                    print("✓ Detected monitor refresh rate: 144 Hz")
+                    return 144
+                else:
+                    print("✓ Detected monitor refresh rate: 60 Hz (default)")
+                    return 60
+            except Exception as e:
+                print(f"✗ Error detecting refresh rate: {e}")
+
+        elif system == "Linux":
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ["xrandr"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                # Parse xrandr output for refresh rate
+                for line in result.stdout.split('\n'):
+                    if '*' in line:  # Current mode
+                        parts = line.split()
+                        for part in parts:
+                            if '+' in part:
+                                rate = float(part.replace('+', ''))
+                                print(f"✓ Detected monitor refresh rate: {int(rate)} Hz")
+                                return int(rate)
+            except Exception as e:
+                print(f"✗ Error detecting refresh rate: {e}")
+
+    except Exception as e:
+        print(f"✗ Unexpected error detecting refresh rate: {e}")
+
+    print("⚠ Could not detect refresh rate, using default: 60 Hz")
+    return 60
+
+
+def calculate_optimal_callback_interval(refresh_rate, target_fps=None):
+    """
+    Calculate optimal callback interval based on monitor refresh rate.
+
+    Args:
+        refresh_rate (int): Monitor refresh rate in Hz
+        target_fps (int): Target animation FPS (default: match refresh rate)
+
+    Returns:
+        callback_interval (int): Milliseconds between callbacks
+    """
+    if target_fps is None:
+        target_fps = refresh_rate
+
+    # Ensure target FPS doesn't exceed refresh rate
+    target_fps = min(target_fps, refresh_rate)
+
+    callback_interval = int(1000 / target_fps)
+    print(f"✓ Animation FPS: {target_fps}, Callback interval: {callback_interval}ms")
+    return callback_interval
+
+
+def calculate_animation_frames(refresh_rate, animation_duration_ms=1000):
+    """
+    Calculate animation frame count for smooth animations synchronized to refresh rate.
+
+    Args:
+        refresh_rate (int): Monitor refresh rate in Hz
+        animation_duration_ms (int): Desired animation duration in milliseconds
+
+    Returns:
+        frames (int): Number of frames for smooth animation
+    """
+    # Calculate frames needed for smooth animation
+    frames = max(refresh_rate, int(refresh_rate * animation_duration_ms / 1000))
+    print(
+        f"✓ Animation will use {frames} frames over {animation_duration_ms}ms at {refresh_rate}Hz")
+    return frames
+
+
+def create_rotated_svg(base64_url, rotation_degrees):
+    """
+    Wrap a base64 image in an SVG with rotation transform without cropping.
+
+    Args:
+        base64_url: Data URL of the image (e.g., "data:image/png;base64,...")
+        rotation_degrees: Rotation angle in degrees (counter-clockwise)
+
+    Returns:
+        SVG data URL with rotated image
+    """
+    import base64
+
+    # Use a larger SVG canvas to prevent clipping during rotation
+    # The diagonal of a 100x100 square is ~141, so use 150x150 to be safe
+    svg_template = f'''<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <g transform="translate(75 75) rotate({rotation_degrees}) translate(-50 -50)">
+            <image href="{base64_url}" x="0" y="0" width="100" height="100"/>
+        </g>
+    </svg>'''
+
+    svg_b64 = base64.b64encode(svg_template.encode()).decode()
+    return f"data:image/svg+xml;base64,{svg_b64}"
 
 
 def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y,
@@ -184,13 +323,17 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
     import base64
     node_image_urls = []
     node_image_sequences = {}  # Store animation sequences for nodes
+    propeller_rotation_sequences = {}
+    rotation_angles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]  # 12 frames
 
     for node in node_indices:
         icon_name = node_icons[node]
         icon_path = icons_dict[icon_name]
 
+        base_url = None  # Store the loaded image URL
+
         # Check if this is an animated icon (list of paths) or static (single path)
-        if isinstance(icon_path, list):
+        if isinstance(icon_path, list) and icon_name != "propeller":
             # Animated icon
             animation_frames = []
             for frame_path in icon_path:
@@ -217,13 +360,14 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
 
             if animation_frames:
                 node_image_sequences[node] = animation_frames
-                node_image_urls.append(animation_frames[0])  # Start with first frame
+                base_url = animation_frames[0]  # Start with first frame
+                node_image_urls.append(base_url)
                 print(f"✓ Loaded animated icon: {icon_name} ({len(animation_frames)} frames)")
             else:
-                node_image_urls.append(
-                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
+                base_url = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg=="
+                node_image_urls.append(base_url)
         else:
-            # Static icon
+            # Static icon (including propellers)
             try:
                 icon_file = Path(icon_path)
                 if not icon_file.exists():
@@ -240,17 +384,29 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
                         '.svg': 'image/svg+xml',
                     }
                     mime_type = mime_types.get(ext, 'image/png')
-                    url = f"data:{mime_type};base64,{img_data}"
-                    node_image_urls.append(url)
+                    base_url = f"data:{mime_type};base64,{img_data}"
+                    node_image_urls.append(base_url)
                     print(f"✓ Loaded icon: {icon_name}")
             except FileNotFoundError as e:
                 print(f"✗ FILE NOT FOUND: {icon_name} - {e}")
-                node_image_urls.append(
-                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
+                base_url = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg=="
+                node_image_urls.append(base_url)
             except Exception as e:
                 print(f"✗ ERROR loading {icon_name}: {type(e).__name__}: {e}")
-                node_image_urls.append(
-                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
+                base_url = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg=="
+                node_image_urls.append(base_url)
+
+        # NOW create propeller rotation frames AFTER loading the base image
+        if icon_name == "propeller" and base_url:
+            rotation_frames = []
+            for angle in rotation_angles:
+                rotated_url = create_rotated_svg(base_url, angle)
+                rotation_frames.append(rotated_url)
+
+            propeller_rotation_sequences[node] = rotation_frames
+            # Set initial image to first frame
+            node_image_urls[-1] = rotation_frames[0]  # Update the last appended URL
+            print(f"✓ Created rotation animation for propeller: {node}")
 
     # Prepare edge data for animated multi_line
     edge_start_x = []
@@ -348,7 +504,7 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
     )
     plot.add_tools(hover, TapTool(), BoxSelectTool())
 
-    return plot, edge_source, node_source, node_image_sequences
+    return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
 
 
 def power_train_network_viewer_hv_server(
@@ -356,6 +512,7 @@ def power_train_network_viewer_hv_server(
         port: int = 5006,
         address: str = "localhost",
         layout_prog: str = "dot",
+        refresh_rate: int = None,
 ):
     """
     Start a Bokeh Server for the power train network visualization.
@@ -365,10 +522,20 @@ def power_train_network_viewer_hv_server(
         port: Port to run the server on (default: 5006)
         address: Server address (default: localhost)
         layout_prog: Graphviz layout program ('dot', 'neato', 'fdp', 'sfdp', 'circo', 'twopi')
+        refresh_rate: Monitor refresh rate in Hz (auto-detected if None)
     """
 
+    # Auto-detect refresh rate if not provided
+    if refresh_rate is None:
+        refresh_rate = get_monitor_refresh_rate()
+
+    # Calculate optimal animation parameters
+    callback_interval = calculate_optimal_callback_interval(refresh_rate, target_fps=refresh_rate)
+    animation_frames = calculate_animation_frames(refresh_rate, animation_duration_ms=1000)
+    propeller_frames = 12  # Use 12 frames for propeller (divisible by common refresh rates)
+
     def make_document(doc):
-        plot, edge_source, node_source, node_image_sequences = create_network_plot(
+        plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = create_network_plot(
             power_train_file_path, layout_prog)
         animation_counter = [0]
 
@@ -387,31 +554,26 @@ def power_train_network_viewer_hv_server(
 
         # Add periodic callback for animation
         def update():
-            animation_counter[0] = (animation_counter[0] + 1) % 100
-            progress = animation_counter[0] / 100.0  # 0 to 1
+            animation_counter[0] = (animation_counter[0] + 1) % animation_frames
+            progress = animation_counter[0] / animation_frames  # 0 to 1
 
             num_segments = len(edge_source.data['xs'])
-            num_edges = max(edge_source.data['edge_id']) + 1 if edge_source.data['edge_id'] else 1
-            segments_per_edge = num_segments // num_edges
+            edge_id_list = edge_source.data['edge_id']
+            num_edges = max(edge_id_list) + 1 if edge_id_list else 1
+            segments_per_edge = num_segments // num_edges if num_edges > 0 else 1
 
             new_alphas = []
 
             for i in range(num_segments):
-                edge_idx = edge_source.data['edge_id'][i]
-                segment_idx = i % segments_per_edge
+                edge_idx = edge_id_list[i]
+                segment_idx = i % segments_per_edge if segments_per_edge > 0 else 0
 
-                # Normalize segment position within edge (0 to 1)
-                seg_position = segment_idx / segments_per_edge
+                seg_position = segment_idx / segments_per_edge if segments_per_edge > 0 else 0
+                wave_pos = (-progress + edge_idx * 0.1) % 1.0
 
-                # Calculate wave position for this segment
-                # The wave moves from 0 to 1 as progress goes from 0 to 1
-                wave_pos = (-progress + edge_idx * 0.1) % 1.0 # Offset each edge slightly
-
-                # Distance from segment to wave center
                 distance = abs(seg_position - wave_pos)
 
-                # Use gaussian-like falloff for smooth wave
-                if distance < 0.3:  # Wave width
+                if distance < 0.3:
                     alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
                 else:
                     alpha = 0.3
@@ -423,25 +585,34 @@ def power_train_network_viewer_hv_server(
             })
 
             # Update animated node icons
-            if node_image_sequences:
-                frame_index = (animation_counter[0] // 2) % 5  # Slower animation for nodes
+            if propeller_rotation_sequences:
+                # Synchronize propeller rotation with refresh rate
+                frame_index = (animation_counter[
+                                   0] * propeller_frames // animation_frames) % propeller_frames
 
                 new_urls = []
+                updated = False
+
                 for i, node in enumerate(node_source.data['name']):
-                    if node in node_image_sequences:
-                        seq = node_image_sequences[node]
+                    if node in propeller_rotation_sequences:
+                        seq = propeller_rotation_sequences[node]
                         frame_idx = frame_index % len(seq)
                         new_urls.append(seq[frame_idx])
+                        updated = True
+                    elif node in node_image_sequences:
+                        seq = node_image_sequences[node]
+                        frame_idx = (animation_counter[0] * len(seq) // animation_frames) % len(seq)
+                        new_urls.append(seq[frame_idx])
+                        updated = True
                     else:
                         new_urls.append(node_source.data['url'][i])
 
-                node_source.patch({
-                    'url': [(slice(len(new_urls)), new_urls)]
-                })
+                if updated and new_urls and len(new_urls) == len(node_source.data['url']):
+                    node_source.patch({
+                        'url': [(slice(len(new_urls)), new_urls)]
+                    })
 
-        doc.add_periodic_callback(update,
-                                  50)  # Update every 50ms for smooth motion for smooth color
-        # cycling
+        doc.add_periodic_callback(update, callback_interval)
 
     server = Server(
         {"/": make_document},
@@ -452,6 +623,9 @@ def power_train_network_viewer_hv_server(
 
     print(f"\n{'=' * 60}")
     print(f"Bokeh Server started!")
+    print(f"Monitor refresh rate: {refresh_rate} Hz")
+    print(f"Callback interval: {callback_interval}ms")
+    print(f"Animation frames: {animation_frames}")
     print(f"Open your browser and go to:")
     print(f"  http://{address}:{port}/")
     print(f"{'=' * 60}\n")
