@@ -8,16 +8,13 @@ import os.path as pth
 from pathlib import Path
 import re
 import pygraphviz as pgv
-import networkx as nx
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import (
     ColumnDataSource,
     HoverTool,
-    TapTool,
     BoxSelectTool,
     LabelSet,
 )
-from tornado.gen import Return
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
@@ -43,7 +40,7 @@ icons_dict = {
     "turbine": pth.join(icons.__path__[0], "turbine.png"),
     "gearbox": pth.join(icons.__path__[0], "gears.png"),
 }
-
+BACKGROUND_COLOR_CODE = "#bebebe"
 
 def power_train_network_viewer(
         power_train_file_path: str,
@@ -65,7 +62,7 @@ def power_train_network_viewer(
         "circo" - Circular layout
     """
     # Create AGraph (PyGraphviz) object
-    G = pgv.AGraph(directed=True, rankdir=orientation)
+    graph = pgv.AGraph(directed=True, rankdir=orientation)
 
     configurator = FASTGAHEPowerTrainConfigurator()
     configurator.load(power_train_file_path)
@@ -88,7 +85,7 @@ def power_train_network_viewer(
     for component_name, component_type, om_type, icon_name, icon_size in zip(
             names, components_type, components_type_om, icons_name, icons_size
     ):
-        G.add_node(component_name)
+        graph.add_node(component_name)
         node_sizes[component_name] = icon_size
         node_types[component_name] = component_type
         node_om_types[component_name] = om_type
@@ -99,14 +96,14 @@ def power_train_network_viewer(
         # Filter out bus connection output numbers
         source = connection[0][0] if isinstance(connection[0], list) else connection[0]
         target = connection[1][0] if isinstance(connection[1], list) else connection[1]
-        G.add_edge(source, target)
+        graph.add_edge(source, target)
 
     # Apply Graphviz layout algorithm
-    G.layout(prog=layout_prog)
+    graph.layout(prog=layout_prog)
 
     # Extract positions from Graphviz layout
     pos = {}
-    for node in G.nodes():
+    for node in graph.nodes():
         x, y = map(float, node.attr["pos"].split(","))
         pos[node] = (x, y)
 
@@ -120,7 +117,7 @@ def power_train_network_viewer(
         x_range = x_max - x_min if x_max > x_min else 1
         y_range = y_max - y_min if y_max > y_min else 1
 
-        # Scale to a reasonable display size
+        # Scale to a reasonable display size with different orientation
         if orientation == "TB" or orientation == "BT":
             x_factor = 0.5
             y_factor = 1.0
@@ -161,7 +158,7 @@ def power_train_network_viewer(
         x_range=(-50, x_range_max),
         y_range=(-50, y_range_max),
         toolbar_location="above",
-        background_fill_color="#bebebe",
+        background_fill_color=BACKGROUND_COLOR_CODE,
         title=get_file_name(power_train_file_path),
     )
     plot.xgrid.visible = False
@@ -170,7 +167,7 @@ def power_train_network_viewer(
     plot.yaxis.visible = False
 
     # Prepare node data
-    node_indices = list(G.nodes())
+    node_indices = list(graph.nodes())
     node_x = [pos[node][0] for node in node_indices]
     node_y = [pos[node][1] for node in node_indices]
     node_image_urls = [icons_dict[node_icons[node]] for node in node_indices]
@@ -187,7 +184,7 @@ def power_train_network_viewer(
     edge_end_x = []
     edge_end_y = []
 
-    for edge in G.edges():
+    for edge in graph.edges():
         start, end = edge
         edge_start_x.append(pos[start][0])
         edge_start_y.append(pos[start][1])
@@ -224,12 +221,13 @@ def power_train_network_viewer(
         )
     )
 
+    # Add circle to cover edge line
     plot.circle(
         x="x",
         y="y",
         size=45,  # Adjust size to match your icon size
         source=node_source,
-        color="#bebebe",
+        color=BACKGROUND_COLOR_CODE,
         line_alpha=0,
     )
 
@@ -265,7 +263,7 @@ def power_train_network_viewer(
     plot.add_layout(labels)
 
     # Add interactive tools
-    # Add invisible circles on top for hover interactivity
+    # clean up type class and component type for hove info list
     cleaned_node_types = []
     cleaned_node_om_types = []
     for node_type, node_om_type in zip(node_types_list, node_om_types_list):
@@ -276,7 +274,7 @@ def power_train_network_viewer(
 
         cleaned_node_om_types.append(string_clean_up(node_om_type))
 
-
+    # Define list info
     hover_source = ColumnDataSource(
         data=dict(
             x=node_x,
@@ -288,18 +286,19 @@ def power_train_network_viewer(
             component_type = cleaned_node_om_types,
         )
     )
+
+    # Add invisible circles on top for hover interactivity
     plot.circle(
         x="x",
         y="y",
-        size=60,  # Adjust size to match your icon size
+        size=60,
         source=hover_source,
-        fill_alpha=0,  # Invisible
-        line_alpha=0,  # Invisible border
-        hover_fill_alpha=0.1,  # Optional: show faint highlight on hover
+        fill_alpha=0,
+        line_alpha=0,
+        hover_fill_alpha=0.1,  # show faint highlight on component icon
         hover_line_alpha=0.3,
     )
 
-    # Add interactive tools
     hover = HoverTool(
         tooltips=[
             ("Name", "@name"),
