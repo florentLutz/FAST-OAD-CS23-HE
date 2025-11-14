@@ -63,12 +63,36 @@ def get_monitor_refresh_rate():
                     text=True,
                     timeout=5
                 )
-                lines = result.stdout.strip().split('\n')
+                lines = [line.strip() for line in result.stdout.strip().split('\n') if line.strip()]
                 if len(lines) > 1:
-                    rate = int(lines[1].strip())
-                    if rate > 0:
-                        print(f"✓ Detected monitor refresh rate: {rate} Hz")
-                        return rate
+                    try:
+                        rate = int(lines[1])
+                        if rate > 0:
+                            print(f"✓ Detected monitor refresh rate: {rate} Hz")
+                            return rate
+                    except (ValueError, IndexError) as e:
+                        print(f"✗ Could not parse refresh rate from wmic output: {lines}")
+            except FileNotFoundError:
+                print("✗ wmic command not found, trying alternative method...")
+                try:
+                    import subprocess
+                    # Alternative: Use Get-WmiObject PowerShell command
+                    result = subprocess.run(
+                        ["powershell", "-Command",
+                         "Get-WmiObject -Namespace root\\cimv2 -Class Win32_VideoController | Select-Object CurrentRefreshRate"],
+                        capture_output=True,
+                        text=True,
+                        timeout=5
+                    )
+                    lines = [line.strip() for line in result.stdout.strip().split('\n') if
+                             line.strip() and line.strip().isdigit()]
+                    if lines:
+                        rate = int(lines[0])
+                        if rate > 0:
+                            print(f"✓ Detected monitor refresh rate: {rate} Hz")
+                            return rate
+                except Exception as e2:
+                    print(f"✗ PowerShell method also failed: {e2}")
             except Exception as e:
                 print(f"✗ Error detecting refresh rate: {e}")
 
