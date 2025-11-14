@@ -106,7 +106,7 @@ def _create_network_plot(
         names,
         connections,
         components_type,
-        components_type_om,
+        components_om_type,
         icons_name,
         icons_size,
     ) = configurator.get_network_elements_list()
@@ -116,12 +116,13 @@ def _create_network_plot(
     node_types = {}
     node_om_types = {}
     node_icons = {}
+
     # For animation purposes
     node_image_sequences = {}
     propeller_rotation_sequences = {}
 
     for component_name, component_type, om_type, icon_name, icon_size in zip(
-        names, components_type, components_type_om, icons_name, icons_size
+        names, components_type, components_om_type, icons_name, icons_size
     ):
         graph.add_node(component_name)
         node_sizes[component_name] = icon_size
@@ -168,6 +169,7 @@ def _create_network_plot(
             icon_width_factor = 1.0
             x_orientation_offset = 125
             y_orientation_offset = 0.0
+
         elif orientation == "LR" or orientation == "RL":
             x_factor = 1.0
             y_factor = 0.5
@@ -206,16 +208,24 @@ def _create_network_plot(
 
     # Prepare node data
     node_indices = list(graph.nodes())
-    node_x = [pos[node][0] for node in node_indices]
-    node_y = [pos[node][1] for node in node_indices]
-    node_image_urls = [icons_dict[node_icons[node]] for node in node_indices]
-    node_sizes_list = [node_sizes[node] * icon_factor for node in node_indices]
-    node_types_list = [node_types[node] for node in node_indices]
-    node_om_types_list = [node_om_types[node] for node in node_indices]
+    node_x = []
+    node_y = []
+    node_sizes_list = []
+    node_types_list = []
+    node_om_types_list = []
+
+    for node in node_indices:
+        node_x.append(pos[node][0])
+        node_y.append(pos[node][1])
+        node_sizes_list.append(node_sizes[node]*icon_factor)
+        node_types_list.append(node_types[node])
+        node_om_types_list.append(node_om_types[node])
 
     if static:
         # Convert file paths to file:// URLs for local images
-        node_image_urls = ["file://" + str(Path(url).resolve()) for url in node_image_urls]
+        node_image_urls = [
+            "file://" + str(Path(icons_dict[node_icons[node]]).resolve()) for node in node_indices
+        ]
 
     # Create edge data
     edge_start_x = []
@@ -324,7 +334,7 @@ def _create_network_plot(
             w=[s * icon_width_factor for s in node_sizes_list],
             h=[s for s in node_sizes_list],
             name=node_indices,
-            type=cleaned_node_types,
+            type_class=cleaned_node_types,
             component_type=cleaned_node_om_types,
         )
     )
@@ -344,7 +354,7 @@ def _create_network_plot(
     hover = HoverTool(
         tooltips=[
             ("Name", "@name"),
-            ("Type class", "@type"),
+            ("Type class", "@type_class"),
             ("Component type", "@component_type"),
         ]
     )
