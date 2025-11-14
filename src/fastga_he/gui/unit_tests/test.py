@@ -1,7 +1,7 @@
 import os
 import os.path as pth
 from pathlib import Path
-
+import re
 import pygraphviz as pgv
 from bokeh.plotting import figure, curdoc
 from bokeh.models import (
@@ -247,7 +247,7 @@ def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y,
 
     return seg_xs, seg_ys, seg_alphas, edge_ids
 
-def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
+def create_network_plot(power_train_file_path: str, layout_prog: str = "dot",orientation: str = "TB"):
     """
     Create an interactive network visualization of a power train using Bokeh Server with animated edges.
 
@@ -259,7 +259,7 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         plot: Bokeh figure object
     """
     # Create AGraph (PyGraphviz) object
-    G = pgv.AGraph(directed=True, rankdir="TB")
+    G = pgv.AGraph(directed=True, rankdir=orientation)
 
     configurator = FASTGAHEPowerTrainConfigurator()
     configurator.load(power_train_file_path)
@@ -268,23 +268,24 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         names,
         connections,
         components_type,
-        components_om_type,
+        components_type_om,
         icons_name,
         icons_size,
     ) = configurator.get_network_elements_list()
-    distance_from_prop_loads, prop_loads = configurator.get_distance_from_propulsive_load()
 
     # Build node attributes dictionaries
     node_sizes = {}
     node_types = {}
+    node_om_types = {}
     node_icons = {}
 
-    for component_name, component_type, icon_name, icon_size in zip(
-            names, components_type, icons_name, icons_size
+    for component_name, component_type, om_type, icon_name, icon_size in zip(
+            names, components_type, components_type_om, icons_name, icons_size
     ):
         G.add_node(component_name)
         node_sizes[component_name] = icon_size
         node_types[component_name] = component_type
+        node_om_types[component_name] = om_type
         node_icons[component_name] = icon_name
 
     # Add edges
@@ -312,21 +313,46 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         x_range = x_max - x_min if x_max > x_min else 1
         y_range = y_max - y_min if y_max > y_min else 1
 
-        scale = 500
+        # Scale to a reasonable display size with different orientation
+        if orientation == "TB" or orientation == "BT":
+            x_factor = 0.5
+            y_factor = 1.0
+            scale = 550
+            plot_width = 1200
+            plot_height = 900
+            x_range_max = 600
+            y_range_max = 600
+            icon_factor = 1
+            icon_width_factor = 1.0
+            x_orientation_offset = 125
+            y_orientation_offset = 0.0
+        elif orientation == "LR" or orientation == "RL":
+            x_factor = 1.0
+            y_factor = 0.5
+            scale = 600
+            plot_width = 1500
+            plot_height = 900
+            x_range_max = 600
+            y_range_max = 600
+            icon_factor = 1.75
+            icon_width_factor = 0.6
+            x_orientation_offset = -25
+            y_orientation_offset = 150
+
         pos = {
             node: (
-                ((p[0] - x_min) / x_range * scale * 0.8 + scale * 0.1),
-                ((p[1] - y_min) / y_range * scale * 0.8 + scale * 0.1)
+                ((p[0] - x_min) / x_range * scale * x_factor + x_orientation_offset),
+                ((p[1] - y_min) / y_range * scale * y_factor + y_orientation_offset),
             )
             for node, p in pos.items()
         }
 
     # Create Bokeh plot
     plot = figure(
-        width=1200,
-        height=800,
-        x_range=(-50, 600),
-        y_range=(-50, 600),
+        width=plot_width,
+        height=plot_height,
+        x_range=(-50, x_range_max),
+        y_range=(-50, y_range_max),
         toolbar_location="above",
         background_fill_color="#bebebe",
         title=f"Power Train Network (Layout: {layout_prog})",
@@ -340,8 +366,9 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
     node_indices = list(G.nodes())
     node_x = [pos[node][0] for node in node_indices]
     node_y = [pos[node][1] for node in node_indices]
-    node_sizes_list = [node_sizes[node] * 2 for node in node_indices]
+    node_sizes_list = [node_sizes[node] * icon_factor for node in node_indices]
     node_types_list = [node_types[node] for node in node_indices]
+    node_om_types_list = [node_om_types[node] for node in node_indices]
 
     # Get image paths and convert to Base64 URLs (cross-platform)
     import base64
@@ -440,12 +467,10 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
 
     for edge in G.edges():
         start, end = edge
-        start_x, start_y = pos[start]
-        end_x, end_y = pos[end]
-        edge_start_x.append(start_x)
-        edge_start_y.append(start_y)
-        edge_end_x.append(end_x)
-        edge_end_y.append(end_y)
+        edge_start_x.append(pos[start][0])
+        edge_start_y.append(pos[start][1])
+        edge_end_x.append(pos[end][0])
+        edge_end_y.append(pos[end][1])
 
     # Create segmented edges for flowing animation
     seg_xs, seg_ys, seg_alphas, edge_ids = create_segmented_edges(
@@ -479,15 +504,24 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
             x=node_x,
             y=node_y,
             url=node_image_urls,
-            w=[s for s in node_sizes_list],
+            w=[s * icon_width_factor for s in node_sizes_list],
             h=[s for s in node_sizes_list],
             name=node_indices,
             type=node_types_list,
         )
     )
 
+    plot.scatter(
+        x="x",
+        y="y",
+        size=45,  # Adjust size to match your icon size
+        source=node_source,
+        color="#bebebe",
+        line_alpha=0,
+    )
+
     # Draw nodes as images and store renderer for hover tool
-    image_renderer = plot.image_url(
+    plot.image_url(
         url="url",
         x="x",
         y="y",
@@ -518,15 +552,50 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
     )
     plot.add_layout(labels)
 
-    # Add interactive tools
+    # clean up type class and component type for hove info list
+    cleaned_node_types = []
+    cleaned_node_om_types = []
+    for node_type, node_om_type in zip(node_types_list, node_om_types_list):
+        if isinstance(node_type, str):
+            cleaned_node_types.append(_string_clean_up(node_type.capitalize()))
+        else:
+            cleaned_node_types.append(_string_clean_up(node_type))
+
+        cleaned_node_om_types.append(_string_clean_up(node_om_type))
+
+    # Define list info
+    hover_source = ColumnDataSource(
+        data=dict(
+            x=node_x,
+            y=node_y,
+            w=[s * icon_width_factor for s in node_sizes_list],
+            h=[s for s in node_sizes_list],
+            name=node_indices,
+            type=cleaned_node_types,
+            component_type=cleaned_node_om_types,
+        )
+    )
+
+    # Add invisible circles on top for hover interactivity
+    plot.scatter(
+        x="x",
+        y="y",
+        size=60,
+        source=hover_source,
+        fill_alpha=0,
+        line_alpha=0,
+        hover_fill_alpha=0.1,  # show faint highlight on component icon
+        hover_line_alpha=0.3,
+    )
+
     hover = HoverTool(
         tooltips=[
             ("Name", "@name"),
-            ("Type", "@type"),
-        ],
-        renderers=[image_renderer],  # Explicitly reference the image renderer
+            ("Type class", "@type"),
+            ("Component type", "@component_type"),
+        ]
     )
-    plot.add_tools(hover, TapTool(), BoxSelectTool())
+    plot.add_tools(hover, BoxSelectTool())
 
     return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
 
@@ -537,6 +606,7 @@ def power_train_network_viewer_hv_server(
         address: str = "localhost",
         layout_prog: str = "dot",
         refresh_rate: int = None,
+        orientation: str = "TB",
 ):
     """
     Start a Bokeh Server for the power train network visualization.
@@ -560,7 +630,7 @@ def power_train_network_viewer_hv_server(
 
     def make_document(doc):
         plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = create_network_plot(
-            power_train_file_path, layout_prog)
+            power_train_file_path, layout_prog, orientation=orientation)
         animation_counter = [0]
 
         doc.add_root(column(plot))
@@ -657,6 +727,25 @@ def power_train_network_viewer_hv_server(
     server.start()
     server.io_loop.start()
 
+def _string_clean_up(old_string):
+    # In case for list type definition
+    if isinstance(old_string, list):
+        old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
+
+    # Replace underscore with space
+    new_string = re.sub(r"[_:/]+", " ", old_string)
+
+    # Add a space after 'DC' if followed immediately by a letter or number
+    new_string = re.sub(r"\bDC(?=[A-Za-z0-9])", "DC ", new_string)
+    new_string = re.sub(r"\bDC DC(?=[A-Za-z0-9])", "DC-DC ", new_string)
+
+    # Add space before a capital letter preceded by a lowercase letter
+    new_string = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", new_string)
+
+    # Remove extra spaces
+    new_string = re.sub(r"\s+", " ", new_string).strip()
+
+    return new_string
 
 if __name__ == "__main__":
     # Example usage
@@ -664,4 +753,5 @@ if __name__ == "__main__":
     power_train_network_viewer_hv_server(
         power_train_file_path=power_train_file_path,
         layout_prog="dot",
+        orientation="LR"
     )

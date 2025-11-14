@@ -128,7 +128,7 @@ PROPELLER = {
         {"delta_Cm": None},
     ],
     ICON: "propeller",
-    ICON_SIZE: 15,
+    ICON_SIZE: 20,
     RSD: ["thrust_coefficient", "power_coefficient"],
     SETS_V: False,
     IO_INDEP_V: False,
