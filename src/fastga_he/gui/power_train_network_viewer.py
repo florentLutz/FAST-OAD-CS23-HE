@@ -264,7 +264,7 @@ def _create_network_plot(
     )
 
     # Add circle to cover edge line
-    plot.circle(
+    plot.scatter(
         x="x",
         y="y",
         size=45,  # Adjust size to match your icon size
@@ -330,7 +330,7 @@ def _create_network_plot(
     )
 
     # Add invisible circles on top for hover interactivity
-    plot.circle(
+    plot.scatter(
         x="x",
         y="y",
         size=60,
