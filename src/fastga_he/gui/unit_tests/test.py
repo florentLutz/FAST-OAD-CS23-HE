@@ -30,7 +30,12 @@ icons_dict = {
     "generator": pth.join(icons.__path__[0], "generator.png"),
     "ice": pth.join(icons.__path__[0], "ice.png"),
     "switch": pth.join(icons.__path__[0], "switch.png"),
-    "propeller": pth.join(icons.__path__[0], "propeller.png"),
+    "propeller": [
+        pth.join(icons.__path__[0], "propeller_1.png"),
+        pth.join(icons.__path__[0], "propeller_2.png"),
+        pth.join(icons.__path__[0], "propeller_3.png"),
+        pth.join(icons.__path__[0], "propeller_4.png"),
+    ],
     "splitter": pth.join(icons.__path__[0], "splitter.png"),
     "rectifier": pth.join(icons.__path__[0], "AC_DC.png"),
     "dc_converter": pth.join(icons.__path__[0], "DC_DC.png"),
@@ -41,6 +46,43 @@ icons_dict = {
     "gearbox": pth.join(icons.__path__[0], "gears.png"),
 }
 
+
+def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y,
+                           segments_per_edge=10):
+    """
+    Break each edge into multiple segments for flowing animation.
+
+    Args:
+        edge_start_x, edge_start_y: Lists of edge starting coordinates
+        edge_end_x, edge_end_y: Lists of edge ending coordinates
+        segments_per_edge: Number of segments to divide each edge into
+
+    Returns:
+        Lists of segment endpoints and metadata for animation
+    """
+    seg_xs = []  # List of [x1, x2] for each segment
+    seg_ys = []  # List of [y1, y2] for each segment
+    seg_alphas = []
+    edge_ids = []  # Track which edge each segment belongs to
+
+    for edge_idx, (sx, sy, ex, ey) in enumerate(
+            zip(edge_start_x, edge_start_y, edge_end_x, edge_end_y)):
+        for seg in range(segments_per_edge):
+            # Interpolate segment endpoints
+            t_start = seg / segments_per_edge
+            t_end = (seg + 1) / segments_per_edge
+
+            x1 = sx + (ex - sx) * t_start
+            y1 = sy + (ey - sy) * t_start
+            x2 = sx + (ex - sx) * t_end
+            y2 = sy + (ey - sy) * t_end
+
+            seg_xs.append([x1, x2])
+            seg_ys.append([y1, y2])
+            seg_alphas.append(0.7)  # Initial alpha
+            edge_ids.append(edge_idx)
+
+    return seg_xs, seg_ys, seg_alphas, edge_ids
 
 def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
     """
@@ -63,10 +105,11 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         names,
         connections,
         components_type,
+        components_om_type,
         icons_name,
         icons_size,
     ) = configurator.get_network_elements_list()
-    # distance_from_prop_loads, prop_loads = configurator.get_distance_from_propulsive_load()
+    distance_from_prop_loads, prop_loads = configurator.get_distance_from_propulsive_load()
 
     # Build node attributes dictionaries
     node_sizes = {}
@@ -122,7 +165,7 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         x_range=(-50, 600),
         y_range=(-50, 600),
         toolbar_location="above",
-        background_fill_color="#fffcfa",
+        background_fill_color="#bebebe",
         title=f"Power Train Network (Layout: {layout_prog})",
     )
     plot.xgrid.visible = False
@@ -140,46 +183,74 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
     # Get image paths and convert to Base64 URLs (cross-platform)
     import base64
     node_image_urls = []
+    node_image_sequences = {}  # Store animation sequences for nodes
+
     for node in node_indices:
         icon_name = node_icons[node]
         icon_path = icons_dict[icon_name]
 
-        try:
-            # Use Path for cross-platform compatibility
-            icon_file = Path(icon_path)
+        # Check if this is an animated icon (list of paths) or static (single path)
+        if isinstance(icon_path, list):
+            # Animated icon
+            animation_frames = []
+            for frame_path in icon_path:
+                try:
+                    icon_file = Path(frame_path)
+                    if not icon_file.exists():
+                        raise FileNotFoundError(f"Icon file not found: {frame_path}")
 
-            # Check if file exists
-            if not icon_file.exists():
-                raise FileNotFoundError(f"Icon file not found: {icon_path}")
+                    with open(icon_file, 'rb') as img_file:
+                        img_data = base64.b64encode(img_file.read()).decode()
+                        ext = icon_file.suffix.lower()
+                        mime_types = {
+                            '.png': 'image/png',
+                            '.jpg': 'image/jpeg',
+                            '.jpeg': 'image/jpeg',
+                            '.gif': 'image/gif',
+                            '.svg': 'image/svg+xml',
+                        }
+                        mime_type = mime_types.get(ext, 'image/png')
+                        url = f"data:{mime_type};base64,{img_data}"
+                        animation_frames.append(url)
+                except Exception as e:
+                    print(f"✗ ERROR loading animation frame for {icon_name}: {e}")
 
-            # Read file as binary
-            with open(icon_file, 'rb') as img_file:
-                img_data = base64.b64encode(img_file.read()).decode()
+            if animation_frames:
+                node_image_sequences[node] = animation_frames
+                node_image_urls.append(animation_frames[0])  # Start with first frame
+                print(f"✓ Loaded animated icon: {icon_name} ({len(animation_frames)} frames)")
+            else:
+                node_image_urls.append(
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
+        else:
+            # Static icon
+            try:
+                icon_file = Path(icon_path)
+                if not icon_file.exists():
+                    raise FileNotFoundError(f"Icon file not found: {icon_path}")
 
-                # Determine MIME type from extension (case-insensitive)
-                ext = icon_file.suffix.lower()
-                mime_types = {
-                    '.png': 'image/png',
-                    '.jpg': 'image/jpeg',
-                    '.jpeg': 'image/jpeg',
-                    '.gif': 'image/gif',
-                    '.svg': 'image/svg+xml',
-                }
-                mime_type = mime_types.get(ext, 'image/png')
-
-                # Create data URL
-                url = f"data:{mime_type};base64,{img_data}"
-                node_image_urls.append(url)
-                print(f"✓ Loaded icon: {icon_name}")
-
-        except FileNotFoundError as e:
-            print(f"✗ FILE NOT FOUND: {icon_name} - {e}")
-            node_image_urls.append(
-                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
-        except Exception as e:
-            print(f"✗ ERROR loading {icon_name}: {type(e).__name__}: {e}")
-            node_image_urls.append(
-                "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
+                with open(icon_file, 'rb') as img_file:
+                    img_data = base64.b64encode(img_file.read()).decode()
+                    ext = icon_file.suffix.lower()
+                    mime_types = {
+                        '.png': 'image/png',
+                        '.jpg': 'image/jpeg',
+                        '.jpeg': 'image/jpeg',
+                        '.gif': 'image/gif',
+                        '.svg': 'image/svg+xml',
+                    }
+                    mime_type = mime_types.get(ext, 'image/png')
+                    url = f"data:{mime_type};base64,{img_data}"
+                    node_image_urls.append(url)
+                    print(f"✓ Loaded icon: {icon_name}")
+            except FileNotFoundError as e:
+                print(f"✗ FILE NOT FOUND: {icon_name} - {e}")
+                node_image_urls.append(
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
+            except Exception as e:
+                print(f"✗ ERROR loading {icon_name}: {type(e).__name__}: {e}")
+                node_image_urls.append(
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk5OSIvPjwvc3ZnPg==")
 
     # Prepare edge data for animated multi_line
     edge_start_x = []
@@ -196,20 +267,20 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         edge_end_x.append(end_x)
         edge_end_y.append(end_y)
 
-    # Create edge data source with line dash pattern
-    edge_source = ColumnDataSource(
-        data=dict(
-            xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
-            ys=[[sy, ey] for sy, ey in zip(edge_start_y, edge_end_y)],
-            colors=["#4472C4"] * len(edge_start_x),
-        )
+    # Create segmented edges for flowing animation
+    seg_xs, seg_ys, seg_alphas, edge_ids = create_segmented_edges(
+        edge_start_x, edge_start_y, edge_end_x, edge_end_y, segments_per_edge=60
     )
 
-    # Store original edge data for animation
-    edge_source.data['edge_start_x'] = edge_start_x
-    edge_source.data['edge_start_y'] = edge_start_y
-    edge_source.data['edge_end_x'] = edge_end_x
-    edge_source.data['edge_end_y'] = edge_end_y
+    edge_source = ColumnDataSource(
+        data=dict(
+            xs=seg_xs,
+            ys=seg_ys,
+            colors=["#4472C4"] * len(seg_xs),
+            line_alpha=seg_alphas,
+            edge_id=edge_ids,  # This is the missing definition
+        )
+    )
 
     # Draw animated edges
     plot.multi_line(
@@ -217,8 +288,9 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         ys="ys",
         source=edge_source,
         line_color="colors",
-        line_width=2,
-        line_alpha=0.7,
+        line_width=3,
+        line_alpha="line_alpha",
+        line_dash="solid",
     )
 
     # Draw nodes as images
@@ -234,7 +306,8 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         )
     )
 
-    plot.image_url(
+    # Draw nodes as images and store renderer for hover tool
+    image_renderer = plot.image_url(
         url="url",
         x="x",
         y="y",
@@ -260,7 +333,7 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         source=label_source,
         text_align="center",
         text_baseline="top",
-        text_color="gray",
+        text_color="white",
         text_font_size="8pt",
     )
     plot.add_layout(labels)
@@ -270,11 +343,12 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot"):
         tooltips=[
             ("Name", "@name"),
             ("Type", "@type"),
-        ]
+        ],
+        renderers=[image_renderer],  # Explicitly reference the image renderer
     )
     plot.add_tools(hover, TapTool(), BoxSelectTool())
 
-    return plot, edge_source
+    return plot, edge_source, node_source, node_image_sequences
 
 
 def power_train_network_viewer_hv_server(
@@ -294,7 +368,8 @@ def power_train_network_viewer_hv_server(
     """
 
     def make_document(doc):
-        plot, edge_source = create_network_plot(power_train_file_path, layout_prog)
+        plot, edge_source, node_source, node_image_sequences = create_network_plot(
+            power_train_file_path, layout_prog)
         animation_counter = [0]
 
         doc.add_root(column(plot))
@@ -312,19 +387,61 @@ def power_train_network_viewer_hv_server(
 
         # Add periodic callback for animation
         def update():
-            animation_counter[0] = (animation_counter[0] + 1) % len(gradient_colors)
+            animation_counter[0] = (animation_counter[0] + 1) % 100
+            progress = animation_counter[0] / 100.0  # 0 to 1
 
-            # Get current color from gradient
-            current_color = gradient_colors[animation_counter[0]]
+            num_segments = len(edge_source.data['xs'])
+            num_edges = max(edge_source.data['edge_id']) + 1 if edge_source.data['edge_id'] else 1
+            segments_per_edge = num_segments // num_edges
 
-            # Update all edge colors to current gradient color
-            new_colors = [current_color] * len(edge_source.data['xs'])
+            new_alphas = []
+
+            for i in range(num_segments):
+                edge_idx = edge_source.data['edge_id'][i]
+                segment_idx = i % segments_per_edge
+
+                # Normalize segment position within edge (0 to 1)
+                seg_position = segment_idx / segments_per_edge
+
+                # Calculate wave position for this segment
+                # The wave moves from 0 to 1 as progress goes from 0 to 1
+                wave_pos = (-progress + edge_idx * 0.1) % 1.0 # Offset each edge slightly
+
+                # Distance from segment to wave center
+                distance = abs(seg_position - wave_pos)
+
+                # Use gaussian-like falloff for smooth wave
+                if distance < 0.3:  # Wave width
+                    alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                else:
+                    alpha = 0.3
+
+                new_alphas.append(alpha)
 
             edge_source.patch({
-                'colors': [(slice(len(new_colors)), new_colors)]
+                'line_alpha': [(slice(len(new_alphas)), new_alphas)]
             })
 
-        doc.add_periodic_callback(update, 300)  # Update every 100ms for smooth color cycling
+            # Update animated node icons
+            if node_image_sequences:
+                frame_index = (animation_counter[0] // 2) % 5  # Slower animation for nodes
+
+                new_urls = []
+                for i, node in enumerate(node_source.data['name']):
+                    if node in node_image_sequences:
+                        seq = node_image_sequences[node]
+                        frame_idx = frame_index % len(seq)
+                        new_urls.append(seq[frame_idx])
+                    else:
+                        new_urls.append(node_source.data['url'][i])
+
+                node_source.patch({
+                    'url': [(slice(len(new_urls)), new_urls)]
+                })
+
+        doc.add_periodic_callback(update,
+                                  50)  # Update every 50ms for smooth motion for smooth color
+        # cycling
 
     server = Server(
         {"/": make_document},
