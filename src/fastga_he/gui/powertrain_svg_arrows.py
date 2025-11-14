@@ -40,9 +40,9 @@ icons_dict = {
 
 
 def power_train_network_viewer_hv_svg(
-        power_train_file_path: str,
-        network_file_path: str,
-        layout_prog: str = "dot",
+    power_train_file_path: str,
+    network_file_path: str,
+    layout_prog: str = "dot",
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with animated Segment glyphs.
@@ -73,7 +73,7 @@ def power_train_network_viewer_hv_svg(
     node_icons = {}
 
     for component_name, component_type, icon_name, icon_size in zip(
-            names, components_type, icons_name, icons_size
+        names, components_type, icons_name, icons_size
     ):
         G.add_node(component_name)
         node_sizes[component_name] = icon_size
@@ -109,7 +109,7 @@ def power_train_network_viewer_hv_svg(
         pos = {
             node: (
                 ((p[0] - x_min) / x_range * scale * 0.8 + scale * 0.1),
-                ((p[1] - y_min) / y_range * scale * 0.8 + scale * 0.1)
+                ((p[1] - y_min) / y_range * scale * 0.8 + scale * 0.1),
             )
             for node, p in pos.items()
         }

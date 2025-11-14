@@ -40,10 +40,10 @@ icons_dict = {
 
 
 def power_train_network_viewer_hv(
-        power_train_file_path: str,
-        network_file_path: str,
-        layout_prog: str = "dot",
-        orientation: str = "TB",
+    power_train_file_path: str,
+    network_file_path: str,
+    layout_prog: str = "dot",
+    orientation: str = "TB",
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
@@ -81,7 +81,7 @@ def power_train_network_viewer_hv(
     node_icons = {}
 
     for component_name, component_type, om_type, icon_name, icon_size in zip(
-            names, components_type, components_type_om, icons_name, icons_size
+        names, components_type, components_type_om, icons_name, icons_size
     ):
         G.add_node(component_name)
         node_sizes[component_name] = icon_size
@@ -144,7 +144,7 @@ def power_train_network_viewer_hv(
         pos = {
             node: (
                 ((p[0] - x_min) / x_range * scale * x_factor + x_orientation_offset),
-                ((p[1] - y_min) / y_range * scale * y_factor + y_orientation_offset)
+                ((p[1] - y_min) / y_range * scale * y_factor + y_orientation_offset),
             )
             for node, p in pos.items()
         }
@@ -169,7 +169,7 @@ def power_train_network_viewer_hv(
     node_x = [pos[node][0] for node in node_indices]
     node_y = [pos[node][1] for node in node_indices]
     node_image_urls = [icons_dict[node_icons[node]] for node in node_indices]
-    node_sizes_list = [node_sizes[node]*icon_factor for node in node_indices]
+    node_sizes_list = [node_sizes[node] * icon_factor for node in node_indices]
     node_types_list = [node_types[node] for node in node_indices]
     node_om_types_list = [node_om_types[node] for node in node_indices]
 
@@ -194,7 +194,7 @@ def power_train_network_viewer_hv(
         data=dict(
             xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
             ys=[[sy, ey] for sy, ey in zip(edge_start_y, edge_end_y)],
-            line_color=["gray"]*len(edge_start_x)
+            line_color=["gray"] * len(edge_start_x),
         )
     )
     plot.multi_line(
@@ -212,7 +212,7 @@ def power_train_network_viewer_hv(
             x=node_x,
             y=node_y,
             url=node_image_urls,
-            w=[s*icon_width_factor for s in node_sizes_list],
+            w=[s * icon_width_factor for s in node_sizes_list],
             h=[s for s in node_sizes_list],
             name=node_indices,
             type=node_types_list,
@@ -271,7 +271,6 @@ def power_train_network_viewer_hv(
 
         cleaned_node_om_types.append(string_clean_up(node_om_type))
 
-
     hover_source = ColumnDataSource(
         data=dict(
             x=node_x,
@@ -280,7 +279,7 @@ def power_train_network_viewer_hv(
             h=[s for s in node_sizes_list],
             name=node_indices,
             type=cleaned_node_types,
-            component_type = cleaned_node_om_types,
+            component_type=cleaned_node_om_types,
         )
     )
     plot.circle(
@@ -322,27 +321,27 @@ def string_clean_up(old_string):
         old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
 
     # Replace underscore with space
-    new_string = re.sub(r'[_:/]+', ' ', old_string)
+    new_string = re.sub(r"[_:/]+", " ", old_string)
 
     # Add a space after 'DC' if followed immediately by a letter or number
-    new_string = re.sub(r'\bDC(?=[A-Za-z0-9])', 'DC ', new_string)
-    new_string = re.sub(r'\bDC DC(?=[A-Za-z0-9])','DC-DC ',new_string)
+    new_string = re.sub(r"\bDC(?=[A-Za-z0-9])", "DC ", new_string)
+    new_string = re.sub(r"\bDC DC(?=[A-Za-z0-9])", "DC-DC ", new_string)
 
     # Add space before a capital letter preceded by a lowercase letter
-    new_string = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', new_string)
+    new_string = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", new_string)
 
     # Remove extra spaces
-    new_string = re.sub(r'\s+', ' ', new_string).strip()
+    new_string = re.sub(r"\s+", " ", new_string).strip()
 
     return new_string
 
+
 def get_file_name(file_path):
-    match_html = re.search(r'[^/\\]+\.yml$', str(file_path))
+    match_html = re.search(r"[^/\\]+\.yml$", str(file_path))
 
     if match_html:
         filename = match_html.group()
-        filename = re.sub(r'\.yml$', '', filename)
-        filename = re.sub(r'[_:/]+', ' ', filename).capitalize()
+        filename = re.sub(r"\.yml$", "", filename)
+        filename = re.sub(r"[_:/]+", " ", filename).capitalize()
 
-        return  f"{filename} powertrain network"
-
+        return f"{filename} powertrain network"

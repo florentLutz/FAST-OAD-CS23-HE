@@ -77,4 +77,3 @@ def test_pt_network_viewer_tri_prop_two_chainz(cleanup):
 
     # Cleanup to avoid any overclogging
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
-
