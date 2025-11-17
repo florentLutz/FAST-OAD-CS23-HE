@@ -107,7 +107,7 @@ def power_train_network_viewer(
     layout_prog: str = "dot",
     orientation: str = "TB",
     legend_position: str = "TR",
-    static: bool = True,
+    static_html: bool = True,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
@@ -121,6 +121,16 @@ def power_train_network_viewer(
         "fdp" - Force-directed placement
         "sfdp" - Scalable force-directed placement
         "circo" - Circular layout
+        legend_position: String defines the legend box position
+        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
+        * * T * *
+        * * * * *
+        * * M * *
+        L * C * R
+        * * B * *
+        orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
+        (T: top, B: button, L: left, R: right)
+        static_html: True if using static html
     """
 
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
@@ -129,11 +139,11 @@ def power_train_network_viewer(
             layout_prog=layout_prog,
             orientation=orientation,
             legend_position=legend_position,
-            static=static,
+            static_html=static_html,
         )
     )
 
-    if static:
+    if static_html:
         _save_static_html(plot, network_file_path)
 
 
@@ -142,21 +152,31 @@ def _create_network_plot(
     layout_prog: str = "dot",
     orientation: str = "TB",
     legend_position: str = "TR",
-    static: bool = True,
+    static_html: bool = True,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
 
     Args:
         power_train_file_path: Path to the power train configuration file
-        network_file_path: Path where the HTML output will be saved
         layout_prog: Graphviz layout program ('dot', 'neato', 'fdp', 'sfdp', 'circo')
         "dot" - Hierarchical layout
         "neato" - Spring model layout
         "fdp" - Force-directed placement
         "sfdp" - Scalable force-directed placement
         "circo" - Circular layout
+        legend_position: String defines the legend box position
+        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
+        * * T * *
+        * * * * *
+        * * M * *
+        L * C * R
+        * * B * *
+        orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
+        (T: top, B: button, L: left, R: right)
+        static_html: True if using static html
     """
+
     # Create AGraph (PyGraphviz) object
     graph = pgv.AGraph(directed=True, rankdir=orientation)
 
@@ -202,17 +222,17 @@ def _create_network_plot(
     graph.layout(prog=layout_prog)
 
     # Extract positions from Graphviz layout
-    pos = {}
+    position_dict = {}
     for node in graph.nodes():
         x, y = map(float, node.attr["pos"].split(","))
-        pos[node] = (x, y)
+        position_dict[node] = (x, y)
 
     # Normalize positions for Bokeh
-    if pos:
-        x_coords = [p[0] for p in pos.values()]
-        y_coords = [p[1] for p in pos.values()]
-        x_min, x_max = min(x_coords), max(x_coords)
-        y_min, y_max = min(y_coords), max(y_coords)
+    if position_dict:
+        x_coordinates = [coords[0] for coords in position_dict.values()]
+        y_coordinates = [coords[1] for coords in position_dict.values()]
+        x_min, x_max = min(x_coordinates), max(x_coordinates)
+        y_min, y_max = min(y_coordinates), max(y_coordinates)
 
         x_range = x_max - x_min if x_max > x_min else 1
         y_range = y_max - y_min if y_max > y_min else 1
@@ -244,12 +264,12 @@ def _create_network_plot(
             x_orientation_offset = -25
             y_orientation_offset = 150
 
-        pos = {
+        position_dict = {
             node: (
-                ((p[0] - x_min) / x_range * scale * x_factor + x_orientation_offset),
-                ((p[1] - y_min) / y_range * scale * y_factor + y_orientation_offset),
+                ((coordinate[0] - x_min) / x_range * scale * x_factor + x_orientation_offset),
+                ((coordinate[1] - y_min) / y_range * scale * y_factor + y_orientation_offset),
             )
-            for node, p in pos.items()
+            for node, coordinate in position_dict.items()
         }
 
     # Create Bokeh plot
@@ -262,6 +282,7 @@ def _create_network_plot(
         background_fill_color=BACKGROUND_COLOR_CODE,
         title=_get_file_name(power_train_file_path),
     )
+
     plot.xgrid.visible = False
     plot.ygrid.visible = False
     plot.xaxis.visible = False
@@ -276,14 +297,14 @@ def _create_network_plot(
     node_om_types_list = []
 
     for node in node_indices:
-        node_x.append(pos[node][0])
-        node_y.append(pos[node][1])
+        node_x.append(position_dict[node][0])
+        node_y.append(position_dict[node][1])
         node_sizes_list.append(node_sizes[node] * icon_factor)
         node_types_list.append(node_types[node])
         node_om_types_list.append(node_om_types[node])
 
-    if static:
-        # Convert file paths to file:// URLs for local images
+    # Convert file paths to file:// URLs for local images
+    if static_html:
         node_image_urls = [
             "file://" + str(Path(icons_dict[node_icons[node]][0]).resolve())
             for node in node_indices
@@ -303,10 +324,10 @@ def _create_network_plot(
 
     for edge in graph.edges():
         start, end = edge
-        edge_start_x.append(pos[start][0])
-        edge_start_y.append(pos[start][1])
-        edge_end_x.append(pos[end][0])
-        edge_end_y.append(pos[end][1])
+        edge_start_x.append(position_dict[start][0])
+        edge_start_y.append(position_dict[start][1])
+        edge_end_x.append(position_dict[end][0])
+        edge_end_y.append(position_dict[end][1])
 
         # Determine edge color based on connected nodes
         source_icon = node_icons[start]
@@ -315,7 +336,7 @@ def _create_network_plot(
         edge_colors.append(edge_color)
 
     # Draw edges
-    if static:
+    if static_html:
         edge_source = ColumnDataSource(
             data=dict(
                 xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
@@ -423,7 +444,7 @@ def _create_network_plot(
         source=hover_source,
         fill_alpha=0,
         line_alpha=0,
-        hover_fill_alpha=0.1,  # show faint highlight on component icon
+        hover_fill_alpha=0.1,
         hover_line_alpha=0.3,
     )
 
@@ -446,6 +467,12 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
     Args:
         plot: Bokeh figure object
         legend_position: String defines the legend box position
+        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
+        * * T * *
+        * * * * *
+        * * M * *
+        L * C * R
+        * * B * *
         color_icon_urls: List of URLs for color icons
     """
 
@@ -480,8 +507,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         source=legend_box_source,
         fill_color=BACKGROUND_COLOR_CODE,
         fill_alpha=0.9,
-        line_color=BACKGROUND_COLOR_CODE,
-        line_width=2,
+        line_width=0,
     )
 
     # Legend items
@@ -491,23 +517,23 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         (2, "Electrical Current"),
     ]
 
-    item_height = 22
+    legend_item_height = 22
     icon_size = 12
-    item_start_y = legend_y_start - 25
+    legend_item_start_y = legend_y_start - 25
 
     for i, (icon_idx, description) in enumerate(legend_items):
-        y_pos = item_start_y - (i * item_height)
+        y_position = legend_item_start_y - (i * legend_item_height)
 
         # Create data source for icon
         icon_source = ColumnDataSource(
             data=dict(
                 x=[legend_x_start + 10],
-                y=[y_pos],
+                y=[y_position],
                 url=[color_icon_urls[icon_idx]],
             )
         )
 
-        # Draw icon image
+        # Draw color icon image
         plot.image_url(
             url="url",
             x="x",
@@ -518,11 +544,11 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
             source=icon_source,
         )
 
-        # Add text label
+        # Add text label next to the color icon image
         label_source = ColumnDataSource(
             data=dict(
                 x=[legend_x_start + 25],
-                y=[y_pos],
+                y=[y_position],
                 text=[description],
             )
         )
@@ -535,12 +561,15 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
             text_align="left",
             text_baseline="middle",
             text_color="white",
-            text_font_size="12pt",
+            text_font_size="10pt",
         )
         plot.add_layout(labels)
 
 
 def _string_clean_up(old_string):
+    """
+    Clean up list content for better readability.
+    """
     # In case for list type definition
     if isinstance(old_string, list):
         old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
@@ -566,6 +595,9 @@ def _string_clean_up(old_string):
 
 
 def _get_file_name(file_path):
+    """
+    Using the file name as the plot title
+    """
     match_html = re.search(r"[^/\\]+\.yml$", str(file_path))
 
     if match_html:
@@ -577,6 +609,9 @@ def _get_file_name(file_path):
 
 
 def _save_static_html(plot, file_path):
+    """
+    Save the network plot as static html. This can be applied both before and after the computation.
+    """
     # Create directory if it doesn't exist
     directory_to_save_graph = os.path.dirname(file_path)
 
