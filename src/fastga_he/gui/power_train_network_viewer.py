@@ -20,27 +20,85 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from . import icons
 
+BACKGROUND_COLOR_CODE = "#bebebe"
+ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
+FUEL_FLOW_COLOR_CODE = "#FF5722"
+MECHANICAL_POWER_COLOR_CODE = "#2E7D32"
+
 # Image URLs for graph nodes
 
 icons_dict = {
-    "battery": pth.join(icons.__path__[0], "battery.png"),
-    "bus_bar": pth.join(icons.__path__[0], "bus_bar.png"),
-    "cable": pth.join(icons.__path__[0], "cable.png"),
-    "e_motor": pth.join(icons.__path__[0], "e_motor.png"),
-    "generator": pth.join(icons.__path__[0], "generator.png"),
-    "ice": pth.join(icons.__path__[0], "ice.png"),
-    "switch": pth.join(icons.__path__[0], "switch.png"),
-    "propeller": pth.join(icons.__path__[0], "propeller.png"),
-    "splitter": pth.join(icons.__path__[0], "splitter.png"),
-    "rectifier": pth.join(icons.__path__[0], "AC_DC.png"),
-    "dc_converter": pth.join(icons.__path__[0], "DC_DC.png"),
-    "inverter": pth.join(icons.__path__[0], "DC_AC.png"),
-    "fuel_tank": pth.join(icons.__path__[0], "fuel_tank.png"),
-    "fuel_system": pth.join(icons.__path__[0], "fuel_system.png"),
-    "turbine": pth.join(icons.__path__[0], "turbine.png"),
-    "gearbox": pth.join(icons.__path__[0], "gears.png"),
+    "battery": [pth.join(icons.__path__[0], "battery.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "bus_bar": [pth.join(icons.__path__[0], "bus_bar.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "cable": [pth.join(icons.__path__[0], "cable.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "e_motor": [
+        pth.join(icons.__path__[0], "e_motor.png"),
+        [ELECTRICITY_CURRENT_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+    ],
+    "generator": [
+        pth.join(icons.__path__[0], "generator.png"),
+        [MECHANICAL_POWER_COLOR_CODE, ELECTRICITY_CURRENT_COLOR_CODE],
+    ],
+    "ice": [
+        pth.join(icons.__path__[0], "ice.png"),
+        [ELECTRICITY_CURRENT_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+    ],
+    "switch": [pth.join(icons.__path__[0], "switch.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "propeller": [pth.join(icons.__path__[0], "propeller.png"), MECHANICAL_POWER_COLOR_CODE],
+    "splitter": [pth.join(icons.__path__[0], "splitter.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "rectifier": [pth.join(icons.__path__[0], "AC_DC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "dc_converter": [pth.join(icons.__path__[0], "DC_DC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "inverter": [pth.join(icons.__path__[0], "DC_AC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "fuel_tank": [pth.join(icons.__path__[0], "fuel_tank.png"), FUEL_FLOW_COLOR_CODE],
+    "fuel_system": [pth.join(icons.__path__[0], "fuel_system.png"), FUEL_FLOW_COLOR_CODE],
+    "turbine": [
+        pth.join(icons.__path__[0], "turbine.png"),
+        [FUEL_FLOW_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+    ],
+    "gearbox": [pth.join(icons.__path__[0], "gears.png"), MECHANICAL_POWER_COLOR_CODE],
+    "fuel_cell": [
+        pth.join(icons.__path__[0], "fuel_cell.png"),
+        [FUEL_FLOW_COLOR_CODE, ELECTRICITY_CURRENT_COLOR_CODE],
+    ],
 }
-BACKGROUND_COLOR_CODE = "#bebebe"
+
+color_icon_dict = {
+    "mechanical": pth.join(icons.__path__[0], "mechanical.png"),
+    "fuel": pth.join(icons.__path__[0], "fuel.png"),
+    "electricity": pth.join(icons.__path__[0], "electricity.png"),
+}
+
+
+def _get_edge_color(source_icon, target_icon):
+    """
+    Determine edge color based on source and target node types.
+
+    Args:
+        source_icon: Icon name of the source node
+        target_icon: Icon name of the target node
+
+    Returns:
+        Color code for the edge
+    """
+    source_colors = icons_dict.get(source_icon, [None, "gray"])[1]
+    target_colors = icons_dict.get(target_icon, [None, "gray"])[1]
+
+    # Normalize to lists for easier comparison
+    source_colors = source_colors if isinstance(source_colors, list) else [source_colors]
+    target_colors = target_colors if isinstance(target_colors, list) else [target_colors]
+
+    # Find common color between source and target
+    common_colors = set(source_colors) & set(target_colors)
+
+    if common_colors:
+        # Use the first common color
+        return list(common_colors)[0]
+
+    # If no common color, use source output color (last in list for multi-output components)
+    if source_colors:
+        return source_colors[-1]
+
+    return "gray"
 
 
 def power_train_network_viewer(
@@ -217,21 +275,28 @@ def _create_network_plot(
     for node in node_indices:
         node_x.append(pos[node][0])
         node_y.append(pos[node][1])
-        node_sizes_list.append(node_sizes[node]*icon_factor)
+        node_sizes_list.append(node_sizes[node] * icon_factor)
         node_types_list.append(node_types[node])
         node_om_types_list.append(node_om_types[node])
 
     if static:
         # Convert file paths to file:// URLs for local images
         node_image_urls = [
-            "file://" + str(Path(icons_dict[node_icons[node]]).resolve()) for node in node_indices
+            "file://" + str(Path(icons_dict[node_icons[node]][0]).resolve())
+            for node in node_indices
         ]
 
-    # Create edge data
+    color_icon_urls = [
+        "file://" + str(Path(color_icon_dict[color_icon]).resolve())
+        for color_icon in ["fuel", "mechanical", "electricity"]
+    ]
+
+    # Create edge data with colors
     edge_start_x = []
     edge_start_y = []
     edge_end_x = []
     edge_end_y = []
+    edge_colors = []
 
     for edge in graph.edges():
         start, end = edge
@@ -240,14 +305,20 @@ def _create_network_plot(
         edge_end_x.append(pos[end][0])
         edge_end_y.append(pos[end][1])
 
+        # Determine edge color based on connected nodes
+        source_icon = node_icons[start]
+        target_icon = node_icons[end]
+        edge_color = _get_edge_color(source_icon, target_icon)
+        edge_colors.append(edge_color)
+
     # Draw edges
     if static:
         edge_source = ColumnDataSource(
             data=dict(
                 xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
                 ys=[[sy, ey] for sy, ey in zip(edge_start_y, edge_end_y)],
-                line_color=["gray"] * len(edge_start_x),
-                line_alpha=[0.5] * len(edge_start_x),
+                line_color=edge_colors,
+                line_alpha=[0.7] * len(edge_start_x),
             )
         )
 
@@ -314,6 +385,9 @@ def _create_network_plot(
     )
     plot.add_layout(labels)
 
+    # Add color legend at bottom right
+    _add_color_legend(plot, y_range_max, color_icon_urls)
+
     # Add interactive tools
     # clean up type class and component type for hove info list
     cleaned_node_types = []
@@ -363,6 +437,72 @@ def _create_network_plot(
     return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
 
 
+def _add_color_legend(plot, y_range_max, color_icon_urls):
+    """
+    Add a color legend for edge colors at the upper right of the plot.
+
+    Args:
+        plot: Bokeh figure object
+        y_range_max: Maximum y-range of the plot
+        color_icon_urls: List of URLs for color icons
+    """
+    # Position for legend items (upper right)
+    legend_x_start = 480
+    legend_y_start = y_range_max - 50
+    item_height = 25
+    icon_size = 15
+
+    legend_items = [
+        (0, "Fuel Flow"),
+        (1, "Mechanical Power"),
+        (2, "Electrical Current"),
+    ]
+
+    for i, (icon_idx, description) in enumerate(legend_items):
+        y_pos = legend_y_start - (i * item_height)
+
+        # Create data source for icon
+        icon_source = ColumnDataSource(
+            data=dict(
+                x=[legend_x_start],
+                y=[y_pos],
+                url=[color_icon_urls[icon_idx]],
+            )
+        )
+
+        # Draw icon image
+        plot.image_url(
+            url="url",
+            x="x",
+            y="y",
+            w=icon_size,
+            h=icon_size * 0.75,
+            anchor="center",
+            source=icon_source,
+        )
+
+        # Add text label
+        label_source = ColumnDataSource(
+            data=dict(
+                x=[legend_x_start + icon_size + 5],
+                y=[y_pos],
+                text=[description],
+            )
+        )
+
+        labels = LabelSet(
+            x="x",
+            y="y",
+            text="text",
+            source=label_source,
+            text_align="left",
+            text_baseline="middle",
+            text_color="white",
+            text_font_size="9pt",
+        )
+        plot.add_layout(labels)
+
+
 def _string_clean_up(old_string):
     # In case for list type definition
     if isinstance(old_string, list):
@@ -374,6 +514,10 @@ def _string_clean_up(old_string):
     # Add a space after 'DC' if followed immediately by a letter or number
     new_string = re.sub(r"\bDC(?=[A-Za-z0-9])", "DC ", new_string)
     new_string = re.sub(r"\bDC DC(?=[A-Za-z0-9])", "DC-DC ", new_string)
+
+    # Add a space after 'H2' and 'PEMFC'
+    new_string = re.sub(r"\bH2(?=[A-Za-z0-9])", "H2 ", new_string)
+    new_string = re.sub(r"\bPEMFC(?=[A-Za-z0-9])", "PEMFC ", new_string)
 
     # Add space before a capital letter preceded by a lowercase letter
     new_string = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", new_string)
