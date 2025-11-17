@@ -106,6 +106,7 @@ def power_train_network_viewer(
     network_file_path: str,
     layout_prog: str = "dot",
     orientation: str = "TB",
+    legend_position: str = "TR",
     static: bool = True,
 ):
     """
@@ -127,6 +128,7 @@ def power_train_network_viewer(
             power_train_file_path=power_train_file_path,
             layout_prog=layout_prog,
             orientation=orientation,
+            legend_position=legend_position,
             static=static,
         )
     )
@@ -139,6 +141,7 @@ def _create_network_plot(
     power_train_file_path: str,
     layout_prog: str = "dot",
     orientation: str = "TB",
+    legend_position: str = "TR",
     static: bool = True,
 ):
     """
@@ -385,8 +388,7 @@ def _create_network_plot(
     )
     plot.add_layout(labels)
 
-    # Add color legend at bottom right
-    _add_color_legend(plot, y_range_max, color_icon_urls)
+    _add_color_legend_separate(plot, legend_position, color_icon_urls)
 
     # Add interactive tools
     # clean up type class and component type for hove info list
@@ -437,34 +439,69 @@ def _create_network_plot(
     return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
 
 
-def _add_color_legend(plot, y_range_max, color_icon_urls):
+def _add_color_legend_separate(plot, legend_position, color_icon_urls):
     """
-    Add a color legend for edge colors at the upper right of the plot.
+    Add a color legend as a separate visual entity within the same plot.
 
     Args:
         plot: Bokeh figure object
-        y_range_max: Maximum y-range of the plot
+        legend_position: String defines the legend box position
         color_icon_urls: List of URLs for color icons
     """
-    # Position for legend items (upper right)
-    legend_x_start = 480
-    legend_y_start = y_range_max - 50
-    item_height = 25
-    icon_size = 15
 
+    if "T" in legend_position:
+        legend_y_start = 600
+    elif "B" in legend_position:
+        legend_y_start = 50
+    elif "M" in legend_position:
+        legend_y_start = 325
+
+    if "R" in legend_position:
+        legend_x_start = 500
+    elif "L" in legend_position:
+        legend_x_start = -50
+    elif "C" in legend_position:
+        legend_x_start = 225
+
+    # Draw legend background box using quad
+    legend_box_source = ColumnDataSource(
+        data=dict(
+            left=[legend_x_start],
+            right=[legend_x_start + 100],
+            top=[legend_y_start],
+            bottom=[legend_y_start - 100],
+        )
+    )
+    plot.quad(
+        left="left",
+        right="right",
+        top="top",
+        bottom="bottom",
+        source=legend_box_source,
+        fill_color=BACKGROUND_COLOR_CODE,
+        fill_alpha=0.9,
+        line_color=BACKGROUND_COLOR_CODE,
+        line_width=2,
+    )
+
+    # Legend items
     legend_items = [
         (0, "Fuel Flow"),
         (1, "Mechanical Power"),
         (2, "Electrical Current"),
     ]
 
+    item_height = 22
+    icon_size = 12
+    item_start_y = legend_y_start - 25
+
     for i, (icon_idx, description) in enumerate(legend_items):
-        y_pos = legend_y_start - (i * item_height)
+        y_pos = item_start_y - (i * item_height)
 
         # Create data source for icon
         icon_source = ColumnDataSource(
             data=dict(
-                x=[legend_x_start],
+                x=[legend_x_start + 10],
                 y=[y_pos],
                 url=[color_icon_urls[icon_idx]],
             )
@@ -476,7 +513,7 @@ def _add_color_legend(plot, y_range_max, color_icon_urls):
             x="x",
             y="y",
             w=icon_size,
-            h=icon_size * 0.75,
+            h=icon_size,
             anchor="center",
             source=icon_source,
         )
@@ -484,7 +521,7 @@ def _add_color_legend(plot, y_range_max, color_icon_urls):
         # Add text label
         label_source = ColumnDataSource(
             data=dict(
-                x=[legend_x_start + icon_size + 5],
+                x=[legend_x_start + 25],
                 y=[y_pos],
                 text=[description],
             )
@@ -498,7 +535,7 @@ def _add_color_legend(plot, y_range_max, color_icon_urls):
             text_align="left",
             text_baseline="middle",
             text_color="white",
-            text_font_size="9pt",
+            text_font_size="12pt",
         )
         plot.add_layout(labels)
 
