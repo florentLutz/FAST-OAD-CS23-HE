@@ -28,7 +28,8 @@ jobs:
       - name: Install Graphviz (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install graphviz -y
+          choco install graphviz --version=2.49.3 -y
+          echo "GRAPHVIZ_DIR=C:\Program Files\Graphviz" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Install Poetry
         run: pipx install poetry==1.8.3
@@ -41,7 +42,7 @@ jobs:
 
       - name: Install pygraphviz with pip
         run: |
-          python -m pip install pygraphviz
+          python -m pip install --no-cache-dir pygraphviz
 
       - name: Activate environment and install dependencies
         if: matrix.python-version != '3.10'
