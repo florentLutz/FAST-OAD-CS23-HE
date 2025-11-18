@@ -4,6 +4,7 @@
 
 import os
 import os.path as pth
+import platform
 
 from pathlib import Path
 import re
@@ -18,7 +19,7 @@ from bokeh.models import (
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
-from . import icons
+from . import icons, external
 
 BACKGROUND_COLOR_CODE = "#bebebe"
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
@@ -67,6 +68,71 @@ color_icon_dict = {
     "fuel": pth.join(icons.__path__[0], "fuel.png"),
     "electricity": pth.join(icons.__path__[0], "electricity.png"),
 }
+
+
+def _setup_bundled_graphviz():
+    """
+    Configure pygraphviz to use bundled Graphviz executables (Windows only).
+    Linux and macOS users must install Graphviz system-wide using package managers.
+
+    Expected folder structure for Windows:
+    powertrain_builder/
+    ├── icons/
+    ├── external/
+    │   └── graphviz_windows/
+    │       └── bin/
+    │           ├── dot.exe
+    │           └── ...other executables
+    ├── network_viewer.py
+    └── powertrain.py
+
+    Installation instructions for other OS:
+    - Linux (Ubuntu/Debian): sudo apt-get install graphviz
+    - Linux (Fedora/RHEL): sudo dnf install graphviz
+    - macOS: brew install graphviz
+    """
+
+    system = platform.system()
+
+    if system == "Windows":
+        # Windows: Use bundled Graphviz
+        graphviz_bundle = "graphviz_windows"
+        graphviz_dir = pth.join(external.__path__[0], graphviz_bundle)
+        bin_dir = pth.join(graphviz_dir, "bin")
+
+        if not pth.exists(bin_dir):
+            raise FileNotFoundError(
+                f"Graphviz binaries not found at {bin_dir}. "
+                f"Please ensure bundled Graphviz is installed in external/graphviz_windows/bin/"
+            )
+
+        # Add to PATH so pygraphviz can find the executables
+        if bin_dir not in os.environ.get("PATH", ""):
+            os.environ["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
+
+        # Set environment variable for pygraphviz to locate dot.exe
+        os.environ["GRAPHVIZ_DOT"] = pth.join(bin_dir, "dot.exe")
+
+        return graphviz_dir
+
+    elif system == "Darwin":  # macOS
+        # macOS: Expect system-wide installation via Homebrew
+        print("macOS detected. Please ensure Graphviz is installed system-wide:")
+        print("  brew install graphviz")
+        # pygraphviz will find it in standard system paths
+        return None
+
+    elif system == "Linux":
+        # Linux: Expect system-wide installation via package manager
+        print("Linux detected. Please ensure Graphviz is installed system-wide:")
+        print("  Ubuntu/Debian: sudo apt-get install graphviz")
+        print("  Fedora/RHEL: sudo dnf install graphviz")
+        print("  Arch: sudo pacman -S graphviz")
+        # pygraphviz will find it in standard system paths
+        return None
+
+    else:
+        raise OSError(f"Unsupported operating system: {system}")
 
 
 def _get_edge_color(source_icon, target_icon):
@@ -133,6 +199,13 @@ def power_train_network_viewer(
         static_html: True if using static html
     """
 
+    # Setup bundled Graphviz
+    try:
+        _setup_bundled_graphviz()
+    except FileNotFoundError as e:
+        print(f"Warning: {e}")
+        print("Falling back to system Graphviz installation...")
+
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
         _create_network_plot(
             power_train_file_path=power_train_file_path,
@@ -160,20 +233,8 @@ def _create_network_plot(
     Args:
         power_train_file_path: Path to the power train configuration file
         layout_prog: Graphviz layout program ('dot', 'neato', 'fdp', 'sfdp', 'circo')
-        "dot" - Hierarchical layout
-        "neato" - Spring model layout
-        "fdp" - Force-directed placement
-        "sfdp" - Scalable force-directed placement
-        "circo" - Circular layout
         legend_position: String defines the legend box position
-        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
-        * * T * *
-        * * * * *
-        * * M * *
-        L * C * R
-        * * B * *
         orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
-        (T: top, B: button, L: left, R: right)
         static_html: True if using static html
     """
 
@@ -372,7 +433,7 @@ def _create_network_plot(
     plot.scatter(
         x="x",
         y="y",
-        size=45,  # Adjust size to match your icon size
+        size=45,
         source=node_source,
         color=BACKGROUND_COLOR_CODE,
         line_alpha=0,
@@ -412,7 +473,6 @@ def _create_network_plot(
     _add_color_legend_separate(plot, legend_position, color_icon_urls)
 
     # Add interactive tools
-    # clean up type class and component type for hove info list
     cleaned_node_types = []
     cleaned_node_om_types = []
     for node_type, node_om_type in zip(node_types_list, node_om_types_list):
@@ -463,17 +523,6 @@ def _create_network_plot(
 def _add_color_legend_separate(plot, legend_position, color_icon_urls):
     """
     Add a color legend as a separate visual entity within the same plot.
-
-    Args:
-        plot: Bokeh figure object
-        legend_position: String defines the legend box position
-        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
-        * * T * *
-        * * * * *
-        * * M * *
-        L * C * R
-        * * B * *
-        color_icon_urls: List of URLs for color icons
     """
 
     if "T" in legend_position:
@@ -610,7 +659,7 @@ def _get_file_name(file_path):
 
 def _save_static_html(plot, file_path):
     """
-    Save the network plot as static html. This can be applied both before and after the computation.
+    Save the network plot as static html.
     """
     # Create directory if it doesn't exist
     directory_to_save_graph = os.path.dirname(file_path)

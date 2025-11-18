@@ -24,13 +24,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y graphviz graphviz-dev python3-dev
 
-      - name: Install Graphviz (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          choco install graphviz --version=13.1.2 -y
-          choco install msvc-runtime -y
-        shell: powershell
-
       - name: Install Poetry
         run: pipx install poetry==1.8.3
 
