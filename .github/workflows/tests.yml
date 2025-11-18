@@ -34,6 +34,10 @@ jobs:
           Write-Host "Using bundled Graphviz from: $graphvizBinPath"
         shell: powershell
 
+      - name: Install pygraphviz with pip
+        run: |
+          python -m pip install --no-cache-dir pygraphviz
+
       - name: Install Poetry
         run: pipx install poetry==1.8.3
 
