@@ -21,25 +21,53 @@ from fastga_he.gui import icons
 DATA_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "results")
 
+BACKGROUND_COLOR_CODE = "#bebebe"
+ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
+FUEL_FLOW_COLOR_CODE = "#FF5722"
+MECHANICAL_POWER_COLOR_CODE = "#2E7D32"
+
 # Image URLs for graph nodes
 icons_dict = {
-    "battery": pth.join(icons.__path__[0], "battery.png"),
-    "bus_bar": pth.join(icons.__path__[0], "bus_bar.png"),
-    "cable": pth.join(icons.__path__[0], "cable.png"),
-    "e_motor": pth.join(icons.__path__[0], "e_motor.png"),
-    "generator": pth.join(icons.__path__[0], "generator.png"),
-    "ice": pth.join(icons.__path__[0], "ice.png"),
-    "switch": pth.join(icons.__path__[0], "switch.png"),
-    "propeller": pth.join(icons.__path__[0], "propeller.png"),
-    "splitter": pth.join(icons.__path__[0], "splitter.png"),
-    "rectifier": pth.join(icons.__path__[0], "AC_DC.png"),
-    "dc_converter": pth.join(icons.__path__[0], "DC_DC.png"),
-    "inverter": pth.join(icons.__path__[0], "DC_AC.png"),
-    "fuel_tank": pth.join(icons.__path__[0], "fuel_tank.png"),
-    "fuel_system": pth.join(icons.__path__[0], "fuel_system.png"),
-    "turbine": pth.join(icons.__path__[0], "turbine.png"),
-    "gearbox": pth.join(icons.__path__[0], "gears.png"),
+    "battery": [pth.join(icons.__path__[0], "battery.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "bus_bar": [pth.join(icons.__path__[0], "bus_bar.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "cable": [pth.join(icons.__path__[0], "cable.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "e_motor": [
+        pth.join(icons.__path__[0], "e_motor.png"),
+        [ELECTRICITY_CURRENT_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+    ],
+    "generator": [
+        pth.join(icons.__path__[0], "generator.png"),
+        [MECHANICAL_POWER_COLOR_CODE, ELECTRICITY_CURRENT_COLOR_CODE],
+    ],
+    "ice": [
+        pth.join(icons.__path__[0], "ice.png"),
+        [ELECTRICITY_CURRENT_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+    ],
+    "switch": [pth.join(icons.__path__[0], "switch.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "propeller": [pth.join(icons.__path__[0], "propeller.png"), MECHANICAL_POWER_COLOR_CODE],
+    "splitter": [pth.join(icons.__path__[0], "splitter.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "rectifier": [pth.join(icons.__path__[0], "AC_DC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "dc_converter": [pth.join(icons.__path__[0], "DC_DC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "inverter": [pth.join(icons.__path__[0], "DC_AC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "fuel_tank": [pth.join(icons.__path__[0], "fuel_tank.png"), FUEL_FLOW_COLOR_CODE],
+    "fuel_system": [pth.join(icons.__path__[0], "fuel_system.png"), FUEL_FLOW_COLOR_CODE],
+    "turbine": [
+        pth.join(icons.__path__[0], "turbine.png"),
+        [FUEL_FLOW_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+    ],
+    "gearbox": [pth.join(icons.__path__[0], "gears.png"), MECHANICAL_POWER_COLOR_CODE],
+    "fuel_cell": [
+        pth.join(icons.__path__[0], "fuel_cell.png"),
+        [FUEL_FLOW_COLOR_CODE, ELECTRICITY_CURRENT_COLOR_CODE],
+    ],
 }
+
+color_icon_dict = {
+    "mechanical": pth.join(icons.__path__[0], "mechanical.png"),
+    "fuel": pth.join(icons.__path__[0], "fuel.png"),
+    "electricity": pth.join(icons.__path__[0], "electricity.png"),
+}
+
 
 
 def get_monitor_refresh_rate():
@@ -379,7 +407,7 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot",ori
 
     for node in node_indices:
         icon_name = node_icons[node]
-        icon_path = icons_dict[icon_name]
+        icon_path = icons_dict[icon_name][0]
 
         base_url = None  # Store the loaded image URL
 
