@@ -22,12 +22,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y graphviz graphviz-dev python3-dev
+          sudo apt-get install -y graphviz=13.1.2-1 graphviz-dev=13.1.2-1 python3-dev
 
       - name: Install Graphviz (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install graphviz -y
+          choco install graphviz --version=13.1.2 -y
         shell: powershell
 
       - name: Install Poetry
