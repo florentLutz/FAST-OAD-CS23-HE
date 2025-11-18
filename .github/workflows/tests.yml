@@ -28,7 +28,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install graphviz --version=13.1.2 -y
-          choco install graphviz.portable --version=13.1.2 -y
+          choco install msvc-runtime -y
         shell: powershell
 
       - name: Install Poetry
