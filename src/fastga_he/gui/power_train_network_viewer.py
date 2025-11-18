@@ -4,8 +4,6 @@
 
 import os
 import os.path as pth
-import platform
-
 from pathlib import Path
 import re
 import pygraphviz as pgv
@@ -19,7 +17,7 @@ from bokeh.models import (
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
-from . import icons, external
+from . import icons
 
 BACKGROUND_COLOR_CODE = "#bebebe"
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
@@ -68,71 +66,6 @@ color_icon_dict = {
     "fuel": pth.join(icons.__path__[0], "fuel.png"),
     "electricity": pth.join(icons.__path__[0], "electricity.png"),
 }
-
-
-def _setup_bundled_graphviz():
-    """
-    Configure pygraphviz to use bundled Graphviz executables (Windows only).
-    Linux and macOS users must install Graphviz system-wide using package managers.
-
-    Expected folder structure for Windows:
-    powertrain_builder/
-    ├── icons/
-    ├── external/
-    │   └── graphviz_windows/
-    │       └── bin/
-    │           ├── dot.exe
-    │           └── ...other executables
-    ├── network_viewer.py
-    └── powertrain.py
-
-    Installation instructions for other OS:
-    - Linux (Ubuntu/Debian): sudo apt-get install graphviz
-    - Linux (Fedora/RHEL): sudo dnf install graphviz
-    - macOS: brew install graphviz
-    """
-
-    system = platform.system()
-
-    if system == "Windows":
-        # Windows: Use bundled Graphviz
-        graphviz_bundle = "graphviz_windows"
-        graphviz_dir = pth.join(external.__path__[0], graphviz_bundle)
-        bin_dir = pth.join(graphviz_dir, "bin")
-
-        if not pth.exists(bin_dir):
-            raise FileNotFoundError(
-                f"Graphviz binaries not found at {bin_dir}. "
-                f"Please ensure bundled Graphviz is installed in external/graphviz_windows/bin/"
-            )
-
-        # Add to PATH so pygraphviz can find the executables
-        if bin_dir not in os.environ.get("PATH", ""):
-            os.environ["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
-
-        # Set environment variable for pygraphviz to locate dot.exe
-        os.environ["GRAPHVIZ_DOT"] = pth.join(bin_dir, "dot.exe")
-
-        return graphviz_dir
-
-    elif system == "Darwin":  # macOS
-        # macOS: Expect system-wide installation via Homebrew
-        print("macOS detected. Please ensure Graphviz is installed system-wide:")
-        print("  brew install graphviz")
-        # pygraphviz will find it in standard system paths
-        return None
-
-    elif system == "Linux":
-        # Linux: Expect system-wide installation via package manager
-        print("Linux detected. Please ensure Graphviz is installed system-wide:")
-        print("  Ubuntu/Debian: sudo apt-get install graphviz")
-        print("  Fedora/RHEL: sudo dnf install graphviz")
-        print("  Arch: sudo pacman -S graphviz")
-        # pygraphviz will find it in standard system paths
-        return None
-
-    else:
-        raise OSError(f"Unsupported operating system: {system}")
 
 
 def _get_edge_color(source_icon, target_icon):
@@ -198,13 +131,6 @@ def power_train_network_viewer(
         (T: top, B: button, L: left, R: right)
         static_html: True if using static html
     """
-
-    # Setup bundled Graphviz
-    try:
-        _setup_bundled_graphviz()
-    except FileNotFoundError as e:
-        print(f"Warning: {e}")
-        print("Falling back to system Graphviz installation...")
 
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
         _create_network_plot(

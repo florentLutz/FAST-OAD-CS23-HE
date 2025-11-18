@@ -119,8 +119,8 @@ def test_ecopulse_powertrain_network():
     pt_file_path = pth.join(DATA_FOLDER_PATH, "turbo_electric_propulsion.yml")
     network_file_path = pth.join(RESULTS_FOLDER_PATH, "turbo_electric_propulsion.html")
 
-    if not pth.exists(network_file_path):
-        power_train_network_viewer(pt_file_path, network_file_path)
+    # if not pth.exists(network_file_path):
+    power_train_network_viewer(pt_file_path, network_file_path)
 
 
 def test_retrofit_ecopulse():

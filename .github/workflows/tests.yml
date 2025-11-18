@@ -25,18 +25,10 @@ jobs:
           sudo apt-get install -y graphviz graphviz-dev python3-dev
           echo "GRAPHVIZ_DOT=$(which dot)" >> $GITHUB_ENV
 
-      - name: Set up bundled Graphviz on Windows
+      - name: Install Graphviz (Windows)
         if: runner.os == 'Windows'
         run: |
-          $graphvizBinPath = (Resolve-Path "src/fastga_he/gui/external/graphviz_windows/bin").Path
-          echo "GRAPHVIZ_DOT=$graphvizBinPath\dot.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "PATH=$graphvizBinPath;$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          Write-Host "Using bundled Graphviz from: $graphvizBinPath"
-        shell: powershell
-
-      - name: Install pygraphviz with pip
-        run: |
-          python -m pip install --no-cache-dir pygraphviz
+          choco install graphviz -y
 
       - name: Install Poetry
         run: pipx install poetry==1.8.3
@@ -46,6 +38,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'poetry'
+
+      - name: Install pygraphviz with pip
+        run: |
+          python -m pip install pygraphviz
 
       - name: Activate environment and install dependencies
         if: matrix.python-version != '3.10'
