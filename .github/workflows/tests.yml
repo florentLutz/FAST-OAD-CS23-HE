@@ -18,11 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install system dependencies (Linux)
+      - name: Install Graphviz dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz graphviz-dev python3-dev
+
+      - name: Install Graphviz (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install graphviz -y
+        shell: powershell
 
       - name: Install Poetry
         run: pipx install poetry==1.8.3
