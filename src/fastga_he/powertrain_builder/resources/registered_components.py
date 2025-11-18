@@ -1157,7 +1157,7 @@ PEMFC_STACK = {
     SMP: [
         {"delta_Cd": None},
     ],
-    ICON: "battery",
+    ICON: "fuel_cell",
     ICON_SIZE: 20,
     RSD: ["voltage_out"],
     SETS_V: False,

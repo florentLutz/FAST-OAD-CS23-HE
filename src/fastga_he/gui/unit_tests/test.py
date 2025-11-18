@@ -238,7 +238,7 @@ def create_rotated_svg(base64_url, rotation_degrees):
     return f"data:image/svg+xml;base64,{svg_b64}"
 
 
-def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y,
+def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y, edge_colors,
                            segments_per_edge=10):
     """
     Break each edge into multiple segments for flowing animation.
@@ -254,10 +254,12 @@ def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y,
     seg_xs = []  # List of [x1, x2] for each segment
     seg_ys = []  # List of [y1, y2] for each segment
     seg_alphas = []
+    seg_colors = []
     edge_ids = []  # Track which edge each segment belongs to
 
-    for edge_idx, (sx, sy, ex, ey) in enumerate(
-            zip(edge_start_x, edge_start_y, edge_end_x, edge_end_y)):
+
+    for edge_idx, (sx, sy, ex, ey, color) in enumerate(
+            zip(edge_start_x, edge_start_y, edge_end_x, edge_end_y, edge_colors)):
         for seg in range(segments_per_edge):
             # Interpolate segment endpoints
             t_start = seg / segments_per_edge
@@ -271,9 +273,41 @@ def create_segmented_edges(edge_start_x, edge_start_y, edge_end_x, edge_end_y,
             seg_xs.append([x1, x2])
             seg_ys.append([y1, y2])
             seg_alphas.append(0.7)  # Initial alpha
+            seg_colors.append(color)
             edge_ids.append(edge_idx)
 
-    return seg_xs, seg_ys, seg_alphas, edge_ids
+    return seg_xs, seg_ys, seg_alphas, edge_ids, seg_colors
+
+def get_edge_color(source_icon, target_icon):
+    """
+    Determine edge color based on source and target node types.
+
+    Args:
+        source_icon: Icon name of the source node
+        target_icon: Icon name of the target node
+
+    Returns:
+        Color code for the edge
+    """
+    source_colors = icons_dict.get(source_icon, [None, "gray"])[1]
+    target_colors = icons_dict.get(target_icon, [None, "gray"])[1]
+
+    # Normalize to lists for easier comparison
+    source_colors = source_colors if isinstance(source_colors, list) else [source_colors]
+    target_colors = target_colors if isinstance(target_colors, list) else [target_colors]
+
+    # Find common color between source and target
+    common_colors = set(source_colors) & set(target_colors)
+
+    if common_colors:
+        # Use the first common color
+        return list(common_colors)[0]
+
+    # If no common color, use source output color (last in list for multi-output components)
+    if source_colors:
+        return source_colors[-1]
+
+    return "gray"
 
 def create_network_plot(power_train_file_path: str, layout_prog: str = "dot",orientation: str = "TB"):
     """
@@ -398,6 +432,11 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot",ori
     node_types_list = [node_types[node] for node in node_indices]
     node_om_types_list = [node_om_types[node] for node in node_indices]
 
+    color_icon_urls = [
+        "file://" + str(Path(color_icon_dict[color_icon]).resolve())
+        for color_icon in ["fuel", "mechanical", "electricity"]
+    ]
+
     # Get image paths and convert to Base64 URLs (cross-platform)
     import base64
     node_image_urls = []
@@ -492,6 +531,7 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot",ori
     edge_start_y = []
     edge_end_x = []
     edge_end_y = []
+    edge_colors = []
 
     for edge in G.edges():
         start, end = edge
@@ -500,16 +540,22 @@ def create_network_plot(power_train_file_path: str, layout_prog: str = "dot",ori
         edge_end_x.append(pos[end][0])
         edge_end_y.append(pos[end][1])
 
+        # Determine edge color based on connected nodes
+        source_icon = node_icons[start]
+        target_icon = node_icons[end]
+        edge_color = get_edge_color(source_icon, target_icon)
+        edge_colors.append(edge_color)
+
     # Create segmented edges for flowing animation
-    seg_xs, seg_ys, seg_alphas, edge_ids = create_segmented_edges(
-        edge_start_x, edge_start_y, edge_end_x, edge_end_y, segments_per_edge=60
+    seg_xs, seg_ys, seg_alphas, edge_ids, seg_colors = create_segmented_edges(
+        edge_start_x, edge_start_y, edge_end_x, edge_end_y, edge_colors, segments_per_edge=30
     )
 
     edge_source = ColumnDataSource(
         data=dict(
             xs=seg_xs,
             ys=seg_ys,
-            colors=["#4472C4"] * len(seg_xs),
+            colors=seg_colors,
             line_alpha=seg_alphas,
             edge_id=edge_ids,  # This is the missing definition
         )
@@ -662,17 +708,6 @@ def power_train_network_viewer_hv_server(
         animation_counter = [0]
 
         doc.add_root(column(plot))
-
-        # RGB gradient colors for animation
-        gradient_colors = [
-            "#FF0000",  # Red
-            "#FF7F00",  # Orange
-            "#FFFF00",  # Yellow
-            "#00FF00",  # Green
-            "#0000FF",  # Blue
-            "#4B0082",  # Indigo
-            "#9400D3",  # Violet
-        ]
 
         # Add periodic callback for animation
         def update():
