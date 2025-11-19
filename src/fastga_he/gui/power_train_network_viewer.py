@@ -4,9 +4,11 @@
 
 import os
 import os.path as pth
+
 from pathlib import Path
 import re
-import pygraphviz as pgv
+import networkx as nx
+from networkx.drawing.nx_agraph import graphviz_layout
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import (
     ColumnDataSource,
@@ -100,6 +102,90 @@ def _get_edge_color(source_icon, target_icon):
     return "gray"
 
 
+def _compute_hierarchical_layout(graph, orientation="TB"):
+    """
+    Compute hierarchical layout using networkx without external Graphviz dependency.
+    Uses a custom implementation of hierarchical positioning.
+
+    Args:
+        graph: NetworkX DiGraph object
+        orientation: Layout orientation ('TB', 'BT', 'LR', 'RL')
+
+    Returns:
+        Dictionary of node positions
+    """
+    # Find topological levels
+    try:
+        topo_sort = list(nx.topological_sort(graph))
+    except nx.NetworkXError:
+        # If graph has cycles, use a different approach
+        topo_sort = list(graph.nodes())
+
+    # Compute levels (distance from roots)
+    levels = {}
+    in_degree = dict(graph.in_degree())
+
+    # Find root nodes (no incoming edges)
+    roots = [node for node in graph.nodes() if in_degree[node] == 0]
+
+    if not roots:
+        roots = [topo_sort[0]]
+
+    # BFS to assign levels
+    from collections import deque
+    queue = deque([(node, 0) for node in roots])
+    visited = set()
+
+    while queue:
+        node, level = queue.popleft()
+        if node in visited:
+            continue
+        visited.add(node)
+        levels[node] = max(levels.get(node, 0), level)
+
+        for successor in graph.successors(node):
+            queue.append((successor, level + 1))
+
+    # Assign remaining nodes
+    for node in graph.nodes():
+        if node not in levels:
+            levels[node] = 0
+
+    # Group nodes by level
+    level_dict = {}
+    for node, level in levels.items():
+        if level not in level_dict:
+            level_dict[level] = []
+        level_dict[level].append(node)
+
+    # Compute positions
+    pos = {}
+    max_level = max(level_dict.keys()) if level_dict else 0
+
+    for level, nodes in level_dict.items():
+        num_nodes = len(nodes)
+        for i, node in enumerate(nodes):
+            if orientation == "TB":
+                x = (i - num_nodes / 2) * 100
+                y = max_level * 100 - level * 100
+            elif orientation == "BT":
+                x = (i - num_nodes / 2) * 100
+                y = level * 100
+            elif orientation == "LR":
+                x = level * 100
+                y = (i - num_nodes / 2) * 100
+            elif orientation == "RL":
+                x = (max_level - level) * 100
+                y = (i - num_nodes / 2) * 100
+            else:
+                x = (i - num_nodes / 2) * 100
+                y = level * 100
+
+            pos[node] = (x, y)
+
+    return pos
+
+
 def power_train_network_viewer(
     power_train_file_path: str,
     network_file_path: str,
@@ -109,17 +195,16 @@ def power_train_network_viewer(
     static_html: bool = True,
 ):
     """
-    Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
+    Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
 
     Args:
         power_train_file_path: Path to the power train configuration file
         network_file_path: Path where the HTML output will be saved
-        layout_prog: Graphviz layout program ('dot', 'neato', 'fdp', 'sfdp', 'circo')
-        "dot" - Hierarchical layout
-        "neato" - Spring model layout
-        "fdp" - Force-directed placement
-        "sfdp" - Scalable force-directed placement
-        "circo" - Circular layout
+        layout_prog: Layout algorithm ('hierarchical', 'spring', 'circular', 'kamada_kawai')
+        'hierarchical' - Layered hierarchical layout (replaces 'dot')
+        'spring' - Spring model layout (replaces 'neato')
+        'circular' - Circular layout (replaces 'circo')
+        'kamada_kawai' - Kamada-Kawai layout (alternative to 'fdp')
         legend_position: String defines the legend box position
         (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
         * * T * *
@@ -148,24 +233,24 @@ def power_train_network_viewer(
 
 def _create_network_plot(
     power_train_file_path: str,
-    layout_prog: str = "dot",
+    layout_prog: str = "hierarchical",
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
 ):
     """
-    Create an interactive network visualization of a power train using Bokeh with PyGraphviz layout.
+    Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
 
     Args:
         power_train_file_path: Path to the power train configuration file
-        layout_prog: Graphviz layout program ('dot', 'neato', 'fdp', 'sfdp', 'circo')
+        layout_prog: Layout algorithm ('hierarchical', 'spring', 'circular', 'kamada_kawai')
         legend_position: String defines the legend box position
         orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
         static_html: True if using static html
     """
 
-    # Create AGraph (PyGraphviz) object
-    graph = pgv.AGraph(directed=True, rankdir=orientation)
+    # Create NetworkX DiGraph object
+    graph = nx.DiGraph()
 
     configurator = FASTGAHEPowerTrainConfigurator()
     configurator.load(power_train_file_path)
@@ -205,14 +290,18 @@ def _create_network_plot(
         target = connection[1][0] if isinstance(connection[1], list) else connection[1]
         graph.add_edge(source, target)
 
-    # Apply Graphviz layout algorithm
-    graph.layout(prog=layout_prog)
-
-    # Extract positions from Graphviz layout
-    position_dict = {}
-    for node in graph.nodes():
-        x, y = map(float, node.attr["pos"].split(","))
-        position_dict[node] = (x, y)
+    # Compute layout based on specified algorithm
+    if layout_prog == "hierarchical":
+        position_dict = _compute_hierarchical_layout(graph, orientation)
+    elif layout_prog == "spring":
+        position_dict = nx.spring_layout(graph, k=2, iterations=50, seed=42)
+    elif layout_prog == "circular":
+        position_dict = nx.circular_layout(graph)
+    elif layout_prog == "kamada_kawai":
+        position_dict = nx.kamada_kawai_layout(graph)
+    else:
+        # Default to hierarchical
+        position_dict = _compute_hierarchical_layout(graph, orientation)
 
     # Normalize positions for Bokeh
     if position_dict:
@@ -449,6 +538,11 @@ def _create_network_plot(
 def _add_color_legend_separate(plot, legend_position, color_icon_urls):
     """
     Add a color legend as a separate visual entity within the same plot.
+
+    Args:
+        plot: Bokeh figure object
+        legend_position: String defines the legend box position
+        color_icon_urls: List of URLs for color icons
     """
 
     if "T" in legend_position:
