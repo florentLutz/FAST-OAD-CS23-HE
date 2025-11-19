@@ -951,6 +951,39 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distance_from_propulsor
 
+    def get_distance_from_energy_storage(self):
+        energy_storage_names = []
+
+        # First and for reason that will appear clear later, we get a list of energy storage
+        # component
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            if (
+                "gaseous_hydrogen_tank" in component_type
+                or "fuel_tank" in component_type
+                or "battery_pack" in component_type
+            ):
+                energy_storage_names.append(component_name)
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        distance_from_energy_storage = {}
+        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+
+        for component_name in self._components_name:
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_energy_storages = list(set(energy_storage_names) & set(connected_components))
+
+            min_distance = np.inf
+            for storage in connected_energy_storages:
+                distance_to_storage = connections_length_between_nodes[component_name][storage]
+                if distance_to_storage < min_distance:
+                    min_distance = distance_to_storage
+
+            distance_from_energy_storage[component_name] = min_distance
+
+        return distance_from_energy_storage
+
     def reorder_components(self, *lists):
         """
         Reorders components by their distance from the nearest propeller and assigns proper

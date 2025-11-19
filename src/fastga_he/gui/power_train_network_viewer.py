@@ -8,7 +8,6 @@ import os.path as pth
 from pathlib import Path
 import re
 import networkx as nx
-from networkx.drawing.nx_agraph import graphviz_layout
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import (
     ColumnDataSource,
@@ -20,6 +19,7 @@ from bokeh.models import (
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from . import icons
+from .sugiyama_layout import SugiyamaLayout
 
 BACKGROUND_COLOR_CODE = "#bebebe"
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
@@ -102,94 +102,25 @@ def _get_edge_color(source_icon, target_icon):
     return "gray"
 
 
-def _compute_hierarchical_layout(graph, orientation="TB"):
+def _compute_hierarchical_layout(graph, orientation="TB", node_layer_override=None):
     """
-    Compute hierarchical layout using networkx without external Graphviz dependency.
-    Uses a custom implementation of hierarchical positioning.
+    Compute hierarchical layout using the Sugiyama algorithm.
 
     Args:
         graph: NetworkX DiGraph object
         orientation: Layout orientation ('TB', 'BT', 'LR', 'RL')
+        node_layer_override: Optional dictionary to override layer assignment
 
     Returns:
         Dictionary of node positions
     """
-    # Find topological levels
-    try:
-        topo_sort = list(nx.topological_sort(graph))
-    except nx.NetworkXError:
-        # If graph has cycles, use a different approach
-        topo_sort = list(graph.nodes())
-
-    # Compute levels (distance from roots)
-    levels = {}
-    in_degree = dict(graph.in_degree())
-
-    # Find root nodes (no incoming edges)
-    roots = [node for node in graph.nodes() if in_degree[node] == 0]
-
-    if not roots:
-        roots = [topo_sort[0]]
-
-    # BFS to assign levels
-    from collections import deque
-    queue = deque([(node, 0) for node in roots])
-    visited = set()
-
-    while queue:
-        node, level = queue.popleft()
-        if node in visited:
-            continue
-        visited.add(node)
-        levels[node] = max(levels.get(node, 0), level)
-
-        for successor in graph.successors(node):
-            queue.append((successor, level + 1))
-
-    # Assign remaining nodes
-    for node in graph.nodes():
-        if node not in levels:
-            levels[node] = 0
-
-    # Group nodes by level
-    level_dict = {}
-    for node, level in levels.items():
-        if level not in level_dict:
-            level_dict[level] = []
-        level_dict[level].append(node)
-
-    # Compute positions
-    pos = {}
-    max_level = max(level_dict.keys()) if level_dict else 0
-
-    for level, nodes in level_dict.items():
-        num_nodes = len(nodes)
-        for i, node in enumerate(nodes):
-            if orientation == "TB":
-                x = (i - num_nodes / 2) * 100
-                y = max_level * 100 - level * 100
-            elif orientation == "BT":
-                x = (i - num_nodes / 2) * 100
-                y = level * 100
-            elif orientation == "LR":
-                x = level * 100
-                y = (i - num_nodes / 2) * 100
-            elif orientation == "RL":
-                x = (max_level - level) * 100
-                y = (i - num_nodes / 2) * 100
-            else:
-                x = (i - num_nodes / 2) * 100
-                y = level * 100
-
-            pos[node] = (x, y)
-
-    return pos
+    sugiyama = SugiyamaLayout(graph, orientation, node_layer_override)
+    return sugiyama.compute()
 
 
 def power_train_network_viewer(
     power_train_file_path: str,
     network_file_path: str,
-    layout_prog: str = "dot",
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
@@ -201,10 +132,10 @@ def power_train_network_viewer(
         power_train_file_path: Path to the power train configuration file
         network_file_path: Path where the HTML output will be saved
         layout_prog: Layout algorithm ('hierarchical', 'spring', 'circular', 'kamada_kawai')
-        'hierarchical' - Layered hierarchical layout (replaces 'dot')
-        'spring' - Spring model layout (replaces 'neato')
-        'circular' - Circular layout (replaces 'circo')
-        'kamada_kawai' - Kamada-Kawai layout (alternative to 'fdp')
+        'hierarchical' - Sugiyama layered hierarchical layout
+        'spring' - Spring model layout
+        'circular' - Circular layout
+        'kamada_kawai' - Kamada-Kawai layout
         legend_position: String defines the legend box position
         (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
         * * T * *
@@ -220,7 +151,6 @@ def power_train_network_viewer(
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
         _create_network_plot(
             power_train_file_path=power_train_file_path,
-            layout_prog=layout_prog,
             orientation=orientation,
             legend_position=legend_position,
             static_html=static_html,
@@ -233,7 +163,6 @@ def power_train_network_viewer(
 
 def _create_network_plot(
     power_train_file_path: str,
-    layout_prog: str = "hierarchical",
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
@@ -243,7 +172,6 @@ def _create_network_plot(
 
     Args:
         power_train_file_path: Path to the power train configuration file
-        layout_prog: Layout algorithm ('hierarchical', 'spring', 'circular', 'kamada_kawai')
         legend_position: String defines the legend box position
         orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
         static_html: True if using static html
@@ -263,6 +191,8 @@ def _create_network_plot(
         icons_name,
         icons_size,
     ) = configurator.get_network_elements_list()
+
+    distance_from_energy_storage = configurator.get_distance_from_energy_storage()
 
     # Build node attributes dictionaries
     node_sizes = {}
@@ -290,18 +220,14 @@ def _create_network_plot(
         target = connection[1][0] if isinstance(connection[1], list) else connection[1]
         graph.add_edge(source, target)
 
-    # Compute layout based on specified algorithm
-    if layout_prog == "hierarchical":
-        position_dict = _compute_hierarchical_layout(graph, orientation)
-    elif layout_prog == "spring":
-        position_dict = nx.spring_layout(graph, k=2, iterations=50, seed=42)
-    elif layout_prog == "circular":
-        position_dict = nx.circular_layout(graph)
-    elif layout_prog == "kamada_kawai":
-        position_dict = nx.kamada_kawai_layout(graph)
-    else:
-        # Default to hierarchical
-        position_dict = _compute_hierarchical_layout(graph, orientation)
+    # Build node_layer_override from distance_from_energy_storage
+    node_layer_override = {}
+    max_distance = max(distance_from_energy_storage.values())
+    for node_name, distance in distance_from_energy_storage.items():
+        node_layer_override[node_name] = max_distance - distance
+
+    # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
+    position_dict = _compute_hierarchical_layout(graph, orientation, node_layer_override)
 
     # Normalize positions for Bokeh
     if position_dict:
