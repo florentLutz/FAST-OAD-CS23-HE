@@ -38,7 +38,7 @@ class HierarchicalLayout:
             # assign layers based on the distance from energy storage component nodes
             self.node_layer = {node: int(layer) for node, layer in self.node_layer_dict.items()}
         else:
-            # Fallback to flow_hierarchy
+            # Fallback in case node layer is not provided
             self.node_layer = nx.algorithms.dag_longest_path_length(self.graph)
 
         max_layer = max(self.node_layer.values()) if self.node_layer else 0
@@ -104,13 +104,13 @@ class HierarchicalLayout:
         return self.positions
 
 
-def _detect_edge_crossing(p1, p2, p3, p4):
+def _detect_edge_crossing(point_1, point_2, point_3, point_4):
     """
     Detect if two line segments cross using the orientation method.
 
     Args:
-        p1, p2: Endpoints of first line segment (x, y tuples)
-        p3, p4: Endpoints of second line segment (x, y tuples)
+        point_1, point_2: Endpoints of first line segment (x, y tuples)
+        point_3, point_4: Endpoints of second line segment (x, y tuples)
 
     Returns:
         True if segments cross, False otherwise
@@ -121,7 +121,9 @@ def _detect_edge_crossing(p1, p2, p3, p4):
         return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
     # Check if segments intersect
-    return ccw(p1, p3, p4) != ccw(p2, p3, p4) and ccw(p1, p2, p3) != ccw(p1, p2, p4)
+    return ccw(point_1, point_3, point_4) != ccw(point_2, point_3, point_4) and ccw(
+        point_1, point_2, point_3
+    ) != ccw(point_1, point_2, point_4)
 
 
 def _find_edge_crossings(graph, positions, layers, node_layer):
@@ -135,34 +137,34 @@ def _find_edge_crossings(graph, positions, layers, node_layer):
         node_layer: Dictionary mapping nodes to their layer indices
 
     Returns:
-        List of crossing pairs: [(edge1, edge2), ...]
+        List of crossing pairs: [(edge_1, edge_2), ...]
     """
     edges = list(graph.edges())
     crossings = []
 
     # Compare each pair of edges
-    for i, edge1 in enumerate(edges):
-        for edge2 in edges[i + 1 :]:
-            src1, tgt1 = edge1
-            src2, tgt2 = edge2
+    for i, edge_1 in enumerate(edges):
+        for edge_2 in edges[i + 1 :]:
+            source_1, target_1 = edge_1
+            source_2, target_2 = edge_2
 
             # Skip if edges share a node
-            if src1 in (src2, tgt2) or tgt1 in (src2, tgt2):
+            if source_1 in (source_2, target_2) or target_1 in (source_2, target_2):
                 continue
 
             # Skip if edges are in the same or adjacent layers
-            if abs(node_layer[src1] - node_layer[src2]) <= 1:
+            if abs(node_layer[source_1] - node_layer[source_2]) <= 1:
                 continue
 
             # Check for crossing
-            p1 = positions.get(src1)
-            p2 = positions.get(tgt1)
-            p3 = positions.get(src2)
-            p4 = positions.get(tgt2)
+            point_1 = positions.get(source_1)
+            point_2 = positions.get(target_1)
+            point_3 = positions.get(source_2)
+            point_4 = positions.get(target_2)
 
-            if p1 and p2 and p3 and p4:
-                if _detect_edge_crossing(p1, p2, p3, p4):
-                    crossings.append((edge1, edge2))
+            if point_1 and point_2 and point_3 and point_4:
+                if _detect_edge_crossing(point_1, point_2, point_3, point_4):
+                    crossings.append((edge_1, edge_2))
 
     return crossings
 
@@ -188,23 +190,24 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
     for iteration in range(max_iterations):
         crossings = _find_edge_crossings(graph, positions, layers, node_layer)
 
+        # skip if there is no crossing after sorts
         if not crossings:
             break
 
         swaps_this_iteration = 0
 
         # Process each crossing
-        for edge1, edge2 in crossings:
-            src1, tgt1 = edge1
-            src2, tgt2 = edge2
+        for edge_1, edge_2 in crossings:
+            source_1, target_1 = edge_1
+            source_2, target_2 = edge_2
 
             # Get the layers involved
-            layer1_src = node_layer[src1]
-            layer2_src = node_layer[src2]
+            layer1_source = node_layer[source_1]
+            layer2_source = node_layer[source_2]
 
             # Determine which layer to perform the swap
             # Try swapping nodes in the layer with sources
-            for layer_idx in set([layer1_src, layer2_src]):
+            for layer_idx in set([layer1_source, layer2_source]):
                 if layer_idx < len(layers) - 1:
                     # Find which nodes in this layer are involved in the crossing
                     nodes_in_layer = layers[layer_idx]
@@ -219,7 +222,7 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
                             layers[layer_idx][i], layers[layer_idx][j] = node_b, node_a
 
                             # Recalculate positions
-                            _recalculate_positions_for_layer(layer_idx, layers, positions)
+                            _recalculate_node_positions_for_each_layer(layer_idx, layers, positions)
 
                             # Check if crossing is reduced
                             new_crossings = _find_edge_crossings(
@@ -233,7 +236,9 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
                             else:
                                 # Revert swap
                                 layers[layer_idx][i], layers[layer_idx][j] = node_a, node_b
-                                _recalculate_positions_for_layer(layer_idx, layers, positions)
+                                _recalculate_node_positions_for_each_layer(
+                                    layer_idx, layers, positions
+                                )
 
                         if swaps_this_iteration > 0:
                             break
@@ -242,9 +247,7 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
             break
 
 
-def _recalculate_positions_for_layer(
-    layer_idx, layers, positions, layer_spacing=100, node_spacing=80
-):
+def _recalculate_node_positions_for_each_layer(layer_idx, layers, positions, node_spacing=80):
     """
     Recalculate x,y positions for nodes in a specific layer.
 
@@ -265,7 +268,7 @@ def _recalculate_positions_for_layer(
         x = x_offset + i * node_spacing
         if node in positions:
             # Keep y relative to orientation, update x based on new position
-            old_x, old_y = positions[node]
+            _, old_y = positions[node]
             positions[node] = (x, old_y)
 
 
@@ -280,22 +283,33 @@ def _minimize_crossings_iterative(layers, graph, node_layer, positions):
         node_layer: Dictionary mapping nodes to their layer
         positions: Dictionary of node positions
     """
-    # First pass: apply barycenter heuristic
+    # First sorting: apply barycenter heuristic (sort the component by layer based on their
+    # predecessors)
     for layer_idx in range(1, len(layers)):
         barycenters = {}
 
         for node in layers[layer_idx]:
+            # "predecessors" is the list that contains the nodes in the immediately higher layer
+            # which are directly connected to the current node.
+
             predecessors = [
-                p for p in graph.predecessors(node) if node_layer.get(p, -1) == layer_idx - 1
+                predecessor
+                for predecessor in graph.predecessors(node)
+                if node_layer.get(predecessor, -1) == layer_idx - 1
             ]
 
             if predecessors:
-                pred_positions = [layers[layer_idx - 1].index(p) for p in predecessors]
-                barycenters[node] = sum(pred_positions) / len(pred_positions)
+                predecessor_positions = [
+                    layers[layer_idx - 1].index(predecessor) for predecessor in predecessors
+                ]
+                # Calculate the center placement among the preprocessors
+                barycenters[node] = sum(predecessor_positions) / len(predecessor_positions)
             else:
+                # If no predecessor exists in the previous layer, place the node at the end
                 barycenters[node] = float("inf")
 
-        layers[layer_idx].sort(key=lambda n: barycenters.get(n, float("inf")))
+        # Sort all nodes in the current layer by their barycenter values in ascending order
+        layers[layer_idx].sort(key=lambda node: barycenters.get(node, float("inf")))
 
-    # Second pass: resolve remaining crossings via swapping
+    # Second sorting: resolve remaining crossings via swapping
     _resolve_crossings_by_swapping(graph, positions, layers, node_layer)

@@ -102,20 +102,20 @@ def _get_edge_color(source_icon, target_icon):
     return "gray"
 
 
-def _compute_hierarchical_layout(graph, orientation="TB", node_layer_dict=None):
-    """
-    Compute hierarchical layout using the Sugiyama algorithm.
-
-    Args:
-        graph: NetworkX DiGraph object
-        orientation: Layout orientation ('TB', 'BT', 'LR', 'RL')
-        node_layer_dict: Optional dictionary to override layer assignment
-
-    Returns:
-        Dictionary of node positions
-    """
-    sugiyama = HierarchicalLayout(graph, orientation, node_layer_dict)
-    return sugiyama.compute()
+# def _compute_hierarchical_layout(graph, orientation="TB", node_layer_dict=None):
+#     """
+#     Compute hierarchical layout.
+#
+#     Args:
+#         graph: NetworkX DiGraph object
+#         orientation: Layout orientation ('TB', 'BT', 'LR', 'RL')
+#         node_layer_dict: Optional dictionary to override layer assignment
+#
+#     Returns:
+#         Dictionary of node positions
+#     """
+#
+#     return HierarchicalLayout(graph, orientation, node_layer_dict).compute()
 
 
 def power_train_network_viewer(
@@ -227,7 +227,7 @@ def _create_network_plot(
         node_layer_dict[node_name] = max_distance - distance
 
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
-    position_dict = _compute_hierarchical_layout(graph, orientation, node_layer_dict)
+    position_dict = HierarchicalLayout(graph, orientation, node_layer_dict).compute()
 
     # Normalize positions for Bokeh
     if position_dict:
