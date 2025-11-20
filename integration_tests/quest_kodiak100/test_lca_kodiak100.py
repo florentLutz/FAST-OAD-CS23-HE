@@ -208,7 +208,7 @@ def test_search_engine_thesis():
     # For the reference design, we consider the impacts of the fuel consumption and the production
     # of the fuel. Last one is sanity check.
     # Results are naturally given for a payload*km, but since we want the impact per MJ of primary
-    # energy used, we must first put them back to one flight and then to one MJ of that flight
+    # energy used, we must first put them back to the frame of one flight and then transfer to one MJ of that flight
 
     ref_design_datafile = oad.DataFile(
         RESULTS_SENSITIVITY_FOLDER_PATH_REF / "ref_kodiak_lca.xml_7077.xml"
@@ -254,7 +254,7 @@ def test_search_engine_thesis():
     # of the fuel, the impact of the production of electricity for the mission and the production
     # of the battery. Last one is sanity check again, those should represent a big part of the
     # total. Results are naturally given for a kg*km, but since we want the impact per MJ of primary
-    # energy used, we must first put them back to one flight and then to one MJ of that flight
+    # energy used, we must first put them back to the frame of one flight and then transfer to one MJ of that flight
 
     hybrid_design_datafile = oad.DataFile(
         RESULTS_SENSITIVITY_FOLDER_PATH / "hybrid_kodiak_lca.xml_7077.xml"

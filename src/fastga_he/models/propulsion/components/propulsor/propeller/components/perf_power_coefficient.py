@@ -29,7 +29,7 @@ class PerformancesPowerCoefficient(om.ExplicitComponent):
         self.options.declare(
             "cut_off_propeller_efficiency",
             default=0.5,
-            desc="Limit lower value of the efficiency for the Cp computation",
+            desc="Limit the lower bound of efficiency for the Cp computation",
         )
 
     def setup(self):
