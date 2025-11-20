@@ -21,52 +21,94 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from . import icons
 from .layout_generation import HierarchicalLayout
 
-BACKGROUND_COLOR_CODE = "#bebebe" # canvas background color
-ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF" # color for electricity transmitting connections
-FUEL_FLOW_COLOR_CODE = "#FF5722" # color for fuel (including hydrogen) transmitting connections
-MECHANICAL_POWER_COLOR_CODE = "#2E7D32" # color for mechanical power transmitting connections
+BACKGROUND_COLOR_CODE = "#bebebe"  # canvas background color
+ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"  # color for electricity transmitting connections
+FUEL_FLOW_COLOR_CODE = "#FF5722"  # color for fuel (including hydrogen) transmitting connections
+MECHANICAL_POWER_COLOR_CODE = "#2E7D32"  # color for mechanical power transmitting connections
 
 # Image URLs for graph nodes
+# "icon_file_name" : [file_path, color_as_source, color_as_target]
 icons_dict = {
-    "battery": [pth.join(icons.__path__[0], "battery.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "bus_bar": [pth.join(icons.__path__[0], "bus_bar.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "cable": [pth.join(icons.__path__[0], "cable.png"), ELECTRICITY_CURRENT_COLOR_CODE],
+    "battery": [pth.join(icons.__path__[0], "battery.png"), None, ELECTRICITY_CURRENT_COLOR_CODE],
+    "bus_bar": [
+        pth.join(icons.__path__[0], "bus_bar.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
+    "cable": [
+        pth.join(icons.__path__[0], "cable.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
     "e_motor": [
         pth.join(icons.__path__[0], "e_motor.png"),
-        [ELECTRICITY_CURRENT_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        MECHANICAL_POWER_COLOR_CODE,
     ],
     "generator": [
         pth.join(icons.__path__[0], "generator.png"),
-        [MECHANICAL_POWER_COLOR_CODE, ELECTRICITY_CURRENT_COLOR_CODE],
+        MECHANICAL_POWER_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
     ],
     "ice": [
         pth.join(icons.__path__[0], "ice.png"),
-        [ELECTRICITY_CURRENT_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+        FUEL_FLOW_COLOR_CODE,
+        MECHANICAL_POWER_COLOR_CODE,
     ],
-    "switch": [pth.join(icons.__path__[0], "switch.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "propeller": [pth.join(icons.__path__[0], "propeller.png"), MECHANICAL_POWER_COLOR_CODE],
-    "splitter": [pth.join(icons.__path__[0], "splitter.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "rectifier": [pth.join(icons.__path__[0], "AC_DC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "dc_converter": [pth.join(icons.__path__[0], "DC_DC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "inverter": [pth.join(icons.__path__[0], "DC_AC.png"), ELECTRICITY_CURRENT_COLOR_CODE],
-    "fuel_tank": [pth.join(icons.__path__[0], "fuel_tank.png"), FUEL_FLOW_COLOR_CODE],
-    "fuel_system": [pth.join(icons.__path__[0], "fuel_system.png"), FUEL_FLOW_COLOR_CODE],
+    "switch": [
+        pth.join(icons.__path__[0], "switch.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
+    "propeller": [pth.join(icons.__path__[0], "propeller.png"), MECHANICAL_POWER_COLOR_CODE, None],
+    "splitter": [
+        pth.join(icons.__path__[0], "splitter.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
+    "rectifier": [
+        pth.join(icons.__path__[0], "AC_DC.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
+    "dc_converter": [
+        pth.join(icons.__path__[0], "DC_DC.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
+    "inverter": [
+        pth.join(icons.__path__[0], "DC_AC.png"),
+        ELECTRICITY_CURRENT_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
+    ],
+    "fuel_tank": [pth.join(icons.__path__[0], "fuel_tank.png"), None, FUEL_FLOW_COLOR_CODE],
+    "fuel_system": [
+        pth.join(icons.__path__[0], "fuel_system.png"),
+        FUEL_FLOW_COLOR_CODE,
+        FUEL_FLOW_COLOR_CODE,
+    ],
     "turbine": [
         pth.join(icons.__path__[0], "turbine.png"),
-        [FUEL_FLOW_COLOR_CODE, MECHANICAL_POWER_COLOR_CODE],
+        FUEL_FLOW_COLOR_CODE,
+        MECHANICAL_POWER_COLOR_CODE,
     ],
-    "gearbox": [pth.join(icons.__path__[0], "gears.png"), MECHANICAL_POWER_COLOR_CODE],
+    "gearbox": [
+        pth.join(icons.__path__[0], "gears.png"),
+        MECHANICAL_POWER_COLOR_CODE,
+        MECHANICAL_POWER_COLOR_CODE,
+    ],
     "fuel_cell": [
         pth.join(icons.__path__[0], "fuel_cell.png"),
-        [FUEL_FLOW_COLOR_CODE, ELECTRICITY_CURRENT_COLOR_CODE],
+        FUEL_FLOW_COLOR_CODE,
+        ELECTRICITY_CURRENT_COLOR_CODE,
     ],
 }
 
-color_icon_dict = {
-    "mechanical": pth.join(icons.__path__[0], "mechanical.png"),
-    "fuel": pth.join(icons.__path__[0], "fuel.png"),
-    "electricity": pth.join(icons.__path__[0], "electricity.png"),
-}
+color_icon_list = [
+    pth.join(icons.__path__[0], "fuel.png"),
+    pth.join(icons.__path__[0], "mechanical.png"),
+    pth.join(icons.__path__[0], "electricity.png"),
+]
 
 
 def _get_edge_color(source_icon, target_icon):
@@ -80,41 +122,20 @@ def _get_edge_color(source_icon, target_icon):
     Returns:
         Color code for the edge
     """
-    source_colors = icons_dict.get(source_icon, [None, "gray"])[1]
-    target_colors = icons_dict.get(target_icon, [None, "gray"])[1]
+    # edge color for the source component serves as source
+    color_as_source = icons_dict.get(source_icon)[1]
+    # edge color for the target component serves as source
+    color_as_target = icons_dict.get(target_icon)[2]
 
-    # Normalize to lists for easier comparison
-    source_colors = source_colors if isinstance(source_colors, list) else [source_colors]
-    target_colors = target_colors if isinstance(target_colors, list) else [target_colors]
+    if color_as_target:
+        return color_as_target
 
-    # Find common color between source and target
-    common_colors = set(source_colors) & set(target_colors)
+    # For propulsor component which won't be connected as target
+    elif color_as_source:
+        return color_as_source
 
-    if common_colors:
-        # Use the first common color
-        return list(common_colors)[0]
-
-    # If no common color, use source output color (last in list for multi-output components)
-    if source_colors:
-        return source_colors[-1]
-
-    return "gray"
-
-
-# def _compute_hierarchical_layout(graph, orientation="TB", node_layer_dict=None):
-#     """
-#     Compute hierarchical layout.
-#
-#     Args:
-#         graph: NetworkX DiGraph object
-#         orientation: Layout orientation ('TB', 'BT', 'LR', 'RL')
-#         node_layer_dict: Optional dictionary to override layer assignment
-#
-#     Returns:
-#         Dictionary of node positions
-#     """
-#
-#     return HierarchicalLayout(graph, orientation, node_layer_dict).compute()
+    else:
+        return "gray"
 
 
 def power_train_network_viewer(
@@ -235,8 +256,8 @@ def _create_network_plot(
         x_min, x_max = min(x_coordinates), max(x_coordinates)
         y_min, y_max = min(y_coordinates), max(y_coordinates)
 
-        x_range = x_max - x_min if x_max > x_min else 1
-        y_range = y_max - y_min if y_max > y_min else 1
+        x_range = x_max - x_min
+        y_range = y_max - y_min
 
         # Scale to a reasonable display size with different orientation
         if orientation == "TB" or orientation == "BT":
@@ -264,6 +285,8 @@ def _create_network_plot(
             icon_width_factor = 0.6
             x_orientation_offset = -25
             y_orientation_offset = 150
+
+        # Here update the position from NetworkX to fit in the bokeh plot
 
         position_dict = {
             node: (
@@ -312,8 +335,7 @@ def _create_network_plot(
         ]
 
     color_icon_urls = [
-        "file://" + str(Path(color_icon_dict[color_icon]).resolve())
-        for color_icon in ["fuel", "mechanical", "electricity"]
+        "file://" + str(Path(color_icon).resolve()) for color_icon in color_icon_list
     ]
 
     # Create edge data with colors
@@ -340,8 +362,8 @@ def _create_network_plot(
     if static_html:
         edge_source = ColumnDataSource(
             data=dict(
-                xs=[[sx, ex] for sx, ex in zip(edge_start_x, edge_end_x)],
-                ys=[[sy, ey] for sy, ey in zip(edge_start_y, edge_end_y)],
+                xs=[[x_start, x_end] for x_start, x_end in zip(edge_start_x, edge_end_x)],
+                ys=[[y_start, y_end] for y_start, y_end in zip(edge_start_y, edge_end_y)],
                 line_color=edge_colors,
                 line_alpha=[0.7] * len(edge_start_x),
             )
