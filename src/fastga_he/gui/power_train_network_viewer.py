@@ -21,13 +21,12 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from . import icons
 from .layout_generation import HierarchicalLayout
 
-BACKGROUND_COLOR_CODE = "#bebebe"
-ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
-FUEL_FLOW_COLOR_CODE = "#FF5722"
-MECHANICAL_POWER_COLOR_CODE = "#2E7D32"
+BACKGROUND_COLOR_CODE = "#bebebe" # canvas background color
+ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF" # color for electricity transmitting connections
+FUEL_FLOW_COLOR_CODE = "#FF5722" # color for fuel (including hydrogen) transmitting connections
+MECHANICAL_POWER_COLOR_CODE = "#2E7D32" # color for mechanical power transmitting connections
 
 # Image URLs for graph nodes
-
 icons_dict = {
     "battery": [pth.join(icons.__path__[0], "battery.png"), ELECTRICITY_CURRENT_COLOR_CODE],
     "bus_bar": [pth.join(icons.__path__[0], "bus_bar.png"), ELECTRICITY_CURRENT_COLOR_CODE],

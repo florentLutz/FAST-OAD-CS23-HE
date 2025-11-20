@@ -16,7 +16,6 @@ from fastga_he.models.propulsion.assemblers.performances_from_pt_file import (
 )
 from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
-
 from ..components.loads.pmsm import PerformancesPMSM
 from ..components.connectors.planetary_gear import PerformancesPlanetaryGear
 from ..components.propulsor.propeller import PerformancesPropeller
