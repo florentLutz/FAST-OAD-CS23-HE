@@ -1,4 +1,4 @@
-project: pipistrel_assembly
+project: hybrid_propulsion
 
 ecoinvent:
     version: 3.9.1
@@ -105,6 +105,38 @@ model:
                 # propeller, but it seems like the value they give also include materials production which
                 # we don't want to count twice. This means that we don't consider the assembly of the
                 # propeller, resulting in an underestimation.
+        planetary_gear_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: planetary_gear_1_production
+        
+            gearbox:
+              amount: data__propulsion__he_power_train__planetary_gear__planetary_gear_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the gearbox,
+                # but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # gearbox, resulting in an underestimation.
+        ice_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: ice_1_production
+        
+            name: 'internal combustion engine production, passenger car'
+            loc: 'GLO'
+            amount: data__propulsion__he_power_train__ICE__ice_1__mass_per_fu
+
         motor_1:
             custom_attributes:
                 - attribute: "component"
@@ -120,6 +152,30 @@ model:
         
             name: 'inverter production, for electric passenger car'
             amount: data__propulsion__he_power_train__inverter__inverter_1__mass_per_fu
+
+        fuel_system_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: fuel_system_1_production
+        
+            fuel_system:
+              amount: data__propulsion__he_power_train__fuel_system__fuel_system_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.667
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.333
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the fuel
+                # system, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't count the assembly of the fuel
+                # system, resulting in an underestimation.
 
         dc_bus_1:
             custom_attributes:
@@ -137,13 +193,13 @@ model:
             name: 'cable production, three-conductor cable'
             amount: data__propulsion__he_power_train__DC_cable_harness__harness_1__length_per_fu
 
-        dc_splitter_1:
+        dc_bus_2:
             custom_attributes:
                 - attribute: "component"
-                  value: dc_splitter_1_production
-            
+                  value: dc_bus_2_production
+        
             name: 'power distribution unit production, for electric passenger car'
-            amount: data__propulsion__he_power_train__DC_splitter__dc_splitter_1__mass_per_fu
+            amount: data__propulsion__he_power_train__DC_bus__dc_bus_2__mass_per_fu
 
         dc_sspc_1:
             custom_attributes:
@@ -163,29 +219,63 @@ model:
             loc: 'RoW'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass_per_fu
 
-        dc_sspc_2:
-            custom_attributes:
-                - attribute: "component"
-                  value: dc_sspc_2_production
-        
-            name: 'silicon carbide production'
-            loc: 'RoW'
-            amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_2__mass_per_fu
-
-        battery_pack_2:
-            custom_attributes:
-                - attribute: "component"
-                  value: battery_pack_2_production
-        
-            name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
-            loc: 'RoW'
-            amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
-
 
     manufacturing:
         custom_attributes:
             - attribute: "phase"
               value: "manufacturing"
+
+        ice_1:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            lead:
+              amount: data__LCA__manufacturing__he_power_train__ICE__ice_1__lead_per_fu
+              name: 'Lead II'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
         battery_pack_1:
         
@@ -232,31 +322,61 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
-        battery_pack_2:
+        electricity_for_mission_production:
+        
+            name: 'electricity, high voltage, production mix'
+            loc: 'FR'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__manufacturing__he_power_train__electricity__energy_per_fu / 1000
+
+        gasoline_for_mission_production:
+        
+            gasoline:
+                amount: data__LCA__manufacturing__he_power_train__gasoline__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for Gasoline, much less for AvGas so we'll approximate it like that
+                unleaded_petrol:
+                    name: 'market for petrol, unleaded'
+                    loc: RoW
+                    amount: 1
+        
+                lead:
+                    name: 'market for lead'
+                    amount: 0.794 / 1000  # 0.794 g / kg of fuel and then the unit for lead is kg
+
+
+    distribution:
+        custom_attributes:
+            - attribute: "phase"
+              value: "distribution"
+
+        ice_1:
         
             CO2:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
+              amount: data__LCA__distribution__he_power_train__ICE__ice_1__CO2_per_fu
               name: 'carbon dioxide, fossil'  # this is a biosphere process
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             CO:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__CO_per_fu
+              amount: data__LCA__distribution__he_power_train__ICE__ice_1__CO_per_fu
               name: 'carbon monoxide, fossil'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             SOx:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
+              amount: data__LCA__distribution__he_power_train__ICE__ice_1__SOx_per_fu
               name: 'sulfur dioxide'
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
         
             NOx:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
+              amount: data__LCA__distribution__he_power_train__ICE__ice_1__NOx_per_fu
               name: 'nitrogen oxides'
               categories:
                 - 'air'
@@ -264,14 +384,66 @@ model:
         
         #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
         #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
+        #      amount: data__LCA__distribution__he_power_train__ICE__ice_1__H2O_per_fu
         #      name: 'water'
         #      categories:
         #        - 'air'
         #        - 'lower stratosphere + upper troposphere'
         
             PM:
-              amount: data__LCA__manufacturing__he_power_train__battery_pack__battery_pack_2__HC_per_fu
+              amount: data__LCA__distribution__he_power_train__ICE__ice_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            lead:
+              amount: data__LCA__distribution__he_power_train__ICE__ice_1__lead_per_fu
+              name: 'Lead II'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        battery_pack_1:
+        
+            CO2:
+              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__distribution__he_power_train__battery_pack__battery_pack_1__HC_per_fu
               name: 'Particulate Matter, < 2.5 um'
               categories:
                 - 'air'
@@ -283,24 +455,84 @@ model:
             loc: 'FR'
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
-            amount: data__LCA__manufacturing__he_power_train__electricity__energy_per_fu / 1000
+            amount: data__LCA__distribution__he_power_train__electricity__energy_per_fu / 1000
 
-
-    distribution:
-        custom_attributes:
-            - attribute: "phase"
-              value: "distribution"
-
-        transport_via_train:
-            name: 'market group for transport, freight train'
-            loc: 'RER'
-            amount: data__environmental_impact__delivery__cargo_transport_per_fu
+        gasoline_for_mission_production:
+        
+            gasoline:
+                amount: data__LCA__distribution__he_power_train__gasoline__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for Gasoline, much less for AvGas so we'll approximate it like that
+                unleaded_petrol:
+                    name: 'market for petrol, unleaded'
+                    loc: RoW
+                    amount: 1
+        
+                lead:
+                    name: 'market for lead'
+                    amount: 0.794 / 1000  # 0.794 g / kg of fuel and then the unit for lead is kg
 
 
     use:
         custom_attributes:
             - attribute: "phase"
               value: "operation"
+
+        ice_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: ice_1_operation
+        
+            CO2:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__operation__he_power_train__ICE__ice_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            lead:
+              amount: data__LCA__operation__he_power_train__ICE__ice_1__lead_per_fu
+              name: 'Lead II'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
         battery_pack_1:
             custom_attributes:
@@ -350,54 +582,6 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
-        battery_pack_2:
-            custom_attributes:
-                - attribute: "component"
-                  value: battery_pack_2_operation
-        
-            CO2:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__CO2_per_fu
-              name: 'carbon dioxide, fossil'  # this is a biosphere process
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            CO:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__CO_per_fu
-              name: 'carbon monoxide, fossil'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            SOx:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__SOx_per_fu
-              name: 'sulfur dioxide'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-            NOx:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__NOx_per_fu
-              name: 'nitrogen oxides'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-        
-        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
-        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
-        #      amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__H2O_per_fu
-        #      name: 'water'
-        #      categories:
-        #        - 'air'
-        #        - 'lower stratosphere + upper troposphere'
-        
-            PM:
-              amount: data__LCA__operation__he_power_train__battery_pack__battery_pack_2__HC_per_fu
-              name: 'Particulate Matter, < 2.5 um'
-              categories:
-                - 'air'
-                - 'lower stratosphere + upper troposphere'
-
         electricity_for_mission_production:
             custom_attributes:
                 - attribute: "component"
@@ -408,6 +592,25 @@ model:
             # This variable should always exist since we will only add this part to the conf file if
             # there are batteries and if there are batteries the component that computes this value will be added
             amount: data__LCA__operation__he_power_train__electricity__energy_per_fu / 1000
+
+        gasoline_for_mission_production:
+            custom_attributes:
+                - attribute: "component"
+                  value: gasoline_for_mission_operation
+        
+            gasoline:
+                amount: data__LCA__operation__he_power_train__gasoline__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for Gasoline, much less for AvGas so we'll approximate it like that
+                unleaded_petrol:
+                    name: 'market for petrol, unleaded'
+                    loc: RoW
+                    amount: 1
+        
+                lead:
+                    name: 'market for lead'
+                    amount: 0.794 / 1000  # 0.794 g / kg of fuel and then the unit for lead is kg
 
 
 methods:

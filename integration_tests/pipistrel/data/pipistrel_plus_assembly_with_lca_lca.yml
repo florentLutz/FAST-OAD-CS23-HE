@@ -154,6 +154,14 @@ model:
             loc: 'RoW'
             amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_1__mass_per_fu
 
+        dc_dc_converter_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: dc_dc_converter_1_production
+        
+            name: 'inverter production, for electric passenger car' # For lack of a better proxy, i'll use that
+            amount: data__propulsion__he_power_train__DC_DC_converter__dc_dc_converter_1__mass_per_fu
+
         battery_pack_1:
             custom_attributes:
                 - attribute: "component"
@@ -171,6 +179,14 @@ model:
             name: 'silicon carbide production'
             loc: 'RoW'
             amount: data__propulsion__he_power_train__DC_SSPC__dc_sspc_2__mass_per_fu
+
+        dc_dc_converter_2:
+            custom_attributes:
+                - attribute: "component"
+                  value: dc_dc_converter_2_production
+        
+            name: 'inverter production, for electric passenger car' # For lack of a better proxy, i'll use that
+            amount: data__propulsion__he_power_train__DC_DC_converter__dc_dc_converter_2__mass_per_fu
 
         battery_pack_2:
             custom_attributes:

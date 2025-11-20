@@ -169,14 +169,14 @@ model:
                 amount: 1.0
 
               old_cathode_removal:
-                name: 'market for cathode, NMC811, for Li-ion battery'
-                loc: 'CN'
-                amount: -0.4
+                name: 'market for cathode, NMC111, for Li-ion battery'
+                loc: 'RoW'
+                amount: -0.4 * 0.768
 
               new_cathode_addition:
-                name: 'market for anode, graphite, for Li-ion battery'
-                loc: 'CN'
-                amount: 0.4
+                name: 'graphite production'
+                loc: 'RER'
+                amount: 0.4 * 0.768
 
         dc_sspc_2:
             custom_attributes:
@@ -202,14 +202,14 @@ model:
                 amount: 1.0
 
               old_cathode_removal:
-                name: 'market for cathode, NMC811, for Li-ion battery'
-                loc: 'CN'
-                amount: -0.4
+                name: 'market for cathode, NMC111, for Li-ion battery'
+                loc: 'RoW'
+                amount: -0.4 * 0.768
 
               new_cathode_addition:
-                name: 'market for anode, graphite, for Li-ion battery'
-                loc: 'CN'
-                amount: 0.4
+                name: 'graphite production'
+                loc: 'RER'
+                amount: 0.4 * 0.768
 
 
     manufacturing:

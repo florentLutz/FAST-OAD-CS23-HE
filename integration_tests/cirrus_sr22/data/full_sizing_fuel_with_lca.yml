@@ -1,0 +1,78 @@
+title: Sample OAD Process
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+# Input and output files
+input_file: ../results/full_sizing_in_with_lca.xml
+output_file: ../results/full_sizing_out_with_lca.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA', debug_print=["objs"])
+
+model:
+  aircraft_sizing:
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=100, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True)
+    linear_solver: om.LinearBlockGS()
+    geometry:
+      id: fastga.geometry.legacy
+      propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    aerodynamics_lowspeed:
+      id: fastga.aerodynamics.lowspeed.legacy
+      propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+      result_folder_path : ../workdir
+      compute_slipstream : false
+    aerodynamics_highspeed:
+      id: fastga.aerodynamics.highspeed.legacy
+      propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+      result_folder_path: ../workdir
+      compute_mach_interpolation: false
+      compute_slipstream: false
+    power_train_sizing:
+      id: fastga_he.power_train.sizing
+      power_train_file_path: ./fuel_propulsion.yml
+    weight:
+      id: fastga.weight.legacy
+      propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+    performances:
+      id: fastga_he.performances.mission_vector
+      number_of_points_climb: 30
+      number_of_points_cruise: 30
+      number_of_points_descent: 20
+      number_of_points_reserve: 10
+      power_train_file_path: ./fuel_propulsion.yml
+      out_file: ../results/fuel_propulsion.csv
+      use_linesearch: False
+      pre_condition_pt: False
+      use_apply_nonlinear: False
+    mtow:
+      id: fastga.loop.mtow
+    hq:
+      tail_sizing:
+        id: fastga.handling_qualities.tail_sizing
+        propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+      static_margin:
+        id: fastga.handling_qualities.static_margin
+    wing_position:
+      id: fastga.loop.wing_position
+    wing_area:
+      id: fastga.loop.wing_area
+  post_processing:
+    lca:
+      id: fastga_he.lca.legacy
+      power_train_file_path: ./fuel_propulsion.yml
+      component_level_breakdown: true
+      airframe_material: composite
+      delivery_method: flight
+      normalization: true
+      weighting: true
+      aircraft_lifespan_in_hours: true
+
+submodels:
+  submodel.propulsion.constraints.ice.sea_level_power: fastga_he.submodel.propulsion.constraints.ice.sea_level_power.ensure
+  submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
+  service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+  service.weight.mass.system.power_system: null
+  service.geometry.nacelle.dimension: null
+  service.geometry.vertical_tail.distance.fd: null
+  service.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops

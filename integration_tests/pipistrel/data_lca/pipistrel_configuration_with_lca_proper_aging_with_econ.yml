@@ -23,9 +23,9 @@ model:
     normalization: true
     weighting: true
     ecoinvent_version: 3.9.1
-    impact_assessment_method: ReCiPe 2016 v1.03
-    write_lca_conf: false
-    lca_conf_file_path: ./pipistrel_assembly_with_lca_lca.yml
+    impact_assessment_method: EF v3.1
+#    write_lca_conf: false
+#    lca_conf_file_path: ./pipistrel_assembly_with_lca_lca.yml
 
 submodels:
   service.propulsion.battery.mass_per_fu: fastga_he.submodel.propulsion.battery.mass_per_fu.from_hours_flown

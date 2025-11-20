@@ -509,7 +509,12 @@ DC_SPLITTER = {
     IN: [(None, "dc_voltage_in_"), ("dc_current_in_", None)],
     OUT: [(None, "dc_voltage"), ("dc_current_out", None)],
     CTC: "connector",
-    MP: [{"dc_voltage": "V"}, {"power_split": "percent"}],
+    MP: [
+        {"dc_voltage": "V"},
+        {"power_split": "percent"},
+        {"dc_voltage_in_1": "V"},
+        {"dc_voltage_in_2": "V"},
+    ],
     SMP: [
         {"delta_Cd": None},
     ],

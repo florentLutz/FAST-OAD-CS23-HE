@@ -94,12 +94,17 @@ def test_sizing_sr22_op_mission():
     problem.setup()
 
     problem.set_val("data:mission:operational:range", val=200, units="NM")
+    # problem.set_val("data:mission:operational:cruise:v_tas", val=144, units="knot")
 
     # om.n2(problem, show_browser=False, outfile=n2_path)
 
     problem.run_model()
 
     problem.write_outputs()
+
+    assert problem.get_val("data:mission:operational:fuel", units="kg") == pytest.approx(
+        68.35, rel=1e-2
+    )
 
 
 def test_sizing_sr22_electric_original():

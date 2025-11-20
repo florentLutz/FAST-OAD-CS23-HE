@@ -135,10 +135,11 @@
         <thrust_distribution is_input="True">1.0</thrust_distribution>
         <DC_DC_converter>
           <dc_dc_converter_1>
+            <efficiency_mission>0.98</efficiency_mission>
             <current_ripple is_input="True">0.4<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
-            <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
+            <power_density units="W/kg" is_input="True">15000.0<!--Power density of the converter--></power_density>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
-            <voltage_out_target_mission units="V" is_input="True">400.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_out_target_mission units="V" is_input="True">390.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <capacitor>
               <aspect_ratio is_input="True">2.0</aspect_ratio>
@@ -163,10 +164,11 @@
             </CG>
           </dc_dc_converter_1>
           <dc_dc_converter_2>
+            <efficiency_mission>0.98</efficiency_mission>
             <current_ripple is_input="True">0.4<!--Amplitude of the current ripple as a percent of the current caliber--></current_ripple>
-            <power_density units="W/kg" is_input="True">4000.0<!--Power density of the converter--></power_density>
+            <power_density units="W/kg" is_input="True">15000.0<!--Power density of the converter--></power_density>
             <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
-            <voltage_out_target_mission units="V" is_input="True">400.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_out_target_mission units="V" is_input="True">390.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
             <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
             <capacitor>
               <aspect_ratio is_input="True">2.0</aspect_ratio>
