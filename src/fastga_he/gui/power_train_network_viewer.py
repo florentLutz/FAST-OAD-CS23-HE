@@ -19,7 +19,7 @@ from bokeh.models import (
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
 from . import icons
-from .sugiyama_layout import SugiyamaLayout
+from .layout_generation import HierarchicalLayout
 
 BACKGROUND_COLOR_CODE = "#bebebe"
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
@@ -102,19 +102,19 @@ def _get_edge_color(source_icon, target_icon):
     return "gray"
 
 
-def _compute_hierarchical_layout(graph, orientation="TB", node_layer_override=None):
+def _compute_hierarchical_layout(graph, orientation="TB", node_layer_dict=None):
     """
     Compute hierarchical layout using the Sugiyama algorithm.
 
     Args:
         graph: NetworkX DiGraph object
         orientation: Layout orientation ('TB', 'BT', 'LR', 'RL')
-        node_layer_override: Optional dictionary to override layer assignment
+        node_layer_dict: Optional dictionary to override layer assignment
 
     Returns:
         Dictionary of node positions
     """
-    sugiyama = SugiyamaLayout(graph, orientation, node_layer_override)
+    sugiyama = HierarchicalLayout(graph, orientation, node_layer_dict)
     return sugiyama.compute()
 
 
@@ -220,14 +220,14 @@ def _create_network_plot(
         target = connection[1][0] if isinstance(connection[1], list) else connection[1]
         graph.add_edge(source, target)
 
-    # Build node_layer_override from distance_from_energy_storage
-    node_layer_override = {}
+    # Build node_layer_dict from distance_from_energy_storage
+    node_layer_dict = {}
     max_distance = max(distance_from_energy_storage.values())
     for node_name, distance in distance_from_energy_storage.items():
-        node_layer_override[node_name] = max_distance - distance
+        node_layer_dict[node_name] = max_distance - distance
 
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
-    position_dict = _compute_hierarchical_layout(graph, orientation, node_layer_override)
+    position_dict = _compute_hierarchical_layout(graph, orientation, node_layer_dict)
 
     # Normalize positions for Bokeh
     if position_dict:
@@ -249,7 +249,7 @@ def _create_network_plot(
             x_range_max = 600
             y_range_max = 600
             icon_factor = 1
-            icon_width_factor = 1.0
+            icon_width_factor = 0.8
             x_orientation_offset = 125
             y_orientation_offset = 0.0
 

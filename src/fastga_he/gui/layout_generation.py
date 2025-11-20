@@ -3,100 +3,43 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import networkx as nx
-from collections import deque
 
 
-class SugiyamaLayout:
+class HierarchicalLayout:
     """
-    Implements the Sugiyama hierarchical graph layout algorithm.
+    Implements the hierarchical graph layout algorithm.
 
-    The algorithm has four main phases:
-    1. Cycle breaking (ensures DAG property)
-    2. Layer assignment (places nodes into layers)
-    3. Crossing minimization (reduces edge crossings between layers)
-    4. Coordinate assignment (positions nodes within layers)
+    The algorithm has three main phases:
+    1. Layer assignment (places nodes into layers using flow_hierarchy)
+    2. Crossing minimization (reduces edge crossings between layers)
+    3. Coordinate assignment (positions nodes within layers)
     """
 
-    def __init__(self, graph, orientation="TB", node_layer_override=None):
+    def __init__(self, graph, orientation="TB", node_layer_dict=None):
         """
-        Initialize the Sugiyama layout.
+        Initialize the hierarchical layout.
 
         Args:
             graph: NetworkX DiGraph
             orientation: 'TB' (top-bottom), 'BT' (bottom-top),
                         'LR' (left-right), 'RL' (right-left)
-            node_layer_override: Optional dictionary to override layer assignment
+            node_layer_dict: Dictionary mapping nodes to their layer assignment (required)
         """
         self.graph = graph
         self.orientation = orientation
         self.layers = []
         self.node_layer = {}
         self.positions = {}
-        self.node_layer_override = node_layer_override
-
-    def _break_cycles(self):
-        """Remove cycles by reversing edges in a feedback arc set."""
-        if nx.is_directed_acyclic_graph(self.graph):
-            return set()
-
-        reversed_edges = set()
-        G_copy = self.graph.copy()
-
-        while not nx.is_directed_acyclic_graph(G_copy):
-            max_node = None
-            max_diff = float("-inf")
-
-            for node in G_copy.nodes():
-                diff = G_copy.out_degree(node) - G_copy.in_degree(node)
-                if diff > max_diff:
-                    max_diff = diff
-                    max_node = node
-
-            if max_node is None:
-                break
-
-            incoming = list(G_copy.in_edges(max_node))
-            for source, target in incoming:
-                G_copy.remove_edge(source, target)
-                G_copy.add_edge(target, source)
-                reversed_edges.add((source, target))
-
-        return reversed_edges
+        self.node_layer_dict = node_layer_dict
 
     def _assign_layers(self):
-        """Assign each node to a layer using provided override or longest path from roots."""
-        # Use override if provided
-        if self.node_layer_override:
-            # Convert float values to integers for layer assignment
-            self.node_layer = {node: int(layer) for node, layer in self.node_layer_override.items()}
+        """Assign each node to a layer using provided override with flow_hierarchy as fallback."""
+        if self.node_layer_dict:
+            # assign layers based on the distance from energy storage component nodes
+            self.node_layer = {node: int(layer) for node, layer in self.node_layer_dict.items()}
         else:
-            # Fallback to longest path method
-            roots = [node for node in self.graph.nodes() if self.graph.in_degree(node) == 0]
-
-            if not roots:
-                try:
-                    roots = [list(nx.topological_sort(self.graph))[0]]
-                except nx.NetworkXUnfeasible:
-                    # Fallback when graph is not a DAG
-                    roots = [list(self.graph.nodes())[0]]
-
-            self.node_layer = {node: 0 for node in self.graph.nodes()}
-            queue = deque([(node, 0) for node in roots])
-            visited = set()
-
-            while queue:
-                node, layer = queue.popleft()
-
-                if node in visited:
-                    continue
-                visited.add(node)
-
-                self.node_layer[node] = max(self.node_layer.get(node, 0), layer)
-
-                for successor in self.graph.successors(node):
-                    successor_layer = self.node_layer[node] + 1
-                    if successor_layer > self.node_layer.get(successor, 0):
-                        queue.append((successor, successor_layer))
+            # Fallback to flow_hierarchy
+            self.node_layer = nx.algorithms.dag_longest_path_length(self.graph)
 
         max_layer = max(self.node_layer.values()) if self.node_layer else 0
         self.layers = [[] for _ in range(max_layer + 1)]
@@ -108,7 +51,7 @@ class SugiyamaLayout:
 
     def _minimize_crossings(self):
         """Reorder nodes within layers to minimize edge crossings using barycenter heuristic."""
-        _enhanced_minimize_crossings(self.layers, self.graph, self.node_layer, self.positions)
+        _minimize_crossings_iterative(self.layers, self.graph, self.node_layer, self.positions)
 
     def _assign_coordinates(self, layer_spacing=100, node_spacing=100):
         """Assign x, y coordinates to nodes based on orientation."""
@@ -154,7 +97,6 @@ class SugiyamaLayout:
 
     def compute(self, layer_spacing=100, node_spacing=100):
         """Compute the layout by running all phases of the algorithm."""
-        self._break_cycles()
         self._assign_layers()
         self._minimize_crossings()
         self._assign_coordinates(layer_spacing, node_spacing)
@@ -242,7 +184,6 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
         Number of swaps performed
     """
     max_iterations = 10
-    swap_count = 0
 
     for iteration in range(max_iterations):
         crossings = _find_edge_crossings(graph, positions, layers, node_layer)
@@ -288,7 +229,6 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
                             # Keep swap if it reduces crossings
                             if len(new_crossings) < len(crossings):
                                 swaps_this_iteration += 1
-                                swap_count += 1
                                 break
                             else:
                                 # Revert swap
@@ -300,8 +240,6 @@ def _resolve_crossings_by_swapping(graph, positions, layers, node_layer):
 
         if swaps_this_iteration == 0:
             break
-
-    return swap_count
 
 
 def _recalculate_positions_for_layer(
@@ -331,7 +269,7 @@ def _recalculate_positions_for_layer(
             positions[node] = (x, old_y)
 
 
-def _enhanced_minimize_crossings(layers, graph, node_layer, positions):
+def _minimize_crossings_iterative(layers, graph, node_layer, positions):
     """
     Enhanced crossing minimization that combines barycenter heuristic with
     iterative swapping to resolve edge crossings.
@@ -360,6 +298,4 @@ def _enhanced_minimize_crossings(layers, graph, node_layer, positions):
         layers[layer_idx].sort(key=lambda n: barycenters.get(n, float("inf")))
 
     # Second pass: resolve remaining crossings via swapping
-    swap_count = _resolve_crossings_by_swapping(graph, positions, layers, node_layer)
-
-    return swap_count
+    _resolve_crossings_by_swapping(graph, positions, layers, node_layer)
