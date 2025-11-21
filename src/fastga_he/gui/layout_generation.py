@@ -1,6 +1,9 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2025 ISAE-SUPAERO
+
 import numpy as np
-from scipy.sparse import csr_matrix
-from scipy.sparse.linalg import spsolve
+import scipy.sparse as sci_sparse
 
 
 class HierarchicalLayout:
@@ -232,9 +235,9 @@ def _resolve_crossings_with_tutte(
 
     # Solve linear systems
     try:
-        laplacian_sparse = csr_matrix(laplacian_matrix)
-        x_interior = spsolve(laplacian_sparse, b_x)
-        y_interior = spsolve(laplacian_sparse, b_y)
+        laplacian_sparse = sci_sparse.csr_matrix(laplacian_matrix)
+        x_interior = sci_sparse.linalg.spsolve(laplacian_sparse, b_x)
+        y_interior = sci_sparse.linalg.spsolve(laplacian_sparse, b_y)
     except Exception:
         # If solver fails, return empty dict to fall back to traditional layout
         return {}

@@ -8,13 +8,8 @@ import os.path as pth
 from pathlib import Path
 import re
 import networkx as nx
-from bokeh.plotting import figure, output_file, save
-from bokeh.models import (
-    ColumnDataSource,
-    HoverTool,
-    BoxSelectTool,
-    LabelSet,
-)
+import bokeh.plotting as bkplot
+import bokeh.models as bkmodel
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
@@ -25,6 +20,7 @@ BACKGROUND_COLOR_CODE = "#bebebe"  # canvas background color
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"  # color for electricity transmitting connections
 FUEL_FLOW_COLOR_CODE = "#FF5722"  # color for fuel (including hydrogen) transmitting connections
 MECHANICAL_POWER_COLOR_CODE = "#2E7D32"  # color for mechanical power transmitting connections
+DEFAULF_COLOR = "gray"
 
 # Image URLs for graph nodes
 # "icon_file_name" : [file_path, color_as_source, color_as_target]
@@ -135,7 +131,7 @@ def _get_edge_color(source_icon, target_icon):
         return color_as_source
 
     else:
-        return "gray"
+        return DEFAULF_COLOR
 
 
 def power_train_network_viewer(
@@ -319,7 +315,7 @@ def _create_network_plot(
         }
 
     # Create Bokeh plot
-    plot = figure(
+    plot = bkplot.figure(
         width=plot_width,
         height=plot_height,
         x_range=(-50, x_range_max),
@@ -384,7 +380,7 @@ def _create_network_plot(
 
     # Draw edges
     if static_html:
-        edge_source = ColumnDataSource(
+        edge_source = bkmodel.ColumnDataSource(
             data=dict(
                 xs=[[x_start, x_end] for x_start, x_end in zip(edge_start_x, edge_end_x)],
                 ys=[[y_start, y_end] for y_start, y_end in zip(edge_start_y, edge_end_y)],
@@ -403,7 +399,7 @@ def _create_network_plot(
     )
 
     # Draw nodes as images
-    node_source = ColumnDataSource(
+    node_source = bkmodel.ColumnDataSource(
         data=dict(
             x=node_x,
             y=node_y,
@@ -436,7 +432,7 @@ def _create_network_plot(
     )
 
     # Add labels below nodes
-    label_source = ColumnDataSource(
+    label_source = bkmodel.ColumnDataSource(
         data=dict(
             x=node_x,
             y=[y - node_height[i] * 0.7 for i, y in enumerate(node_y)],
@@ -444,7 +440,7 @@ def _create_network_plot(
         )
     )
 
-    labels = LabelSet(
+    labels = bkmodel.LabelSet(
         x="x",
         y="y",
         text="names",
@@ -470,7 +466,7 @@ def _create_network_plot(
         cleaned_node_om_types.append(_string_clean_up(node_om_type))
 
     # Define list info
-    hover_source = ColumnDataSource(
+    hover_source = bkmodel.ColumnDataSource(
         data=dict(
             x=node_x,
             y=node_y,
@@ -494,14 +490,14 @@ def _create_network_plot(
         hover_line_alpha=0.3,
     )
 
-    hover = HoverTool(
+    hover = bkmodel.HoverTool(
         tooltips=[
             ("Name", "@name"),
             ("Type class", "@type_class"),
             ("Component type", "@component_type"),
         ]
     )
-    plot.add_tools(hover, BoxSelectTool())
+    plot.add_tools(hover, bkmodel.BoxSelectTool())
 
     return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
 
@@ -549,7 +545,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         y_position = legend_item_start_y - (i * legend_item_height)
 
         # Create data source for icon
-        icon_source = ColumnDataSource(
+        icon_source = bkmodel.ColumnDataSource(
             data=dict(
                 x=[legend_x_start + 10],
                 y=[y_position],
@@ -569,7 +565,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         )
 
         # Add text label next to the color icon image
-        label_source = ColumnDataSource(
+        label_source = bkmodel.ColumnDataSource(
             data=dict(
                 x=[legend_x_start + 25],
                 y=[y_position],
@@ -577,7 +573,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
             )
         )
 
-        labels = LabelSet(
+        labels = bkmodel.LabelSet(
             x="x",
             y="y",
             text="text",
@@ -642,5 +638,5 @@ def _save_static_html(plot, file_path):
         os.makedirs(directory_to_save_graph)
 
     # Save the plot
-    output_file(file_path)
-    save(plot)
+    bkplot.output_file(file_path)
+    bkplot.save(plot)
