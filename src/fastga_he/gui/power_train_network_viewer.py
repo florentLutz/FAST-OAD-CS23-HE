@@ -144,6 +144,7 @@ def power_train_network_viewer(
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
+    propulsor_based: bool = False,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
@@ -174,6 +175,7 @@ def power_train_network_viewer(
             orientation=orientation,
             legend_position=legend_position,
             static_html=static_html,
+            propulsor_based=propulsor_based,
         )
     )
 
@@ -186,6 +188,7 @@ def _create_network_plot(
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
+    propulsor_based: bool = False,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
@@ -219,6 +222,7 @@ def _create_network_plot(
     node_types = {}
     node_om_types = {}
     node_icons = {}
+    propeller_names = []
 
     # For animation purposes
     node_image_sequences = {}
@@ -228,6 +232,8 @@ def _create_network_plot(
         names, components_type, components_om_type, icons_name, icons_size
     ):
         graph.add_node(component_name)
+        if component_type == "propulsor":
+            propeller_names.append(component_name)
         node_sizes[component_name] = icon_size
         node_types[component_name] = component_type
         node_om_types[component_name] = om_type
@@ -243,8 +249,24 @@ def _create_network_plot(
     # Build node_layer_dict from distance_from_energy_storage
     node_layer_dict = {}
     max_distance = max(distance_from_energy_storage.values())
+
     for node_name, distance in distance_from_energy_storage.items():
-        node_layer_dict[node_name] = max_distance - distance
+        if max_distance > distance:
+            node_layer_dict[node_name] = max_distance - distance
+
+        elif max_distance == distance:
+            if node_name in propeller_names:
+                node_layer_dict[node_name] = max_distance - distance
+
+            else:
+                propulsor_based = True
+                break
+
+    if propulsor_based:
+        distance_from_propulsor = configurator.get_distance_from_propulsor()
+
+        for node_name, distance in distance_from_propulsor.items():
+            node_layer_dict[node_name] = distance
 
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
     position_dict = HierarchicalLayout(graph, orientation, node_layer_dict).compute()
@@ -256,8 +278,8 @@ def _create_network_plot(
         x_min, x_max = min(x_coordinates), max(x_coordinates)
         y_min, y_max = min(y_coordinates), max(y_coordinates)
 
-        x_range = x_max - x_min
-        y_range = y_max - y_min
+        x_range = x_max - x_min if x_max > x_min else 1  # For the case of straight structure
+        y_range = y_max - y_min if y_max > y_min else 1  # For the case of straight structure
 
         # Scale to a reasonable display size with different orientation
         if orientation == "TB" or orientation == "BT":
@@ -316,14 +338,16 @@ def _create_network_plot(
     node_indices = list(graph.nodes())
     node_x = []
     node_y = []
-    node_sizes_list = []
+    node_width = []
+    node_height = []
     node_types_list = []
     node_om_types_list = []
 
     for node in node_indices:
         node_x.append(position_dict[node][0])
         node_y.append(position_dict[node][1])
-        node_sizes_list.append(node_sizes[node] * icon_factor)
+        node_height.append(node_sizes[node] * icon_factor)
+        node_width.append(node_sizes[node] * icon_factor * icon_width_factor)
         node_types_list.append(node_types[node])
         node_om_types_list.append(node_om_types[node])
 
@@ -384,8 +408,8 @@ def _create_network_plot(
             x=node_x,
             y=node_y,
             url=node_image_urls,
-            w=[s * icon_width_factor for s in node_sizes_list],
-            h=[s for s in node_sizes_list],
+            w=node_width,
+            h=node_height,
             name=node_indices,
             type=node_types_list,
         )
@@ -415,7 +439,7 @@ def _create_network_plot(
     label_source = ColumnDataSource(
         data=dict(
             x=node_x,
-            y=[y - node_sizes_list[i] * 0.7 for i, y in enumerate(node_y)],
+            y=[y - node_height[i] * 0.7 for i, y in enumerate(node_y)],
             names=node_indices,
         )
     )
@@ -450,8 +474,8 @@ def _create_network_plot(
         data=dict(
             x=node_x,
             y=node_y,
-            w=[s * icon_width_factor for s in node_sizes_list],
-            h=[s for s in node_sizes_list],
+            w=node_width,
+            h=node_height,
             name=node_indices,
             type_class=cleaned_node_types,
             component_type=cleaned_node_om_types,
@@ -498,6 +522,8 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         legend_y_start = 50
     elif "M" in legend_position:
         legend_y_start = 325
+    else:
+        legend_y_start = 600
 
     if "R" in legend_position:
         legend_x_start = 500
@@ -505,26 +531,8 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         legend_x_start = -50
     elif "C" in legend_position:
         legend_x_start = 225
-
-    # Draw legend background box using quad
-    legend_box_source = ColumnDataSource(
-        data=dict(
-            left=[legend_x_start],
-            right=[legend_x_start + 100],
-            top=[legend_y_start],
-            bottom=[legend_y_start - 100],
-        )
-    )
-    plot.quad(
-        left="left",
-        right="right",
-        top="top",
-        bottom="bottom",
-        source=legend_box_source,
-        fill_color=BACKGROUND_COLOR_CODE,
-        fill_alpha=0.9,
-        line_width=0,
-    )
+    else:
+        legend_x_start = 500
 
     # Legend items
     legend_items = [
@@ -591,7 +599,7 @@ def _string_clean_up(old_string):
         old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
 
     # Replace underscore with space
-    new_string = re.sub(r"[_:/]+", " ", old_string)
+    new_string = old_string.replace("_", " ")
 
     # Add a space after 'DC' if followed immediately by a letter or number
     new_string = re.sub(r"\bDC(?=[A-Za-z0-9])", "DC ", new_string)
@@ -618,8 +626,7 @@ def _get_file_name(file_path):
 
     if match_html:
         filename = match_html.group()
-        filename = re.sub(r"\.yml$", "", filename)
-        filename = re.sub(r"[_:/]+", " ", filename).capitalize()
+        filename = filename.replace("_", " ").replace(".yml", "").capitalize()
 
         return f"{filename} powertrain network"
 
