@@ -142,7 +142,8 @@ def _resolve_crossings_with_tutte(
     graph, layers, orientation="TB", layer_spacing=100, node_spacing=80
 ):
     """
-    Apply Tutte's drawing algorithm to minimize edge crossings in hierarchical layout.
+    Apply Tutte's drawing algorithm :cite:`tutte:1963` to minimize edge crossings
+    in hierarchical layout.
 
     The top layer and bottom layer are fixed as boundary nodes, while interior layers
     are positioned to minimize edge crossings.
