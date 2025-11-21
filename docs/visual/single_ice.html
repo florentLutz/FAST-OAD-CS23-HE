@@ -1,405 +1,61 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        
-            <script>function neighbourhoodHighlight(params) {
-  // console.log("in nieghbourhoodhighlight");
-  allNodes = nodes.get({ returnType: "Object" });
-  // originalNodes = JSON.parse(JSON.stringify(allNodes));
-  // if something is selected:
-  if (params.nodes.length > 0) {
-    highlightActive = true;
-    var i, j;
-    var selectedNode = params.nodes[0];
-    var degrees = 2;
-
-    // mark all nodes as hard to read.
-    for (let nodeId in allNodes) {
-      // nodeColors[nodeId] = allNodes[nodeId].color;
-      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
-      if (allNodes[nodeId].hiddenLabel === undefined) {
-        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
-        allNodes[nodeId].label = undefined;
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bokeh Plot</title>
+    <style>
+      html, body {
+        box-sizing: border-box;
+        display: flow-root;
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
-    }
-    var connectedNodes = network.getConnectedNodes(selectedNode);
-    var allConnectedNodes = [];
-
-    // get the second degree nodes
-    for (i = 1; i < degrees; i++) {
-      for (j = 0; j < connectedNodes.length; j++) {
-        allConnectedNodes = allConnectedNodes.concat(
-          network.getConnectedNodes(connectedNodes[j])
-        );
-      }
-    }
-
-    // all second degree nodes get a different color and their label back
-    for (i = 0; i < allConnectedNodes.length; i++) {
-      // allNodes[allConnectedNodes[i]].color = "pink";
-      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
-      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
-        allNodes[allConnectedNodes[i]].label =
-          allNodes[allConnectedNodes[i]].hiddenLabel;
-        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
-      }
-    }
-
-    // all first degree nodes get their own color and their label back
-    for (i = 0; i < connectedNodes.length; i++) {
-      // allNodes[connectedNodes[i]].color = undefined;
-      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
-      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
-        allNodes[connectedNodes[i]].label =
-          allNodes[connectedNodes[i]].hiddenLabel;
-        allNodes[connectedNodes[i]].hiddenLabel = undefined;
-      }
-    }
-
-    // the main node gets its own color and its label back.
-    // allNodes[selectedNode].color = undefined;
-    allNodes[selectedNode].color = nodeColors[selectedNode];
-    if (allNodes[selectedNode].hiddenLabel !== undefined) {
-      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
-      allNodes[selectedNode].hiddenLabel = undefined;
-    }
-  } else if (highlightActive === true) {
-    // console.log("highlightActive was true");
-    // reset all nodes
-    for (let nodeId in allNodes) {
-      // allNodes[nodeId].color = "purple";
-      allNodes[nodeId].color = nodeColors[nodeId];
-      // delete allNodes[nodeId].color;
-      if (allNodes[nodeId].hiddenLabel !== undefined) {
-        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
-        allNodes[nodeId].hiddenLabel = undefined;
-      }
-    }
-    highlightActive = false;
-  }
-
-  // transform the object into an array
-  var updateArray = [];
-  if (params.nodes.length > 0) {
-    for (let nodeId in allNodes) {
-      if (allNodes.hasOwnProperty(nodeId)) {
-        // console.log(allNodes[nodeId]);
-        updateArray.push(allNodes[nodeId]);
-      }
-    }
-    nodes.update(updateArray);
-  } else {
-    // console.log("Nothing was selected");
-    for (let nodeId in allNodes) {
-      if (allNodes.hasOwnProperty(nodeId)) {
-        // console.log(allNodes[nodeId]);
-        // allNodes[nodeId].color = {};
-        updateArray.push(allNodes[nodeId]);
-      }
-    }
-    nodes.update(updateArray);
-  }
-}
-
-function filterHighlight(params) {
-  allNodes = nodes.get({ returnType: "Object" });
-  // if something is selected:
-  if (params.nodes.length > 0) {
-    filterActive = true;
-    let selectedNodes = params.nodes;
-
-    // hiding all nodes and saving the label
-    for (let nodeId in allNodes) {
-      allNodes[nodeId].hidden = true;
-      if (allNodes[nodeId].savedLabel === undefined) {
-        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
-        allNodes[nodeId].label = undefined;
-      }
-    }
-
-    for (let i=0; i < selectedNodes.length; i++) {
-      allNodes[selectedNodes[i]].hidden = false;
-      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
-        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
-        allNodes[selectedNodes[i]].savedLabel = undefined;
-      }
-    }
-
-  } else if (filterActive === true) {
-    // reset all nodes
-    for (let nodeId in allNodes) {
-      allNodes[nodeId].hidden = false;
-      if (allNodes[nodeId].savedLabel !== undefined) {
-        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
-        allNodes[nodeId].savedLabel = undefined;
-      }
-    }
-    filterActive = false;
-  }
-
-  // transform the object into an array
-  var updateArray = [];
-  if (params.nodes.length > 0) {
-    for (let nodeId in allNodes) {
-      if (allNodes.hasOwnProperty(nodeId)) {
-        updateArray.push(allNodes[nodeId]);
-      }
-    }
-    nodes.update(updateArray);
-  } else {
-    for (let nodeId in allNodes) {
-      if (allNodes.hasOwnProperty(nodeId)) {
-        updateArray.push(allNodes[nodeId]);
-      }
-    }
-    nodes.update(updateArray);
-  }
-}
-
-function selectNode(nodes) {
-  network.selectNodes(nodes);
-  neighbourhoodHighlight({ nodes: nodes });
-  return nodes;
-}
-
-function selectNodes(nodes) {
-  network.selectNodes(nodes);
-  filterHighlight({nodes: nodes});
-  return nodes;
-}
-
-function highlightFilter(filter) {
-  let selectedNodes = []
-  let selectedProp = filter['property']
-  if (filter['item'] === 'node') {
-    let allNodes = nodes.get({ returnType: "Object" });
-    for (let nodeId in allNodes) {
-      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
-        selectedNodes.push(nodeId)
-      }
-    }
-  }
-  else if (filter['item'] === 'edge'){
-    let allEdges = edges.get({returnType: 'object'});
-    // check if the selected property exists for selected edge and select the nodes connected to the edge
-    for (let edge in allEdges) {
-      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
-        selectedNodes.push(allEdges[edge]['from'])
-        selectedNodes.push(allEdges[edge]['to'])
-      }
-    }
-  }
-  selectNodes(selectedNodes)
-}</script>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            
-            
-            
-            
-            
-            
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.0-rc.4/css/tom-select.min.css" integrity="sha512-43fHB3GLgZfz8QXl1RPQ8O66oIgv3po9cJ5erMt1c4QISq9dYb195T3vr5ImnJPXuVroKcGBPXBFKETW8jrPNQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.0-rc.4/js/tom-select.complete.js" integrity="sha512-jeF9CfnvzDiw9G9xiksVjxR2lib44Gnovvkv+3CgCG6NXCD4gqlA5nDAVW5WjpA+i+/zKsUWV5xNEbW1X/HH0Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            
-
-        
-<center>
-<h1></h1>
-</center>
-
-<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
-<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
-          crossorigin="anonymous"
-        />
-        <script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
-          crossorigin="anonymous"
-        ></script>
-
-
-        <center>
-          <h1></h1>
-        </center>
-        <style type="text/css">
-
-             #mynetwork {
-                 width: 100%;
-                 height: 600px;
-                 background-color: #bebebe;
-                 border: 1px solid lightgray;
-                 position: relative;
-                 float: left;
-             }
-
-             
-
-             
-
-             
-        </style>
-    </head>
-
-
-    <body>
-        <div class="card" style="width: 100%">
-            
-                <div id="select-menu" class="card-header">
-                    <div class="row no-gutters">
-                        <div class="col-10 pb-2">
-                            <select
-                            class="form-select"
-                            aria-label="Default select example"
-                            onchange="selectNode([value]);"
-                            id="select-node"
-                            placeholder="Select node..."
-                            >
-                                <option selected>Select a Node by ID</option>
-                                
-                                    <option value="propeller_1">propeller_1</option>
-                                
-                                    <option value="ice_1">ice_1</option>
-                                
-                                    <option value="fuel_system_1">fuel_system_1</option>
-                                
-                                    <option value="fuel_tank_1">fuel_tank_1</option>
-                                
-                                    <option value="fuel_tank_2">fuel_tank_2</option>
-                                
-                            </select>
-                        </div>
-                        <div class="col-2 pb-2">
-                            <button type="button" class="btn btn-primary btn-block" onclick="neighbourhoodHighlight({nodes: []});">Reset Selection</button>
-                        </div>
-                    </div>
-                </div>
-            
-            
-            <div id="mynetwork" class="card-body"></div>
-        </div>
-
-        
-        
-
-        <script type="text/javascript">
-
-              // initialize global variables.
-              var edges;
-              var nodes;
-              var allNodes;
-              var allEdges;
-              var nodeColors;
-              var originalNodes;
-              var network;
-              var container;
-              var options, data;
-              var filter = {
-                  item : '',
-                  property : '',
-                  value : []
-              };
-
-              
-                  new TomSelect("#select-node",{
-                      create: false,
-                      sortField: {
-                          field: "text",
-                          direction: "asc"
-                      }
-                  });
-              
-
-              
-
-              // This method is responsible for drawing the graph, returns the drawn network
-              function drawGraph() {
-                  var container = document.getElementById('mynetwork');
-
-                  
-
-                  // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#97c2fc", "font": {"color": "white"}, "id": "propeller_1", "image": "file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\propeller.png", "label": "propeller_1", "level": 0, "shape": "image", "size": 10, "value": 30}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "ice_1", "image": "file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\ice.png", "label": "ice_1", "level": 1, "shape": "image", "size": 10, "value": 40}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "fuel_system_1", "image": "file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel_system.png", "label": "fuel_system_1", "level": 2, "shape": "image", "size": 10, "value": 30}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "fuel_tank_1", "image": "file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel_tank.png", "label": "fuel_tank_1", "level": 3, "shape": "image", "size": 10, "value": 30}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "fuel_tank_2", "image": "file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel_tank.png", "label": "fuel_tank_2", "level": 3, "shape": "image", "size": 10, "value": 30}]);
-                  edges = new vis.DataSet([{"from": "propeller_1", "to": "ice_1", "width": 1}, {"from": "ice_1", "to": "fuel_system_1", "width": 1}, {"from": "fuel_system_1", "to": "fuel_tank_1", "width": 1}, {"from": "fuel_system_1", "to": "fuel_tank_2", "width": 1}]);
-
-                  nodeColors = {};
-                  allNodes = nodes.get({ returnType: "Object" });
-                  for (nodeId in allNodes) {
-                    nodeColors[nodeId] = allNodes[nodeId].color;
-                  }
-                  allEdges = edges.get({ returnType: "Object" });
-                  // adding nodes and edges to the graph
-                  data = {nodes: nodes, edges: edges};
-
-                  var options = {
-    "configure": {
-        "enabled": false
-    },
-    "edges": {
-        "color": {
-            "inherit": true
-        },
-        "smooth": {
-            "enabled": true,
-            "type": "dynamic"
-        }
-    },
-    "interaction": {
-        "dragNodes": true,
-        "hideEdgesOnDrag": false,
-        "hideNodesOnDrag": false
-    },
-    "layout": {
-        "hierarchical": {
-            "blockShifting": true,
-            "edgeMinimization": true,
-            "enabled": true,
-            "levelSeparation": 150,
-            "parentCentralization": true,
-            "sortMethod": "hubsize",
-            "treeSpacing": 200
-        },
-        "improvedLayout": true,
-        "randomSeed": 0
-    },
-    "physics": {
-        "enabled": true,
-        "stabilization": {
-            "enabled": true,
-            "fit": true,
-            "iterations": 1000,
-            "onlyDynamicEdges": false,
-            "updateInterval": 50
-        }
-    }
-};
-
-                  
-
-
-                  
-
-                  network = new vis.Network(container, data, options);
-
-                  
-
-                  
-                    network.on("selectNode", neighbourhoodHighlight);
-                  
-
-                  
-
-
-                  
-
-                  return network;
-
+    </style>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-3.8.0.min.js"></script>
+<script type="text/javascript">
+Bokeh.set_log_level("info");
+</script>
+  </head>
+  <body>
+    <div id="cb5f315f-aec8-4acc-b7bb-71762d80a764" data-root-id="p1006" style="display: contents;"></div>
+  
+    <script type="application/json" id="e1845145-bd23-4c14-9d25-17ee56cc1c04">
+      {"74967de4-b7ce-4aa1-a5f3-a999c86e78c7":{"version":"3.8.0","title":"Bokeh Application","config":{"type":"object","name":"DocumentConfig","id":"p1164","attributes":{"notifications":{"type":"object","name":"Notifications","id":"p1165"}}},"roots":[{"type":"object","name":"Figure","id":"p1006","attributes":{"width":1200,"height":900,"x_range":{"type":"object","name":"Range1d","id":"p1016","attributes":{"start":-50,"end":600}},"y_range":{"type":"object","name":"Range1d","id":"p1017","attributes":{"start":-50,"end":600}},"x_scale":{"type":"object","name":"LinearScale","id":"p1018"},"y_scale":{"type":"object","name":"LinearScale","id":"p1019"},"title":{"type":"object","name":"Title","id":"p1009","attributes":{"text":"Fuel propulsion powertrain network"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1052","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1043","attributes":{"selected":{"type":"object","name":"Selection","id":"p1044","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1045"},"data":{"type":"map","entries":[["xs",[[262.5,262.5],[262.5,262.5],[262.5,125.0],[262.5,400.0]]],["ys",[[550.0,366.66666666666663],[366.66666666666663,183.33333333333331],[183.33333333333331,0.0],[183.33333333333331,0.0]]],["line_color",["#2E7D32","#FF5722","#FF5722","#FF5722"]],["line_alpha",[0.7,0.7,0.7,0.7]]]}}},"view":{"type":"object","name":"CDSView","id":"p1053","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1054"}}},"glyph":{"type":"object","name":"MultiLine","id":"p1049","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"field","field":"line_color"},"line_alpha":{"type":"field","field":"line_alpha"},"line_width":{"type":"value","value":3}}},"nonselection_glyph":{"type":"object","name":"MultiLine","id":"p1050","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"field","field":"line_color"},"line_alpha":{"type":"value","value":0.1},"line_width":{"type":"value","value":3}}},"muted_glyph":{"type":"object","name":"MultiLine","id":"p1051","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"field","field":"line_color"},"line_alpha":{"type":"value","value":0.2},"line_width":{"type":"value","value":3}}}}},{"type":"object","name":"GlyphRenderer","id":"p1064","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1055","attributes":{"selected":{"type":"object","name":"Selection","id":"p1056","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1057"},"data":{"type":"map","entries":[["x",[262.5,262.5,262.5,125.0,400.0]],["y",[550.0,366.66666666666663,183.33333333333331,0.0,0.0]],["url",["file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\propeller.png","file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\ice.png","file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel_system.png","file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel_tank.png","file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel_tank.png"]],["w",[12.0,13.600000000000001,12.0,12.0,12.0]],["h",[15,17,15,15,15]],["name",["propeller_1","ice_1","fuel_system_1","fuel_tank_1","fuel_tank_2"]],["type",["propulsor",["source","propulsive_load"],"connector","tank","tank"]]]}}},"view":{"type":"object","name":"CDSView","id":"p1065","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1066"}}},"glyph":{"type":"object","name":"Scatter","id":"p1061","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":45},"line_color":{"type":"value","value":"#bebebe"},"line_alpha":{"type":"value","value":0},"fill_color":{"type":"value","value":"#bebebe"},"hatch_color":{"type":"value","value":"#bebebe"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1062","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":45},"line_color":{"type":"value","value":"#bebebe"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"#bebebe"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"#bebebe"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1063","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":45},"line_color":{"type":"value","value":"#bebebe"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"#bebebe"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"#bebebe"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p1073","attributes":{"data_source":{"id":"p1055"},"view":{"type":"object","name":"CDSView","id":"p1074","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1075"}}},"glyph":{"type":"object","name":"ImageURL","id":"p1070","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"field","field":"w"},"h":{"type":"field","field":"h"},"anchor":"center"}},"nonselection_glyph":{"type":"object","name":"ImageURL","id":"p1071","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"field","field":"w"},"h":{"type":"field","field":"h"},"global_alpha":{"type":"value","value":0.1},"anchor":"center"}},"muted_glyph":{"type":"object","name":"ImageURL","id":"p1072","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"field","field":"w"},"h":{"type":"field","field":"h"},"global_alpha":{"type":"value","value":0.2},"anchor":"center"}}}},{"type":"object","name":"GlyphRenderer","id":"p1092","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1083","attributes":{"selected":{"type":"object","name":"Selection","id":"p1084","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1085"},"data":{"type":"map","entries":[["x",[510]],["y",[575]],["url",["file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\fuel.png"]]]}}},"view":{"type":"object","name":"CDSView","id":"p1093","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1094"}}},"glyph":{"type":"object","name":"ImageURL","id":"p1089","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"anchor":"center"}},"nonselection_glyph":{"type":"object","name":"ImageURL","id":"p1090","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"global_alpha":{"type":"value","value":0.1},"anchor":"center"}},"muted_glyph":{"type":"object","name":"ImageURL","id":"p1091","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"global_alpha":{"type":"value","value":0.2},"anchor":"center"}}}},{"type":"object","name":"GlyphRenderer","id":"p1111","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1102","attributes":{"selected":{"type":"object","name":"Selection","id":"p1103","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1104"},"data":{"type":"map","entries":[["x",[510]],["y",[553]],["url",["file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\mechanical.png"]]]}}},"view":{"type":"object","name":"CDSView","id":"p1112","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1113"}}},"glyph":{"type":"object","name":"ImageURL","id":"p1108","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"anchor":"center"}},"nonselection_glyph":{"type":"object","name":"ImageURL","id":"p1109","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"global_alpha":{"type":"value","value":0.1},"anchor":"center"}},"muted_glyph":{"type":"object","name":"ImageURL","id":"p1110","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"global_alpha":{"type":"value","value":0.2},"anchor":"center"}}}},{"type":"object","name":"GlyphRenderer","id":"p1130","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1121","attributes":{"selected":{"type":"object","name":"Selection","id":"p1122","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1123"},"data":{"type":"map","entries":[["x",[510]],["y",[531]],["url",["file://C:\\Users\\c.liu\\Documents\\GitHub\\FAST-OAD-CS23-HE\\src\\fastga_he\\gui\\icons\\electricity.png"]]]}}},"view":{"type":"object","name":"CDSView","id":"p1131","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1132"}}},"glyph":{"type":"object","name":"ImageURL","id":"p1127","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"anchor":"center"}},"nonselection_glyph":{"type":"object","name":"ImageURL","id":"p1128","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"global_alpha":{"type":"value","value":0.1},"anchor":"center"}},"muted_glyph":{"type":"object","name":"ImageURL","id":"p1129","attributes":{"url":{"type":"field","field":"url"},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"w":{"type":"value","value":12},"h":{"type":"value","value":12},"global_alpha":{"type":"value","value":0.2},"anchor":"center"}}}},{"type":"object","name":"GlyphRenderer","id":"p1150","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1140","attributes":{"selected":{"type":"object","name":"Selection","id":"p1141","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1142"},"data":{"type":"map","entries":[["x",[262.5,262.5,262.5,125.0,400.0]],["y",[550.0,366.66666666666663,183.33333333333331,0.0,0.0]],["w",[12.0,13.600000000000001,12.0,12.0,12.0]],["h",[15,17,15,15,15]],["name",["propeller_1","ice_1","fuel_system_1","fuel_tank_1","fuel_tank_2"]],["type_class",["Propulsor","Source, Propulsive load","Connector","Tank","Tank"]],["component_type",["Propeller","ICE","Fuel System","Fuel Tank","Fuel Tank"]]]}}},"view":{"type":"object","name":"CDSView","id":"p1151","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1152"}}},"glyph":{"type":"object","name":"Scatter","id":"p1146","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":60},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0},"fill_color":{"type":"value","value":"#1f77b4"},"fill_alpha":{"type":"value","value":0}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1147","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":60},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"#1f77b4"},"fill_alpha":{"type":"value","value":0.1},"hatch_alpha":{"type":"value","value":0.1}}},"hover_glyph":{"type":"object","name":"Scatter","id":"p1148","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":60},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.3},"fill_color":{"type":"value","value":"#1f77b4"},"fill_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1149","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":60},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"#1f77b4"},"fill_alpha":{"type":"value","value":0.2},"hatch_alpha":{"type":"value","value":0.2}}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1015","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1030"},{"type":"object","name":"WheelZoomTool","id":"p1031","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p1032","attributes":{"dimensions":"both","overlay":{"type":"object","name":"BoxAnnotation","id":"p1033","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p1039","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p1038","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p1040"},{"type":"object","name":"ResetTool","id":"p1041"},{"type":"object","name":"HelpTool","id":"p1042"},{"type":"object","name":"HoverTool","id":"p1153","attributes":{"renderers":"auto","tooltips":[["Name","@name"],["Type class","@type_class"],["Component type","@component_type"]],"sort_by":null}},{"type":"object","name":"BoxSelectTool","id":"p1154","attributes":{"renderers":"auto","overlay":{"type":"object","name":"BoxAnnotation","id":"p1155","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"editable":true,"handles":{"type":"object","name":"BoxInteractionHandles","id":"p1161","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p1160","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}}]}},"toolbar_location":"above","left":[{"type":"object","name":"LinearAxis","id":"p1025","attributes":{"visible":false,"ticker":{"type":"object","name":"BasicTicker","id":"p1026","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1027"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p1028"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1020","attributes":{"visible":false,"ticker":{"type":"object","name":"BasicTicker","id":"p1021","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1022"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p1023"}}}],"center":[{"type":"object","name":"Grid","id":"p1024","attributes":{"visible":false,"axis":{"id":"p1020"}}},{"type":"object","name":"Grid","id":"p1029","attributes":{"visible":false,"dimension":1,"axis":{"id":"p1025"}}},{"type":"object","name":"LabelSet","id":"p1079","attributes":{"source":{"type":"object","name":"ColumnDataSource","id":"p1076","attributes":{"selected":{"type":"object","name":"Selection","id":"p1077","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1078"},"data":{"type":"map","entries":[["x",[262.5,262.5,262.5,125.0,400.0]],["y",[539.5,354.76666666666665,172.83333333333331,-10.5,-10.5]],["names",["propeller_1","ice_1","fuel_system_1","fuel_tank_1","fuel_tank_2"]]]}}},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"text":{"type":"field","field":"names"},"text_color":{"type":"value","value":"white"},"text_font_size":{"type":"value","value":"8pt"},"text_align":{"type":"value","value":"center"},"text_baseline":{"type":"value","value":"top"}}},{"type":"object","name":"LabelSet","id":"p1098","attributes":{"source":{"type":"object","name":"ColumnDataSource","id":"p1095","attributes":{"selected":{"type":"object","name":"Selection","id":"p1096","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1097"},"data":{"type":"map","entries":[["x",[525]],["y",[575]],["text",["Fuel Flow"]]]}}},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"text":{"type":"field","field":"text"},"text_color":{"type":"value","value":"white"},"text_font_size":{"type":"value","value":"10pt"},"text_baseline":{"type":"value","value":"middle"}}},{"type":"object","name":"LabelSet","id":"p1117","attributes":{"source":{"type":"object","name":"ColumnDataSource","id":"p1114","attributes":{"selected":{"type":"object","name":"Selection","id":"p1115","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1116"},"data":{"type":"map","entries":[["x",[525]],["y",[553]],["text",["Mechanical Power"]]]}}},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"text":{"type":"field","field":"text"},"text_color":{"type":"value","value":"white"},"text_font_size":{"type":"value","value":"10pt"},"text_baseline":{"type":"value","value":"middle"}}},{"type":"object","name":"LabelSet","id":"p1136","attributes":{"source":{"type":"object","name":"ColumnDataSource","id":"p1133","attributes":{"selected":{"type":"object","name":"Selection","id":"p1134","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1135"},"data":{"type":"map","entries":[["x",[525]],["y",[531]],["text",["Electrical Current"]]]}}},"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"text":{"type":"field","field":"text"},"text_color":{"type":"value","value":"white"},"text_font_size":{"type":"value","value":"10pt"},"text_baseline":{"type":"value","value":"middle"}}}],"background_fill_color":"#bebebe"}}]}}
+    </script>
+    <script type="text/javascript">
+      (function() {
+        const fn = function() {
+          Bokeh.safely(function() {
+            (function(root) {
+              function embed_document(root) {
+              const docs_json = document.getElementById('e1845145-bd23-4c14-9d25-17ee56cc1c04').textContent;
+              const render_items = [{"docid":"74967de4-b7ce-4aa1-a5f3-a999c86e78c7","roots":{"p1006":"cb5f315f-aec8-4acc-b7bb-71762d80a764"},"root_ids":["p1006"]}];
+              root.Bokeh.embed.embed_items(docs_json, render_items);
               }
-              drawGraph();
-        </script>
-    </body>
+              if (root.Bokeh !== undefined) {
+                embed_document(root);
+              } else {
+                let attempts = 0;
+                const timer = setInterval(function(root) {
+                  if (root.Bokeh !== undefined) {
+                    clearInterval(timer);
+                    embed_document(root);
+                  } else {
+                    attempts++;
+                    if (attempts > 100) {
+                      clearInterval(timer);
+                      console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                    }
+                  }
+                }, 10, root)
+              }
+            })(window);
+          });
+        };
+        if (document.readyState != "loading") fn();
+        else document.addEventListener("DOMContentLoaded", fn);
+      })();
+    </script>
+  </body>
 </html>

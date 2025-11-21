@@ -7,6 +7,12 @@ The ``power_train_network_viewer`` function generates a visual representation of
 file. The example below demonstrates how to import and use this function with the single ICE architecture from the
 :ref:`PT file templates <templates>`.
 
+.. toctree::
+   :maxdepth: 1
+
+    Function attributes <attributes>
+    Sorting Mechanism <sort_mechanism>
+
 
 .. code:: python
 
@@ -22,5 +28,5 @@ The generated network should look like this:
 
 .. raw:: html
 
-   <a href="../../../../visual/single_ice.html" target="_blank">Single ICE architecture visualization</a><br>
+   <a href="../../../../../visual/single_ice.html" target="_blank">Single ICE architecture visualization</a><br>
 
