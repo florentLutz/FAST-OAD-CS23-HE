@@ -46,11 +46,7 @@ class HierarchicalLayout:
         return self.layers
 
     def _minimize_crossings(self):
-        """Minimize edge crossings using barycenter heuristic followed by Tutte's algorithm."""
-        # First apply barycenter heuristic
-        _minimize_crossings_iterative_barycenter(self.layers, self.graph, self.node_layer)
-
-        # Then apply Tutte's algorithm to refine positions
+        """Minimize edge crossings using Tutte's algorithm."""
         self.positions = _resolve_crossings_with_tutte(self.graph, self.layers, self.orientation)
 
     def _assign_coordinates(self, layer_spacing=100, node_spacing=100):
@@ -111,36 +107,6 @@ class HierarchicalLayout:
         return self.positions
 
 
-def _minimize_crossings_iterative_barycenter(layers, graph, node_layer):
-    """
-    Apply barycenter heuristic to sort nodes within layers.
-
-    Args:
-        layers: List of nodes per layer
-        graph: NetworkX DiGraph
-        node_layer: Dictionary mapping nodes to their layer
-    """
-    for layer_idx in range(1, len(layers)):
-        barycenters = {}
-
-        for node in layers[layer_idx]:
-            predecessors = [
-                predecessor
-                for predecessor in graph.predecessors(node)
-                if node_layer.get(predecessor, -1) == layer_idx - 1
-            ]
-
-            if predecessors:
-                predecessor_positions = [
-                    layers[layer_idx - 1].index(predecessor) for predecessor in predecessors
-                ]
-                barycenters[node] = sum(predecessor_positions) / len(predecessor_positions)
-            else:
-                barycenters[node] = float("inf")
-
-        layers[layer_idx].sort(key=lambda node: barycenters.get(node, float("inf")))
-
-
 def _resolve_crossings_with_tutte(
     graph, layers, orientation="TB", layer_spacing=100, node_spacing=80
 ):
@@ -183,7 +149,7 @@ def _resolve_crossings_with_tutte(
     # Assign boundary coordinates based on layer positions
     boundary_coords = {}
 
-    # First (Propulsor) layer (top/left boundary)
+    # First layer (top/left boundary) setup
     top_nodes = layers[0]
     num_top = len(top_nodes)
     for i, node in enumerate(top_nodes):
@@ -195,7 +161,7 @@ def _resolve_crossings_with_tutte(
             y = -(num_top - 1) * node_spacing / 2 + i * node_spacing
         boundary_coords[node] = (x, y)
 
-    # Last (Energy storage) layer (bottom/right boundary)
+    # Last layer (bottom/right boundary) setup
     bottom_nodes = layers[-1]
     num_bottom = len(bottom_nodes)
     for i, node in enumerate(bottom_nodes):
@@ -208,6 +174,7 @@ def _resolve_crossings_with_tutte(
         boundary_coords[node] = (x, y)
 
     # Build Laplacian matrix for interior nodes
+    # Laplacian matrix is the A matrix of the AX = b_x , AY = b_y linear system of equations
     laplacian_matrix = np.zeros((num_interior_nodes, num_interior_nodes))
     b_x = np.zeros(num_interior_nodes)
     b_y = np.zeros(num_interior_nodes)
@@ -219,16 +186,17 @@ def _resolve_crossings_with_tutte(
 
         if degree == 0:
             continue
-        # Fill up the diagonal with the amount of connected neighbor nodes
+        # Fill up the diagonal with the amount of edges
         laplacian_matrix[i, i] = degree
 
         for neighbor in neighbors:
+            # For the connected neighbor node
             if neighbor in interior_idx:
-                # Connected neighbor node contribution
                 j = interior_idx[neighbor]
                 laplacian_matrix[i, j] -= 1
+
             else:
-                # Boundary node contribution
+                # Boundary node contribution (directly assign value as the coordinate is fixed)
                 bx, by = boundary_coords[neighbor]
                 b_x[i] += bx
                 b_y[i] += by
