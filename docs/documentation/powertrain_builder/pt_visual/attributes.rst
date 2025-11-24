@@ -3,21 +3,57 @@
 =========================================
 PT file visualization function attributes
 =========================================
+Other than the key settings—the PT config file path and where you want to save the HTML—you can tweak several other
+options to adjust how the final plot looks.
 
-**********************
-System position option
-**********************
-The hydrogen fuel system is typically placed inside the fuselage, with the power source and storage tank in separate
-positions. However, components could also be installed together or integrated along the wing. To support these
-configurations, the ``compact`` and ``wing_related`` options are also introduced.
+Sorting reference layer option
+==============================
+This attribute sets the :ref:`reference level <ref-level-sort>` used by the sorting mechanism. The default approach is
+the `from-storage approach`, which helps minimise connection crossings. To configure the sorting process to
+from-propulsor approach, use:
 
-Compact option
-**************
-The compact configuration option sets the hydrogen fuel system length as the wing MAC, ensuring accurate weight
-estimation when the power source and tank are installed at the same position.
+.. code:: python
 
-Wing-related option
-*******************
-The wing-related configuration option adjusts the center of gravity and system length when the pipe network extends into
-the wing to connect the power source or storage tank.
+    power_train_network_viewer(pt_file_path, network_file_path, from_propulsor=True)
+
+Plot orientation option
+=======================
+This attribute specifies the orientation of the main powertrain architecture. The four valid options are
+``"TB"`` (Top–Bottom), ``"BT"`` (Bottom–Top), ``"LR"`` (Left–Right), and ``"RL"`` (Right–Left). To configure the
+orientation, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, orientation="TB")
+
+
+Legend position option
+======================
+This attribute specifies the orientation of the main powertrain architecture. The four valid options are
+``"TB"`` (Top–Bottom), ``"BT"`` (Bottom–Top), ``"LR"`` (Left–Right), and ``"RL"`` (Right–Left). To configure the
+position, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, legend_position="TR")
+
+Plot size scaling option
+========================
+This attribute specifies the size factor of the main powertrain architecture from the default settings. Only positive
+value is valid. To configure this factor, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, plot_scaling=1.2)
+
+Legend size scaling option
+==========================
+This attribute specifies the size factor of the connection color legend from the default settings. Only positive
+value is valid. To configure this factor, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, legend_scaling=1.2)
+
+
 

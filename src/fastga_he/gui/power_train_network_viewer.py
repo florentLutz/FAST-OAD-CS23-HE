@@ -172,8 +172,8 @@ def power_train_network_viewer(
             legend_position=legend_position,
             static_html=static_html,
             from_propulsor=from_propulsor,
-            plot_scaling=plot_scaling,
-            legend_scaling=legend_scaling,
+            plot_scaling=abs(plot_scaling),
+            legend_scaling=abs(legend_scaling),
         )
     )
 
@@ -283,6 +283,9 @@ def _create_network_plot(
 
         x_range = x_max - x_min if x_max > x_min else 1  # For the case of straight structure
         y_range = y_max - y_min if y_max > y_min else 1  # For the case of straight structure
+
+        if orientation != "TB" or orientation != "BT" or orientation != "LR" or orientation != "RL":
+            orientation = "TB"
 
         # Scale to a reasonable display size with different orientation
         if orientation == "TB" or orientation == "BT":

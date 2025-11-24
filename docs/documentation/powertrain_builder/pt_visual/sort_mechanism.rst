@@ -20,6 +20,8 @@ solution for drawing 3-connected planar graphs. The following garphe is an examp
 This method has since been widely applied in computing embeddings of complex planar polygons when the boundary nodes are
 appropriately selected.
 
+.. _ref-level-sort:
+
 Reference level
 ===============
 The reference level definition is one of the two preparation steps before the actual sorting. Two approaches are
