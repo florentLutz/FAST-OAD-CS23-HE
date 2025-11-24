@@ -22,8 +22,7 @@ class HierarchicalLayout:
 
         Args:
             graph: NetworkX DiGraph
-            orientation: 'TB' (top-bottom), 'BT' (bottom-top),
-                        'LR' (left-right), 'RL' (right-left)
+            orientation: 'TB' (top-bottom), 'BT' (bottom-top), 'LR' (left-right), 'RL' (right-left)
             node_layer_dict: Dictionary mapping nodes to their layer assignment (required)
         """
         self.graph = graph
@@ -108,7 +107,7 @@ class HierarchicalLayout:
 
 
 def _resolve_crossings_with_tutte(
-    graph, layers, orientation="TB", layer_spacing=100, node_spacing=80
+    graph, layers, orientation="TB", layer_spacing=100, node_spacing=100
 ):
     """
     Apply Tutte's drawing algorithm :cite:`tutte:1963` to minimize edge crossings

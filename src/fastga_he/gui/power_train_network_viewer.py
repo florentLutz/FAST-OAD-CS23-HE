@@ -140,7 +140,9 @@ def power_train_network_viewer(
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
-    propulsor_based: bool = False,
+    from_propulsor: bool = False,
+    plot_scaling: float = 1.0,
+    legend_scaling: float = 1.0,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
@@ -148,11 +150,6 @@ def power_train_network_viewer(
     Args:
         power_train_file_path: Path to the power train configuration file
         network_file_path: Path where the HTML output will be saved
-        layout_prog: Layout algorithm ('hierarchical', 'spring', 'circular', 'kamada_kawai')
-        'hierarchical' - Sugiyama layered hierarchical layout
-        'spring' - Spring model layout
-        'circular' - Circular layout
-        'kamada_kawai' - Kamada-Kawai layout
         legend_position: String defines the legend box position
         (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
         * * T * *
@@ -163,6 +160,9 @@ def power_train_network_viewer(
         orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
         (T: top, B: button, L: left, R: right)
         static_html: True if using static html
+        from_propulsor: Set all propulsor component into reference layer of the hierarchy
+        plot_scaling: Scaling factor for the main powertrain architecture
+        legend_scaling: Scaling factor for the legend size
     """
 
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
@@ -171,7 +171,9 @@ def power_train_network_viewer(
             orientation=orientation,
             legend_position=legend_position,
             static_html=static_html,
-            propulsor_based=propulsor_based,
+            from_propulsor=from_propulsor,
+            plot_scaling=plot_scaling,
+            legend_scaling=legend_scaling,
         )
     )
 
@@ -184,16 +186,21 @@ def _create_network_plot(
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
-    propulsor_based: bool = False,
+    from_propulsor: bool = False,
+    plot_scaling: float = 1.0,
+    legend_scaling: float = 1.0,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
 
     Args:
         power_train_file_path: Path to the power train configuration file
-        legend_position: String defines the legend box position
         orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
+        legend_position: String defines the legend box position
         static_html: True if using static html
+        from_propulsor: Set all propulsor component into reference layer of the hierarchy
+        plot_scaling: Scaling factor for the main powertrain architecture
+        legend_scaling: Scaling factor for the legend size
     """
 
     # Create NetworkX DiGraph object
@@ -255,10 +262,10 @@ def _create_network_plot(
                 node_layer_dict[node_name] = max_distance - distance
 
             else:
-                propulsor_based = True
+                from_propulsor = True
                 break
 
-    if propulsor_based:
+    if from_propulsor:
         distance_from_propulsor = configurator.get_distance_from_propulsor()
 
         for node_name, distance in distance_from_propulsor.items():
@@ -281,11 +288,7 @@ def _create_network_plot(
         if orientation == "TB" or orientation == "BT":
             x_factor = 0.5
             y_factor = 1.0
-            scale = 550
-            plot_width = 1200
-            plot_height = 900
-            x_range_max = 600
-            y_range_max = 600
+            plot_width_factor = 1
             icon_factor = 1
             icon_width_factor = 0.8
             x_orientation_offset = 125
@@ -294,11 +297,7 @@ def _create_network_plot(
         elif orientation == "LR" or orientation == "RL":
             x_factor = 1.0
             y_factor = 0.5
-            scale = 600
-            plot_width = 1500
-            plot_height = 900
-            x_range_max = 600
-            y_range_max = 600
+            plot_width_factor = 1.25
             icon_factor = 1.75
             icon_width_factor = 0.6
             x_orientation_offset = -25
@@ -308,18 +307,18 @@ def _create_network_plot(
 
         position_dict = {
             node: (
-                ((coordinate[0] - x_min) / x_range * scale * x_factor + x_orientation_offset),
-                ((coordinate[1] - y_min) / y_range * scale * y_factor + y_orientation_offset),
+                ((coordinate[0] - x_min) / x_range * 550 * x_factor + x_orientation_offset),
+                ((coordinate[1] - y_min) / y_range * 550 * y_factor + y_orientation_offset),
             )
             for node, coordinate in position_dict.items()
         }
 
     # Create Bokeh plot
     plot = bkplot.figure(
-        width=plot_width,
-        height=plot_height,
-        x_range=(-50, x_range_max),
-        y_range=(-50, y_range_max),
+        width=int(1200 * plot_scaling * plot_width_factor),
+        height=int(900 * plot_scaling),
+        x_range=(-50, 600),
+        y_range=(-50, 600),
         toolbar_location="above",
         background_fill_color=BACKGROUND_COLOR_CODE,
         title=_get_file_name(power_train_file_path),
@@ -342,8 +341,8 @@ def _create_network_plot(
     for node in node_indices:
         node_x.append(position_dict[node][0])
         node_y.append(position_dict[node][1])
-        node_height.append(node_sizes[node] * icon_factor)
-        node_width.append(node_sizes[node] * icon_factor * icon_width_factor)
+        node_height.append(node_sizes[node] * icon_factor * plot_scaling)
+        node_width.append(node_sizes[node] * icon_factor * icon_width_factor * plot_scaling)
         node_types_list.append(node_types[node])
         node_om_types_list.append(node_om_types[node])
 
@@ -415,7 +414,7 @@ def _create_network_plot(
     plot.scatter(
         x="x",
         y="y",
-        size=45,
+        size=45 * plot_scaling,
         source=node_source,
         color=BACKGROUND_COLOR_CODE,
         line_alpha=0,
@@ -435,7 +434,7 @@ def _create_network_plot(
     label_source = bkmodel.ColumnDataSource(
         data=dict(
             x=node_x,
-            y=[y - node_height[i] * 0.7 for i, y in enumerate(node_y)],
+            y=[y - 15 * icon_factor * plot_scaling * 0.7 for i, y in enumerate(node_y)],
             names=node_indices,
         )
     )
@@ -448,11 +447,11 @@ def _create_network_plot(
         text_align="center",
         text_baseline="top",
         text_color="white",
-        text_font_size="8pt",
+        text_font_size=str(8 * plot_scaling) + "pt",
     )
     plot.add_layout(labels)
 
-    _add_color_legend_separate(plot, legend_position, color_icon_urls)
+    _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_scaling)
 
     # Add interactive tools
     cleaned_node_types = []
@@ -482,7 +481,7 @@ def _create_network_plot(
     plot.scatter(
         x="x",
         y="y",
-        size=60,
+        size=55 * plot_scaling,
         source=hover_source,
         fill_alpha=0,
         line_alpha=0,
@@ -502,7 +501,7 @@ def _create_network_plot(
     return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
 
 
-def _add_color_legend_separate(plot, legend_position, color_icon_urls):
+def _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_scaling: float = 1.0):
     """
     Add a color legend as a separate visual entity within the same plot.
 
@@ -510,6 +509,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         plot: Bokeh figure object
         legend_position: String defines the legend box position
         color_icon_urls: List of URLs for color icons
+        legend_scaling: Scaling factor for the legend size
     """
 
     if "T" in legend_position:
@@ -537,9 +537,8 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         (2, "Electrical Current"),
     ]
 
-    legend_item_height = 22
-    icon_size = 12
-    legend_item_start_y = legend_y_start - 25
+    legend_item_height = int(22 * legend_scaling)
+    legend_item_start_y = legend_y_start - int(25 * legend_scaling)
 
     for i, (icon_idx, description) in enumerate(legend_items):
         y_position = legend_item_start_y - (i * legend_item_height)
@@ -547,7 +546,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
         # Create data source for icon
         icon_source = bkmodel.ColumnDataSource(
             data=dict(
-                x=[legend_x_start + 10],
+                x=[legend_x_start + int(10 * legend_scaling)],
                 y=[y_position],
                 url=[color_icon_urls[icon_idx]],
             )
@@ -558,8 +557,8 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
             url="url",
             x="x",
             y="y",
-            w=icon_size,
-            h=icon_size,
+            w=9 * legend_scaling,
+            h=12 * legend_scaling,
             anchor="center",
             source=icon_source,
         )
@@ -581,7 +580,7 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls):
             text_align="left",
             text_baseline="middle",
             text_color="white",
-            text_font_size="10pt",
+            text_font_size=str(10 * legend_scaling) + "pt",
         )
         plot.add_layout(labels)
 
