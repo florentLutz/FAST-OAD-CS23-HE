@@ -12,6 +12,7 @@ import logging
 import sys
 import os.path as pth
 import pathlib
+import time
 
 from abc import ABC
 from importlib.resources import open_text
@@ -79,6 +80,7 @@ class FASTGAHEPowerTrainConfigurator:
     """
 
     _connection_check_cache = {}
+    _timer_cache = {}
 
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
@@ -208,6 +210,10 @@ class FASTGAHEPowerTrainConfigurator:
 
         :param power_train_file: Path to the file to open.
         """
+        key = str(pth.abspath(power_train_file))
+        FASTGAHEPowerTrainConfigurator._timer_cache.setdefault(key, {})
+        FASTGAHEPowerTrainConfigurator._timer_cache[key].setdefault(
+            "first_load_time" , time.time())
 
         self._power_train_file = pth.abspath(power_train_file)
 
@@ -557,6 +563,11 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
+
+        key = str(self._power_train_file)
+        first_load_time = FASTGAHEPowerTrainConfigurator._timer_cache[key].get("first_load_time")
+        FASTGAHEPowerTrainConfigurator._timer_cache[key].setdefault(
+            "initialization_time", time.time() - first_load_time)
 
     def _check_connection(self, connections_list):
         """
