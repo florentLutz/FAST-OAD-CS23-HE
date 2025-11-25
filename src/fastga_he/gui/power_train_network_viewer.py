@@ -20,7 +20,7 @@ BACKGROUND_COLOR_CODE = "#bebebe"  # canvas background color
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"  # color for electricity transmitting connections
 FUEL_FLOW_COLOR_CODE = "#FF5722"  # color for fuel (including hydrogen) transmitting connections
 MECHANICAL_POWER_COLOR_CODE = "#2E7D32"  # color for mechanical power transmitting connections
-DEFAULF_COLOR = "gray"
+DEFAULT_COLOR = "gray"
 
 # Image URLs for graph nodes
 # "icon_file_name" : [file_path, color_as_source, color_as_target]
@@ -131,7 +131,7 @@ def _get_edge_color(source_icon, target_icon):
         return color_as_source
 
     else:
-        return DEFAULF_COLOR
+        return DEFAULT_COLOR
 
 
 def power_train_network_viewer(
@@ -150,15 +150,8 @@ def power_train_network_viewer(
     Args:
         power_train_file_path: Path to the power train configuration file
         network_file_path: Path where the HTML output will be saved
-        legend_position: String defines the legend box position
-        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
-        * * T * *
-        * * * * *
-        * * M * *
-        L * C * R
-        * * B * *
-        orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
-        (T: top, B: button, L: left, R: right)
+        legend_position: String defines the legend position
+        orientation: network plot orientation
         static_html: True if using static html
         from_propulsor: Set all propulsor component into reference layer of the hierarchy
         plot_scaling: Scaling factor for the main powertrain architecture
@@ -196,6 +189,7 @@ def _create_network_plot(
     Args:
         power_train_file_path: Path to the power train configuration file
         orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
+        (T: top, B: button, L: left, R: right)
         legend_position: String defines the legend box position
         static_html: True if using static html
         from_propulsor: Set all propulsor component into reference layer of the hierarchy
@@ -511,9 +505,26 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_sc
     Args:
         plot: Bokeh figure object
         legend_position: String defines the legend box position
+        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
+
+        +-----+-----+-----+-----+-----+
+        |     |     |  T  |     |     |
+        +-----+-----+-----+-----+-----+
+        |     |     |     |     |     |
+        +-----+-----+-----+-----+-----+
+        |     |     |  M  |     |     |
+        +-----+-----+-----+-----+-----+
+        |  L  |     |  C  |     |  R  |
+        +-----+-----+-----+-----+-----+
+        |     |     |  B  |     |     |
+        +-----+-----+-----+-----+-----+
+
         color_icon_urls: List of URLs for color icons
         legend_scaling: Scaling factor for the legend size
     """
+
+    if len(legend_position) != 2:
+        legend_scaling = "TR"
 
     if "T" in legend_position:
         legend_y_start = 600
