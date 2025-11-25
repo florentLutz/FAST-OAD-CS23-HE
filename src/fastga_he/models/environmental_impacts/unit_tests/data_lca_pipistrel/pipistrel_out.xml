@@ -7,6 +7,7 @@
       <v_approach units="m/s" is_input="True">30.095000000000002<!--approach speed--></v_approach>
       <v_cruise units="knot" is_input="True">93.0<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">110.0<!--maximum speed at sea level--></v_max_sl>
+      <max_airframe_hours units="h" is_input="True">4000.0<!--Expected lifetime of the aircraft expressed in airframe hours--></max_airframe_hours>
     </TLAR>
     <geometry>
       <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>
@@ -469,6 +470,7 @@
         </PMSM>
         <battery_pack>
           <battery_pack_1>
+            <lifespan is_input="True">700.0<!--Expected lifetime of the battery pack, expressed in cycles. Default value is the number of cycle required for the reference cell to reach 60% nominal capacity--></lifespan>
             <SOC_min units="percent" is_input="False">8.13391632056981<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">2.0054685184863223<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
@@ -514,6 +516,7 @@
             </module>
           </battery_pack_1>
           <battery_pack_2>
+            <lifespan is_input="True">700.0<!--Expected lifetime of the battery pack, expressed in cycles. Default value is the number of cycle required for the reference cell to reach 60% nominal capacity--></lifespan>
             <SOC_min units="percent" is_input="False">8.133916320569824<!--Minimum state-of-charge of the battery during the mission--></SOC_min>
             <c_rate_max units="1/h" is_input="False">2.0054685184863223<!--Maximum C-rate of the battery modules during the mission--></c_rate_max>
             <cell_temperature_mission units="degK" is_input="True">298.15<!--Cell temperature of the battery for the points--></cell_temperature_mission>
@@ -1130,6 +1133,7 @@
           <thrust units="N" is_input="False">485.96112311015116</thrust>
         </taxi_out>
         <main_route>
+          <duration units="s" is_input="False">1694.3438593550231</duration>
           <climb>
             <distance units="m" is_input="False">8492.316454382377</distance>
             <duration units="s" is_input="False">214.96391679117636</duration>

@@ -47,7 +47,7 @@ def test_doe_sr22_hybrid_power_split():
     process_file_name = "full_sizing_hybrid.yml"
 
     # power_splits = np.arange(60, 79.5, 1)
-    power_splits = [67]
+    power_splits = [80]
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
     problem = configurator.get_problem()
@@ -70,7 +70,7 @@ def test_doe_sr22_hybrid_power_split():
         "reference_curve_current": [100.0, 4000.0, 8000.0, 12000.0],
         "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
     }
-    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": False}
+    problem.model_options["*motor_1*"] = {"adjust_rpm_rating": True}
 
     problem.setup()
 

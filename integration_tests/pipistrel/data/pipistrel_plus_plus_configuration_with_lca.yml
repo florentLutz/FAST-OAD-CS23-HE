@@ -103,6 +103,7 @@ submodels:
   submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
   submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
   service.propulsion.battery.lifespan: fastga_he.submodel.propulsion.battery.lifespan.legacy_aging_model
+  submodel.propulsion.dc_dc_converter.weight: fastga_he.submodel.propulsion.dc_dc_converter.weight.power_to_mass
 
 optimization: # This section is needed only if optimization process is run
   design_variables:

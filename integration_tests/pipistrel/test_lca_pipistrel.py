@@ -64,7 +64,7 @@ def test_lca_pipistrel_reference():
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        0.00084237, rel=1e-3
+        0.00083991, rel=1e-3
     )
 
 
