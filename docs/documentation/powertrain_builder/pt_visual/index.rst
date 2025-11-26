@@ -10,7 +10,7 @@ file. The example below demonstrates how to import and use this function with th
 .. toctree::
    :maxdepth: 1
 
-    Function attributes <attributes>
+    Viewer settings <attributes>
     Sorting Mechanism <sort_mechanism>
 
 
