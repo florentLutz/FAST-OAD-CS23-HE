@@ -29,103 +29,113 @@ DEFAULT_COLOR = "gray"
 # Image URLs for graph nodes
 # "icon_file_name" : [file_path, color_as_source, color_as_target]
 icons_dict = {
-    "battery": [pth.join(icons.__path__[0], "battery.png"), None, ELECTRICITY_CURRENT_COLOR_CODE],
-    "bus_bar": [
-        pth.join(icons.__path__[0], "bus_bar.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "cable": [
-        pth.join(icons.__path__[0], "cable.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "e_motor": [
-        pth.join(icons.__path__[0], "e_motor.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        MECHANICAL_POWER_COLOR_CODE,
-    ],
-    "generator": [
-        pth.join(icons.__path__[0], "generator.png"),
-        MECHANICAL_POWER_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "ice": [
-        pth.join(icons.__path__[0], "ice.png"),
-        FUEL_FLOW_COLOR_CODE,
-        MECHANICAL_POWER_COLOR_CODE,
-    ],
-    "switch": [
-        pth.join(icons.__path__[0], "switch.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "propeller": [pth.join(icons.__path__[0], "propeller.png"), MECHANICAL_POWER_COLOR_CODE, None],
-    "splitter": [
-        pth.join(icons.__path__[0], "splitter.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "rectifier": [
-        pth.join(icons.__path__[0], "AC_DC.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "dc_converter": [
-        pth.join(icons.__path__[0], "DC_DC.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "inverter": [
-        pth.join(icons.__path__[0], "DC_AC.png"),
-        ELECTRICITY_CURRENT_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
-    "fuel_tank": [pth.join(icons.__path__[0], "fuel_tank.png"), None, FUEL_FLOW_COLOR_CODE],
-    "fuel_system": [
-        pth.join(icons.__path__[0], "fuel_system.png"),
-        FUEL_FLOW_COLOR_CODE,
-        FUEL_FLOW_COLOR_CODE,
-    ],
-    "turbine": [
-        pth.join(icons.__path__[0], "turbine.png"),
-        FUEL_FLOW_COLOR_CODE,
-        MECHANICAL_POWER_COLOR_CODE,
-    ],
-    "gearbox": [
-        pth.join(icons.__path__[0], "gears.png"),
-        MECHANICAL_POWER_COLOR_CODE,
-        MECHANICAL_POWER_COLOR_CODE,
-    ],
-    "fuel_cell": [
-        pth.join(icons.__path__[0], "fuel_cell.png"),
-        FUEL_FLOW_COLOR_CODE,
-        ELECTRICITY_CURRENT_COLOR_CODE,
-    ],
+    "battery": {
+        "icon_path": pth.join(icons.__path__[0], "battery.png"),
+        "source_color": None,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "bus_bar": {
+        "icon_path": pth.join(icons.__path__[0], "bus_bar.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "cable": {
+        "icon_path": pth.join(icons.__path__[0], "cable.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "e_motor": {
+        "icon_path": pth.join(icons.__path__[0], "e_motor.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": MECHANICAL_POWER_COLOR_CODE,
+    },
+    "generator": {
+        "icon_path": pth.join(icons.__path__[0], "generator.png"),
+        "source_color": MECHANICAL_POWER_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "ice": {
+        "icon_path": pth.join(icons.__path__[0], "ice.png"),
+        "source_color": FUEL_FLOW_COLOR_CODE,
+        "target_color": MECHANICAL_POWER_COLOR_CODE,
+    },
+    "switch": {
+        "icon_path": pth.join(icons.__path__[0], "switch.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "propeller": {
+        "icon_path": pth.join(icons.__path__[0], "propeller.png"),
+        "source_color": MECHANICAL_POWER_COLOR_CODE,
+        "target_color": None,
+    },
+    "splitter": {
+        "icon_path": pth.join(icons.__path__[0], "splitter.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "rectifier": {
+        "icon_path": pth.join(icons.__path__[0], "AC_DC.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "dc_converter": {
+        "icon_path": pth.join(icons.__path__[0], "DC_DC.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "inverter": {
+        "icon_path": pth.join(icons.__path__[0], "DC_AC.png"),
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
+    "fuel_tank": {
+        "icon_path": pth.join(icons.__path__[0], "fuel_tank.png"),
+        "source_color": None,
+        "target_color": FUEL_FLOW_COLOR_CODE,
+    },
+    "fuel_system": {
+        "icon_path": pth.join(icons.__path__[0], "fuel_system.png"),
+        "source_color": FUEL_FLOW_COLOR_CODE,
+        "target_color": FUEL_FLOW_COLOR_CODE,
+    },
+    "turbine": {
+        "icon_path": pth.join(icons.__path__[0], "turbine.png"),
+        "source_color": FUEL_FLOW_COLOR_CODE,
+        "target_color": MECHANICAL_POWER_COLOR_CODE,
+    },
+    "gearbox": {
+        "icon_path": pth.join(icons.__path__[0], "gears.png"),
+        "source_color": MECHANICAL_POWER_COLOR_CODE,
+        "target_color": MECHANICAL_POWER_COLOR_CODE,
+    },
+    "fuel_cell": {
+        "icon_path": pth.join(icons.__path__[0], "fuel_cell.png"),
+        "source_color": FUEL_FLOW_COLOR_CODE,
+        "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
+    },
 }
 
-color_icon_list = [
-    pth.join(icons.__path__[0], "fuel.png"),
-    pth.join(icons.__path__[0], "mechanical.png"),
-    pth.join(icons.__path__[0], "electricity.png"),
-]
+color_icon_dict = {
+    "fuel": pth.join(icons.__path__[0], "fuel.png"),
+    "mechanical": pth.join(icons.__path__[0], "mechanical.png"),
+    "electricity": pth.join(icons.__path__[0], "electricity.png"),
+}
 
 
 def _get_edge_color(source_icon, target_icon):
     """
     Determine edge color based on source and target node types.
 
-    Args:
-        source_icon: Icon name of the source node
-        target_icon: Icon name of the target node
+    :param source_icon: Icon name of the source node
+    :param target_icon: Icon name of the target node
 
-    Returns:
-        Color code for the edge
+    :return: Color code for the edge
     """
     # edge color for the source component serves as source
-    color_as_source = icons_dict.get(source_icon)[1]
+    color_as_source = icons_dict.get(source_icon)["source_color"]
     # edge color for the target component serves as source
-    color_as_target = icons_dict.get(target_icon)[2]
+    color_as_target = icons_dict.get(target_icon)["target_color"]
 
     if color_as_target:
         return color_as_target
@@ -144,6 +154,7 @@ def power_train_network_viewer(
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
+    sorting: bool = True,
     from_propulsor: bool = False,
     plot_scaling: float = 1.0,
     legend_scaling: float = 1.0,
@@ -151,15 +162,15 @@ def power_train_network_viewer(
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
 
-    Args:
-        power_train_file_path: Path to the power train configuration file
-        network_file_path: Path where the HTML output will be saved
-        legend_position: String defines the legend position
-        orientation: network plot orientation
-        static_html: True if using static html
-        from_propulsor: Set all propulsor component into reference layer of the hierarchy
-        plot_scaling: Scaling factor for the main powertrain architecture
-        legend_scaling: Scaling factor for the legend size
+    :param power_train_file_path: Path to the power train configuration file
+    :param network_file_path: Path where the HTML output will be saved
+    :param legend_position: String defines the legend position
+    :param orientation: network plot orientation
+    :param static_html: True if using static html
+    :param sorting: True to enable tutte's drawing algorithm for sorting
+    :param from_propulsor: Set all propulsor component into reference layer of the hierarchy
+    :param plot_scaling: Scaling factor for the main powertrain architecture
+    :param legend_scaling: Scaling factor for the legend size
     """
 
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
@@ -168,6 +179,7 @@ def power_train_network_viewer(
             orientation=orientation,
             legend_position=legend_position,
             static_html=static_html,
+            sorting=sorting,
             from_propulsor=from_propulsor,
             plot_scaling=abs(plot_scaling),
             legend_scaling=abs(legend_scaling),
@@ -183,6 +195,7 @@ def _create_network_plot(
     orientation: str = "TB",
     legend_position: str = "TR",
     static_html: bool = True,
+    sorting: bool = True,
     from_propulsor: bool = False,
     plot_scaling: float = 1.0,
     legend_scaling: float = 1.0,
@@ -190,15 +203,15 @@ def _create_network_plot(
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
 
-    Args:
-        power_train_file_path: Path to the power train configuration file
-        orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
-        (T: top, B: button, L: left, R: right)
-        legend_position: String defines the legend box position
-        static_html: True if using static html
-        from_propulsor: Set all propulsor component into reference layer of the hierarchy
-        plot_scaling: Scaling factor for the main powertrain architecture
-        legend_scaling: Scaling factor for the legend size
+    :param power_train_file_path: Path to the power train configuration file
+    :param orientation: network plot orientation ('TB', 'BT', 'LR', 'RL')
+    (T: top, B: button, L: left, R: right)
+    :param legend_position: String defines the legend box position
+    :param static_html: True if using static html
+    :param sorting: True to enable tutte's drawing algorithm for sorting
+    :param from_propulsor: Set all propulsor component into reference layer of the hierarchy
+    :param plot_scaling: Scaling factor for the main powertrain architecture
+    :param legend_scaling: Scaling factor for the legend size
     """
 
     # Create NetworkX DiGraph object
@@ -270,7 +283,7 @@ def _create_network_plot(
             node_layer_dict[node_name] = distance
 
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
-    position_dict = HierarchicalLayout(graph, orientation, node_layer_dict).compute()
+    position_dict = HierarchicalLayout(graph, orientation, node_layer_dict, sorting).compute()
 
     # Normalize positions for Bokeh
     if position_dict:
@@ -282,7 +295,7 @@ def _create_network_plot(
         x_range = x_max - x_min if x_max > x_min else 1  # For the case of straight structure
         y_range = y_max - y_min if y_max > y_min else 1  # For the case of straight structure
 
-        if orientation != "TB" or orientation != "BT" or orientation != "LR" or orientation != "RL":
+        if orientation not in ["TB", "BT", "LR", "RL"]:
             orientation = "TB"
 
         # Scale to a reasonable display size with different orientation
@@ -350,12 +363,13 @@ def _create_network_plot(
     # Convert file paths to file:// URLs for local images
     if static_html:
         node_image_urls = [
-            "file://" + str(Path(icons_dict[node_icons[node]][0]).resolve())
+            "file://" + str(Path(icons_dict[node_icons[node]]["icon_path"]).resolve())
             for node in node_indices
         ]
 
     color_icon_urls = [
-        "file://" + str(Path(color_icon).resolve()) for color_icon in color_icon_list
+        "file://" + str(Path(color_icon_dict[color_icon]).resolve())
+        for color_icon in color_icon_dict.keys()
     ]
 
     # Create edge data with colors
@@ -506,25 +520,24 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_sc
     """
     Add a color legend as a separate visual entity within the same plot.
 
-    Args:
-        plot: Bokeh figure object
-        legend_position: String defines the legend box position
-        (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
+    :param plot: Bokeh figure object
+    :param legend_position: String defines the legend box position
+    (T: top, M: middle (vertical), Button, L: left, R: right, C: center (horizontal))
 
-        +-----+-----+-----+-----+-----+
-        |     |     |  T  |     |     |
-        +-----+-----+-----+-----+-----+
-        |     |     |     |     |     |
-        +-----+-----+-----+-----+-----+
-        |     |     |  M  |     |     |
-        +-----+-----+-----+-----+-----+
-        |  L  |     |  C  |     |  R  |
-        +-----+-----+-----+-----+-----+
-        |     |     |  B  |     |     |
-        +-----+-----+-----+-----+-----+
+    +-----+-----+-----+-----+-----+
+    |     |     |  T  |     |     |
+    +-----+-----+-----+-----+-----+
+    |     |     |     |     |     |
+    +-----+-----+-----+-----+-----+
+    |     |     |  M  |     |     |
+    +-----+-----+-----+-----+-----+
+    |  L  |     |  C  |     |  R  |
+    +-----+-----+-----+-----+-----+
+    |     |     |  B  |     |     |
+    +-----+-----+-----+-----+-----+
 
-        color_icon_urls: List of URLs for color icons
-        legend_scaling: Scaling factor for the legend size
+    :param color_icon_urls: List of URLs for color icons
+    :param legend_scaling: Scaling factor for the legend size
     """
 
     if len(legend_position) != 2:
