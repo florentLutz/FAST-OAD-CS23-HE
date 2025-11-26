@@ -3,7 +3,7 @@
 =========================================
 PT file visualization function attributes
 =========================================
-Other than the key settings—the PT config file path and where you want to save the HTML—you can tweak several other
+Other than the key settings like the PT config file path and where you want to save the HTML, you can tweak several other
 options to adjust how the final plot looks.
 
 Sorting reference layer
@@ -48,7 +48,7 @@ To configure the position, use:
 Plot size scaling
 =================
 This attribute specifies the size factor of the main powertrain architecture from the default settings. Only positive
-value is valid. To configure this factor, use:
+values are valid. To configure this factor, use:
 
 .. code:: python
 
@@ -57,7 +57,7 @@ value is valid. To configure this factor, use:
 Legend size scaling
 ===================
 This attribute specifies the size factor of the connection color legend from the default settings. Only positive
-value is valid. To configure this factor, use:
+values are valid. To configure this factor, use:
 
 .. code:: python
 
