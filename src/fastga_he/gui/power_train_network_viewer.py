@@ -2,14 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
-import os
-import os.path as pth
-
-from pathlib import Path
-import re
 import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
+from pathlib import Path
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
@@ -26,100 +22,102 @@ MECHANICAL_POWER_COLOR_CODE = "#2E7D32"
 # color for mechanical power transmitting connections (medium forest green)
 DEFAULT_COLOR = "gray"
 
+ICON_FOLDER_PATH = Path(icons.__path__[0])
+
 # Image URLs for graph nodes
 # "icon_file_name" : [file_path, color_as_source, color_as_target]
 icons_dict = {
     "battery": {
-        "icon_path": pth.join(icons.__path__[0], "battery.png"),
+        "icon_path": ICON_FOLDER_PATH / "battery.png",
         "source_color": None,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "bus_bar": {
-        "icon_path": pth.join(icons.__path__[0], "bus_bar.png"),
+        "icon_path": ICON_FOLDER_PATH / "bus_bar.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "cable": {
-        "icon_path": pth.join(icons.__path__[0], "cable.png"),
+        "icon_path": ICON_FOLDER_PATH / "cable.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "e_motor": {
-        "icon_path": pth.join(icons.__path__[0], "e_motor.png"),
+        "icon_path": ICON_FOLDER_PATH / "e_motor.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": MECHANICAL_POWER_COLOR_CODE,
     },
     "generator": {
-        "icon_path": pth.join(icons.__path__[0], "generator.png"),
+        "icon_path": ICON_FOLDER_PATH / "generator.png",
         "source_color": MECHANICAL_POWER_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "ice": {
-        "icon_path": pth.join(icons.__path__[0], "ice.png"),
+        "icon_path": ICON_FOLDER_PATH / "ice.png",
         "source_color": FUEL_FLOW_COLOR_CODE,
         "target_color": MECHANICAL_POWER_COLOR_CODE,
     },
     "switch": {
-        "icon_path": pth.join(icons.__path__[0], "switch.png"),
+        "icon_path": ICON_FOLDER_PATH / "switch.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "propeller": {
-        "icon_path": pth.join(icons.__path__[0], "propeller.png"),
+        "icon_path": ICON_FOLDER_PATH / "propeller.png",
         "source_color": MECHANICAL_POWER_COLOR_CODE,
         "target_color": None,
     },
     "splitter": {
-        "icon_path": pth.join(icons.__path__[0], "splitter.png"),
+        "icon_path": ICON_FOLDER_PATH / "splitter.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "rectifier": {
-        "icon_path": pth.join(icons.__path__[0], "AC_DC.png"),
+        "icon_path": ICON_FOLDER_PATH / "AC_DC.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "dc_converter": {
-        "icon_path": pth.join(icons.__path__[0], "DC_DC.png"),
+        "icon_path": ICON_FOLDER_PATH / "DC_DC.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "inverter": {
-        "icon_path": pth.join(icons.__path__[0], "DC_AC.png"),
+        "icon_path": ICON_FOLDER_PATH / "DC_AC.png",
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
     "fuel_tank": {
-        "icon_path": pth.join(icons.__path__[0], "fuel_tank.png"),
+        "icon_path": ICON_FOLDER_PATH / "fuel_tank.png",
         "source_color": None,
         "target_color": FUEL_FLOW_COLOR_CODE,
     },
     "fuel_system": {
-        "icon_path": pth.join(icons.__path__[0], "fuel_system.png"),
+        "icon_path": ICON_FOLDER_PATH / "fuel_system.png",
         "source_color": FUEL_FLOW_COLOR_CODE,
         "target_color": FUEL_FLOW_COLOR_CODE,
     },
     "turbine": {
-        "icon_path": pth.join(icons.__path__[0], "turbine.png"),
+        "icon_path": ICON_FOLDER_PATH / "turbine.png",
         "source_color": FUEL_FLOW_COLOR_CODE,
         "target_color": MECHANICAL_POWER_COLOR_CODE,
     },
     "gearbox": {
-        "icon_path": pth.join(icons.__path__[0], "gears.png"),
+        "icon_path": ICON_FOLDER_PATH / "gears.png",
         "source_color": MECHANICAL_POWER_COLOR_CODE,
         "target_color": MECHANICAL_POWER_COLOR_CODE,
     },
     "fuel_cell": {
-        "icon_path": pth.join(icons.__path__[0], "fuel_cell.png"),
+        "icon_path": ICON_FOLDER_PATH / "fuel_cell.png",
         "source_color": FUEL_FLOW_COLOR_CODE,
         "target_color": ELECTRICITY_CURRENT_COLOR_CODE,
     },
 }
 
 color_icon_dict = {
-    "fuel": pth.join(icons.__path__[0], "fuel.png"),
-    "mechanical": pth.join(icons.__path__[0], "mechanical.png"),
-    "electricity": pth.join(icons.__path__[0], "electricity.png"),
+    "fuel": ICON_FOLDER_PATH / "fuel.png",
+    "mechanical": ICON_FOLDER_PATH / "mechanical.png",
+    "electricity": ICON_FOLDER_PATH / "electricity.png",
 }
 
 
@@ -268,10 +266,11 @@ def _create_network_plot(
         if max_distance > distance:
             node_layer_dict[node_name] = max_distance - distance
 
-        elif max_distance == distance:
+        else:
             if node_name in propeller_names:
                 node_layer_dict[node_name] = max_distance - distance
 
+            # Triggered if there is a component that is
             else:
                 from_propulsor = True
                 break
@@ -287,8 +286,12 @@ def _create_network_plot(
 
     # Normalize positions for Bokeh
     if position_dict:
-        x_coordinates = [coords[0] for coords in position_dict.values()]
-        y_coordinates = [coords[1] for coords in position_dict.values()]
+        x_coordinates = []
+        y_coordinates = []
+        for coords in position_dict.values():
+            x_coordinates.append(coords[0])
+            y_coordinates.append(coords[1])
+
         x_min, x_max = min(x_coordinates), max(x_coordinates)
         y_min, y_max = min(y_coordinates), max(y_coordinates)
 
@@ -344,7 +347,7 @@ def _create_network_plot(
     plot.yaxis.visible = False
 
     # Prepare node data
-    node_indices = list(graph.nodes())
+    node_name_list = list(graph.nodes())
     node_x = []
     node_y = []
     node_width = []
@@ -352,7 +355,7 @@ def _create_network_plot(
     node_types_list = []
     node_om_types_list = []
 
-    for node in node_indices:
+    for node in node_name_list:
         node_x.append(position_dict[node][0])
         node_y.append(position_dict[node][1])
         node_height.append(node_sizes[node] * icon_factor * plot_scaling)
@@ -364,7 +367,7 @@ def _create_network_plot(
     if static_html:
         node_image_urls = [
             "file://" + str(Path(icons_dict[node_icons[node]]["icon_path"]).resolve())
-            for node in node_indices
+            for node in node_name_list
         ]
 
     color_icon_urls = [
@@ -373,18 +376,14 @@ def _create_network_plot(
     ]
 
     # Create edge data with colors
-    edge_start_x = []
-    edge_start_y = []
-    edge_end_x = []
-    edge_end_y = []
+    edge_x_pos = []
+    edge_y_pos = []
     edge_colors = []
 
     for edge in graph.edges():
         start, end = edge
-        edge_start_x.append(position_dict[start][0])
-        edge_start_y.append(position_dict[start][1])
-        edge_end_x.append(position_dict[end][0])
-        edge_end_y.append(position_dict[end][1])
+        edge_x_pos.append([position_dict[start][0], position_dict[end][0]])
+        edge_y_pos.append([position_dict[start][1], position_dict[end][1]])
 
         # Determine edge color based on connected nodes
         source_icon = node_icons[start]
@@ -396,10 +395,10 @@ def _create_network_plot(
     if static_html:
         edge_source = bkmodel.ColumnDataSource(
             data=dict(
-                xs=[[x_start, x_end] for x_start, x_end in zip(edge_start_x, edge_end_x)],
-                ys=[[y_start, y_end] for y_start, y_end in zip(edge_start_y, edge_end_y)],
+                xs=edge_x_pos,
+                ys=edge_y_pos,
                 line_color=edge_colors,
-                line_alpha=[0.7] * len(edge_start_x),
+                line_alpha=[0.7] * len(edge_x_pos),
             )
         )
 
@@ -420,7 +419,7 @@ def _create_network_plot(
             url=node_image_urls,
             w=node_width,
             h=node_height,
-            name=node_indices,
+            name=node_name_list,
             type=node_types_list,
         )
     )
@@ -450,7 +449,7 @@ def _create_network_plot(
         data=dict(
             x=node_x,
             y=[y - 15 * icon_factor * plot_scaling * 0.7 for i, y in enumerate(node_y)],
-            names=node_indices,
+            names=node_name_list,
         )
     )
 
@@ -486,7 +485,7 @@ def _create_network_plot(
             y=node_y,
             w=node_width,
             h=node_height,
-            name=node_indices,
+            name=node_name_list,
             type_class=cleaned_node_types,
             component_type=cleaned_node_om_types,
         )
@@ -622,37 +621,77 @@ def _string_clean_up(old_string):
     """
     # In case for list type definition
     if isinstance(old_string, list):
-        old_string = old_string[0].capitalize() + ", " + old_string[1].capitalize()
+        old_string = ", ".join([old_string[0].capitalize(), old_string[1].capitalize()])
 
     # Replace underscore with space
     new_string = old_string.replace("_", " ")
 
     # Add a space after 'DC' if followed immediately by a letter or number
-    new_string = re.sub(r"\bDC(?=[A-Za-z0-9])", "DC ", new_string)
-    new_string = re.sub(r"\bDC DC(?=[A-Za-z0-9])", "DC-DC ", new_string)
+    new_string = _add_space_after_acronym(new_string, "DC")
+    new_string = new_string.replace("DC DC", "DC-DC")
 
     # Add a space after 'H2' and 'PEMFC'
-    new_string = re.sub(r"\bH2(?=[A-Za-z0-9])", "H2 ", new_string)
-    new_string = re.sub(r"\bPEMFC(?=[A-Za-z0-9])", "PEMFC ", new_string)
+    new_string = _add_space_after_acronym(new_string, "H2")
+    new_string = _add_space_after_acronym(new_string, "PEMFC")
 
     # Add space before a capital letter preceded by a lowercase letter
-    new_string = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", new_string)
+    new_string = _add_space_before_caps(new_string)
 
     # Remove extra spaces
-    new_string = re.sub(r"\s+", " ", new_string).strip()
+    new_string = " ".join(new_string.split())
 
     return new_string
 
 
+def _add_space_after_acronym(text, acronym):
+    """
+    Add a space after an acronym if followed by a letter or number.
+    """
+    result = []
+    i = 0
+    while i < len(text):
+        if text[i : i + len(acronym)] == acronym:
+            # Check if acronym is followed by a letter or number
+            next_index = i + len(acronym)
+            if next_index < len(text) and text[next_index].isalnum():
+                result.append(acronym + " ")
+                i = next_index
+            else:
+                result.append(acronym)
+                i = next_index
+        else:
+            result.append(text[i])
+            i += 1
+    return "".join(result)
+
+
+def _add_space_before_caps(text):
+    """
+    Add space before a capital letter preceded by a lowercase letter.
+    """
+    result = []
+    for i, char in enumerate(text):
+        if i > 0 and char.isupper() and text[i - 1].islower():
+            result.append(" " + char)
+        else:
+            result.append(char)
+    return "".join(result)
+
+
 def _get_file_name(file_path):
     """
-    Using the file name as the plot title
+    Using the file name as the plot title.
     """
-    match_html = re.search(r"[^/\\]+\.yml$", str(file_path))
+    file_path = str(file_path)
 
-    if match_html:
-        filename = match_html.group()
-        filename = filename.replace("_", " ").replace(".yml", "").capitalize()
+    # Extract filename from path (handle both / and \ separators)
+    filename = file_path.replace("\\", "/").split("/")[-1]
+
+    # Check if it ends with .yml
+    if filename.endswith(".yml"):
+        # Remove .yml extension and process
+        filename = filename[:-4]  # Remove last 4 characters (.yml)
+        filename = filename.replace("_", " ").capitalize()
 
         return f"{filename} powertrain network"
 
@@ -661,12 +700,11 @@ def _save_static_html(plot, file_path):
     """
     Save the network plot as static html.
     """
-    # Create directory if it doesn't exist
-    directory_to_save_graph = os.path.dirname(file_path)
+    file_path = Path(file_path)
 
-    if directory_to_save_graph and not os.path.exists(directory_to_save_graph):
-        os.makedirs(directory_to_save_graph)
+    # Create directory if it doesn't exist
+    file_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Save the plot
-    bkplot.output_file(file_path)
+    bkplot.output_file(str(file_path))
     bkplot.save(plot)
