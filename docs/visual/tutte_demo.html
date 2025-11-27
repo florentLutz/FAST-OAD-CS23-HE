@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutte's Drawing Algorithm Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f9fafb;
+            padding: 24px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #111;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .canvas-container {
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+        
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #4b5563;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #374151;
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f3f4f6;
+            border-radius: 6px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .dot-ref { background: #3b82f6; }
+        .dot-interior { background: #10b981; }
+        .dot-boundary { background: #ef4444; }
+        
+        .explanation {
+            margin-top: 24px;
+        }
+        
+        .explanation-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #eff6ff;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 14px;
+            text-align: left;
+        }
+        
+        .explanation-toggle:hover {
+            background: #dbeafe;
+        }
+        
+        .explanation-content {
+            padding: 16px;
+            background: #eff6ff;
+            border-radius: 6px;
+            margin-top: 12px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #374151;
+        }
+        
+        .explanation-content.active {
+            display: block;
+        }
+        
+        .explanation-content p {
+            margin-bottom: 12px;
+        }
+        
+        .explanation-content strong {
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tutte's Drawing Algorithm</h1>
+        <p class="subtitle">Interactive demonstration of how nodes are sorted</p>
+        
+        <div class="canvas-container">
+            <svg id="canvas" width="600" height="400" viewBox="0 0 300 350" style="border: 1px solid #e5e7eb; border-radius: 4px;"></svg>
+        </div>
+        
+        <div class="controls">
+            <button id="animateBtn" class="btn-primary">▶ Sort Layout</button>
+            <button id="resetBtn" class="btn-secondary">⟲ Reset</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot dot-ref"></div>
+                <span>Reference Layer (Fixed)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot dot-interior"></div>
+                <span>Interior Nodes (Move)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot dot-boundary"></div>
+                <span>Boundary Nodes (Fixed)</span>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <button class="explanation-toggle" id="toggleBtn">ℹ Show Explanation</button>
+            <div class="explanation-content" id="content">
+                <p><strong>Step 1:</strong> Reference layer (blue) and boundary nodes (red) are fixed in place.</p>
+                <p><strong>Step 2:</strong> Interior nodes (green) are initially placed randomly with edge crossings. When you click "Animate Layout", each interior node moves toward the average position of its neighbors.</p>
+                <p><strong>Step 3:</strong> This process repeats iteratively. Nodes naturally settle into positions that minimize edge crossings and tension.</p>
+                <p><strong>Result:</strong> The algorithm produces a visually clear graph with minimal edge crossings.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const animateBtn = document.getElementById('animateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const content = document.getElementById('content');
+        
+        let nodes = [];
+        let edges = [];
+        let isAnimating = false;
+        
+        const nodeColors = {
+            reference: '#3b82f6',
+            interior: '#10b981',
+            boundary: '#ef4444'
+        };
+        
+        function resetGraph() {
+            nodes = [
+                { id: 0, x: 75, y: 30, label: 'Battery', type: 'reference', fixed: true },
+                { id: 1, x: 150, y: 30, label: 'Supercap', type: 'reference', fixed: true },
+                { id: 2, x: 225, y: 30, label: 'Fuel Cell', type: 'reference', fixed: true },
+                { id: 3, x: 220, y: 150, label: 'Controller', type: 'interior' },
+                { id: 4, x: 150, y: 150, label: 'Converter', type: 'interior' },
+                { id: 5, x: 80, y: 150, label: 'Motor', type: 'interior' },
+                { id: 6, x: 100, y: 280, label: 'Propulsor', type: 'boundary', fixed: true },
+                { id: 7, x: 200, y: 280, label: 'Propulsor', type: 'boundary', fixed: true },
+            ];
+            
+            edges = [
+                { from: 0, to: 3 },
+                { from: 0, to: 4 },
+                { from: 1, to: 4 },
+                { from: 2, to: 4 },
+                { from: 2, to: 5 },
+                { from: 3, to: 4 },
+                { from: 4, to: 5 },
+                { from: 3, to: 6 },
+                { from: 4, to: 6 },
+                { from: 4, to: 7 },
+                { from: 5, to: 7 },
+            ];
+            
+            isAnimating = false;
+            animateBtn.disabled = false;
+            draw();
+        }
+        
+        function getNeighbors(nodeId) {
+            const neighbors = [];
+            edges.forEach(edge => {
+                if (edge.from === nodeId) neighbors.push(edge.to);
+                if (edge.to === nodeId) neighbors.push(edge.from);
+            });
+            return neighbors;
+        }
+        
+        function calculateBarycenter(nodeId) {
+            const neighbors = getNeighbors(nodeId);
+            if (neighbors.length === 0) {
+                const node = nodes.find(n => n.id === nodeId);
+                return { x: node.x, y: node.y };
+            }
+            
+            let sumX = 0, sumY = 0;
+            neighbors.forEach(nId => {
+                const neighbor = nodes.find(n => n.id === nId);
+                sumX += neighbor.x;
+                sumY += neighbor.y;
+            });
+            
+            return {
+                x: sumX / neighbors.length,
+                y: sumY / neighbors.length
+            };
+        }
+        
+        function animateLayout() {
+            animateBtn.disabled = true;
+            isAnimating = true;
+            let step = 0;
+            const maxSteps = 10;
+            const damping = 0.7;
+            
+            const animate = () => {
+                if (step >= maxSteps) {
+                    isAnimating = false;
+                    animateBtn.disabled = false;
+                    return;
+                }
+                
+                nodes.forEach(node => {
+                    if (!node.fixed) {
+                        const barycenter = calculateBarycenter(node.id);
+                        const dx = (barycenter.x - node.x) * damping;
+                        const dy = (barycenter.y - node.y) * damping;
+                        node.x += dx;
+                        node.y += dy;
+                    }
+                });
+                
+                draw();
+                step++;
+                setTimeout(animate, 300);
+            };
+            
+            animate();
+        }
+        
+        function draw() {
+            canvas.innerHTML = '';
+            
+            // Draw edges
+            edges.forEach(edge => {
+                const fromNode = nodes[edge.from];
+                const toNode = nodes[edge.to];
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', fromNode.x);
+                line.setAttribute('y1', fromNode.y);
+                line.setAttribute('x2', toNode.x);
+                line.setAttribute('y2', toNode.y);
+                line.setAttribute('stroke', '#d1d5db');
+                line.setAttribute('stroke-width', '1.5');
+                canvas.appendChild(line);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', node.x);
+                circle.setAttribute('cy', node.y);
+                circle.setAttribute('r', '20');
+                circle.setAttribute('fill', nodeColors[node.type]);
+                circle.setAttribute('opacity', '0.8');
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dy', '0.3em');
+                text.setAttribute('fill', 'white');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('font-weight', 'bold');
+                text.textContent = node.id;
+                
+                g.appendChild(circle);
+                g.appendChild(text);
+                canvas.appendChild(g);
+            });
+        }
+        
+        animateBtn.addEventListener('click', animateLayout);
+        resetBtn.addEventListener('click', resetGraph);
+        toggleBtn.addEventListener('click', () => {
+            content.classList.toggle('active');
+            toggleBtn.textContent = content.classList.contains('active') ? 'ℹ Hide Explanation' : 'ℹ Show Explanation';
+        });
+        
+        resetGraph();
+    </script>
+</body>
+</html>

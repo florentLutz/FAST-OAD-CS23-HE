@@ -9,12 +9,23 @@ options to adjust how the final plot looks.
 Sorting reference layer
 =======================
 This attribute sets the :ref:`reference level <ref-level-sort>` used by the sorting mechanism. The default approach is
-the `from-storage approach`, which helps minimise connection crossings. To configure the sorting process to
-`from-propulsor approach`, use:
+the `from-storage approach`, which helps minimise connection crossings and possibly improves the structure layout.
+
+.. caution::
+
+    If there is any non-propulsor node at the top of the hierarchy, the attribute will be overwritten with
+    `from-propulsor approach` to prevent crossing.
+
+To configure the sorting process to `from-propulsor approach`, use:
 
 .. code:: python
 
     power_train_network_viewer(pt_file_path, network_file_path, from_propulsor=True)
+
+.. note::
+
+    If the crossing remains after switching between two approaches, please check the the sequencing of the node(s)
+    that is / are causing crossing in the PT configuration file.
 
 Plot orientation
 ================
@@ -25,7 +36,6 @@ orientation, use:
 .. code:: python
 
     power_train_network_viewer(pt_file_path, network_file_path, orientation="TB")
-
 
 Legend position
 ===============
@@ -62,6 +72,3 @@ values are valid. To configure this factor, use:
 .. code:: python
 
     power_train_network_viewer(pt_file_path, network_file_path, legend_scaling=1.2)
-
-
-

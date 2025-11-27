@@ -19,7 +19,7 @@ class HierarchicalLayout:
     3. Coordinate assignment (positions nodes within layers)
     """
 
-    def __init__(self, graph, orientation="TB", node_layer_dict=None, sorting=True):
+    def __init__(self, graph, orientation="TB", node_layer_dict={}, sorting=True):
         """
         Initialize the hierarchical layout.
 
@@ -32,19 +32,17 @@ class HierarchicalLayout:
         self.graph = graph
         self.orientation = orientation
         self.layers = []
-        self.node_layer = {}
         self.positions = {}
         self.node_layer_dict = node_layer_dict
         self.sorting = sorting
 
     def _assign_layers(self):
         """Assign each node to a layer using provided override with flow_hierarchy as fallback."""
-        self.node_layer = {node: int(layer) for node, layer in self.node_layer_dict.items()}
 
-        max_layer = max(self.node_layer.values()) if self.node_layer else 0
+        max_layer = max(self.node_layer_dict.values())
         self.layers = [[] for _ in range(max_layer + 1)]
 
-        for node, layer in self.node_layer.items():
+        for node, layer in self.node_layer_dict.items():
             self.layers[layer].append(node)
 
         return self.layers
