@@ -79,8 +79,7 @@ class FASTGAHEPowerTrainConfigurator:
     :param power_train_file_path: if provided, power train will be read directly from it
     """
 
-    _connection_check_cache = {}
-    _timer_cache = {}
+    _cache = {}
 
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
@@ -211,9 +210,8 @@ class FASTGAHEPowerTrainConfigurator:
         :param power_train_file: Path to the file to open.
         """
         key = str(pth.abspath(power_train_file))
-        FASTGAHEPowerTrainConfigurator._timer_cache.setdefault(key, {})
-        FASTGAHEPowerTrainConfigurator._timer_cache[key].setdefault(
-            "first_load_time" , time.time())
+        FASTGAHEPowerTrainConfigurator._cache.setdefault(key, {})
+        FASTGAHEPowerTrainConfigurator._cache[key].setdefault("first_load_time", time.time())
 
         self._power_train_file = pth.abspath(power_train_file)
 
@@ -565,9 +563,10 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_inputs = openmdao_input_list
 
         key = str(self._power_train_file)
-        first_load_time = FASTGAHEPowerTrainConfigurator._timer_cache[key].get("first_load_time")
-        FASTGAHEPowerTrainConfigurator._timer_cache[key].setdefault(
-            "initialization_time", time.time() - first_load_time)
+        first_load_time = FASTGAHEPowerTrainConfigurator._cache[key].get("first_load_time")
+        FASTGAHEPowerTrainConfigurator._cache[key].setdefault(
+            "initialization_time", time.time() - first_load_time
+        )
 
     def _check_connection(self, connections_list):
         """
@@ -2973,7 +2972,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         # If cache is empty, no instance is usable
-        if not FASTGAHEPowerTrainConfigurator._connection_check_cache:
+        if not FASTGAHEPowerTrainConfigurator._cache:
             return False
 
         key = str(power_train_file)
@@ -2985,15 +2984,18 @@ class FASTGAHEPowerTrainConfigurator:
 
         # If cache is not empty but there is no instance of that particular configuration file, no
         # instance is usable.
-        if key not in FASTGAHEPowerTrainConfigurator._connection_check_cache:
+        if (
+            FASTGAHEPowerTrainConfigurator._cache[key].get("skip_test")
+            or FASTGAHEPowerTrainConfigurator._cache[key].get("last_mod_time")
+        ) is None:
             return False
 
-        if FASTGAHEPowerTrainConfigurator._connection_check_cache[key]["skip_test"]:
+        if FASTGAHEPowerTrainConfigurator._cache[key]["skip_test"]:
             return True
 
         # Finally, if an instance exists, but it has been modified since, no instance is usable.
         if (
-            FASTGAHEPowerTrainConfigurator._connection_check_cache[key]["last_mod_time"]
+            FASTGAHEPowerTrainConfigurator._cache[key]["last_mod_time"]
             < pathlib.Path(power_train_file).lstat().st_mtime
         ):
             return False
@@ -3009,11 +3011,10 @@ class FASTGAHEPowerTrainConfigurator:
 
         key = str(power_train_file)
 
-        cache_instance = {
-            "last_mod_time": pathlib.Path(power_train_file).lstat().st_mtime,
-            "skip_test": False,
-        }
-        FASTGAHEPowerTrainConfigurator._connection_check_cache[key] = cache_instance
+        FASTGAHEPowerTrainConfigurator._cache[key].setdefault(
+            "last_mod_time", pathlib.Path(power_train_file).lstat().st_mtime
+        )
+        FASTGAHEPowerTrainConfigurator._cache[key].setdefault("skip_test", False)
 
     @staticmethod
     def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:
