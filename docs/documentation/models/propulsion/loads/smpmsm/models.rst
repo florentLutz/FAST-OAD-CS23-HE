@@ -259,5 +259,5 @@ PMSM model.
 
 .. raw:: html
 
-   <a href="../../../../../../../_static/n2/n2_performance_sm_pmsm.html" target="_blank">SM PMSM performance N2 diagram</a><br>
-   <a href="../../../../../../../_static/n2/n2_sizing_sm_pmsm.html" target="_blank">SM PMSM sizing N2 diagram</a>
+   <a href="../../../../../../../_n2/n2_performance_sm_pmsm.html" target="_blank">SM PMSM performance N2 diagram</a><br>
+   <a href="../../../../../../../_n2/n2_sizing_sm_pmsm.html" target="_blank">SM PMSM sizing N2 diagram</a>

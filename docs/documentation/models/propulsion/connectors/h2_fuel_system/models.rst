@@ -68,5 +68,5 @@ for the hydrogen fuel system component.
 
 .. raw:: html
 
-   <a href="../../../../../../../_static/n2/n2_performance_h2_fuel_system.html" target="_blank">Hydrogen fuel system performance N2 diagram</a><br>
-   <a href="../../../../../../../_static/n2/n2_sizing_h2_fuel_system.html" target="_blank">Hydrogen fuel system sizing N2 diagram</a>
+   <a href="../../../../../../../_n2/n2_performance_h2_fuel_system.html" target="_blank">Hydrogen fuel system performance N2 diagram</a><br>
+   <a href="../../../../../../../_n2/n2_sizing_h2_fuel_system.html" target="_blank">Hydrogen fuel system sizing N2 diagram</a>

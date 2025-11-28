@@ -86,5 +86,5 @@ in gaseous hydrogen tank component.
 
 .. raw:: html
 
-   <a href="../../../../../../../_static/n2/n2_performance_gh2_tank.html" target="_blank">Gaseous hydrogen tank performance N2 diagram</a><br>
-   <a href="../../../../../../../_static/n2/n2_sizing_gh2_tank.html" target="_blank">Gaseous hydrogen tank sizing N2 diagram</a>
+   <a href="../../../../../../../_n2/n2_performance_gh2_tank.html" target="_blank">Gaseous hydrogen tank performance N2 diagram</a><br>
+   <a href="../../../../../../../_n2/n2_sizing_gh2_tank.html" target="_blank">Gaseous hydrogen tank sizing N2 diagram</a>
