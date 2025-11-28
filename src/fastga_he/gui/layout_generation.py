@@ -56,14 +56,11 @@ class HierarchicalLayout:
         :return: Dictionary mapping nodes to (x, y) coordinates
         """
         # Return the node set object of Networkx into ordinary list
-        graph = self.graph
-        layers = self.layers
-        orientation = self.orientation
-        all_nodes = list(graph.nodes())
-        num_layers = len(layers)
+        all_nodes = list(self.graph.nodes())
+        num_layers = len(self.layers)
 
         # Identify boundary nodes (first and last layers)
-        boundary_nodes = layers[0] + layers[-1]
+        boundary_nodes = self.layers[0] + self.layers[-1]
         interior_nodes = [node for node in all_nodes if node not in boundary_nodes]
 
         # Create node to index mapping
@@ -75,7 +72,7 @@ class HierarchicalLayout:
             node: [] for node in all_nodes
         }  # generate empty lists for each interior node
         # Adding the neighbor connected nodes into the list
-        for source, target in graph.edges():
+        for source, target in self.graph.edges():
             adjacency_dict[source].append(target)
             adjacency_dict[target].append(source)
 
@@ -83,10 +80,10 @@ class HierarchicalLayout:
         boundary_coords = {}
 
         # First layer (top/left boundary) setup
-        top_nodes = layers[0]
+        top_nodes = self.layers[0]
         num_top = len(top_nodes)
         for i, node in enumerate(top_nodes):
-            if orientation in ["TB", "BT"]:
+            if self.orientation in ["TB", "BT"]:
                 x = -(num_top - 1) / 2 + i
                 y = -1.0
             else:  # LR, RL
@@ -95,10 +92,10 @@ class HierarchicalLayout:
             boundary_coords[node] = (x, y)
 
         # Last layer (bottom/right boundary) setup
-        bottom_nodes = layers[-1]
+        bottom_nodes = self.layers[-1]
         num_bottom = len(bottom_nodes)
         for i, node in enumerate(bottom_nodes):
-            if orientation in ["TB", "BT"]:
+            if self.orientation in ["TB", "BT"]:
                 x = -(num_bottom - 1) / 2 + i
                 y = 1.0
             else:  # LR, RL
@@ -156,10 +153,10 @@ class HierarchicalLayout:
         # Map nodes back to layer positions based on their Tutte y-coordinate (or x for LR/RL)
         positions = {}
 
-        for layer_idx, layer_nodes in enumerate(layers):
-            if orientation in ["TB", "BT"]:
+        for layer_idx, layer_nodes in enumerate(self.layers):
+            if self.orientation in ["TB", "BT"]:
                 # y coordinate determines vertical position
-                layer_y = layer_idx if orientation == "BT" else num_layers - 1 - layer_idx
+                layer_y = layer_idx if self.orientation == "BT" else num_layers - 1 - layer_idx
 
                 # Sort nodes by their x-coordinate from Tutte
                 sorted_nodes = sorted(layer_nodes, key=lambda n: coords[n][0])
@@ -171,7 +168,7 @@ class HierarchicalLayout:
                     positions[node] = (x, layer_y)
             else:  # LR, RL
                 # x coordinate determines horizontal position
-                layer_x = layer_idx if orientation == "LR" else num_layers - 1 - layer_idx
+                layer_x = layer_idx if self.orientation == "LR" else num_layers - 1 - layer_idx
 
                 # Sort nodes by their y-coordinate from Tutte
                 sorted_nodes = sorted(layer_nodes, key=lambda n: coords[n][1])
@@ -231,7 +228,7 @@ class HierarchicalLayout:
 
         return self.positions
 
-    def compute(self):
+    def generate_networkx_hierarchy_plot(self):
         """Compute the layout by running all phases of the algorithm."""
         self._assign_layers()
 

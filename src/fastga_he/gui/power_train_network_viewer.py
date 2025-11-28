@@ -249,7 +249,7 @@ def _create_network_plot(
             if node_name in propeller_names:
                 node_layer_dict[node_name] = max_distance - distance
 
-            # Triggered if there is a component that is
+            # Triggered if there is a non-propulsor component at the top level
             else:
                 from_propulsor = True
                 break
@@ -261,7 +261,9 @@ def _create_network_plot(
             node_layer_dict[node_name] = distance
 
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
-    position_dict = HierarchicalLayout(graph, orientation, node_layer_dict, sorting).compute()
+    position_dict = HierarchicalLayout(
+        graph, orientation, node_layer_dict, sorting
+    ).generate_networkx_hierarchy_plot()
 
     plot, position_dict, icon_factor, icon_width_factor = _create_bokeh_plot(
         power_train_file_path, position_dict, orientation, plot_scaling
