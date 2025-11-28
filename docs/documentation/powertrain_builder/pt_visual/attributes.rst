@@ -3,12 +3,12 @@
 =========================================
 PT file visualization function attributes
 =========================================
-Other than the key settings like the PT config file path and where you want to save the HTML, you can tweak several other
+Other than the mandatory settings like the PT config file path and where you want to save the HTML, you can tweak several other
 options to adjust how the final plot looks.
 
 Sorting
 =======
-This attributes serve as the switch of the sorting mechanism, set to `True` as default to enable sorting. To disable,
+This attributes is used to activate the sorting mechanism, set to `True` as default to enable sorting. To disable,
 use:
 
 .. code:: python
@@ -34,7 +34,7 @@ To configure the sorting process to `from-propulsor approach`, use:
 .. note::
 
     If the crossing remains after switching between two approaches, please check the the sequencing of the node(s)
-    that is / are causing crossing in the PT configuration file.
+    that is/are causing crossing in the PT configuration file.
 
 Plot orientation
 ================
