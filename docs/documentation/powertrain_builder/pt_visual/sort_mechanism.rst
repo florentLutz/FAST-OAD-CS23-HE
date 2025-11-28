@@ -5,7 +5,7 @@ Hierarchy sorting
 =================
 The sorting mechanism inspired by the `Tutte's drawing algorithm <https://www2.cs.arizona.edu/~kpavlou/Tutte_Embedding.pdf>`_
 :cite:`pavlou:2008` is utilized before each visualization. This prevents connection crossing between two layers and allows a more organized presentation of the powertrain
-architecture. The sorting process would look like this: `Tutte's drawing sorting </tutte_demo.html>`_
+architecture. The sorting process would look like this: `Tutte's drawing sorting <../../../tutte_demo.html>`_
 
 Tutte's drawing algorithm
 =========================
