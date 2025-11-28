@@ -178,6 +178,18 @@ def test_power_train_file_connections():
         print("[" + om_output + ", " + om_input + "]")
 
 
+def test_power_train_initialization_time():
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    assert power_train_configurator._cache[sample_power_train_file_path]["initialization_time"] > 0
+
+
 def test_power_train_file_connection_check_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
