@@ -26,7 +26,7 @@ file. The example below demonstrates how to import and use this function with th
 
 The generated network should look like this:
 
-.. raw:: html
-
-   <a href="../../../single_ice.html" target="_blank">Single ICE architecture visualization</a><br>
+.. image:: ../../../img/single_ice.svg
+    :width: 800
+    :align: center
 

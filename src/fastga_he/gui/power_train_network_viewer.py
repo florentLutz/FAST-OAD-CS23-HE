@@ -171,6 +171,7 @@ def power_train_network_viewer(
     :param legend_scaling: Scaling factor for the legend size
     """
 
+    # Variables for animated powertrain display
     plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
         _create_network_plot(
             power_train_file_path=power_train_file_path,
