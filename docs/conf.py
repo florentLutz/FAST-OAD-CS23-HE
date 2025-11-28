@@ -121,7 +121,10 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static", "_n2", "_visual"]
+html_static_path = ["_static"]
+
+# Ensure all files are copied from static paths
+html_extra_path = ["_n2", "_visual"]
 
 try:
     from fastga_he import __version__

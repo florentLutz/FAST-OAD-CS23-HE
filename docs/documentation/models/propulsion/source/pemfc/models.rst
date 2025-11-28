@@ -185,9 +185,9 @@ computation in Proton-Exchange Membrane Fuel Cell (PEMFC) stack component.
 
 .. raw:: html
 
-   <a href="../../../../../../../_n2/n2_performance_pemfc_empirical.html" target="_blank">PEMFC stack performance N2 diagram with empirical polarization model</a><br>
-   <a href="../../../../../../../_n2/n2_performance_pemfc_analytical.html" target="_blank">PEMFC stack performance N2 diagram with analytical polarization model</a><br>
-   <a href="../../../../../../../_n2/n2_sizing_pemfc.html" target="_blank">PEMFC stack sizing N2 diagram</a>
+   <a href="/n2_performance_pemfc_empirical.html" target="_blank">PEMFC stack performance N2 diagram with empirical polarization model</a><br>
+   <a href="/n2_performance_pemfc_analytical.html" target="_blank">PEMFC stack performance N2 diagram with analytical polarization model</a><br>
+   <a href="/n2_sizing_pemfc.html" target="_blank">PEMFC stack sizing N2 diagram</a>
 
 
 

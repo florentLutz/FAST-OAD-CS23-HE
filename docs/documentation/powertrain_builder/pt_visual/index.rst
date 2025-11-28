@@ -28,5 +28,5 @@ The generated network should look like this:
 
 .. raw:: html
 
-   <a href="../../../../../_visual/single_ice.html" target="_blank">Single ICE architecture visualization</a><br>
+   <a href="/single_ice.html" target="_blank">Single ICE architecture visualization</a><br>
 
