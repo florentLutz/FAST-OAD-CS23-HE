@@ -229,34 +229,13 @@ def _create_network_plot(
 
     distance_from_energy_storage = configurator.get_distance_from_energy_storage()
 
-    # Build node attributes dictionaries
-    node_sizes = {}
-    node_types = {}
-    node_om_types = {}
-    node_icons = {}
-    propeller_names = []
-
     # For animation purposes
     node_image_sequences = {}
     propeller_rotation_sequences = {}
 
-    for component_name, component_type, om_type, icon_name, icon_size in zip(
-        names, components_type, components_om_type, icons_name, icons_size
-    ):
-        graph.add_node(component_name)
-        if component_type == "propulsor":
-            propeller_names.append(component_name)
-        node_sizes[component_name] = icon_size
-        node_types[component_name] = component_type
-        node_om_types[component_name] = om_type
-        node_icons[component_name] = icon_name
-
-    # Add edges
-    for connection in connections:
-        # Filter out bus connection output numbers
-        source = connection[0][0] if isinstance(connection[0], list) else connection[0]
-        target = connection[1][0] if isinstance(connection[1], list) else connection[1]
-        graph.add_edge(source, target)
+    propeller_names, node_sizes, node_types, node_om_types, node_icons = _define_hierarchy_elements(
+        graph, names, connections, components_type, components_om_type, icons_name, icons_size
+    )
 
     # Build node_layer_dict from distance_from_energy_storage
     node_layer_dict = {}
@@ -284,124 +263,35 @@ def _create_network_plot(
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
     position_dict = HierarchicalLayout(graph, orientation, node_layer_dict, sorting).compute()
 
-    # Normalize positions for Bokeh
-    if position_dict:
-        x_coordinates = []
-        y_coordinates = []
-        for coords in position_dict.values():
-            x_coordinates.append(coords[0])
-            y_coordinates.append(coords[1])
-
-        x_min, x_max = min(x_coordinates), max(x_coordinates)
-        y_min, y_max = min(y_coordinates), max(y_coordinates)
-
-        x_range = x_max - x_min if x_max > x_min else 1  # For the case of straight structure
-        y_range = y_max - y_min if y_max > y_min else 1  # For the case of straight structure
-
-        if orientation not in ["TB", "BT", "LR", "RL"]:
-            orientation = "TB"
-
-        # Scale to a reasonable display size with different orientation
-        if orientation == "TB" or orientation == "BT":
-            x_factor = 0.5
-            y_factor = 1.0
-            plot_width_factor = 1
-            icon_factor = 1
-            icon_width_factor = 0.8
-            x_orientation_offset = 125
-            y_orientation_offset = 0.0
-
-        elif orientation == "LR" or orientation == "RL":
-            x_factor = 1.0
-            y_factor = 0.5
-            plot_width_factor = 1.25
-            icon_factor = 1.75
-            icon_width_factor = 0.6
-            x_orientation_offset = -25
-            y_orientation_offset = 150
-
-        # Here update the position from NetworkX to fit in the bokeh plot
-
-        position_dict = {
-            node: (
-                ((coordinate[0] - x_min) / x_range * 550 * x_factor + x_orientation_offset),
-                ((coordinate[1] - y_min) / y_range * 550 * y_factor + y_orientation_offset),
-            )
-            for node, coordinate in position_dict.items()
-        }
-
-    # Create Bokeh plot
-    plot = bkplot.figure(
-        width=int(1200 * plot_scaling * plot_width_factor),
-        height=int(900 * plot_scaling),
-        x_range=(-50, 600),
-        y_range=(-50, 600),
-        toolbar_location="above",
-        background_fill_color=BACKGROUND_COLOR_CODE,
-        title=_get_file_name(power_train_file_path),
+    plot, position_dict, icon_factor, icon_width_factor = _create_bokeh_plot(
+        power_train_file_path, position_dict, orientation, plot_scaling
     )
 
-    plot.xgrid.visible = False
-    plot.ygrid.visible = False
-    plot.xaxis.visible = False
-    plot.yaxis.visible = False
+    (
+        node_source,
+        node_x,
+        node_y,
+        node_width,
+        node_height,
+        node_name_list,
+        node_types_list,
+        node_om_types_list,
+    ) = _build_node_dict_bokeh(
+        graph,
+        position_dict,
+        node_types,
+        node_om_types,
+        node_icons,
+        icon_width_factor,
+        node_sizes,
+        icon_factor,
+        plot_scaling,
+        static_html,
+    )
 
-    # Prepare node data
-    node_name_list = list(graph.nodes())
-    node_x = []
-    node_y = []
-    node_width = []
-    node_height = []
-    node_types_list = []
-    node_om_types_list = []
+    edge_source = _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html)
 
-    for node in node_name_list:
-        node_x.append(position_dict[node][0])
-        node_y.append(position_dict[node][1])
-        node_height.append(node_sizes[node] * icon_factor * plot_scaling)
-        node_width.append(node_sizes[node] * icon_factor * icon_width_factor * plot_scaling)
-        node_types_list.append(node_types[node])
-        node_om_types_list.append(node_om_types[node])
-
-    # Convert file paths to file:// URLs for local images
-    if static_html:
-        node_image_urls = [
-            "file://" + str(Path(icons_dict[node_icons[node]]["icon_path"]).resolve())
-            for node in node_name_list
-        ]
-
-    color_icon_urls = [
-        "file://" + str(Path(color_icon_dict[color_icon]).resolve())
-        for color_icon in color_icon_dict.keys()
-    ]
-
-    # Create edge data with colors
-    edge_x_pos = []
-    edge_y_pos = []
-    edge_colors = []
-
-    for edge in graph.edges():
-        start, end = edge
-        edge_x_pos.append([position_dict[start][0], position_dict[end][0]])
-        edge_y_pos.append([position_dict[start][1], position_dict[end][1]])
-
-        # Determine edge color based on connected nodes
-        source_icon = node_icons[start]
-        target_icon = node_icons[end]
-        edge_color = _get_edge_color(source_icon, target_icon)
-        edge_colors.append(edge_color)
-
-    # Draw edges
-    if static_html:
-        edge_source = bkmodel.ColumnDataSource(
-            data=dict(
-                xs=edge_x_pos,
-                ys=edge_y_pos,
-                line_color=edge_colors,
-                line_alpha=[0.7] * len(edge_x_pos),
-            )
-        )
-
+    # Draw edge lines
     plot.multi_line(
         xs="xs",
         ys="ys",
@@ -409,19 +299,6 @@ def _create_network_plot(
         line_color="line_color",
         line_width=3,
         line_alpha="line_alpha",
-    )
-
-    # Draw nodes as images
-    node_source = bkmodel.ColumnDataSource(
-        data=dict(
-            x=node_x,
-            y=node_y,
-            url=node_image_urls,
-            w=node_width,
-            h=node_height,
-            name=node_name_list,
-            type=node_types_list,
-        )
     )
 
     # Add circle to cover edge line
@@ -434,6 +311,7 @@ def _create_network_plot(
         line_alpha=0,
     )
 
+    # Draw nodes as image
     plot.image_url(
         url="url",
         x="x",
@@ -465,6 +343,11 @@ def _create_network_plot(
     )
     plot.add_layout(labels)
 
+    color_icon_urls = [
+        "file://" + str(Path(color_icon_dict[color_icon]).resolve())
+        for color_icon in color_icon_dict.keys()
+    ]
+
     _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_scaling)
 
     # Add interactive tools
@@ -478,7 +361,7 @@ def _create_network_plot(
 
         cleaned_node_om_types.append(_string_clean_up(node_om_type))
 
-    # Define list info
+    # Define hover list info
     hover_source = bkmodel.ColumnDataSource(
         data=dict(
             x=node_x,
@@ -513,6 +396,200 @@ def _create_network_plot(
     plot.add_tools(hover, bkmodel.BoxSelectTool())
 
     return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
+
+
+def _define_hierarchy_elements(
+    graph, names, connections, components_type, components_om_type, icons_name, icons_size
+):
+    """Define the nodes and edges for networkx and the node properties for bokeh."""
+
+    # Build node attributes dictionaries
+    propeller_names = []
+    node_sizes = {}
+    node_types = {}
+    node_om_types = {}
+    node_icons = {}
+
+    for component_name, component_type, om_type, icon_name, icon_size in zip(
+        names, components_type, components_om_type, icons_name, icons_size
+    ):
+        graph.add_node(component_name)
+        if component_type == "propulsor":
+            propeller_names.append(component_name)
+        node_sizes[component_name] = icon_size
+        node_types[component_name] = component_type
+        node_om_types[component_name] = om_type
+        node_icons[component_name] = icon_name
+
+    # Add edges
+    for connection in connections:
+        # Filter out bus connection output numbers
+        source = connection[0][0] if isinstance(connection[0], list) else connection[0]
+        target = connection[1][0] if isinstance(connection[1], list) else connection[1]
+        graph.add_edge(source, target)
+
+    return propeller_names, node_sizes, node_types, node_om_types, node_icons
+
+
+def _create_bokeh_plot(power_train_file_path, position_dict, orientation, plot_scaling):
+    """Create a bokeh plot to add the node and edges from the networkx plot."""
+
+    # Normalize positions for Bokeh
+    x_coordinates = []
+    y_coordinates = []
+
+    for coords in position_dict.values():
+        x_coordinates.append(coords[0])
+        y_coordinates.append(coords[1])
+
+    x_min, x_max = min(x_coordinates), max(x_coordinates)
+    y_min, y_max = min(y_coordinates), max(y_coordinates)
+
+    x_range = x_max - x_min if x_max > x_min else 1  # For the case of straight structure
+    y_range = y_max - y_min if y_max > y_min else 1  # For the case of straight structure
+
+    if orientation not in ["TB", "BT", "LR", "RL"]:
+        orientation = "TB"
+
+    # Scale to a reasonable display size with different orientation
+    if orientation == "TB" or orientation == "BT":
+        x_factor = 0.5
+        y_factor = 1.0
+        plot_width_factor = 1
+        icon_factor = 1
+        icon_width_factor = 0.8
+        x_orientation_offset = 125
+        y_orientation_offset = 0.0
+
+    elif orientation == "LR" or orientation == "RL":
+        x_factor = 1.0
+        y_factor = 0.5
+        plot_width_factor = 1.25
+        icon_factor = 1.75
+        icon_width_factor = 0.6
+        x_orientation_offset = -25
+        y_orientation_offset = 150
+
+    # Here update the position from NetworkX to fit in the bokeh plot
+
+    position_dict = {
+        node: (
+            ((coordinate[0] - x_min) / x_range * 550 * x_factor + x_orientation_offset),
+            ((coordinate[1] - y_min) / y_range * 550 * y_factor + y_orientation_offset),
+        )
+        for node, coordinate in position_dict.items()
+    }
+
+    # Create Bokeh plot
+    plot = bkplot.figure(
+        width=int(1200 * plot_scaling * plot_width_factor),
+        height=int(900 * plot_scaling),
+        x_range=(-50, 600),
+        y_range=(-50, 600),
+        toolbar_location="above",
+        background_fill_color=BACKGROUND_COLOR_CODE,
+        title=_get_file_name(power_train_file_path),
+    )
+
+    plot.xgrid.visible = False
+    plot.ygrid.visible = False
+    plot.xaxis.visible = False
+    plot.yaxis.visible = False
+
+    return plot, position_dict, icon_factor, icon_width_factor
+
+
+def _build_node_dict_bokeh(
+    graph,
+    position_dict,
+    node_types,
+    node_om_types,
+    node_icons,
+    icon_width_factor,
+    node_sizes,
+    icon_factor,
+    plot_scaling,
+    static_html,
+):
+    """Create the dictionary of nodes for add the nodes into bokeh plot."""
+
+    # Prepare node data
+    node_name_list = list(graph.nodes())
+    node_x = []
+    node_y = []
+    node_width = []
+    node_height = []
+    node_types_list = []
+    node_om_types_list = []
+
+    for node in node_name_list:
+        node_x.append(position_dict[node][0])
+        node_y.append(position_dict[node][1])
+        node_height.append(node_sizes[node] * icon_factor * plot_scaling)
+        node_width.append(node_sizes[node] * icon_factor * icon_width_factor * plot_scaling)
+        node_types_list.append(node_types[node])
+        node_om_types_list.append(node_om_types[node])
+
+    # Convert file paths to file:// URLs for local images
+    if static_html:
+        node_image_urls = [
+            "file://" + str(Path(icons_dict[node_icons[node]]["icon_path"]).resolve())
+            for node in node_name_list
+        ]
+
+    node_source = bkmodel.ColumnDataSource(
+        data=dict(
+            x=node_x,
+            y=node_y,
+            url=node_image_urls,
+            w=node_width,
+            h=node_height,
+        )
+    )
+
+    return (
+        node_source,
+        node_x,
+        node_y,
+        node_width,
+        node_height,
+        node_name_list,
+        node_types_list,
+        node_om_types_list,
+    )
+
+
+def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html):
+    """Create the dictionary of edges for add the edges into bokeh plot."""
+
+    # Create edge data with colors
+    edge_x_pos = []
+    edge_y_pos = []
+    edge_colors = []
+
+    for edge in graph.edges():
+        start, end = edge
+        edge_x_pos.append([position_dict[start][0], position_dict[end][0]])
+        edge_y_pos.append([position_dict[start][1], position_dict[end][1]])
+
+        # Determine edge color based on connected nodes
+        source_icon = node_icons[start]
+        target_icon = node_icons[end]
+        edge_color = _get_edge_color(source_icon, target_icon)
+        edge_colors.append(edge_color)
+
+    # Draw edges
+    if static_html:
+        edge_source = bkmodel.ColumnDataSource(
+            data=dict(
+                xs=edge_x_pos,
+                ys=edge_y_pos,
+                line_color=edge_colors,
+                line_alpha=[0.7] * len(edge_x_pos),
+            )
+        )
+
+    return edge_source
 
 
 def _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_scaling: float = 1.0):
@@ -627,12 +704,12 @@ def _string_clean_up(old_string):
     new_string = old_string.replace("_", " ")
 
     # Add a space after 'DC' if followed immediately by a letter or number
-    new_string = _add_space_after_acronym(new_string, "DC")
+    new_string = new_string.replace("DC", "DC ")
     new_string = new_string.replace("DC DC", "DC-DC")
 
     # Add a space after 'H2' and 'PEMFC'
-    new_string = _add_space_after_acronym(new_string, "H2")
-    new_string = _add_space_after_acronym(new_string, "PEMFC")
+    new_string = new_string.replace("H2", "H2 ")
+    new_string = new_string.replace("PEMFC", "PEMFC ")
 
     # Add space before a capital letter preceded by a lowercase letter
     new_string = _add_space_before_caps(new_string)
@@ -641,28 +718,6 @@ def _string_clean_up(old_string):
     new_string = " ".join(new_string.split())
 
     return new_string
-
-
-def _add_space_after_acronym(text, acronym):
-    """
-    Add a space after an acronym if followed by a letter or number.
-    """
-    result = []
-    i = 0
-    while i < len(text):
-        if text[i : i + len(acronym)] == acronym:
-            # Check if acronym is followed by a letter or number
-            next_index = i + len(acronym)
-            if next_index < len(text) and text[next_index].isalnum():
-                result.append(acronym + " ")
-                i = next_index
-            else:
-                result.append(acronym)
-                i = next_index
-        else:
-            result.append(text[i])
-            i += 1
-    return "".join(result)
 
 
 def _add_space_before_caps(text):

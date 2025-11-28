@@ -6,6 +6,15 @@ PT file visualization function attributes
 Other than the key settings like the PT config file path and where you want to save the HTML, you can tweak several other
 options to adjust how the final plot looks.
 
+Sorting
+=======
+This attributes serve as the switch of the sorting mechanism, set to `True` as default to enable sorting. To disable,
+use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, sorting=False)
+
 Sorting reference layer
 =======================
 This attribute sets the :ref:`reference level <ref-level-sort>` used by the sorting mechanism. The default approach is

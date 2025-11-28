@@ -34,7 +34,7 @@ def test_pt_network_viewer(cleanup):
 
     assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
 
-    # Cleanup to avoid any overclogging
+    # Cleanup to avoid any over-clogging
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
 
 
@@ -54,7 +54,7 @@ def test_pt_network_viewer_tri_prop(cleanup):
 
     assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
 
-    # Cleanup to avoid any overclogging
+    # Cleanup to avoid any over-clogging
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
 
 
@@ -74,5 +74,5 @@ def test_pt_network_viewer_tri_prop_two_chainz(cleanup):
 
     assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
 
-    # Cleanup to avoid any overclogging
+    # Cleanup to avoid any over-clogging
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
