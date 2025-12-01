@@ -2,6 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2025 ISAE-SUPAERO
 
+import base64
 import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
@@ -766,3 +767,79 @@ def _save_static_html(plot, file_path):
     # Save the plot
     bkplot.output_file(str(file_path))
     bkplot.save(plot)
+
+    # Read the generated HTML
+    with open(file_path, "r", encoding="utf-8") as f:
+        html_content = f.read()
+
+    # Replace file:// URLs in the HTML string directly
+    try:
+        # Split by 'file://' and process each part
+        parts = html_content.split("file://")
+        result = [parts[0]]  # Keep the part before first file://
+
+        for part in parts[1:]:
+            # Find the end of the URL (quote or comma or bracket)
+            end_chars = ['"', ",", "]", "}"]
+            end_idx = len(part)
+
+            for char in end_chars:
+                idx = part.find(char)
+                if idx != -1 and idx < end_idx:
+                    end_idx = idx
+
+            # Extract the URL and convert it
+            url = "file://" + part[:end_idx]
+            converted = _url_to_base64(url)
+
+            # Reconstruct: converted URL + rest of the part
+            result.append(converted + part[end_idx:])
+
+        html_content = "".join(result)
+    except Exception as e:
+        print(f"Error processing URLs: {e}")
+
+    # Write the updated HTML back
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    print(f"Static HTML saved to: {file_path}")
+
+
+def _url_to_base64(url):
+    """
+    Convert a file:// URL to a Base64 data URI.
+    :param url: File path or file:// URL to convert
+
+    Returns: Base64 data URI string, or original URL if conversion fails
+    """
+    # Skip non-file URLs
+    if not url.startswith("file://"):
+        return url
+
+    try:
+        # Convert file:// URL to local path
+        file_path_str = url.replace("file:///", "").replace("file://", "")
+        local_path = Path(file_path_str)
+
+        # Read and encode as Base64
+        with open(local_path, "rb") as img_file:
+            img_data = base64.b64encode(img_file.read()).decode("utf-8")
+
+        # Determine MIME type
+        suffix = local_path.suffix.lower()
+        mime_types = {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".gif": "image/gif",
+            ".svg": "image/svg+xml",
+        }
+        mime_type = mime_types.get(suffix, "image/png")
+
+        # Return data URI
+        return f"data:{mime_type};base64,{img_data}"
+
+    except Exception as e:
+        print(f"Error processing {url}: {e}")
+        return url
