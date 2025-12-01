@@ -123,6 +123,9 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
+# Ensure all files are copied from static paths
+html_extra_path = ["_n2", "_visual"]
+
 try:
     from fastga_he import __version__
 except ImportError:
