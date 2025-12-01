@@ -66,7 +66,7 @@ To configure the position, use:
 
 Plot size scaling
 =================
-This attribute specifies the size factor of the main powertrain architecture from the default settings. Only positive
+This attribute allows to resize the architecture with keeping the original aspect ratio. Only positive
 values are valid. To configure this factor, use:
 
 .. code:: python
@@ -75,7 +75,7 @@ values are valid. To configure this factor, use:
 
 Legend size scaling
 ===================
-This attribute specifies the size factor of the connection color legend from the default settings. Only positive
+This attribute allows to resize the color legend with keeping the original aspect ratio. Only positive
 values are valid. To configure this factor, use:
 
 .. code:: python
