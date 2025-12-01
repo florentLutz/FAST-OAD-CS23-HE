@@ -23,5 +23,5 @@ The following two links are the N2 diagrams representing the performance and siz
 
 .. raw:: html
 
-   <a href="../../../../../../../n2/n2_performance_af_pmsm.html" target="_blank">AF PMSM performance N2 diagram</a><br>
-   <a href="../../../../../../../n2/n2_sizing_af_pmsm.html" target="_blank">AF PMSM sizing N2 diagram</a>
+   <a href="../../../../../n2_performance_af_pmsm.html" target="_blank">AF PMSM performance N2 diagram</a><br>
+   <a href="../../../../../n2_sizing_af_pmsm.html" target="_blank">AF PMSM sizing N2 diagram</a>

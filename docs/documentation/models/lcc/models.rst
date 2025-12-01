@@ -156,7 +156,7 @@ of `EMRAX <https://emrax.com/e-motors/>`_.
 
 Battery purchase cost
 *********************
-The battery purchase cost is modeled with power regression from :cite:`Wesley:2023`.
+The battery purchase cost is modeled with power regression from :cite:`wesley:2023`.
 
 .. math::
 
@@ -332,5 +332,5 @@ The following diagrams present the structure of the LCC model using the TBM-900 
 
 .. raw:: html
 
-   <a href="../../../../../n2/n2_tbm_900_lcc.html" target="_blank">LCC N2 diagram with TBM 900</a><br>
-   <a href="../../../../../n2/n2_pipistrel_electro_lcc.html" target="_blank">LCC N2 diagram with Pipistrel Velis Electro</a><br>
+   <a href="../../../n2_tbm_900_lcc.html" target="_blank">LCC N2 diagram with TBM 900</a><br>
+   <a href="../../../n2_pipistrel_electro_lcc.html" target="_blank">LCC N2 diagram with Pipistrel Velis Electro</a><br>

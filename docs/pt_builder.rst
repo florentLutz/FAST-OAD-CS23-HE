@@ -13,6 +13,6 @@ simple powertrain templates.
 
     Powertrain configuration (PT) file <documentation/powertrain_builder/pt_file>
     Component Constraints and ID <documentation/powertrain_builder/constraints>
-    PT file visualization <documentation/powertrain_builder/pt_visual>
+    PT file visualization <documentation/powertrain_builder/pt_visual/index>
     PT file templates <documentation/powertrain_builder/templates>
 
