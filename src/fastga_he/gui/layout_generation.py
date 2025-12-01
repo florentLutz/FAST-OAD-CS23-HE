@@ -228,7 +228,7 @@ class HierarchicalLayout:
 
         return self.positions
 
-    def generate_networkx_hierarchy_plot(self):
+    def generate_networkx_layout(self):
         """Compute the layout by running all phases of the algorithm."""
         self._assign_layers()
 

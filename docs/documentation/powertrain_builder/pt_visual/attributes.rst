@@ -66,7 +66,7 @@ To configure the position, use:
 
 Plot size scaling
 =================
-This attribute allows to resize the architecture with keeping the original aspect ratio. Only positive
+This attribute allows to resize the architecture while keeping the original aspect ratio. Only positive
 values are valid. To configure this factor, use:
 
 .. code:: python
@@ -75,7 +75,7 @@ values are valid. To configure this factor, use:
 
 Legend size scaling
 ===================
-This attribute allows to resize the color legend with keeping the original aspect ratio. Only positive
+This attribute allows to resize the color legend while keeping the original aspect ratio. Only positive
 values are valid. To configure this factor, use:
 
 .. code:: python

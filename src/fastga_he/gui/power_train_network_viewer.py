@@ -265,7 +265,7 @@ def _create_network_plot(
     # Compute layout based on specified algorithm with hierarchy from distance_from_energy_storage
     position_dict = HierarchicalLayout(
         graph, orientation, node_layer_dict, sorting
-    ).generate_networkx_hierarchy_plot()
+    ).generate_networkx_layout()
 
     plot, position_dict, icon_factor, icon_width_factor = _create_bokeh_plot(
         power_train_file_path, position_dict, orientation, plot_scaling
