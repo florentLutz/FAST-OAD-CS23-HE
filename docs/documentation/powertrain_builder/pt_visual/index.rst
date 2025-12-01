@@ -29,5 +29,5 @@ The generated network should look like this:
 .. raw:: html
 
    <a href="../../../single_ice.html" target="_blank" style="text-decoration: none;">
-       <img src="../../../_images/single_ice.svg" alt="Single ICE powertrain architecture" style="max-width: 100%; cursor: pointer; opacity: 1; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+       <img src="../../../single_ice.svg" alt="Single ICE powertrain architecture" style="max-width: 100%; cursor: pointer; opacity: 1; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
    </a>
