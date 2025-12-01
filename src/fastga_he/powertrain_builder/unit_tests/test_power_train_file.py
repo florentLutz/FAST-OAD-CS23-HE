@@ -185,8 +185,18 @@ def test_power_train_initialization_time():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
+    initialization_duration = power_train_configurator._cache[sample_power_train_file_path][
+        "initialization_duration"
+    ]
+
+    power_train_configurator._get_connections()
+
     assert (
         power_train_configurator._cache[sample_power_train_file_path]["initialization_duration"] > 0
+    )
+    assert (
+        power_train_configurator._cache[sample_power_train_file_path]["initialization_duration"]
+        == initialization_duration
     )
 
 
