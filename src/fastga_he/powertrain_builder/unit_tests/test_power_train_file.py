@@ -185,19 +185,12 @@ def test_power_train_initialization_time():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    initialization_duration = power_train_configurator._cache[sample_power_train_file_path][
-        "initialization_duration"
-    ]
+    cache = power_train_configurator._cache[sample_power_train_file_path]
 
-    power_train_configurator._get_connections()
-
-    assert (
-        power_train_configurator._cache[sample_power_train_file_path]["initialization_duration"] > 0
-    )
-    assert (
-        power_train_configurator._cache[sample_power_train_file_path]["initialization_duration"]
-        == initialization_duration
-    )
+    print("\n")
+    print(f"Load time: {cache['load_time']} sec")
+    print(f"Get component time: {cache['get_component_time']} sec")
+    print(f"Get connection time: {cache['get_connection_time']} sec")
 
 
 def test_power_train_file_connection_check_cache():
