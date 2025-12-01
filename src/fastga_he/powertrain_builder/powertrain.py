@@ -565,7 +565,7 @@ class FASTGAHEPowerTrainConfigurator:
         key = str(self._power_train_file)
         first_load_time = FASTGAHEPowerTrainConfigurator._cache[key].get("first_load_time")
         FASTGAHEPowerTrainConfigurator._cache[key].setdefault(
-            "initialization_time", time.time() - first_load_time
+            "initialization_duration", time.time() - first_load_time
         )
 
     def _check_connection(self, connections_list):
