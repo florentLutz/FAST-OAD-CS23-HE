@@ -41,6 +41,9 @@ if __name__ == "__main__":
     m_star_1 = torque_star ** (3.0 / 3.5)
     m_star_2 = torque_star
 
+    pure_poly = np.polyfit(cont_torque, 7.1 * m_star_data, 2)
+    m_star_from_poly = np.polyval(pure_poly, cont_torque) / 7.1
+
     fig = go.Figure()
 
     discrete_x = ["EMRAX 188", "EMRAX 208", "EMRAX 228", "EMRAX 268", "EMRAX 348"]
@@ -89,6 +92,16 @@ if __name__ == "__main__":
     )
     fig.add_trace(scatter_2)
 
+    scatter_poly = go.Scatter(
+        x=discrete_x,
+        y=m_star_from_poly,
+        mode="markers",
+        name="From polynomial",
+        marker_size=15,
+        showlegend=True,
+    )
+    fig.add_trace(scatter_poly)
+
     fig.update_layout(
         title_text="Comparison of the methodologies to estimate the scaling of the motor mass",
         title_x=0.5,
@@ -101,4 +114,4 @@ if __name__ == "__main__":
     fig.update_layout(legend=dict(font=dict(size=20)))
     fig.show()
 
-    fig.write_image("mass_scaling.pdf")
+    # fig.write_image("mass_scaling.pdf")
