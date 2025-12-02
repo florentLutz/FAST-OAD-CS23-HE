@@ -210,7 +210,7 @@ class FASTGAHEPowerTrainConfigurator:
         :param power_train_file: Path to the file to open.
         """
         start_time = time.perf_counter()
-        if FASTGAHEPowerTrainConfigurator._cache.get(pth.abspath(power_train_file)) is None:
+        if not FASTGAHEPowerTrainConfigurator._cache.get(pth.abspath(power_train_file)):
             FASTGAHEPowerTrainConfigurator._cache[pth.abspath(power_train_file)] = {}
 
         self._power_train_file = pth.abspath(power_train_file)
@@ -3030,10 +3030,10 @@ class FASTGAHEPowerTrainConfigurator:
 
         # If cache is not empty but there is no instance of that particular configuration file, no
         # instance is usable.
-        if (
+        if not (
             FASTGAHEPowerTrainConfigurator._cache[key].get("skip_test")
             or FASTGAHEPowerTrainConfigurator._cache[key].get("last_mod_time")
-        ) is None:
+        ):
             return False
 
         if FASTGAHEPowerTrainConfigurator._cache[key]["skip_test"]:
