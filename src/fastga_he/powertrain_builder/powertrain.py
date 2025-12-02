@@ -984,6 +984,16 @@ class FASTGAHEPowerTrainConfigurator:
 
         return distance_from_energy_storage
 
+    def get_distance(self, references):
+        reference_component = []
+        for component_type, component_type_class in resources.DICTIONARY_CT_CTC.items():
+            if type(references) == str:
+                if component_type == references or component_type_class == references:
+                    reference_component.append(component_type)
+
+
+
+
     def reorder_components(self, *lists):
         """
         Reorders components by their distance from the nearest propeller and assigns proper
