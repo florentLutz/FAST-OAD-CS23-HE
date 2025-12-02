@@ -213,7 +213,8 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._power_train_file = pth.abspath(power_train_file)
 
-        self._check_existing_instance(self._power_train_file)
+        if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
 
         self._serializer = _YAMLSerializer()
         self._serializer.read(self._power_train_file)
@@ -428,9 +429,9 @@ class FASTGAHEPowerTrainConfigurator:
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
 
-        if not self._check_existing_instance(self._power_train_file):
+        if not self._check_existing_connection_cache_instance():
             self._check_connection(connections_list)
-            self._add_connection_check_cache_instance(self._power_train_file)
+            self._add_connection_check_cache_instance()
             _LOGGER.info("Powertrain components' connections checked.")
 
         self._connection_list = connections_list
@@ -3020,57 +3021,51 @@ class FASTGAHEPowerTrainConfigurator:
 
         return clean_dict, list(set(species_list))
 
-    @staticmethod
-    def _check_existing_instance(power_train_file):
+    def _check_existing_connection_cache_instance(self):
         """
         Checks the cache to see if an instance of the cache already exists and is usable. Usable
         means there was no modification to the powertrain configuration file.
         """
-        key = str(power_train_file)
 
         # If cache is empty, no instance is usable
-        if not FASTGAHEPowerTrainConfigurator._cache.get(key):
-            FASTGAHEPowerTrainConfigurator._cache[key] = {}
+        if not FASTGAHEPowerTrainConfigurator._cache:
             return False
 
         # If the powertrain configuration file is a temporary copy or dedicated for a test,
         # the connection test will be omitted
-        if key.endswith("_temp_copy.yml"):
+        if self._power_train_file.endswith("_temp_copy.yml"):
             return True
 
         # If cache is not empty but there is no instance of that particular configuration file, no
         # instance is usable.
         if not (
-            FASTGAHEPowerTrainConfigurator._cache[key].get("skip_test")
-            or FASTGAHEPowerTrainConfigurator._cache[key].get("last_mod_time")
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("skip_test")
+            or FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("last_mod_time")
         ):
             return False
 
-        if FASTGAHEPowerTrainConfigurator._cache[key]["skip_test"]:
+        if FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["skip_test"]:
             return True
 
         # Finally, if an instance exists, but it has been modified since, no instance is usable.
         if (
-            FASTGAHEPowerTrainConfigurator._cache[key]["last_mod_time"]
-            < pathlib.Path(power_train_file).lstat().st_mtime
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"]
+            < pathlib.Path(self._power_train_file).lstat().st_mtime
         ):
             return False
 
         return True
 
-    @staticmethod
-    def _add_connection_check_cache_instance(power_train_file):
+    def _add_connection_check_cache_instance(self):
         """
         In the case where no instance were usable and the compilation needed to be redone, we add
         said compilation to the cache.
         """
 
-        key = str(power_train_file)
-
-        FASTGAHEPowerTrainConfigurator._cache[key]["last_mod_time"] = (
-            pathlib.Path(power_train_file).lstat().st_mtime
+        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"] = (
+            pathlib.Path(self._power_train_file).lstat().st_mtime
         )
-        FASTGAHEPowerTrainConfigurator._cache[key]["skip_test"] = False
+        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["skip_test"] = False
 
     @staticmethod
     def belongs_to_custom_attribute_definition(line, line_idx, lines_to_inspect) -> bool:

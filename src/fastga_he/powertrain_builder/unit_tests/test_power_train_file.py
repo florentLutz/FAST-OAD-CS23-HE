@@ -199,10 +199,11 @@ def test_power_train_initialization_time():
     power_train_configurator._get_connections()
 
     octo_cache = power_train_configurator._cache[octo_power_train_file_path]
+    simple_cache_post = power_train_configurator._cache[simple_power_train_file_path]
 
-    assert load_time_simple == simple_cache["load_time"]
-    assert get_component_time_simple == simple_cache["get_component_time"]
-    assert get_connection_time_simple == simple_cache["get_connection_time"]
+    assert load_time_simple == simple_cache_post["load_time"]
+    assert get_component_time_simple == simple_cache_post["get_component_time"]
+    assert get_connection_time_simple == simple_cache_post["get_connection_time"]
 
     print("\n")
     print("Simple assembly")
@@ -226,7 +227,9 @@ def test_power_train_file_connection_check_cache():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    assert power_train_configurator._check_existing_instance(sample_power_train_file_path)
+    assert power_train_configurator._check_existing_connection_cache_instance(
+        sample_power_train_file_path
+    )
 
 
 def test_power_train_file_no_propeller():
