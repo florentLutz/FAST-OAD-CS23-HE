@@ -177,45 +177,36 @@ def test_power_train_file_connections():
 
 
 def test_power_train_initialization_time():
-    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    simple_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
+        power_train_file_path=simple_power_train_file_path
     )
 
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    cache = power_train_configurator._cache[sample_power_train_file_path]
+    octo_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=octo_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    simple_cache = power_train_configurator._cache[simple_power_train_file_path]
+    octo_cache = power_train_configurator._cache[octo_power_train_file_path]
 
     print("\n")
     print("Simple assembly")
-    print(f"Load time: {cache['load_time']} sec")
-    print(f"Get component time: {cache['get_component_time']} sec")
-    print(f"Get connection time: {cache['get_connection_time']} sec")
-    print("=" * 50)
-    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
+    print(f"Load time: {simple_cache['load_time']} sec")
+    print(f"Get component time: {simple_cache['get_component_time']} sec")
+    print(f"Get connection time: {simple_cache['get_connection_time']} sec")
 
-    power_train_configurator._get_components()
-    power_train_configurator._get_connections()
-
-    file_path = power_train_configurator._cache.keys()
-
-    for path in file_path:
-        cache = power_train_configurator._cache[path]
-
-        print("\n")
-        if path == sample_power_train_file_path:
-            print("Octo assembly")
-        else:
-            print("Temporary assembly")
-        print(f"Load time: {cache['load_time']} sec")
-        print(f"Get component time: {cache['get_component_time']} sec")
-        print(f"Get connection time: {cache['get_connection_time']} sec")
-
-    print("=" * 50)
+    print("\n")
+    print("Octo assembly")
+    print(f"Load time: {octo_cache['load_time']} sec")
+    print(f"Get component time: {octo_cache['get_component_time']} sec")
+    print(f"Get connection time: {octo_cache['get_connection_time']} sec")
 
 
 def test_power_train_file_connection_check_cache():

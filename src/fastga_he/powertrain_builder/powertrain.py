@@ -210,10 +210,11 @@ class FASTGAHEPowerTrainConfigurator:
         :param power_train_file: Path to the file to open.
         """
         start_time = time.perf_counter()
-        if not FASTGAHEPowerTrainConfigurator._cache.get(pth.abspath(power_train_file)):
-            FASTGAHEPowerTrainConfigurator._cache[pth.abspath(power_train_file)] = {}
 
         self._power_train_file = pth.abspath(power_train_file)
+
+        if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
 
         self._serializer = _YAMLSerializer()
         self._serializer.read(self._power_train_file)
@@ -228,9 +229,11 @@ class FASTGAHEPowerTrainConfigurator:
                 _LOGGER.warning('Power train file: "%s" is not a FAST-OAD-GA-HE key.', key)
 
         end_time = time.perf_counter()
-        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].setdefault(
-            "load_time", end_time - start_time
-        )
+
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("load_time"):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["load_time"] = (
+                end_time - start_time
+            )
 
     def get_watcher_file_path(self):
         """
@@ -258,9 +261,13 @@ class FASTGAHEPowerTrainConfigurator:
             self._generate_components_list()
 
         end_time = time.perf_counter()
-        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].setdefault(
-            "get_component_time", end_time - start_time
-        )
+
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
+            "get_component_time"
+        ):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["get_component_time"] = (
+                end_time - start_time
+            )
 
     def _generate_components_list(self):
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
@@ -576,9 +583,13 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_connection_inputs = openmdao_input_list
 
         end_time = time.perf_counter()
-        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].setdefault(
-            "get_connection_time", end_time - start_time
-        )
+
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
+            "get_connection_time"
+        ):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["get_connection_time"] = (
+                end_time - start_time
+            )
 
     def _check_connection(self, connections_list):
         """
