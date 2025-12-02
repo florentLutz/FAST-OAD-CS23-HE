@@ -854,6 +854,17 @@ class FASTGAHEPowerTrainConfigurator:
         self._connection_graph = graph
 
     def get_distance(self, references):
+        """
+        Calculate the shortest distance from each component to the nearest reference component(s).
+
+        :param references: Component type class or component type of reference component(s).
+                          Can be a single string or a list of type string entries.
+                          Each string should match a valid component type or component type class.
+
+        :return: A dictionary mapping each component name to its minimum distance to any
+                 of the reference components. Distance is measured as the number of edges in
+                 the shortest path.
+        """
         reference_component_types = []
         if isinstance(references, str):
             references = [references]
