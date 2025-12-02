@@ -853,152 +853,16 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._connection_graph = graph
 
-    def get_distance_from_propulsive_load(self):
-        propulsor_name = []
-        propulsive_load_names = []
-
-        # First and for reason that will appear clear later, we get a list of propulsor
-        for component_type_class, component_name in zip(
-            self._components_type_class, self._components_name
-        ):
-            if "propulsor" in component_type_class:
-                propulsor_name.append(component_name)
-
-        self._construct_connection_graph()
-        graph = self._connection_graph
-
-        # We now get a list of propulsive loads. Because of the use envisioned for this function (
-        # mostly post-processing), the ICE won't be considered a propulsive load if no propulsor
-        # is attached to it
-        for component_type_class, component_name in zip(
-            self._components_type_class, self._components_name
-        ):
-            if "propulsive_load" == [component_type_class]:
-                propulsive_load_names.append(component_name)
-
-            # This case will correspond to ICE/turbomachinery
-            elif "propulsive_load" in component_type_class:
-                # Check whether or not at least one neighbor is a propulsor
-                neighbors = list(graph.neighbors(component_name))
-                if set(neighbors).intersection(propulsor_name):
-                    propulsive_load_names.append(component_name)
-                # If there are gearboxes among neighbor, we also check for the neighbor of the
-                # gearbox. Not very generic way to do things :/
-                else:
-                    name_to_id = dict(zip(self._components_name, self._components_id))
-                    for neighbor in set(neighbors):
-                        if (
-                            name_to_id[neighbor] == "fastga_he.pt_component.speed_reducer"
-                            or name_to_id[neighbor] == "fastga_he.pt_component.planetary_gear"
-                            or name_to_id[neighbor] == "fastga_he.pt_component.gearbox"
-                        ):
-                            neighbors_gb = list(graph.neighbors(neighbor))
-                            if set(neighbors_gb).intersection(propulsor_name):
-                                propulsive_load_names.append(component_name)
-
-        distance_from_propulsive_load = {}
-        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
-
-        for component_name in self._components_name:
-            # When there are two separate sub propulsion chain in the same propulsion file,
-            # these line will cause an issue because, as it will browse all propulsive load he
-            # will attempt to reach loads he is not connected to and therefore not in
-            # connections_length_between_nodes. So first we must make sure to only browse
-            # connected loads.
-
-            connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_propulsive_loads = list(
-                set(propulsive_load_names) & set(connected_components)
-            )
-
-            min_distance = np.inf
-            for prop_load in connected_propulsive_loads:
-                distance_to_load = connections_length_between_nodes[component_name][prop_load]
-                if distance_to_load < min_distance:
-                    min_distance = distance_to_load
-
-            distance_from_propulsive_load[component_name] = min_distance
-
-        return distance_from_propulsive_load, propulsive_load_names
-
-    def get_distance_from_propulsor(self):
-        propulsor_names = []
-
-        # First and for reason that will appear clear later, we get a list of propulsor
-        for component_type_class, component_name in zip(
-            self._components_type_class, self._components_name
-        ):
-            if "propulsor" in component_type_class:
-                propulsor_names.append(component_name)
-
-        self._construct_connection_graph()
-        graph = self._connection_graph
-
-        distance_from_propulsor = {}
-        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
-
-        for component_name in self._components_name:
-            connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_propulsors = list(set(propulsor_names) & set(connected_components))
-
-            min_distance = np.inf
-            for prop in connected_propulsors:
-                distance_to_load = connections_length_between_nodes[component_name][prop]
-                if distance_to_load < min_distance:
-                    min_distance = distance_to_load
-
-            distance_from_propulsor[component_name] = min_distance
-
-        return distance_from_propulsor
-
-    def get_distance_from_energy_storage(self):
-        energy_storage_names = []
-
-        # First and for reason that will appear clear later, we get a list of energy storage
-        # component
-        for component_type, component_name in zip(self._components_type, self._components_name):
-            if (
-                "gaseous_hydrogen_tank" in component_type
-                or "fuel_tank" in component_type
-                or "battery_pack" in component_type
-            ):
-                energy_storage_names.append(component_name)
-
-        self._construct_connection_graph()
-        graph = self._connection_graph
-
-        distance_from_energy_storage = {}
-        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
-
-        for component_name in self._components_name:
-            connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_energy_storages = list(set(energy_storage_names) & set(connected_components))
-
-            min_distance = np.inf
-            for storage in connected_energy_storages:
-                distance_to_storage = connections_length_between_nodes[component_name][storage]
-                if distance_to_storage < min_distance:
-                    min_distance = distance_to_storage
-
-            distance_from_energy_storage[component_name] = min_distance
-
-        return distance_from_energy_storage
-
     def get_distance(self, references):
         reference_component_types = []
         if isinstance(references, str):
             references = [references]
 
+        # Check
         for component_type, component_type_class in resources.DICTIONARY_CT_CTC.items():
             for reference in references:
-                # For component having single component type or component type class
                 if isinstance(reference, str):
-                    if reference == component_type or reference == component_type_class:
-                        reference_component_types.append(component_type)
-
-                # For component having multiple component type class
-                elif isinstance(reference, list):
-                    if reference == component_type_class:
+                    if reference == component_type or reference in component_type_class:
                         reference_component_types.append(component_type)
 
                 else:
@@ -1052,7 +916,7 @@ class FASTGAHEPowerTrainConfigurator:
         the same order and count as input lists.
         """
         # Sort items by value first, then by original key order to maintain consistency
-        distance_from_prop = self.get_distance_from_propulsor()
+        distance_from_prop = self.get_distance("propulsor")
         sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
 
         # Create new dictionary with proper sequential indices

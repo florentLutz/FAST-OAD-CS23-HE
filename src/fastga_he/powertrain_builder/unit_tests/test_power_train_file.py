@@ -520,6 +520,28 @@ def test_distance_from_propulsor():
     assert distance_from_prop["battery_pack_1"] == 7
 
 
+def test_distance_from_energy_storage():
+    sample_power_train_file_path = pth.join(
+        pth.dirname(__file__), "data", "sample_power_train_hybrid.yml"
+    )
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    print("\n")
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    print("\n")
+    distance_from_energy_storage = power_train_configurator.get_distance(["tank", "battery_pack"])
+
+    assert distance_from_energy_storage["motor_1"] == 4
+    assert distance_from_energy_storage["turboshaft_1"] == 2
+    assert distance_from_energy_storage["inverter_2"] == 3
+    assert distance_from_energy_storage["dc_dc_converter_1"] == 1
+    assert distance_from_energy_storage["battery_pack_1"] == 0
+
+
 def test_independent_voltage_subgraph():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
