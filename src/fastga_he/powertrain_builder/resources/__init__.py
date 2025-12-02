@@ -39,5 +39,5 @@ from .registered_components import (
     DICTIONARY_VARIESN_T_MASS,
     DICTIONARY_ETA,
     DICTIONARY_CTRL_PARAM,
-    DICTIONARY_CT_CTC
+    DICTIONARY_CT_CTC,
 )

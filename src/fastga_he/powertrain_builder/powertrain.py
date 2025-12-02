@@ -985,14 +985,57 @@ class FASTGAHEPowerTrainConfigurator:
         return distance_from_energy_storage
 
     def get_distance(self, references):
-        reference_component = []
+        reference_component_types = []
+        if isinstance(references, str):
+            references = [references]
+
         for component_type, component_type_class in resources.DICTIONARY_CT_CTC.items():
-            if type(references) == str:
-                if component_type == references or component_type_class == references:
-                    reference_component.append(component_type)
+            for reference in references:
+                # For component having single component type or component type class
+                if isinstance(reference, str):
+                    if reference == component_type or reference == component_type_class:
+                        reference_component_types.append(component_type)
 
+                # For component having multiple component type class
+                elif isinstance(reference, list):
+                    if reference == component_type_class:
+                        reference_component_types.append(component_type)
 
+                else:
+                    raise TypeError(
+                        f"{reference} is not a valid data type for a component type or component type class"
+                    )
 
+        if not reference_component_types:
+            raise ValueError("Invalid component type(s) or component type class(es)")
+
+        # Collect reference component of the powertrain
+        reference_component_names = []
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            if component_type in reference_component_types:
+                reference_component_names.append(component_name)
+
+        self._construct_connection_graph()
+        graph = self._connection_graph
+
+        distance_from_reference_component = {}
+        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+
+        for component_name in self._components_name:
+            connected_components = list(connections_length_between_nodes[component_name].keys())
+            connected_reference_component = list(
+                set(reference_component_names) & set(connected_components)
+            )
+
+            min_distance = np.inf
+            for component in connected_reference_component:
+                distance_to_reference = connections_length_between_nodes[component_name][component]
+                if distance_to_reference < min_distance:
+                    min_distance = distance_to_reference
+
+            distance_from_reference_component[component_name] = min_distance
+
+        return distance_from_reference_component
 
     def reorder_components(self, *lists):
         """
