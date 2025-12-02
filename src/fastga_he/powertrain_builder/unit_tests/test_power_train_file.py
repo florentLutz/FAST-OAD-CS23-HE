@@ -185,6 +185,11 @@ def test_power_train_initialization_time():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
+    simple_cache = power_train_configurator._cache[simple_power_train_file_path]
+    load_time_simple = simple_cache["load_time"]
+    get_component_time_simple = simple_cache["get_component_time"]
+    get_connection_time_simple = simple_cache["get_connection_time"]
+
     octo_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=octo_power_train_file_path
@@ -193,8 +198,11 @@ def test_power_train_initialization_time():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    simple_cache = power_train_configurator._cache[simple_power_train_file_path]
     octo_cache = power_train_configurator._cache[octo_power_train_file_path]
+
+    assert load_time_simple == simple_cache["load_time"]
+    assert get_component_time_simple == simple_cache["get_component_time"]
+    assert get_connection_time_simple == simple_cache["get_connection_time"]
 
     print("\n")
     print("Simple assembly")

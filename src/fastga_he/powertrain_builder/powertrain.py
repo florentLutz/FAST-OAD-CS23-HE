@@ -213,8 +213,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._power_train_file = pth.abspath(power_train_file)
 
-        if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
+        self._check_existing_instance(self._power_train_file)
 
         self._serializer = _YAMLSerializer()
         self._serializer.read(self._power_train_file)
@@ -3027,12 +3026,12 @@ class FASTGAHEPowerTrainConfigurator:
         Checks the cache to see if an instance of the cache already exists and is usable. Usable
         means there was no modification to the powertrain configuration file.
         """
+        key = str(power_train_file)
 
         # If cache is empty, no instance is usable
-        if not FASTGAHEPowerTrainConfigurator._cache:
+        if not FASTGAHEPowerTrainConfigurator._cache.get(key):
+            FASTGAHEPowerTrainConfigurator._cache[key] = {}
             return False
-
-        key = str(power_train_file)
 
         # If the powertrain configuration file is a temporary copy or dedicated for a test,
         # the connection test will be omitted
