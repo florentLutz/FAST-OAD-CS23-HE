@@ -227,9 +227,7 @@ def test_power_train_file_connection_check_cache():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    assert power_train_configurator._check_existing_connection_cache_instance(
-        sample_power_train_file_path
-    )
+    assert power_train_configurator._check_existing_connection_cache_instance()
 
 
 def test_power_train_file_no_propeller():
