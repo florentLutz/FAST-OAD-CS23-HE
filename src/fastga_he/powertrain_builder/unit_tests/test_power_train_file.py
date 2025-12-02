@@ -188,9 +188,34 @@ def test_power_train_initialization_time():
     cache = power_train_configurator._cache[sample_power_train_file_path]
 
     print("\n")
+    print("Simple assembly")
     print(f"Load time: {cache['load_time']} sec")
     print(f"Get component time: {cache['get_component_time']} sec")
     print(f"Get connection time: {cache['get_connection_time']} sec")
+    print("=" * 50)
+    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=sample_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    file_path = power_train_configurator._cache.keys()
+
+    for path in file_path:
+        cache = power_train_configurator._cache[path]
+
+        print("\n")
+        if path == sample_power_train_file_path:
+            print("Octo assembly")
+        else:
+            print("Temporary assembly")
+        print(f"Load time: {cache['load_time']} sec")
+        print(f"Get component time: {cache['get_component_time']} sec")
+        print(f"Get connection time: {cache['get_connection_time']} sec")
+
+    print("=" * 50)
 
 
 def test_power_train_file_connection_check_cache():
