@@ -29,6 +29,11 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
             val=np.nan,
             desc="Flat rating of the turboshaft",
         )
+        self.add_input(
+            "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_weight",
+            val=1.0,
+            desc="K-factor to adjust the weight of the turboshaft",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":uninstalled_mass",
@@ -45,8 +50,11 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
         power_rating = inputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
         ]
+        k_weight = inputs[
+            "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_weight"
+        ]
 
-        uninstalled_mass = 105.04 + 0.1387 * power_rating
+        uninstalled_mass = (105.04 + 0.1387 * power_rating) * k_weight
 
         outputs[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":uninstalled_mass"
@@ -55,7 +63,18 @@ class SizingTurboshaftUninstalledWeight(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         turboshaft_id = self.options["turboshaft_id"]
 
+        power_rating = inputs[
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating"
+        ]
+        k_weight = inputs[
+            "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_weight"
+        ]
+
         partials[
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":uninstalled_mass",
             "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":power_rating",
-        ] = 0.1387
+        ] = 0.1387 * k_weight
+        partials[
+            "data:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":uninstalled_mass",
+            "settings:propulsion:he_power_train:turboshaft:" + turboshaft_id + ":k_weight",
+        ] = 105.04 + 0.1387 * power_rating
