@@ -1243,14 +1243,12 @@ DICTIONARY_VARIES_MASS = {}
 DICTIONARY_VARIESN_T_MASS = {}
 DICTIONARY_ETA = {}
 DICTIONARY_CTRL_PARAM = {}
-DICTIONARY_CT_CTC = {}
 
 for known_component in KNOWN_COMPONENTS:
     KNOWN_ID.append(known_component[ID])
     DICTIONARY_CN[known_component[ID]] = known_component[CN]
     DICTIONARY_CN_ID[known_component[ID]] = known_component[CN_ID]
     DICTIONARY_CT[known_component[ID]] = known_component[CT]
-    DICTIONARY_CT_CTC[known_component[CT]] = known_component[CTC]
     DICTIONARY_ATT[known_component[ID]] = known_component[ATT]
     DICTIONARY_PT[known_component[ID]] = known_component[PT]
     DICTIONARY_SPT[known_component[ID]] = known_component[SPT]

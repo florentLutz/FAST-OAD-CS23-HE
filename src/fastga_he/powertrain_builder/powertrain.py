@@ -903,11 +903,14 @@ class FASTGAHEPowerTrainConfigurator:
             references = [references]
 
         # Check
-        for component_type, component_type_class in resources.DICTIONARY_CT_CTC.items():
+        for id in resources.KNOWN_ID:
             for reference in references:
                 if isinstance(reference, str):
-                    if reference == component_type or reference in component_type_class:
-                        reference_component_types.append(component_type)
+                    if (
+                        reference == resources.DICTIONARY_CT[id]
+                        or reference in resources.DICTIONARY_CTC[id]
+                    ):
+                        reference_component_types.append(resources.DICTIONARY_CT[id])
 
                 else:
                     raise TypeError(
