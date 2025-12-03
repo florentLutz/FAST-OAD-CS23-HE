@@ -76,3 +76,6 @@ venv*/
 **/workdir/**
 
 **/.env
+
+# UQPCE outputs
+**/outputs*/**
