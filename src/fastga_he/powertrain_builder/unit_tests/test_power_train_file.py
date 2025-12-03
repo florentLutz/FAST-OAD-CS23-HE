@@ -510,7 +510,9 @@ def test_distance_from_propulsive_load_with_component_type_specification():
     power_train_configurator._get_connections()
 
     print("\n")
-    distance_from_prop_load = power_train_configurator.get_component_distance(["propulsive_load", "ICE"])
+    distance_from_prop_load = power_train_configurator.get_component_distance(
+        ["propulsive_load", "ICE"]
+    )
 
     assert distance_from_prop_load["battery_pack_1"] == 5
     assert distance_from_prop_load["ice_1"] == 0
@@ -609,7 +611,9 @@ def test_distance_from_energy_storage():
     power_train_configurator._get_connections()
 
     print("\n")
-    distance_from_energy_storage = power_train_configurator.get_component_distance(["tank", "battery_pack"])
+    distance_from_energy_storage = power_train_configurator.get_component_distance(
+        ["tank", "battery_pack"]
+    )
 
     assert distance_from_energy_storage["motor_1"] == 4
     assert distance_from_energy_storage["turboshaft_1"] == 2
