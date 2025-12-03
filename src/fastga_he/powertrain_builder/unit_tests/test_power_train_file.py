@@ -116,9 +116,7 @@ def test_power_train_file_components_performances_sspc_last():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_sspc_last.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -178,6 +176,48 @@ def test_power_train_file_connections():
         print("[" + om_output + ", " + om_input + "]")
 
 
+def test_power_train_initialization_time():
+    simple_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=simple_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    simple_cache = power_train_configurator._cache[simple_power_train_file_path]
+    load_time_simple = simple_cache["load_time"]
+    get_component_time_simple = simple_cache["get_component_time"]
+    get_connection_time_simple = simple_cache["get_connection_time"]
+
+    octo_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
+    power_train_configurator = FASTGAHEPowerTrainConfigurator(
+        power_train_file_path=octo_power_train_file_path
+    )
+
+    power_train_configurator._get_components()
+    power_train_configurator._get_connections()
+
+    octo_cache = power_train_configurator._cache[octo_power_train_file_path]
+    simple_cache_post = power_train_configurator._cache[simple_power_train_file_path]
+
+    assert load_time_simple == simple_cache_post["load_time"]
+    assert get_component_time_simple == simple_cache_post["get_component_time"]
+    assert get_connection_time_simple == simple_cache_post["get_connection_time"]
+
+    print("\n")
+    print("Simple assembly")
+    print(f"Load time: {simple_cache['load_time']} sec")
+    print(f"Get component time: {simple_cache['get_component_time']} sec")
+    print(f"Get connection time: {simple_cache['get_connection_time']} sec")
+
+    print("\n")
+    print("Octo assembly")
+    print(f"Load time: {octo_cache['load_time']} sec")
+    print(f"Get component time: {octo_cache['get_component_time']} sec")
+    print(f"Get connection time: {octo_cache['get_connection_time']} sec")
+
+
 def test_power_train_file_connection_check_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
@@ -187,7 +227,7 @@ def test_power_train_file_connection_check_cache():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    assert power_train_configurator._check_existing_instance(sample_power_train_file_path)
+    assert power_train_configurator._check_existing_connection_cache_instance()
 
 
 def test_power_train_file_no_propeller():
@@ -373,9 +413,7 @@ def test_power_train_file_connections_splitter():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -442,9 +480,7 @@ def test_distance_from_propulsive_load():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -524,9 +560,7 @@ def test_independent_voltage_subgraph():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -560,9 +594,7 @@ def test_voltage_setter_list():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -800,9 +832,7 @@ def test_get_power_on_each_node():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_splitter.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -1109,9 +1139,7 @@ def test_propulsor_connection():
     sample_power_train_file_path = pth.join(
         pth.dirname(__file__), "data", "sample_power_train_file_tri_prop_one_unconnected.yml"
     )
-    FASTGAHEPowerTrainConfigurator._connection_check_cache[sample_power_train_file_path] = {
-        "skip_test": True
-    }
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {"skip_test": True}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
