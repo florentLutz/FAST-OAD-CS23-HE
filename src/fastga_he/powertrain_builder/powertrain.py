@@ -919,9 +919,56 @@ class FASTGAHEPowerTrainConfigurator:
 
         # Collect reference component of the powertrain
         reference_component_names = []
-        for component_type, component_name in zip(self._components_type, self._components_name):
+        propulsor_names = self.get_thrust_element_list()
+        generator_names = self.get_generator_list()
+        for component_type_class, component_type, component_name in zip(
+            self._components_type_class, self._components_type, self._components_name
+        ):
             if component_type in reference_component_types:
                 reference_component_names.append(component_name)
+
+            if isinstance(component_type_class, list):
+                # Case if the component type is directly designated
+                if component_type in references:
+                    continue
+                # Case with all component type class in the list is a subset of references
+                elif set(component_type_class).issubset(set(references)):
+                    continue
+                # Check if the component is a propulsive load
+                elif "propulsive_load" in component_type_class and "propulsive_load" in references:
+                    distance_from_component_dict = self._get_distance_from_component_name(
+                        component_name
+                    )
+                    min_distance_from_propulsor = np.inf
+                    min_distance_from_generator = np.inf
+
+                    for component, distance in distance_from_component_dict.items():
+                        if component in propulsor_names:
+                            if distance < min_distance_from_propulsor:
+                                min_distance_from_propulsor = distance
+
+                        if component in generator_names:
+                            if distance < min_distance_from_generator:
+                                min_distance_from_generator = distance
+
+                    if min_distance_from_generator < min_distance_from_propulsor:
+                        reference_component_names.remove(component_name)
+
+        return self._get_distance_from_component_name(reference_component_names)
+
+    def _get_distance_from_component_name(self, component_names):
+        """
+        Calculate the shortest distance from each component to the nearest reference component(s).
+
+        :param component_names: Component name of reference component(s).
+                          Can be a single string or a list of type string entries.
+
+        :return: A dictionary mapping each component name to its minimum distance to any
+                 of the reference components. Distance is measured as the number of edges in
+                 the shortest path.
+        """
+        if isinstance(component_names, str):
+            component_names = [component_names]
 
         self._construct_connection_graph()
         graph = self._connection_graph
@@ -931,9 +978,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         for component_name in self._components_name:
             connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_reference_component = list(
-                set(reference_component_names) & set(connected_components)
-            )
+            connected_reference_component = list(set(component_names) & set(connected_components))
 
             min_distance = np.inf
             for component in connected_reference_component:
@@ -1341,6 +1386,20 @@ class FASTGAHEPowerTrainConfigurator:
                 components_types.append(component_type)
 
         return components_names, components_types
+
+    def get_generator_list(self) -> list:
+        """
+        Returns the list of generator component(s) in the powertrain architecture.
+        """
+
+        self._get_components()
+        components_names = []
+
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            if "generator" in component_type:
+                components_names.append(component_name)
+
+        return components_names
 
     def get_fuel_tank_list_and_fuel(self) -> Tuple[list, list, list]:
         """
