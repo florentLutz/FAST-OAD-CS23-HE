@@ -229,7 +229,7 @@ def _create_network_plot(
         icons_size,
     ) = configurator.get_network_elements_list()
 
-    distance_from_energy_storage = configurator.get_distance(["tank", "battery_pack"])
+    distance_from_energy_storage = configurator.get_component_distance(["tank", "battery_pack"])
 
     # For animation purposes
     node_image_sequences = {}
@@ -257,7 +257,7 @@ def _create_network_plot(
                 break
 
     if from_propulsor:
-        distance_from_propulsor = configurator.get_distance("propulsor")
+        distance_from_propulsor = configurator.get_component_distance("propulsor")
 
         for node_name, distance in distance_from_propulsor.items():
             node_layer_dict[node_name] = distance

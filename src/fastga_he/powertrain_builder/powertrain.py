@@ -886,7 +886,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._connection_graph = graph
 
-    def get_distance(self, references):
+    def get_component_distance(self, references):
         """
         Calculate the shortest distance from each component to the nearest reference component(s).
 
@@ -1005,7 +1005,7 @@ class FASTGAHEPowerTrainConfigurator:
         the same order and count as input lists.
         """
         # Sort items by value first, then by original key order to maintain consistency
-        distance_from_prop = self.get_distance("propulsor")
+        distance_from_prop = self.get_component_distance("propulsor")
         sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
 
         # Create new dictionary with proper sequential indices
