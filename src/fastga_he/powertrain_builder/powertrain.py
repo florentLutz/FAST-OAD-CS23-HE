@@ -907,20 +907,17 @@ class FASTGAHEPowerTrainConfigurator:
 
         # Collect the reference component type by comparing the registered component type classes
         # and component types to the given reference list
-        for id in resources.KNOWN_ID:
+        valid_references_string = []
+        for comp_id in resources.KNOWN_ID:
             for reference in references:
                 if isinstance(reference, str):
                     if (
-                        reference == resources.DICTIONARY_CT[id]
-                        or reference in resources.DICTIONARY_CTC[id]
+                        reference == resources.DICTIONARY_CT[comp_id]
+                        or reference in resources.DICTIONARY_CTC[comp_id]
                     ):
-                        reference_component_types.append(resources.DICTIONARY_CT[id])
-
-                    else:
-                        raise AttributeError(
-                            f"{reference} is not a valid entry for component type or "
-                            f"component type class"
-                        )
+                        reference_component_types.append(resources.DICTIONARY_CT[comp_id])
+                        if reference not in valid_references_string:
+                            valid_references_string.append(reference)
 
                 else:
                     raise TypeError(
@@ -930,6 +927,12 @@ class FASTGAHEPowerTrainConfigurator:
 
         if not reference_component_types:
             raise ValueError("Invalid component type(s) or component type class(es)")
+
+        if not set(references).issubset(set(valid_references_string)):
+            missing = set(references) - set(valid_references_string)
+            raise AttributeError(
+                f"{missing} is / are not valid entry for component type or component type class"
+            )
 
         # Collect reference component of the powertrain from the reference component type(s)
         reference_component_names = []
