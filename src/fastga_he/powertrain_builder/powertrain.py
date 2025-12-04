@@ -892,8 +892,8 @@ class FASTGAHEPowerTrainConfigurator:
         a certain type or type class.
 
         :param references: Component type class or component type of reference component(s).
-                          Can be a single string or a list of type string entries.
-                          Each string should match a valid component type or component type class.
+                          Can be a single string or a list of type string entries. Each string
+                          should match a registered component type or component type class.
 
         :return: A dictionary mapping each component name to its minimum distance to any
                  of the reference components. Distance is measured as the number of edges in
@@ -916,6 +916,7 @@ class FASTGAHEPowerTrainConfigurator:
                         or reference in resources.DICTIONARY_CTC[comp_id]
                     ):
                         reference_component_types.append(resources.DICTIONARY_CT[comp_id])
+                        # Add registered reference into the valid list
                         if reference not in valid_references_string:
                             valid_references_string.append(reference)
 
