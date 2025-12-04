@@ -888,7 +888,8 @@ class FASTGAHEPowerTrainConfigurator:
 
     def get_component_distance(self, references):
         """
-        Calculate the shortest distance from each component to the nearest reference component(s) of a certain type or type class. 
+        Calculate the shortest distance from each component to the nearest reference component(s) of
+        a certain type or type class.
 
         :param references: Component type class or component type of reference component(s).
                           Can be a single string or a list of type string entries.
@@ -899,10 +900,13 @@ class FASTGAHEPowerTrainConfigurator:
                  the shortest path.
         """
         reference_component_types = []
+
+        # Packing single component type / component type class string into list
         if isinstance(references, str):
             references = [references]
 
-        # Check
+        # Collect the reference component type by comparing the registered component type classes
+        # and component types to the given reference list
         for id in resources.KNOWN_ID:
             for reference in references:
                 if isinstance(reference, str):
@@ -912,15 +916,22 @@ class FASTGAHEPowerTrainConfigurator:
                     ):
                         reference_component_types.append(resources.DICTIONARY_CT[id])
 
+                    else:
+                        raise AttributeError(
+                            f"{reference} is not a valid entry for component type or "
+                            f"component type class"
+                        )
+
                 else:
                     raise TypeError(
-                        f"{reference} is not a valid data type for a component type or component type class"
+                        f"{reference} is not a valid data type for a component type or component "
+                        f"type class"
                     )
 
         if not reference_component_types:
             raise ValueError("Invalid component type(s) or component type class(es)")
 
-        # Collect reference component of the powertrain
+        # Collect reference component of the powertrain from the reference component type(s)
         reference_component_names = []
         propulsor_names = self.get_thrust_element_list()
         generator_names = self.get_generator_list()
@@ -930,11 +941,16 @@ class FASTGAHEPowerTrainConfigurator:
             if component_type in reference_component_types:
                 reference_component_names.append(component_name)
 
+            # This section checks whether a component with multiple component-type classes is
+            # explicitly included in the reference list, or whether its two type classes are subsets
+            # of that list. If only one of the two component types appears in the list, an
+            # additional check is performed to confirm that the component indeed belongs to that
+            # specific type class.
             if isinstance(component_type_class, list):
-                # Case if the component type is directly designated
+                # Check if the component type is in the reference list
                 if component_type in references:
                     continue
-                # Case with all component type class in the list is a subset of references
+                # Check if all component type class in the list is a subset of the reference list
                 elif set(component_type_class).issubset(set(references)):
                     continue
                 # Check if the component is a propulsive load
