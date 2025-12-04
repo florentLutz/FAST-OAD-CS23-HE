@@ -25,7 +25,7 @@ def test_sizing_kodiak_100():
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
 
-    samp_count = 19
+    samp_count = 25
     aleat_cnt = 500000
     epist_cnt = 1
 
@@ -33,7 +33,7 @@ def test_sizing_kodiak_100():
         order=2,
         verbose=True,
         outputs=True,
-        plot=False,
+        plot=True,
         aleat_samp_size=aleat_cnt,
         epist_samp_size=epist_cnt,
 
