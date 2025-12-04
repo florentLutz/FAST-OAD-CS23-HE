@@ -888,7 +888,7 @@ class FASTGAHEPowerTrainConfigurator:
 
     def get_component_distance(self, references):
         """
-        Calculate the shortest distance from each component to the nearest reference component(s).
+        Calculate the shortest distance from each component to the nearest reference component(s) of a certain type or type class. 
 
         :param references: Component type class or component type of reference component(s).
                           Can be a single string or a list of type string entries.
