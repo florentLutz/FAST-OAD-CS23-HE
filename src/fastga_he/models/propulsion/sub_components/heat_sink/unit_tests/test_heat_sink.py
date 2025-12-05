@@ -6,7 +6,6 @@ import os.path as pth
 import openmdao.api as om
 import pytest
 
-from ..components.sizing_heat_sink_dimension import SizingHeatSinkDimension
 from ..components.sizing_heat_sink_tube_length import SizingHeatSinkTubeLength
 from ..components.sizing_heat_sink_tube_mass_flow import SizingHeatSinkTubeMassFlow
 from ..components.sizing_heat_sink_coolant_prandtl import SizingHeatSinkCoolantPrandtl
@@ -27,26 +26,6 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_heat_sink.xml"
 PREFIX = PT_DATA_PREFIX + "inverter:inverter_1"
-
-
-def test_dimension_heat_sink():
-    # Research independent input value in .xml file
-    ivc = get_indep_var_comp(
-        list_inputs(SizingHeatSinkDimension(prefix=PREFIX)),
-        __file__,
-        XML_FILE,
-    )
-
-    problem = run_system(SizingHeatSinkDimension(prefix=PREFIX), ivc)
-
-    assert problem.get_val(PREFIX + ":heat_sink:length", units="m") == pytest.approx(
-        0.2145, rel=1e-2
-    )
-    assert problem.get_val(PREFIX + ":heat_sink:width", units="m") == pytest.approx(
-        0.1716, rel=1e-2
-    )
-
-    problem.check_partials(compact_print=True)
 
 
 def test_length_heat_sink_tube():

@@ -7,7 +7,7 @@ import os.path as pth
 import numpy as np
 import openmdao.api as om
 
-from modules.mtow_loop import SizingLoopMTOW
+from .modules.mtow_loop import SizingLoopMTOW
 
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 

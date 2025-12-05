@@ -9,8 +9,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from turboshaft_components.turboshaft_geometry_computation import DesignPointCalculation
-from turboshaft_components.turboshaft_off_design_fuel import Turboshaft
+from .turboshaft_components.turboshaft_geometry_computation import DesignPointCalculation
+from .turboshaft_components.turboshaft_off_design_fuel import Turboshaft
 
 THERMODYNAMIC_POWER_COLUMN_NAME = "Design Power (kW)"
 OPR_COLUMN_NAME = "Design OPR (-)"
