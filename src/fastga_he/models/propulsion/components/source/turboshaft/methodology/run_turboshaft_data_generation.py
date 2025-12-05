@@ -13,12 +13,12 @@ import pandas as pd
 
 from pyDOE2 import lhs
 
-from turboshaft_components.turboshaft_geometry_computation import DesignPointCalculation
-from turboshaft_components.turboshaft_off_design_max_power import (
+from .turboshaft_components.turboshaft_geometry_computation import DesignPointCalculation
+from .turboshaft_components.turboshaft_off_design_max_power import (
     TurboshaftMaxPowerOPRLimit,
     TurboshaftMaxPowerITTLimit,
 )
-from turboshaft_components.turboshaft_off_design_fuel import Turboshaft
+from .turboshaft_components.turboshaft_off_design_fuel import Turboshaft
 
 
 def get_ivc_all_data(
