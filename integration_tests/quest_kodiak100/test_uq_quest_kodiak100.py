@@ -2,11 +2,16 @@
 #  Electric Aircraft.
 #  Copyright (C) 2025 ISAE-SUPAERO
 
+import time
+
 import logging
 import pathlib
-import pytest
 
 import numpy as np
+
+import plotly.graph_objects as go
+import plotly.io as pio
+
 import fastoad.api as oad
 from uqpce import PCE
 
@@ -36,7 +41,6 @@ def test_sizing_kodiak_100():
         plot=True,
         aleat_samp_size=aleat_cnt,
         epist_samp_size=epist_cnt,
-
     )
 
     # Add normal variables for all the parameters we are uncertain of.
@@ -75,7 +79,6 @@ def test_sizing_kodiak_100():
     wing_area_t = np.array([])
 
     for x in x_t:
-
         problem = configurator.get_problem()
 
         # Create inputs
@@ -85,17 +88,27 @@ def test_sizing_kodiak_100():
         problem.read_inputs()
         problem.setup()
 
-        problem.set_val("settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_sfc", val=x[0])
-        problem.set_val("settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_weight", val=x[1])
-        problem.set_val("settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_length", val=x[2])
-        problem.set_val("settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_diameter", val=x[3])
+        problem.set_val(
+            "settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_sfc", val=x[0]
+        )
+        problem.set_val(
+            "settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_weight", val=x[1]
+        )
+        problem.set_val(
+            "settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_length", val=x[2]
+        )
+        problem.set_val(
+            "settings:propulsion:he_power_train:turboshaft:turboshaft_1:k_diameter", val=x[3]
+        )
 
         problem.run_model()
 
         mtow_t = np.append(mtow_t, problem.get_val("data:weight:aircraft:MTOW", units="kg"))
         owe_t = np.append(owe_t, problem.get_val("data:weight:aircraft:OWE", units="kg"))
         fuel_t = np.append(fuel_t, problem.get_val("data:mission:sizing:fuel", units="kg"))
-        wing_area_t = np.append(wing_area_t, problem.get_val("data:geometry:wing:area", units="m**2"))
+        wing_area_t = np.append(
+            wing_area_t, problem.get_val("data:geometry:wing:area", units="m**2")
+        )
 
     pce.fit(x_t, mtow_t)  # Fit the PCE model
     pce.check_variables(x_t)  # Check if the samples correspond to the distributions
@@ -136,3 +149,189 @@ def test_sizing_kodiak_100():
 
     # The output file will be stored under output folder
     pce.write_outputs()
+
+
+def test_post_process_uq_kodiak100():
+    fig = go.Figure()
+
+    fig.add_bar(
+        y=[
+            3279.8,
+            1726.9,
+            932.99,
+        ],
+        x=["MTOW", "OWE", "Fuel"],
+        name="Mean value",
+        showlegend=True,
+        orientation="v",
+        error_y=dict(
+            type="data",
+            array=[
+                101.2,
+                50.3,
+                72.3,
+            ],
+            arrayminus=[
+                100.6,
+                50.2,
+                71.54,
+            ],
+            color="red",
+            thickness=6,
+            width=10,
+        ),
+        marker=dict(
+            color="white",
+            line=dict(color="black", width=2),
+            pattern_shape="/",
+        ),
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[None, None],
+            y=[None, None],
+            mode="lines",
+            line=dict(color="red"),
+            name="Uncertainties",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=["MTOW", "OWE", "Fuel"],
+            y=[3290, 1712, 960],
+            mode="markers",
+            marker=dict(color="black", symbol="diamond", size=10),
+            name="Reference value",
+        )
+    )
+    fig.update_layout(
+        height=600,
+        width=900,
+        showlegend=True,
+        font=dict(size=25),
+        bargap=0.05,
+        bargroupgap=0,
+        margin=dict(l=5, r=5, t=60, b=5),
+        barmode="stack",
+        plot_bgcolor="white",
+        legend=dict(yanchor="top", y=0.98, xanchor="right", x=0.98),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=15),
+        tickfont=dict(size=15),
+        showline=True,
+        linecolor="black",
+        categoryorder="array",
+        linewidth=3,
+    )
+
+    # Add 10% to the range for proper display of the topmost points
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=15),
+        title_font=dict(size=15),
+        range=[500, 3550],
+    )
+
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
+
+    fig.show()
+
+    pdf_path = "results/figures/uncertainties_mass.pdf"
+
+    fig.update_layout(title=None)
+    pio.write_image(fig, pdf_path, width=900, height=600)
+    time.sleep(3)
+    pio.write_image(fig, pdf_path, width=900, height=600)
+
+
+def test_post_process_uq_kodiak100_area():
+    fig = go.Figure()
+
+    fig.add_bar(
+        y=[23.039],
+        x=["Wing area"],
+        name="Mean value",
+        showlegend=True,
+        orientation="v",
+        error_y=dict(
+            type="data", array=[0.4049], arrayminus=[0.403], color="red", thickness=6, width=10
+        ),
+        marker=dict(
+            color="white",
+            line=dict(color="black", width=2),
+            pattern_shape="/",
+        ),
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[None, None],
+            y=[None, None],
+            mode="lines",
+            line=dict(color="red"),
+            name="Uncertainties",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=["Wing area"],
+            y=[22.3],
+            mode="markers",
+            marker=dict(color="black", symbol="diamond", size=10),
+            name="Reference value",
+        )
+    )
+    fig.update_layout(
+        height=600,
+        width=400,
+        showlegend=False,
+        font=dict(size=25),
+        bargap=0.05,
+        bargroupgap=0,
+        margin=dict(l=5, r=5, t=60, b=5),
+        barmode="stack",
+        plot_bgcolor="white",
+        legend=dict(yanchor="top", y=0.98, xanchor="right", x=0.98),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=15),
+        tickfont=dict(size=15),
+        showline=True,
+        linecolor="black",
+        categoryorder="array",
+        linewidth=3,
+    )
+
+    # Add 10% to the range for proper display of the topmost points
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=15),
+        title_font=dict(size=15),
+    )
+
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
+
+    fig.show()
+
+    pdf_path = "results/figures/uncertainties_area.pdf"
+
+    fig.update_layout(title=None)
+    pio.write_image(fig, pdf_path, width=400, height=600)
+    time.sleep(3)
+    pio.write_image(fig, pdf_path, width=400, height=600)
