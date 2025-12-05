@@ -550,7 +550,7 @@ class FASTGAHEPowerTrainConfigurator:
                     target_id == "fastga_he.pt_component.dc_bus"
                     or target_id == "fastga_he.pt_component.dc_splitter"
                 ):
-                    self._sspc_list[source_name] = True
+                    pt_cache["sspc_list"][source_name] = True
 
                 # The possibility to connect a battery or a PEMFC stack directly to a bus has been
                 # added. However, to make it backward compatible (whatever it means today because I
@@ -572,7 +572,7 @@ class FASTGAHEPowerTrainConfigurator:
                     target_option = self._components_options[target_index]
 
                     if not target_option:
-                        self._components_options[target_index] = {"direct_bus_connection": True}
+                        pt_cache["components_options"][target_index] = {"direct_bus_connection": True}
 
                     current_outputs = resources.DICTIONARY_OUT[target_id]
 
@@ -636,8 +636,6 @@ class FASTGAHEPowerTrainConfigurator:
 
             # Populate and update pt_cache
             pt_cache["connection_list"] = self._connection_list
-            pt_cache["sspc_list"] = self._sspc_list
-            pt_cache["components_options"] = self._components_options
             pt_cache["openmdao_output_list"] = self._components_connection_outputs
             pt_cache["openmdao_input_list"] = self._components_connection_inputs
 
@@ -646,8 +644,6 @@ class FASTGAHEPowerTrainConfigurator:
         else:
             # Assign everything from pt_cache
             self._connection_list = pt_cache["connection_list"]
-            self._sspc_list = pt_cache["sspc_list"]
-            self._components_options = pt_cache["components_options"]
             self._components_connection_outputs = pt_cache["openmdao_output_list"]
             self._components_connection_inputs = pt_cache["openmdao_input_list"]
 
