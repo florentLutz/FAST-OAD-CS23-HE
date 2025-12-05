@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import POSSIBLE_POSITION
+from ...constants import POSSIBLE_POSITION
 
 
 class SizingH2FuelSystemCGX(om.ExplicitComponent):
