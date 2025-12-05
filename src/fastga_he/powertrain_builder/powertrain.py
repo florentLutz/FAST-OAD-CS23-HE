@@ -216,26 +216,29 @@ class FASTGAHEPowerTrainConfigurator:
         if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
 
-        self._serializer = _YAMLSerializer()
-        self._serializer.read(self._power_train_file)
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("serializer"):
+            self._serializer = _YAMLSerializer()
+            self._serializer.read(self._power_train_file)
 
-        # Syntax validation
-        with open_text(resources, JSON_SCHEMA_NAME) as json_file:
-            json_schema = json.loads(json_file.read())
-        validate(self._serializer.data, json_schema)
+            # Syntax validation
+            with open_text(resources, JSON_SCHEMA_NAME) as json_file:
+                json_schema = json.loads(json_file.read())
+            validate(self._serializer.data, json_schema)
 
-        for key in self._serializer.data:
-            if key not in json_schema["properties"].keys():
-                _LOGGER.warning('Power train file: "%s" is not a FAST-OAD-GA-HE key.', key)
+            for key in self._serializer.data:
+                if key not in json_schema["properties"].keys():
+                    _LOGGER.warning('Power train file: "%s" is not a FAST-OAD-GA-HE key.', key)
 
-        end_time = time.perf_counter()
+            end_time = time.perf_counter()
 
-        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer"] = (
-            self._serializer
-        )
-        # FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer_data"] = (
-        #     self._serializer.data
-        # )
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer"] = (
+                self._serializer
+            )
+
+        else:
+            self._serializer = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
+                "serializer"
+            ]
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("load_time"):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["load_time"] = (
@@ -268,10 +271,6 @@ class FASTGAHEPowerTrainConfigurator:
             self._generate_components_list()
 
         end_time = time.perf_counter()
-
-        # size = sys.getsizeof(FASTGAHEPowerTrainConfigurator._cache[self._power_train_file])
-        # _LOGGER.info(f"Dictionary size: {size} bytes")
-        # _LOGGER.info(f"Get component time : {end_time - start_time} sec")
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
             "get_component_time"
@@ -413,7 +412,7 @@ class FASTGAHEPowerTrainConfigurator:
                 else:
                     components_options_list.append(None)
 
-            # Populate cache only once
+            # Populate cache
             pt_cache["components_list_dict"] = components_list
             pt_cache["components_id"] = components_id
             pt_cache["components_position"] = components_position
@@ -477,170 +476,183 @@ class FASTGAHEPowerTrainConfigurator:
         start_time = time.perf_counter()
         # This should do nothing if it has already been run.
         self._get_components()
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
+        if not pt_cache.get("connections_list"):
+            connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
 
-        if not self._check_existing_connection_cache_instance():
-            self._check_connection(connections_list)
-            self._add_connection_check_cache_instance()
-            _LOGGER.info("Powertrain components' connections checked.")
+            if not self._check_existing_connection_cache_instance():
+                self._check_connection(connections_list)
+                self._add_connection_check_cache_instance()
+                _LOGGER.info("Powertrain components' connections checked.")
 
-        self._connection_list = connections_list
+            self._connection_list = connections_list
 
-        # Create a dictionary to translate component name back to component_id to identify
-        # outputs and inputs in each case
-        translator = dict(zip(self._components_name, self._components_id))
+            # Create a dictionary to translate component name back to component_id to identify
+            # outputs and inputs in each case
+            translator = dict(zip(self._components_name, self._components_id))
 
-        openmdao_output_list = []
-        openmdao_input_list = []
+            openmdao_output_list = []
+            openmdao_input_list = []
 
-        for connection in connections_list:
-            # Check in case the source or target is not a string but an array, meaning we are
-            # dealing with a component which might have multiple inputs/outputs (bus, gearbox,
-            # splitter, ...)
-            if type(connection["source"]) is str:
-                source_name = connection["source"]
-                source_id = translator[source_name]
-                source_number = ""
-                source_inputs = resources.DICTIONARY_IN[source_id]
-            else:
-                source_name = connection["source"][0]
-                source_id = translator[source_name]
-                source_number = str(connection["source"][1])
-                source_inputs = resources.DICTIONARY_IN[source_id]
-
-            if type(connection["target"]) is str:
-                target_name = connection["target"]
-                target_id = translator[target_name]
-                target_number = ""
-                target_outputs = resources.DICTIONARY_OUT[target_id]
-            else:
-                target_name = connection["target"][0]
-                target_id = translator[target_name]
-                target_number = str(connection["target"][1])
-                target_outputs = resources.DICTIONARY_OUT[target_id]
-
-            # First we check if we are dealing with an SSPC, because of their nature explained
-            # more in depth in the perf_voltage_out module, they will get a special treatment.
-            # They will always be connected to a bus and even more, their 'input' side will
-            # always be connected to a bus.
-
-            # If SSPC is source and connected to a bus there should be no worries, else we need a
-            # special treatment since the "input" side of the SSPC should be connected to the
-            # bus. Same reasoning apply for splitter since they are a type of bus.
-            if source_id == "fastga_he.pt_component.dc_sspc" and not (
-                target_id == "fastga_he.pt_component.dc_bus"
-                or target_id == "fastga_he.pt_component.dc_splitter"
-            ):
-                # We reverse the SSPC inputs and outputs
-                source_inputs = resources.DICTIONARY_OUT[source_id]
-
-            # Same reasoning here, we just have to reverse the SSPC inputs and outputs
-            elif target_id == "fastga_he.pt_component.dc_sspc" and (
-                source_id == "fastga_he.pt_component.dc_bus"
-                or source_id == "fastga_he.pt_component.dc_splitter"
-            ):
-                # We reverse the SSPC outputs and input
-                target_outputs = resources.DICTIONARY_IN[target_id]
-
-            # Because we need to know if the SSPC is at a bus output for the model to work,
-            # this check is necessary
-            if source_id == "fastga_he.pt_component.dc_sspc" and (
-                target_id == "fastga_he.pt_component.dc_bus"
-                or target_id == "fastga_he.pt_component.dc_splitter"
-            ):
-                self._sspc_list[source_name] = True
-
-            # The possibility to connect a battery or a PEMFC stack directly to a bus has been
-            # added. However, to make it backward compatible (whatever it means today because I
-            # have no users) and to impart less burden during the writing of the pt file,
-            # we won't ask the user to set the option accordingly, rather, we will do it here.
-
-            if (
-                target_id == "fastga_he.pt_component.battery_pack"
-                or target_id == "fastga_he.pt_component.pemfc_stack"
-            ) and (
-                source_id == "fastga_he.pt_component.dc_bus"
-                or source_id == "fastga_he.pt_component.dc_splitter"
-                or source_id == "fastga_he.pt_component.dc_sspc"
-            ):
-                # First we'll check if the option has already been set or no, just to avoid
-                # losing time
-
-                target_index = self._components_name.index(target_name)
-                target_option = self._components_options[target_index]
-
-                if not target_option:
-                    self._components_options[target_index] = {"direct_bus_connection": True}
-
-                current_outputs = resources.DICTIONARY_OUT[target_id]
-
-                target_outputs = []
-                for current_output in current_outputs:
-                    target_outputs.append(tuple(reversed(current_output)))
-
-            # Compressor connection for the PEMFC stack. This if condition won't be activated until
-            # the implementation of the compressor component.
-
-            # if (
-            #     target_id == "fastga_he.pt_component.pemfc_stack"
-            #     and source_id == "fastga_he.pt_component.compressor"
-            # ):
-            #     # First we'll check if the option has already been set or no, just to avoid
-            #     # losing time
-            #
-            #     target_index = self._components_name.index(target_name)
-            #     target_option = self._components_options[target_index]
-            #
-            #     if not target_option:
-            #         self._components_options[target_index] = {"compressor_connection": True}
-            #
-            #     current_outputs = resources.DICTIONARY_OUT[target_id]
-            #
-            #     target_outputs = []
-            #     for current_output in current_outputs:
-            #         target_outputs.append(tuple(reversed(current_output)))
-
-            for system_input, system_output in zip(source_inputs, target_outputs):
-                if system_input[0]:
-                    if system_input[0][-1] == "_":
-                        system_input_str = system_input[0] + source_number
-                    else:
-                        system_input_str = system_input[0]
-
-                    if system_output[1][-1] == "_":
-                        system_output_str = system_output[1] + target_number
-                    else:
-                        system_output_str = system_output[1]
-
-                    openmdao_input_list.append(source_name + "." + system_input_str)
-                    openmdao_output_list.append(target_name + "." + system_output_str)
-
+            for connection in connections_list:
+                # Check in case the source or target is not a string but an array, meaning we are
+                # dealing with a component which might have multiple inputs/outputs (bus, gearbox,
+                # splitter, ...)
+                if type(connection["source"]) is str:
+                    source_name = connection["source"]
+                    source_id = translator[source_name]
+                    source_number = ""
+                    source_inputs = resources.DICTIONARY_IN[source_id]
                 else:
-                    if system_input[1][-1] == "_":
-                        system_input_str = system_input[1] + source_number
+                    source_name = connection["source"][0]
+                    source_id = translator[source_name]
+                    source_number = str(connection["source"][1])
+                    source_inputs = resources.DICTIONARY_IN[source_id]
+
+                if type(connection["target"]) is str:
+                    target_name = connection["target"]
+                    target_id = translator[target_name]
+                    target_number = ""
+                    target_outputs = resources.DICTIONARY_OUT[target_id]
+                else:
+                    target_name = connection["target"][0]
+                    target_id = translator[target_name]
+                    target_number = str(connection["target"][1])
+                    target_outputs = resources.DICTIONARY_OUT[target_id]
+
+                # First we check if we are dealing with an SSPC, because of their nature explained
+                # more in depth in the perf_voltage_out module, they will get a special treatment.
+                # They will always be connected to a bus and even more, their 'input' side will
+                # always be connected to a bus.
+
+                # If SSPC is source and connected to a bus there should be no worries, else we need a
+                # special treatment since the "input" side of the SSPC should be connected to the
+                # bus. Same reasoning apply for splitter since they are a type of bus.
+                if source_id == "fastga_he.pt_component.dc_sspc" and not (
+                    target_id == "fastga_he.pt_component.dc_bus"
+                    or target_id == "fastga_he.pt_component.dc_splitter"
+                ):
+                    # We reverse the SSPC inputs and outputs
+                    source_inputs = resources.DICTIONARY_OUT[source_id]
+
+                # Same reasoning here, we just have to reverse the SSPC inputs and outputs
+                elif target_id == "fastga_he.pt_component.dc_sspc" and (
+                    source_id == "fastga_he.pt_component.dc_bus"
+                    or source_id == "fastga_he.pt_component.dc_splitter"
+                ):
+                    # We reverse the SSPC outputs and input
+                    target_outputs = resources.DICTIONARY_IN[target_id]
+
+                # Because we need to know if the SSPC is at a bus output for the model to work,
+                # this check is necessary
+                if source_id == "fastga_he.pt_component.dc_sspc" and (
+                    target_id == "fastga_he.pt_component.dc_bus"
+                    or target_id == "fastga_he.pt_component.dc_splitter"
+                ):
+                    self._sspc_list[source_name] = True
+
+                # The possibility to connect a battery or a PEMFC stack directly to a bus has been
+                # added. However, to make it backward compatible (whatever it means today because I
+                # have no users) and to impart less burden during the writing of the pt file,
+                # we won't ask the user to set the option accordingly, rather, we will do it here.
+
+                if (
+                    target_id == "fastga_he.pt_component.battery_pack"
+                    or target_id == "fastga_he.pt_component.pemfc_stack"
+                ) and (
+                    source_id == "fastga_he.pt_component.dc_bus"
+                    or source_id == "fastga_he.pt_component.dc_splitter"
+                    or source_id == "fastga_he.pt_component.dc_sspc"
+                ):
+                    # First we'll check if the option has already been set or no, just to avoid
+                    # losing time
+
+                    target_index = self._components_name.index(target_name)
+                    target_option = self._components_options[target_index]
+
+                    if not target_option:
+                        self._components_options[target_index] = {"direct_bus_connection": True}
+
+                    current_outputs = resources.DICTIONARY_OUT[target_id]
+
+                    target_outputs = []
+                    for current_output in current_outputs:
+                        target_outputs.append(tuple(reversed(current_output)))
+
+                # Compressor connection for the PEMFC stack. This if condition won't be activated until
+                # the implementation of the compressor component.
+
+                # if (
+                #     target_id == "fastga_he.pt_component.pemfc_stack"
+                #     and source_id == "fastga_he.pt_component.compressor"
+                # ):
+                #     # First we'll check if the option has already been set or no, just to avoid
+                #     # losing time
+                #
+                #     target_index = self._components_name.index(target_name)
+                #     target_option = self._components_options[target_index]
+                #
+                #     if not target_option:
+                #         self._components_options[target_index] = {"compressor_connection": True}
+                #
+                #     current_outputs = resources.DICTIONARY_OUT[target_id]
+                #
+                #     target_outputs = []
+                #     for current_output in current_outputs:
+                #         target_outputs.append(tuple(reversed(current_output)))
+
+                for system_input, system_output in zip(source_inputs, target_outputs):
+                    if system_input[0]:
+                        if system_input[0][-1] == "_":
+                            system_input_str = system_input[0] + source_number
+                        else:
+                            system_input_str = system_input[0]
+
+                        if system_output[1][-1] == "_":
+                            system_output_str = system_output[1] + target_number
+                        else:
+                            system_output_str = system_output[1]
+
+                        openmdao_input_list.append(source_name + "." + system_input_str)
+                        openmdao_output_list.append(target_name + "." + system_output_str)
+
                     else:
-                        system_input_str = system_input[1]
+                        if system_input[1][-1] == "_":
+                            system_input_str = system_input[1] + source_number
+                        else:
+                            system_input_str = system_input[1]
 
-                    if system_output[0][-1] == "_":
-                        system_output_str = system_output[0] + target_number
-                    else:
-                        system_output_str = system_output[0]
+                        if system_output[0][-1] == "_":
+                            system_output_str = system_output[0] + target_number
+                        else:
+                            system_output_str = system_output[0]
 
-                    openmdao_input_list.append(target_name + "." + system_output_str)
-                    openmdao_output_list.append(source_name + "." + system_input_str)
+                        openmdao_input_list.append(target_name + "." + system_output_str)
+                        openmdao_output_list.append(source_name + "." + system_input_str)
 
-        self._components_connection_outputs = openmdao_output_list
-        self._components_connection_inputs = openmdao_input_list
+            self._components_connection_outputs = openmdao_output_list
+            self._components_connection_inputs = openmdao_input_list
 
-        end_time = time.perf_counter()
+            # Populate and update pt_cache
+            pt_cache["connection_list"] = self._connection_list
+            pt_cache["sspc_list"] = self._sspc_list
+            pt_cache["components_options"] = self._components_options
+            pt_cache["openmdao_output_list"] = self._components_connection_outputs
+            pt_cache["openmdao_input_list"] = self._components_connection_inputs
 
-        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
-            "get_connection_time"
-        ):
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["get_connection_time"] = (
-                end_time - start_time
-            )
+            end_time = time.perf_counter()
+
+        else:
+            # Assign everything from pt_cache
+            self._connection_list = pt_cache["connection_list"]
+            self._sspc_list = pt_cache["sspc_list"]
+            self._components_options = pt_cache["components_options"]
+            self._components_connection_outputs = pt_cache["openmdao_output_list"]
+            self._components_connection_inputs = pt_cache["openmdao_input_list"]
+
+        if not pt_cache.get("get_connection_time"):
+            pt_cache["get_connection_time"] = end_time - start_time
 
     def _check_connection(self, connections_list):
         """
