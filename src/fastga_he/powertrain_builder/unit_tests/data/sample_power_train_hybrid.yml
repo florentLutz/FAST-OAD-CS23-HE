@@ -1,0 +1,118 @@
+title: Sample power train file for testing purposes
+
+power_train_components:
+  propeller_1:
+    id: fastga_he.pt_component.propeller
+  propeller_2:
+    id: fastga_he.pt_component.propeller
+
+  planetary_gear_1:
+    id: fastga_he.pt_component.planetary_gear
+  planetary_gear_2:
+    id: fastga_he.pt_component.planetary_gear
+
+  speed_reducer_2:
+    id: fastga_he.pt_component.speed_reducer
+  speed_reducer_1:
+    id: fastga_he.pt_component.speed_reducer
+
+  turboshaft_1:
+    id: fastga_he.pt_component.turboshaft
+  turboshaft_2:
+    id: fastga_he.pt_component.turboshaft
+
+  motor_1:
+    id: fastga_he.pt_component.sm_pmsm
+  motor_2:
+    id: fastga_he.pt_component.sm_pmsm
+
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+  dc_dc_converter_2:
+    id: fastga_he.pt_component.dc_dc_converter
+
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+  battery_pack_2:
+    id: fastga_he.pt_component.battery_pack
+
+  fuel_system_1:
+    id: fastga_he.pt_component.fuel_system
+
+  fuel_tank_1:
+    id: fastga_he.pt_component.fuel_tank
+
+  fuel_tank_2:
+    id: fastga_he.pt_component.fuel_tank
+
+component_connections:
+  - source: propeller_1
+    target: [planetary_gear_1, 1]
+
+  - source: [planetary_gear_1, 1]
+    target: turboshaft_1
+
+  - source: turboshaft_1
+    target: [fuel_system_1,1]
+
+  - source: [fuel_system_1,1]
+    target: fuel_tank_1
+
+  - source: [planetary_gear_1, 2]
+    target: speed_reducer_1
+
+  - source: speed_reducer_1
+    target: motor_1
+
+  - source: motor_1
+    target: inverter_1
+
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+
+  - source: [dc_bus_1, 1]
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
+    target: battery_pack_1
+
+  - source: propeller_2
+    target: [planetary_gear_2, 1]
+
+  - source: [planetary_gear_2, 1]
+    target: turboshaft_2
+
+  - source: turboshaft_2
+    target: [fuel_system_1,2]
+
+  - source: [fuel_system_1,2]
+    target: fuel_tank_2
+
+  - source: [planetary_gear_2, 2]
+    target: speed_reducer_2
+
+  - source: speed_reducer_2
+    target: motor_2
+
+  - source: motor_2
+    target: inverter_2
+
+  - source: inverter_2
+    target: [dc_bus_2, 1]
+
+  - source: [dc_bus_2, 1]
+    target: dc_dc_converter_2
+
+  - source: dc_dc_converter_2
+    target: battery_pack_2

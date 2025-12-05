@@ -927,136 +927,132 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._connection_graph = graph
 
-    def get_distance_from_propulsive_load(self):
-        propulsor_name = []
-        propulsive_load_names = []
+    def get_component_distance(self, references):
+        """
+        Calculate the shortest distance from each component to the nearest reference component(s) of
+        a certain type or type class.
 
-        # First and for reason that will appear clear later, we get a list of propulsor
-        for component_type_class, component_name in zip(
-            self._components_type_class, self._components_name
-        ):
-            if "propulsor" in component_type_class:
-                propulsor_name.append(component_name)
+        :param references: Component type class or component type of reference component(s).
+                          Can be a single string or a list of type string entries. Each string
+                          should match a registered component type or component type class.
 
-        self._construct_connection_graph()
-        graph = self._connection_graph
+        :return: A dictionary mapping each component name to its minimum distance to any
+                 of the reference components. Distance is measured as the number of edges in
+                 the shortest path.
+        """
+        reference_component_types = []
 
-        # We now get a list of propulsive loads. Because of the use envisioned for this function (
-        # mostly post-processing), the ICE won't be considered a propulsive load if no propulsor
-        # is attached to it
-        for component_type_class, component_name in zip(
-            self._components_type_class, self._components_name
-        ):
-            if "propulsive_load" == [component_type_class]:
-                propulsive_load_names.append(component_name)
+        # Packing single component type / component type class string into list
+        if isinstance(references, str):
+            references = [references]
 
-            # This case will correspond to ICE/turbomachinery
-            elif "propulsive_load" in component_type_class:
-                # Check whether or not at least one neighbor is a propulsor
-                neighbors = list(graph.neighbors(component_name))
-                if set(neighbors).intersection(propulsor_name):
-                    propulsive_load_names.append(component_name)
-                # If there are gearboxes among neighbor, we also check for the neighbor of the
-                # gearbox. Not very generic way to do things :/
+        # Collect the reference component type by comparing the registered component type classes
+        # and component types to the given reference list
+        valid_references_string = []
+        for comp_id in resources.KNOWN_ID:
+            for reference in references:
+                if isinstance(reference, str):
+                    if (
+                        reference == resources.DICTIONARY_CT[comp_id]
+                        or reference in resources.DICTIONARY_CTC[comp_id]
+                    ):
+                        reference_component_types.append(resources.DICTIONARY_CT[comp_id])
+                        # Add registered reference into the valid list
+                        if reference not in valid_references_string:
+                            valid_references_string.append(reference)
+
                 else:
-                    name_to_id = dict(zip(self._components_name, self._components_id))
-                    for neighbor in set(neighbors):
-                        if (
-                            name_to_id[neighbor] == "fastga_he.pt_component.speed_reducer"
-                            or name_to_id[neighbor] == "fastga_he.pt_component.planetary_gear"
-                            or name_to_id[neighbor] == "fastga_he.pt_component.gearbox"
-                        ):
-                            neighbors_gb = list(graph.neighbors(neighbor))
-                            if set(neighbors_gb).intersection(propulsor_name):
-                                propulsive_load_names.append(component_name)
+                    raise TypeError(
+                        f"{reference} is not a valid data type for a component type or component "
+                        f"type class"
+                    )
 
-        distance_from_propulsive_load = {}
-        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
+        if not reference_component_types:
+            raise ValueError("Invalid component type(s) or component type class(es)")
 
-        for component_name in self._components_name:
-            # When there are two separate sub propulsion chain in the same propulsion file,
-            # these line will cause an issue because, as it will browse all propulsive load he
-            # will attempt to reach loads he is not connected to and therefore not in
-            # connections_length_between_nodes. So first we must make sure to only browse
-            # connected loads.
-
-            connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_propulsive_loads = list(
-                set(propulsive_load_names) & set(connected_components)
+        if not set(references).issubset(set(valid_references_string)):
+            missing = set(references) - set(valid_references_string)
+            raise AttributeError(
+                f"{missing} is / are not valid entry for component type or component type class"
             )
 
-            min_distance = np.inf
-            for prop_load in connected_propulsive_loads:
-                distance_to_load = connections_length_between_nodes[component_name][prop_load]
-                if distance_to_load < min_distance:
-                    min_distance = distance_to_load
-
-            distance_from_propulsive_load[component_name] = min_distance
-
-        return distance_from_propulsive_load, propulsive_load_names
-
-    def get_distance_from_propulsor(self):
-        propulsor_names = []
-
-        # First and for reason that will appear clear later, we get a list of propulsor
-        for component_type_class, component_name in zip(
-            self._components_type_class, self._components_name
+        # Collect reference component of the powertrain from the reference component type(s)
+        reference_component_names = []
+        propulsor_names = self.get_thrust_element_list()
+        generator_names = self.get_generator_list()
+        for component_type_class, component_type, component_name in zip(
+            self._components_type_class, self._components_type, self._components_name
         ):
-            if "propulsor" in component_type_class:
-                propulsor_names.append(component_name)
+            if component_type in reference_component_types:
+                reference_component_names.append(component_name)
+
+            # This section checks whether a component with multiple component-type classes is
+            # explicitly included in the reference list, or whether its two type classes are subsets
+            # of that list. If only one of the two component types appears in the list, an
+            # additional check is performed to confirm that the component indeed belongs to that
+            # specific type class.
+            if isinstance(component_type_class, list):
+                # Check if the component type is in the reference list
+                if component_type in references:
+                    continue
+                # Check if all component type class in the list is a subset of the reference list
+                elif set(component_type_class).issubset(set(references)):
+                    continue
+                # Check if the component is a propulsive load
+                elif "propulsive_load" in component_type_class and "propulsive_load" in references:
+                    distance_from_component_dict = self._get_distance_from_component_name(
+                        component_name
+                    )
+                    min_distance_from_propulsor = np.inf
+                    min_distance_from_generator = np.inf
+
+                    for component, distance in distance_from_component_dict.items():
+                        if component in propulsor_names:
+                            if distance < min_distance_from_propulsor:
+                                min_distance_from_propulsor = distance
+
+                        if component in generator_names:
+                            if distance < min_distance_from_generator:
+                                min_distance_from_generator = distance
+
+                    if min_distance_from_generator < min_distance_from_propulsor:
+                        reference_component_names.remove(component_name)
+
+        return self._get_distance_from_component_name(reference_component_names)
+
+    def _get_distance_from_component_name(self, component_names):
+        """
+        Calculate the shortest distance from each component to the nearest reference component(s).
+
+        :param component_names: Component name of reference component(s).
+                          Can be a single string or a list of type string entries.
+
+        :return: A dictionary mapping each component name to its minimum distance to any
+                 of the reference components. Distance is measured as the number of edges in
+                 the shortest path.
+        """
+        if isinstance(component_names, str):
+            component_names = [component_names]
 
         self._construct_connection_graph()
         graph = self._connection_graph
 
-        distance_from_propulsor = {}
+        distance_from_reference_component = {}
         connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
 
         for component_name in self._components_name:
             connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_propulsors = list(set(propulsor_names) & set(connected_components))
+            connected_reference_component = list(set(component_names) & set(connected_components))
 
             min_distance = np.inf
-            for prop in connected_propulsors:
-                distance_to_load = connections_length_between_nodes[component_name][prop]
-                if distance_to_load < min_distance:
-                    min_distance = distance_to_load
+            for component in connected_reference_component:
+                distance_to_reference = connections_length_between_nodes[component_name][component]
+                if distance_to_reference < min_distance:
+                    min_distance = distance_to_reference
 
-            distance_from_propulsor[component_name] = min_distance
+            distance_from_reference_component[component_name] = min_distance
 
-        return distance_from_propulsor
-
-    def get_distance_from_energy_storage(self):
-        energy_storage_names = []
-
-        # First and for reason that will appear clear later, we get a list of energy storage
-        # component
-        for component_type, component_name in zip(self._components_type, self._components_name):
-            if (
-                "gaseous_hydrogen_tank" in component_type
-                or "fuel_tank" in component_type
-                or "battery_pack" in component_type
-            ):
-                energy_storage_names.append(component_name)
-
-        self._construct_connection_graph()
-        graph = self._connection_graph
-
-        distance_from_energy_storage = {}
-        connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
-
-        for component_name in self._components_name:
-            connected_components = list(connections_length_between_nodes[component_name].keys())
-            connected_energy_storages = list(set(energy_storage_names) & set(connected_components))
-
-            min_distance = np.inf
-            for storage in connected_energy_storages:
-                distance_to_storage = connections_length_between_nodes[component_name][storage]
-                if distance_to_storage < min_distance:
-                    min_distance = distance_to_storage
-
-            distance_from_energy_storage[component_name] = min_distance
-
-        return distance_from_energy_storage
+        return distance_from_reference_component
 
     def reorder_components(self, *lists):
         """
@@ -1073,7 +1069,7 @@ class FASTGAHEPowerTrainConfigurator:
         the same order and count as input lists.
         """
         # Sort items by value first, then by original key order to maintain consistency
-        distance_from_prop = self.get_distance_from_propulsor()
+        distance_from_prop = self.get_component_distance("propulsor")
         sorted_items = sorted(distance_from_prop.items(), key=lambda x: (x[1], x[0]))
 
         # Create new dictionary with proper sequential indices
@@ -1454,6 +1450,20 @@ class FASTGAHEPowerTrainConfigurator:
                 components_types.append(component_type)
 
         return components_names, components_types
+
+    def get_generator_list(self) -> list:
+        """
+        Returns the list of generator component(s) in the powertrain architecture.
+        """
+
+        self._get_components()
+        components_names = []
+
+        for component_type, component_name in zip(self._components_type, self._components_name):
+            if "generator" in component_type:
+                components_names.append(component_name)
+
+        return components_names
 
     def get_fuel_tank_list_and_fuel(self) -> Tuple[list, list, list]:
         """
