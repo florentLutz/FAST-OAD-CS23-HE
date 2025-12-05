@@ -282,10 +282,11 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _generate_components_list(self):
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
-        if not pt_cache.get("get_component_time"):
-            components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
-
+        if not pt_cache.get("get_component_time") or components_list != pt_cache.get(
+            "components_list_dict"
+        ):
             components_id = []
             components_position = []
             components_name_id_list = []
@@ -413,6 +414,7 @@ class FASTGAHEPowerTrainConfigurator:
                     components_options_list.append(None)
 
             # Populate cache only once
+            pt_cache["components_list_dict"] = components_list
             pt_cache["components_id"] = components_id
             pt_cache["components_position"] = components_position
             pt_cache["components_name"] = components_name_list
@@ -435,6 +437,8 @@ class FASTGAHEPowerTrainConfigurator:
             pt_cache["source_does_not_make_mass_vary"] = source_does_not_make_mass_vary
             pt_cache["components_efficiency"] = components_efficiency
             pt_cache["components_control_parameters"] = components_control_parameter
+            pt_cache["sspc_list"] = self._sspc_list
+            pt_cache["sspc_default_state"] = self._sspc_default_state
 
         # Assign everything from pt_cache
         self._components_id = pt_cache["components_id"]
@@ -459,6 +463,8 @@ class FASTGAHEPowerTrainConfigurator:
         self._source_does_not_make_mass_vary = pt_cache["source_does_not_make_mass_vary"]
         self._components_efficiency = pt_cache["components_efficiency"]
         self._components_control_parameters = pt_cache["components_control_parameters"]
+        self._sspc_list = pt_cache["sspc_list"]
+        self._sspc_default_state = pt_cache["sspc_default_state"]
 
     def _get_connections(self):
         """
