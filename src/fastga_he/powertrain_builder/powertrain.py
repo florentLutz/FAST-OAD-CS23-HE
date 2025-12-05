@@ -233,9 +233,9 @@ class FASTGAHEPowerTrainConfigurator:
         FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer"] = (
             self._serializer
         )
-        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer_data"] = (
-            self._serializer.data
-        )
+        # FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer_data"] = (
+        #     self._serializer.data
+        # )
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("load_time"):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["load_time"] = (
@@ -269,6 +269,10 @@ class FASTGAHEPowerTrainConfigurator:
 
         end_time = time.perf_counter()
 
+        # size = sys.getsizeof(FASTGAHEPowerTrainConfigurator._cache[self._power_train_file])
+        # _LOGGER.info(f"Dictionary size: {size} bytes")
+        # _LOGGER.info(f"Get component time : {end_time - start_time} sec")
+
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
             "get_component_time"
         ):
@@ -279,7 +283,7 @@ class FASTGAHEPowerTrainConfigurator:
     def _generate_components_list(self):
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        if not pt_cache["get_component_time"]:
+        if not pt_cache.get("get_component_time"):
             components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
 
             components_id = []
