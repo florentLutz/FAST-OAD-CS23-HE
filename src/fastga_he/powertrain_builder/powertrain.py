@@ -572,7 +572,9 @@ class FASTGAHEPowerTrainConfigurator:
                     target_option = self._components_options[target_index]
 
                     if not target_option:
-                        pt_cache["components_options"][target_index] = {"direct_bus_connection": True}
+                        pt_cache["components_options"][target_index] = {
+                            "direct_bus_connection": True
+                        }
 
                     current_outputs = resources.DICTIONARY_OUT[target_id]
 
