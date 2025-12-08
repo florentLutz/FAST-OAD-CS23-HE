@@ -84,107 +84,107 @@ class FASTGAHEPowerTrainConfigurator:
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
 
-        self._serializer = _YAMLSerializer()
+        # self._serializer = _YAMLSerializer()
 
         # Contains the id of the components
-        self._components_id = None
+        # self._components_id = None
 
         # Contains the position of the components
-        self._components_position = None
+        # self._components_position = None
 
         # Contains the name of the component as it will be found in the input/output file to
         # contain the data. Will also be used as subsystem name
-        self._components_name = None
+        # self._components_name = None
 
         # Contains the name of the options used to provide the names in self._components_name
-        self._components_name_id = None
+        # self._components_name_id = None
 
         # Contains the suffix of the component added to Performances and Sizing, will be used to
         # instantiate the subsystems
-        self._components_om_type = None
+        # self._components_om_type = None
 
         # Contains the type of the component as it will be found in the input/output file to
         # contain the data
-        self._components_type = None
+        # self._components_type = None
 
         # Contains a special tag on the class of element as some may need specific assemblers to
         # work such as propulsor
-        self._components_type_class = None
+        # self._components_type_class = None
 
         # Contains the options of the component which will be given during object instantiation
-        self._components_options = None
+        # self._components_options = None
 
         # Contains the list of aircraft inputs that are necessary to promote in the performances
         # modules for the code to work
-        self._components_promotes = None
+        # self._components_promotes = None
 
         # Contains the list of aircraft inputs that are necessary to promote in the slipstream
         # modules for the code to work
-        self._components_slipstream_promotes = None
+        # self._components_slipstream_promotes = None
 
         # Contains the list of variables that needs to be promoted from the performances
         # computations to slipstream computation
-        self._components_performances_to_slipstream = None
+        # self._components_performances_to_slipstream = None
 
         # Contains a list with, for each component, a boolean telling whether the component
         # needs the flaps position for the computation of the slipstream effects
-        self._components_slipstream_flaps = None
+        # self._components_slipstream_flaps = None
 
         # Contains a list with, for each component, a boolean telling whether the component
         # lift increase is added to the wing. Will be used for the increase in induced drag
-        self._components_slipstream_wing_lift = None
+        # self._components_slipstream_wing_lift = None
 
         # Contains a basic list of the connections in the power train, with no processing whatsoever
-        self._connection_list = None
+        # self._connection_list = None
 
         # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
         # connections between components
-        self._components_connection_outputs = None
+        # self._components_connection_outputs = None
 
         # Contains the list of all inputs (in the OpenMDAO sense of the term) needed to make the
         # connections between components
-        self._components_connection_inputs = None
+        # self._components_connection_inputs = None
 
         # Contains a list, for each component, of all the variables that will be monitored in the
         # performances watcher of the power train, meaning this should be a list of list
-        self._components_perf_watchers = None
+        # self._components_perf_watchers = None
 
         # Contains a list, for each component, of all the variables in the slipstream computation
         # that will be monitored in the performances watcher of the power train, meaning this
         # should be a list of list
-        self._components_slipstream_perf_watchers = None
+        # self._components_slipstream_perf_watchers = None
 
         # Contains a list of all pair of components which are symmetrical on the y axis with
         # respect to the fuselage center line. This is for now intended for the computation of the
         # loads on the wing to avoid accounting twice for the components as the wing mass will be
         # computed as twice the weight of a half-wing
-        self._components_symmetrical_pairs = None
+        # self._components_symmetrical_pairs = None
 
         # Contains the list of all boolean telling whether the components will make the
         # aircraft weight vary during flight
-        self._components_makes_mass_vary = None
+        # self._components_makes_mass_vary = None
 
         # Contains the list of all boolean telling whether the components are energy
         # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
         # energy)
-        self._source_does_not_make_mass_vary = None
+        # self._source_does_not_make_mass_vary = None
 
         # Contains the list of an initial guess of the component's efficiency. Is used to compute
         # the initial of the currents and power of each component
-        self._components_efficiency = None
+        # self._components_efficiency = None
 
         # Contains the list of control parameters name for each component. Is used to detect
         # them in cas we want to give them a different name during the mission
-        self._components_control_parameters = None
+        # self._components_control_parameters = None
 
         # Because of their very peculiar role, we will scan the architecture for any SSPC defined
         # by the user and whether they are at the output of a bus, because a specific
         # option needs to be turned on in this was
-        self._sspc_list = {}
+        # self._sspc_list = {}
 
         # Contains the default state of the SSPC, will be used if other states are not specified
         # as an option of the performances group
-        self._sspc_default_state = {}
+        # self._sspc_default_state = {}
 
         # After construction contains a graph (graph theory) with all components and their
         # connection. It will for instance allow to check if a cable has SSPC's at both its end
@@ -302,6 +302,10 @@ class FASTGAHEPowerTrainConfigurator:
             components_efficiency = []
             components_control_parameter = []
 
+            if not pt_cache.get("sspc_list") or not pt_cache.get("sspc_default_state"):
+                pt_cache["sspc_list"] = {}
+                pt_cache["sspc_default_state"] = {}
+
             # Doing it like that allows us to have the names of the components before we start the
             # loop, which I'm gonna use to check if the pairs are valid
             components_name_list = list(components_list.keys())
@@ -351,17 +355,17 @@ class FASTGAHEPowerTrainConfigurator:
                     # Create a dictionary with SSPC name and a tag to see if they are at bus output
                     # or not, it will be set at False by default but be changed later on
 
-                    self._sspc_list[component_name] = False
+                    pt_cache["sspc_list"][component_name] = False
 
                     if "options" in component.keys():
                         if "closed_by_default" in component["options"]:
-                            self._sspc_default_state[component_name] = component["options"][
+                            pt_cache["sspc_default_state"][component_name] = component["options"][
                                 "closed_by_default"
                             ]
                         else:
-                            self._sspc_default_state[component_name] = True
+                            pt_cache["sspc_default_state"][component_name] = True
                     else:
-                        self._sspc_default_state[component_name] = True
+                        pt_cache["sspc_default_state"][component_name] = True
 
                 components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
                 components_type_list.append(resources.DICTIONARY_CT[component_id])
@@ -432,34 +436,6 @@ class FASTGAHEPowerTrainConfigurator:
             pt_cache["source_does_not_make_mass_vary"] = source_does_not_make_mass_vary
             pt_cache["components_efficiency"] = components_efficiency
             pt_cache["components_control_parameters"] = components_control_parameter
-            # pt_cache["sspc_list"] = self._sspc_list
-            # pt_cache["sspc_default_state"] = self._sspc_default_state
-
-        # Assign everything from pt_cache
-        # self._components_id = pt_cache["components_id"]
-        # self._components_position = pt_cache["components_position"]
-        # self._components_name = pt_cache["components_name"]
-        # self._components_name_id = pt_cache["components_name_id"]
-        # self._components_type = pt_cache["components_type"]
-        # self._components_om_type = pt_cache["components_om_type"]
-        # self._components_options = pt_cache["components_options"]
-        # self._components_promotes = pt_cache["components_promotes"]
-        # self._components_slipstream_promotes = pt_cache["components_slipstream_promotes"]
-        # self._components_performances_to_slipstream = pt_cache[
-        #     "components_performances_to_slipstream"
-        # ]
-        # self._components_type_class = pt_cache["components_type_class"]
-        # self._components_perf_watchers = pt_cache["components_perf_watchers"]
-        # self._components_slipstream_perf_watchers = pt_cache["components_slipstream_perf_watchers"]
-        # self._components_slipstream_flaps = pt_cache["components_slipstream_flaps"]
-        # self._components_slipstream_wing_lift = pt_cache["components_slipstream_wing_lift"]
-        # self._components_symmetrical_pairs = pt_cache["components_symmetrical_pairs"]
-        # self._components_makes_mass_vary = pt_cache["components_makes_mass_vary"]
-        # self._source_does_not_make_mass_vary = pt_cache["source_does_not_make_mass_vary"]
-        # self._components_efficiency = pt_cache["components_efficiency"]
-        # self._components_control_parameters = pt_cache["components_control_parameters"]
-        # self._sspc_list = pt_cache["sspc_list"]
-        # self._sspc_default_state = pt_cache["sspc_default_state"]
 
     def _get_connections(self):
         """
@@ -546,7 +522,7 @@ class FASTGAHEPowerTrainConfigurator:
                     target_id == "fastga_he.pt_component.dc_bus"
                     or target_id == "fastga_he.pt_component.dc_splitter"
                 ):
-                    self._sspc_list[source_name] = True
+                    pt_cache["sspc_list"][source_name] = True
 
                 # The possibility to connect a battery or a PEMFC stack directly to a bus has been
                 # added. However, to make it backward compatible (whatever it means today because I
@@ -1210,8 +1186,8 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_connection_outputs,
             self._components_connection_inputs,
             pt_cache["components_promotes"],
-            self._sspc_list,
-            self._sspc_default_state,
+            pt_cache["sspc_list"],
+            pt_cache["sspc_default_state"],
         )
 
     def get_slipstream_element_lists(self) -> tuple:
@@ -2282,7 +2258,9 @@ class FASTGAHEPowerTrainConfigurator:
         # We will iterate through the default state of the sspc and remover the connections
         # between sspc in and sspc out if they are open (meaning no current goes through it so it
         # doesn't carry power).
-        for sspc_name, sspc_default_state in self._sspc_default_state.items():
+        for sspc_name, sspc_default_state in FASTGAHEPowerTrainConfigurator._cache[
+            self._power_train_file
+        ]["sspc_default_state"].items():
             # If not closed by default
             if not sspc_default_state:
                 undirected_graph.remove_edge(sspc_name + "_in", sspc_name + "_out")
