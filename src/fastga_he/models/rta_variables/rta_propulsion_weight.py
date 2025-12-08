@@ -44,8 +44,8 @@ class RTAPropulsionWeight(om.ExplicitComponent):
         ) = self.configurator.get_propulsive_element_list()
 
         if any(
-            component in self.configurator._cache[self.configurator._power_train_file][
-                "components_type"]
+            component
+            in self.configurator._cache[self.configurator._power_train_file]["components_type"]
             for component in ["battery_pack", "PEMFC_stack"]
         ):
             self.add_input(
@@ -86,8 +86,8 @@ class RTAPropulsionWeight(om.ExplicitComponent):
         )
 
         if any(
-            component in self.configurator._cache[self.configurator._power_train_file][
-                "components_type"]
+            component
+            in self.configurator._cache[self.configurator._power_train_file]["components_type"]
             for component in ["battery_pack", "PEMFC_stack"]
         ):
             self.declare_partials(
@@ -130,8 +130,8 @@ class RTAPropulsionWeight(om.ExplicitComponent):
         engine_weight = 0.0
 
         if any(
-            component in self.configurator._cache[self.configurator._power_train_file][
-                "components_type"]
+            component
+            in self.configurator._cache[self.configurator._power_train_file]["components_type"]
             for component in ["battery_pack", "PEMFC_stack"]
         ):
             engine_weight = inputs["data:propulsion:he_power_train:base_model_engine_mass"]

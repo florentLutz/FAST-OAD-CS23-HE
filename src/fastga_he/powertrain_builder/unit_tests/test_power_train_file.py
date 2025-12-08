@@ -170,8 +170,12 @@ def test_power_train_file_connections():
     power_train_configurator._get_connections()
 
     for om_output, om_input in zip(
-        power_train_configurator._components_connection_outputs,
-        power_train_configurator._components_connection_inputs,
+        power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_outputs"
+        ],
+        power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_inputs"
+        ],
     ):
         print("[" + om_output + ", " + om_input + "]")
 
@@ -396,16 +400,29 @@ def test_power_train_file_direct_bus_battery_connection():
 
     # Battery voltage is no longer an output, rather, it becomes an input
     assert (
-        "battery_pack_1.voltage_out" not in power_train_configurator._components_connection_outputs
+        "battery_pack_1.voltage_out"
+        not in power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_outputs"
+        ]
     )
-    assert "battery_pack_1.voltage_out" in power_train_configurator._components_connection_inputs
+    assert (
+        "battery_pack_1.voltage_out"
+        in power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_inputs"
+        ]
+    )
 
     assert (
         "battery_pack_1.dc_current_out"
-        not in power_train_configurator._components_connection_inputs
+        not in power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_inputs"
+        ]
     )
     assert (
-        "battery_pack_1.dc_current_out" in power_train_configurator._components_connection_outputs
+        "battery_pack_1.dc_current_out"
+        in power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_outputs"
+        ]
     )
 
 
@@ -423,8 +440,12 @@ def test_power_train_file_connections_splitter():
     power_train_configurator._get_connections()
 
     for om_output, om_input in zip(
-        power_train_configurator._components_connection_outputs,
-        power_train_configurator._components_connection_inputs,
+        power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_outputs"
+        ],
+        power_train_configurator._cache[sample_power_train_file_path][
+            "components_connection_inputs"
+        ],
     ):
         print("[" + om_output + ", " + om_input + "]")
 
