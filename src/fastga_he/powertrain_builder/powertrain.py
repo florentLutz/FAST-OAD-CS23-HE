@@ -84,12 +84,6 @@ class FASTGAHEPowerTrainConfigurator:
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
 
-        # After construction contains a graph (graph theory) with all components and their
-        # connection. It will for instance allow to check if a cable has SSPC's at both its end
-        # or check if a propulsor is not connected to a power source, in which case, we should not
-        # be able to require thrust from him (will come later)
-        self._connection_graph = None
-
         # Contains the results of the function that sets the power in the graphs, is declared as
         # an attribute to avoid having to recompute everything
         self._power_at_each_node = None
@@ -837,30 +831,36 @@ class FASTGAHEPowerTrainConfigurator:
         )
 
     def _construct_connection_graph(self):
-        graph = nx.Graph()
-
+        """
+        This constructs a graph (graph theory) with all components and their connection for checks.
+        For instance,this checks if a cable has SSPC's at both its end or checks if no power
+        source is connected to a specific propulsor, no thrust should be demanded from it.
+        """
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        for component in pt_cache["components_name"]:
-            graph.add_node(component)
+        if not pt_cache.get("connection_graph"):
+            graph = nx.Graph()
 
-        for connection in pt_cache["connection_list"]:
-            # When the component is connected to a bus, the output number is also specified but it
-            # isn't meaningful when drawing a graph, so we will just filter it
+            for component in pt_cache["components_name"]:
+                graph.add_node(component)
 
-            if type(connection["source"]) is list:
-                source = connection["source"][0]
-            else:
-                source = connection["source"]
+            for connection in pt_cache["connection_list"]:
+                # When the component is connected to a bus, the output number is also specified but it
+                # isn't meaningful when drawing a graph, so we will just filter it
 
-            if type(connection["target"]) is list:
-                target = connection["target"][0]
-            else:
-                target = connection["target"]
+                if type(connection["source"]) is list:
+                    source = connection["source"][0]
+                else:
+                    source = connection["source"]
 
-            graph.add_edge(source, target)
+                if type(connection["target"]) is list:
+                    target = connection["target"][0]
+                else:
+                    target = connection["target"]
 
-        self._connection_graph = graph
+                graph.add_edge(source, target)
+
+            pt_cache["connection_graph"] = graph
 
     def get_component_distance(self, references):
         """
@@ -974,10 +974,10 @@ class FASTGAHEPowerTrainConfigurator:
         if isinstance(component_names, str):
             component_names = [component_names]
 
-        self._construct_connection_graph()
-        graph = self._connection_graph
-
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+
+        self._construct_connection_graph()
+        graph = pt_cache["connection_graph"]
 
         distance_from_reference_component = {}
         connections_length_between_nodes = dict(nx.all_pairs_shortest_path_length(graph))
@@ -1033,7 +1033,7 @@ class FASTGAHEPowerTrainConfigurator:
     def check_sspc_states(self, declared_state):
         self._construct_connection_graph()
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
-        graph = self._connection_graph
+        graph = pt_cache["connection_graph"]
 
         components_to_check = {}
 
