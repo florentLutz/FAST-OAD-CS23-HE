@@ -84,6 +84,108 @@ class FASTGAHEPowerTrainConfigurator:
     def __init__(self, power_train_file_path=None):
         self._power_train_file = None
 
+        # self._serializer = _YAMLSerializer()
+
+        # Contains the id of the components
+        # self._components_id = None
+
+        # Contains the position of the components
+        # self._components_position = None
+
+        # Contains the name of the component as it will be found in the input/output file to
+        # contain the data. Will also be used as subsystem name
+        # self._components_name = None
+
+        # Contains the name of the options used to provide the names in self._components_name
+        # self._components_name_id = None
+
+        # Contains the suffix of the component added to Performances and Sizing, will be used to
+        # instantiate the subsystems
+        # self._components_om_type = None
+
+        # Contains the type of the component as it will be found in the input/output file to
+        # contain the data
+        # self._components_type = None
+
+        # Contains a special tag on the class of element as some may need specific assemblers to
+        # work such as propulsor
+        # self._components_type_class = None
+
+        # Contains the options of the component which will be given during object instantiation
+        # self._components_options = None
+
+        # Contains the list of aircraft inputs that are necessary to promote in the performances
+        # modules for the code to work
+        # self._components_promotes = None
+
+        # Contains the list of aircraft inputs that are necessary to promote in the slipstream
+        # modules for the code to work
+        # self._components_slipstream_promotes = None
+
+        # Contains the list of variables that needs to be promoted from the performances
+        # computations to slipstream computation
+        # self._components_performances_to_slipstream = None
+
+        # Contains a list with, for each component, a boolean telling whether the component
+        # needs the flaps position for the computation of the slipstream effects
+        # self._components_slipstream_flaps = None
+
+        # Contains a list with, for each component, a boolean telling whether the component
+        # lift increase is added to the wing. Will be used for the increase in induced drag
+        # self._components_slipstream_wing_lift = None
+
+        # Contains a basic list of the connections in the power train, with no processing whatsoever
+        # self._connection_list = None
+
+        # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
+        # connections between components
+        # self._components_connection_outputs = None
+
+        # Contains the list of all inputs (in the OpenMDAO sense of the term) needed to make the
+        # connections between components
+        # self._components_connection_inputs = None
+
+        # Contains a list, for each component, of all the variables that will be monitored in the
+        # performances watcher of the power train, meaning this should be a list of list
+        # self._components_perf_watchers = None
+
+        # Contains a list, for each component, of all the variables in the slipstream computation
+        # that will be monitored in the performances watcher of the power train, meaning this
+        # should be a list of list
+        # self._components_slipstream_perf_watchers = None
+
+        # Contains a list of all pair of components which are symmetrical on the y axis with
+        # respect to the fuselage center line. This is for now intended for the computation of the
+        # loads on the wing to avoid accounting twice for the components as the wing mass will be
+        # computed as twice the weight of a half-wing
+        # self._components_symmetrical_pairs = None
+
+        # Contains the list of all boolean telling whether the components will make the
+        # aircraft weight vary during flight
+        # self._components_makes_mass_vary = None
+
+        # Contains the list of all boolean telling whether the components are energy
+        # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
+        # energy)
+        # self._source_does_not_make_mass_vary = None
+
+        # Contains the list of an initial guess of the component's efficiency. Is used to compute
+        # the initial of the currents and power of each component
+        # self._components_efficiency = None
+
+        # Contains the list of control parameters name for each component. Is used to detect
+        # them in cas we want to give them a different name during the mission
+        # self._components_control_parameters = None
+
+        # Because of their very peculiar role, we will scan the architecture for any SSPC defined
+        # by the user and whether they are at the output of a bus, because a specific
+        # option needs to be turned on in this was
+        # self._sspc_list = {}
+
+        # Contains the default state of the SSPC, will be used if other states are not specified
+        # as an option of the performances group
+        # self._sspc_default_state = {}
+
         # After construction contains a graph (graph theory) with all components and their
         # connection. It will for instance allow to check if a cable has SSPC's at both its end
         # or check if a propulsor is not connected to a power source, in which case, we should not
@@ -179,78 +281,34 @@ class FASTGAHEPowerTrainConfigurator:
 
         if not pt_cache.get("get_component_time") or components_list != pt_cache.get(
             "components_list_dict"
-        ):  # Contains the id of the components
+        ):
             components_id = []
-            # Contains the position of the components
             components_position = []
-            # Contains the name of the options used to provide the names in self._components_name
             components_name_id_list = []
-            # Contains the type of the component as it will be found in the input/output file to
-            # contain the data
             components_type_list = []
-            # Contains the suffix of the component added to Performances and Sizing, will be used to
-            # instantiate the subsystems
             components_om_type_list = []
-            # Contains the options of the component which will be given during object instantiation
             components_options_list = []
-            # Contains the list of aircraft inputs that are necessary to promote in the performances
-            # modules for the code to work
             components_promote_list = []
-            # Contains the list of aircraft inputs that are necessary to promote in the slipstream
-            # modules for the code to work
             components_slip_promote_list = []
-            # Contains the list of variables that needs to be promoted from the performances
-            # computations to slipstream computation
             components_perf_to_slip_list = []
-            # Contains a special tag on the class of element as some may need specific assemblers to
-            # work such as propulsor
             components_type_class_list = []
-            # Contains a list, for each component, of all the variables that will be monitored in the
-            # performances watcher of the power train, meaning this should be a list of list
             components_perf_watchers_list = []
-            # Contains a list, for each component, of all the variables in the slipstream computation
-            # that will be monitored in the performances watcher of the power train, meaning this
-            # should be a list of list
             components_slipstream_perf_watchers_list = []
-            # Contains a list with, for each component, a boolean telling whether the component
-            # needs the flaps position for the computation of the slipstream effects
             components_slipstream_needs_flaps = []
-            # Contains a list with, for each component, a boolean telling whether the component
-            # lift increase is added to the wing. Will be used for the increase in induced drag
             components_slipstream_wing_lift = []
-            # Contains a list of all pair of components which are symmetrical on the y axis with
-            # respect to the fuselage center line. This is for now intended for the computation of the
-            # loads on the wing to avoid accounting twice for the components as the wing mass will be
-            # computed as twice the weight of a half-wing
             components_symmetrical_pairs = []
-            # Contains the list of all boolean telling whether the components will make the
-            # aircraft weight vary during flight
             components_makes_mass_vary = []
-            # Contains the list of all boolean telling whether the components are energy
-            # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
-            # energy)
             source_does_not_make_mass_vary = []
-            # Contains the list of an initial guess of the component's efficiency. Is used to compute
-            # the initial of the currents and power of each component
             components_efficiency = []
-            # Contains the list of control parameters name for each component. Is used to detect
-            # them in cas we want to give them a different name during the mission
             components_control_parameter = []
 
             if not pt_cache.get("sspc_list") or not pt_cache.get("sspc_default_state"):
-                # Because of their very peculiar role, we will scan the architecture for any SSPC defined
-                # by the user and whether they are at the output of a bus, because a specific
-                # option needs to be turned on in this was
                 pt_cache["sspc_list"] = {}
-                # Contains the default state of the SSPC, will be used if other states are not specified
-                # as an option of the performances group
                 pt_cache["sspc_default_state"] = {}
 
             # Doing it like that allows us to have the names of the components before we start the
             # loop, which I'm gonna use to check if the pairs are valid
             components_name_list = list(components_list.keys())
-            # Contains the name of the component as it will be found in the input/output file to
-            # contain the data. Will also be used as subsystem name
 
             for component_name in components_list:
                 component = copy.deepcopy(components_list[component_name])
@@ -393,7 +451,6 @@ class FASTGAHEPowerTrainConfigurator:
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
         if not pt_cache.get("connections_list"):
-            # Contains a basic list of the connections in the power train, with no processing whatsoever
             connections_list = pt_cache["serializer"].data.get(KEY_PT_CONNECTIONS)
 
             if not self._check_existing_connection_cache_instance():
@@ -401,17 +458,13 @@ class FASTGAHEPowerTrainConfigurator:
                 self._add_connection_check_cache_instance()
                 _LOGGER.info("Powertrain components' connections checked.")
 
-            pt_cache["connection_list"] = connections_list
+            self._connection_list = connections_list
 
             # Create a dictionary to translate component name back to component_id to identify
             # outputs and inputs in each case
             translator = dict(zip(pt_cache["components_name"], pt_cache["components_id"]))
 
-            # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
-            # connections between components
             openmdao_output_list = []
-            # Contains the list of all inputs (in the OpenMDAO sense of the term) needed to make the
-            # connections between components
             openmdao_input_list = []
 
             for connection in connections_list:
@@ -552,10 +605,21 @@ class FASTGAHEPowerTrainConfigurator:
                         openmdao_input_list.append(target_name + "." + system_output_str)
                         openmdao_output_list.append(source_name + "." + system_input_str)
 
-            pt_cache["components_connection_outputs"] = openmdao_output_list
-            pt_cache["components_connection_inputs"] = openmdao_input_list
+            self._components_connection_outputs = openmdao_output_list
+            self._components_connection_inputs = openmdao_input_list
+
+            # Populate and update pt_cache
+            pt_cache["connection_list"] = self._connection_list
+            pt_cache["openmdao_output_list"] = self._components_connection_outputs
+            pt_cache["openmdao_input_list"] = self._components_connection_inputs
 
             end_time = time.perf_counter()
+
+        else:
+            # Assign everything from pt_cache
+            self._connection_list = pt_cache["connection_list"]
+            self._components_connection_outputs = pt_cache["openmdao_output_list"]
+            self._components_connection_inputs = pt_cache["openmdao_input_list"]
 
         if not pt_cache.get("get_connection_time"):
             pt_cache["get_connection_time"] = end_time - start_time
@@ -844,7 +908,7 @@ class FASTGAHEPowerTrainConfigurator:
         for component in pt_cache["components_name"]:
             graph.add_node(component)
 
-        for connection in pt_cache["connection_list"]:
+        for connection in self._connection_list:
             # When the component is connected to a bus, the output number is also specified but it
             # isn't meaningful when drawing a graph, so we will just filter it
 
@@ -1119,8 +1183,8 @@ class FASTGAHEPowerTrainConfigurator:
             pt_cache["components_type"],
             pt_cache["components_om_type"],
             pt_cache["components_options"],
-            pt_cache["components_connection_outputs"],
-            pt_cache["components_connection_inputs"],
+            self._components_connection_outputs,
+            self._components_connection_inputs,
             pt_cache["components_promotes"],
             pt_cache["sspc_list"],
             pt_cache["sspc_default_state"],
@@ -1171,8 +1235,8 @@ class FASTGAHEPowerTrainConfigurator:
         for variable_to_check in variables_to_check:
             inputs_in_slipstream.append(variable_to_check)
             outputs_in_performances.append(
-                pt_cache["components_connection_outputs"][
-                    pt_cache["components_connection_inputs"].index(variable_to_check)
+                self._components_connection_outputs[
+                    self._components_connection_inputs.index(variable_to_check)
                 ]
             )
 
@@ -1793,7 +1857,7 @@ class FASTGAHEPowerTrainConfigurator:
         for component_name in pt_cache["components_name"]:
             graph.add_node(component_name)
 
-        for connection in pt_cache["connection_list"]:
+        for connection in self._connection_list:
             # For bus and splitter, we don't really care about what number of input it is
             # connected to, so we do the following
 
@@ -1843,7 +1907,7 @@ class FASTGAHEPowerTrainConfigurator:
                     component_name + "_in",
                 )
 
-        for connection in pt_cache["connection_list"]:
+        for connection in self._connection_list:
             # For bus and splitter, we don't really care about what number of input it is
             # connected to, so we do the following
 
@@ -2152,7 +2216,7 @@ class FASTGAHEPowerTrainConfigurator:
                 component_name + "_in",
             )
 
-        for connection in pt_cache["connection_list"]:
+        for connection in self._connection_list:
             # For bus and splitter, we don't really care about what number of input it is
             # connected to so we do the following
 
@@ -2478,15 +2542,15 @@ class FASTGAHEPowerTrainConfigurator:
 
                             output_name = component_name + ".dc_current_out"
                             if name_to_id[component_name] == "fastga_he.pt_component.dc_sspc":
-                                if output_name not in pt_cache["components_connection_outputs"]:
+                                if output_name not in self._components_connection_outputs:
                                     output_name = component_name + ".dc_current_in"
 
                             if name_to_id[component_name] == "fastga_he.pt_component.dc_line":
                                 output_name = component_name + ".dc_current"
 
                             # We look at the number of the corresponding splitter input
-                            index = pt_cache["components_connection_outputs"].index(output_name)
-                            splitter_input_name = pt_cache["components_connection_inputs"][index]
+                            index = self._components_connection_outputs.index(output_name)
+                            splitter_input_name = self._components_connection_inputs[index]
 
                             if splitter_input_name.endswith("1"):
                                 power_at_each_node[node] = primary_input_power
@@ -2515,8 +2579,8 @@ class FASTGAHEPowerTrainConfigurator:
                             # the input list
                             # We look at the number of the corresponding splitter input
                             input_name = component_name + ".shaft_power_out"
-                            index = pt_cache["components_connection_inputs"].index(input_name)
-                            gearbox_input_name = pt_cache["components_connection_outputs"][index]
+                            index = self._components_connection_inputs.index(input_name)
+                            gearbox_input_name = self._components_connection_outputs[index]
 
                             if gearbox_input_name.endswith("1"):
                                 power_at_each_node[node] = primary_input_power
@@ -2536,10 +2600,8 @@ class FASTGAHEPowerTrainConfigurator:
                             )
 
                             output_name = component_name + ".fuel_consumed_t"
-                            index = pt_cache["components_connection_inputs"].index(output_name)
-                            fuel_system_input_name = pt_cache["components_connection_outputs"][
-                                index
-                            ]
+                            index = self._components_connection_inputs.index(output_name)
+                            fuel_system_input_name = self._components_connection_outputs[index]
                             input_number = fuel_system_input_name[-1]
                             power_at_each_node[node] = input_power_dict[
                                 "fuel_consumed_in_t_" + input_number
@@ -2625,7 +2687,7 @@ class FASTGAHEPowerTrainConfigurator:
         # If the connection is between a bus and an sspc, we shorten the length
         curated_connection_list = []
 
-        for connections in pt_cache["connection_list"]:
+        for connections in self._connection_list:
             curated_connection_list.append((connections["source"], connections["target"]))
 
         return (
@@ -2673,9 +2735,9 @@ class FASTGAHEPowerTrainConfigurator:
         # Then we pop all the connections that don't involve the components we have
         self._get_connections()
 
-        cured_connection_list = copy.deepcopy(pt_cache["connection_list"])
+        cured_connection_list = copy.deepcopy(self._connection_list)
 
-        for connection in pt_cache["connection_list"]:
+        for connection in self._connection_list:
             if type(connection["source"]) is str:
                 if connection["source"] not in retained_components:
                     cured_connection_list.remove(connection)
