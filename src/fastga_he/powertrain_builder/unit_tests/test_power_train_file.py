@@ -464,13 +464,10 @@ def test_power_train_logic_check():
 
     # This state should be correct, let's check it
     actual_state = power_train_configurator.check_sspc_states(
-        power_train_configurator._cache[sample_power_train_file_path]["sspc_default_state"]
+        power_train_configurator._sspc_default_state
     )
 
-    assert (
-        actual_state
-        == power_train_configurator._cache[sample_power_train_file_path]["sspc_default_state"]
-    )
+    assert actual_state == power_train_configurator._sspc_default_state
 
     # Check that if we open one end, the other will be opened
     new_state = {"dc_sspc_1": True, "dc_sspc_2": False, "dc_sspc_3": True}
