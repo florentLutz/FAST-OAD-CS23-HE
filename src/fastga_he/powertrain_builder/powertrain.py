@@ -196,53 +196,54 @@ class FASTGAHEPowerTrainConfigurator:
             # Contains the list of aircraft inputs that are necessary to promote in the performances
             # modules for the code to work
             components_promote_list = []
-            # Contains aircraft inputs that are necessary to promote in the slipstream modules
-            # for the code to work
+            # Contains the list of aircraft inputs that are necessary to promote in the slipstream
+            # modules for the code to work
             components_slip_promote_list = []
-            # Contains variables that needs to be promoted from the performances computations to
-            # slipstream computation
+            # Contains the list of variables that needs to be promoted from the performances
+            # computations to slipstream computation
             components_perf_to_slip_list = []
             # Contains a special tag on the class of element as some may need specific assemblers to
             # work such as propulsor
             components_type_class_list = []
-            # Contains a list, for each component, of all the variables that will be monitored in
-            # the performances watcher of the power train, meaning this should be a list of list
+            # Contains a list, for each component, of all the variables that will be monitored in the
+            # performances watcher of the power train, meaning this should be a list of list
             components_perf_watchers_list = []
-            # Contains a list, for each component, of all the variables in the slipstream
-            # computation that will be monitored in the performances watcher of the power train,
-            # meaning this should be a list of list
+            # Contains a list, for each component, of all the variables in the slipstream computation
+            # that will be monitored in the performances watcher of the power train, meaning this
+            # should be a list of list
             components_slipstream_perf_watchers_list = []
-            # Contains a boolean for each component, telling whether the component needs the
-            # flaps position for the computation of the slipstream effects
+            # Contains a list with, for each component, a boolean telling whether the component
+            # needs the flaps position for the computation of the slipstream effects
             components_slipstream_needs_flaps = []
-            # Contains a boolean for each component, telling whether the component lift increase
-            # is added to the wing. Will be used for the increase in induced drag
+            # Contains a list with, for each component, a boolean telling whether the component
+            # lift increase is added to the wing. Will be used for the increase in induced drag
             components_slipstream_wing_lift = []
-            # Contains all pair of components which are symmetrical on the y axis with respect to
-            # the fuselage center line. This is for now intended for the computation of the loads
-            # on the wing to avoid accounting twice for the components as the wing mass will be
+            # Contains a list of all pair of components which are symmetrical on the y axis with
+            # respect to the fuselage center line. This is for now intended for the computation of the
+            # loads on the wing to avoid accounting twice for the components as the wing mass will be
             # computed as twice the weight of a half-wing
             components_symmetrical_pairs = []
-            # Contains all boolean telling whether the components will make the aircraft weight
-            # vary during flight
+            # Contains the list of all boolean telling whether the components will make the
+            # aircraft weight vary during flight
             components_makes_mass_vary = []
-            # Contains all boolean telling whether the components are energy sources that do not
-            # make the aircraft vary (ergo they will have a non-nil non-consumable energy)
+            # Contains the list of all boolean telling whether the components are energy
+            # sources that do not make the aircraft vary (ergo they will have a non-nil unconsumable
+            # energy)
             source_does_not_make_mass_vary = []
-            # Contains an initial guess of the component's efficiency. Is used to compute the
-            # initial of the currents and power of each component
+            # Contains the list of an initial guess of the component's efficiency. Is used to compute
+            # the initial of the currents and power of each component
             components_efficiency = []
-            # Contains control parameters name for each component. Is used to detect them in case
-            # we want to give them a different name during the mission
+            # Contains the list of control parameters name for each component. Is used to detect
+            # them in cas we want to give them a different name during the mission
             components_control_parameter = []
 
             if not pt_cache.get("sspc_list") or not pt_cache.get("sspc_default_state"):
-                # Because of their very peculiar role, we will scan the architecture for any SSPC
-                # defined by the user and whether they are at the output of a bus, because a
-                # specific option needs to be turned on in this was
+                # Because of their very peculiar role, we will scan the architecture for any SSPC defined
+                # by the user and whether they are at the output of a bus, because a specific
+                # option needs to be turned on in this was
                 pt_cache["sspc_list"] = {}
-                # Contains the default state of the SSPC, will be used if other states are not
-                # specified as an option of the performances group
+                # Contains the default state of the SSPC, will be used if other states are not specified
+                # as an option of the performances group
                 pt_cache["sspc_default_state"] = {}
 
             # Doing it like that allows us to have the names of the components before we start the
@@ -334,8 +335,8 @@ class FASTGAHEPowerTrainConfigurator:
                     if component_id != "fastga_he.pt_component.dc_sspc":
                         components_options_list.append(component["options"])
 
-                        # While we are at it, we also check that we have the right options and
-                        # with the right names
+                        # While we are at it, we also check that we have the right options and with the
+                        # right names
 
                         if set(component["options"].keys()) != set(
                             resources.DICTIONARY_ATT[component_id]
@@ -392,8 +393,7 @@ class FASTGAHEPowerTrainConfigurator:
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
         if not pt_cache.get("connections_list"):
-            # Contains a basic list of the connections in the power train, with no processing
-            # whatsoever
+            # Contains a basic list of the connections in the power train, with no processing whatsoever
             connections_list = pt_cache["serializer"].data.get(KEY_PT_CONNECTIONS)
 
             if not self._check_existing_connection_cache_instance():
@@ -407,8 +407,8 @@ class FASTGAHEPowerTrainConfigurator:
             # outputs and inputs in each case
             translator = dict(zip(pt_cache["components_name"], pt_cache["components_id"]))
 
-            # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make
-            # the connections between components
+            # Contains the list of all outputs (in the OpenMDAO sense of the term) needed to make the
+            # connections between components
             openmdao_output_list = []
             # Contains the list of all inputs (in the OpenMDAO sense of the term) needed to make the
             # connections between components
