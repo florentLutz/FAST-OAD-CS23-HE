@@ -69,8 +69,8 @@ TYPE_TO_FUEL = {
 }
 ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 DEFAULT_VOLTAGE_VALUE = 737.800
-GET_COMPONENT_VARIABLE = [
-    "_components_id",
+COMPONENT_VARIABLE = [
+    "_component_list" "_components_id",
     "_components_position",
     "_components_name",
     "_components_name_id",
@@ -91,7 +91,7 @@ GET_COMPONENT_VARIABLE = [
     "_components_efficiency",
     "_components_control_parameters",
 ]
-GET_CONNECTION_VARIABLE = [
+CONNECTION_VARIABLE = [
     "_connection_list",
     "_components_connection_outputs",
     "_components_connection_inputs",
@@ -439,58 +439,33 @@ class FASTGAHEPowerTrainConfigurator:
                 else:
                     components_options_list.append(None)
 
-            # Populate cache
-            pt_cache["components_list_dict"] = components_list
-            pt_cache["components_id"] = components_id
-            pt_cache["components_position"] = components_position
-            pt_cache["components_name"] = components_name_list
-            pt_cache["components_name_id"] = components_name_id_list
-            pt_cache["components_type"] = components_type_list
-            pt_cache["components_om_type"] = components_om_type_list
-            pt_cache["components_options"] = components_options_list
-            pt_cache["components_promotes"] = components_promote_list
-            pt_cache["components_slipstream_promotes"] = components_slip_promote_list
-            pt_cache["components_performances_to_slipstream"] = components_perf_to_slip_list
-            pt_cache["components_type_class"] = components_type_class_list
-            pt_cache["components_perf_watchers"] = components_perf_watchers_list
-            pt_cache["components_slipstream_perf_watchers"] = (
-                components_slipstream_perf_watchers_list
-            )
-            pt_cache["components_slipstream_flaps"] = components_slipstream_needs_flaps
-            pt_cache["components_slipstream_wing_lift"] = components_slipstream_wing_lift
-            pt_cache["components_symmetrical_pairs"] = components_symmetrical_pairs
-            pt_cache["components_makes_mass_vary"] = components_makes_mass_vary
-            pt_cache["source_does_not_make_mass_vary"] = source_does_not_make_mass_vary
-            pt_cache["components_efficiency"] = components_efficiency
-            pt_cache["components_control_parameters"] = components_control_parameter
-            pt_cache["sspc_list"] = self._sspc_list
-            pt_cache["sspc_default_state"] = self._sspc_default_state
+            self._components_list = components_list
+            self._components_id = components_id
+            self._components_position = components_position
+            self._components_name = components_name_list
+            self._components_name_id = components_name_id_list
+            self._components_type = components_type_list
+            self._components_om_type = components_om_type_list
+            self._components_options = components_options_list
+            self._components_promotes = components_promote_list
+            self._components_slipstream_promotes = components_slip_promote_list
+            self._components_performances_to_slipstream = components_perf_to_slip_list
+            self._components_type_class = components_type_class_list
+            self._components_perf_watchers = components_perf_watchers_list
+            self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
+            self._components_slipstream_flaps = components_slipstream_needs_flaps
+            self._components_slipstream_wing_lift = components_slipstream_wing_lift
+            self._components_symmetrical_pairs = components_symmetrical_pairs
+            self._components_makes_mass_vary = components_makes_mass_vary
+            self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
+            self._components_efficiency = components_efficiency
+            self._components_control_parameters = components_control_parameter
 
-        # Assign everything from pt_cache
-        self._components_id = pt_cache["components_id"]
-        self._components_position = pt_cache["components_position"]
-        self._components_name = pt_cache["components_name"]
-        self._components_name_id = pt_cache["components_name_id"]
-        self._components_type = pt_cache["components_type"]
-        self._components_om_type = pt_cache["components_om_type"]
-        self._components_options = pt_cache["components_options"]
-        self._components_promotes = pt_cache["components_promotes"]
-        self._components_slipstream_promotes = pt_cache["components_slipstream_promotes"]
-        self._components_performances_to_slipstream = pt_cache[
-            "components_performances_to_slipstream"
-        ]
-        self._components_type_class = pt_cache["components_type_class"]
-        self._components_perf_watchers = pt_cache["components_perf_watchers"]
-        self._components_slipstream_perf_watchers = pt_cache["components_slipstream_perf_watchers"]
-        self._components_slipstream_flaps = pt_cache["components_slipstream_flaps"]
-        self._components_slipstream_wing_lift = pt_cache["components_slipstream_wing_lift"]
-        self._components_symmetrical_pairs = pt_cache["components_symmetrical_pairs"]
-        self._components_makes_mass_vary = pt_cache["components_makes_mass_vary"]
-        self._source_does_not_make_mass_vary = pt_cache["source_does_not_make_mass_vary"]
-        self._components_efficiency = pt_cache["components_efficiency"]
-        self._components_control_parameters = pt_cache["components_control_parameters"]
-        self._sspc_list = pt_cache["sspc_list"]
-        self._sspc_default_state = pt_cache["sspc_default_state"]
+            # Populate cache
+            self._set_cache_instance(COMPONENT_VARIABLE)
+
+        else:
+            self._get_cache_instance(COMPONENT_VARIABLE)
 
     def _get_connections(self):
         """
@@ -502,14 +477,14 @@ class FASTGAHEPowerTrainConfigurator:
 
         start_time = time.perf_counter()
         # This should do nothing if it has already been run.
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
+
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
         if not pt_cache.get("connections_list"):
             connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
 
-            if not self._check_existing_connection_cache_instance():
+            if not self._check_existing_connection_check_cache_instance():
                 self._check_connection(connections_list)
                 self._add_connection_check_cache_instance()
                 _LOGGER.info("Powertrain components' connections checked.")
@@ -665,17 +640,13 @@ class FASTGAHEPowerTrainConfigurator:
             self._components_connection_inputs = openmdao_input_list
 
             # Populate and update pt_cache
-            pt_cache["connection_list"] = self._connection_list
-            pt_cache["openmdao_output_list"] = self._components_connection_outputs
-            pt_cache["openmdao_input_list"] = self._components_connection_inputs
+            self._set_cache_instance(CONNECTION_VARIABLE)
 
             end_time = time.perf_counter()
 
         else:
             # Assign everything from pt_cache
-            self._connection_list = pt_cache["connection_list"]
-            self._components_connection_outputs = pt_cache["openmdao_output_list"]
-            self._components_connection_inputs = pt_cache["openmdao_input_list"]
+            self._get_cache_instance(CONNECTION_VARIABLE)
 
         if not pt_cache.get("get_connection_time"):
             pt_cache["get_connection_time"] = end_time - start_time
@@ -690,8 +661,7 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         # This should do nothing if it has already been run.
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         propulsor_component = []
         aux_load_component = []
@@ -1189,8 +1159,7 @@ class FASTGAHEPowerTrainConfigurator:
         inside the power train file.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         return (
             self._components_name,
@@ -1207,8 +1176,7 @@ class FASTGAHEPowerTrainConfigurator:
         inside the power train file.
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         # We now need to check if the SSPC "logic" is respected, the main rule being for now that
         # if a cable has one SSPC at each end of the cable, they should both be in the same
@@ -1234,8 +1202,7 @@ class FASTGAHEPowerTrainConfigurator:
         inside the power train file.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         return (
             self._components_name,
@@ -1253,8 +1220,7 @@ class FASTGAHEPowerTrainConfigurator:
         component.
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         variables_to_check = []
 
@@ -1283,8 +1249,7 @@ class FASTGAHEPowerTrainConfigurator:
         Returns the list of control parameters of the components inside the powertrain.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         # Because we might want different thrust distribution for mission and landing. As the
         # default is always an array of one for that variable it shouldn't cause any problem.
@@ -1385,8 +1350,7 @@ class FASTGAHEPowerTrainConfigurator:
         the mass of the power train.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         variable_names = []
 
@@ -1401,8 +1365,7 @@ class FASTGAHEPowerTrainConfigurator:
         the center of gravity of the power train.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         variable_names_cg = []
 
@@ -1420,8 +1383,7 @@ class FASTGAHEPowerTrainConfigurator:
         as they are meant to be used once in the same component
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         variable_names_drag_ls = []
         variable_names_drag_cruise = []
@@ -1442,8 +1404,7 @@ class FASTGAHEPowerTrainConfigurator:
         the repartition of thrust among propellers.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
 
         for component_type_class, component_name in zip(
@@ -1460,8 +1421,7 @@ class FASTGAHEPowerTrainConfigurator:
         the ratio between the required power and the max available power on propulsive loads.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
         components_types = []
 
@@ -1480,8 +1440,7 @@ class FASTGAHEPowerTrainConfigurator:
         contribution of each source to the global energy consumption.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
 
         for component_type_class, component_name in zip(
@@ -1498,8 +1457,7 @@ class FASTGAHEPowerTrainConfigurator:
         during flight because of a varying mass (but a constant position)
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
         components_types = []
 
@@ -1517,8 +1475,7 @@ class FASTGAHEPowerTrainConfigurator:
         Returns the list of generator component(s) in the powertrain architecture.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
 
         for component_type, component_name in zip(self._components_type, self._components_name):
@@ -1569,8 +1526,7 @@ class FASTGAHEPowerTrainConfigurator:
         Returns the list of electricity storage components inside the power train.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
         components_types = []
 
@@ -1588,8 +1544,7 @@ class FASTGAHEPowerTrainConfigurator:
         Returns the list of OpenMDAO variables that are interesting to monitor in the residuals
         watcher.
         """
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         components_residuals_watchers_name_organised_list = []
         components_name_organised_list = []
@@ -1608,8 +1563,7 @@ class FASTGAHEPowerTrainConfigurator:
         watcher.
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         components_perf_watchers_name_organised_list = []
         components_perf_watchers_unit_organised_list = []
@@ -1652,8 +1606,7 @@ class FASTGAHEPowerTrainConfigurator:
         that are to be registered by the performances watcher.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         components_slip_perf_watchers_name_organised_list = []
         components_slip_perf_watchers_unit_organised_list = []
@@ -1680,8 +1633,7 @@ class FASTGAHEPowerTrainConfigurator:
         masses acting on the wing due to their positions as defined in the powertrain file
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         punctual_mass_names = []
         punctual_mass_types = []
@@ -1716,8 +1668,7 @@ class FASTGAHEPowerTrainConfigurator:
         fuel tanks acting on the wing due to their positions as defined in the powertrain file
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         punctual_tank_names = []
         punctual_tank_types = []
@@ -1752,8 +1703,7 @@ class FASTGAHEPowerTrainConfigurator:
         masses acting on the wing due to their positions as defined in the powertrain file
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         distributed_mass_names = []
         distributed_mass_types = []
@@ -1788,8 +1738,7 @@ class FASTGAHEPowerTrainConfigurator:
         fuel tanks acting on the wing due to their positions as defined in the powertrain file
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         distributed_tanks_names = []
         distributed_tanks_types = []
@@ -1825,8 +1774,7 @@ class FASTGAHEPowerTrainConfigurator:
         certain types of batteries). For now, will only be used in the initial guess.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         return any(self._components_makes_mass_vary)
 
@@ -1837,8 +1785,7 @@ class FASTGAHEPowerTrainConfigurator:
         provide smart initial guess.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         return any(self._source_does_not_make_mass_vary)
 
@@ -1848,8 +1795,7 @@ class FASTGAHEPowerTrainConfigurator:
         components like what get_graphs_connected_voltage() does
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         graph = nx.Graph()
 
@@ -1885,8 +1831,7 @@ class FASTGAHEPowerTrainConfigurator:
         different connected voltage.
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         graph = nx.Graph()
 
@@ -2145,8 +2090,29 @@ class FASTGAHEPowerTrainConfigurator:
 
         return final_list
 
-    def _none_variables(self):
-        return [name for name, value in self.__dict__.items() if value is None]
+    def _check_component_cache(self):
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        return pt_cache.get("get_component_time") and self._components_list == pt_cache.get(
+            "components_list"
+        )
+
+    def _set_cache_instance(self, variable_list):
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        if variable_list == COMPONENT_VARIABLE:
+            variable_list.append("_sspc_list")
+            variable_list.append("_sspc_default_state")
+
+        for variable in variable_list:
+            pt_cache[variable.lstrip("_")] = self.__dict__.get(variable)
+
+    def _get_cache_instance(self, variable_list):
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        if variable_list == COMPONENT_VARIABLE:
+            variable_list.append("_sspc_list")
+            variable_list.append("_sspc_default_state")
+
+        for variable in variable_list:
+            self.__dict__[variable] = pt_cache[variable.lstrip("_")]
 
     @staticmethod
     def get_number_of_cell_in_series(component_name: str, component_type: str, inputs) -> float:
@@ -2190,8 +2156,7 @@ class FASTGAHEPowerTrainConfigurator:
         allow to include efficiency.
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         graph = nx.DiGraph()
 
@@ -2660,8 +2625,7 @@ class FASTGAHEPowerTrainConfigurator:
         power train as a network graph.
         """
 
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         icons_name = []
         icons_size = []
@@ -2697,8 +2661,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         simplified_serializer = copy.deepcopy(self._serializer)
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
 
         retained_components = []
 
@@ -2715,8 +2678,7 @@ class FASTGAHEPowerTrainConfigurator:
                 retained_components.append(component_name)
 
         # Then we pop all the connections that don't involve the components we have
-        if set(GET_CONNECTION_VARIABLE).issubset(set(self._none_variables())):
-            self._get_connections()
+        self._get_connections()
 
         cured_connection_list = copy.deepcopy(self._connection_list)
 
@@ -2868,8 +2830,7 @@ class FASTGAHEPowerTrainConfigurator:
         super-capacitors and others.
         """
 
-        if set(GET_COMPONENT_VARIABLE).issubset(set(self._none_variables())):
-            self._get_components()
+        self._get_components()
         components_names = []
         components_types = []
 
@@ -3154,7 +3115,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return clean_dict, list(set(species_list))
 
-    def _check_existing_connection_cache_instance(self):
+    def _check_existing_connection_check_cache_instance(self):
         """
         Checks the cache to see if an instance of the cache already exists and is usable. Usable
         means there was no modification to the powertrain configuration file.
