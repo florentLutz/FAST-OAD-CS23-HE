@@ -295,182 +295,166 @@ class FASTGAHEPowerTrainConfigurator:
         # components is necessary
 
         start_time = time.perf_counter()
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        if self._components_id is None:
+        if self._components_id is None and not pt_cache.get("get_component_time"):
             self._generate_components_list()
         else:
             self._get_cache_instance(COMPONENT_VARIABLE)
 
         end_time = time.perf_counter()
 
-        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
-            "get_component_time"
-        ):
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["get_component_time"] = (
-                end_time - start_time
-            )
+        if not pt_cache.get("get_component_time"):
+            pt_cache["get_component_time"] = end_time - start_time
 
     def _generate_components_list(self):
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        if not pt_cache.get("get_component_time") or components_list != pt_cache.get(
-            "components_list"
-        ):
-            pt_cache["components_list"] = components_list
+        components_id = []
+        components_position = []
+        components_name_id_list = []
+        components_type_list = []
+        components_om_type_list = []
+        components_options_list = []
+        components_promote_list = []
+        components_slip_promote_list = []
+        components_perf_to_slip_list = []
+        components_type_class_list = []
+        components_perf_watchers_list = []
+        components_slipstream_perf_watchers_list = []
+        components_slipstream_needs_flaps = []
+        components_slipstream_wing_lift = []
+        components_symmetrical_pairs = []
+        components_makes_mass_vary = []
+        source_does_not_make_mass_vary = []
+        components_efficiency = []
+        components_control_parameter = []
 
-            components_id = []
-            components_position = []
-            components_name_id_list = []
-            components_type_list = []
-            components_om_type_list = []
-            components_options_list = []
-            components_promote_list = []
-            components_slip_promote_list = []
-            components_perf_to_slip_list = []
-            components_type_class_list = []
-            components_perf_watchers_list = []
-            components_slipstream_perf_watchers_list = []
-            components_slipstream_needs_flaps = []
-            components_slipstream_wing_lift = []
-            components_symmetrical_pairs = []
-            components_makes_mass_vary = []
-            source_does_not_make_mass_vary = []
-            components_efficiency = []
-            components_control_parameter = []
+        # Doing it like that allows us to have the names of the components before we start the
+        # loop, which I'm gonna use to check if the pairs are valid
+        components_name_list = list(components_list.keys())
 
-            # Doing it like that allows us to have the names of the components before we start the
-            # loop, which I'm gonna use to check if the pairs are valid
-            components_name_list = list(components_list.keys())
+        for component_name in components_list:
+            component = copy.deepcopy(components_list[component_name])
+            component_id = component["id"]
+            components_id.append(component_id)
+            if component_id not in resources.KNOWN_ID:
+                raise FASTGAHEUnknownComponentID(
+                    component_id + " is not a known ID of a power train component"
+                )
+            if "position" in component:
+                component_position = component["position"]
+                components_position.append(component_position)
+            else:
+                components_position.append("")
 
-            for component_name in components_list:
-                component = copy.deepcopy(components_list[component_name])
-                component_id = component["id"]
-                components_id.append(component_id)
-                if component_id not in resources.KNOWN_ID:
-                    raise FASTGAHEUnknownComponentID(
-                        component_id + " is not a known ID of a power train component"
+            if "symmetrical" in component:
+                component_symmetrical = component["symmetrical"]
+
+                if component_symmetrical not in components_name_list:
+                    raise FASTGAHEImpossiblePair(
+                        "Cannot pair "
+                        + component_name
+                        + " with "
+                        + component_symmetrical
+                        + " because "
+                        + component_symmetrical
+                        + " does not exist. Valid pair choice are among the following list: "
+                        + ", ".join(components_name_list)
+                        + ". \nBest regards."
                     )
-                if "position" in component:
-                    component_position = component["position"]
-                    components_position.append(component_position)
-                else:
-                    components_position.append("")
 
-                if "symmetrical" in component:
-                    component_symmetrical = component["symmetrical"]
+                # We sort the pair to ensure that if the pair is already there because the
+                # symmetrical tag is defined twice (propeller1 is symmetrical to propeller2 and
+                # propeller2 is symmetrical to propeller1) it will have the same name, and we
+                # don't have to register it twice.
+                sorted_pair = sorted([component_name, component_symmetrical])
 
-                    if component_symmetrical not in components_name_list:
-                        raise FASTGAHEImpossiblePair(
-                            "Cannot pair "
-                            + component_name
-                            + " with "
-                            + component_symmetrical
-                            + " because "
-                            + component_symmetrical
-                            + " does not exist. Valid pair choice are among the following list: "
-                            + ", ".join(components_name_list)
-                            + ". \nBest regards."
-                        )
+                if sorted_pair not in components_symmetrical_pairs:
+                    components_symmetrical_pairs.append(sorted_pair)
+                    # We don't put an else because as opposed to options, we don't expected all
+                    # components to have symmetrical tag
 
-                    # We sort the pair to ensure that if the pair is already there because the
-                    # symmetrical tag is defined twice (propeller1 is symmetrical to propeller2 and
-                    # propeller2 is symmetrical to propeller1) it will have the same name, and we
-                    # don't have to register it twice.
-                    sorted_pair = sorted([component_name, component_symmetrical])
+            if component_id == "fastga_he.pt_component.dc_sspc":
+                # Create a dictionary with SSPC name and a tag to see if they are at bus output
+                # or not, it will be set at False by default but be changed later on
 
-                    if sorted_pair not in components_symmetrical_pairs:
-                        components_symmetrical_pairs.append(sorted_pair)
-                        # We don't put an else because as opposed to options, we don't expected all
-                        # components to have symmetrical tag
-
-                if component_id == "fastga_he.pt_component.dc_sspc":
-                    # Create a dictionary with SSPC name and a tag to see if they are at bus output
-                    # or not, it will be set at False by default but be changed later on
-
-                    self._sspc_list[component_name] = False
-
-                    if "options" in component.keys():
-                        if "closed_by_default" in component["options"]:
-                            self._sspc_default_state[component_name] = component["options"][
-                                "closed_by_default"
-                            ]
-                        else:
-                            self._sspc_default_state[component_name] = True
-                    else:
-                        self._sspc_default_state[component_name] = True
-
-                components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
-                components_type_list.append(resources.DICTIONARY_CT[component_id])
-                components_om_type_list.append(resources.DICTIONARY_CN[component_id])
-                components_promote_list.append(resources.DICTIONARY_PT[component_id])
-                components_slip_promote_list.append(resources.DICTIONARY_SPT[component_id])
-                components_perf_to_slip_list.append(resources.DICTIONARY_PTS[component_id])
-                components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
-                components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
-                components_slipstream_perf_watchers_list.append(
-                    resources.DICTIONARY_SMP[component_id]
-                )
-                components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
-                components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
-                components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
-                source_does_not_make_mass_vary.append(
-                    resources.DICTIONARY_VARIESN_T_MASS[component_id]
-                )
-                components_efficiency.append(resources.DICTIONARY_ETA[component_id])
-                components_control_parameter.append(resources.DICTIONARY_CTRL_PARAM[component_id])
+                self._sspc_list[component_name] = False
 
                 if "options" in component.keys():
-                    # SSPC is treated above, this way of doing things however makes no other option
-                    # for SSPC can be set, may need to be changed
-                    if component_id != "fastga_he.pt_component.dc_sspc":
-                        components_options_list.append(component["options"])
-
-                        # While we are at it, we also check that we have the right options and with the
-                        # right names
-
-                        if set(component["options"].keys()) != set(
-                            resources.DICTIONARY_ATT[component_id]
-                        ):
-                            raise FASTGAHEUnknownOption(
-                                "Component "
-                                + component_id
-                                + " does not have all options declare or they "
-                                "have an erroneous name. The following options should be declared: "
-                                + ", ".join(resources.DICTIONARY_ATT[component_id])
-                            )
+                    if "closed_by_default" in component["options"]:
+                        self._sspc_default_state[component_name] = component["options"][
+                            "closed_by_default"
+                        ]
                     else:
-                        components_options_list.append(None)
+                        self._sspc_default_state[component_name] = True
+                else:
+                    self._sspc_default_state[component_name] = True
 
+            components_name_id_list.append(resources.DICTIONARY_CN_ID[component_id])
+            components_type_list.append(resources.DICTIONARY_CT[component_id])
+            components_om_type_list.append(resources.DICTIONARY_CN[component_id])
+            components_promote_list.append(resources.DICTIONARY_PT[component_id])
+            components_slip_promote_list.append(resources.DICTIONARY_SPT[component_id])
+            components_perf_to_slip_list.append(resources.DICTIONARY_PTS[component_id])
+            components_type_class_list.append(resources.DICTIONARY_CTC[component_id])
+            components_perf_watchers_list.append(resources.DICTIONARY_MP[component_id])
+            components_slipstream_perf_watchers_list.append(resources.DICTIONARY_SMP[component_id])
+            components_slipstream_needs_flaps.append(resources.DICTIONARY_SFR[component_id])
+            components_slipstream_wing_lift.append(resources.DICTIONARY_SWL[component_id])
+            components_makes_mass_vary.append(resources.DICTIONARY_VARIES_MASS[component_id])
+            source_does_not_make_mass_vary.append(resources.DICTIONARY_VARIESN_T_MASS[component_id])
+            components_efficiency.append(resources.DICTIONARY_ETA[component_id])
+            components_control_parameter.append(resources.DICTIONARY_CTRL_PARAM[component_id])
+
+            if "options" in component.keys():
+                # SSPC is treated above, this way of doing things however makes no other option
+                # for SSPC can be set, may need to be changed
+                if component_id != "fastga_he.pt_component.dc_sspc":
+                    components_options_list.append(component["options"])
+
+                    # While we are at it, we also check that we have the right options and with the
+                    # right names
+
+                    if set(component["options"].keys()) != set(
+                        resources.DICTIONARY_ATT[component_id]
+                    ):
+                        raise FASTGAHEUnknownOption(
+                            "Component "
+                            + component_id
+                            + " does not have all options declare or they "
+                            "have an erroneous name. The following options should be declared: "
+                            + ", ".join(resources.DICTIONARY_ATT[component_id])
+                        )
                 else:
                     components_options_list.append(None)
 
-            self._components_id = components_id
-            self._components_position = components_position
-            self._components_name = components_name_list
-            self._components_name_id = components_name_id_list
-            self._components_type = components_type_list
-            self._components_om_type = components_om_type_list
-            self._components_options = components_options_list
-            self._components_promotes = components_promote_list
-            self._components_slipstream_promotes = components_slip_promote_list
-            self._components_performances_to_slipstream = components_perf_to_slip_list
-            self._components_type_class = components_type_class_list
-            self._components_perf_watchers = components_perf_watchers_list
-            self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
-            self._components_slipstream_flaps = components_slipstream_needs_flaps
-            self._components_slipstream_wing_lift = components_slipstream_wing_lift
-            self._components_symmetrical_pairs = components_symmetrical_pairs
-            self._components_makes_mass_vary = components_makes_mass_vary
-            self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
-            self._components_efficiency = components_efficiency
-            self._components_control_parameters = components_control_parameter
+            else:
+                components_options_list.append(None)
 
-            # Populate cache
-            self._set_cache_instance(COMPONENT_VARIABLE)
+        self._components_id = components_id
+        self._components_position = components_position
+        self._components_name = components_name_list
+        self._components_name_id = components_name_id_list
+        self._components_type = components_type_list
+        self._components_om_type = components_om_type_list
+        self._components_options = components_options_list
+        self._components_promotes = components_promote_list
+        self._components_slipstream_promotes = components_slip_promote_list
+        self._components_performances_to_slipstream = components_perf_to_slip_list
+        self._components_type_class = components_type_class_list
+        self._components_perf_watchers = components_perf_watchers_list
+        self._components_slipstream_perf_watchers = components_slipstream_perf_watchers_list
+        self._components_slipstream_flaps = components_slipstream_needs_flaps
+        self._components_slipstream_wing_lift = components_slipstream_wing_lift
+        self._components_symmetrical_pairs = components_symmetrical_pairs
+        self._components_makes_mass_vary = components_makes_mass_vary
+        self._source_does_not_make_mass_vary = source_does_not_make_mass_vary
+        self._components_efficiency = components_efficiency
+        self._components_control_parameters = components_control_parameter
 
-        else:
-            self._get_cache_instance(COMPONENT_VARIABLE)
+        # Populate cache
+        self._set_cache_instance(COMPONENT_VARIABLE)
 
     def _get_connections(self):
         """
