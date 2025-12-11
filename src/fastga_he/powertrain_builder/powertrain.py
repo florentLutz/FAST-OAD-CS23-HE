@@ -70,7 +70,7 @@ TYPE_TO_FUEL = {
 ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 DEFAULT_VOLTAGE_VALUE = 737.800
 COMPONENT_VARIABLE = [
-    "_component_list" "_components_id",
+    "_components_id",
     "_components_position",
     "_components_name",
     "_components_name_id",
@@ -90,6 +90,8 @@ COMPONENT_VARIABLE = [
     "_source_does_not_make_mass_vary",
     "_components_efficiency",
     "_components_control_parameters",
+    "_sspc_list",
+    "_sspc_default_state",
 ]
 CONNECTION_VARIABLE = [
     "_connection_list",
@@ -296,6 +298,8 @@ class FASTGAHEPowerTrainConfigurator:
 
         if self._components_id is None:
             self._generate_components_list()
+        else:
+            self._get_cache_instance(COMPONENT_VARIABLE)
 
         end_time = time.perf_counter()
 
@@ -307,12 +311,14 @@ class FASTGAHEPowerTrainConfigurator:
             )
 
     def _generate_components_list(self):
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
         if not pt_cache.get("get_component_time") or components_list != pt_cache.get(
-            "components_list_dict"
+            "components_list"
         ):
+            pt_cache["components_list"] = components_list
+
             components_id = []
             components_position = []
             components_name_id_list = []
@@ -439,7 +445,6 @@ class FASTGAHEPowerTrainConfigurator:
                 else:
                     components_options_list.append(None)
 
-            self._components_list = components_list
             self._components_id = components_id
             self._components_position = components_position
             self._components_name = components_name_list
@@ -2090,29 +2095,17 @@ class FASTGAHEPowerTrainConfigurator:
 
         return final_list
 
-    def _check_component_cache(self):
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
-        return pt_cache.get("get_component_time") and self._components_list == pt_cache.get(
-            "components_list"
-        )
-
     def _set_cache_instance(self, variable_list):
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
-        if variable_list == COMPONENT_VARIABLE:
-            variable_list.append("_sspc_list")
-            variable_list.append("_sspc_default_state")
-
         for variable in variable_list:
-            pt_cache[variable.lstrip("_")] = self.__dict__.get(variable)
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][variable.lstrip("_")] = (
+                self.__dict__.get(variable)
+            )
 
     def _get_cache_instance(self, variable_list):
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
-        if variable_list == COMPONENT_VARIABLE:
-            variable_list.append("_sspc_list")
-            variable_list.append("_sspc_default_state")
-
         for variable in variable_list:
-            self.__dict__[variable] = pt_cache[variable.lstrip("_")]
+            self.__dict__[variable] = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
+                variable.lstrip("_")
+            ]
 
     @staticmethod
     def get_number_of_cell_in_series(component_name: str, component_type: str, inputs) -> float:
