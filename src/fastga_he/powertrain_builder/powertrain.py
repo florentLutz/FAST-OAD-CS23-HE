@@ -245,7 +245,11 @@ class FASTGAHEPowerTrainConfigurator:
         if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
 
-        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("serializer"):
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+
+        if not pt_cache.get("_serializer") or pt_cache.get("pt_file_size") != pth.getsize(
+            self._power_train_file
+        ):
             self._serializer = _YAMLSerializer()
             self._serializer.read(self._power_train_file)
 
@@ -260,14 +264,16 @@ class FASTGAHEPowerTrainConfigurator:
 
             end_time = time.perf_counter()
 
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["serializer"] = (
-                self._serializer
-            )
+            pt_cache["_serializer"] = self._serializer
+
+            if pt_cache.get("pt_file_size") != pth.getsize(self._power_train_file):
+                pt_cache["pt_file_size"] = pth.getsize(self._power_train_file)
+                self._components_id = None
+                pt_cache["_connections_list"] = None
+                pt_cache["get_component_time"] = None
 
         else:
-            self._serializer = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
-                "serializer"
-            ]
+            self._serializer = pt_cache["_serializer"]
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("load_time"):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["load_time"] = (
@@ -297,8 +303,9 @@ class FASTGAHEPowerTrainConfigurator:
         start_time = time.perf_counter()
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        if self._components_id is None and not pt_cache.get("get_component_time"):
+        if not self._components_id and not pt_cache.get("get_component_time"):
             self._generate_components_list()
+
         else:
             self._get_cache_instance(COMPONENT_VARIABLE)
 
@@ -470,7 +477,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        if not pt_cache.get("connections_list"):
+        if not pt_cache.get("_connections_list"):
             connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
 
             if not self._check_existing_connection_check_cache_instance():
@@ -542,7 +549,7 @@ class FASTGAHEPowerTrainConfigurator:
                     target_id == "fastga_he.pt_component.dc_bus"
                     or target_id == "fastga_he.pt_component.dc_splitter"
                 ):
-                    pt_cache["sspc_list"][source_name] = True
+                    pt_cache["_sspc_list"][source_name] = True
 
                 # The possibility to connect a battery or a PEMFC stack directly to a bus has been
                 # added. However, to make it backward compatible (whatever it means today because I
@@ -564,7 +571,7 @@ class FASTGAHEPowerTrainConfigurator:
                     target_option = self._components_options[target_index]
 
                     if not target_option:
-                        pt_cache["components_options"][target_index] = {
+                        pt_cache["_components_options"][target_index] = {
                             "direct_bus_connection": True
                         }
 
@@ -2081,14 +2088,14 @@ class FASTGAHEPowerTrainConfigurator:
 
     def _set_cache_instance(self, variable_list):
         for variable in variable_list:
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][variable.lstrip("_")] = (
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][variable] = (
                 self.__dict__.get(variable)
             )
 
     def _get_cache_instance(self, variable_list):
         for variable in variable_list:
             self.__dict__[variable] = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
-                variable.lstrip("_")
+                variable
             ]
 
     @staticmethod
