@@ -221,6 +221,8 @@ def test_power_train_initialization_time():
 
 def test_load_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -237,6 +239,8 @@ def test_load_cache():
 
 def test_component_connection_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
@@ -255,6 +259,8 @@ def test_component_connection_cache():
 
 def test_connection_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
+
+    FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path] = {}
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
