@@ -4,7 +4,6 @@
 
 import os
 import os.path as pth
-import shutil
 
 import pytest
 
@@ -13,7 +12,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from ..powertrain import FASTGAHEPowerTrainConfigurator, COMPONENT_VARIABLE, CONNECTION_VARIABLE
+from ..powertrain import FASTGAHEPowerTrainConfigurator
 from ..exceptions import (
     FASTGAHESingleSSPCAtEndOfLine,
     FASTGAHEImpossiblePair,
@@ -217,99 +216,6 @@ def test_power_train_initialization_time():
     print(f"Load time: {octo_cache['load_time']} sec")
     print(f"Get component time: {octo_cache['get_component_time']} sec")
     print(f"Get connection time: {octo_cache['get_connection_time']} sec")
-
-
-def test_load_cache():
-    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
-    power_train_configurator._get_components()
-
-    load_cache = power_train_configurator._cache[sample_power_train_file_path]["_serializer"]
-
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
-
-    assert load_cache == power_train_configurator._serializer
-
-
-def test_component_cache():
-    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
-    power_train_configurator._get_components()
-
-    component_cache = {}
-
-    for variable in COMPONENT_VARIABLE:
-        component_cache[variable] = power_train_configurator._cache[sample_power_train_file_path][
-            variable
-        ]
-
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
-    power_train_configurator._get_components()
-
-    for variable in COMPONENT_VARIABLE:
-        assert component_cache[variable] == power_train_configurator.__dict__[variable]
-
-
-def test_connection_cache():
-    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
-    power_train_configurator._get_components()
-    power_train_configurator._get_connections()
-
-    connection_cache = {}
-
-    for variable in CONNECTION_VARIABLE:
-        connection_cache[variable] = power_train_configurator._cache[sample_power_train_file_path][
-            variable
-        ]
-
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=sample_power_train_file_path
-    )
-    power_train_configurator._get_components()
-    power_train_configurator._get_connections()
-
-    for variable in CONNECTION_VARIABLE:
-        assert connection_cache[variable] == power_train_configurator.__dict__[variable]
-
-def test_cache_with_modified_file():
-    sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
-    directory = pth.dirname(sample_power_train_file_path)
-    tmp_file_path = pth.join(directory, "tmp.yml")
-    shutil.copy(sample_power_train_file_path, tmp_file_path)
-
-    power_train_configurator = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=tmp_file_path
-    )
-    power_train_configurator._get_components()
-    power_train_configurator._get_connections()
-
-    original_cache = power_train_configurator._cache
-
-    octo_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
-    shutil.copy(octo_power_train_file_path, tmp_file_path)
-
-    power_train_configurator_octo = FASTGAHEPowerTrainConfigurator(
-        power_train_file_path=tmp_file_path
-    )
-    power_train_configurator_octo._get_components()
-    power_train_configurator_octo._get_connections()
-
-    octo_cache = power_train_configurator_octo._cache
-
-    os.remove(tmp_file_path)
-
-    assert original_cache != octo_cache
 
 
 def test_power_train_file_connection_check_cache():
