@@ -495,7 +495,6 @@ class FASTGAHEPowerTrainConfigurator:
         """
 
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
         if not self._check_existing_connection_check_cache_instance():
             self._check_connection(connections_list)
@@ -566,7 +565,7 @@ class FASTGAHEPowerTrainConfigurator:
                 target_id == "fastga_he.pt_component.dc_bus"
                 or target_id == "fastga_he.pt_component.dc_splitter"
             ):
-                pt_cache["_sspc_list"][source_name] = True
+                self._sspc_list[source_name] = True
 
             # The possibility to connect a battery or a PEMFC stack directly to a bus has been
             # added. However, to make it backward compatible (whatever it means today because I
@@ -588,7 +587,7 @@ class FASTGAHEPowerTrainConfigurator:
                 target_option = self._components_options[target_index]
 
                 if not target_option:
-                    pt_cache["_components_options"][target_index] = {"direct_bus_connection": True}
+                    self._components_options[target_index] = {"direct_bus_connection": True}
 
                 current_outputs = resources.DICTIONARY_OUT[target_id]
 

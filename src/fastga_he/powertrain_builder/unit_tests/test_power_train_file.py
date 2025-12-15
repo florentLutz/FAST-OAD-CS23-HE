@@ -226,28 +226,23 @@ def test_load_cache():
     )
     power_train_configurator._get_components()
 
-    load_cache = power_train_configurator._cache[sample_power_train_file_path]["_serializer"]
+    loaded_cache = power_train_configurator._cache[sample_power_train_file_path]["_serializer"]
 
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
 
-    assert load_cache == power_train_configurator._serializer
+    assert loaded_cache == power_train_configurator._serializer
 
 
-def test_component_cache():
+def test_component_connection_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
     power_train_configurator._get_components()
 
-    component_cache = {}
-
-    for variable in COMPONENT_VARIABLE:
-        component_cache[variable] = power_train_configurator._cache[sample_power_train_file_path][
-            variable
-        ]
+    component_cache = power_train_configurator._cache[sample_power_train_file_path]
 
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
@@ -266,12 +261,7 @@ def test_connection_cache():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    connection_cache = {}
-
-    for variable in CONNECTION_VARIABLE:
-        connection_cache[variable] = power_train_configurator._cache[sample_power_train_file_path][
-            variable
-        ]
+    connection_cache = power_train_configurator._cache[sample_power_train_file_path]
 
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
