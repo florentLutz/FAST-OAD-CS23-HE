@@ -2097,6 +2097,11 @@ class FASTGAHEPowerTrainConfigurator:
             ]
 
     def _reset_cache_instance(self):
+        """
+        This function resets the cache instances of a PT file that already has registered cache
+        instances but modified during calculation. This will only be triggered during the load
+        process.
+        """
         pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
         last_mod_time = pathlib.Path(self._power_train_file).lstat().st_mtime
         if pt_cache and pt_cache.get("last_mod_time") != last_mod_time:
@@ -3125,6 +3130,9 @@ class FASTGAHEPowerTrainConfigurator:
         # If the powertrain configuration file is a temporary copy or dedicated for a test,
         # the connection test will be omitted
         if self._power_train_file.endswith("_temp_copy.yml"):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"] = (
+                pathlib.Path(self._power_train_file).lstat().st_mtime
+            )
             return True
 
         # If cache is not empty but there is no instance of that particular configuration file, no
@@ -3136,6 +3144,9 @@ class FASTGAHEPowerTrainConfigurator:
             return False
 
         if FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("skip_test"):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"] = (
+                pathlib.Path(self._power_train_file).lstat().st_mtime
+            )
             return True
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(

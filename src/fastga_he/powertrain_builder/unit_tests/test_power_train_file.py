@@ -3,10 +3,11 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os
-import sys
 import os.path as pth
+import pathlib
 import shutil
 import pytest
+import time
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -221,35 +222,59 @@ def test_load_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
 
     FASTGAHEPowerTrainConfigurator._cache = {}
+
+    start = time.perf_counter()
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
-    power_train_configurator._get_components()
+    end = time.perf_counter()
 
-    loaded_cache = power_train_configurator._cache[sample_power_train_file_path]["_serializer"]
+    power_train_configurator._cache[sample_power_train_file_path]["last_mod_time"] = (
+        pathlib.Path(sample_power_train_file_path).lstat().st_mtime
+    )
 
+    first_run_time = end - start
+    loaded_cache = FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path][
+        "_serializer"
+    ]
+
+    start = time.perf_counter()
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
-    # memory registry changes due to reassigned cache
-    assert sys.getsizeof(loaded_cache) == sys.getsizeof(power_train_configurator._serializer)
+    end = time.perf_counter()
+
+    assert first_run_time > 10.0 * (end - start)
+    assert loaded_cache == power_train_configurator._serializer
 
 
-def test_component_connection_cache():
+def test_component_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
 
     FASTGAHEPowerTrainConfigurator._cache = {}
+
+    start = time.perf_counter()
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
     power_train_configurator._get_components()
+    end = time.perf_counter()
 
-    component_cache = power_train_configurator._cache[sample_power_train_file_path]
+    power_train_configurator._cache[sample_power_train_file_path]["last_mod_time"] = (
+        pathlib.Path(sample_power_train_file_path).lstat().st_mtime
+    )
 
+    first_run_time = end - start
+    component_cache = FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path]
+
+    start = time.perf_counter()
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
     power_train_configurator._get_components()
+    end = time.perf_counter()
+
+    assert first_run_time > 10.0 * (end - start)
 
     for variable in COMPONENT_VARIABLE:
         assert component_cache[variable] == power_train_configurator.__dict__[variable]
@@ -259,20 +284,27 @@ def test_connection_cache():
     sample_power_train_file_path = pth.join(pth.dirname(__file__), "data", YML_FILE)
 
     FASTGAHEPowerTrainConfigurator._cache = {}
+
+    start = time.perf_counter()
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
+    end = time.perf_counter()
 
-    connection_cache = power_train_configurator._cache[sample_power_train_file_path]
+    first_run_time = end - start
+    connection_cache = FASTGAHEPowerTrainConfigurator._cache[sample_power_train_file_path]
 
+    start = time.perf_counter()
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
+    end = time.perf_counter()
 
+    assert first_run_time > 10.0 * (end - start)
     for variable in CONNECTION_VARIABLE:
         assert connection_cache[variable] == power_train_configurator.__dict__[variable]
 
