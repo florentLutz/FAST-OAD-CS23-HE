@@ -245,11 +245,9 @@ class FASTGAHEPowerTrainConfigurator:
         if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
 
-        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        self._reset_cache_instance()
 
-        if not pt_cache.get("_serializer") or pt_cache.get("pt_file_size") != pth.getsize(
-            self._power_train_file
-        ):
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("_serializer"):
             self._serializer = _YAMLSerializer()
             self._serializer.read(self._power_train_file)
 
@@ -264,16 +262,14 @@ class FASTGAHEPowerTrainConfigurator:
 
             end_time = time.perf_counter()
 
-            pt_cache["_serializer"] = self._serializer
-
-            if pt_cache.get("pt_file_size") != pth.getsize(self._power_train_file):
-                pt_cache["pt_file_size"] = pth.getsize(self._power_train_file)
-                self._components_id = None
-                pt_cache["_connections_list"] = None
-                pt_cache["get_component_time"] = None
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["_serializer"] = (
+                self._serializer
+            )
 
         else:
-            self._serializer = pt_cache["_serializer"]
+            self._serializer = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
+                "_serializer"
+            ]
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("load_time"):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["load_time"] = (
@@ -2100,6 +2096,21 @@ class FASTGAHEPowerTrainConfigurator:
                 variable
             ]
 
+    def _reset_cache_instance(self):
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        last_mod_time = pathlib.Path(self._power_train_file).lstat().st_mtime
+        if pt_cache and pt_cache.get("last_mod_time") != last_mod_time:
+            self._components_id = None
+            if pt_cache.get("skip_test"):
+                pt_cache = {
+                    "skip_test": True,
+                    "last_mod_time": last_mod_time,
+                }
+            else:
+                pt_cache = {"last_mod_time": last_mod_time}
+
+        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = pt_cache
+
     @staticmethod
     def get_number_of_cell_in_series(component_name: str, component_type: str, inputs) -> float:
         """
@@ -3124,13 +3135,11 @@ class FASTGAHEPowerTrainConfigurator:
         ):
             return False
 
-        if FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["skip_test"]:
+        if FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("skip_test"):
             return True
 
-        # Finally, if an instance exists, but it has been modified since, no instance is usable.
-        if (
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"]
-            < pathlib.Path(self._power_train_file).lstat().st_mtime
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
+            "get_connection_time"
         ):
             return False
 

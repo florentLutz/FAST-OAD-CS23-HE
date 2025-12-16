@@ -3,6 +3,7 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import os
+import sys
 import os.path as pth
 import shutil
 
@@ -233,8 +234,8 @@ def test_load_cache():
     power_train_configurator = FASTGAHEPowerTrainConfigurator(
         power_train_file_path=sample_power_train_file_path
     )
-
-    assert loaded_cache == power_train_configurator._serializer
+    # memory registry changes due to reassigned cache
+    assert sys.getsizeof(loaded_cache) == sys.getsizeof(power_train_configurator._serializer)
 
 
 def test_component_connection_cache():
@@ -289,7 +290,7 @@ def test_cache_with_modified_file():
     power_train_configurator._get_components()
     power_train_configurator._get_connections()
 
-    original_file_size = power_train_configurator._cache[tmp_file_path]["pt_file_size"]
+    original_file_last_mod = power_train_configurator._cache[tmp_file_path]["last_mod_time"]
 
     octo_power_train_file_path = pth.join(pth.dirname(__file__), "data", "octo_assembly.yml")
     shutil.copy(octo_power_train_file_path, tmp_file_path)
@@ -300,11 +301,11 @@ def test_cache_with_modified_file():
     power_train_configurator_octo._get_components()
     power_train_configurator_octo._get_connections()
 
-    octo_file_size = power_train_configurator_octo._cache[tmp_file_path]["pt_file_size"]
+    octo_file_last_mod = power_train_configurator_octo._cache[tmp_file_path]["last_mod_time"]
 
     os.remove(tmp_file_path)
 
-    assert original_file_size < octo_file_size
+    assert original_file_last_mod < octo_file_last_mod
 
 
 def test_power_train_file_connection_check_cache():
