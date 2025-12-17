@@ -69,6 +69,35 @@ TYPE_TO_FUEL = {
 }
 ELECTRICITY_STORAGE_TYPES = ["battery_pack"]
 DEFAULT_VOLTAGE_VALUE = 737.800
+COMPONENT_VARIABLE = [
+    "_components_id",
+    "_components_position",
+    "_components_name",
+    "_components_name_id",
+    "_components_om_type",
+    "_components_type",
+    "_components_type_class",
+    "_components_options",
+    "_components_promotes",
+    "_components_slipstream_promotes",
+    "_components_performances_to_slipstream",
+    "_components_slipstream_flaps",
+    "_components_slipstream_wing_lift",
+    "_components_perf_watchers",
+    "_components_slipstream_perf_watchers",
+    "_components_symmetrical_pairs",
+    "_components_makes_mass_vary",
+    "_source_does_not_make_mass_vary",
+    "_components_efficiency",
+    "_components_control_parameters",
+    "_sspc_list",
+    "_sspc_default_state",
+]
+CONNECTION_VARIABLE = [
+    "_connection_list",
+    "_components_connection_outputs",
+    "_components_connection_inputs",
+]
 
 
 class FASTGAHEPowerTrainConfigurator:
@@ -216,19 +245,31 @@ class FASTGAHEPowerTrainConfigurator:
         if not FASTGAHEPowerTrainConfigurator._cache.get(self._power_train_file):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = {}
 
-        self._serializer = _YAMLSerializer()
-        self._serializer.read(self._power_train_file)
+        self._reset_cache_instance()
 
-        # Syntax validation
-        with open_text(resources, JSON_SCHEMA_NAME) as json_file:
-            json_schema = json.loads(json_file.read())
-        validate(self._serializer.data, json_schema)
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("_serializer"):
+            self._serializer = _YAMLSerializer()
+            self._serializer.read(self._power_train_file)
 
-        for key in self._serializer.data:
-            if key not in json_schema["properties"].keys():
-                _LOGGER.warning('Power train file: "%s" is not a FAST-OAD-GA-HE key.', key)
+            # Syntax validation
+            with open_text(resources, JSON_SCHEMA_NAME) as json_file:
+                json_schema = json.loads(json_file.read())
+            validate(self._serializer.data, json_schema)
 
-        end_time = time.perf_counter()
+            for key in self._serializer.data:
+                if key not in json_schema["properties"].keys():
+                    _LOGGER.warning('Power train file: "%s" is not a FAST-OAD-GA-HE key.', key)
+
+            end_time = time.perf_counter()
+
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["_serializer"] = (
+                self._serializer
+            )
+
+        else:
+            self._serializer = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
+                "_serializer"
+            ]
 
         if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("load_time"):
             FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["load_time"] = (
@@ -256,18 +297,20 @@ class FASTGAHEPowerTrainConfigurator:
         # components is necessary
 
         start_time = time.perf_counter()
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
 
-        if self._components_id is None:
+        if not self._components_id and not pt_cache.get("get_component_time"):
             self._generate_components_list()
+            # Populate cache
+            self._set_cache_instance(COMPONENT_VARIABLE)
+
+        else:
+            self._get_cache_instance(COMPONENT_VARIABLE)
 
         end_time = time.perf_counter()
 
-        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
-            "get_component_time"
-        ):
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["get_component_time"] = (
-                end_time - start_time
-            )
+        if not pt_cache.get("get_component_time"):
+            pt_cache["get_component_time"] = end_time - start_time
 
     def _generate_components_list(self):
         components_list = self._serializer.data.get(KEY_PT_COMPONENTS)
@@ -416,6 +459,30 @@ class FASTGAHEPowerTrainConfigurator:
         self._components_control_parameters = components_control_parameter
 
     def _get_connections(self):
+        # We will work under the assumption that is one list is empty, all are hence only one if
+        # statement. This allows us to know whether re-triggering the identification of
+        # connections is necessary
+
+        start_time = time.perf_counter()
+        # This should do nothing if it has already been run.
+        self._get_components()
+
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+
+        if not pt_cache.get("_connections_list"):
+            self._generate_connections_list()
+            # Populate cache
+            self._set_cache_instance(CONNECTION_VARIABLE)
+
+        else:
+            self._get_cache_instance(CONNECTION_VARIABLE)
+
+        end_time = time.perf_counter()
+
+        if not pt_cache.get("get_connection_time"):
+            pt_cache["get_connection_time"] = end_time - start_time
+
+    def _generate_connections_list(self):
         """
         This function inspects all the connections detected in the power train file and prepare
         the list necessary to do the connections in the performance file.
@@ -423,13 +490,9 @@ class FASTGAHEPowerTrainConfigurator:
         The _get_components method must be run beforehand.
         """
 
-        start_time = time.perf_counter()
-        # This should do nothing if it has already been run.
-        self._get_components()
-
         connections_list = self._serializer.data.get(KEY_PT_CONNECTIONS)
 
-        if not self._check_existing_connection_cache_instance():
+        if not self._check_existing_connection_check_cache_instance():
             self._check_connection(connections_list)
             self._add_connection_check_cache_instance()
             _LOGGER.info("Powertrain components' connections checked.")
@@ -581,15 +644,6 @@ class FASTGAHEPowerTrainConfigurator:
 
         self._components_connection_outputs = openmdao_output_list
         self._components_connection_inputs = openmdao_input_list
-
-        end_time = time.perf_counter()
-
-        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
-            "get_connection_time"
-        ):
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["get_connection_time"] = (
-                end_time - start_time
-            )
 
     def _check_connection(self, connections_list):
         """
@@ -2030,6 +2084,38 @@ class FASTGAHEPowerTrainConfigurator:
 
         return final_list
 
+    def _set_cache_instance(self, variable_list):
+        for variable in variable_list:
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][variable] = (
+                self.__dict__.get(variable)
+            )
+
+    def _get_cache_instance(self, variable_list):
+        for variable in variable_list:
+            self.__dict__[variable] = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file][
+                variable
+            ]
+
+    def _reset_cache_instance(self):
+        """
+        This function resets the cache instances of a PT file that already has registered cache
+        instances but modified during calculation. This will only be triggered during the load
+        process.
+        """
+        pt_cache = FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]
+        last_mod_time = pathlib.Path(self._power_train_file).lstat().st_mtime
+        if pt_cache and pt_cache.get("last_mod_time") != last_mod_time:
+            self._components_id = None
+            if pt_cache.get("skip_test"):
+                pt_cache = {
+                    "skip_test": True,
+                    "last_mod_time": last_mod_time,
+                }
+            else:
+                pt_cache = {"last_mod_time": last_mod_time}
+
+        FASTGAHEPowerTrainConfigurator._cache[self._power_train_file] = pt_cache
+
     @staticmethod
     def get_number_of_cell_in_series(component_name: str, component_type: str, inputs) -> float:
         """
@@ -3031,7 +3117,7 @@ class FASTGAHEPowerTrainConfigurator:
 
         return clean_dict, list(set(species_list))
 
-    def _check_existing_connection_cache_instance(self):
+    def _check_existing_connection_check_cache_instance(self):
         """
         Checks the cache to see if an instance of the cache already exists and is usable. Usable
         means there was no modification to the powertrain configuration file.
@@ -3044,6 +3130,9 @@ class FASTGAHEPowerTrainConfigurator:
         # If the powertrain configuration file is a temporary copy or dedicated for a test,
         # the connection test will be omitted
         if self._power_train_file.endswith("_temp_copy.yml"):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"] = (
+                pathlib.Path(self._power_train_file).lstat().st_mtime
+            )
             return True
 
         # If cache is not empty but there is no instance of that particular configuration file, no
@@ -3054,13 +3143,14 @@ class FASTGAHEPowerTrainConfigurator:
         ):
             return False
 
-        if FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["skip_test"]:
+        if FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get("skip_test"):
+            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"] = (
+                pathlib.Path(self._power_train_file).lstat().st_mtime
+            )
             return True
 
-        # Finally, if an instance exists, but it has been modified since, no instance is usable.
-        if (
-            FASTGAHEPowerTrainConfigurator._cache[self._power_train_file]["last_mod_time"]
-            < pathlib.Path(self._power_train_file).lstat().st_mtime
+        if not FASTGAHEPowerTrainConfigurator._cache[self._power_train_file].get(
+            "get_connection_time"
         ):
             return False
 
