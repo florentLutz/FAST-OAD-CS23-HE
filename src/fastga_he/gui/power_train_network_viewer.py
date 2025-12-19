@@ -7,10 +7,12 @@ import base64
 import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
-
-from bokeh.server.server import Server as bkserver
+from bokeh.server.server import Server
 from bokeh.layouts import column
 from pathlib import Path
+import webbrowser
+import logging
+from tornado.ioloop import IOLoop
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
 
@@ -951,7 +953,7 @@ def _get_monitor_refresh_rate():
                         if rate > 0:
                             print(f"✓ Detected monitor refresh rate: {rate} Hz")
                             return rate
-                    except (ValueError, IndexError) as e:
+                    except (ValueError, IndexError):
                         print(f"✗ Could not parse refresh rate from wmic output: {lines}")
             except FileNotFoundError:
                 print("✗ wmic command not found, trying alternative method...")
@@ -1086,7 +1088,7 @@ def _start_bokeh_server(
 ):
     """
     Start and run a Bokeh Server with the provided document maker function.
-    Automatically opens the browser to the server URL.
+    Automatically opens the browser to the server URL and stops when window closes.
 
     :param make_document: Function that creates the Bokeh document
     :param port (int): Port to run the server on
@@ -1095,24 +1097,27 @@ def _start_bokeh_server(
     :param callback_interval (int): Milliseconds between callbacks
     :param animation_frames (int): Number of animation frames
     """
-    import webbrowser
-    from tornado.ioloop import IOLoop
 
-    server = bkserver(
-        {"/": make_document},
+    # Suppress Bokeh debug logging
+    logging.getLogger("bokeh").setLevel(logging.WARNING)
+    logging.getLogger("tornado").setLevel(logging.WARNING)
+
+    def make_document_with_tracking(doc):
+        # Call original make_document
+        make_document(doc)
+
+        # Callback when document is destroyed
+        def on_destroy(session_context):
+            IOLoop.current().stop()
+
+        doc.on_session_destroyed(on_destroy)
+
+    server = Server(
+        {"/": make_document_with_tracking},
         port=port,
         address=address,
         num_procs=1,
     )
-
-    print(f"\n{'=' * 60}")
-    print(f"Bokeh Server started!")
-    print(f"Monitor refresh rate: {refresh_rate} Hz")
-    print(f"Callback interval: {callback_interval}ms")
-    print(f"Animation frames: {animation_frames}")
-    print(f"Opening browser at:")
-    print(f"  http://{address}:{port}/")
-    print(f"{'=' * 60}\n")
 
     server.start()
 
@@ -1120,6 +1125,6 @@ def _start_bokeh_server(
     def open_browser():
         webbrowser.open(f"http://{address}:{port}/")
 
-    IOLoop.current().call_later(0.5, open_browser)
+    IOLoop.current().call_later(0.1, open_browser)
 
     server.io_loop.start()
