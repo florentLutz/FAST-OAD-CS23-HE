@@ -204,7 +204,6 @@ def power_train_network_viewer(
             refresh_rate, target_fps=refresh_rate
         )
         animation_frames = _calculate_animation_frames(refresh_rate, animation_duration_ms=1000)
-        propeller_frames = 12
 
         def make_document(doc):
             animation_counter = [0]
@@ -239,33 +238,6 @@ def power_train_network_viewer(
                     new_alphas.append(alpha)
 
                 edge_source.patch({"line_alpha": [(slice(len(new_alphas)), new_alphas)]})
-
-                if propeller_rotation_sequences:
-                    frame_index = (
-                        animation_counter[0] * propeller_frames // animation_frames
-                    ) % propeller_frames
-
-                    new_urls = []
-                    updated = False
-
-                    for i, node in enumerate(node_source.data["name"]):
-                        if node in propeller_rotation_sequences:
-                            seq = propeller_rotation_sequences[node]
-                            frame_idx = frame_index % len(seq)
-                            new_urls.append(seq[frame_idx])
-                            updated = True
-                        elif node in node_image_sequences:
-                            seq = node_image_sequences[node]
-                            frame_idx = (animation_counter[0] * len(seq) // animation_frames) % len(
-                                seq
-                            )
-                            new_urls.append(seq[frame_idx])
-                            updated = True
-                        else:
-                            new_urls.append(node_source.data["url"][i])
-
-                    if updated and new_urls and len(new_urls) == len(node_source.data["url"]):
-                        node_source.patch({"url": [(slice(len(new_urls)), new_urls)]})
 
             doc.add_periodic_callback(update, callback_interval)
 
@@ -624,31 +596,23 @@ def _build_node_dict_bokeh(
             "file://" + str(Path(icons_dict[node_icons[node]]["icon_path"]).resolve())
             for node in node_name_list
         ]
-
-        node_source = bkmodel.ColumnDataSource(
-            data=dict(
-                x=node_x,
-                y=node_y,
-                url=node_image_urls,
-                w=node_width,
-                h=node_height,
-            )
-        )
-
     else:
-        node_image_urls = []
-        node_image_sequences = {}  # Store animation sequences for nodes
-        propeller_rotation_sequences = {}
-        rotation_angles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]  # 12 frames
+        node_image_urls = [
+            _url_to_base64(
+                "file://" + str(Path(icons_dict[node_icons[node]]["icon_path"]).resolve())
+            )
+            for node in node_name_list
+        ]
 
-        # for node in node_name_list:
-        #     if (
-        #         isinstance(icons_dict[node_icons[node]]["icon_path"], list)
-        #         and node_icons[node] != "propeller"
-        #     ):
-        #         # Animated icon
-        #         animation_frames = []
-        #         for frame_path in
+    node_source = bkmodel.ColumnDataSource(
+        data=dict(
+            x=node_x,
+            y=node_y,
+            url=node_image_urls,
+            w=node_width,
+            h=node_height,
+        )
+    )
 
     return (
         node_source,
@@ -700,7 +664,7 @@ def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html):
             data=dict(
                 xs=seg_xs,
                 ys=seg_ys,
-                colors=seg_colors,
+                line_color=seg_colors,
                 line_alpha=seg_alphas,
                 edge_id=edge_ids,  # This is the missing definition
             )
@@ -766,13 +730,13 @@ def _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_sc
 
     for i, (icon_idx, description) in enumerate(legend_items):
         y_position = legend_item_start_y - (i * legend_item_height)
-
+        icon_url = _url_to_base64(color_icon_urls[icon_idx])
         # Create data source for icon
         icon_source = bkmodel.ColumnDataSource(
             data=dict(
                 x=[legend_x_start + int(10 * legend_scaling)],
                 y=[y_position],
-                url=[color_icon_urls[icon_idx]],
+                url=[icon_url],
             )
         )
 
@@ -1077,31 +1041,6 @@ def _calculate_animation_frames(refresh_rate, animation_duration_ms=1000):
     return max(refresh_rate, int(refresh_rate * animation_duration_ms / 1000))
 
 
-def _create_rotated_svg(base64_url, rotation_degrees):
-    """
-    Wrap a base64 image in an SVG with rotation transform without cropping.
-
-
-    :param base64_url: Data URL of the image (e.g., "data:image/png;base64,...")
-    :param rotation_degrees: Rotation angle in degrees (counter-clockwise)
-
-    return: SVG data URL with rotated image
-    """
-
-    # Use a larger SVG canvas to prevent clipping during rotation
-    # The diagonal of a 100x100 square is ~141, so use 150x150 to be safe.
-    # This is based on the size of the original png image of propelller icon.
-    svg_template = f"""<svg width="150" height="150" viewBox="0 0 150 150" 
-    xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-        <g transform="translate(75 75) rotate({rotation_degrees}) translate(-50 -50)">
-            <image href="{base64_url}" x="0" y="0" width="100" height="100"/>
-        </g>
-    </svg>"""
-
-    svg_b64 = base64.b64encode(svg_template.encode()).decode()
-    return f"data:image/svg+xml;base64,{svg_b64}"
-
-
 def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_edge=10):
     """
     Break each edge into multiple segments for flowing animation.
@@ -1147,6 +1086,7 @@ def _start_bokeh_server(
 ):
     """
     Start and run a Bokeh Server with the provided document maker function.
+    Automatically opens the browser to the server URL.
 
     :param make_document: Function that creates the Bokeh document
     :param port (int): Port to run the server on
@@ -1155,6 +1095,9 @@ def _start_bokeh_server(
     :param callback_interval (int): Milliseconds between callbacks
     :param animation_frames (int): Number of animation frames
     """
+    import webbrowser
+    from tornado.ioloop import IOLoop
+
     server = bkserver(
         {"/": make_document},
         port=port,
@@ -1167,9 +1110,16 @@ def _start_bokeh_server(
     print(f"Monitor refresh rate: {refresh_rate} Hz")
     print(f"Callback interval: {callback_interval}ms")
     print(f"Animation frames: {animation_frames}")
-    print(f"Open your browser and go to:")
+    print(f"Opening browser at:")
     print(f"  http://{address}:{port}/")
     print(f"{'=' * 60}\n")
 
     server.start()
+
+    # Schedule browser opening after server starts
+    def open_browser():
+        webbrowser.open(f"http://{address}:{port}/")
+
+    IOLoop.current().call_later(0.5, open_browser)
+
     server.io_loop.start()
