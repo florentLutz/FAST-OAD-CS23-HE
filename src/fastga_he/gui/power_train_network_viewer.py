@@ -3,9 +3,13 @@
 # Copyright (C) 2025 ISAE-SUPAERO
 
 import base64
+
 import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
+
+from bokeh.server.server import Server as bkserver
+from bokeh.layouts import column
 from pathlib import Path
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
@@ -157,6 +161,9 @@ def power_train_network_viewer(
     from_propulsor: bool = False,
     plot_scaling: float = 1.0,
     legend_scaling: float = 1.0,
+    port: int = 5006,
+    address: str = "localhost",
+    refresh_rate: int = None,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
@@ -188,6 +195,83 @@ def power_train_network_viewer(
 
     if static_html:
         _save_static_html(plot, network_file_path)
+
+    else:
+        if refresh_rate is None:
+            refresh_rate = _get_monitor_refresh_rate()
+
+        callback_interval = _calculate_optimal_callback_interval(
+            refresh_rate, target_fps=refresh_rate
+        )
+        animation_frames = _calculate_animation_frames(refresh_rate, animation_duration_ms=1000)
+        propeller_frames = 12
+
+        def make_document(doc):
+            animation_counter = [0]
+
+            doc.add_root(column(plot))
+
+            def update():
+                animation_counter[0] = (animation_counter[0] + 1) % animation_frames
+                progress = animation_counter[0] / animation_frames
+
+                num_segments = len(edge_source.data["xs"])
+                edge_id_list = edge_source.data["edge_id"]
+                num_edges = max(edge_id_list) + 1 if edge_id_list else 1
+                segments_per_edge = num_segments // num_edges if num_edges > 0 else 1
+
+                new_alphas = []
+
+                for i in range(num_segments):
+                    edge_idx = edge_id_list[i]
+                    segment_idx = i % segments_per_edge if segments_per_edge > 0 else 0
+
+                    seg_position = segment_idx / segments_per_edge if segments_per_edge > 0 else 0
+                    wave_pos = (-progress + edge_idx * 0.1) % 1.0
+
+                    distance = abs(seg_position - wave_pos)
+
+                    if distance < 0.3:
+                        alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                    else:
+                        alpha = 0.3
+
+                    new_alphas.append(alpha)
+
+                edge_source.patch({"line_alpha": [(slice(len(new_alphas)), new_alphas)]})
+
+                if propeller_rotation_sequences:
+                    frame_index = (
+                        animation_counter[0] * propeller_frames // animation_frames
+                    ) % propeller_frames
+
+                    new_urls = []
+                    updated = False
+
+                    for i, node in enumerate(node_source.data["name"]):
+                        if node in propeller_rotation_sequences:
+                            seq = propeller_rotation_sequences[node]
+                            frame_idx = frame_index % len(seq)
+                            new_urls.append(seq[frame_idx])
+                            updated = True
+                        elif node in node_image_sequences:
+                            seq = node_image_sequences[node]
+                            frame_idx = (animation_counter[0] * len(seq) // animation_frames) % len(
+                                seq
+                            )
+                            new_urls.append(seq[frame_idx])
+                            updated = True
+                        else:
+                            new_urls.append(node_source.data["url"][i])
+
+                    if updated and new_urls and len(new_urls) == len(node_source.data["url"]):
+                        node_source.patch({"url": [(slice(len(new_urls)), new_urls)]})
+
+            doc.add_periodic_callback(update, callback_interval)
+
+        _start_bokeh_server(
+            make_document, port, address, refresh_rate, callback_interval, animation_frames
+        )
 
 
 def _create_network_plot(
@@ -541,15 +625,30 @@ def _build_node_dict_bokeh(
             for node in node_name_list
         ]
 
-    node_source = bkmodel.ColumnDataSource(
-        data=dict(
-            x=node_x,
-            y=node_y,
-            url=node_image_urls,
-            w=node_width,
-            h=node_height,
+        node_source = bkmodel.ColumnDataSource(
+            data=dict(
+                x=node_x,
+                y=node_y,
+                url=node_image_urls,
+                w=node_width,
+                h=node_height,
+            )
         )
-    )
+
+    else:
+        node_image_urls = []
+        node_image_sequences = {}  # Store animation sequences for nodes
+        propeller_rotation_sequences = {}
+        rotation_angles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]  # 12 frames
+
+        # for node in node_name_list:
+        #     if (
+        #         isinstance(icons_dict[node_icons[node]]["icon_path"], list)
+        #         and node_icons[node] != "propeller"
+        #     ):
+        #         # Animated icon
+        #         animation_frames = []
+        #         for frame_path in
 
     return (
         node_source,
@@ -590,6 +689,20 @@ def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html):
                 ys=edge_y_pos,
                 line_color=edge_colors,
                 line_alpha=[0.7] * len(edge_x_pos),
+            )
+        )
+    else:
+        seg_xs, seg_ys, seg_alphas, edge_ids, seg_colors = _create_segmented_edges(
+            edge_x_pos, edge_y_pos, edge_colors, segments_per_edge=30
+        )
+
+        edge_source = bkmodel.ColumnDataSource(
+            data=dict(
+                xs=seg_xs,
+                ys=seg_ys,
+                colors=seg_colors,
+                line_alpha=seg_alphas,
+                edge_id=edge_ids,  # This is the missing definition
             )
         )
 
@@ -843,3 +956,220 @@ def _url_to_base64(url):
     except Exception as e:
         print(f"Error processing {url}: {e}")
         return url
+
+
+def _get_monitor_refresh_rate():
+    """
+    Detect monitor refresh rate from system settings.
+
+    :return: Monitor refresh rate in Hz (default 60 if detection fails)
+    """
+    try:
+        import platform
+
+        system = platform.system()
+
+        if system == "Windows":
+            try:
+                import subprocess
+
+                # Use wmic to get refresh rate on Windows
+                result = subprocess.run(
+                    ["wmic", "path", "win32_videocontroller", "get", "currentrefreshrate"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+                lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
+                if len(lines) > 1:
+                    try:
+                        rate = int(lines[1])
+                        if rate > 0:
+                            print(f"✓ Detected monitor refresh rate: {rate} Hz")
+                            return rate
+                    except (ValueError, IndexError) as e:
+                        print(f"✗ Could not parse refresh rate from wmic output: {lines}")
+            except FileNotFoundError:
+                print("✗ wmic command not found, trying alternative method...")
+                try:
+                    import subprocess
+
+                    # Alternative: Use Get-WmiObject PowerShell command
+                    result = subprocess.run(
+                        [
+                            "powershell",
+                            "-Command",
+                            "Get-WmiObject -Namespace root\\cimv2 -Class Win32_VideoController | Select-Object CurrentRefreshRate",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=5,
+                    )
+                    lines = [
+                        line.strip()
+                        for line in result.stdout.strip().split("\n")
+                        if line.strip() and line.strip().isdigit()
+                    ]
+                    if lines:
+                        rate = int(lines[0])
+                        if rate > 0:
+                            print(f"✓ Detected monitor refresh rate: {rate} Hz")
+                            return rate
+                except Exception as e2:
+                    print(f"✗ PowerShell method also failed: {e2}")
+            except Exception as e:
+                print(f"✗ Error detecting refresh rate: {e}")
+
+        elif system == "Linux":
+            try:
+                import subprocess
+
+                result = subprocess.run(["xrandr"], capture_output=True, text=True, timeout=5)
+                # Parse xrandr output for refresh rate
+                for line in result.stdout.split("\n"):
+                    if "*" in line:  # Current mode
+                        parts = line.split()
+                        for part in parts:
+                            if "+" in part:
+                                rate = float(part.replace("+", ""))
+                                print(f"✓ Detected monitor refresh rate: {int(rate)} Hz")
+                                return int(rate)
+            except Exception as e:
+                print(f"✗ Error detecting refresh rate: {e}")
+
+    except Exception as e:
+        print(f"✗ Unexpected error detecting refresh rate: {e}")
+
+    print("⚠ Could not detect refresh rate, using default: 60 Hz")
+    return 60
+
+
+def _calculate_optimal_callback_interval(refresh_rate, target_fps=None):
+    """
+    Calculate optimal callback interval based on monitor refresh rate.
+
+    :param refresh_rate (int): Monitor refresh rate in Hz
+    :param target_fps (int): Target animation FPS (default: match refresh rate)
+
+    :return callback_interval (int): Milliseconds between callbacks
+    """
+    if target_fps is None:
+        target_fps = refresh_rate
+
+    # Ensure target FPS doesn't exceed refresh rate
+    target_fps = min(target_fps, refresh_rate)
+
+    callback_interval = int(1000 / target_fps)
+    return callback_interval
+
+
+def _calculate_animation_frames(refresh_rate, animation_duration_ms=1000):
+    """
+    Calculate animation frame count for smooth animations synchronized to refresh rate.
+
+    :param refresh_rate (int): Monitor refresh rate in Hz
+    :param animation_duration_ms (int): Desired animation duration in milliseconds
+
+    :return frames (int): Number of frames for smooth animation
+    """
+    # Calculate frames needed for smooth animation
+
+    return max(refresh_rate, int(refresh_rate * animation_duration_ms / 1000))
+
+
+def _create_rotated_svg(base64_url, rotation_degrees):
+    """
+    Wrap a base64 image in an SVG with rotation transform without cropping.
+
+
+    :param base64_url: Data URL of the image (e.g., "data:image/png;base64,...")
+    :param rotation_degrees: Rotation angle in degrees (counter-clockwise)
+
+    return: SVG data URL with rotated image
+    """
+
+    # Use a larger SVG canvas to prevent clipping during rotation
+    # The diagonal of a 100x100 square is ~141, so use 150x150 to be safe.
+    # This is based on the size of the original png image of propelller icon.
+    svg_template = f"""<svg width="150" height="150" viewBox="0 0 150 150" 
+    xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <g transform="translate(75 75) rotate({rotation_degrees}) translate(-50 -50)">
+            <image href="{base64_url}" x="0" y="0" width="100" height="100"/>
+        </g>
+    </svg>"""
+
+    svg_b64 = base64.b64encode(svg_template.encode()).decode()
+    return f"data:image/svg+xml;base64,{svg_b64}"
+
+
+def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_edge=10):
+    """
+    Break each edge into multiple segments for flowing animation.
+
+    :param edge_start_x, edge_start_y: Lists of edge starting coordinates
+    :param edge_end_x, edge_end_y: Lists of edge ending coordinates
+    :param segments_per_edge: Number of segments to divide each edge into
+
+    return: Lists of segment endpoints and metadata for animation
+    """
+    seg_xs = []  # List of [x1, x2] for each segment
+    seg_ys = []  # List of [y1, y2] for each segment
+    seg_alphas = []
+    seg_colors = []
+    edge_ids = []  # Track which edge each segment belongs to
+
+    for edge_idx, (edge_x, edge_y, color) in enumerate(zip(edge_x_pos, edge_y_pos, edge_colors)):
+        sx = edge_x[0]
+        ex = edge_x[1]
+        sy = edge_y[0]
+        ey = edge_y[1]
+        for seg in range(segments_per_edge):
+            # Interpolate segment endpoints
+            t_start = seg / segments_per_edge
+            t_end = (seg + 1) / segments_per_edge
+
+            x1 = sx + (ex - sx) * t_start
+            y1 = sy + (ey - sy) * t_start
+            x2 = sx + (ex - sx) * t_end
+            y2 = sy + (ey - sy) * t_end
+
+            seg_xs.append([x1, x2])
+            seg_ys.append([y1, y2])
+            seg_alphas.append(0.7)  # Initial alpha
+            seg_colors.append(color)
+            edge_ids.append(edge_idx)
+
+    return seg_xs, seg_ys, seg_alphas, edge_ids, seg_colors
+
+
+def _start_bokeh_server(
+    make_document, port, address, refresh_rate, callback_interval, animation_frames
+):
+    """
+    Start and run a Bokeh Server with the provided document maker function.
+
+    :param make_document: Function that creates the Bokeh document
+    :param port (int): Port to run the server on
+    :param address (str): Server address (default: localhost)
+    :param refresh_rate (int): Monitor refresh rate in Hz
+    :param callback_interval (int): Milliseconds between callbacks
+    :param animation_frames (int): Number of animation frames
+    """
+    server = bkserver(
+        {"/": make_document},
+        port=port,
+        address=address,
+        num_procs=1,
+    )
+
+    print(f"\n{'=' * 60}")
+    print(f"Bokeh Server started!")
+    print(f"Monitor refresh rate: {refresh_rate} Hz")
+    print(f"Callback interval: {callback_interval}ms")
+    print(f"Animation frames: {animation_frames}")
+    print(f"Open your browser and go to:")
+    print(f"  http://{address}:{port}/")
+    print(f"{'=' * 60}\n")
+
+    server.start()
+    server.io_loop.start()
