@@ -8,10 +8,11 @@ import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
 from bokeh.server.server import Server
-from bokeh.layouts import column
+from bokeh.layouts import row
 from pathlib import Path
 import webbrowser
 import logging
+import pandas as pd
 from tornado.ioloop import IOLoop
 
 from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurator
@@ -166,6 +167,7 @@ def power_train_network_viewer(
     port: int = 5006,
     address: str = "localhost",
     refresh_rate: int = None,
+    csv_file_path: str = None,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
@@ -182,17 +184,23 @@ def power_train_network_viewer(
     """
 
     # Variables for animated powertrain display
-    plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences = (
-        _create_network_plot(
-            power_train_file_path=power_train_file_path,
-            orientation=orientation,
-            legend_position=legend_position,
-            static_html=static_html,
-            sorting=sorting,
-            from_propulsor=from_propulsor,
-            plot_scaling=abs(plot_scaling),
-            legend_scaling=abs(legend_scaling),
-        )
+    (
+        plot,
+        edge_source,
+        node_source,
+        node_image_sequences,
+        propeller_rotation_sequences,
+        edge_state_dict,
+    ) = _create_network_plot(
+        power_train_file_path=power_train_file_path,
+        orientation=orientation,
+        legend_position=legend_position,
+        static_html=static_html,
+        sorting=sorting,
+        from_propulsor=from_propulsor,
+        plot_scaling=abs(plot_scaling),
+        legend_scaling=abs(legend_scaling),
+        csv_file_path=csv_file_path,
     )
 
     if static_html:
@@ -210,7 +218,15 @@ def power_train_network_viewer(
         def make_document(doc):
             animation_counter = [0]
 
-            doc.add_root(column(plot))
+            if csv_file_path:
+                last_flight_point = len(edge_state_dict[0])
+                flight_point_slider = bkmodel.Slider(
+                    start=1, end=last_flight_point, value=1, step=1, title="Flight Point"
+                )
+                doc.add_root(row(plot, flight_point_slider))
+
+            else:
+                doc.add_root(plot)
 
             def update():
                 animation_counter[0] = (animation_counter[0] + 1) % animation_frames
@@ -232,10 +248,21 @@ def power_train_network_viewer(
 
                     distance = abs(seg_position - wave_pos)
 
-                    if distance < 0.3:
-                        alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                    if csv_file_path:
+                        flight_point = int(flight_point_slider.value) - 1
+                        if edge_state_dict[edge_idx][flight_point]:
+                            if distance < 0.3:
+                                alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                            else:
+                                alpha = 0.3
+                        else:
+                            alpha = 0.3
+
                     else:
-                        alpha = 0.3
+                        if distance < 0.3:
+                            alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                        else:
+                            alpha = 0.3
 
                     new_alphas.append(alpha)
 
@@ -243,9 +270,7 @@ def power_train_network_viewer(
 
             doc.add_periodic_callback(update, callback_interval)
 
-        _start_bokeh_server(
-            make_document, port, address, refresh_rate, callback_interval, animation_frames
-        )
+        _start_bokeh_server(make_document, port, address)
 
 
 def _create_network_plot(
@@ -257,6 +282,7 @@ def _create_network_plot(
     from_propulsor: bool = False,
     plot_scaling: float = 1.0,
     legend_scaling: float = 1.0,
+    csv_file_path: str = None,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh with NetworkX layout.
@@ -351,7 +377,9 @@ def _create_network_plot(
         static_html,
     )
 
-    edge_source = _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html)
+    edge_source, edge_state_dict = _build_edge_dict_bokeh(
+        graph, position_dict, node_icons, static_html, csv_file_path
+    )
 
     # Draw edge lines
     plot.multi_line(
@@ -457,7 +485,14 @@ def _create_network_plot(
     )
     plot.add_tools(hover, bkmodel.BoxSelectTool())
 
-    return plot, edge_source, node_source, node_image_sequences, propeller_rotation_sequences
+    return (
+        plot,
+        edge_source,
+        node_source,
+        node_image_sequences,
+        propeller_rotation_sequences,
+        edge_state_dict,
+    )
 
 
 def _define_hierarchy_elements(
@@ -628,15 +663,19 @@ def _build_node_dict_bokeh(
     )
 
 
-def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html):
+def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html, csv_file_path):
     """Create the dictionary of edges for add the edges into bokeh plot."""
 
     # Create edge data with colors
     edge_x_pos = []
     edge_y_pos = []
     edge_colors = []
+    edge_state_dict = {}
 
-    for edge in graph.edges():
+    if csv_file_path:
+        df_pt = pd.read_csv(csv_file_path)
+
+    for index, edge in enumerate(list(graph.edges())):
         start, end = edge
         edge_x_pos.append([position_dict[start][0], position_dict[end][0]])
         edge_y_pos.append([position_dict[start][1], position_dict[end][1]])
@@ -646,6 +685,10 @@ def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html):
         target_icon = node_icons[end]
         edge_color = _get_edge_color(source_icon, target_icon)
         edge_colors.append(edge_color)
+
+        if csv_file_path:
+            edge_working_state = _pt_performance_post_processing(df_pt, start, end)
+            edge_state_dict[index] = edge_working_state
 
     # Draw edges
     if static_html:
@@ -672,7 +715,7 @@ def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html):
             )
         )
 
-    return edge_source
+    return edge_source, edge_state_dict
 
 
 def _add_color_legend_separate(plot, legend_position, color_icon_urls, legend_scaling: float = 1.0):
@@ -1083,9 +1126,7 @@ def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_ed
     return seg_xs, seg_ys, seg_alphas, edge_ids, seg_colors
 
 
-def _start_bokeh_server(
-    make_document, port, address, refresh_rate, callback_interval, animation_frames
-):
+def _start_bokeh_server(make_document, port, address):
     """
     Start and run a Bokeh Server with the provided document maker function.
     Automatically opens the browser to the server URL and stops when window closes.
@@ -1093,9 +1134,6 @@ def _start_bokeh_server(
     :param make_document: Function that creates the Bokeh document
     :param port (int): Port to run the server on
     :param address (str): Server address (default: localhost)
-    :param refresh_rate (int): Monitor refresh rate in Hz
-    :param callback_interval (int): Milliseconds between callbacks
-    :param animation_frames (int): Number of animation frames
     """
 
     # Suppress Bokeh debug logging
@@ -1128,3 +1166,20 @@ def _start_bokeh_server(
     IOLoop.current().call_later(0.1, open_browser)
 
     server.io_loop.start()
+
+
+def _pt_performance_post_processing(df_pt, start, end):
+    watcher_variable_list = df_pt.columns.tolist()
+    edge_working_state = []
+    for variable in watcher_variable_list:
+        if start in variable or end in variable:
+            if "current" in variable or "torque" in variable or "fuel" in variable:
+                for state in df_pt[variable]:
+                    if state < 1e-6:
+                        edge_working_state.append(False)
+                    else:
+                        edge_working_state.append(True)
+
+                break
+
+    return edge_working_state
