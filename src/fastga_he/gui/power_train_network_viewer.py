@@ -8,7 +8,7 @@ import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
 from bokeh.server.server import Server
-from bokeh.layouts import row
+from bokeh.layouts import row, column
 from pathlib import Path
 import webbrowser
 import logging
@@ -188,9 +188,11 @@ def power_train_network_viewer(
         plot,
         edge_source,
         node_source,
+        hover_source,
         node_image_sequences,
         propeller_rotation_sequences,
         edge_state_dict,
+        component_performance_dict,
     ) = _create_network_plot(
         power_train_file_path=power_train_file_path,
         orientation=orientation,
@@ -223,7 +225,73 @@ def power_train_network_viewer(
                 flight_point_slider = bkmodel.Slider(
                     start=1, end=last_flight_point, value=1, step=1, title="Flight Point"
                 )
-                doc.add_root(row(plot, flight_point_slider))
+
+                # Create a separate ColumnDataSource for the table
+                table_source = bkmodel.ColumnDataSource(
+                    data=dict(
+                        property=[],
+                        value=[],
+                    )
+                )
+
+                # Define table columns
+                columns = [
+                    bkmodel.TableColumn(field="property", title="Property", width=170),
+                    bkmodel.TableColumn(field="value", title="Value", width=100),
+                ]
+
+                # Create DataTable
+                data_table = bkmodel.DataTable(
+                    source=table_source, columns=columns, width=280, height=400, index_position=None
+                )
+
+                # Callback when a node is clicked
+                def node_click_callback(attr, old, new):
+                    selected_indices = new
+
+                    if selected_indices:
+                        idx = selected_indices[0]
+                        node_name = hover_source.data["name"][idx]
+
+                        # Get the current flight point from slider
+                        flight_point = int(flight_point_slider.value) - 1
+
+                        # Access component_performance_dict with flight point
+                        properties = []
+                        values = []
+
+                        if node_name in component_performance_dict:
+                            node_performance = component_performance_dict[node_name]
+
+                            for key, value_list in node_performance.items():
+                                properties.append(key)
+                                # Get the value at the current flight point
+                                if flight_point < len(value_list):
+                                    values.append(str(value_list[flight_point]))
+                                else:
+                                    values.append("N/A")
+
+                        # Update table with variable number of rows
+                        table_source.data = dict(
+                            property=properties,
+                            value=values,
+                        )
+                    else:
+                        table_source.data = dict(property=[], value=[])
+
+                # Bind selection callback to hover_source (the scatter glyph already in plot)
+                hover_source.selected.on_change("indices", node_click_callback)
+
+                # Also update table when slider changes (if a node is selected)
+                def slider_change_callback(attr, old, new):
+                    selected_indices = hover_source.selected.indices
+                    if selected_indices:
+                        # Trigger the node click callback to update table with new slider value
+                        node_click_callback(None, None, selected_indices)
+
+                flight_point_slider.on_change("value", slider_change_callback)
+
+                doc.add_root(row(plot, column(flight_point_slider, data_table)))
 
             else:
                 doc.add_root(plot)
@@ -252,15 +320,15 @@ def power_train_network_viewer(
                         flight_point = int(flight_point_slider.value) - 1
                         if edge_state_dict[edge_idx][flight_point]:
                             if distance < 0.3:
-                                alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                                alpha = 0.3 + 0.7 * (1.0 - (distance / 0.3) ** 2.0)
                             else:
                                 alpha = 0.3
                         else:
-                            alpha = 0.3
+                            alpha = 0.1
 
                     else:
                         if distance < 0.3:
-                            alpha = 0.3 + 0.7 * (1 - (distance / 0.3) ** 2)
+                            alpha = 0.3 + 0.7 * (1.0 - (distance / 0.3) ** 2.0)
                         else:
                             alpha = 0.3
 
@@ -364,6 +432,7 @@ def _create_network_plot(
         node_name_list,
         node_types_list,
         node_om_types_list,
+        component_performance_dict,
     ) = _build_node_dict_bokeh(
         graph,
         position_dict,
@@ -375,6 +444,7 @@ def _create_network_plot(
         icon_factor,
         plot_scaling,
         static_html,
+        csv_file_path,
     )
 
     edge_source, edge_state_dict = _build_edge_dict_bokeh(
@@ -464,8 +534,8 @@ def _create_network_plot(
         )
     )
 
-    # Add invisible circles on top for hover interactivity
-    plot.scatter(
+    # Add invisible circles on top for hover interactivity and clicking
+    scatter_glyph = plot.scatter(
         x="x",
         y="y",
         size=55 * plot_scaling,
@@ -483,15 +553,20 @@ def _create_network_plot(
             ("Component type", "@component_type"),
         ]
     )
-    plot.add_tools(hover, bkmodel.BoxSelectTool())
+
+    # Configure tap tool to select the scatter glyph
+    tap_tool = bkmodel.TapTool(renderers=[scatter_glyph])
+    plot.add_tools(hover, tap_tool, bkmodel.BoxSelectTool())
 
     return (
         plot,
         edge_source,
         node_source,
+        hover_source,
         node_image_sequences,
         propeller_rotation_sequences,
         edge_state_dict,
+        component_performance_dict,
     )
 
 
@@ -607,6 +682,7 @@ def _build_node_dict_bokeh(
     icon_factor,
     plot_scaling,
     static_html,
+    csv_file_path,
 ):
     """Create the dictionary of nodes for add the nodes into bokeh plot."""
 
@@ -618,6 +694,10 @@ def _build_node_dict_bokeh(
     node_height = []
     node_types_list = []
     node_om_types_list = []
+    component_performance_dict = {}
+
+    if csv_file_path:
+        df_pt = pd.read_csv(csv_file_path)
 
     for node in node_name_list:
         node_x.append(position_dict[node][0])
@@ -626,6 +706,11 @@ def _build_node_dict_bokeh(
         node_width.append(node_sizes[node] * icon_factor * icon_width_factor * plot_scaling)
         node_types_list.append(node_types[node])
         node_om_types_list.append(node_om_types[node])
+
+        if csv_file_path:
+            component_performance_dict = _pt_component_post_processing(
+                df_pt, node, component_performance_dict
+            )
 
     # Convert file paths to file:// URLs for local images
     if static_html:
@@ -660,6 +745,7 @@ def _build_node_dict_bokeh(
         node_name_list,
         node_types_list,
         node_om_types_list,
+        component_performance_dict,
     )
 
 
@@ -687,7 +773,7 @@ def _build_edge_dict_bokeh(graph, position_dict, node_icons, static_html, csv_fi
         edge_colors.append(edge_color)
 
         if csv_file_path:
-            edge_working_state = _pt_performance_post_processing(df_pt, start, end)
+            edge_working_state = _pt_connection_post_processing(df_pt, start, end)
             edge_state_dict[index] = edge_working_state
 
     # Draw edges
@@ -1168,7 +1254,7 @@ def _start_bokeh_server(make_document, port, address):
     server.io_loop.start()
 
 
-def _pt_performance_post_processing(df_pt, start, end):
+def _pt_connection_post_processing(df_pt, start, end):
     watcher_variable_list = df_pt.columns.tolist()
     edge_working_state = []
     for variable in watcher_variable_list:
@@ -1183,3 +1269,19 @@ def _pt_performance_post_processing(df_pt, start, end):
                 break
 
     return edge_working_state
+
+
+def _pt_component_post_processing(df_pt, name, component_performance_dict):
+    watcher_variable_list = df_pt.columns.tolist()
+    for variable in watcher_variable_list:
+        if name in variable:
+            registered_variable = variable.replace(name + " ", "")
+
+            if not component_performance_dict.get(name):
+                component_performance_dict[name] = {}
+
+            component_performance_dict[name][registered_variable] = []
+            for value in df_pt[variable]:
+                component_performance_dict[name][registered_variable].append(round(value, 3))
+
+    return component_performance_dict
