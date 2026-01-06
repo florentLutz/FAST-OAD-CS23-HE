@@ -83,16 +83,16 @@ if __name__ == "__main__":
         axref="x",
         ayref="y",
     )
-    fig.add_annotation(
-        x=0.51,
-        y=135 * 0.5,
-        text=r"$P_{1} =\begin{cases} P_{th} & \text{if } P_{th} < P_{out} \\ P_{out} & \text{otherwise} \end{cases}$",
-        showarrow=False,
-        xanchor="left",
-        yanchor="middle",
-        font=dict(size=50, color="black"),
-        align="left",
-    )
+    # fig.add_annotation(
+    #     x=0.51,
+    #     y=135 * 0.5,
+    #     text=r"$P_{1} =\begin{cases} P_{th} & \text{if } P_{th} < P_{out} \\ P_{out} & \text{otherwise} \end{cases}$",
+    #     showarrow=False,
+    #     xanchor="left",
+    #     yanchor="middle",
+    #     font=dict(size=50, color="black"),
+    #     align="left",
+    # )
 
     # fig.add_annotation(
     #     x=4, y=3,
@@ -139,6 +139,7 @@ if __name__ == "__main__":
     fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
     pdf_path = "results/power_share_mode.pdf"
+    svg_path = "results/power_share_mode.svg"
 
     fig.show()
 
@@ -149,3 +150,4 @@ if __name__ == "__main__":
         pio.write_image(fig, pdf_path, width=1600, height=900)
         time.sleep(3)
         pio.write_image(fig, pdf_path, width=1600, height=900)
+        pio.write_image(fig, svg_path, width=1600, height=900)

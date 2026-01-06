@@ -83,16 +83,16 @@ if __name__ == "__main__":
         axref="x",
         ayref="y",
     )
-    fig.add_annotation(
-        x=0.51,
-        y=0.7 * 140 * 0.5,
-        text=r"$P_{1} = P_{out} \cdot \dfrac{\mathbb{S}}{100}$",
-        showarrow=False,
-        xanchor="left",
-        yanchor="middle",
-        font=dict(size=50, color="black"),
-        align="left",
-    )
+    # fig.add_annotation(
+    #     x=0.51,
+    #     y=0.7 * 140 * 0.5,
+    #     text=r"$P_{1} = P_{out} \cdot \dfrac{\mathbb{S}}{100}$",
+    #     showarrow=False,
+    #     xanchor="left",
+    #     yanchor="middle",
+    #     font=dict(size=50, color="black"),
+    #     align="left",
+    # )
 
     # fig.add_annotation(
     #     x=4, y=3,
@@ -139,6 +139,7 @@ if __name__ == "__main__":
     fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
     pdf_path = "results/percent_split_mode.pdf"
+    svg_path = "results/percent_split_mode.svg"
 
     fig.show()
 
@@ -149,3 +150,4 @@ if __name__ == "__main__":
         pio.write_image(fig, pdf_path, width=1600, height=900)
         time.sleep(3)
         pio.write_image(fig, pdf_path, width=1600, height=900)
+        pio.write_image(fig, svg_path, width=1600, height=900)
