@@ -45,19 +45,14 @@ class _TotalCd0ParasiticFactor(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
-
         self.add_input("data:geometry:aircraft:wetted_area", val=np.nan, units="m**2")
 
         self.add_output("k_parasitic", val=0.1)
 
     def setup_partials(self):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
-
         self.declare_partials("k_parasitic", "data:geometry:aircraft:wetted_area", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         wet_area_total = inputs["data:geometry:aircraft:wetted_area"]
 
         k_parasitic = (
@@ -70,9 +65,7 @@ class _TotalCd0ParasiticFactor(om.ExplicitComponent):
         outputs["k_parasitic"] = k_parasitic
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         wet_area_total = inputs["data:geometry:aircraft:wetted_area"]
-        cd0_fuselage = inputs["data:aerodynamics:fuselage:" + ls_tag + ":CD0"]
 
         partials["k_parasitic", "data:geometry:aircraft:wetted_area"] = (
             -7.17e-12 * wet_area_total**2.0 + 5.16e-8 * wet_area_total - 0.89e-4

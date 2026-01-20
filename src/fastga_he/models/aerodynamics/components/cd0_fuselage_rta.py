@@ -27,7 +27,7 @@ class Cd0Fuselage(om.Group):
 
         self.add_subsystem(
             "fuselage_plate_friction_coeff_" + ls_tag,
-            FlatPlateFrictionDragCoefficient(low_speed_aero=self.options["low_speed_aero"]),
+            FlatPlateFrictionDragCoefficient(),
             promotes=[
                 "data:*",
                 ("characteristic_length", "data:geometry:fuselage:length"),

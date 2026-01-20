@@ -33,7 +33,6 @@ class CorrectRTANaming(om.ExplicitComponent):
         self.add_input("data:propulsion:RTO_power", val=np.nan, units="W")
         self.add_input("data:geometry:fuselage:wetted_area", val=np.nan, units="m**2")
 
-
         self.add_output("data:TLAR:NPAX_design")
         self.add_output("data:geometry:cabin:seats:passenger:count_by_row")
         self.add_output("data:geometry:cabin:seats:passenger:length", units="m")
@@ -47,7 +46,6 @@ class CorrectRTANaming(om.ExplicitComponent):
         self.add_output("data:aerodynamics:wing:low_speed:induced_drag_coefficient")
         self.add_output("data:aerodynamics:wing:low_speed:CL_max_clean")
         self.add_output("data:geometry:fuselage:wet_area", val=150.0, units="m**2")
-
 
     def setup_partials(self):
         self.declare_partials(of="data:TLAR:NPAX_design", wrt="data:TLAR:NPAX", val=1.0)

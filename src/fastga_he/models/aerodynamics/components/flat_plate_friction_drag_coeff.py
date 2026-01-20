@@ -15,7 +15,6 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
         self.options.declare("low_speed_aero", default=False, types=bool)
 
     def setup(self):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         mach_variable = (
             "data:aerodynamics:aircraft:takeoff:mach"
             if self.options["low_speed_aero"]
@@ -32,7 +31,6 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
         self.declare_partials("plate_drag_friction_coeff", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         mach_variable = (
             "data:aerodynamics:aircraft:takeoff:mach"
             if self.options["low_speed_aero"]
@@ -48,7 +46,6 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
         mach_variable = (
             "data:aerodynamics:aircraft:takeoff:mach"
             if self.options["low_speed_aero"]
