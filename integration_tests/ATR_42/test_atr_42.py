@@ -137,8 +137,8 @@ def test_hybrid_atr_42_powertrain_network():
 
     pt_file_path = DATA_FOLDER_PATH / "parallel_hybrid_assembly.yml"
     network_file_path = RESULTS_FOLDER_PATH / "hybrid_atr42.html"
-    csv_file_path = RESULTS_FOLDER_PATH / "atr42_hybrid_power_train_data.csv"
+    pt_watcher_path = RESULTS_FOLDER_PATH / "atr42_hybrid_power_train_data.csv"
 
     power_train_network_viewer(
-        pt_file_path, network_file_path, static_html=False, csv_file_path=csv_file_path
+        pt_file_path, network_file_path, static_html=False, pt_watcher_path=pt_watcher_path
     )

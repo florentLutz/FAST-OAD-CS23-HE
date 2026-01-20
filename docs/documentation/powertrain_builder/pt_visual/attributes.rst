@@ -81,3 +81,38 @@ values are valid. To configure this factor, use:
 .. code:: python
 
     power_train_network_viewer(pt_file_path, network_file_path, legend_scaling=1.2)
+
+Plot animation
+==============
+This attribute sets the local machine as a local server and enables a glowing animation for each connection. However,
+since the plot is no longer a static HTML file, no file will be saved even if a html file path is provided.
+To configure this option, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, static_html=False)
+
+Refresh rate
+============
+This attribute sets the frame rate to ensure smooth animation. By default, the refresh rate is obtained from
+the system, but it can also be specified manually. To configure the plot refresh rate, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, static_html=False , refresh_rate=60)
+
+PT watcher file path
+====================
+This attribute enables monitoring of each powertrain component’s performance across flight point segments. This is
+achieved through a sliding bar for selecting flight points and a list displayed on the right-hand side of the Bokeh
+canvas.
+
+.. image:: ../../../img/slide_bar_list.svg
+    :width: 400
+    :align: center
+
+To configure the PT watcher file path, use:
+
+.. code:: python
+
+    power_train_network_viewer(pt_file_path, network_file_path, static_html=False , pt_watcher_path=pt_watcher_path)

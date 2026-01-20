@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import base64
 import logging
@@ -143,7 +143,7 @@ def power_train_network_viewer(
     port: int = 5006,
     address: str = "localhost",
     refresh_rate: int = None,
-    csv_file_path: str = None,
+    pt_watcher_path: str = None,
 ):
     """
     Create an interactive network visualization of a power train using Bokeh.
@@ -160,7 +160,7 @@ def power_train_network_viewer(
     :param port: Port for Bokeh server
     :param address: Server address
     :param refresh_rate: Monitor refresh rate (auto-detected if None)
-    :param csv_file_path: Path to CSV file with performance data
+    :param pt_watcher_path: Path to PT watcher file with performance data
     """
 
     # Build graph
@@ -204,12 +204,12 @@ def power_train_network_viewer(
         icon_factor,
         abs(plot_scaling),
         static_html,
-        csv_file_path,
+        pt_watcher_path,
     )
 
     # Build edges
     edge_source, edge_state_dict = EdgesBuilder._build_edges(
-        graph_builder.graph, position_dict, node_icons, static_html, csv_file_path
+        graph_builder.graph, position_dict, node_icons, static_html, pt_watcher_path
     )
 
     # Draw edges
@@ -292,7 +292,7 @@ def power_train_network_viewer(
             refresh_rate = _get_monitor_refresh_rate()
 
         doc_builder = InteractiveDocumentBuilder(
-            plot, edge_source, hover_source, edge_state_dict, component_perf, csv_file_path
+            plot, edge_source, hover_source, edge_state_dict, component_perf, pt_watcher_path
         )
 
         BokehServerManager._start_server(doc_builder._build_document, port, address)
