@@ -207,8 +207,9 @@ class _FuselageUpsweepContribution(om.ExplicitComponent):
             partials["upsweep_contribution", "data:aerodynamics:aircraft:" + ls_tag + ":CL"] = (
                 np.where(
                     cl == cl_median,
-                    (2.0 * 0.0029 * cl - 0.0066) * (
-                                0.67 * 3.6 * height_max * width_max) / wing_area,
+                    (2.0 * 0.0029 * cl - 0.0066)
+                    * (0.67 * 3.6 * height_max * width_max)
+                    / wing_area,
                     0,
                 )
             )
@@ -216,7 +217,10 @@ class _FuselageUpsweepContribution(om.ExplicitComponent):
             partials["upsweep_contribution", "data:aerodynamics:aircraft:" + ls_tag + ":CL"] = (
                 np.where(
                     np.abs(cl - cl_median) == np.min(np.abs(cl - cl_median)),
-                    (2.0 * 0.0029 * cl - 0.0066) * (0.67 * 3.6 * height_max * width_max) / wing_area / 2.0,
+                    (2.0 * 0.0029 * cl - 0.0066)
+                    * (0.67 * 3.6 * height_max * width_max)
+                    / wing_area
+                    / 2.0,
                     0,
                 )
             )

@@ -146,11 +146,23 @@ class _CamberContribution(om.ExplicitComponent):
         )
         contribution_median = np.median(camber_contribution)
 
-        partials["camber_contribution", "data:aerodynamics:aircraft:" + ls_tag + ":CL"] = np.where(
-            camber_contribution == contribution_median,
-            (8.577 * cl**2.0 / denom**3.0 - 3.698 * cl / denom**2.0 + 0.382 / denom),
-            0.0,
-        )
+        if len(cl) % 2 == 1:
+            partials["camber_contribution", "data:aerodynamics:aircraft:" + ls_tag + ":CL"] = (
+                np.where(
+                    camber_contribution == contribution_median,
+                    (8.577 * cl**2.0 / denom**3.0 - 3.698 * cl / denom**2.0 + 0.382 / denom),
+                    0.0,
+                )
+            )
+        else:
+            partials["camber_contribution", "data:aerodynamics:aircraft:" + ls_tag + ":CL"] = (
+                np.where(
+                    np.abs(cl - np.median(cl))
+                    == np.min(np.abs(cl - np.median(cl))),
+                    (8.577 * cl**2.0 / denom**3.0 - 3.698 * cl / denom**2.0 + 0.382 / denom) / 2.0,
+                    0.0,
+                )
+            )
 
         partials["camber_contribution", "data:geometry:wing:sweep_25"] = np.median(
             17.154 * cl_sw_frac**3.0 * np.tan(sw_25)
