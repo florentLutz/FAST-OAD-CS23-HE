@@ -127,12 +127,12 @@ def test_hybrid_atr_42_full_sizing():
     problem.write_outputs()
 
 
-def test_sizing_atr_42_retrofit_hybrid_underbelly():
+def test_sizing_atr_42_full_sizing_hybrid_underbelly():
     """
     Test the overall aircraft design process with retrofitting the parallel hybrid powertrain in
     the ATR 42. In this configuration, the electrical component of the powertrain supplies power
-    only during the climb phase of the flight mission. Aditionally, the battery will be located
-    in the underbelly of the aircraft
+    only during the climb phase of the flight mission. Additionally, the battery will be located
+    in the underbelly of the aircraft.
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -143,7 +143,12 @@ def test_sizing_atr_42_retrofit_hybrid_underbelly():
     )
     problem = configurator.get_problem()
 
-    problem.write_needed_inputs(DATA_FOLDER_PATH / "resized_underbelly_hybrid_inputs.xml")
+    # Load inputs
+    copy(
+        DATA_FOLDER_PATH / "resized_underbelly_hybrid_inputs.xml",
+        RESULTS_FOLDER_PATH / "resized_underbelly_hybrid_inputs.xml",
+    )
+
     problem.read_inputs()
 
     problem.model_options["*"] = {

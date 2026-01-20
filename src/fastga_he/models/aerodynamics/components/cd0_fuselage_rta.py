@@ -26,7 +26,7 @@ class Cd0Fuselage(om.Group):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_subsystem(
-            "plate_friction_coeff_" + ls_tag,
+            "fuselage_plate_friction_coeff_" + ls_tag,
             FlatPlateFrictionDragCoefficient(low_speed_aero=self.options["low_speed_aero"]),
             promotes=[
                 "data:*",
@@ -54,7 +54,7 @@ class Cd0Fuselage(om.Group):
         )
 
         self.connect(
-            "plate_friction_coeff_" + ls_tag + ".plate_drag_friction_coeff",
+            "fuselage_plate_friction_coeff_" + ls_tag + ".plate_drag_friction_coeff",
             "fuselage_friction_drag_" + ls_tag + ".plate_drag_friction_coeff",
         )
         self.connect(

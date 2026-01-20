@@ -73,7 +73,7 @@ power_train_components:
     options:
       number_of_inputs: 1
       number_of_outputs: 2
-    position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
 
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter

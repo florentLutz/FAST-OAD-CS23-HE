@@ -26,7 +26,7 @@ class Cd0Wing(om.Group):
         ls_tag = "low_speed" if self.options["low_speed_aero"] else "cruise"
 
         self.add_subsystem(
-            "plate_friction_coeff_" + ls_tag,
+            "wing_plate_friction_coeff_" + ls_tag,
             FlatPlateFrictionDragCoefficient(low_speed_aero=self.options["low_speed_aero"]),
             promotes=[
                 "data:*",
@@ -56,7 +56,7 @@ class Cd0Wing(om.Group):
         )
 
         self.connect(
-            "plate_friction_coeff_" + ls_tag + ".plate_drag_friction_coeff",
+            "wing_plate_friction_coeff_" + ls_tag + ".plate_drag_friction_coeff",
             "cd0_wing.plate_drag_friction_coeff",
         )
         self.connect(
@@ -157,8 +157,7 @@ class _CamberContribution(om.ExplicitComponent):
         else:
             partials["camber_contribution", "data:aerodynamics:aircraft:" + ls_tag + ":CL"] = (
                 np.where(
-                    np.abs(cl - np.median(cl))
-                    == np.min(np.abs(cl - np.median(cl))),
+                    np.abs(cl - np.median(cl)) == np.min(np.abs(cl - np.median(cl))),
                     (8.577 * cl**2.0 / denom**3.0 - 3.698 * cl / denom**2.0 + 0.382 / denom) / 2.0,
                     0.0,
                 )
