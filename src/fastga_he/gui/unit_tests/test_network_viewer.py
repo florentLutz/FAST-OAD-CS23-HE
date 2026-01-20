@@ -88,10 +88,9 @@ def test_pt_network_viewer_tri_prop_two_chainz(cleanup):
     power_train_network_viewer(
         os.path.join(DATA_FOLDER_PATH, "simple_assembly_tri_prop_two_chainz.yml"),
         os.path.join(RESULTS_FOLDER_PATH, "network.html"),
-        static_html=False,
     )
 
-    # assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
-    #
-    # # Cleanup to avoid any over-clogging
-    # rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+    assert os.path.exists(os.path.join(RESULTS_FOLDER_PATH, "network.html"))
+
+    # Cleanup to avoid any over-clogging
+    rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)

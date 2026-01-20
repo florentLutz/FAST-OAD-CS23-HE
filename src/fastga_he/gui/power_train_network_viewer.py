@@ -236,13 +236,13 @@ def power_train_network_viewer(
 
                 # Define table columns
                 columns = [
-                    bkmodel.TableColumn(field="property", title="Property", width=170),
-                    bkmodel.TableColumn(field="value", title="Value", width=100),
+                    bkmodel.TableColumn(field="property", title="Property", width=210),
+                    bkmodel.TableColumn(field="value", title="Value", width=60),
                 ]
 
                 # Create DataTable
                 data_table = bkmodel.DataTable(
-                    source=table_source, columns=columns, width=280, height=400, index_position=None
+                    source=table_source, columns=columns, width=280, height=600, index_position=None
                 )
 
                 # Callback when a node is clicked
@@ -297,6 +297,9 @@ def power_train_network_viewer(
                 doc.add_root(plot)
 
             def update():
+                """
+                Plot periodic update for the add_preriodic_callback function.
+                """
                 animation_counter[0] = (animation_counter[0] + 1) % animation_frames
                 progress = animation_counter[0] / animation_frames
 
