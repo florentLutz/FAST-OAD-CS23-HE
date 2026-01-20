@@ -28,7 +28,11 @@ class Cd0Wing(om.Group):
         self.add_subsystem(
             "plate_friction_coeff_" + ls_tag,
             FlatPlateFrictionDragCoefficient(low_speed_aero=self.options["low_speed_aero"]),
-            promotes=["data:*"],
+            promotes=[
+                "data:*",
+                ("characteristic_length", "data:geometry:wing:MAC:length"),
+                ("characteristic_reynolds", "data:aerodynamics:wing:" + ls_tag + ":reynolds"),
+            ],
         )
         self.add_subsystem(
             "wing_relative_thickness_" + ls_tag,

@@ -28,6 +28,8 @@ def test_cd0_wing_rta():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(Cd0Wing(), ivc)
 
-    assert problem.get_val("data:aerodynamics:wing:cruise:CD0") == pytest.approx(0.01013465, rel=1e-2)
+    assert problem.get_val("data:aerodynamics:wing:cruise:CD0") == pytest.approx(
+        0.01013465, rel=1e-2
+    )
 
     problem.check_partials(compact_print=True)

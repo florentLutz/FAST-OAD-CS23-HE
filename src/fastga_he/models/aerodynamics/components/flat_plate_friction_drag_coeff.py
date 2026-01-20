@@ -22,8 +22,8 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
             else "data:TLAR:cruise_mach"
         )
 
-        self.add_input("data:geometry:wing:MAC:length", val=np.nan, units="m")
-        self.add_input("data:aerodynamics:wing:" + ls_tag + ":reynolds", val=np.nan)
+        self.add_input("characteristic_length", val=np.nan, units="m")
+        self.add_input("characteristic_reynolds", val=np.nan)
         self.add_input(mach_variable, val=np.nan)
 
         self.add_output("plate_drag_friction_coeff")
@@ -39,9 +39,9 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
             else "data:TLAR:cruise_mach"
         )
 
-        length = inputs["data:geometry:wing:MAC:length"]
+        length = inputs["characteristic_length"]
         mach = inputs[mach_variable]
-        reynolds = inputs["data:aerodynamics:wing:" + ls_tag + ":reynolds"]
+        reynolds = inputs["characteristic_reynolds"]
 
         outputs["plate_drag_friction_coeff"] = 0.455 / (
             (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log10(reynolds * length) ** 2.58
@@ -55,9 +55,9 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
             else "data:TLAR:cruise_mach"
         )
 
-        length = inputs["data:geometry:wing:MAC:length"]
+        length = inputs["characteristic_length"]
         mach = inputs[mach_variable]
-        reynolds = inputs["data:aerodynamics:wing:" + ls_tag + ":reynolds"]
+        reynolds = inputs["characteristic_reynolds"]
 
         partials["plate_drag_friction_coeff", mach_variable] = (
             -0.085176
@@ -65,11 +65,10 @@ class FlatPlateFrictionDragCoefficient(om.ExplicitComponent):
             / ((1.0 + 0.144 * mach**2.0) ** 1.65 * np.log10(reynolds * length) ** 2.58)
         )
 
-        partials["plate_drag_friction_coeff", "data:geometry:wing:MAC:length"] = -10.095959 / (
+        partials["plate_drag_friction_coeff", "characteristic_length"] = -10.095959 / (
             (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * length
         )
 
-        partials["plate_drag_friction_coeff", "data:aerodynamics:wing:" + ls_tag + ":reynolds"] = (
-            -10.095959
-            / ((1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * reynolds)
+        partials["plate_drag_friction_coeff", "characteristic_reynolds"] = -10.095959 / (
+            (1.0 + 0.144 * mach**2.0) ** 0.65 * np.log(reynolds * length) ** 3.58 * reynolds
         )
