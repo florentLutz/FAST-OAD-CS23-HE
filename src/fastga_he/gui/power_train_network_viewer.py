@@ -532,16 +532,28 @@ def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_ed
 def _extract_connection_state(df_pt: pd.DataFrame, start: str, end: str) -> list:
     """Extract edge working state from CSV data."""
     watcher_variables = df_pt.columns.tolist()
-    edge_state = []
+    edge_state_start = None
+    edge_state_end = None
+    keys = ["current", "torque", "fuel"]
 
     for variable in watcher_variables:
-        if (start in variable or end in variable) and any(
-            key in variable for key in ["current", "torque", "fuel"]
-        ):
-            edge_state = [state >= 1e-6 for state in df_pt[variable]]
+        if edge_state_start is None and start in variable and any(key in variable for key in keys):
+            edge_state_start = [state >= 1e-6 for state in df_pt[variable]]
+
+        if edge_state_end is None and end in variable and any(key in variable for key in keys):
+            edge_state_end = [state >= 1e-6 for state in df_pt[variable]]
+
+        # Early exit if both found
+        if edge_state_start is not None and edge_state_end is not None:
             break
 
-    return edge_state
+    # Combine results
+    if edge_state_start and edge_state_end:
+        return [state_s and state_e for state_s, state_e in zip(edge_state_start, edge_state_end)]
+    elif edge_state_start:
+        return edge_state_start
+    else:
+        return edge_state_end
 
 
 def _extract_component_performance(df_pt: pd.DataFrame, name: str, perf_dict: dict) -> dict:
