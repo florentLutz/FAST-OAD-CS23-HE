@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import pytest
 from fastoad import api
-
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 from utils.filter_residuals import filter_residuals
 
 DATA_FOLDER_PATH = Path(__file__).parent / "data"
@@ -125,6 +125,22 @@ def test_hybrid_atr_42_full_sizing():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
+
+
+def test_hybrid_atr_42_powertrain_network():
+    """
+    Test the network viewer in interactive mode with local Bokeh server. The flow animation of
+    electric branches should be deactivated during both cruise and descend phases as these
+    components are used only in climb phase.
+    """
+
+    pt_file_path = DATA_FOLDER_PATH / "parallel_hybrid_assembly.yml"
+    network_file_path = RESULTS_FOLDER_PATH / "hybrid_atr42.html"
+    pt_watcher_path = RESULTS_FOLDER_PATH / "atr42_hybrid_power_train_data.csv"
+
+    power_train_network_viewer(
+        pt_file_path, network_file_path, static_html=False, pt_watcher_path=pt_watcher_path
+    )
 
 
 def test_sizing_atr_42_full_sizing_hybrid_underbelly():
