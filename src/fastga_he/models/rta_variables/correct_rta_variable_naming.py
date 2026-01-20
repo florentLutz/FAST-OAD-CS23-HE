@@ -31,6 +31,7 @@ class CorrectRTANaming(om.ExplicitComponent):
             "data:propulsion:L1_engine:turbine_inlet_temperature", val=np.nan, units="degK"
         )
         self.add_input("data:propulsion:RTO_power", val=np.nan, units="W")
+        self.add_input("data:geometry:fuselage:wetted_area", val=np.nan, units="m**2")
 
         self.add_output("data:TLAR:NPAX_design")
         self.add_output("data:geometry:cabin:seats:passenger:count_by_row")
@@ -44,6 +45,7 @@ class CorrectRTANaming(om.ExplicitComponent):
         self.add_output("data:aerodynamics:wing:cruise:induced_drag_coefficient")
         self.add_output("data:aerodynamics:wing:low_speed:induced_drag_coefficient")
         self.add_output("data:aerodynamics:wing:low_speed:CL_max_clean")
+        self.add_output("data:geometry:fuselage:wet_area", val=150.0, units="m**2")
 
     def setup_partials(self):
         self.declare_partials(of="data:TLAR:NPAX_design", wrt="data:TLAR:NPAX", val=1.0)
@@ -103,6 +105,10 @@ class CorrectRTANaming(om.ExplicitComponent):
             method="exact",
         )
 
+        self.declare_partials(
+            "data:geometry:fuselage:wet_area", "data:geometry:fuselage:wetted_area", val=1.0
+        )
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:TLAR:NPAX_design"] = inputs["data:TLAR:NPAX"]
 
@@ -147,6 +153,8 @@ class CorrectRTANaming(om.ExplicitComponent):
         outputs["data:aerodynamics:wing:low_speed:CL_max_clean"] = inputs[
             "data:aerodynamics:aircraft:low_speed:CL"
         ][-1]
+
+        outputs["data:geometry:fuselage:wet_area"] = inputs["data:geometry:fuselage:wetted_area"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         partials[

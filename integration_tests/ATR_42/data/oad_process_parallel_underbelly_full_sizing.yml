@@ -1,11 +1,11 @@
-title: ATR 42 OAD Process
+title: Resized ATR 42 with parallel hybrid powertrain
 
 # List of folder paths where user added custom registered OpenMDAO components
 module_folders:
 
 # Input and output files
-input_file: ../results/atr42_full_sizing_inputs.xml
-output_file: ../results/atr42_full_sizing_outputs.xml
+input_file: ../results/resized_underbelly_hybrid_inputs.xml
+output_file: ../results/resized_underbelly_hybrid_outputs.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
@@ -16,7 +16,7 @@ driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
 model:
 
   #  Solvers are defined assuming the OpenMDAO convention "import openmdao.api as om"
-  nonlinear_solver: om.NonlinearBlockGS(maxiter=100, atol=1e-2)
+  nonlinear_solver: om.NonlinearBlockGS(maxiter=20, rtol=1e-5)
   linear_solver: om.DirectSolver()
 
 
@@ -24,8 +24,8 @@ model:
   subgroup:
 
     # A group can be set with its own solvers.
-    # Uncomment the 2 next lines for using the performance module with "mission_file_path: ::sizing_mission"
-    nonlinear_solver: om.NonlinearBlockGS(maxiter=100, atol=1e-2, iprint=0)
+    # Uncomment the 2 next lines for using the performance module with "mission_file_path:sizing_mission"
+    nonlinear_solver: om.NonlinearBlockGS(maxiter=30, rtol=1e-5, iprint=2)
     linear_solver: om.DirectSolver()
 
     geometry:
@@ -54,7 +54,7 @@ model:
 
     rta_integration:
       id: fastga_he.rta_variables
-      power_train_file_path: fuel_propulsion_assembly.yml
+      power_train_file_path: parallel_hybrid_assembly_underbelly.yml
 
     performances:
       id: fastga_he.performances.mission_vector
@@ -62,15 +62,15 @@ model:
       number_of_points_cruise: 30
       number_of_points_descent: 20
       number_of_points_reserve: 10
-      power_train_file_path: fuel_propulsion_assembly.yml
-      out_file: ../results/fuel_propulsion.csv
+      power_train_file_path: parallel_hybrid_assembly_underbelly.yml
+      out_file: ../results/full_sized_hybrid_underbelly_propulsion.csv
       use_linesearch: False
       pre_condition_pt: False
-      use_apply_nonlinear: False
+      sort_component: True
+      use_apply_nonlinear: True
     power_train_sizing:
       id: fastga_he.power_train.sizing
-      power_train_file_path: fuel_propulsion_assembly.yml
-
+      power_train_file_path: parallel_hybrid_assembly_underbelly.yml
 
 submodels:
   service.aerodynamics.CD0.sum: fastga_he.submodel.aerodynamics.sum.cd0.rta
@@ -80,7 +80,13 @@ submodels:
   service.aerodynamics.polar: fastoad.submodel.aerodynamics.polar.legacy
   service.geometry.wing: rta.submodel.geometry.wing
   submodel.performances_he.energy_consumption: fastga_he.submodel.performances.energy_consumption.from_pt_file
-  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
   service.mass.propulsion: fastga_he.submodel.weight.mass.propulsion.power_train.rta
-
-
+  submodel.performances_he.dep_effect: fastga_he.submodel.performances.dep_effect.from_pt_file
+  service.performances.delta_m: fastga_he.submodel.performances.delta_m.constant
+  submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+  submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+  submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.fixed
+  submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
+  submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
+  submodel.propulsion.dc_dc_converter.inductor.inductance: null
+  submodel.propulsion.dc_dc_converter.weight: null

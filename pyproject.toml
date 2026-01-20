@@ -51,6 +51,7 @@ kaleido = "0.2.1"
 click = "8.0.4"
 debugpy = "1.5.0"
 lca-modeller = { version = "^0.1.1b0", optional=true, python="3.10" }
+jupyterlab-widgets = "3.0.15"  # Hotfix for jupyterlab-widgets. To remove once this issue is fixed: https://github.com/jupyter-widgets/ipywidgets/issues/4013
 
 [tool.poetry.group.dev.dependencies]
 pyvplm = { git = "https://github.com/florentLutz/pyvplm.git", branch = "master" }
