@@ -5,7 +5,8 @@
 import base64
 import logging
 from pathlib import Path
-
+import platform
+import subprocess
 import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
@@ -19,9 +20,6 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 from . import icons
 from .layout_generation import HierarchicalLayout
 
-# ============================================================================
-# COLOR AND STYLING CONSTANTS
-# ============================================================================
 BACKGROUND_COLOR_CODE = "#bebebe"
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
 FUEL_FLOW_COLOR_CODE = "#FF5722"
@@ -126,7 +124,7 @@ COLOR_ICON_CONFIG = {
 }
 
 # ============================================================================
-# MAIN VISUALIZATION FUNCTION
+# Main visualization function
 # ============================================================================
 
 
@@ -299,7 +297,7 @@ def power_train_network_viewer(
 
 
 # ============================================================================
-# COLOR AND ICON UTILITIES
+# Color and icon utilities
 # ============================================================================
 
 
@@ -382,21 +380,20 @@ def _get_file_name(file_path: str) -> str:
 
 
 # ============================================================================
-# MONITOR AND ANIMATION UTILITIES
+# Monitor and animation utilities
 # ============================================================================
 
 
 def _get_monitor_refresh_rate() -> int:
     """Detect monitor refresh rate from system settings."""
     try:
-        import platform
-
         system = platform.system()
 
         if system == "Windows":
             return _get_windows_refresh_rate()
         elif system == "Linux":
             return _get_linux_refresh_rate()
+
     except Exception as e:
         print(f"Unexpected error detecting refresh rate: {e}")
 
@@ -407,8 +404,6 @@ def _get_monitor_refresh_rate() -> int:
 def _get_windows_refresh_rate() -> int:
     """Get refresh rate on Windows."""
     try:
-        import subprocess
-
         result = subprocess.run(
             ["wmic", "path", "win32_videocontroller", "get", "currentrefreshrate"],
             capture_output=True,
@@ -426,14 +421,12 @@ def _get_windows_refresh_rate() -> int:
     except Exception as e:
         print(f"Error detecting refresh rate: {e}")
 
-    return None
+    return 60
 
 
 def _get_windows_refresh_rate_powershell() -> int:
     """Get refresh rate on Windows using PowerShell."""
     try:
-        import subprocess
-
         result = subprocess.run(
             [
                 "powershell",
@@ -457,14 +450,12 @@ def _get_windows_refresh_rate_powershell() -> int:
     except Exception as e:
         print(f"PowerShell method failed: {e}")
 
-    return None
+    return 60
 
 
 def _get_linux_refresh_rate() -> int:
     """Get refresh rate on Linux."""
     try:
-        import subprocess
-
         result = subprocess.run(["xrandr"], capture_output=True, text=True, timeout=5)
         for line in result.stdout.split("\n"):
             if "*" in line:
@@ -477,7 +468,7 @@ def _get_linux_refresh_rate() -> int:
     except Exception as e:
         print(f"Error detecting refresh rate on Linux: {e}")
 
-    return None
+    return 60
 
 
 def _calculate_callback_interval(refresh_rate: int, target_fps: int = None) -> int:
@@ -525,7 +516,7 @@ def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_ed
 
 
 # ============================================================================
-# DATA PROCESSING UTILITIES
+# Data processing utilities
 # ============================================================================
 
 
@@ -573,7 +564,7 @@ def _extract_component_performance(df_pt: pd.DataFrame, name: str, perf_dict: di
 
 
 # ============================================================================
-# GRAPH INITIALIZATION
+# Graph initialization
 # ============================================================================
 
 
@@ -642,7 +633,7 @@ class GraphBuilder:
 
 
 # ============================================================================
-# PLOT CREATION AND CONFIGURATION
+# Plot creation and configuration
 # ============================================================================
 
 
@@ -746,7 +737,7 @@ class BokehPlotBuilder:
 
 
 # ============================================================================
-# NODE AND EDGE BUILDING
+# Node and edge building
 # ============================================================================
 
 
@@ -882,7 +873,7 @@ class EdgesBuilder:
 
 
 # ============================================================================
-# LEGEND BUILDING
+# Legend building
 # ============================================================================
 
 
@@ -974,7 +965,7 @@ class LegendBuilder:
 
 
 # ============================================================================
-# INTERACTIVE TOOLS
+# Interactive tools
 # ============================================================================
 
 
@@ -1014,7 +1005,7 @@ class InteractiveToolsBuilder:
 
 
 # ============================================================================
-# HTML SAVING
+# HTML saving
 # ============================================================================
 
 
@@ -1075,7 +1066,7 @@ class HTMLSaver:
 
 
 # ============================================================================
-# SERVER MANAGEMENT
+# Server management
 # ============================================================================
 
 
@@ -1113,7 +1104,7 @@ class BokehServerManager:
 
 
 # ============================================================================
-# INTERACTIVE DOCUMENT BUILDER
+# Interactive document builder
 # ============================================================================
 
 
