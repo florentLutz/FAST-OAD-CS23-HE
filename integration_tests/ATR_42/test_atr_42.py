@@ -3,7 +3,6 @@ import logging
 from pathlib import Path
 import pytest
 from fastoad import api
-from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
 
 from utils.filter_residuals import filter_residuals
 
@@ -107,6 +106,47 @@ def test_hybrid_atr_42_full_sizing():
     copy(
         DATA_FOLDER_PATH / "resized_hybrid_inputs.xml",
         RESULTS_FOLDER_PATH / "resized_hybrid_inputs.xml",
+    )
+
+    problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 30e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+
+def test_sizing_atr_42_full_sizing_hybrid_underbelly():
+    """
+    Test the overall aircraft design process with retrofitting the parallel hybrid powertrain in
+    the ATR 42. In this configuration, the electrical component of the powertrain supplies power
+    only during the climb phase of the flight mission. Additionally, the battery will be located
+    in the underbelly of the aircraft.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    configurator = api.FASTOADProblemConfigurator(
+        DATA_FOLDER_PATH / "oad_process_parallel_underbelly_full_sizing.yml"
+    )
+    problem = configurator.get_problem()
+
+    # Load inputs
+    copy(
+        DATA_FOLDER_PATH / "resized_underbelly_hybrid_inputs.xml",
+        RESULTS_FOLDER_PATH / "resized_underbelly_hybrid_inputs.xml",
     )
 
     problem.read_inputs()
