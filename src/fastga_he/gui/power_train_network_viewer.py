@@ -5,8 +5,6 @@
 import base64
 import logging
 from pathlib import Path
-import platform
-import subprocess
 import networkx as nx
 import bokeh.plotting as bkplot
 import bokeh.models as bkmodel
@@ -138,14 +136,14 @@ def power_train_network_viewer(
     network_file_path: str,
     orientation: str = "TB",
     legend_position: str = "TR",
-    static_html: bool = True,
+    static_architecture: bool = True,
     sorting: bool = True,
     from_propulsor: bool = False,
     plot_scaling: float = 1.0,
     legend_scaling: float = 1.0,
     port: int = 5006,
     address: str = "localhost",
-    refresh_rate: int = None,
+    refresh_rate: int = 60,
     pt_watcher_path: str = None,
 ):
     """
@@ -155,14 +153,14 @@ def power_train_network_viewer(
     :param network_file_path: Path where the HTML output will be saved
     :param orientation: Network plot orientation ('TB', 'BT', 'LR', 'RL')
     :param legend_position: Legend position ('TR', 'TL', 'BR', 'BL', etc.)
-    :param static_html: True for static HTML, False for interactive server
+    :param static_architecture: True for static HTML, False for interactive server
     :param sorting: Enable Tutte's drawing algorithm for sorting
     :param from_propulsor: Set all propulsor components into reference layer
     :param plot_scaling: Scaling factor for the main powertrain architecture
     :param legend_scaling: Scaling factor for the legend size
     :param port: Port for Bokeh server
     :param address: Server address
-    :param refresh_rate: Monitor refresh rate (auto-detected if None)
+    :param refresh_rate: Monitor refresh rate
     :param pt_watcher_path: Path to PT watcher file with performance data
     """
 
@@ -182,7 +180,7 @@ def power_train_network_viewer(
 
     # Create Bokeh plot
     plot, position_dict, icon_factor, icon_width_factor = BokehPlotBuilder._create_plot(
-        power_train_file_path, position_dict, orientation, abs(plot_scaling)
+        power_train_file_path, position_dict, orientation, plot_scaling
     )
 
     # Build nodes
@@ -205,14 +203,14 @@ def power_train_network_viewer(
         icon_width_factor,
         node_sizes,
         icon_factor,
-        abs(plot_scaling),
-        static_html,
+        plot_scaling,
+        static_architecture,
         pt_watcher_path,
     )
 
     # Build edges
     edge_source, edge_state_dict = EdgesBuilder._build_edges(
-        graph_builder.graph, position_dict, node_icons, static_html, pt_watcher_path
+        graph_builder.graph, position_dict, node_icons, static_architecture, pt_watcher_path
     )
 
     # Draw edges
@@ -229,7 +227,7 @@ def power_train_network_viewer(
     plot.scatter(
         x="x",
         y="y",
-        size=45 * abs(plot_scaling),
+        size=45 * plot_scaling,
         source=node_source,
         color=BACKGROUND_COLOR_CODE,
         line_alpha=0,
@@ -250,7 +248,7 @@ def power_train_network_viewer(
     label_source = bkmodel.ColumnDataSource(
         data=dict(
             x=node_x,
-            y=[y - 15 * icon_factor * abs(plot_scaling) * 0.7 for y in node_y],
+            y=[y - 15 * icon_factor * plot_scaling * 0.7 for y in node_y],
             names=node_name_list,
         )
     )
@@ -262,7 +260,7 @@ def power_train_network_viewer(
         text_align="center",
         text_baseline="top",
         text_color="white",
-        text_font_size=str(8 * abs(plot_scaling)) + "pt",
+        text_font_size=str(8 * plot_scaling) + "pt",
     )
     plot.add_layout(labels)
 
@@ -288,14 +286,17 @@ def power_train_network_viewer(
     InteractiveToolsBuilder._add_interactive_tools(plot, hover_source)
 
     # Save or serve
-    if static_html:
+    if static_architecture:
         HTMLSaver._save_static_html(plot, network_file_path)
     else:
-        if refresh_rate is None:
-            refresh_rate = _get_monitor_refresh_rate()
-
         doc_builder = InteractiveDocumentBuilder(
-            plot, edge_source, hover_source, edge_state_dict, component_perf, pt_watcher_path
+            plot,
+            edge_source,
+            hover_source,
+            edge_state_dict,
+            component_perf,
+            refresh_rate,
+            pt_watcher_path,
         )
 
         BokehServerManager._start_server(doc_builder._build_document, port, address)
@@ -307,7 +308,14 @@ def power_train_network_viewer(
 
 
 def _get_edge_color(source_icon: str, target_icon: str) -> str:
-    """Determine edge color based on source and target node types."""
+    """
+    Determine edge color based on source and target node types.
+
+    :param source_icon: Icon name of the source node
+    :param target_icon: Icon name of the target node
+
+    :return: Color code for the edge
+    """
     color_as_target = ICONS_CONFIG.get(target_icon, {}).get("target_color")
     if color_as_target:
         return color_as_target
@@ -320,17 +328,26 @@ def _get_edge_color(source_icon: str, target_icon: str) -> str:
 
 
 def _url_to_base64(url: str) -> str:
-    """Convert a file:// URL to a Base64 data URI."""
+    """
+    Convert a file:// URL to a Base64 data URI.
+    :param url: File path or file:// URL to convert
+
+    Returns: Base64 data URI string, or original URL if conversion fails
+    """
+    # Skip non-file URLs
     if not url.startswith("file://"):
         return url
 
     try:
+        # Convert file:// URL to local path
         file_path_str = url.replace("file:///", "").replace("file://", "")
         local_path = Path(file_path_str)
 
+        # Read and encode as Base64
         with open(local_path, "rb") as img_file:
             img_data = base64.b64encode(img_file.read()).decode("utf-8")
 
+        # Determine MIME type
         suffix = local_path.suffix.lower()
         mime_types = {
             ".png": "image/png",
@@ -340,28 +357,45 @@ def _url_to_base64(url: str) -> str:
             ".svg": "image/svg+xml",
         }
         mime_type = mime_types.get(suffix, "image/png")
+
+        # Return data URI
         return f"data:{mime_type};base64,{img_data}"
+
     except Exception as e:
         print(f"Error processing {url}: {e}")
         return url
 
 
 def _string_cleanup(text: str) -> str:
-    """Clean up text for better readability."""
+    """
+    Clean up text for better readability.
+    """
+    # In case for list type definition
     if isinstance(text, list):
         text = ", ".join([text[0].capitalize(), text[1].capitalize()])
 
+    # Replace underscore with space
     text = text.replace("_", " ")
+
+    # Add a space after 'DC' if followed immediately by a letter or number
     text = text.replace("DC", "DC ").replace("DC DC", "DC-DC")
+
+    # Add a space after 'H2' and 'PEMFC'
     text = text.replace("H2", "H2 ").replace("PEMFC", "PEMFC ")
+
+    # Add space before a capital letter preceded by a lowercase letter
     text = _add_space_before_caps(text)
+
+    # Remove extra spaces
     text = " ".join(text.split())
 
     return text
 
 
 def _add_space_before_caps(text: str) -> str:
-    """Add space before capital letters preceded by lowercase."""
+    """
+    Add space before capital letters preceded by lowercase.
+    """
     result = []
     for i, char in enumerate(text):
         if i > 0 and char.isupper() and text[i - 1].islower():
@@ -372,7 +406,9 @@ def _add_space_before_caps(text: str) -> str:
 
 
 def _get_file_name(file_path: str) -> str:
-    """Extract and format filename from file path."""
+    """
+    Extract and format filename from file path.
+    """
     file_path = str(file_path)
     filename = file_path.replace("\\", "/").split("/")[-1]
 
@@ -385,104 +421,13 @@ def _get_file_name(file_path: str) -> str:
 
 
 # ============================================================================
-# Monitor and animation utilities
+# Animation utilities
 # ============================================================================
 
 
-def _get_monitor_refresh_rate() -> int:
-    """Detect monitor refresh rate from system settings."""
-    try:
-        system = platform.system()
-
-        if system == "Windows":
-            return _get_windows_refresh_rate()
-        elif system == "Linux":
-            return _get_linux_refresh_rate()
-
-    except Exception as e:
-        print(f"Unexpected error detecting refresh rate: {e}")
-
-    print("Could not detect refresh rate, using default: 60 Hz")
-    return 60
-
-
-def _get_windows_refresh_rate() -> int:
-    """Get refresh rate on Windows."""
-    try:
-        result = subprocess.run(
-            ["wmic", "path", "win32_videocontroller", "get", "currentrefreshrate"],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
-        if len(lines) > 1:
-            rate = int(lines[1])
-            if rate > 0:
-                print(f"Detected monitor refresh rate: {rate} Hz")
-                return rate
-    except FileNotFoundError:
-        return _get_windows_refresh_rate_powershell()
-    except Exception as e:
-        print(f"Error detecting refresh rate: {e}")
-
-    return 60
-
-
-def _get_windows_refresh_rate_powershell() -> int:
-    """Get refresh rate on Windows using PowerShell."""
-    try:
-        result = subprocess.run(
-            [
-                "powershell",
-                "-Command",
-                "Get-WmiObject -Namespace root\\cimv2 -Class Win32_VideoController | Select-Object CurrentRefreshRate",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=5,
-        )
-        lines = [
-            line.strip()
-            for line in result.stdout.strip().split("\n")
-            if line.strip() and line.strip().isdigit()
-        ]
-        if lines:
-            rate = int(lines[0])
-            if rate > 0:
-                print(f"Detected monitor refresh rate: {rate} Hz")
-                return rate
-    except Exception as e:
-        print(f"PowerShell method failed: {e}")
-
-    return 60
-
-
-def _get_linux_refresh_rate() -> int:
-    """Get refresh rate on Linux."""
-    try:
-        result = subprocess.run(["xrandr"], capture_output=True, text=True, timeout=5)
-        for line in result.stdout.split("\n"):
-            if "*" in line:
-                parts = line.split()
-                for part in parts:
-                    if "+" in part:
-                        rate = int(float(part.replace("+", "")))
-                        print(f"Detected monitor refresh rate: {rate} Hz")
-                        return rate
-    except Exception as e:
-        print(f"Error detecting refresh rate on Linux: {e}")
-
-    return 60
-
-
-def _calculate_callback_interval(refresh_rate: int, target_fps: int = None) -> int:
+def _calculate_callback_interval(refresh_rate: int) -> int:
     """Calculate optimal callback interval based on monitor refresh rate."""
-    if target_fps is None:
-        target_fps = refresh_rate
-
-    target_fps = min(target_fps, refresh_rate)
-    return int(1000 / target_fps)
+    return int(1000 / refresh_rate)
 
 
 def _calculate_animation_frames(refresh_rate: int, animation_duration_ms: int = 1000) -> int:
@@ -525,8 +470,16 @@ def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_ed
 # ============================================================================
 
 
-def _extract_connection_state(df_pt: pd.DataFrame, start: str, end: str) -> list:
-    """Extract edge working state from CSV data."""
+def _extract_edge_working_state(df_pt: pd.DataFrame, start: str, end: str) -> list:
+    """
+    Extract edge working state from PT watcher dataframe.
+
+    :param df_pt: Pandas dataframe of PT watcher extract from the csv file
+    :param start: The component at the source side of the connection
+    :param end: The component at the target side of the connection
+
+    :return: the edge working state list of for each flight point
+    """
     watcher_variables = df_pt.columns.tolist()
     edge_state_start = None
     edge_state_end = None
@@ -553,7 +506,15 @@ def _extract_connection_state(df_pt: pd.DataFrame, start: str, end: str) -> list
 
 
 def _extract_component_performance(df_pt: pd.DataFrame, name: str, perf_dict: dict) -> dict:
-    """Extract component performance data from CSV."""
+    """
+    Extract specific component performance data from PT watcher dataframe.
+
+    :param df_pt: Pandas dataframe of PT watcher extract from the csv file
+    :param name: The component name specified in the PT file
+    :param perf_dict: The dictionary saves the performance matrice of each component
+
+    :return: the performance dictionary is returned for the next component
+    """
     watcher_variables = df_pt.columns.tolist()
 
     for variable in watcher_variables:
@@ -582,7 +543,9 @@ class GraphBuilder:
         self.graph = nx.DiGraph()
 
     def _build_graph(self) -> tuple:
-        """Build the complete graph with all nodes and edges."""
+        """
+        Build the complete graph with all nodes and edges.
+        """
         names, connections, components_type, components_om_type, icons_name, icons_size = (
             self.configurator.get_network_elements_list()
         )
@@ -614,7 +577,14 @@ class GraphBuilder:
         return propeller_names, node_sizes, node_types, node_om_types, node_icons
 
     def _get_hierarchy_layers(self, propeller_names: list, from_propulsor: bool = False) -> dict:
-        """Compute hierarchy layers for graph layout."""
+        """
+        Compute hierarchy layers for graph layout.
+
+        :param propeller_names: Component name list of the propeller in powertrain
+        :param from_propulsor: Set all propulsor component into reference layer of the hierarchy
+
+        :return: The dictionary of the node hierarchy level
+        """
         distance_from_energy = self.configurator.get_component_distance(["tank", "battery_pack"])
         node_layer_dict = {}
         max_distance = max(distance_from_energy.values())
@@ -649,7 +619,14 @@ class BokehPlotBuilder:
     def _create_plot(
         power_train_file: str, position_dict: dict, orientation: str, plot_scaling: float
     ) -> tuple:
-        """Create Bokeh plot with proper scaling and positioning."""
+        """
+        Create Bokeh plot with proper scaling and positioning.
+
+        :param power_train_file: Path to the power train configuration file
+        :param position_dict: The component position dictionary obtained from layout generation
+        :param orientation: network plot orientation
+        :param plot_scaling: Scaling factor for the main powertrain architecture
+        """
         x_coords = [coords[0] for coords in position_dict.values()]
         y_coords = [coords[1] for coords in position_dict.values()]
 
@@ -695,7 +672,9 @@ class BokehPlotBuilder:
 
     @staticmethod
     def _get_orientation_params(orientation: str) -> dict:
-        """Get orientation-specific parameters."""
+        """
+        Get orientation-specific parameters.
+        """
         if orientation not in ["TB", "BT", "LR", "RL"]:
             orientation = "TB"
 
@@ -760,10 +739,25 @@ class NodesBuilder:
         node_sizes: dict,
         icon_factor: float,
         plot_scaling: float,
-        static_html: bool,
-        csv_file: str = None,
+        static_architecture: bool,
+        pt_watcher_file_path: str = None,
     ) -> tuple:
-        """Build complete node data structure."""
+        """
+        Build complete node data structure.
+
+        :param position_dict: The component position dictionary obtained from layout generation
+        :param node_types: Dictionary mapping component names to their component type classes
+        :param node_om_types: Dictionary mapping component names to their om types
+        :param node_icons: Dictionary mapping component names to their icon name
+        :param icon_width_factor: Factor that adjusts the icon width based on plot orientation
+        :param node_sizes: Dictionary mapping component names to their icon size
+        :param icon_factor: Factor that adjusts the icon size based on plot orientation
+        :param plot_scaling: Scaling factor for the main powertrain architecture
+        :param static_architecture: True for static HTML, False for interactive server
+        :param pt_watcher_file_path: Path to the PT watcher csv file
+
+        :return: Node properties and node Bokeh dataSource
+        """
         node_name_list = list(graph.nodes())
         node_x = []
         node_y = []
@@ -773,7 +767,7 @@ class NodesBuilder:
         node_om_types_list = []
         component_perf = {}
 
-        df_pt = pd.read_csv(csv_file) if csv_file else None
+        df_pt = pd.read_csv(pt_watcher_file_path) if pt_watcher_file_path else None
 
         for node in node_name_list:
             node_x.append(position_dict[node][0])
@@ -786,7 +780,9 @@ class NodesBuilder:
             if df_pt is not None:
                 component_perf = _extract_component_performance(df_pt, node, component_perf)
 
-        node_image_urls = NodesBuilder._get_node_image_urls(node_name_list, node_icons, static_html)
+        node_image_urls = NodesBuilder._get_node_image_urls(
+            node_name_list, node_icons, static_architecture
+        )
 
         node_source = bkmodel.ColumnDataSource(
             data=dict(x=node_x, y=node_y, url=node_image_urls, w=node_width, h=node_height)
@@ -805,14 +801,16 @@ class NodesBuilder:
         )
 
     @staticmethod
-    def _get_node_image_urls(node_name_list: list, node_icons: dict, static_html: bool) -> list:
+    def _get_node_image_urls(
+        node_name_list: list, node_icons: dict, static_architecture: bool
+    ) -> list:
         """Generate image URLs for nodes."""
         urls = []
         for node in node_name_list:
             icon_path = ICONS_CONFIG[node_icons[node]]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
 
-            if static_html:
+            if static_architecture:
                 urls.append(file_url)
             else:
                 urls.append(_url_to_base64(file_url))
@@ -828,16 +826,25 @@ class EdgesBuilder:
         graph: nx.DiGraph,
         position_dict: dict,
         node_icons: dict,
-        static_html: bool,
-        csv_file: str = None,
+        static_architecture: bool,
+        pt_watcher_file_path: str = None,
     ) -> tuple:
-        """Build complete edge data structure."""
+        """
+        Build complete edge data structure.
+
+        :param position_dict: The component position dictionary obtained from layout generation
+        :param node_icons: Dictionary mapping component names to their icon name
+        :param static_architecture: True for static HTML, False for interactive server
+        :param pt_watcher_file_path: Path to the PT watcher csv file
+
+        :return: Edge properties and edge Bokeh dataSource
+        """
         edge_x_pos = []
         edge_y_pos = []
         edge_colors = []
         edge_state = {}
 
-        df_pt = pd.read_csv(csv_file) if csv_file else None
+        df_pt = pd.read_csv(pt_watcher_file_path) if pt_watcher_file_path else None
 
         for index, (start, end) in enumerate(list(graph.edges())):
             edge_x_pos.append([position_dict[start][0], position_dict[end][0]])
@@ -849,9 +856,9 @@ class EdgesBuilder:
             edge_colors.append(edge_color)
 
             if df_pt is not None:
-                edge_state[index] = _extract_connection_state(df_pt, start, end)
+                edge_state[index] = _extract_edge_working_state(df_pt, start, end)
 
-        if static_html:
+        if static_architecture:
             edge_source = bkmodel.ColumnDataSource(
                 data=dict(
                     xs=edge_x_pos,
@@ -887,7 +894,12 @@ class LegendBuilder:
 
     @staticmethod
     def _add_legend(plot, legend_position: str, legend_scaling: float = 1.0):
-        """Add color legend to the plot."""
+        """
+        Add color legend to the plot.
+
+        :param legend_position: Legend position ('TR', 'TL', 'BR', 'BL', etc.)
+        :param legend_scaling: Scaling factor for the legend size
+        """
         color_icon_urls = [
             "file://" + str(Path(COLOR_ICON_CONFIG[key]).resolve())
             for key in COLOR_ICON_CONFIG.keys()
@@ -896,8 +908,8 @@ class LegendBuilder:
         if len(legend_position) != 2:
             legend_position = "TR"
 
-        x_start = LegendBuilder._get_x_position(legend_position, legend_scaling)
-        y_start = LegendBuilder._get_y_position(legend_position, legend_scaling)
+        x_start = LegendBuilder._get_x_position(legend_position)
+        y_start = LegendBuilder._get_y_position(legend_position)
 
         legend_items = [
             (0, "Fuel Flow"),
@@ -947,7 +959,7 @@ class LegendBuilder:
             plot.add_layout(labels)
 
     @staticmethod
-    def _get_x_position(legend_position: str, legend_scaling: float) -> int:
+    def _get_x_position(legend_position: str) -> int:
         """Get x position based on legend position code."""
         if "R" in legend_position:
             return 500
@@ -958,7 +970,7 @@ class LegendBuilder:
         return 500
 
     @staticmethod
-    def _get_y_position(legend_position: str, legend_scaling: float) -> int:
+    def _get_y_position(legend_position: str) -> int:
         """Get y position based on legend position code."""
         if "T" in legend_position:
             return 600
@@ -1123,20 +1135,22 @@ class InteractiveDocumentBuilder:
         hover_source,
         edge_state_dict,
         component_perf_dict,
-        csv_file: str = None,
+        refresh_rate: int = 60,
+        pt_watcher_file_path: str = None,
     ):
         self.plot = plot
         self.edge_source = edge_source
         self.hover_source = hover_source
         self.edge_state_dict = edge_state_dict
         self.component_perf_dict = component_perf_dict
-        self.csv_file = csv_file
+        self.pt_watcher_file_path = pt_watcher_file_path
+        self.refresh_rate = refresh_rate
         self.flight_point_slider = None
         self.table_source = None
 
     def _build_document(self, doc):
         """Build interactive document with sliders and tables."""
-        if self.csv_file:
+        if self.pt_watcher_file_path:
             last_point = len(self.edge_state_dict[0])
             self._setup_flight_point_controls(last_point)
             doc.add_root(row(self.plot, column(self.flight_point_slider, self._create_table())))
@@ -1144,7 +1158,9 @@ class InteractiveDocumentBuilder:
             doc.add_root(self.plot)
 
         animation_counter = 0
-        animation_frames = _calculate_animation_frames(refresh_rate=60, animation_duration_ms=1000)
+        animation_frames = _calculate_animation_frames(
+            refresh_rate=self.refresh_rate, animation_duration_ms=1000
+        )
 
         def _update_animation():
             """Update animation state for flowing edges."""
@@ -1155,7 +1171,7 @@ class InteractiveDocumentBuilder:
             new_alphas = self._calculate_edge_alphas(progress)
             self.edge_source.patch({"line_alpha": [(slice(len(new_alphas)), new_alphas)]})
 
-        callback_interval = _calculate_callback_interval(refresh_rate=60, target_fps=60)
+        callback_interval = _calculate_callback_interval(refresh_rate=self.refresh_rate)
         doc.add_periodic_callback(_update_animation, callback_interval)
 
     def _setup_flight_point_controls(self, last_point: int):
@@ -1219,7 +1235,7 @@ class InteractiveDocumentBuilder:
             wave_pos = (-progress + edge_idx * 0.1) % 1.0
             distance = abs(seg_position - wave_pos)
 
-            if self.csv_file:
+            if self.pt_watcher_file_path:
                 flight_point = int(self.flight_point_slider.value) - 1
                 is_active = (
                     self.edge_state_dict.get(edge_idx, [False])[flight_point]
