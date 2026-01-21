@@ -90,7 +90,7 @@ To configure this option, use:
 
 .. code:: python
 
-    power_train_network_viewer(pt_file_path, network_file_path, static_html=False)
+    power_train_network_viewer(pt_file_path, network_file_path, static_architecture=False)
 
 Refresh rate
 ============
@@ -99,7 +99,7 @@ the system, but it can also be specified manually. To configure the plot refresh
 
 .. code:: python
 
-    power_train_network_viewer(pt_file_path, network_file_path, static_html=False , refresh_rate=60)
+    power_train_network_viewer(pt_file_path, network_file_path, static_architecture=False , refresh_rate=60)
 
 PT watcher file path
 ====================
@@ -115,4 +115,4 @@ To configure the PT watcher file path, use:
 
 .. code:: python
 
-    power_train_network_viewer(pt_file_path, network_file_path, static_html=False , pt_watcher_path=pt_watcher_path)
+    power_train_network_viewer(pt_file_path, network_file_path, static_architecture=False , pt_watcher_path=pt_watcher_path)
