@@ -514,9 +514,6 @@ DC_SPLITTER = {
         {"power_split": "percent"},
         {"dc_voltage_in_1": "V"},
         {"dc_voltage_in_2": "V"},
-        {"dc_current_in_1": "A"},
-        {"dc_current_in_2": "A"},
-        {"dc_current_out": "A"},
     ],
     SMP: [
         {"delta_Cd": None},

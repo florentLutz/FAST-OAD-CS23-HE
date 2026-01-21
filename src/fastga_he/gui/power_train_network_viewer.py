@@ -21,14 +21,19 @@ from . import icons
 from .layout_generation import HierarchicalLayout
 
 BACKGROUND_COLOR_CODE = "#bebebe"
+# canvas background color (french gray)
 ELECTRICITY_CURRENT_COLOR_CODE = "#007BFF"
+# color for electricity transmitting connections (artyClick deep sky blue)
 FUEL_FLOW_COLOR_CODE = "#FF5722"
+# color for fuel (including hydrogen) transmitting connections (portland orange)
 MECHANICAL_POWER_COLOR_CODE = "#2E7D32"
+# color for mechanical power transmitting connections (medium forest green)
 DEFAULT_COLOR = "gray"
 
 ICON_FOLDER_PATH = Path(icons.__path__[0])
 
-# Icon configuration dictionary
+# Image URLs for graph nodes
+# "icon_file_name" : [file_path, color_as_source, color_as_target]
 ICONS_CONFIG = {
     "battery": {
         "icon_path": ICON_FOLDER_PATH / "battery.png",
@@ -187,7 +192,7 @@ def power_train_network_viewer(
         node_y,
         node_width,
         node_height,
-        node_names,
+        node_name_list,
         node_types_list,
         node_om_types_list,
         component_perf,
@@ -246,7 +251,7 @@ def power_train_network_viewer(
         data=dict(
             x=node_x,
             y=[y - 15 * icon_factor * abs(plot_scaling) * 0.7 for y in node_y],
-            names=node_names,
+            names=node_name_list,
         )
     )
     labels = bkmodel.LabelSet(
@@ -271,7 +276,7 @@ def power_train_network_viewer(
             y=node_y,
             w=node_width,
             h=node_height,
-            name=node_names,
+            name=node_name_list,
             type_class=[
                 _string_cleanup(nt.capitalize() if isinstance(nt, str) else nt)
                 for nt in node_types_list
@@ -759,7 +764,7 @@ class NodesBuilder:
         csv_file: str = None,
     ) -> tuple:
         """Build complete node data structure."""
-        node_names = list(graph.nodes())
+        node_name_list = list(graph.nodes())
         node_x = []
         node_y = []
         node_width = []
@@ -770,7 +775,7 @@ class NodesBuilder:
 
         df_pt = pd.read_csv(csv_file) if csv_file else None
 
-        for node in node_names:
+        for node in node_name_list:
             node_x.append(position_dict[node][0])
             node_y.append(position_dict[node][1])
             node_height.append(node_sizes[node] * icon_factor * plot_scaling)
@@ -781,7 +786,7 @@ class NodesBuilder:
             if df_pt is not None:
                 component_perf = _extract_component_performance(df_pt, node, component_perf)
 
-        node_image_urls = NodesBuilder._get_node_image_urls(node_names, node_icons, static_html)
+        node_image_urls = NodesBuilder._get_node_image_urls(node_name_list, node_icons, static_html)
 
         node_source = bkmodel.ColumnDataSource(
             data=dict(x=node_x, y=node_y, url=node_image_urls, w=node_width, h=node_height)
@@ -793,17 +798,17 @@ class NodesBuilder:
             node_y,
             node_width,
             node_height,
-            node_names,
+            node_name_list,
             node_types_list,
             node_om_types_list,
             component_perf,
         )
 
     @staticmethod
-    def _get_node_image_urls(node_names: list, node_icons: dict, static_html: bool) -> list:
+    def _get_node_image_urls(node_name_list: list, node_icons: dict, static_html: bool) -> list:
         """Generate image URLs for nodes."""
         urls = []
-        for node in node_names:
+        for node in node_name_list:
             icon_path = ICONS_CONFIG[node_icons[node]]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
 
