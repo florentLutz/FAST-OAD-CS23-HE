@@ -84,7 +84,7 @@ values are valid. To configure this factor, use:
 
 Plot animation
 ==============
-This attribute enables an animated powertrain architecture of showing active power transfer and an state inspection for
+This attribute enables an animated powertrain architecture of showing active power transfer and a state inspection for
 every component at each step of the flight. This is achieved by setting the local machine as a local server. However,
 since the plot is no longer a static HTML file, no file will be saved even if a html file path is provided. To configure
 this option, use:
