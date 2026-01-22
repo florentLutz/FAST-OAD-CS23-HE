@@ -52,7 +52,7 @@ def test_pt_network_viewer_local_server(cleanup):
     power_train_network_viewer(
         os.path.join(DATA_FOLDER_PATH, "simple_assembly.yml"),
         os.path.join(RESULTS_FOLDER_PATH, "network.html"),
-        static_architecture=False,
+        animated_plot=True,
     )
 
 

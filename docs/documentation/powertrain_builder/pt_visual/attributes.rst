@@ -84,22 +84,23 @@ values are valid. To configure this factor, use:
 
 Plot animation
 ==============
-This attribute sets the local machine as a local server and enables a glowing animation for each connection. However,
-since the plot is no longer a static HTML file, no file will be saved even if a html file path is provided.
-To configure this option, use:
+This attribute enables an animated powertrain architecture of showing active power transfer and an state inspection for
+every component at each step of the flight. This is achieved by setting the local machine as a local server. However,
+since the plot is no longer a static HTML file, no file will be saved even if a html file path is provided. To configure
+this option, use:
 
 .. code:: python
 
-    power_train_network_viewer(pt_file_path, network_file_path, static_architecture=False)
+    power_train_network_viewer(pt_file_path, network_file_path, animated_plot=True)
 
 Refresh rate
 ============
-This attribute sets the frame rate to ensure smooth animation. By default, the refresh rate is obtained from
-the system, but it can also be specified manually. To configure the plot refresh rate, use:
+This attribute sets the frame rate to ensure smooth animation. The default refresh rate is 60 Hz. To configure the
+plot refresh rate, use:
 
 .. code:: python
 
-    power_train_network_viewer(pt_file_path, network_file_path, static_architecture=False , refresh_rate=60)
+    power_train_network_viewer(pt_file_path, network_file_path, animated_plot=True, refresh_rate=60)
 
 PT watcher file path
 ====================
@@ -115,4 +116,4 @@ To configure the PT watcher file path, use:
 
 .. code:: python
 
-    power_train_network_viewer(pt_file_path, network_file_path, static_architecture=False , pt_watcher_path=pt_watcher_path)
+    power_train_network_viewer(pt_file_path, network_file_path, animated_plot=True, pt_watcher_path=pt_watcher_path)

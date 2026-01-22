@@ -136,7 +136,7 @@ def power_train_network_viewer(
     network_file_path: str,
     orientation: str = "TB",
     legend_position: str = "TR",
-    static_architecture: bool = True,
+    animated_plot: bool = False,
     sorting: bool = True,
     from_propulsor: bool = False,
     plot_scaling: float = 1.0,
@@ -153,7 +153,7 @@ def power_train_network_viewer(
     :param network_file_path: Path where the HTML output will be saved
     :param orientation: Network plot orientation ('TB', 'BT', 'LR', 'RL')
     :param legend_position: Legend position ('TR', 'TL', 'BR', 'BL', etc.)
-    :param static_architecture: True for static HTML, False for interactive server
+    :param animated_plot: False for static HTML, True for interactive server
     :param sorting: Enable Tutte's drawing algorithm for sorting
     :param from_propulsor: Set all propulsor components into reference layer
     :param plot_scaling: Scaling factor for the main powertrain architecture
@@ -204,13 +204,13 @@ def power_train_network_viewer(
         node_sizes,
         icon_factor,
         plot_scaling,
-        static_architecture,
+        animated_plot,
         pt_watcher_path,
     )
 
     # Build edges
     edge_source, edge_state_dict = EdgesBuilder._build_edges(
-        graph_builder.graph, position_dict, node_icons, static_architecture, pt_watcher_path
+        graph_builder.graph, position_dict, node_icons, animated_plot, pt_watcher_path
     )
 
     # Draw edges
@@ -276,8 +276,8 @@ def power_train_network_viewer(
             h=node_height,
             name=node_name_list,
             type_class=[
-                _string_cleanup(nt.capitalize() if isinstance(nt, str) else nt)
-                for nt in node_types_list
+                _string_cleanup(node_type.capitalize() if isinstance(node_type, str) else node_type)
+                for node_type in node_types_list
             ],
             component_type=[_string_cleanup(nt) for nt in node_om_types_list],
         )
@@ -286,7 +286,7 @@ def power_train_network_viewer(
     InteractiveToolsBuilder._add_interactive_tools(plot, hover_source)
 
     # Save or serve
-    if static_architecture:
+    if not animated_plot:
         HTMLSaver._save_static_html(plot, network_file_path)
     else:
         doc_builder = InteractiveDocumentBuilder(
@@ -347,7 +347,7 @@ def _url_to_base64(url: str) -> str:
         with open(local_path, "rb") as img_file:
             img_data = base64.b64encode(img_file.read()).decode("utf-8")
 
-        # Determine MIME type
+        # Determine Multipurpose Internet Mail Extensions (MIME) type
         suffix = local_path.suffix.lower()
         mime_types = {
             ".png": "image/png",
@@ -472,13 +472,14 @@ def _create_segmented_edges(edge_x_pos, edge_y_pos, edge_colors, segments_per_ed
 
 def _extract_edge_working_state(df_pt: pd.DataFrame, start: str, end: str) -> list:
     """
-    Extract edge working state from PT watcher dataframe.
+    Extract the working state evolution of a specified edge from the PT watcher DataFrame, returned
+    as a list of boolean values.
 
     :param df_pt: Pandas dataframe of PT watcher extract from the csv file
     :param start: The component at the source side of the connection
     :param end: The component at the target side of the connection
 
-    :return: the edge working state list of for each flight point
+    :return: A boolean list identifies the edge working state for each flight point
     """
     watcher_variables = df_pt.columns.tolist()
     edge_state_start = None
@@ -739,7 +740,7 @@ class NodesBuilder:
         node_sizes: dict,
         icon_factor: float,
         plot_scaling: float,
-        static_architecture: bool,
+        animated_plot: bool,
         pt_watcher_file_path: str = None,
     ) -> tuple:
         """
@@ -753,7 +754,7 @@ class NodesBuilder:
         :param node_sizes: Dictionary mapping component names to their icon size
         :param icon_factor: Factor that adjusts the icon size based on plot orientation
         :param plot_scaling: Scaling factor for the main powertrain architecture
-        :param static_architecture: True for static HTML, False for interactive server
+        :param animated_plot: False for static HTML, True for interactive server
         :param pt_watcher_file_path: Path to the PT watcher csv file
 
         :return: Node properties and node Bokeh dataSource
@@ -781,7 +782,7 @@ class NodesBuilder:
                 component_perf = _extract_component_performance(df_pt, node, component_perf)
 
         node_image_urls = NodesBuilder._get_node_image_urls(
-            node_name_list, node_icons, static_architecture
+            node_name_list, node_icons, animated_plot
         )
 
         node_source = bkmodel.ColumnDataSource(
@@ -801,16 +802,14 @@ class NodesBuilder:
         )
 
     @staticmethod
-    def _get_node_image_urls(
-        node_name_list: list, node_icons: dict, static_architecture: bool
-    ) -> list:
+    def _get_node_image_urls(node_name_list: list, node_icons: dict, animated_plot: bool) -> list:
         """Generate image URLs for nodes."""
         urls = []
         for node in node_name_list:
             icon_path = ICONS_CONFIG[node_icons[node]]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
 
-            if static_architecture:
+            if not animated_plot:
                 urls.append(file_url)
             else:
                 urls.append(_url_to_base64(file_url))
@@ -826,7 +825,7 @@ class EdgesBuilder:
         graph: nx.DiGraph,
         position_dict: dict,
         node_icons: dict,
-        static_architecture: bool,
+        animated_plot: bool,
         pt_watcher_file_path: str = None,
     ) -> tuple:
         """
@@ -834,7 +833,7 @@ class EdgesBuilder:
 
         :param position_dict: The component position dictionary obtained from layout generation
         :param node_icons: Dictionary mapping component names to their icon name
-        :param static_architecture: True for static HTML, False for interactive server
+        :param animated_plot: False for static HTML, True for interactive server
         :param pt_watcher_file_path: Path to the PT watcher csv file
 
         :return: Edge properties and edge Bokeh dataSource
@@ -858,7 +857,7 @@ class EdgesBuilder:
             if df_pt is not None:
                 edge_state[index] = _extract_edge_working_state(df_pt, start, end)
 
-        if static_architecture:
+        if not animated_plot:
             edge_source = bkmodel.ColumnDataSource(
                 data=dict(
                     xs=edge_x_pos,
