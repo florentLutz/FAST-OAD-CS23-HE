@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import os
 from shutil import rmtree
@@ -11,6 +11,7 @@ from ..power_train_network_viewer import power_train_network_viewer
 
 DATA_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = os.path.join(os.path.dirname(__file__), "results")
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 @pytest.fixture(scope="module")
@@ -36,6 +37,23 @@ def test_pt_network_viewer(cleanup):
 
     # Cleanup to avoid any over-clogging
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_pt_network_viewer_local_server(cleanup):
+    """
+    Basic tests for testing the power train viewer server mode.
+    """
+
+    # Create a directory to save graph to
+    os.makedirs(RESULTS_FOLDER_PATH)
+
+    # No real way to verify the plot, we wil just check that it is created.
+    power_train_network_viewer(
+        os.path.join(DATA_FOLDER_PATH, "simple_assembly.yml"),
+        os.path.join(RESULTS_FOLDER_PATH, "network.html"),
+        animated_plot=True,
+    )
 
 
 def test_pt_network_viewer_tri_prop(cleanup):

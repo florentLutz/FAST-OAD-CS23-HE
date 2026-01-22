@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 ID = "id"
 # CN is used to translate the ID to the prefix used in the OpenMDAO names for the components,
@@ -611,6 +611,7 @@ GENERATOR = {
         {"efficiency": None},
         {"ac_voltage_rms_out": "V"},
         {"ac_voltage_peak_out": "V"},
+        {"ac_current_rms_out": "A"},
     ],
     SMP: [
         {"delta_Cd": None},
@@ -1002,6 +1003,7 @@ TURBO_GENERATOR = {
         {"torque_in": "N*m"},
         {"ac_voltage_rms_out": "V"},
         {"ac_voltage_peak_out": "V"},
+        {"ac_current_rms_out": "A"},
     ],
     SMP: [
         {"delta_Cd": None},
