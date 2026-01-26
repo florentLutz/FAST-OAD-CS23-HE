@@ -17,6 +17,8 @@ import fastoad.api as oad
 import plotly.graph_objects as go
 
 from utils.filter_residuals import filter_residuals
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
@@ -126,6 +128,71 @@ def test_sizing_kodiak_100_full_electric():
     # Actual value is 3290 kg
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
         3082.0, rel=1e-2
+    )
+
+
+def test_sizing_kodiak_100_hybrid_scheme_b():
+    """
+    Test the overall aircraft design process for the fully electric variant, with the mission range
+    reduced to 60 NM to align with the original aircraft.
+    """
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "hybrid_kodiak_100_scheme_B_input.xml"
+    process_file_name = "hybrid_kodiak_100_scheme_B_configuration.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Load inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+
+def test_hybrid_kodiak_100_powertrain_network():
+    """
+    Test the network viewer in interactive mode with local Bokeh server. The flow animation of
+    electric branches should be deactivated during both cruise and descend phases as these
+    components are used only in climb phase.
+    """
+
+    pt_file_path = pth.join(
+        DATA_FOLDER_PATH, "hybrid_kodiak_100_scheme_B_propulsive_architecture.yml"
+    )
+    network_file_path = pth.join(RESULTS_FOLDER_PATH, "hybrid_kodiak_100_scheme_B.html")
+    pt_watcher_path = pth.join(
+        RESULTS_FOLDER_PATH, "hybrid_kodiak_100_scheme_B_propulsion_data.csv"
+    )
+
+    power_train_network_viewer(
+        pt_file_path, network_file_path, animated_plot=True, pt_watcher_path=pt_watcher_path
     )
 
 
