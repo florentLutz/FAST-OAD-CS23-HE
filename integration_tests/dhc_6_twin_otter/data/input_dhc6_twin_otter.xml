@@ -263,14 +263,14 @@
       </cooling>
       <flaps>
         <landing>
-          <CL is_input="True">2.0<!--(Gudmundsson p.446) lift coefficient increment due to flaps deployment in landing configuration--></CL>
-          <CL_max is_input="True">1.156<!--maximum lift coefficient increment due to flaps deployment in landing configuration--></CL_max>
-          <CM is_input="True">-0.24648012559668536<!--additional pitching moment coefficient ue to the deployment of flaps in landing configuration--></CM>
+          <CL is_input="True">2.05<!--(Gudmundsson p.446) lift coefficient increment due to flaps deployment in landing configuration--></CL>
+          <CL_max is_input="True">1.2365<!--maximum lift coefficient increment due to flaps deployment in landing configuration--></CL_max>
+          <CM is_input="True">-0.302<!--additional pitching moment coefficient ue to the deployment of flaps in landing configuration--></CM>
         </landing>
         <takeoff>
           <CL is_input="True">0.7<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
-          <CL_max is_input="True">0.369<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>
-          <CM is_input="True">-0.08448449127122522<!--additional pitching moment coefficient due to the deployment of flaps in takeoff configuration--></CM>
+          <CL_max is_input="True">0.2805<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>
+          <CM is_input="True">-0.1025<!--additional pitching moment coefficient due to the deployment of flaps in takeoff configuration--></CM>
         </takeoff>
       </flaps>
       <propeller>
@@ -291,7 +291,7 @@
     </aerodynamics>
     <handling_qualities>
       <static_margin>
-        <target is_input="True">0.05<!--aircraft static margin--></target>
+        <target is_input="True">0.12<!--aircraft static margin--></target>
       </static_margin>
     </handling_qualities>
     <weight>
@@ -300,7 +300,7 @@
         <payload units="kg" is_input="True">1542.2<!--design payload weight--></payload>
         <CG>
           <aft>
-            <MAC_limit is_input="True">0.15<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
+            <MAC_limit is_input="True">0.1<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
           </aft>
           <fwd>
             <MAC_limit is_input="True">0.05<!--position of the fwd limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
@@ -309,13 +309,13 @@
       </aircraft>
       <airframe>
         <horizontal_tail>
-          <k_factor is_input="True">1.0<!--proportional corrective factor for horizontal tail mass--></k_factor>
+          <k_factor is_input="True">0.25<!--proportional corrective factor for horizontal tail mass--></k_factor>
         </horizontal_tail>
         <vertical_tail>
-          <k_factor is_input="True">1.0<!--proportional corrective factor for vertical tail mass--></k_factor>
+          <k_factor is_input="True">0.25<!--proportional corrective factor for vertical tail mass--></k_factor>
         </vertical_tail>
         <wing>
-          <k_factor is_input="True">1.0<!--proportional corrective factor for wing mass--></k_factor>
+          <k_factor is_input="True">1.22<!--proportional corrective factor for wing mass--></k_factor>
         </wing>
       </airframe>
       <furniture>
@@ -427,7 +427,7 @@
     </geometry>
     <handling_qualities>
       <rudder>
-        <safety_margin is_input="True">0.2<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
+        <safety_margin is_input="True">0.4<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
       </rudder>
     </handling_qualities>
     <materials>
