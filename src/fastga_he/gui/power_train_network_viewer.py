@@ -487,15 +487,25 @@ def _extract_edge_working_state(df_pt: pd.DataFrame, start: str, end: str) -> li
     keys = ["current", "torque", "fuel"]
 
     for variable in watcher_variables:
-        if edge_state_start is None and start in variable and any(key in variable for key in keys):
-            edge_state_start = [state >= 1e-6 for state in df_pt[variable]]
+        if start in variable and any(key in variable for key in keys):
+            if edge_state_start is None:
+                edge_state_start = [state >= 1e-6 for state in df_pt[variable]]
+            else:
+                new_state = [state >= 1e-6 for state in df_pt[variable]]
+                edge_state_start = [
+                    state_old or state_new
+                    for state_old, state_new in zip(edge_state_start, new_state)
+                ]
 
-        if edge_state_end is None and end in variable and any(key in variable for key in keys):
-            edge_state_end = [state >= 1e-6 for state in df_pt[variable]]
-
-        # Early exit if both found
-        if edge_state_start is not None and edge_state_end is not None:
-            break
+        if end in variable and any(key in variable for key in keys):
+            if edge_state_end is None:
+                edge_state_end = [state >= 1e-6 for state in df_pt[variable]]
+            else:
+                new_state = [state >= 1e-6 for state in df_pt[variable]]
+                edge_state_end = [
+                    state_old or state_new
+                    for state_old, state_new in zip(edge_state_end, new_state)
+                ]
 
     # Combine results
     if edge_state_start and edge_state_end:
