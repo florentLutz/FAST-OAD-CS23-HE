@@ -263,13 +263,13 @@
       </cooling>
       <flaps>
         <landing>
-          <CL is_input="True">1.4625<!--(Gudmundsson p.446) lift coefficient increment due to flaps deployment in landing configuration--></CL>
-          <CL_max is_input="True">0.95<!--maximum lift coefficient increment due to flaps deployment in landing configuration--></CL_max>
+          <CL is_input="True">2.0<!--(Gudmundsson p.446) lift coefficient increment due to flaps deployment in landing configuration--></CL>
+          <CL_max is_input="True">1.156<!--maximum lift coefficient increment due to flaps deployment in landing configuration--></CL_max>
           <CM is_input="True">-0.24648012559668536<!--additional pitching moment coefficient ue to the deployment of flaps in landing configuration--></CM>
         </landing>
         <takeoff>
-          <CL is_input="True">1.45<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
-          <CL_max is_input="True">0.985<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>
+          <CL is_input="True">0.7<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
+          <CL_max is_input="True">0.369<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>
           <CM is_input="True">-0.08448449127122522<!--additional pitching moment coefficient due to the deployment of flaps in takeoff configuration--></CM>
         </takeoff>
       </flaps>
@@ -531,7 +531,7 @@
         <landing_gear>
           <front>
             <front_fuselage_ratio is_input="True">0.75<!--Position of front landing gear expressed as fuselage front length ratio--></front_fuselage_ratio>
-            <weight_ratio is_input="True">0.2<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
+            <weight_ratio is_input="True">0.24<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
           </front>
         </landing_gear>
       </airframe>
