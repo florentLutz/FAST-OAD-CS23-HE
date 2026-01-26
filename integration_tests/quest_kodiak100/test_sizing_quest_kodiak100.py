@@ -18,7 +18,6 @@ import plotly.graph_objects as go
 
 from utils.filter_residuals import filter_residuals
 
-
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
 WORKDIR_FOLDER_PATH = pth.join(pth.dirname(__file__), "workdir")
