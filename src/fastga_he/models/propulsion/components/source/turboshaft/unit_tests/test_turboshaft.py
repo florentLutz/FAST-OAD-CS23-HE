@@ -108,8 +108,8 @@ def test_fuel_consumption_pw206b():
     print("k_sfc:", 0.548 / sfc)
     # Should be 0.548
 
-def test_fuel_consumption_pt6a_34_dhc6():
 
+def test_fuel_consumption_pt6a_34_dhc6():
     ivc = om.IndepVarComp()
     ivc.add_output(
         "data:propulsion:he_power_train:turboshaft:turboshaft_1:power_rating",

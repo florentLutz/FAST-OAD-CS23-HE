@@ -28,7 +28,6 @@ def cleanup():
 
 
 def test_sizing_dhc6_twin_otter():
-
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -60,7 +59,6 @@ def test_sizing_dhc6_twin_otter():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
-    """
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         5670.0, rel=5e-2
@@ -69,12 +67,11 @@ def test_sizing_dhc6_twin_otter():
         5579.0, rel=5e-2
     )
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        3121.0, rel=5e-2
+        3320.0, rel=5e-2
     )
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        1163.00, rel=5e-2
+        760.00, rel=5e-2
     )
-    """
 
 
 def test_operational_mission_dhc6_twin_otter():
@@ -114,6 +111,3 @@ def test_operational_mission_dhc6_twin_otter():
     assert problem.get_val(
         "data:environmental_impact:operational:fuel_emissions", units="kg"
     ) == pytest.approx(4271.75, rel=1e-2)
-
-
-
