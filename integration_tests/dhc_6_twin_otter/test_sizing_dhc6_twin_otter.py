@@ -50,19 +50,17 @@ def test_sizing_dhc6_twin_otter():
 
     problem.write_outputs()
 
-    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        5670.0, rel=5e-2
-    )
-    # Computed MTOW: 5665 [kg]
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(5665, rel=1e-2)
+    # Actual value is 5670 kg (-0.08%)
     assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
-        5579.0, rel=5e-2
+        5537.5, rel=1e-2
     )
-    # Computed MLW: 5537.5 [kg]
+    # Actual value is 5579 kg (-0.7%)
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        3320.0, rel=5e-2
+        3332.8, rel=1e-2
     )
-    # Computed OWE: 3332.8 [kg]
+    # Actual value is 3320 kg (+0.4%)
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-        808.00, rel=5e-2
+        790.00, rel=1e-2
     )
-    # Computed mission fuel: 790 [kg]
+    # Actual value is 808 kg (-2.2%)

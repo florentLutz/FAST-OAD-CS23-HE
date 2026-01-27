@@ -92,5 +92,3 @@ submodels:
     submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
     submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
     submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
-
-
