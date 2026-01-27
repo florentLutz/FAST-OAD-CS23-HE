@@ -3,7 +3,6 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 import pathlib
-from shutil import rmtree
 import logging
 
 import pytest
@@ -16,13 +15,6 @@ from utils.filter_residuals import filter_residuals
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 WORKDIR_FOLDER_PATH = pathlib.Path(__file__).parent / "workdir"
-
-
-@pytest.fixture(scope="module")
-def cleanup():
-    """Empties results folder to avoid any conflicts."""
-    rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
-    rmtree(WORKDIR_FOLDER_PATH, ignore_errors=True)
 
 
 def test_sizing_dhc6_twin_otter():
@@ -61,12 +53,16 @@ def test_sizing_dhc6_twin_otter():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         5670.0, rel=5e-2
     )
+    # Computed MTOW: 5665 [kg]
     assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
         5579.0, rel=5e-2
     )
+    # Computed MLW: 5537.5 [kg]
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
         3320.0, rel=5e-2
     )
+    # Computed OWE: 3332.8 [kg]
     assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
         808.00, rel=5e-2
     )
+    # Computed mission fuel: 790 [kg]
