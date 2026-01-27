@@ -487,11 +487,11 @@
         <turboshaft>
           <turboshaft_1>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.5<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
+            <k_sfc is_input="True">1.55<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_1>
           <turboshaft_2>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.5<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
+            <k_sfc is_input="True">1.55<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_2>
         </turboshaft>
       </he_power_train>
