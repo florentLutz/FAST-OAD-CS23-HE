@@ -247,7 +247,7 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         self.options.declare(
             "limit_current_density",
             default=22600.0,
-            desc="leak loss of current density from the PEMFC [A/m**2]",
+            desc="limit current density from the PEMFC [A/m**2]",
         )
 
     def setup(self):
@@ -359,8 +359,7 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         ]
 
         temp_op = inputs["operating_temperature"]
-
-        outputs["single_layer_pemfc_voltage"] = pvc * (
+        layer_voltage_sl = (
             e0
             - ds / (2.0 * FARADAY_CONSTANT) * (temp_op - t0)
             + GAS_CONSTANT
@@ -374,6 +373,8 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             - resistance * j_clipped
             - c_loss * np.log(j_lim / (j_lim - j_clipped - j_leak))
         )
+
+        outputs["single_layer_pemfc_voltage"] = pvc * layer_voltage_sl
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_id = self.options["pemfc_stack_id"]
