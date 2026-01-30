@@ -216,38 +216,37 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-
         self.options.declare(
             "entropy_difference",
             default=44.34,
             desc="entropy difference from reaction in [J/(mol*K)]",
         )
-
         self.options.declare(
             "standard_temperature",
             default=289.15,
             desc="standard operating temperature for the PEMFC in [K]",
         )
-
         self.options.declare(
             "cathode_transfer_coefficient",
             default=0.3,
             desc="transfer coefficient at the cathode side of fuel cell",
         )
-
         self.options.declare(
             "mass_transport_loss_constant",
             default=0.5,
             desc="the constant result from mass transport in the PEMFC [V]",
         )
-
         self.options.declare(
             "leakage_current_density",
             default=100.0,
+            desc="leak loss of current density from the PEMFC [A/m**2]",
+        )
+        self.options.declare(
+            "limit_current_density",
+            default=22600.0,
             desc="leak loss of current density from the PEMFC [A/m**2]",
         )
 
@@ -261,7 +260,6 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             desc="Current density of the PEMFC stack",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
@@ -269,7 +267,6 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             units="atm",
             val=DEFAULT_PRESSURE_ATM,
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
@@ -278,19 +275,16 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             val=1e-6,
             desc="Area ohmic resistance of the single-layered PEMFC",
         )
-
         self.add_input(
             "operating_pressure",
             units="atm",
             val=np.full(number_of_points, DEFAULT_PRESSURE_ATM),
         )
-
         self.add_input(
             "operating_temperature",
             units="K",
             val=np.full(number_of_points, DEFAULT_TEMPERATURE),
         )
-
         self.add_input(
             name="ambient_pressure_voltage_correction",
             val=np.full(number_of_points, 1.0),
@@ -301,6 +295,10 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             units="V",
             val=np.full(number_of_points, DEFAULT_LAYER_VOLTAGE),
         )
+
+    def setup_partials(self):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+        number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
             of="*",
@@ -314,7 +312,6 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
-
         self.declare_partials(
             of="*",
             wrt=[
@@ -344,13 +341,13 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         ]
         c_loss = self.options["mass_transport_loss_constant"]
 
-        j_lim = np.full(number_of_points, MAX_CURRENT_DENSITY_ANALYTICAL * 10000)
+        j_lim = np.full(number_of_points, self.options["limit_current_density"])
         j_leak = np.full(number_of_points, self.options["leakage_current_density"])
 
         pvc = inputs["ambient_pressure_voltage_correction"]
 
         j_clipped = np.clip(
-            inputs["fc_current_density"], 10.0, MAX_CURRENT_DENSITY_ANALYTICAL * 10000
+            inputs["fc_current_density"], 10.0, MAX_CURRENT_DENSITY_ANALYTICAL * 10000.0
         )
 
         p_o2 = inputs["operating_pressure"]
@@ -365,11 +362,14 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
 
         outputs["single_layer_pemfc_voltage"] = pvc * (
             e0
-            - ds / (2 * FARADAY_CONSTANT) * (temp_op - t0)
-            + GAS_CONSTANT * temp_op / (2 * FARADAY_CONSTANT) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
+            - ds / (2.0 * FARADAY_CONSTANT) * (temp_op - t0)
+            + GAS_CONSTANT
+            * temp_op
+            / (2.0 * FARADAY_CONSTANT)
+            * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
             - GAS_CONSTANT
             * temp_op
-            / (2 * a_transfer * FARADAY_CONSTANT)
+            / (2.0 * a_transfer * FARADAY_CONSTANT)
             * np.log(j_clipped + j_leak)
             - resistance * j_clipped
             - c_loss * np.log(j_lim / (j_lim - j_clipped - j_leak))
@@ -390,7 +390,7 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         ]
         c_loss = self.options["mass_transport_loss_constant"]
 
-        j_lim = np.full(number_of_points, MAX_CURRENT_DENSITY_ANALYTICAL * 10000)
+        j_lim = np.full(number_of_points, self.options["limit_current_density"])
         j_leak = np.full(number_of_points, self.options["leakage_current_density"])
         p_o2 = inputs["operating_pressure"]
         pvc = inputs["ambient_pressure_voltage_correction"]
@@ -402,14 +402,16 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         ]
 
         j_clipped = np.clip(
-            inputs["fc_current_density"], 10.0, MAX_CURRENT_DENSITY_ANALYTICAL * 10000
+            inputs["fc_current_density"], 10.0, MAX_CURRENT_DENSITY_ANALYTICAL * 10000.0
         )
 
         partials_j = np.where(
             inputs["fc_current_density"] == j_clipped,
             pvc
             * (
-                -GAS_CONSTANT * temp_op / (2 * FARADAY_CONSTANT * a_transfer * (j_clipped + j_leak))
+                -GAS_CONSTANT
+                * temp_op
+                / (2.0 * FARADAY_CONSTANT * a_transfer * (j_clipped + j_leak))
                 - c_loss / (-j_clipped + j_lim - j_leak)
                 - np.full(number_of_points, resistance)
             ),
@@ -426,13 +428,13 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         ] = -j_clipped
 
         partials["single_layer_pemfc_voltage", "operating_temperature"] = pvc * (
-            -ds / np.full(number_of_points, 2 * FARADAY_CONSTANT)
-            + GAS_CONSTANT / (2 * FARADAY_CONSTANT) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
-            - GAS_CONSTANT / (2 * a_transfer * FARADAY_CONSTANT) * np.log(j_clipped + j_leak)
+            -ds / np.full(number_of_points, 2.0 * FARADAY_CONSTANT)
+            + GAS_CONSTANT / (2.0 * FARADAY_CONSTANT) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
+            - GAS_CONSTANT / (2.0 * a_transfer * FARADAY_CONSTANT) * np.log(j_clipped + j_leak)
         )
 
         partials["single_layer_pemfc_voltage", "operating_pressure"] = pvc * (
-            GAS_CONSTANT * temp_op / (4 * FARADAY_CONSTANT * p_o2)
+            GAS_CONSTANT * temp_op / (4.0 * FARADAY_CONSTANT * p_o2)
         )
 
         partials[
@@ -440,15 +442,18 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:"
             + pemfc_stack_id
             + ":hydrogen_reactant_pressure",
-        ] = pvc * (GAS_CONSTANT * temp_op / (2 * FARADAY_CONSTANT * p_h2))
+        ] = pvc * (GAS_CONSTANT * temp_op / (2.0 * FARADAY_CONSTANT * p_h2))
 
         partials["single_layer_pemfc_voltage", "ambient_pressure_voltage_correction"] = (
             e0
-            - ds / (2 * FARADAY_CONSTANT) * (temp_op - t0)
-            + GAS_CONSTANT * temp_op / (2 * FARADAY_CONSTANT) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
+            - ds / (2.0 * FARADAY_CONSTANT) * (temp_op - t0)
+            + GAS_CONSTANT
+            * temp_op
+            / (2.0 * FARADAY_CONSTANT)
+            * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
             - GAS_CONSTANT
             * temp_op
-            / (2 * a_transfer * FARADAY_CONSTANT)
+            / (2.0 * a_transfer * FARADAY_CONSTANT)
             * np.log(j_clipped + j_leak)
             - resistance * j_clipped
             - c_loss * np.log(j_lim / (j_lim - j_clipped - j_leak))
