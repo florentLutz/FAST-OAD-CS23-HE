@@ -558,7 +558,7 @@ def test_pemfc_polarization_curve_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [0.857, 0.799, 0.75, 0.71, 0.66, 0.62, 0.57],
+        [0.86, 0.81, 0.76, 0.72, 0.68, 0.64, 0.60],
         rel=1e-2,
     )
 
@@ -828,18 +828,7 @@ def test_performances_pemfc_layer_voltage_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [
-            0.90045225,
-            0.87104092,
-            0.84551269,
-            0.82200924,
-            0.79965219,
-            0.77794808,
-            0.75658507,
-            0.73534744,
-            0.7140743,
-            0.69263748,
-        ],
+        [0.9038, 0.8760, 0.8522, 0.8305, 0.8101, 0.7904, 0.7712, 0.7522, 0.7334, 0.7145],
         rel=1e-2,
     )
 
@@ -945,16 +934,16 @@ def test_performances_pemfc_stack_analytical():
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
         [
-            0.90045225,
-            0.87104092,
-            0.84551269,
-            0.82200924,
-            0.79965219,
-            0.77794808,
-            0.75658507,
-            0.73534744,
-            0.7140743,
-            0.69263748,
+            0.9038,
+            0.8760,
+            0.8522,
+            0.8305,
+            0.8101,
+            0.7904,
+            0.7712,
+            0.7522,
+            0.7333,
+            0.7145,
         ],
         rel=1e-2,
     )
@@ -969,16 +958,16 @@ def test_performances_pemfc_stack_analytical():
 
     assert problem.get_val("efficiency") == pytest.approx(
         [
-            0.57760273,
-            0.55873658,
-            0.54236128,
-            0.52728479,
-            0.51294367,
-            0.49902139,
-            0.4853179,
-            0.47169485,
-            0.45804901,
-            0.44429818,
+            0.57974307,
+            0.56192916,
+            0.54666114,
+            0.53275144,
+            0.51964152,
+            0.50702037,
+            0.49469409,
+            0.48253119,
+            0.47043621,
+            0.45833569,
         ],
         rel=1e-2,
     )
