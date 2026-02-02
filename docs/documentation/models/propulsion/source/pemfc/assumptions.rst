@@ -6,7 +6,7 @@ Proton-exchange membrane fuel cell assumptions
 The following assumptions have been made in the calculation of the PEMFC stack.
 
 * The hydrogen and oxygen (or air) in the PEMFC stack are consider as ideal gas.
-* The operating temperature of the PEMFC remains equivalent to the ambient temperature.
+* The operating temperature of the PEMFC remains constant with predefined value (350K).
 * The hydrogen operating pressure remains constant as defined by the user in the input file.
 * The oxygen partial pressure is set to 21% of the operating pressure.
 * The operating pressure is equivalent to ambient pressure if no compressor is connected.
