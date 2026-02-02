@@ -251,7 +251,7 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         self.options.declare(
             "limit_current_density",
             default=20000.0,
-            desc="leak loss of current density from the PEMFC [A/m**2]",
+            desc="limit current density of typical PEMFC [A/m**2]",
         )
 
     def setup(self):
