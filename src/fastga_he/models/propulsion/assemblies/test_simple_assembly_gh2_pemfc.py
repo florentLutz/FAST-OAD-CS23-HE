@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import os.path as pth
 import pytest
@@ -708,7 +708,7 @@ def test_performances_sizing_from_pt_with_sizing_options():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
-    ) == pytest.approx(-1727.809, rel=1e-2)
+    ) == pytest.approx(-1677.792, rel=1e-2)
     assert problem.model.full.sizing.pemfc_stack_1.options["model_fidelity"] == "analytical"
     assert problem.model.full.sizing.h2_fuel_system_1.options["wing_related"]
     assert problem.model.full.sizing.h2_fuel_system_1.options["compact"]

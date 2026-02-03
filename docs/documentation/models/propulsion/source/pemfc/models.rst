@@ -113,7 +113,7 @@ And
 Parameter                  Value                    Unit
 =======================  ================  =============================================
 :math:`E_0`               :math:`1.229`         :math:`\text{V}`
-:math:`\Delta S`          :math:`44.34`     :math:`\text{J}/(\text{mol} \cdot \text{K})`
+:math:`\Delta S`          :math:`163.23`     :math:`\text{J}/(\text{mol} \cdot \text{K})`
 :math:`T_0`               :math:`289.15`        :math:`\text{K}`
 :math:`\alpha`            :math:`0.3`           :math:`–`
 :math:`\epsilon`           :math:`0.5`           :math:`\text{V}`

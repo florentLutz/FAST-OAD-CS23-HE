@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import os.path as pth
 import pytest
@@ -32,7 +32,6 @@ from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_power import PerformancesPEMFCStackPower
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
 from ..components.perf_pemfc_operating_pressure import PerformancesPEMFCStackOperatingPressure
-from ..components.perf_pemfc_operating_temperature import PerformancesPEMFCStackOperatingTemperature
 from ..components.perf_pemfc_voltage_adjustment import (
     PerformancesPEMFCStackVoltageAdjustment,
 )
@@ -469,24 +468,6 @@ def test_operating_pressure():
     problem.check_partials(compact_print=True)
 
 
-def test_operating_temperature():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "altitude",
-        units="m",
-        val=np.zeros(NB_POINTS_TEST),
-    )
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesPEMFCStackOperatingTemperature(number_of_points=NB_POINTS_TEST),
-        ivc,
-    )
-    assert problem.get_val("operating_temperature", units="K") == pytest.approx(
-        np.full(NB_POINTS_TEST, 288.15), rel=1e-2
-    )
-    problem.check_partials(compact_print=True)
-
-
 def test_analytical_voltage_adjustment():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -558,7 +539,7 @@ def test_pemfc_polarization_curve_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [0.857, 0.799, 0.75, 0.71, 0.66, 0.62, 0.57],
+        [0.79, 0.73, 0.68, 0.64, 0.59, 0.55, 0.50],
         rel=1e-2,
     )
 
@@ -828,18 +809,7 @@ def test_performances_pemfc_layer_voltage_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [
-            0.90045225,
-            0.87104092,
-            0.84551269,
-            0.82200924,
-            0.79965219,
-            0.77794808,
-            0.75658507,
-            0.73534744,
-            0.7140743,
-            0.69263748,
-        ],
+        [0.79, 0.76, 0.73, 0.71, 0.68, 0.66, 0.64, 0.61, 0.59, 0.57],
         rel=1e-2,
     )
 
@@ -944,18 +914,7 @@ def test_performances_pemfc_stack_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [
-            0.90045225,
-            0.87104092,
-            0.84551269,
-            0.82200924,
-            0.79965219,
-            0.77794808,
-            0.75658507,
-            0.73534744,
-            0.7140743,
-            0.69263748,
-        ],
+        [0.79, 0.76, 0.73, 0.71, 0.68, 0.66, 0.64, 0.61, 0.59, 0.57],
         rel=1e-2,
     )
 
@@ -968,18 +927,7 @@ def test_performances_pemfc_stack_analytical():
     )
 
     assert problem.get_val("efficiency") == pytest.approx(
-        [
-            0.57760273,
-            0.55873658,
-            0.54236128,
-            0.52728479,
-            0.51294367,
-            0.49902139,
-            0.4853179,
-            0.47169485,
-            0.45804901,
-            0.44429818,
-        ],
+        [0.51, 0.49, 0.47, 0.45, 0.44, 0.42, 0.41, 0.394, 0.38, 0.366],
         rel=1e-2,
     )
 
