@@ -1,12 +1,11 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 
 from .perf_ambient_pressure import PerformancesPEMFCStackAmbientPressure
 from .perf_pemfc_operating_pressure import PerformancesPEMFCStackOperatingPressure
-from .perf_pemfc_operating_temperature import PerformancesPEMFCStackOperatingTemperature
 from .perf_pemfc_voltage_adjustment import PerformancesPEMFCStackVoltageAdjustment
 from .perf_pemfc_polarization_curve import (
     PerformancesPEMFCStackPolarizationCurveEmpirical,
@@ -116,12 +115,6 @@ class PerformancesPEMFCStackSingleLayerVoltageAnalytical(om.Group):
         self.add_subsystem(
             "pemfc_voltage_adjustment",
             PerformancesPEMFCStackVoltageAdjustment(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "pemfc_ambient_temperature",
-            PerformancesPEMFCStackOperatingTemperature(number_of_points=number_of_points),
             promotes=["*"],
         )
 

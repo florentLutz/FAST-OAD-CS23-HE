@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 from stdatm import AtmosphereWithPartials
 
 SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA = "submodel.propulsion.constraints.pemfc.effective_area"
@@ -12,7 +12,6 @@ DEFAULT_PRESSURE = AtmosphereWithPartials(0).pressure  # [Pa]
 FARADAY_CONSTANT = 96485.3321  # [C/mol]
 GAS_CONSTANT = 8.314  # [J/(mol*K)]
 H2_MOL_PER_KG = 500.0  # [mol/kg]
-DEFAULT_TEMPERATURE = AtmosphereWithPartials(0).temperature  # [K]
 NUMBER_OF_ELETRONS_FROM_H2 = 2.0
 MAX_DEFAULT_POWER = 100.0  # [kW]
 MAX_DEFAULT_CURRENT = 1000.0  # [A]
