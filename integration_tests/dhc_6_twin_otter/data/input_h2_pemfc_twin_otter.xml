@@ -189,7 +189,7 @@
           <pemfc_stack_1>
             <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
             <number_of_layers is_input="True">970.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
-            <effective_area units="cm**2">1960.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
+            <effective_area units="cm**2">2300.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
           </pemfc_stack_1>
         </PEMFC_stack>
         <SM_PMSM>
