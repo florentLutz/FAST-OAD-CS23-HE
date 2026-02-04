@@ -205,8 +205,8 @@ class PerformancesPEMFCStackPolarizationCurveEmpirical(om.ExplicitComponent):
 class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
     """
     Computation of the single layer voltage of the PEMFC.This model is based on analytical i-v
-    curve equation. Details can be found in :cite:`Juschus:2021`. The hydrogen oxidation reaction
-    is assumed to produce liquid water following :cite:`baschuk:2005`.
+    curve equation. Details can be found in :cite:`juschus:2021` and :cite:`ohayre:2016`. The
+    hydrogen oxidation reaction is assumed to produce liquid water following :cite:`baschuk:2005`.
     """
 
     def initialize(self):
