@@ -87,6 +87,7 @@ submodels:
     submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
     submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
     submodel.propulsion.dc_dc_converter.inductor.inductance: null
+    submodel.propulsion.constraints.pemfc.effective_area: fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
     service.weight.mass.systems: fastga_he.submodel.weight.mass.systems.weight_nan
     service.weight.mass.system.power_system: null

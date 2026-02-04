@@ -241,7 +241,7 @@ class PerformancesPEMFCStackPolarizationCurveAnalytical(om.ExplicitComponent):
         )
         self.options.declare(
             "mass_transport_loss_constant",
-            default=0.5,
+            default=0.1,
             desc="the constant result from mass transport in the PEMFC [V]",
         )
         self.options.declare(

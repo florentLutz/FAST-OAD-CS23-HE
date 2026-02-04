@@ -37,8 +37,8 @@ power_train_components:
   pemfc_stack_1:
     id: fastga_he.pt_component.pemfc_stack
     position: in_the_back  #"in_the_front", "wing_pod", "underbelly", "in_the_back"
-#    options:
-#      model_fidelity: "analytical"
+    options:
+      model_fidelity: "analytical"
   gaseous_hydrogen_tank_1:
     id: fastga_he.pt_component.gaseous_hydrogen_tank
     position: underbelly #"in_the_fuselage", "wing_pod", "in_the_back", "underbelly", "in_the_front"
