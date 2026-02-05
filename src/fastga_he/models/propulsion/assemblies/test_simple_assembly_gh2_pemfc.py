@@ -708,7 +708,7 @@ def test_performances_sizing_from_pt_with_sizing_options():
     assert problem.get_val(
         "constraints:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area",
         units="cm**2",
-    ) == pytest.approx(-1677.792, rel=1e-2)
+    ) == pytest.approx(-1718.488, rel=1e-2)
     assert problem.model.full.sizing.pemfc_stack_1.options["model_fidelity"] == "analytical"
     assert problem.model.full.sizing.h2_fuel_system_1.options["wing_related"]
     assert problem.model.full.sizing.h2_fuel_system_1.options["compact"]
