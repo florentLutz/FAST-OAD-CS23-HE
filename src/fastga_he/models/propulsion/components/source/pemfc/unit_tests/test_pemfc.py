@@ -524,11 +524,6 @@ def test_pemfc_polarization_curve_analytical():
         units="atm",
         val=np.full(7, 1.2),
     )
-    ivc.add_output(
-        name="operating_temperature",
-        units="degC",
-        val=np.full(7, 50.0),
-    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -539,7 +534,7 @@ def test_pemfc_polarization_curve_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [0.79, 0.73, 0.68, 0.64, 0.59, 0.55, 0.50],
+        [0.816, 0.777, 0.75, 0.73, 0.711, 0.694, 0.678],
         rel=1e-2,
     )
 
@@ -809,7 +804,7 @@ def test_performances_pemfc_layer_voltage_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [0.79, 0.76, 0.73, 0.71, 0.68, 0.66, 0.64, 0.61, 0.59, 0.57],
+        [0.815, 0.793, 0.776, 0.762, 0.749, 0.738, 0.728, 0.719, 0.71, 0.701],
         rel=1e-2,
     )
 
@@ -914,7 +909,7 @@ def test_performances_pemfc_stack_analytical():
     )
 
     assert problem.get_val("single_layer_pemfc_voltage", units="V") == pytest.approx(
-        [0.79, 0.76, 0.73, 0.71, 0.68, 0.66, 0.64, 0.61, 0.59, 0.57],
+        [0.815, 0.793, 0.776, 0.762, 0.749, 0.738, 0.728, 0.719, 0.71, 0.701],
         rel=1e-2,
     )
 
@@ -927,7 +922,7 @@ def test_performances_pemfc_stack_analytical():
     )
 
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.51, 0.49, 0.47, 0.45, 0.44, 0.42, 0.41, 0.394, 0.38, 0.366],
+        [0.523, 0.509, 0.498, 0.489, 0.481, 0.474, 0.467, 0.461, 0.455, 0.45],
         rel=1e-2,
     )
 
