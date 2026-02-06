@@ -45,10 +45,11 @@
       <fuselage>
         <PAX_length units="m" is_input="True">5.64<!--(5.64 before) length of the passenger compartment--></PAX_length>
         <front_length units="m" is_input="True">2.59<!--(2.59) length of the front cone of the aircraft--></front_length>
-        <length units="m" is_input="True">15.77<!--(14.55, 15.77) total length of the aircraft--></length>
+        <length units="m" is_input="True">14.55<!--(14.55, 15.77) total length of the aircraft--></length>
         <luggage_length units="m" is_input="True">2.07<!--(2.07) length of the luggage compartment--></luggage_length>
         <maximum_height units="m" is_input="True">2.09<!--maximum fuselage height--></maximum_height>
         <maximum_width units="m" is_input="True">1.865<!--(1.42,1.71) maximum fuselage width--></maximum_width>
+        <fillet_radius units="m">0.1</fillet_radius>
         <rear_length units="m" is_input="True">5.55<!--(3.05) length of the rear cone of the aircraft--></rear_length>
       </fuselage>
       <horizontal_tail>
@@ -75,7 +76,7 @@
         <aspect_ratio is_input="True">1.915<!--(1.35, 1.48,1.68) aspect ratio of vertical tail--></aspect_ratio>
         <sweep_25 units="deg" is_input="True">25.0<!--(35.78) sweep angle at 25% chord of vertical tail--></sweep_25>
         <taper_ratio is_input="True">0.58<!--(0.56, 0.58) taper ratio of vertical tail--></taper_ratio>
-        <thickness_ratio is_input="True">0.14<!--thickness ratio of vertical tail--></thickness_ratio>
+        <thickness_ratio is_input="True">0.17<!--thickness ratio of vertical tail--></thickness_ratio>
         <max_thickness>
           <x_ratio is_input="True">0.1<!--position of the point of maximum thickness as a ratio of vertical tail chord--></x_ratio>
         </max_thickness>
@@ -96,7 +97,7 @@
         <dihedral units="deg" is_input="True">3.0</dihedral>
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of wing--></sweep_25>
         <taper_ratio is_input="True">1.0<!--taper ratio of wing--></taper_ratio>
-        <thickness_ratio is_input="True">0.16<!--mean thickness ratio of wing--></thickness_ratio>
+        <thickness_ratio is_input="True">0.162<!--mean thickness ratio of wing--></thickness_ratio>
         <twist units="deg" is_input="True">-2.0<!--Negative twist means tip AOA is smaller than root--></twist>
         <aileron>
           <chord_ratio is_input="True">0.23<!--aileron chord as a percentage of the wing chord--></chord_ratio>
@@ -105,10 +106,10 @@
           <span_ratio is_input="True">0.0<!--ratio (Y-position of kink)/(semi-span)--></span_ratio>
         </kink>
         <root>
-          <thickness_ratio is_input="True">0.16<!--thickness ratio at wing root--></thickness_ratio>
+          <thickness_ratio is_input="True">0.162<!--thickness ratio at wing root--></thickness_ratio>
         </root>
         <tip>
-          <thickness_ratio is_input="True">0.16<!--thickness ratio at wing tip--></thickness_ratio>
+          <thickness_ratio is_input="True">0.162<!--thickness ratio at wing tip--></thickness_ratio>
         </tip>
       </wing>
       <cockpit>
@@ -124,17 +125,17 @@
           <y_ratio is_input="True">0.28<!--engine position along wing span (if layout=1-2)--></y_ratio>
         </engine>
         <nacelle>
-          <height units="m" is_input="True">0.61468<!--height of the nacelle--></height>
-          <length units="m" is_input="True">3.4905<!--length of the nacelle--></length>
-          <master_cross_section units="m**2" is_input="True">0.3348961044</master_cross_section>
-          <wet_area units="m**2" is_input="True">5.948054398000001<!--nacelle wet area--></wet_area>
-          <width units="m" is_input="True">0.54483<!--width of the nacelle--></width>
+          <height units="m" is_input="True">0.98<!--height of the nacelle--></height>
+          <length units="m" is_input="True">1.67<!--length of the nacelle--></length>
+          <master_cross_section units="m**2" is_input="True">0.5586</master_cross_section>
+          <wet_area units="m**2" is_input="True">5.48<!--nacelle wet area--></wet_area>
+          <width units="m" is_input="True">0.57<!--width of the nacelle--></width>
         </nacelle>
         <tank>
           <LE_chord_percentage is_input="True">0.05<!--distance between the leading edge and the start of the wing tank as a percentage of the wing chord--></LE_chord_percentage>
-          <TE_chord_percentage is_input="True">0.05<!--distance between the trailing edge device and the start of the wing tank as a percentage of the wing chord--></TE_chord_percentage>
-          <y_ratio_tank_beginning is_input="True">0.05<!--start of the tank as a percentage of the wing span--></y_ratio_tank_beginning>
-          <y_ratio_tank_end is_input="True">0.99<!--end of the tank as a percentage of the wing span--></y_ratio_tank_end>
+          <TE_chord_percentage is_input="True">0.25<!--distance between the trailing edge device and the start of the wing tank as a percentage of the wing chord--></TE_chord_percentage>
+          <y_ratio_tank_beginning is_input="True">0.1<!--start of the tank as a percentage of the wing span--></y_ratio_tank_beginning>
+          <y_ratio_tank_end is_input="True">0.9<!--end of the tank as a percentage of the wing span--></y_ratio_tank_end>
         </tank>
       </propulsion>
     </geometry>
@@ -172,7 +173,7 @@
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.2703<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">2.59<!--propeller diameter--></diameter>
-            <from_LE units="m" is_input="True">1.444<!--Distance between the propeller and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.44<!--Distance between the propeller and the leading edge--></from_LE>
             <input_mass units="kg" is_input="True">61.2<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -186,7 +187,7 @@
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.2703<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">2.59<!--propeller diameter--></diameter>
-            <from_LE units="m" is_input="True">1.444<!--Distance between the propeller and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.44<!--Distance between the propeller and the leading edge--></from_LE>
             <input_mass units="kg" is_input="True">61.2<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -198,34 +199,48 @@
         </propeller>
         <turboshaft>
           <turboshaft_1>
-            <from_LE units="m" is_input="True">1.444<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.44<!--Distance between the turboshaft front face and the leading edge--></from_LE>
             <power_offtake units="kW" is_input="True">30.0<!--10 kW of mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
-            <power_rating units="kW" is_input="True">551.0<!--Flat rating of the turboshaft--></power_rating>
             <CG>
               <y_ratio is_input="True">0.28<!--Y position of the propeller center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <design_point>
               <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+              <power_ratio is_input="True">1.355<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
+            <emission_index>
+              <CO units="g/kg" is_input="True">5.0</CO>
+              <CO2 units="g/kg" is_input="True">3155.0</CO2>
+              <H2O units="g/kg" is_input="True">1237.0</H2O>
+              <HC units="g/kg" is_input="True">0.5</HC>
+              <NOx units="g/kg" is_input="True">11.4</NOx>
+              <SOx units="g/kg" is_input="True">0.8</SOx>
+            </emission_index>
             <limit>
               <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
               <OPR is_input="True">8.5<!--Limit OPR of the turboshaft--></OPR>
             </limit>
           </turboshaft_1>
           <turboshaft_2>
-            <from_LE units="m" is_input="True">1.444<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.44<!--Distance between the turboshaft front face and the leading edge--></from_LE>
             <power_offtake units="kW" is_input="True">30.0<!--10 kW of mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
-            <power_rating units="kW" is_input="True">551.0<!--Flat rating of the turboshaft--></power_rating>
             <CG>
               <y_ratio is_input="True">0.28<!--Y position of the propeller center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
             <design_point>
               <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
               <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.2<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
+              <power_ratio is_input="True">1.355<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
             </design_point>
+            <emission_index>
+              <CO units="g/kg" is_input="True">5.0</CO>
+              <CO2 units="g/kg" is_input="True">3155.0</CO2>
+              <H2O units="g/kg" is_input="True">1237.0</H2O>
+              <HC units="g/kg" is_input="True">0.5</HC>
+              <NOx units="g/kg" is_input="True">11.4</NOx>
+              <SOx units="g/kg" is_input="True">0.8</SOx>
+            </emission_index>
             <limit>
               <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
               <OPR is_input="True">8.5<!--Limit OPR of the turboshaft--></OPR>
@@ -255,10 +270,10 @@
       </vertical_tail>
       <cooling>
         <cruise>
-          <CD0 is_input="True">0.002301<!--profile drag due to cooling in cruise conditions--></CD0>
+          <CD0 is_input="True">0.006<!--profile drag due to cooling in cruise conditions--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="True">0.002301<!--profile drag due to cooling in low speed conditions--></CD0>
+          <CD0 is_input="True">0.006<!--profile drag due to cooling in low speed conditions--></CD0>
         </low_speed>
       </cooling>
       <flaps>
@@ -291,7 +306,7 @@
     </aerodynamics>
     <handling_qualities>
       <static_margin>
-        <target is_input="True">0.12<!--aircraft static margin--></target>
+        <target is_input="True">0.2<!--aircraft static margin--></target>
       </static_margin>
     </handling_qualities>
     <weight>
@@ -309,10 +324,10 @@
       </aircraft>
       <airframe>
         <horizontal_tail>
-          <k_factor is_input="True">0.25<!--proportional corrective factor for horizontal tail mass--></k_factor>
+          <k_factor is_input="True">0.5<!--proportional corrective factor for horizontal tail mass--></k_factor>
         </horizontal_tail>
         <vertical_tail>
-          <k_factor is_input="True">0.25<!--proportional corrective factor for vertical tail mass--></k_factor>
+          <k_factor is_input="True">0.5<!--proportional corrective factor for vertical tail mass--></k_factor>
         </vertical_tail>
         <wing>
           <k_factor is_input="True">1.25<!--proportional corrective factor for wing mass--></k_factor>
@@ -339,11 +354,11 @@
       </propulsion>
       <systems>
         <recording>
-          <mass units="kg" is_input="True">240.0<!--Mass of aircraft systems_inp_data:weight:systems:recording:mass--></mass>
+          <mass units="kg" is_input="True">250.0<!--Mass of aircraft systems_inp_data:weight:systems:recording:mass--></mass>
         </recording>
         <power>
           <electric_systems>
-            <mass units="lbm" is_input="True">224.27611606284972<!--Mass of aircraft systems_inp_data:weight:systems:power:electric_systems:mass--></mass>
+            <mass units="kg" is_input="True">150.0<!--Mass of aircraft systems_inp_data:weight:systems:power:electric_systems:mass--></mass>
           </electric_systems>
           <hydraulic_systems>
             <mass units="lbm" is_input="True">51.91278247585929<!--Mass of aircraft systems_inp_data:weight:systems:power:hydraulic_systems:mass--></mass>
@@ -427,7 +442,7 @@
     </geometry>
     <handling_qualities>
       <rudder>
-        <safety_margin is_input="True">0.4<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
+        <safety_margin is_input="True">0.2<!--Ratio of the total rudder deflection not used in the computation of the VT area to leave a safety margin--></safety_margin>
       </rudder>
     </handling_qualities>
     <materials>
@@ -487,11 +502,11 @@
         <turboshaft>
           <turboshaft_1>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.55<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
+            <k_sfc is_input="True">1.05<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_1>
           <turboshaft_2>
             <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.55<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
+            <k_sfc is_input="True">1.05<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
           </turboshaft_2>
         </turboshaft>
       </he_power_train>
@@ -530,7 +545,7 @@
         </fuselage>
         <landing_gear>
           <front>
-            <front_fuselage_ratio is_input="True">0.75<!--Position of front landing gear expressed as fuselage front length ratio--></front_fuselage_ratio>
+            <front_fuselage_ratio is_input="True">0.77<!--Position of front landing gear expressed as fuselage front length ratio--></front_fuselage_ratio>
             <weight_ratio is_input="True">0.23<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
           </front>
         </landing_gear>
@@ -546,7 +561,7 @@
     <aerodynamics>
       <aircraft>
         <undesirable_drag>
-          <k_factor is_input="True">1.0<!--Correction coefficient to take into account the other undesirable drag, default is 1.25 as suggested in Gudmundsson--></k_factor>
+          <k_factor is_input="True">1.3<!--Correction coefficient to take into account the other undesirable drag, default is 1.25 as suggested in Gudmundsson--></k_factor>
         </undesirable_drag>
       </aircraft>
       <reference_flight_conditions>
