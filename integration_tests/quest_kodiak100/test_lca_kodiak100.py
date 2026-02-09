@@ -160,6 +160,7 @@ def test_lca_single_score_sensitivity_analysis_two_plots():
     fig.write_image(FIGURE_FOLDER_PATH / "ga_single_score_evolution.pdf")
     time.sleep(3)
     fig.write_image(FIGURE_FOLDER_PATH / "ga_single_score_evolution.pdf")
+    fig.write_image(FIGURE_FOLDER_PATH / "ga_single_score_evolution.svg")
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
