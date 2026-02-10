@@ -41,6 +41,17 @@ class SizingRectifierResistances(om.ExplicitComponent):
             val=np.nan,
         )
 
+        self.add_input(
+            "settings:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:k_resistance",
+            val=1.0,
+            units="unitless",
+        )
+        self.add_input(
+            "settings:propulsion:he_power_train:rectifier:" + rectifier_id + ":diode:k_resistance",
+            val=1.0,
+            units="unitless",
+        )
+
         self.add_output(
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:resistance",
             val=1e-3,
@@ -52,12 +63,27 @@ class SizingRectifierResistances(om.ExplicitComponent):
             units="ohm",
         )
 
+    def setup_partials(self):
+        rectifier_id = self.options["rectifier_id"]
+
         self.declare_partials(
-            of=[
-                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:resistance",
-                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":diode:resistance",
+            of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:resistance",
+            wrt=[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance",
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":igbt:k_resistance",
             ],
-            wrt="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance",
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":diode:resistance",
+            wrt=[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance",
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":diode:k_resistance",
+            ],
             method="exact",
         )
 
@@ -68,6 +94,11 @@ class SizingRectifierResistances(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance"
             ]
+            * inputs[
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":igbt:k_resistance"
+            ]
             * self.options["R_igbt_ref"]
         )
 
@@ -76,6 +107,11 @@ class SizingRectifierResistances(om.ExplicitComponent):
         ] = (
             inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance"
+            ]
+            * inputs[
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":diode:k_resistance"
             ]
             * self.options["R_diode_ref"]
         )
@@ -86,9 +122,41 @@ class SizingRectifierResistances(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:resistance",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance",
-        ] = self.options["R_igbt_ref"]
+        ] = (
+            self.options["R_igbt_ref"]
+            * inputs[
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":igbt:k_resistance"
+            ]
+        )
+        partials[
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:resistance",
+            "settings:propulsion:he_power_train:rectifier:" + rectifier_id + ":igbt:k_resistance",
+        ] = (
+            self.options["R_igbt_ref"]
+            * inputs[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance"
+            ]
+        )
 
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":diode:resistance",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance",
-        ] = self.options["R_diode_ref"]
+        ] = (
+            self.options["R_diode_ref"]
+            * inputs[
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":diode:k_resistance"
+            ]
+        )
+        partials[
+            "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":diode:resistance",
+            "settings:propulsion:he_power_train:rectifier:" + rectifier_id + ":diode:k_resistance",
+        ] = (
+            self.options["R_diode_ref"]
+            * inputs[
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":scaling:resistance"
+            ]
+        )
