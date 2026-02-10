@@ -88,7 +88,7 @@ def test_sizing_kodiak_100():
 def test_sizing_kodiak_100_full_electric():
     """
     Test the overall aircraft design process for the fully electric variant, with the mission range
-    reduced to 60 NM to align with the original aircraft.
+    reduced to 100 NM to align with the original aircraft's usage.
     """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
@@ -129,6 +129,73 @@ def test_sizing_kodiak_100_full_electric():
         "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
         val=4.0,
         units="h**-1",
+    )
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3616.0, rel=1e-2
+    )
+    # Actual value is 3290 kg
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        2916.0, rel=1e-2
+    )
+
+
+def test_sizing_kodiak_100_full_electric_with_lca():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_elec_kodiak100.xml"
+    process_file_name = "full_sizing_kodiak100_elec_with_lca.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Load inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # In addition to a change in battery production process, the characteristics of the battery
+    # packs are changed. We will assume same polarization curve and small relative capacity effect
+    # . We need at least 4 "fake" points for the relative capacity effect as it assumed to be a
+    # deg 3 polynomial. This correspondons to Ampirius Si-NMC cell at 395 Wh/kg
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 1.34,
+        "cell_weight_ref": 11.7e-3,
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 5100.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=4.0,
+        units="h**-1",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
+        val=4.0,
+        units="h**-1",
+    )
+
+    # In addition to a change in battery production process, the lifespan of the batteries is also
+    # affected, and they need replacement way more often.
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=150.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=150.0
     )
 
     problem.run_model()

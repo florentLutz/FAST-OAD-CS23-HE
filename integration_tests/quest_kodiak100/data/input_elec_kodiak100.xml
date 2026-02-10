@@ -1,6 +1,10 @@
 <FASTOAD_model>
   <data>
     <TLAR>
+      <aircraft_lifespan units="year" is_input="False">24.99041565778854<!--Expected lifetime of the aircraft--></aircraft_lifespan>
+      <flight_hours_per_year units="h" is_input="True">283.2<!--Expected number of hours flown per year--></flight_hours_per_year>
+      <flight_per_year is_input="False">151.6720911047856<!--Average number of flight per year--></flight_per_year>
+      <max_airframe_hours units="h" is_input="True">7077.285714285714<!--Expected lifetime of the aircraft expressed in airframe hours--></max_airframe_hours>
       <NPAX_design is_input="True">6.0<!--FAST-OAD adds two pax to that value for pilot--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">60.0</luggage_mass_design>
       <range units="NM" is_input="True">100.0<!--top-level requirement: design range--></range>
@@ -8,6 +12,19 @@
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
+    <environmental_impact>
+      <buy_to_fly>
+        <metallic is_input="True">7.5<!--Ratio of the amount of material purchased to to what is really put into the manufactured parts. Typical value for metallic material is between 5 and 10--></metallic>
+      </buy_to_fly>
+      <delivery>
+        <distance units="km" is_input="True">8000.0<!--Distance between the site of assembly of the aircraft and the site of delivery. The variable will have the same name regardless of whether the delivery is done by the air or by land.--></distance>
+        <mission_ratio is_input="False">21.59827213822894<!--Ratio of fuel used during the delivery to fuel used during mission. Will only be used if the aircraft is delivered via the air.--></mission_ratio>
+      </delivery>
+      <line_test>
+        <duration units="h" is_input="True">10.0<!--Duration of line tests--></duration>
+        <mission_ratio is_input="False">5.355652934491018<!--Ratio of fuel used during the line tests to fuel used during cruise--></mission_ratio>
+      </line_test>
+    </environmental_impact>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
       <wing_configuration is_input="True">3.0<!--1=low wing configuration / 2=mid wing configuration / 3=high wing configuration--></wing_configuration>
