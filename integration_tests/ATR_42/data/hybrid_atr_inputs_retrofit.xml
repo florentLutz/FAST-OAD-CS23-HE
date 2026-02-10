@@ -280,7 +280,7 @@
             <design_surface_current_density units="kA/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></design_surface_current_density>
             <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
             <design_tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></design_tooth_flux_density>
-            <torque_constant units="N*m/A" is_input="True">0.1426</torque_constant>
+            <torque_constant units="N*m/A" is_input="True">0.433</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
             <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
@@ -312,7 +312,7 @@
             <design_surface_current_density units="A/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></design_surface_current_density>
             <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
             <design_tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></design_tooth_flux_density>
-            <torque_constant units="N*m/A" is_input="True">0.4278</torque_constant>
+            <torque_constant units="N*m/A" is_input="True">0.433</torque_constant>
             <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
             <winding_factor is_input="True">0.97</winding_factor>
             <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
@@ -504,7 +504,7 @@
           <planetary_gear_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">1410<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">1460<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -513,7 +513,7 @@
           <planetary_gear_2>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
-            <power_share units="kW" is_input="True">1410<!--Share of the power going to the first (primary) input, in W--></power_share>
+            <power_share units="kW" is_input="True">1460<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
