@@ -71,32 +71,44 @@ if __name__ == "__main__":
         -1.739057882676467e-07 * (rated_current_sic_based / rated_current_ref_semikron) ** -1
     )
 
-    current_for_energy_eval = 280.
-    e_on_semikron = a_on_default / 2 + b_on_default * current_for_energy_eval / np.pi + c_on_default * current_for_energy_eval ** 2.0 / 4
+    current_for_energy_eval = 280.0
+    e_on_semikron = (
+        a_on_default / 2
+        + b_on_default * current_for_energy_eval / np.pi
+        + c_on_default * current_for_energy_eval**2.0 / 4
+    )
     e_on_sic_based = 8e-3
 
     print(
         "Turn on energy losses, default vs SiC based:",
         e_on_semikron,
         e_on_sic_based,
-        e_on_semikron / e_on_sic_based
+        e_on_semikron / e_on_sic_based,
     )
 
-    e_off_semikron = a_off_default / 2 + b_off_default * current_for_energy_eval / np.pi + c_off_default * current_for_energy_eval ** 2.0 / 4
+    e_off_semikron = (
+        a_off_default / 2
+        + b_off_default * current_for_energy_eval / np.pi
+        + c_off_default * current_for_energy_eval**2.0 / 4
+    )
     e_off_sic_based = 7e-3
 
     print(
         "Turn off energy losses, default vs SiC based:",
         e_off_semikron,
         e_off_sic_based,
-        e_off_semikron / e_off_sic_based
+        e_off_semikron / e_off_sic_based,
     )
 
-    e_rr_semikron = a_rr_default / 2 + b_rr_default * current_for_energy_eval / np.pi + c_rr_default * current_for_energy_eval ** 2.0 / 4
+    e_rr_semikron = (
+        a_rr_default / 2
+        + b_rr_default * current_for_energy_eval / np.pi
+        + c_rr_default * current_for_energy_eval**2.0 / 4
+    )
     e_rr_sic_based = 3.1e-3
     print(
         "Reverse recovery energy losses, default vs SiC based:",
         e_rr_semikron,
         e_rr_sic_based,
-        e_rr_semikron / e_rr_sic_based
+        e_rr_semikron / e_rr_sic_based,
     )
