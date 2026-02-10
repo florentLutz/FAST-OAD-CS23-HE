@@ -168,7 +168,7 @@ def test_sizing_kodiak_100_full_electric_with_lca():
     # In addition to a change in battery production process, the characteristics of the battery
     # packs are changed. We will assume same polarization curve and small relative capacity effect
     # . We need at least 4 "fake" points for the relative capacity effect as it assumed to be a
-    # deg 3 polynomial. This correspondons to Ampirius Si-NMC cell at 395 Wh/kg
+    # deg 3 polynomial. This corresponds to Ampirius Si-NMC cell at 395 Wh/kg
     problem.model_options["*"] = {
         "cell_capacity_ref": 1.34,
         "cell_weight_ref": 11.7e-3,
@@ -213,6 +213,83 @@ def test_sizing_kodiak_100_full_electric_with_lca():
         2916.0, rel=1e-2
     )
 
+
+def test_sizing_kodiak_100_full_electric_future_lis_with_lca():
+    """
+    This test does the sizing of a future aircraft with similar requirement to the electric
+    Kodiak 100. Range will we adjusted to see what is possible. Assumes:
+    - SiC based power converters with higher switching frequencies.
+    - Future materials for electric motors
+    - Li-S batteries with practical energy densities of 1300 Wh/kg
+    - For lack of accurate process for the Li-S LCA the default process will be used.
+    - The airframe will be assumed to be made with additive manufacturing thus a BtF of 1 for
+    metallic materials
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_elec_kodiak100_lis.xml"
+    process_file_name = "full_sizing_kodiak100_elec_lis_with_lca.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Load inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # Not a lot is known about Li-S cell, so we will assumed some characteristics that allow use to
+    # reach the target energy density of 1300 Wh/kg. The C-rate caliber will be set as one at the
+    # beginning, but might change if this cause the cell to be sized for power. The cell weight will
+    # be set equal to that of the Ampirius cell and capacity will be changed accordingly
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 6.91,
+        "cell_weight_ref": 11.7e-3,
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 6900.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=1.0,
+        units="h**-1",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
+        val=1.0,
+        units="h**-1",
+    )
+
+    # According to research papers, renewal rates of 1000 cycles can be achieved in certain
+    # conditions
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=1000.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=1000.0
+    )
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
+        3616.0, rel=1e-2
+    )
+    # Actual value is 3290 kg
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        2916.0, rel=1e-2
+    )
 
 def test_operational_mission_kodiak_100():
     """Test the overall aircraft design process with wing positioning."""
