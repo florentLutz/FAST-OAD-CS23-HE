@@ -73,6 +73,23 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
             val=np.nan,
         )
 
+        self.add_input(
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_igbt_switching_losses",
+            val=1.0,
+            units="unitless",
+            desc="K-factor to tune turn-on and turn-off switching losses in the IGBT module",
+        )
+        self.add_input(
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_diode_switching_losses",
+            val=1.0,
+            units="unitless",
+            desc="K-factor to tune the reverse recovery switching losses in the diode",
+        )
+
         self.add_output(
             "switching_losses_diode",
             units="W",
@@ -88,6 +105,10 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
             lower=np.full(number_of_points, 0.0),
         )
 
+    def setup_partials(self):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="switching_losses_diode",
             wrt=[
@@ -100,6 +121,9 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":energy_rr:c",
+                "settings:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":k_diode_switching_losses",
             ],
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -132,6 +156,9 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:DC_DC_converter:"
                 + dc_dc_converter_id
                 + ":energy_off:c",
+                "settings:propulsion:he_power_train:DC_DC_converter:"
+                + dc_dc_converter_id
+                + ":k_igbt_switching_losses",
             ],
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -180,6 +207,17 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         i_igbt = inputs["current_IGBT"]
         i_diode = inputs["current_diode"]
 
+        k_losses_igbt = inputs[
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_igbt_switching_losses"
+        ]
+        k_losses_diode = inputs[
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_diode_switching_losses"
+        ]
+
         loss_diode = f_sw * (a_rr / 2.0 + b_rr * i_diode / np.pi + c_rr * i_diode**2.0 / 4)
         loss_igbt = f_sw * (
             (a_on + a_off) / 2.0
@@ -188,8 +226,8 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         )
         # a, b and c coefficient on reference were interpolated to give the results in J
 
-        outputs["switching_losses_diode"] = loss_diode
-        outputs["switching_losses_IGBT"] = loss_igbt
+        outputs["switching_losses_diode"] = loss_diode * k_losses_diode
+        outputs["switching_losses_IGBT"] = loss_igbt * k_losses_igbt
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
@@ -228,60 +266,87 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         i_igbt = inputs["current_IGBT"]
         i_diode = inputs["current_diode"]
 
+        k_losses_igbt = inputs[
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_igbt_switching_losses"
+        ]
+        k_losses_diode = inputs[
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_diode_switching_losses"
+        ]
+
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_rr:a",
-        ] = f_sw / 2.0
+        ] = f_sw / 2.0 * k_losses_diode
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_rr:b",
-        ] = f_sw * i_diode / np.pi
+        ] = f_sw * i_diode / np.pi * k_losses_diode
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_rr:c",
-        ] = f_sw * i_diode**2.0 / 4
+        ] = f_sw * i_diode**2.0 / 4 * k_losses_diode
         partials["switching_losses_diode", "switching_frequency"] = (
             a_rr / 2.0 + b_rr * i_diode / np.pi + c_rr * i_diode**2.0 / 4
+        ) * k_losses_diode
+        partials["switching_losses_diode", "current_diode"] = (
+            f_sw * (b_rr / np.pi + c_rr * i_diode / 2.0) * k_losses_diode
         )
-        partials["switching_losses_diode", "current_diode"] = f_sw * (
-            b_rr / np.pi + c_rr * i_diode / 2.0
-        )
+        partials[
+            "switching_losses_diode",
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_diode_switching_losses",
+        ] = f_sw * (a_rr / 2.0 + b_rr * i_diode / np.pi + c_rr * i_diode**2.0 / 4)
 
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_on:a",
-        ] = f_sw / 2.0
+        ] = f_sw / 2.0 * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":energy_off:a",
-        ] = f_sw / 2.0
+        ] = f_sw / 2.0 * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_on:b",
-        ] = f_sw * i_igbt / np.pi
+        ] = f_sw * i_igbt / np.pi * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":energy_off:b",
-        ] = f_sw * i_igbt / np.pi
+        ] = f_sw * i_igbt / np.pi * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":energy_on:c",
-        ] = f_sw * i_igbt**2.0 / 4
+        ] = f_sw * i_igbt**2.0 / 4 * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":energy_off:c",
-        ] = f_sw * i_igbt**2.0 / 4
+        ] = f_sw * i_igbt**2.0 / 4 * k_losses_igbt
         partials["switching_losses_IGBT", "switching_frequency"] = (
             (a_on + a_off) / 2.0
             + (b_on + b_off) * i_igbt / np.pi
             + (c_on + c_off) * i_igbt**2.0 / 4
+        ) * k_losses_igbt
+        partials["switching_losses_IGBT", "current_IGBT"] = (
+            f_sw * ((b_on + b_off) / np.pi + (c_on + c_off) * i_igbt / 2.0) * k_losses_igbt
         )
-        partials["switching_losses_IGBT", "current_IGBT"] = f_sw * (
-            (b_on + b_off) / np.pi + (c_on + c_off) * i_igbt / 2.0
+        partials[
+            "switching_losses_IGBT",
+            "settings:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":k_igbt_switching_losses",
+        ] = f_sw * (
+            (a_on + a_off) / 2.0
+            + (b_on + b_off) * i_igbt / np.pi
+            + (c_on + c_off) * i_igbt**2.0 / 4
         )
