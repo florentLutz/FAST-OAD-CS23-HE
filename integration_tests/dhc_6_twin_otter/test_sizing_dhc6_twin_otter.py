@@ -50,23 +50,21 @@ def test_sizing_dhc6_twin_otter():
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
-    print(residuals)
+
     problem.write_outputs()
 
-    # assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(5665, rel=1e-2)
-    # # Actual value is 5670 kg (-0.08%)
-    # assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
-    #     5537.5, rel=1e-2
-    # )
-    # # Actual value is 5579 kg (-0.7%)
-    # assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-    #     3332.8, rel=1e-2
-    # )
-    # # Actual value is 3320 kg (+0.4%)
-    # assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-    #     790.00, rel=1e-2
-    # )
-    # Actual value is 808 kg (-2.2%)
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(5652, rel=1e-2)
+    # Actual value is 5670 kg (-0.3%)
+    assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
+        5530.7, rel=1e-2
+    )
+    # Actual value is 5579 kg (-0.9%)
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        3326.3, rel=1e-2
+    )
+    # Actual value is 3320 kg (+0.2%)
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(783.1, rel=1e-2)
+    # Actual value is 808 kg (-3.1%)
 
 
 def test_sizing_twin_otter_pemfc_h2():
@@ -77,7 +75,7 @@ def test_sizing_twin_otter_pemfc_h2():
 
     # Define used files depending on options
     xml_file_name = "input_h2_pemfc_twin_otter.xml"
-    process_file_name = "pemfc_h2_twin_otter.yml"
+    process_file_name = "full_sizing_pemfc_h2_twin_otter.yml"
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
     problem = configurator.get_problem()
@@ -105,17 +103,11 @@ def test_sizing_twin_otter_pemfc_h2():
 
     problem.write_outputs()
 
-    # assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(5665, rel=1e-2)
-    # # Actual value is 5670 kg (-0.08%)
-    # assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
-    #     5537.5, rel=1e-2
-    # )
-    # # Actual value is 5579 kg (-0.7%)
-    # assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-    #     3332.8, rel=1e-2
-    # )
-    # # Actual value is 3320 kg (+0.4%)
-    # assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(
-    #     790.00, rel=1e-2
-    # )
-    # # Actual value is 808 kg (-2.2%)
+    assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(5588, rel=1e-2)
+    assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
+        5553.2, rel=1e-2
+    )
+    assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
+        4384.7, rel=1e-2
+    )
+    assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(114.7, rel=1e-2)
