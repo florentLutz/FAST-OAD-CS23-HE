@@ -107,12 +107,30 @@ def test_sizing_kodiak_100_full_electric():
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
 
+    # In addition to a change in battery production process, the characteristics of the battery
+    # packs are changed. We will assume same polarization curve and small relative capacity effect
+    # . We need at least 4 "fake" points for the relative capacity effect as it assumed to be a
+    # deg 3 polynomial. This correspondons to Ampirius Si-NMC cell at 395 Wh/kg
     problem.model_options["*"] = {
-        "cell_capacity_ref": 5.0,
-        "cell_weight_ref": 45.0e-3,
+        "cell_capacity_ref": 1.34,
+        "cell_weight_ref": 11.7e-3,
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 5100.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
     }
 
     problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=4.0,
+        units="h**-1",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
+        val=4.0,
+        units="h**-1",
+    )
+
     problem.run_model()
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
@@ -121,11 +139,11 @@ def test_sizing_kodiak_100_full_electric():
     problem.write_outputs()
 
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
-        3634.0, rel=1e-2
+        3616.0, rel=1e-2
     )
     # Actual value is 3290 kg
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-        3082.0, rel=1e-2
+        2916.0, rel=1e-2
     )
 
 

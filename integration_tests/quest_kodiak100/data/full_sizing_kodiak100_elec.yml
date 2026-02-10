@@ -84,4 +84,6 @@ submodels:
     submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
     submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
     submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+    submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
+    submodel.propulsion.dc_dc_converter.inductor.inductance: null
 
