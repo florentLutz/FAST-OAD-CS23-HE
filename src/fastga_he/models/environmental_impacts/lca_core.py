@@ -63,6 +63,8 @@ class LCACore(om.ExplicitComponent):
         self.parameters = None
 
         self.configurator = FASTGAHEPowerTrainConfigurator()
+        self.lca_configurator = None
+        self.premise_data = None
 
         # Seems required to do it here
         dotenv.load_dotenv()
@@ -175,7 +177,7 @@ class LCACore(om.ExplicitComponent):
     def _get_cache_instance(lca_conf_file_path: pathlib.Path):
         """
         Access the latest usable instance of the cache that has been registered for this LCA
-        configuration file.
+        configuration file. Premise data might be at None as it is not required to function
         """
 
         key = str(lca_conf_file_path)
@@ -187,15 +189,17 @@ class LCACore(om.ExplicitComponent):
             cache_instance["methods"],
             cache_instance["lambdas_dict"],
             cache_instance["partial_lambdas_dict_dict"],
+            cache_instance["premise_data"],
         )
 
     @staticmethod
     def _add_cache_instance(
-        lca_conf_file_path, model, methods, lambdas_dict, partial_lambdas_dict_dict
+        lca_conf_file_path, model, methods, lambdas_dict, partial_lambdas_dict_dict, premise_data
     ):
         """
         In the case where no instance were usable and the compilitation needed to be redone, we add
-        said compilation to the cache.
+        said compilation to the cache. Premise data might be at None as it is not required to
+        function
         """
 
         key = str(lca_conf_file_path)
@@ -206,6 +210,7 @@ class LCACore(om.ExplicitComponent):
             "methods": methods,
             "lambdas_dict": lambdas_dict,
             "partial_lambdas_dict_dict": partial_lambdas_dict_dict,
+            "premise_data": premise_data,
         }
         LCACore._cache[key] = cache_instance
 
@@ -219,9 +224,13 @@ class LCACore(om.ExplicitComponent):
 
         # If a usable instance exist, we use it. Otherwise, we create and cache it.
         if self._check_existing_instance(lca_conf_file_path):
-            self.model, self.methods, self.lambdas_dict, self.partial_lambdas_dict_dict = (
-                self._get_cache_instance(lca_conf_file_path)
-            )
+            (
+                self.model,
+                self.methods,
+                self.lambdas_dict,
+                self.partial_lambdas_dict_dict,
+                self.premise_data,
+            ) = self._get_cache_instance(lca_conf_file_path)
             _LOGGER.info("Loading cached data for LCA")
 
         else:
@@ -230,7 +239,11 @@ class LCACore(om.ExplicitComponent):
                 "Compiling LCA model and functions."
             )
 
-            _, self.model, self.methods = LCAProblemConfigurator(lca_conf_file_path).generate()
+            self.lca_configurator = LCAProblemConfigurator(lca_conf_file_path)
+            _, self.model, self.methods = self.lca_configurator.generate()
+
+            if "premise" in list(self.lca_configurator._serializer.data.keys()):
+                self.premise_data = self.lca_configurator._serializer.data["premise"]
 
             # noinspection PyProtectedMember
             self.lambdas_dict = {
@@ -250,6 +263,7 @@ class LCACore(om.ExplicitComponent):
                 self.methods,
                 self.lambdas_dict,
                 self.partial_lambdas_dict_dict,
+                self.premise_data,
             )
 
         # Get axis keys to ventilate results by e.g. life-cycle phase
@@ -264,11 +278,16 @@ class LCACore(om.ExplicitComponent):
                 parameter_name = parameter.name.replace(
                     "__", ":"
                 )  # refactor names (':' is not supported in LCA parameters)
-                self.add_input(
-                    parameter_name,
-                    val=np.nan,
-                    units=self.name_to_unit[parameter_name.split(":")[-1].replace("_per_fu", "")],
-                )
+                # We use this criterion to filter out the parameters premise adds, they usually
+                # don't include ":"
+                if len(parameter_name.split(":")) > 1:
+                    self.add_input(
+                        parameter_name,
+                        val=np.nan,
+                        units=self.name_to_unit[
+                            parameter_name.split(":")[-1].replace("_per_fu", "")
+                        ],
+                    )
 
         for m in self.methods:
             clean_method_name = re.sub(r": |/| ", "_", m[1])
@@ -337,6 +356,10 @@ class LCACore(om.ExplicitComponent):
         # since we will use it here for the partials and the partials are constant given the
         # nature of LCA
         parameters = {str(name): 1.0 for name in self.parameters}
+        if self.premise_data:
+            parameters["year"] = self.premise_data["scenarios"][0]["year"]
+            parameters["model"] = self.premise_data["scenarios"][0]["model"]
+            parameters["pathway"] = self.premise_data["scenarios"][0]["pathway"].replace("-", "_")
 
         # Then we run a "fake" computation of the partials, and if the value returned is nil,
         # we simply don't declare the partial
@@ -402,6 +425,10 @@ class LCACore(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         parameters = {name.replace(":", "__"): value[0] for name, value in inputs.items()}
+        if self.premise_data:
+            parameters["year"] = self.premise_data["scenarios"][0]["year"]
+            parameters["model"] = self.premise_data["scenarios"][0]["model"]
+            parameters["pathway"] = self.premise_data["scenarios"][0]["pathway"].replace("-", "_")
 
         for axis_to_evaluate in self.axis:
             res = self.compute_impacts_from_lambdas(

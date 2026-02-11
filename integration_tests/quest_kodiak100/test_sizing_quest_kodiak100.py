@@ -213,6 +213,10 @@ def test_sizing_kodiak_100_full_electric_with_lca():
         2916.0, rel=1e-2
     )
 
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        3.680567052496344e-05, rel=1e-2
+    )
+
 
 def test_sizing_kodiak_100_full_electric_future_lis_with_lca():
     """
@@ -364,6 +368,7 @@ def test_sizing_kodiak_100_full_electric_future_lis_with_lca_custom_process():
         4.25107069e-06, rel=1e-2
     )
 
+
 def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     """
     This test does the sizing of a future aircraft with similar requirement to the electric
@@ -434,6 +439,7 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
+
 
 def test_operational_mission_kodiak_100():
     """Test the overall aircraft design process with wing positioning."""

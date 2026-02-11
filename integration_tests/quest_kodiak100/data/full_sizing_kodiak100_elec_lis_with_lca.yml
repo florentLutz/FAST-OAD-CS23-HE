@@ -71,6 +71,8 @@ model:
         normalization: true
         weighting: true
         aircraft_lifespan_in_hours: true
+        write_lca_conf: false
+        lca_conf_file_path: ./elec_kodiak_assembly_lis_lca.yml
 
 submodels:
     submodel.geometry.wing.thickness_ratio: null

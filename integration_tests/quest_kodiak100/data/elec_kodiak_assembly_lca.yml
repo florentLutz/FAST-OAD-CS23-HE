@@ -4,6 +4,15 @@ ecoinvent:
     version: 3.9.1
     model: cutoff
 
+# Use this to update the database and access inventories implemented by premise
+premise:
+    scenarios: # The ecoinvent database will be duplicated and modified according to each element of this list
+        - model: "remind"
+          pathway: "SSP2-Base"
+          year: 2025
+
+    update: all
+
 model:
     production:
         custom_attributes:
@@ -56,6 +65,7 @@ model:
                   value: landing_gear_production
         
             name: 'market for steel, unalloyed'
+            loc: 'World'
             amount: data__weight__airframe__landing_gear__mass_per_fu
         
         assembly:  # Airframe assembly, assumed to be the same as aircraft assembly given the absence of this data in :cite:`thonemann:2024`
@@ -117,6 +127,7 @@ model:
               production:
                 cast_steel:
                   name: 'market for steel, unalloyed'
+                  loc: 'World'
                   amount: 0.750
         
                 aluminium_alloy:
