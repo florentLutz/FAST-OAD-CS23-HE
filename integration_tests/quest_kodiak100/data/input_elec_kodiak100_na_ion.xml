@@ -5,7 +5,7 @@
       <flight_hours_per_year units="h" is_input="True">283.2<!--Expected number of hours flown per year--></flight_hours_per_year>
       <luggage_mass_design units="kg" is_input="True">60.0<!--luggage design mass--></luggage_mass_design>
       <max_airframe_hours units="h" is_input="True">7077.285714285714<!--Expected lifetime of the aircraft expressed in airframe hours--></max_airframe_hours>
-      <range units="NM" is_input="True">600.0<!--top-level requirement: design range--></range>
+      <range units="NM" is_input="True">200.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">78.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">120.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">175.0<!--maximum speed at sea level--></v_max_sl>
@@ -280,8 +280,8 @@
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <cell>
-              <voltage_min_SOC units="V">2.2</voltage_min_SOC>
-              <voltage_max_SOC units="V">2.2</voltage_max_SOC>
+              <voltage_min_SOC units="V">2.7</voltage_min_SOC>
+              <voltage_max_SOC units="V">2.7</voltage_max_SOC>
               <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
             </cell>
             <dimension>
@@ -289,7 +289,7 @@
               <width_length_ratio is_input="True">2.06<!--Ratio between the battery width and length--></width_length_ratio>
             </dimension>
             <module>
-              <number_cells is_input="True">360.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">295.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
           </battery_pack_1>
           <battery_pack_2>
@@ -301,8 +301,8 @@
             <min_safe_SOC units="percent" is_input="True">0.0<!--Minimum state-of-charge that the battery can have without degradation--></min_safe_SOC>
             <state_of_health units="percent" is_input="True">100.0<!--State of Health of the battery, i.e. capacity with respect to nominal capacity--></state_of_health>
             <cell>
-              <voltage_min_SOC units="V">2.2</voltage_min_SOC>
-              <voltage_max_SOC units="V">2.2</voltage_max_SOC>
+              <voltage_min_SOC units="V">2.7</voltage_min_SOC>
+              <voltage_max_SOC units="V">2.7</voltage_max_SOC>
               <c_rate_caliber units="1/h" is_input="True">2.4<!--Maximum C-rate that the battery reference cell can provide--></c_rate_caliber>
             </cell>
             <dimension>
@@ -310,7 +310,7 @@
               <width_length_ratio is_input="True">2.06<!--Ratio between the battery width and length--></width_length_ratio>
             </dimension>
             <module>
-              <number_cells is_input="True">360.0<!--Number of cells in series inside one battery module--></number_cells>
+              <number_cells is_input="True">295.0<!--Number of cells in series inside one battery module--></number_cells>
             </module>
           </battery_pack_2>
         </battery_pack>
