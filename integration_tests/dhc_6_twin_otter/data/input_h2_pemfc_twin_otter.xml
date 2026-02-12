@@ -1,9 +1,9 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">9.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
-      <luggage_mass_design units="kg" is_input="True">150.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
-      <range units="NM" is_input="True">400.0<!--top-level requirement: design range--></range>
+      <NPAX_design is_input="True">1.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <luggage_mass_design units="kg" is_input="True">25.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
+      <range units="NM" is_input="True">200.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">75.4<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">182.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">170.0<!--maximum speed at sea level--></v_max_sl>
@@ -20,7 +20,7 @@
           <width units="m" is_input="True">0.76</width>
         </doors>
         <luggage>
-          <mass_max units="kg" is_input="True">150.0<!--maximum luggage mass--></mass_max>
+          <mass_max units="kg" is_input="True">41.5<!--maximum luggage mass--></mass_max>
         </luggage>
         <windows>
           <height units="m" is_input="True">0.3</height>
@@ -29,8 +29,8 @@
         </windows>
         <seats>
           <passenger>
-            <NPAX_max is_input="True">15.0<!--maximum seating capability of the aircraft--></NPAX_max>
-            <count_by_row is_input="True">3.0<!--passenger seats per row--></count_by_row>
+            <NPAX_max is_input="True">2.0<!--maximum seating capability of the aircraft--></NPAX_max>
+            <count_by_row is_input="True">2.0<!--passenger seats per row--></count_by_row>
             <length units="m" is_input="True">0.7<!--passenger seats length--></length>
           </passenger>
           <pilot>
@@ -188,7 +188,7 @@
         <PEMFC_stack>
           <pemfc_stack_1>
             <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
-            <number_of_layers is_input="True">970.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
+            <number_of_layers is_input="True">1600.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
             <effective_area units="cm**2">2300.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
           </pemfc_stack_1>
         </PEMFC_stack>
@@ -458,6 +458,22 @@
             </cross_section>
           </dc_bus_1>
         </DC_bus>
+        <aux_load>
+          <dc_aux_load_1>
+            <power_in_mission units="kW">120.65</power_in_mission>
+            <power_density units="kW/kg">0.261</power_density>
+            <CG>
+              <y_ratio>0.01</y_ratio>
+            </CG>
+          </dc_aux_load_1>
+          <dc_aux_load_2>
+            <power_in_mission units="kW">120.65</power_in_mission>
+            <power_density units="kW/kg">0.261</power_density>
+            <CG>
+              <y_ratio>0.01</y_ratio>
+            </CG>
+          </dc_aux_load_2>
+        </aux_load>
       </he_power_train>
       <turboprop>
         <design_point>
@@ -481,10 +497,10 @@
       </vertical_tail>
       <cooling>
         <cruise>
-          <CD0 is_input="True">0.008<!--profile drag due to cooling in cruise conditions--></CD0>
+          <CD0 is_input="True">0.02913<!--profile drag due to cooling in cruise conditions (0.008 + 0.01557)--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="True">0.008<!--profile drag due to cooling in low speed conditions--></CD0>
+          <CD0 is_input="True">0.02913<!--profile drag due to cooling in low speed conditions (0.008 + 0.01557)--></CD0>
         </low_speed>
       </cooling>
       <flaps>
@@ -522,8 +538,8 @@
     </handling_qualities>
     <weight>
       <aircraft>
-        <max_payload units="kg" is_input="True">1113.5<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">1088.2<!--design payload weight--></payload>
+        <max_payload units="kg" is_input="True">343.0<!--max payload weight--></max_payload>
+        <payload units="kg" is_input="True">258.4<!--design payload weight--></payload>
         <CG>
           <aft>
             <MAC_limit is_input="True">0.1<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
@@ -546,7 +562,7 @@
       </airframe>
       <furniture>
         <passenger_seats>
-          <mass units="kg" is_input="True">243.0<!--passenger/pilot seats total mass--></mass>
+          <mass units="kg" is_input="True">56.2<!--passenger/pilot seats total mass--></mass>
         </passenger_seats>
       </furniture>
       <propulsion>
@@ -786,7 +802,7 @@
           </fwd>
         </CG>
         <payload>
-          <design_mass_per_passenger units="kg" is_input="True">105.15<!--design payload mass carried by passenger--></design_mass_per_passenger>
+          <design_mass_per_passenger units="kg" is_input="True">94.5<!--design payload mass carried by passenger--></design_mass_per_passenger>
         </payload>
       </aircraft>
       <airframe>

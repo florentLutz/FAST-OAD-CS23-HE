@@ -25,23 +25,30 @@ power_train_components:
   inverter_2:
     id: fastga_he.pt_component.inverter
     position: inside_the_wing #"inside_the_wing", "in_the_front", "in_the_back"
+  # Temporary approach of estimate Thermal Management System (TMS)
+  dc_aux_load_1:
+    id: fastga_he.pt_component.dc_load
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_aux_load_2:
+    id: fastga_he.pt_component.dc_load
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
   dc_bus_1:
     id: fastga_he.pt_component.dc_bus
     options:
       number_of_inputs: 1
-      number_of_outputs: 2
+      number_of_outputs: 4
     position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
     position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
   pemfc_stack_1:
     id: fastga_he.pt_component.pemfc_stack
-    position: in_the_back  #"in_the_front", "wing_pod", "underbelly", "in_the_back"
+    position: underbelly  #"in_the_front", "wing_pod", "underbelly", "in_the_back"
     options:
       model_fidelity: "analytical"
   gaseous_hydrogen_tank_1:
     id: fastga_he.pt_component.gaseous_hydrogen_tank
-    position: underbelly #"in_the_fuselage", "wing_pod", "in_the_back", "underbelly", "in_the_front"
+    position: in_the_cabin # "in_the_cabin", "wing_pod", "in_the_back", "underbelly"
 
 component_connections:
   - source: propeller_1
@@ -67,6 +74,12 @@ component_connections:
 
   - source: inverter_2
     target: [dc_bus_1, 2]
+
+  - source: dc_aux_load_1
+    target: [dc_bus_1, 3]
+
+  - source: dc_aux_load_2
+    target: [ dc_bus_1, 4]
 
   - source: [dc_bus_1, 1]
     target: dc_dc_converter_1
