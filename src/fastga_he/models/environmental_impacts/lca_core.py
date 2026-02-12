@@ -37,6 +37,7 @@ NAME_TO_UNIT = {
     "cargo_transport": "t*km",
     "material": None,
 }
+DEFAULT_BRIGHTWAY_PROJECT_NAME = "FAST-OAD-CS23-HE project"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -935,7 +936,10 @@ class LCACore(om.ExplicitComponent):
             if not self._check_existing_file_instance(
                 lca_conf_file_path, project_name, variables_names_mass
             ):
-                header = {"project": project_name}
+                # Unless forced by foregoing the writing of the LCA conf file, all project name
+                # will be the same to prevent Brightway from re-downloading the same data countless
+                # times. The variable project_name is for internal use only.
+                header = {"project": DEFAULT_BRIGHTWAY_PROJECT_NAME}
 
                 with open(lca_conf_file_path, "w") as new_file:
                     yaml.safe_dump(header, new_file)

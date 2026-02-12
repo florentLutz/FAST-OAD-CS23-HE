@@ -1,4 +1,4 @@
-project: elec_kodiak_assembly_lis
+project: elec_kodiak_assembly
 
 ecoinvent:
     version: 3.9.1
@@ -9,7 +9,7 @@ premise:
     scenarios: # The ecoinvent database will be duplicated and modified according to each element of this list
         - model: "remind"
           pathway: "SSP2-Base"
-          year: 2025
+          year: 2040
 
     update: all
 
@@ -193,8 +193,8 @@ model:
                 - attribute: "component"
                   value: battery_pack_1_production
         
-            name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
-            loc: 'RoW'
+            name: 'market for battery, Li-sulfur, Li-S'
+            loc: 'GLO'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_1__mass_per_fu
 
         dc_sspc_2:
@@ -219,8 +219,8 @@ model:
                 - attribute: "component"
                   value: battery_pack_2_production
         
-            name: 'battery production, Li-ion, NMC111, rechargeable, prismatic'
-            loc: 'RoW'
+            name: 'market for battery, Li-sulfur, Li-S'
+            loc: 'GLO'
             amount: data__propulsion__he_power_train__battery_pack__battery_pack_2__mass_per_fu
 
 

@@ -214,7 +214,7 @@ def test_sizing_kodiak_100_full_electric_with_lca():
     )
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        3.680567052496344e-05, rel=1e-2
+        3.36621439e-05, rel=1e-2
     )
 
 
@@ -288,7 +288,7 @@ def test_sizing_kodiak_100_full_electric_future_lis_with_lca():
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        4.715327454136676e-06, rel=1e-2
+        2.14826485e-06, rel=1e-2
     )
 
 
@@ -439,6 +439,10 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        1.747306946521163e-06, rel=1e-2
+    )
 
 
 def test_operational_mission_kodiak_100():
