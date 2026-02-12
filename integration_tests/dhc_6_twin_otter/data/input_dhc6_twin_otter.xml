@@ -2,7 +2,7 @@
   <data>
     <TLAR>
       <NPAX_design is_input="True">13.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
-      <luggage_mass_design units="kg" is_input="True">175.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
+      <luggage_mass_design units="kg" is_input="True">125.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">400.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">75.4<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">182.0<!--top-level requirement: cruise speed--></v_cruise>
@@ -20,7 +20,7 @@
           <width units="m" is_input="True">0.76</width>
         </doors>
         <luggage>
-          <mass_max units="kg" is_input="True">150.0<!--maximum luggage mass--></mass_max>
+          <mass_max units="kg" is_input="True">175.0<!--maximum luggage mass--></mass_max>
         </luggage>
         <windows>
           <height units="m" is_input="True">0.3</height>
@@ -528,7 +528,7 @@
           </fwd>
         </CG>
         <payload>
-          <design_mass_per_passenger units="kg" is_input="True">105.15<!--design payload mass carried by passenger--></design_mass_per_passenger>
+          <design_mass_per_passenger units="kg" is_input="True">94.5<!--design payload mass carried by passenger--></design_mass_per_passenger>
         </payload>
       </aircraft>
       <airframe>
