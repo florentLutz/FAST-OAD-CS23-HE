@@ -100,12 +100,3 @@ def test_sizing_twin_otter_pemfc_h2():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
-
-    # assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(5564, rel=1e-2)
-    # assert problem.get_val("data:weight:aircraft:MLW", units="kg") == pytest.approx(
-    #     5530.5, rel=1e-2
-    # )
-    # assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
-    #     4362.3, rel=1e-2
-    # )
-    # assert problem.get_val("data:mission:sizing:fuel", units="kg") == pytest.approx(113.4, rel=1e-2)
