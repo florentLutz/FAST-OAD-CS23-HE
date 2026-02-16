@@ -1,12 +1,12 @@
-title: Sample weight computation applied to DHC 6 TWIN OTTER
+title: Sample Weight computation applied to DHC 6 TWIN OTTER
 
 # List of folder paths where user added custom registered OpenMDAO components
 module_folders:
 
 
 # Input and output files
-input_file: ../results/oad_process_inputs_ref.xml
-output_file: ../results/oad_process_outputs_ref.xml
+input_file: ../results/oad_process_inputs_pemfc_h2_gas.xml
+output_file: ../results/oad_process_outputs_pemfc_h2_gas.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
@@ -38,7 +38,7 @@ model:
             compute_slipstream: true
         power_train_sizing:
             id: fastga_he.power_train.sizing
-            power_train_file_path: ./turboshaft_propulsion.yml
+            power_train_file_path: ./pemfc_h2_propulsion.yml
         weight:
             id: fastga.weight.legacy
             propulsion_id: fastga.wrapper.propulsion.basicTurboprop
@@ -48,8 +48,8 @@ model:
             number_of_points_cruise: 30
             number_of_points_descent: 20
             number_of_points_reserve: 10
-            power_train_file_path: ./turboshaft_propulsion.yml
-            out_file: ../results/turboshaft_propulsion.csv
+            power_train_file_path: ./pemfc_h2_propulsion.yml
+            out_file: ../results/pemfc_h2_propulsion.csv
             use_linesearch: True
             pre_condition_pt: False
             use_apply_nonlinear: True
@@ -71,7 +71,6 @@ submodels:
     service.weight.mass.propulsion.installed_engine: fastga.submodel.weight.mass.propulsion.installed_engine.raymer
     service.weight.mass.propulsion.fuel_system: fastga.submodel.weight.mass.propulsion.fuel_system.flops
     service.weight.mass.airframe.paint: fastga.submodel.weight.mass.airframe.paint.by_wet_area
-    submodel.weight.mass.mzfw_and_mlw: fastga_he.submodel.weight.mass.mzfw_and_mlw.legacy
     #    submodel.weight.mass.airframe.tail: fastga.submodel.weight.mass.airframe.tail.torenbeek_gd
     service.weight.mass.airframe.fuselage: fastga.submodel.weight.mass.airframe.fuselage.analytical
     service.weight.mass.airframe.flight_controls: fastga.submodel.weight.mass.airframe.flight_controls.flops
@@ -86,7 +85,11 @@ submodels:
     service.geometry.vertical_tail.distance.fd: null
     submodel.performances.mission_vector.descent_speed: null
     submodel.performances.mission_vector.climb_speed: null
-    submodel.propulsion.constraints.turboshaft.rated_power: fastga_he.submodel.propulsion.constraints.turboshaft.rated_power.enforce
+    submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.with_dynamics
+    submodel.propulsion.constraints.inverter.current: fastga_he.submodel.propulsion.constraints.inverter.current.enforce
+    submodel.propulsion.constraints.inductor.air_gap: fastga_he.submodel.propulsion.constraints.inductor.air_gap.enforce
+    submodel.propulsion.dc_dc_converter.inductor.inductance: null
+    submodel.propulsion.constraints.pemfc.effective_area: fastga_he.submodel.propulsion.constraints.pemfc_stack.effective_area.ensure
     submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
     service.weight.mass.systems: fastga_he.submodel.weight.mass.systems.weight_nan
     service.weight.mass.system.power_system: null

@@ -1,9 +1,9 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">13.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
-      <luggage_mass_design units="kg" is_input="True">125.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
-      <range units="NM" is_input="True">400.0<!--top-level requirement: design range--></range>
+      <NPAX_design is_input="True">5.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <luggage_mass_design units="kg" is_input="True">58.1<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
+      <range units="NM" is_input="True">200.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">75.4<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">182.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">170.0<!--maximum speed at sea level--></v_max_sl>
@@ -20,7 +20,7 @@
           <width units="m" is_input="True">0.76</width>
         </doors>
         <luggage>
-          <mass_max units="kg" is_input="True">175.0<!--maximum luggage mass--></mass_max>
+          <mass_max units="kg" is_input="True">66.4<!--maximum luggage mass--></mass_max>
         </luggage>
         <windows>
           <height units="m" is_input="True">0.3</height>
@@ -29,7 +29,7 @@
         </windows>
         <seats>
           <passenger>
-            <NPAX_max is_input="True">19.0<!--maximum seating capability of the aircraft--></NPAX_max>
+            <NPAX_max is_input="True">6.0<!--maximum seating capability of the aircraft--></NPAX_max>
             <count_by_row is_input="True">3.0<!--passenger seats per row--></count_by_row>
             <length units="m" is_input="True">0.7<!--passenger seats length--></length>
           </passenger>
@@ -49,7 +49,6 @@
         <luggage_length units="m" is_input="True">2.07<!--(2.07) length of the luggage compartment--></luggage_length>
         <maximum_height units="m" is_input="True">2.09<!--maximum fuselage height--></maximum_height>
         <maximum_width units="m" is_input="True">1.865<!--(1.42,1.71) maximum fuselage width--></maximum_width>
-        <fillet_radius units="m">0.1</fillet_radius>
         <rear_length units="m" is_input="True">5.55<!--(3.05) length of the rear cone of the aircraft--></rear_length>
       </fuselage>
       <horizontal_tail>
@@ -144,36 +143,268 @@
       <max_rpm units="min**-1" is_input="True">2200.0<!--maximum number of rotation per minute on the engine--></max_rpm>
       <he_power_train>
         <thrust_distribution is_input="True">[1.0, 1.0]</thrust_distribution>
-        <fuel_system>
-          <fuel_system_1>
-            <fuel_distribution is_input="True">[1.0, 1.0]</fuel_distribution>
-            <fuel_type is_input="True">3.0<!--Type of fuel flowing in the system, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+        <DC_DC_converter>
+          <dc_dc_converter_1>
+            <efficiency_mission is_input="True">0.98<!--Efficiency of the DC/DC converter for the points--></efficiency_mission>
+            <rear_length_ratio is_input="True">0.1<!--Location of the DC/DC converter CG as a ratio of the aircraft rear length--></rear_length_ratio>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the DC/DC converter for the points--></switching_frequency_mission>
+            <voltage_out_target_mission units="V" is_input="True">800.0<!--Target output voltage of the DC/DC converter for the points--></voltage_out_target_mission>
+            <voltage_ripple is_input="True">0.02<!--Amplitude of the voltage ripple as a percent of the voltage caliber--></voltage_ripple>
+            <capacitor>
+              <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
+            </capacitor>
+            <control_card>
+              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
+            </control_card>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <heat_sink>
+              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
+              <coolant>
+                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
+                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
+                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
+                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
+              </coolant>
+              <tube>
+                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
+                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
+              </tube>
+            </heat_sink>
+            <inductor>
+              <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+              <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
+              <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
+            </inductor>
+            <tube>
+              <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
+            </tube>
+          </dc_dc_converter_1>
+        </DC_DC_converter>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
+            <number_of_layers is_input="True">1600.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
+            <effective_area units="cm**2">2300.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
+          </pemfc_stack_1>
+        </PEMFC_stack>
+        <SM_PMSM>
+          <motor_1>
+            <bearing_diameter units="m" is_input="True">0.03<!--The motor bearing bore diameter--></bearing_diameter>
+            <bearing_friction_coefficient is_input="True">0.0015<!--friction coefficient of the motor that house the shaft, the ball bearing is set to default--></bearing_friction_coefficient>
+            <cond_twisting_coeff is_input="True">1.25<!--The factor to account the conductor wire bunching--></cond_twisting_coeff>
+            <conductor_material_density units="kg/m**3" is_input="True">8960.0<!--Electrical conductor material density--></conductor_material_density>
+            <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
+            <design_air_gap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></design_air_gap_flux_density>
+            <design_phase_current_density units="A/m**2" is_input="True">8100000.0<!--The design phase current density of each wire--></design_phase_current_density>
+            <design_surface_current_density units="kA/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></design_surface_current_density>
+            <design_tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></design_tooth_flux_density>
+            <design_yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></design_yoke_flux_density>
+            <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
+            <form_coefficient is_input="True">0.6<!--The fraction of stator bore diameter and active length--></form_coefficient>
+            <frame_density units="kg/m**3" is_input="True">2700.0<!--Default value set as the density of 6063 aluminum alloy--></frame_density>
+            <from_LE units="m" is_input="True">1.444<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <insulation_material_density units="kg/m**3" is_input="True">1400.0<!--Electrical insulation material density--></insulation_material_density>
+            <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material--></magnetic_material_density>
+            <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
+            <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
+            <shaft_material_density units="kg/m**3" is_input="True">7850.0<!--The shaft material density, 4340 steel alloy is set to default--></shaft_material_density>
+            <shaft_poissons_ratio is_input="True">0.29<!--The shaft material Poisson's ratio, 4340 steel alloy is set to default--></shaft_poissons_ratio>
+            <shaft_yield_stress units="Pa" is_input="True">740000000.0<!--The yield stress of the shaft material, 4340 steel alloy is set to default--></shaft_yield_stress>
+            <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
+            <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
+            <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
+            <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
+            <torque_constant units="N*m/A" is_input="True">0.433</torque_constant>
+            <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
+            <winding_factor is_input="True">0.97<!--The factor considers the cable winding effect in the stator slot--></winding_factor>
             <CG>
-              <y_ratio is_input="True">0.0<!--Y position of the symmetric fuel system center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
-          </fuel_system_1>
-        </fuel_system>
-        <fuel_tank>
-          <fuel_tank_1>
-            <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <fairing>
+              <fineness is_input="True">1.75<!--Ratio between the fairing length and the motor diameter--></fineness>
+            </fairing>
+          </motor_1>
+          <motor_2>
+            <bearing_diameter units="m" is_input="True">0.03<!--The motor bearing bore diameter--></bearing_diameter>
+            <bearing_friction_coefficient is_input="True">0.0015<!--friction coefficient of the motor that house the shaft, the ball bearing is set to default--></bearing_friction_coefficient>
+            <cond_twisting_coeff is_input="True">1.25<!--The factor to account the conductor wire bunching--></cond_twisting_coeff>
+            <conductor_material_density units="kg/m**3" is_input="True">8960.0<!--Electrical conductor material density--></conductor_material_density>
+            <conductor_temperature_mission units="degC" is_input="True">180.0<!--The temperature of the winding conductor cable--></conductor_temperature_mission>
+            <design_air_gap_flux_density units="T" is_input="True">0.9<!--The magnetic flux density provided by the permanent magnets--></design_air_gap_flux_density>
+            <design_phase_current_density units="A/m**2" is_input="True">8100000.0<!--The design phase current density of each wire--></design_phase_current_density>
+            <design_surface_current_density units="kA/m" is_input="True">111.1<!--The surface current density of the winding conductor cable--></design_surface_current_density>
+            <design_tooth_flux_density units="T" is_input="True">1.3<!--Magnetic flux density at the stator teeth(slot) layer--></design_tooth_flux_density>
+            <design_yoke_flux_density units="T" is_input="True">1.2<!--Magnetic flux density at the stator yoke layer--></design_yoke_flux_density>
+            <end_winding_coeff is_input="True">1.4<!--The factor to account extra length from end winding--></end_winding_coeff>
+            <form_coefficient is_input="True">0.6<!--The fraction of stator bore diameter and active length--></form_coefficient>
+            <frame_density units="kg/m**3" is_input="True">2700.0<!--Default value set as the density of 6063 aluminum alloy--></frame_density>
+            <from_LE units="m" is_input="True">1.444<!--Distance between the turboshaft front face and the leading edge--></from_LE>
+            <insulation_material_density units="kg/m**3" is_input="True">1400.0<!--Electrical insulation material density--></insulation_material_density>
+            <magnetic_material_density units="kg/m**3" is_input="True">8150.0<!--The density of soft magnetic material--></magnetic_material_density>
+            <pole_pairs_number is_input="True">2.0<!--Number of the north and south pairs in the PMSM--></pole_pairs_number>
+            <radius_ratio is_input="True">0.97<!--the radius ratio of the rotor radius and the stator bore radius--></radius_ratio>
+            <shaft_material_density units="kg/m**3" is_input="True">7850.0<!--The shaft material density, 4340 steel alloy is set to default--></shaft_material_density>
+            <shaft_poissons_ratio is_input="True">0.29<!--The shaft material Poisson's ratio, 4340 steel alloy is set to default--></shaft_poissons_ratio>
+            <shaft_yield_stress units="Pa" is_input="True">740000000.0<!--The yield stress of the shaft material, 4340 steel alloy is set to default--></shaft_yield_stress>
+            <slot_conductor_factor is_input="True">1.0<!--The area factor considers the cross-section shape twist due to wire bunching--></slot_conductor_factor>
+            <slot_fill_factor is_input="True">0.5<!--The factor describes the conductor material fullness inside the stator slots--></slot_fill_factor>
+            <slots_per_poles_phases is_input="True">2.0<!--The number of conductor slots per poles and per phases--></slots_per_poles_phases>
+            <tangential_stress units="N/m**2" is_input="True">50000.0<!--The tangential tensile strength of the material--></tangential_stress>
+            <torque_constant units="N*m/A" is_input="True">0.433</torque_constant>
+            <voltage_caliber units="V" is_input="True">650.0<!--Max voltage of the motor--></voltage_caliber>
+            <winding_factor is_input="True">0.97<!--The factor considers the cable winding effect in the stator slot--></winding_factor>
             <CG>
-              <y_ratio is_input="True">0.57<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.2941<!--Y position of the turboshaft center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
-          </fuel_tank_1>
-          <fuel_tank_2>
-            <fuel_type is_input="True">3.0<!--Type of fuel stored in the tank, 1.0 - gasoline, 2.0 - Diesel, 3.0 - Jet A1--></fuel_type>
+            <fairing>
+              <fineness is_input="True">1.75<!--Ratio between the fairing length and the motor diameter--></fineness>
+            </fairing>
+          </motor_2>
+        </SM_PMSM>
+        <gaseous_hydrogen_tank>
+          <gaseous_hydrogen_tank_1>
+            <diameter_height_ratio is_input="True">0.9<!--Fraction between the tank outer diameter and fuselage height--></diameter_height_ratio>
+            <number_of_tank is_input="True">1.0<!--Number of gaseous hydrogen tank in a stack in fuselage. Default set 1.0 for single tank in fuselage and outside fuselage uses.--></number_of_tank>
+            <safety_factor is_input="True">1.0<!--gaseous hydrogen tank design safety factor--></safety_factor>
+            <tank_pressure units="Pa" is_input="True">70000000.0<!--Hydrogen gas tank static pressure--></tank_pressure>
+            <trapped_ratio is_input="True">0.03<!--Ratio between the hydrogen reactant pressure for fuel cell or the injection pressure for hydrogen engines and filling pressure of hydrogen tank--></trapped_ratio>
+            <dimension>
+              <rear_length_ratio is_input="True">0.5<!--The ratio between the usable length of the rear fuselage and the the whole rear fuselage length.--></rear_length_ratio>
+            </dimension>
+            <material>
+              <density units="kg/m**3" is_input="True">1530.0<!--Choice of the tank material,Some reference: Steel(ASTM-A514):7860, Aluminum(2014-T6):2800, Titanium(6%Al,4%V):4460, Carbon Composite:1530--></density>
+              <yield_strength units="Pa" is_input="True">1900000000.0<!--Hydrogen gas tank material yield stress--></yield_strength>
+            </material>
+          </gaseous_hydrogen_tank_1>
+        </gaseous_hydrogen_tank>
+        <inverter>
+          <inverter_1>
+            <efficiency_mission is_input="True">0.98<!--Efficiency of the DC/DC converter for the points--></efficiency_mission>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <junction_temperature_mission units="degK" is_input="True">283.15<!--Junction temperature of the inverter for the performances computation--></junction_temperature_mission>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
+            <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
             <CG>
-              <y_ratio is_input="True">0.57<!--Y position of the fuel tank center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.28<!--Y position of the inverter center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
-          </fuel_tank_2>
-        </fuel_tank>
+            <capacitor>
+              <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
+            </capacitor>
+            <control_card>
+              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
+            </control_card>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <heat_sink>
+              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
+              <coolant>
+                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
+                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
+                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
+                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
+              </coolant>
+              <tube>
+                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
+                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
+              </tube>
+            </heat_sink>
+            <igbt>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </igbt>
+            <inductor>
+              <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+              <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
+              <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
+            </inductor>
+            <tube>
+              <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
+            </tube>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
+          </inverter_1>
+          <inverter_2>
+            <efficiency_mission is_input="True">0.98<!--Efficiency of the DC/DC converter for the points--></efficiency_mission>
+            <heat_sink_temperature_mission units="degK" is_input="True">288.15<!--Heat sink temperature of the inverter for the points--></heat_sink_temperature_mission>
+            <junction_temperature_mission units="degK" is_input="True">283.15<!--Junction temperature of the inverter for the performances computation--></junction_temperature_mission>
+            <power_factor is_input="True">1.0</power_factor>
+            <switching_frequency_mission units="Hz" is_input="True">12000.0<!--Switching frequency of the inverter for the points--></switching_frequency_mission>
+            <voltage_ripple is_input="True">0.01<!--Amplitude of the voltage ripple the capacitor should be able to withstand, as a percent of voltage caliber--></voltage_ripple>
+            <CG>
+              <y_ratio is_input="True">0.28<!--Y position of the inverter center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <capacitor>
+              <aspect_ratio is_input="True">1.0<!--Ratio of the capacitor diameter over its height--></aspect_ratio>
+            </capacitor>
+            <control_card>
+              <mass units="kg" is_input="True">1.0<!--Weight of the control card, is generally constant, taken at 1 kg--></mass>
+            </control_card>
+            <diode>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </diode>
+            <heat_sink>
+              <density units="kg/m**3" is_input="True">2700.0<!--Density of the heat sink core for the inverter, by default aluminium is assumed--></density>
+              <temperature_rating units="degK" is_input="True">373.15<!--Density of the coolant fluid--></temperature_rating>
+              <coolant>
+                <density units="kg/m**3" is_input="True">1082.0<!--Density of the coolant fluid--></density>
+                <dynamic_viscosity units="Pa*s" is_input="True">0.00487<!--Dynamic viscosity of the coolant fluid--></dynamic_viscosity>
+                <specific_heat_capacity units="J/degK/kg" is_input="True">3260.0<!--Specific heat capacity of the coolant fluid--></specific_heat_capacity>
+                <temperature_in_rating units="degK" is_input="True">323.15<!--Density of the coolant fluid--></temperature_in_rating>
+                <temperature_out_rating units="degK" is_input="True">353.15<!--Density of the coolant fluid--></temperature_out_rating>
+                <thermal_conductivity units="W/m/degK" is_input="True">0.402<!--Thermal conductivity of the coolant fluid--></thermal_conductivity>
+              </coolant>
+              <tube>
+                <density units="kg/m**3" is_input="True">8960.0<!--Density of the tube for the cooling of the inverter, by default copper is assumed--></density>
+                <thickness units="m" is_input="True">0.00125<!--Thickness of the tube for the cooling of the inverter--></thickness>
+              </tube>
+            </heat_sink>
+            <igbt>
+              <gate_voltage units="V" is_input="True">1.3</gate_voltage>
+            </igbt>
+            <inductor>
+              <inductance units="H" is_input="True">1.3612212793999764e-06<!--Inductance of the inductor--></inductance>
+              <magnetic_field units="T" is_input="True">1.0<!--Magnetic field in the inductor core, will be taken at its maximum allowable value to reduce the weight--></magnetic_field>
+              <wire_current_density units="A/m**2" is_input="True">5000000.0<!--Maximum current density allowed in the copper wire--></wire_current_density>
+            </inductor>
+            <tube>
+              <number_of_passes is_input="True">4.0<!--Number of passes in the heat sink (between 2 and 6 usually)--></number_of_passes>
+            </tube>
+            <properties>
+              <resistance_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">0.0033</diode>
+                <igbt units="1/degK" is_input="True">0.0041</igbt>
+              </resistance_temperature_scale_factor>
+              <voltage_temperature_scale_factor>
+                <diode units="1/degK" is_input="True">-0.0022</diode>
+                <igbt units="1/degK" is_input="True">-0.00105</igbt>
+              </voltage_temperature_scale_factor>
+            </properties>
+          </inverter_2>
+        </inverter>
         <propeller>
           <propeller_1>
             <activity_factor is_input="True">150.0<!--Activity factor of the propeller--></activity_factor>
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.2703<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">2.59<!--propeller diameter--></diameter>
-            <from_LE units="m" is_input="True">1.44<!--Distance between the propeller and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.444<!--Distance between the propeller and the leading edge--></from_LE>
             <input_mass units="kg" is_input="True">61.2<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -187,7 +418,7 @@
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
             <depth_to_diameter_ratio is_input="True">0.2703<!--Ratio between the propeller depth and propeller diameter, default at 0.15--></depth_to_diameter_ratio>
             <diameter units="m" is_input="True">2.59<!--propeller diameter--></diameter>
-            <from_LE units="m" is_input="True">1.44<!--Distance between the propeller and the leading edge--></from_LE>
+            <from_LE units="m" is_input="True">1.444<!--Distance between the propeller and the leading edge--></from_LE>
             <input_mass units="kg" is_input="True">61.2<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
@@ -197,56 +428,52 @@
             </CG>
           </propeller_2>
         </propeller>
-        <turboshaft>
-          <turboshaft_1>
-            <from_LE units="m" is_input="True">1.44<!--Distance between the turboshaft front face and the leading edge--></from_LE>
-            <power_offtake units="kW" is_input="True">30.0<!--10 kW of mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
+        <speed_reducer>
+          <speed_reducer_1>
+            <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
+            <gear_ratio is_input="True">2.0408163265306123<!--Gear ratio of the speed reducer r--></gear_ratio>
+            <tech_level_constant is_input="True">6.157<!--Technology level constant for the speed reducer, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
-              <y_ratio is_input="True">0.28<!--Y position of the propeller center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.28<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
-            <design_point>
-              <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
-              <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.44<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
-            </design_point>
-            <emission_index>
-              <CO units="g/kg" is_input="True">5.0</CO>
-              <CO2 units="g/kg" is_input="True">3155.0</CO2>
-              <H2O units="g/kg" is_input="True">1237.0</H2O>
-              <HC units="g/kg" is_input="True">0.5</HC>
-              <NOx units="g/kg" is_input="True">11.4</NOx>
-              <SOx units="g/kg" is_input="True">0.8</SOx>
-            </emission_index>
-            <limit>
-              <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
-              <OPR is_input="True">8.5<!--Limit OPR of the turboshaft--></OPR>
-            </limit>
-          </turboshaft_1>
-          <turboshaft_2>
-            <from_LE units="m" is_input="True">1.44<!--Distance between the turboshaft front face and the leading edge--></from_LE>
-            <power_offtake units="kW" is_input="True">30.0<!--10 kW of mechanical offtake on the turboshaft, is added to shaft power out--></power_offtake>
+          </speed_reducer_1>
+          <speed_reducer_2>
+            <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
+            <gear_ratio is_input="True">2.0408163265306123<!--Gear ratio of the speed reducer r--></gear_ratio>
+            <tech_level_constant is_input="True">6.157<!--Technology level constant for the speed reducer, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
-              <y_ratio is_input="True">0.28<!--Y position of the propeller center of gravity as a ratio of the wing half-span--></y_ratio>
+              <y_ratio is_input="True">0.28<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>
             </CG>
-            <design_point>
-              <OPR is_input="True">7.0<!--OPR of the turboshaft at the design point--></OPR>
-              <T41t units="degK" is_input="True">1400.0<!--Total temperature at the output of the combustion chamber of the turboshaft at the design point--></T41t>
-              <power_ratio is_input="True">1.44<!--Ratio of the thermodynamic power divided by the rated power, typical values on the PT6A family is between 1.3 and 2.5--></power_ratio>
-            </design_point>
-            <emission_index>
-              <CO units="g/kg" is_input="True">5.0</CO>
-              <CO2 units="g/kg" is_input="True">3155.0</CO2>
-              <H2O units="g/kg" is_input="True">1237.0</H2O>
-              <HC units="g/kg" is_input="True">0.5</HC>
-              <NOx units="g/kg" is_input="True">11.4</NOx>
-              <SOx units="g/kg" is_input="True">0.8</SOx>
-            </emission_index>
-            <limit>
-              <ITT is_input="True">1080.0<!--Limit ITT of the turboshaft--></ITT>
-              <OPR is_input="True">8.5<!--Limit OPR of the turboshaft--></OPR>
-            </limit>
-          </turboshaft_2>
-        </turboshaft>
+          </speed_reducer_2>
+        </speed_reducer>
+        <DC_bus>
+          <dc_bus_1>
+            <CG>
+              <y_ratio is_input="True">0.25<!--Y position of the DC bus center of gravity as a ratio of the wing half-span--></y_ratio>
+            </CG>
+            <cross_section>
+              <density units="kg/m**3" is_input="True">8960.0<!--Density of the conductor, copper is assumed--></density>
+              <length units="m" is_input="True">0.3<!--Length of the bus bar conductor--></length>
+              <w_t_ratio is_input="True">20.0</w_t_ratio>
+            </cross_section>
+          </dc_bus_1>
+        </DC_bus>
+        <aux_load>
+          <dc_aux_load_1>
+            <power_in_mission units="kW">120.65</power_in_mission>
+            <power_density units="kW/kg">0.261</power_density>
+            <CG>
+              <y_ratio>0.01</y_ratio>
+            </CG>
+          </dc_aux_load_1>
+          <dc_aux_load_2>
+            <power_in_mission units="kW">120.65</power_in_mission>
+            <power_density units="kW/kg">0.261</power_density>
+            <CG>
+              <y_ratio>0.01</y_ratio>
+            </CG>
+          </dc_aux_load_2>
+        </aux_load>
       </he_power_train>
       <turboprop>
         <design_point>
@@ -270,10 +497,10 @@
       </vertical_tail>
       <cooling>
         <cruise>
-          <CD0 is_input="True">0.008<!--profile drag due to cooling in cruise conditions--></CD0>
+          <CD0 is_input="True">0.02913<!--profile drag due to cooling in cruise conditions (0.008 + 0.01557)--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="True">0.008<!--profile drag due to cooling in low speed conditions--></CD0>
+          <CD0 is_input="True">0.02913<!--profile drag due to cooling in low speed conditions (0.008 + 0.01557)--></CD0>
         </low_speed>
       </cooling>
       <flaps>
@@ -311,8 +538,8 @@
     </handling_qualities>
     <weight>
       <aircraft>
-        <max_payload units="kg" is_input="True">1941.0<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">1542.2<!--design payload weight--></payload>
+        <max_payload units="kg" is_input="True">823.0<!--max payload weight--></max_payload>
+        <payload units="kg" is_input="True">719.8<!--design payload weight--></payload>
         <CG>
           <aft>
             <MAC_limit is_input="True">0.1<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
@@ -335,7 +562,7 @@
       </airframe>
       <furniture>
         <passenger_seats>
-          <mass units="kg" is_input="True">295.0<!--passenger/pilot seats total mass--></mass>
+          <mass units="kg" is_input="True">112.4<!--passenger/pilot seats total mass--></mass>
         </passenger_seats>
       </furniture>
       <propulsion>
@@ -370,7 +597,7 @@
       <sizing>
         <initial_climb>
           <energy units="W*h" is_input="True">0.0</energy>
-          <fuel units="kg" is_input="True">0.88</fuel>
+          <fuel units="kg" is_input="True">0.2</fuel>
         </initial_climb>
         <landing>
           <elevator_angle units="deg" is_input="True">-15.0<!--position of the elevator during landing--></elevator_angle>
@@ -379,7 +606,7 @@
         <takeoff>
           <elevator_angle units="deg" is_input="True">-25.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
           <energy units="W*h" is_input="True">0.0</energy>
-          <fuel units="kg" is_input="True">3.2</fuel>
+          <fuel units="kg" is_input="True">0.75</fuel>
           <thrust_rate is_input="True">1.0<!--thrust rate during takeoff phase--></thrust_rate>
         </takeoff>
         <taxi_in>
@@ -489,6 +716,54 @@
         </pressure_loss>
       </turboprop>
       <he_power_train>
+        <DC_bus>
+          <insulation>
+            <breakdown_voltage units="V" is_input="True">340.0<!--Mininum breakdown voltage of air cavity--></breakdown_voltage>
+            <density units="kg/m**3" is_input="True">1450.0<!--Density of the insulation, Gexol is assumed--></density>
+            <dielectric_permittivity is_input="True">4.0<!--Dielectric permittivity of the insulation, chosen as Gexol insulation--></dielectric_permittivity>
+            <void_thickness units="m" is_input="True">5e-05</void_thickness>
+          </insulation>
+        </DC_bus>
+        <PEMFC_stack>
+          <pemfc_stack_1>
+            <k_mass is_input="True">1.0<!--A tuning factor allows the PEMFC stack weight to be changed manually.--></k_mass>
+            <k_volume is_input="True">1.0<!--A tuning factor allows the PEMFC stack volume to be changed manually.--></k_volume>
+          </pemfc_stack_1>
+        </PEMFC_stack>
+        <SM_PMSM>
+          <motor_1>
+            <k_efficiency is_input="True">1.0<!--K factor for the SM PMSM efficiency--></k_efficiency>
+            <power_factor is_input="True">1.0</power_factor>
+          </motor_1>
+          <motor_2>
+            <k_efficiency is_input="True">1.0<!--K factor for the SM PMSM efficiency--></k_efficiency>
+            <power_factor is_input="True">1.0</power_factor>
+          </motor_2>
+        </SM_PMSM>
+        <inverter>
+          <inverter_1>
+            <reference_temperature units="degK" is_input="True">293.15</reference_temperature>
+            <casing>
+              <specific_heat units="J/kg/degK" is_input="True">600.0<!--Equivalent specific heat capacity of the casing--></specific_heat>
+            </casing>
+            <inductor>
+              <copper_density units="kg/m**3" is_input="True">7800.0<!--Density of the copper used in the inductor--></copper_density>
+              <copper_resistivity units="ohm*um" is_input="True">0.0177<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
+              <iron_permeability units="uH/m" is_input="True">4.396<!--Permeability of the iron core--></iron_permeability>
+            </inductor>
+          </inverter_1>
+          <inverter_2>
+            <reference_temperature units="degK" is_input="True">293.15</reference_temperature>
+            <casing>
+              <specific_heat units="J/kg/degK" is_input="True">600.0<!--Equivalent specific heat capacity of the casing--></specific_heat>
+            </casing>
+            <inductor>
+              <copper_density units="kg/m**3" is_input="True">7800.0<!--Density of the copper used in the inductor--></copper_density>
+              <copper_resistivity units="ohm*um" is_input="True">0.0177<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
+              <iron_permeability units="uH/m" is_input="True">4.396<!--Permeability of the iron core--></iron_permeability>
+            </inductor>
+          </inverter_2>
+        </inverter>
         <propeller>
           <propeller_1>
             <effective_advance_ratio is_input="True">0.9838543920441022<!--Decrease in power coefficient due to installation effects of the propeller--></effective_advance_ratio>
@@ -499,21 +774,20 @@
             <installation_effect is_input="True">0.95<!--Increase in the power coefficient due to installation effects on the propeller--></installation_effect>
           </propeller_2>
         </propeller>
-        <turboshaft>
-          <turboshaft_1>
-            <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.05<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
-          </turboshaft_1>
-          <turboshaft_2>
-            <cg_in_nacelle is_input="True">0.5<!--Location of the engine CG in the nacelle, in percent of the nacelle length--></cg_in_nacelle>
-            <k_sfc is_input="True">1.05<!--K-factor to adjust the sfc/fuel consumption of the turboshaft--></k_sfc>
-          </turboshaft_2>
-        </turboshaft>
+        <DC_DC_converter>
+          <dc_dc_converter_1>
+            <inductor>
+              <copper_density units="kg/m**3" is_input="True">7800.0<!--Density of the copper used in the inductor--></copper_density>
+              <copper_resistivity units="ohm*um" is_input="True">0.0177<!--Resistivity of the copper used in the inductor [Ohm/m]--></copper_resistivity>
+              <iron_permeability units="uH/m" is_input="True">4.396<!--Permeability of the iron core--></iron_permeability>
+            </inductor>
+          </dc_dc_converter_1>
+        </DC_DC_converter>
       </he_power_train>
     </propulsion>
     <weight>
       <aircraft>
-        <MLW_MZFW_ratio is_input="True">1.05</MLW_MZFW_ratio>
+        <MLW_MZFW_ratio is_input="True">1.01</MLW_MZFW_ratio>
         <CG>
           <range is_input="True">0.23<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
           <aft>
