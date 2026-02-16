@@ -1183,6 +1183,46 @@ PEMFC_STACK = {
     ETA: 0.5,
     CTRL_PARAM: [],
 }
+PEMFC_STACK_BOP = {
+    ID: "fastga_he.pt_component.pemfc_stack_bop",
+    CN: "PEMFCStackBOP",
+    CN_ID: "pemfc_stack_bop_id",
+    CT: "PEMFC_stack_bop",
+    ATT: ["model_fidelity"],
+    PT: ["time_step", "altitude"],
+    SPT: [],
+    PTS: [],
+    IN: [(None, "fuel_consumed_t"), (None, "fuel_consumption")],
+    OUT: [(None, "voltage_out"), ("dc_current_out", None)],
+    CTC: "source",
+    MP: [
+        {"fc_current_density": "A/cm**2"},
+        {"voltage_out": "V"},
+        {"fuel_consumption": "kg/h"},
+        {"efficiency": None},
+    ],
+    SMP: [
+        {"delta_Cd": None},
+    ],
+    ICON: "fuel_cell",
+    ICON_SIZE: 20,
+    RSD: ["voltage_out"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [("power_out", "out")],
+    I_TO_SET: [],
+    SFR: False,
+    SWL: False,
+    DST_W: [],
+    PCT_W: ["wing_pod"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: True,
+    VARIESN_T_MASS: False,
+    ETA: 0.5,
+    CTRL_PARAM: [],
+}
 
 
 KNOWN_COMPONENTS = [
@@ -1211,6 +1251,7 @@ KNOWN_COMPONENTS = [
     DC_AUX_LOAD,
     GASEOUS_HYDROGEN_TANK,
     PEMFC_STACK,
+    PEMFC_STACK_BOP,
 ]
 
 KNOWN_ID = []
