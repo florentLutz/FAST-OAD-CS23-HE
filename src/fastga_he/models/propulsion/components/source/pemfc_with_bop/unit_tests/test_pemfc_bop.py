@@ -488,6 +488,26 @@ def test_operating_pressure():
     )
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:operating_pressure",
+        units="atm",
+        val=1.0,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackBOPOperatingPressure(
+            number_of_points=NB_POINTS_TEST,
+            compressor_connection=True,
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+        ),
+        ivc,
+    )
+    assert problem.get_val("operating_pressure", units="atm") == pytest.approx(
+        np.ones(NB_POINTS_TEST), rel=1e-2
+    )
+    problem.check_partials(compact_print=True)
+
 
 def test_analytical_voltage_adjustment():
     ivc = om.IndepVarComp()

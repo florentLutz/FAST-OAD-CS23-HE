@@ -1188,7 +1188,7 @@ PEMFC_STACK_BOP = {
     CN: "PEMFCStackBOP",
     CN_ID: "pemfc_stack_bop_id",
     CT: "PEMFC_stack_bop",
-    ATT: ["model_fidelity"],
+    ATT: ["model_fidelity", "compressor_connection"],
     PT: ["time_step", "altitude"],
     SPT: [],
     PTS: [],
