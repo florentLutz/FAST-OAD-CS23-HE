@@ -141,7 +141,6 @@ def test_sizing_kodiak_100_full_electric():
     assert problem.get_val("data:weight:aircraft:MTOW", units="kg") == pytest.approx(
         3616.0, rel=1e-2
     )
-    # Actual value is 3290 kg
     assert problem.get_val("data:weight:aircraft:OWE", units="kg") == pytest.approx(
         2916.0, rel=1e-2
     )
