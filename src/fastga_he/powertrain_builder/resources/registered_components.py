@@ -1200,6 +1200,7 @@ PEMFC_STACK_BOP = {
         {"voltage_out": "V"},
         {"fuel_consumption": "kg/h"},
         {"efficiency": None},
+        {"power_out": "kW"},
     ],
     SMP: [
         {"delta_Cd": None},

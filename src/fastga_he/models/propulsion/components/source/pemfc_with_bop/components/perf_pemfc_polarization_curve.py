@@ -236,11 +236,6 @@ class PerformancesPEMFCStackBOPPolarizationCurveAnalytical(om.ExplicitComponent)
             desc="standard temperature for the hydrogen oxidation reaction in [K]",
         )
         self.options.declare(
-            "operating_temperature",
-            default=350.0,
-            desc="standard operating temperature for the PEMFC in [K]",
-        )
-        self.options.declare(
             "cathode_transfer_coefficient",
             default=0.3,
             desc="transfer coefficient at the cathode side of fuel cell",
@@ -282,6 +277,14 @@ class PerformancesPEMFCStackBOPPolarizationCurveAnalytical(om.ExplicitComponent)
             desc="Area ohmic resistance of the single-layered PEMFC",
         )
         self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":operating_temperature",
+            units="K",
+            val=350,
+            desc="standard operating temperature for the PEMFC",
+        )
+        self.add_input(
             "operating_pressure",
             units="atm",
             val=np.full(number_of_points, DEFAULT_PRESSURE_ATM),
@@ -321,6 +324,9 @@ class PerformancesPEMFCStackBOPPolarizationCurveAnalytical(om.ExplicitComponent)
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":area_ohmic_resistance",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":operating_temperature",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -356,7 +362,11 @@ class PerformancesPEMFCStackBOPPolarizationCurveAnalytical(om.ExplicitComponent)
             + pemfc_stack_bop_id
             + ":hydrogen_reactant_pressure"
         ]
-        t_operating = self.options["operating_temperature"]
+        t_operating = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":operating_temperature"
+        ]
 
         outputs["single_layer_pemfc_voltage"] = pvc * (
             e0
@@ -380,7 +390,11 @@ class PerformancesPEMFCStackBOPPolarizationCurveAnalytical(om.ExplicitComponent)
         e0 = REVERSIBLE_ELECTRIC_POTENTIAL
         ds = self.options["entropy_difference"]
         t_0 = np.full(number_of_points, self.options["standard_temperature"])
-        t_operating = self.options["operating_temperature"]
+        t_operating = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":operating_temperature"
+        ]
         a_transfer = self.options["cathode_transfer_coefficient"]
         resistance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -450,4 +464,15 @@ class PerformancesPEMFCStackBOPPolarizationCurveAnalytical(om.ExplicitComponent)
             * np.log(j_clipped + j_leak)
             - resistance * j_clipped
             - c_loss * np.log(j_lim / (j_lim - j_clipped - j_leak))
+        )
+
+        partials[
+            "single_layer_pemfc_voltage",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":operating_temperature",
+        ] = pvc * (
+            -ds / (2.0 * FARADAY_CONSTANT)
+            + GAS_CONSTANT / (2.0 * FARADAY_CONSTANT) * np.log(p_h2 * np.sqrt(p_o2 * 0.21))
+            - GAS_CONSTANT / (2.0 * a_transfer * FARADAY_CONSTANT) * np.log(j_clipped + j_leak)
         )

@@ -571,6 +571,7 @@ class FASTGAHEPowerTrainConfigurator:
             if (
                 target_id == "fastga_he.pt_component.battery_pack"
                 or target_id == "fastga_he.pt_component.pemfc_stack"
+                or target_id == "fastga_he.pt_component.pemfc_stack_bop"
             ) and (
                 source_id == "fastga_he.pt_component.dc_bus"
                 or source_id == "fastga_he.pt_component.dc_splitter"
