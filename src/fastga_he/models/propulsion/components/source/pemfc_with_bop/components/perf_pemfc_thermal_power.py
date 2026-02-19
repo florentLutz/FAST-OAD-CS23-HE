@@ -8,9 +8,9 @@ import openmdao.api as om
 from ..constants import MAX_DEFAULT_POWER
 
 
-class PerformancesPEMFCStackBOPWasteHeatFlow(om.ExplicitComponent):
+class PerformancesPEMFCStackBOPThermalPower(om.ExplicitComponent):
     """
-    Waste heat flow computation of the PEMFC stack, using for BOP and TMS sizing.
+    Total power computation of the PEMFC stack, which the thermal waste is also considered.
     """
 
     def initialize(self):
@@ -25,7 +25,7 @@ class PerformancesPEMFCStackBOPWasteHeatFlow(om.ExplicitComponent):
         self.add_input("efficiency", val=np.full(number_of_points, np.nan))
 
         self.add_output(
-            "waste_heat_flow", units="kW", val=np.full(number_of_points, MAX_DEFAULT_POWER * 0.5)
+            "thermal_power", units="kW", val=np.full(number_of_points, MAX_DEFAULT_POWER)
         )
 
     def setup_partials(self):
@@ -40,11 +40,8 @@ class PerformancesPEMFCStackBOPWasteHeatFlow(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["waste_heat_flow"] = inputs["power_out"] / inputs["efficiency"] * 0.35
+        outputs["thermal_power"] = inputs["power_out"] / inputs["efficiency"]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["waste_heat_flow", "power_out"] = 1.0 / inputs["efficiency"] * 0.35
-
-        partials["waste_heat_flow", "efficiency"] = (
-            -inputs["power_out"] / inputs["efficiency"] ** 2.0 * 0.35
-        )
+        partials["thermal_power", "power_out"] = 1.0 / inputs["efficiency"]
+        partials["thermal_power", "efficiency"] = -inputs["power_out"] / inputs["efficiency"] ** 2.0

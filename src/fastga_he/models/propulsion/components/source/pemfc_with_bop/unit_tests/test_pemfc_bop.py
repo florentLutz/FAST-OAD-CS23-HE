@@ -34,6 +34,8 @@ from ..components.perf_pemfc_current_density import PerformancesPEMFCStackBOPCur
 from ..components.perf_maximum import PerformancesPEMFCStackBOPMaximum
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackBOPEfficiency
 from ..components.perf_pemfc_power import PerformancesPEMFCStackBOPPower
+from ..components.perf_pemfc_thermal_power import PerformancesPEMFCStackBOPThermalPower
+from ..components.perf_pemfc_coolant_temperature import PerformancesPEMFCStackBOPCoolantTemperature
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackBOPVoltage
 from ..components.perf_pemfc_operating_pressure import PerformancesPEMFCStackBOPOperatingPressure
 from ..components.perf_pemfc_voltage_adjustment import (
@@ -471,6 +473,32 @@ def test_ambient_pressure():
     problem.check_partials(compact_print=True)
 
 
+def test_coolant_temperature():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:operating_temperature",
+        units="K",
+        val=350.0,
+    )
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackBOPCoolantTemperature(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant_inlet_temperature",
+        units="K",
+    ) == pytest.approx(339.8, rel=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant_outlet_temperature",
+        units="K",
+    ) == pytest.approx(349.8, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_operating_pressure():
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -701,6 +729,33 @@ def test_pemfc_efficiency():
     # Not computed with proper losses, to test only
     assert problem.get_val("efficiency") == pytest.approx(
         [0.5447, 0.5334, 0.5231, 0.5133, 0.5039, 0.4948, 0.4857, 0.4767, 0.4676, 0.4582], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pemfc_total_power():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "power_out",
+        units="kW",
+        val=np.array([320.8, 315.2, 309.7, 306.5, 303.3, 300.1, 298.4, 296.0, 294.4, 292.7]),
+    )
+    ivc.add_output(
+        "efficiency",
+        val=np.array(
+            [0.5447, 0.5334, 0.5231, 0.5133, 0.5039, 0.4948, 0.4857, 0.4767, 0.4676, 0.4582]
+        ),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackBOPThermalPower(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+    assert problem.get_val("thermal_power", units="kW") == pytest.approx(
+        [588.95, 590.93, 592.05, 597.12, 601.91, 606.51, 614.37, 620.94, 629.6, 638.8],
+        rel=1e-2,
     )
 
     problem.check_partials(compact_print=True)

@@ -7,6 +7,8 @@ import openmdao.api as om
 
 from ..components.perf_direct_bus_connection import PerformancesPEMFCStackDirectBusConnection
 from ..components.perf_pemfc_power import PerformancesPEMFCStackBOPPower
+from ..components.perf_pemfc_thermal_power import PerformancesPEMFCStackBOPThermalPower
+from ..components.perf_pemfc_coolant_temperature import PerformancesPEMFCStackBOPCoolantTemperature
 from ..components.perf_maximum import PerformancesPEMFCStackBOPMaximum
 from ..components.perf_pemfc_current_density import PerformancesPEMFCStackBOPCurrentDensity
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackBOPFuelConsumption
@@ -67,6 +69,12 @@ class PerformancesPEMFCStackBOP(om.Group):
                 number_of_points=number_of_points,
                 model_fidelity=model_fidelity,
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "coolant_temperature",
+            PerformancesPEMFCStackBOPCoolantTemperature(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )
 
@@ -132,6 +140,12 @@ class PerformancesPEMFCStackBOP(om.Group):
         self.add_subsystem(
             "pemfc_power",
             PerformancesPEMFCStackBOPPower(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "pemfc_total_thermal_power",
+            PerformancesPEMFCStackBOPThermalPower(number_of_points=number_of_points),
             promotes=["*"],
         )
 
