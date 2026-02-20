@@ -2,8 +2,10 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
+
+from .sizing_humidifier_volume import SizingHumidifierVolume
+from .sizing_humidifier_weight import SizingHumidifierWeight
 
 
 class SizingHumidifier(om.Group):
@@ -11,9 +13,24 @@ class SizingHumidifier(om.Group):
     Sizing of the PEMFC Humidifier
     """
 
-    def setup(self):
-        ## Inputs
-        self.add_input(name="data:thermal:fuel_cell:power", units="kW", val=np.nan)
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
 
-        self.add_output(name="data:thermal:humidifier:mass", units="kg")
-        self.add_output(name="data:thermal:humidifier:volume", units="m**3")
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        self.add_subsystem(
+            "humidifier_volume",
+            SizingHumidifierVolume(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "humidifier_weight",
+            SizingHumidifierWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["data:*"],
+        )

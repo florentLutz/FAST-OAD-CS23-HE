@@ -23,6 +23,7 @@ from ..components.sizing_pemfc_power_density import (
 from ..components.sizing_pemfc_stack import SizingPEMFCStackBOP
 
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackBOPFuelConsumption
+from ..components.perf_ambient_air_consumption import PerformancesPEMFCStackBOPAirConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackBOPFuelConsumed
 from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackBOPSingleLayerVoltageEmpirical,
@@ -659,9 +660,23 @@ def test_maximum():
         val=np.array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0]),
     )
     ivc.add_output(
+        "thermal_power",
+        units="kW",
+        val=np.array(
+            [588.95, 590.93, 592.05, 597.12, 601.91, 606.51, 614.37, 620.94, 629.6, 638.8]
+        ),
+    )
+    ivc.add_output(
         "dc_current_out",
         units="A",
         val=np.array([4.01, 3.93, 3.85, 3.8, 3.75, 3.7, 3.67, 3.63, 3.6, 3.57]),
+    )
+    ivc.add_output(
+        "air_consumption",
+        units="kg/s",
+        val=np.array(
+            [1405.7, 1508.6, 1619.1, 1737.1, 1866.7, 2011.4, 2163.8, 2316.2, 2495.2, 2666.7]
+        ),
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -680,9 +695,23 @@ def test_maximum():
         rel=1e-2,
     )
     assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:thermal_power_max",
+        units="kW",
+    ) == pytest.approx(
+        638.8,
+        rel=1e-2,
+    )
+    assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:power_max", units="kW"
     ) == pytest.approx(
         100.0,
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        units="kg/s",
+    ) == pytest.approx(
+        2666.7,
         rel=1e-2,
     )
 
@@ -801,6 +830,43 @@ def test_fuel_consumption():
             0.000652849740932643,
             0.000718134715025907,
         ],
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_air_consumption():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        name="fuel_consumption",
+        val=np.array([36.9, 39.6, 42.5, 45.6, 49.0, 52.8, 56.8, 60.8, 65.5, 70.0]),
+        units="kg/s",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackBOPAirConsumption(
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("air_consumption", units="kg/s") == pytest.approx(
+        np.array(
+            [
+                1405.71,
+                1508.57,
+                1619.05,
+                1737.14,
+                1866.67,
+                2011.43,
+                2163.81,
+                2316.19,
+                2495.24,
+                2666.67,
+            ]
+        ),
         rel=1e-2,
     )
 

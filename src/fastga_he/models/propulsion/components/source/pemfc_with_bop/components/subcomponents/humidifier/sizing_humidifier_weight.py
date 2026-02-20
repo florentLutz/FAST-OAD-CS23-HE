@@ -11,28 +11,70 @@ class SizingHumidifierWeight(om.ExplicitComponent):
     Weight computation of the humidifier.
     """
 
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
     def setup(self):
-        ## Inputs
-        self.add_input(name="data:thermal:fuel_cell:power", units="kW", val=np.nan)
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":power_rating",
+            units="kW",
+            val=np.nan,
+        )
 
         ## Output
-        self.add_output(name="data:thermal:humidifier:mass", units="kg")
-        self.add_output(name="data:thermal:humidifier:volume", units="m**3")
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":humidifier:mass",
+            units="kg",
+        )
+
+    def setup_partials(self):
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        ## Inputs
-        P_fc = inputs["data:thermal:fuel_cell:power"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        if P_fc <= 200:
-            M = 4.535e-5 * P_fc**2 + 0.062 * P_fc + 2.119
+        pemfc_power_rating = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
+        ]
+
+        if pemfc_power_rating <= 200:
+            mass = 4.535e-5 * pemfc_power_rating**2.0 + 0.062 * pemfc_power_rating + 2.119
         else:
-            M = 16.33 * (P_fc / 200)
+            mass = 16.33 * (pemfc_power_rating / 200)
 
-        if P_fc <= 200:
-            V = (-4.058 * 1e-4 * P_fc**2 + 0.151 * P_fc + 2.019) / 1e3
-        else:
-            V = 15.54 * (P_fc / 150) / 1e3
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":humidifier:mass"
+        ] = mass
 
-        ## Outputs
-        outputs["data:thermal:humidifier:mass"] = M
-        outputs["data:thermal:humidifier:volume"] = V
+    def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        pemfc_power_rating = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
+        ]
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":humidifier:mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":power_rating",
+        ] = np.where(
+            pemfc_power_rating <= 200,
+            9.07e-05 * pemfc_power_rating + 0.062,
+            16.33 / 200,
+        )

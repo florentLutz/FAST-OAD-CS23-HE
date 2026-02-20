@@ -12,6 +12,7 @@ from ..components.perf_pemfc_coolant_temperature import PerformancesPEMFCStackBO
 from ..components.perf_maximum import PerformancesPEMFCStackBOPMaximum
 from ..components.perf_pemfc_current_density import PerformancesPEMFCStackBOPCurrentDensity
 from ..components.perf_fuel_consumption import PerformancesPEMFCStackBOPFuelConsumption
+from ..components.perf_ambient_air_consumption import PerformancesPEMFCStackBOPAirConsumption
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackBOPFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackBOPEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackBOPVoltage
@@ -122,6 +123,11 @@ class PerformancesPEMFCStackBOP(om.Group):
             PerformancesPEMFCStackBOPFuelConsumption(
                 pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "air_consumption",
+            PerformancesPEMFCStackBOPAirConsumption(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

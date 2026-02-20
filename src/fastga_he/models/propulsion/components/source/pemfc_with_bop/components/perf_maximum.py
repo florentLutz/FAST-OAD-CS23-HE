@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import MAX_DEFAULT_POWER, MAX_DEFAULT_CURRENT
+from ..constants import MAX_DEFAULT_POWER, MAX_DEFAULT_CURRENT, DEFAULT_AIR_CONSUMPTION
 
 
 class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
@@ -31,6 +31,7 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
         self.add_input("power_out", units="kW", val=np.full(number_of_points, np.nan))
         self.add_input("thermal_power", units="kW", val=np.full(number_of_points, np.nan))
         self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input("air_consumption", units="kg/s", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_max",
@@ -51,6 +52,14 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
             units="A",
             val=MAX_DEFAULT_CURRENT,
             desc="Maximum current the PEMFC stack has to provide during mission",
+        )
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_consumption_max",
+            units="kg/s",
+            val=DEFAULT_AIR_CONSUMPTION,
+            desc="Maximum air consumption of the PEMFC during mission",
         )
 
     def setup_partials(self):
@@ -77,6 +86,13 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
             wrt="dc_current_out",
             method="exact",
         )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_consumption_max",
+            wrt="air_consumption",
+            method="exact",
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -92,6 +108,11 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":current_max"
         ] = np.max(inputs["dc_current_out"])
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_consumption_max"
+        ] = np.max(inputs["air_consumption"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -112,3 +133,10 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":current_max",
             "dc_current_out",
         ] = np.where(inputs["dc_current_out"] == np.max(inputs["dc_current_out"]), 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_consumption_max",
+            "air_consumption",
+        ] = np.where(inputs["air_consumption"] == np.max(inputs["air_consumption"]), 1.0, 0.0)
