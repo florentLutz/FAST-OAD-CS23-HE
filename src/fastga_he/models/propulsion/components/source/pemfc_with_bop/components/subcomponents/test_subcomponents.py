@@ -20,6 +20,8 @@ from .humidifier.perf_humidifier_rating_pressure_drop import (
 from .humidifier.sizing_humidifier_volume import SizingHumidifierVolume
 from .humidifier.sizing_humidifier_weight import SizingHumidifierWeight
 
+from .coolant_tank.sizing_coolant_tank import SizingCoolantTank
+
 
 def test_fluid_density():
     # Research independent input value in .xml file
@@ -216,5 +218,42 @@ def test_sizing_humidifier_volume():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":humidifier:volume",
         units="m**3",
     ) == pytest.approx(0.124, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_coolant_tank_sizing():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:HEX:coolant_volume",
+        units="m**3",
+        val=0.02,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:radius",
+        units="m",
+        val=0.01,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:number_of_pipes",
+        units="unitless",
+        val=5,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingCoolantTank(pemfc_stack_bop_id="pemfc_stack_bop_1"), ivc)
+    assert problem.get_val("data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
+                           ":coolant_tank:coolant_volume", units="m**3") == pytest.approx(
+        0.025, rel=1e-2
+    )
+    assert problem.get_val("data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
+                           ":coolant_tank:volume", units="m**3") == pytest.approx(
+        0.0274, rel=1e-2
+    )
+    assert problem.get_val("data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
+                           ":coolant_tank:mass", units="kg") == pytest.approx(
+        6.585, rel=1e-2
+    )
 
     problem.check_partials(compact_print=True)
