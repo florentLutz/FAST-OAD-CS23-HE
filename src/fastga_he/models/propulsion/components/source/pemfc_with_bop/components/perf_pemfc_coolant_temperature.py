@@ -43,14 +43,14 @@ class PerformancesPEMFCStackBOPCoolantTemperature(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant_inlet_temperature",
+            + ":coolant:inlet_temperature",
             units="K",
             val=300.0,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant_outlet_temperature",
+            + ":coolant:outlet_temperature",
             units="K",
             val=310.0,
         )
@@ -71,13 +71,13 @@ class PerformancesPEMFCStackBOPCoolantTemperature(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant_inlet_temperature"
+            + ":coolant:inlet_temperature"
         ] = operating_temperature - (temperature_gradiant / heat_transfer_effectiveness)
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant_outlet_temperature"
+            + ":coolant:outlet_temperature"
         ] = (
             operating_temperature
             - (temperature_gradiant / heat_transfer_effectiveness)

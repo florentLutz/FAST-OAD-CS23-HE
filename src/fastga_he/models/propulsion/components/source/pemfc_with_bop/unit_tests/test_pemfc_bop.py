@@ -488,12 +488,12 @@ def test_coolant_temperature():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant_inlet_temperature",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:inlet_temperature",
         units="K",
     ) == pytest.approx(339.8, rel=1e-2)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant_outlet_temperature",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:outlet_temperature",
         units="K",
     ) == pytest.approx(349.8, rel=1e-2)
 
