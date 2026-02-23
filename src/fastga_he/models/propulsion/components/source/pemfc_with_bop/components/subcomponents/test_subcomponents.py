@@ -304,7 +304,7 @@ def test_pipe_reynolds_number():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:dynamic_viscosity",
         units="Pa*s",
-        val=0.195,
+        val=0.195e-3,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -314,7 +314,7 @@ def test_pipe_reynolds_number():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:reynolds_number",
         units="unitless",
-    ) == pytest.approx(26.92, rel=1e-2)
+    ) == pytest.approx(26920.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
