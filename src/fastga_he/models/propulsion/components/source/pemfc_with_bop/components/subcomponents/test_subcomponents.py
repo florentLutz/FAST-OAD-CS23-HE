@@ -27,6 +27,8 @@ from .pipe.perf_pipe_reynolds_number import PerformancesPipeReynoldsNumber
 from .pipe.perf_pipe_darcy_friction_factor import PerformancesPipeDarcyFrictionFactor
 from .pipe.perf_pipe_rating_pressure_drop import PerformancesPipeRatingPressureDrop
 from .pipe.sizing_pipe_wall_thickness import SizingPipeWallThickness
+from .pipe.sizing_pipe import SizingPipe
+from .pipe.perf_pipe import PerformancesPipe
 
 
 def test_fluid_density():
@@ -168,7 +170,7 @@ def test_sizing_humidifier_weight():
     problem = run_system(SizingHumidifierWeight(pemfc_stack_bop_id="pemfc_stack_bop_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":humidifier:mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:humidifier:mass",
         units="kg",
     ) == pytest.approx(12.44, rel=1e-2)
 
@@ -185,7 +187,7 @@ def test_sizing_humidifier_weight():
     problem = run_system(SizingHumidifierWeight(pemfc_stack_bop_id="pemfc_stack_bop_1"), ivc)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":humidifier:mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:humidifier:mass",
         units="kg",
     ) == pytest.approx(97.98, rel=1e-2)
 
@@ -313,6 +315,51 @@ def test_pipe_wall_thickness():
     problem.check_partials(compact_print=True)
 
 
+def test_sizing_pipe():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:static_pressure",
+        units="Pa",
+        val=200000.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mean_temperature",
+        units="K",
+        val=345.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:number_of_pipes",
+        units="unitless",
+        val=5,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPipe(pemfc_stack_bop_id="pemfc_stack_bop_1", coolant_fluid_type="ethylene glycol"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:radius",
+        units="m",
+    ) == pytest.approx(0.029, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:wall_thickness",
+        units="m",
+    ) == pytest.approx(0.00022, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:mass",
+        units="kg",
+    ) == pytest.approx(60.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_pipe_reynolds_number():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
@@ -425,5 +472,53 @@ def test_pipe_rating_pressure_drop():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:rating_pressure_drop",
         units="Pa",
     ) == pytest.approx(1058.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pipe_performance():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:radius",
+        units="m",
+        val=0.01,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:static_pressure",
+        units="Pa",
+        val=200000.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mean_temperature",
+        units="K",
+        val=345.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:number_of_pipes",
+        units="unitless",
+        val=5,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPipe(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", coolant_fluid_type="ethylene glycol"
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:darcy_friction_factor",
+        units="unitless",
+    ) == pytest.approx(0.00997, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:rating_pressure_drop",
+        units="Pa",
+    ) == pytest.approx(1447.56, rel=1e-2)
 
     problem.check_partials(compact_print=True)

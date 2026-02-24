@@ -87,13 +87,13 @@ class PerformancesPipe(om.Group):
         )
 
         self.connect(
-            "pipe_coolant_density_performance:fluid_density", "pipe_reynolds_number:coolant_density"
+            "pipe_coolant_density_performance.fluid_density", "pipe_reynolds_number.coolant_density"
         )
         self.connect(
             "pipe_coolant_dynamic_viscosity_performance.fluid_dynamic_viscosity",
             "pipe_reynolds_number.coolant_dynamic_viscosity",
         )
         self.connect(
-            "pipe_coolant_density_performance:fluid_density",
-            "pipe_rating_pressure_drop:coolant_density",
+            "pipe_coolant_density_performance.fluid_density",
+            "pipe_rating_pressure_drop.coolant_density",
         )
