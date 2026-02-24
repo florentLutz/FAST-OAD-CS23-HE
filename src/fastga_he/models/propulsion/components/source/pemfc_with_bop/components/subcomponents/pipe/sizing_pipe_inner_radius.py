@@ -30,18 +30,17 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:density",
+            name="coolant_density",
             units="kg/m**3",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity",
-            units="Pa*s",
-            val=np.nan,
+            + ":pipe:transport_velocity",
+            units="m/s",
+            val=1.5,
+            desc="Pipe flow velocity",
         )
 
         self.add_output(
@@ -63,20 +62,16 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:mass_flow_rate"
         ]
-        density = inputs[
+        density = inputs["coolant_density"]
+        flow_velocity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:density"
-        ]
-        dynamic_viscosity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity"
+            + ":pipe:transport_velocity"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
-        ] = np.sqrt(mass_flow / (np.pi * density * dynamic_viscosity))
+        ] = np.sqrt(mass_flow / (np.pi * density * flow_velocity))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -86,15 +81,11 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:mass_flow_rate"
         ]
-        density = inputs[
+        density = inputs["coolant_density"]
+        flow_velocity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:density"
-        ]
-        dynamic_viscosity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity"
+            + ":pipe:transport_velocity"
         ]
 
         partials[
@@ -102,18 +93,16 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:mass_flow_rate",
-        ] = 0.5 * np.sqrt(1.0 / (np.pi * density * dynamic_viscosity * mass_flow))
+        ] = 0.5 * np.sqrt(1.0 / (np.pi * density * flow_velocity * mass_flow))
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius",
+            "coolant_density",
+        ] = -0.5 * np.sqrt(mass_flow / (np.pi * density**3.0 * flow_velocity))
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:density",
-        ] = -0.5 * np.sqrt(mass_flow / (np.pi * density**3.0 * dynamic_viscosity))
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity",
-        ] = -0.5 * np.sqrt(mass_flow / (np.pi * density * dynamic_viscosity**3.0))
+            + ":pipe:transport_velocity",
+        ] = -0.5 * np.sqrt(mass_flow / (np.pi * density * flow_velocity**3.0))

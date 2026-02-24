@@ -54,6 +54,13 @@ class PerformancesPEMFCStackBOPCoolantTemperature(om.ExplicitComponent):
             units="K",
             val=310.0,
         )
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mean_temperature",
+            units="K",
+            val=305.0,
+        )
 
     def setup_partials(self):
         self.declare_partials(of="*", wrt="*", val=1.0)
@@ -82,4 +89,14 @@ class PerformancesPEMFCStackBOPCoolantTemperature(om.ExplicitComponent):
             operating_temperature
             - (temperature_gradiant / heat_transfer_effectiveness)
             + temperature_gradiant
+        )
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mean_temperature"
+        ] = (
+            operating_temperature
+            - (temperature_gradiant / heat_transfer_effectiveness)
+            + (temperature_gradiant / 2.0)
         )

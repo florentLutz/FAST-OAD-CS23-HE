@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingHumidifierWeight(om.ExplicitComponent):
+class SizingPipeWeight(om.ExplicitComponent):
     """
     Weight computation of the humidifier.
     """
@@ -25,17 +25,40 @@ class SizingHumidifierWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":power_rating",
-            units="kW",
+            + ":pipe:radius",
+            units="m",
             val=np.nan,
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:wall_thickness",
+            units="m",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:material_density",
+            units="kg/m**3",
+            val=8960.0,
+            desc="Pipe material density, the default material is copper",
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:number_of_pipes",
+            units="unitless",
+            val=np.nan,
+            desc="Number of the coolant pipes in the TMS",
+        )
 
-        ## Output
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":humidifier:mass",
+            + ":pipe:mass",
             units="kg",
+            val=2.0,
         )
 
     def setup_partials(self):
@@ -44,37 +67,82 @@ class SizingHumidifierWeight(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        pemfc_power_rating = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
+        radius = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
         ]
-
-        if pemfc_power_rating <= 200:
-            mass = 4.535e-5 * pemfc_power_rating**2.0 + 0.062 * pemfc_power_rating + 2.119
-        else:
-            mass = 16.33 * (pemfc_power_rating / 200)
-
-        outputs[
+        wall_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":humidifier:mass"
-        ] = mass
+            + ":pipe:wall_thickness"
+        ]
+        material_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:material_density"
+        ]
+        number_of_pipes = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:number_of_pipes"
+        ]
 
-    def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:mass"
+        ] = (
+            (radius**2.0 + 2.0 * radius * wall_thickness)
+            * np.pi
+            * material_density
+            * number_of_pipes
+            * 0.5
+        )
+
+        # Add M_ins = 1.39e3 * radius**2.0 + 2.20e2 * radius + 6.09e-1 (For cryogenics liquids that
+        # require thermal insulation)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        pemfc_power_rating = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
+        radius = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
+        ]
+        wall_thickness = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:wall_thickness"
+        ]
+        material_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:material_density"
+        ]
+        number_of_pipes = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:number_of_pipes"
         ]
 
         partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius",
+        ] = (radius + wall_thickness) * np.pi * material_density * number_of_pipes
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":humidifier:mass",
+            + ":pipe:wall_thickness",
+        ] = radius * np.pi * material_density * number_of_pipes
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":power_rating",
-        ] = np.where(
-            pemfc_power_rating <= 200,
-            9.07e-05 * pemfc_power_rating + 0.062,
-            16.33 / 200,
-        )
+            + ":pipe:material_density",
+        ] = (radius**2.0 + 2.0 * radius * wall_thickness) * np.pi * number_of_pipes * 0.5
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":pipe:number_of_pipes",
+        ] = (radius**2.0 + 2.0 * radius * wall_thickness) * np.pi * material_density * 0.5

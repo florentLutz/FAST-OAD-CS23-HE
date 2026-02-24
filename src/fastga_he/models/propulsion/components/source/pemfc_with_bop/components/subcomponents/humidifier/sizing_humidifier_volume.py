@@ -48,16 +48,15 @@ class SizingHumidifierVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
         ]
 
-        if pemfc_power_rating <= 200.0:
-            volume = -4.058 * 1e-4 * pemfc_power_rating**2.0 + 0.151 * pemfc_power_rating + 2.019
-        else:
-            volume = 15.54 * (pemfc_power_rating / 150.0)
-
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":humidifier:volume"
-        ] = volume
+        ] = np.where(
+            pemfc_power_rating <= 150.0,
+            -4.058 * 1e-4 * pemfc_power_rating**2.0 + 0.151 * pemfc_power_rating + 2.019,
+            15.54 * pemfc_power_rating / 150.0,
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -74,5 +73,5 @@ class SizingHumidifierVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":power_rating",
         ] = np.where(
-            pemfc_power_rating <= 200.0, -8.116 * 1e-4 * pemfc_power_rating + 0.151, 15.54 / 150.0
+            pemfc_power_rating <= 150.0, -8.116 * 1e-4 * pemfc_power_rating + 0.151, 15.54 / 150.0
         )

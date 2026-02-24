@@ -31,16 +31,12 @@ class PerformancesPipeReynoldsNumber(om.ExplicitComponent):
             desc="Pipe flow velocity",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:density",
+            name="coolant_density",
             units="kg/m**3",
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity",
+            name="coolant_dynamic_viscosity",
             units="Pa*s",
             val=np.nan,
         )
@@ -71,16 +67,8 @@ class PerformancesPipeReynoldsNumber(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":pipe:transport_velocity"
         ]
-        fluid_density = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:density"
-        ]
-        dynamic_viscosity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity"
-        ]
+        fluid_density = inputs["coolant_density"]
+        dynamic_viscosity = inputs["coolant_dynamic_viscosity"]
         pipe_radius = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
         ]
@@ -99,16 +87,8 @@ class PerformancesPipeReynoldsNumber(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":pipe:transport_velocity"
         ]
-        fluid_density = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:density"
-        ]
-        dynamic_viscosity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity"
-        ]
+        fluid_density = inputs["coolant_density"]
+        dynamic_viscosity = inputs["coolant_dynamic_viscosity"]
         pipe_radius = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
         ]
@@ -126,18 +106,14 @@ class PerformancesPipeReynoldsNumber(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":pipe:reynolds_number",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:density",
+            "coolant_density",
         ] = 2.0 * pipe_radius * flow_velocity / dynamic_viscosity
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":pipe:reynolds_number",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:dynamic_viscosity",
+            "coolant_dynamic_viscosity",
         ] = -2.0 * pipe_radius * flow_velocity * fluid_density / dynamic_viscosity**2.0
 
         partials[
