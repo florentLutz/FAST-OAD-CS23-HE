@@ -30,6 +30,8 @@ from .pipe.sizing_pipe_wall_thickness import SizingPipeWallThickness
 from .pipe.sizing_pipe import SizingPipe
 from .pipe.perf_pipe import PerformancesPipe
 
+from .valve.sizing_valve import SizingValve
+
 
 def test_fluid_density():
     # Research independent input value in .xml file
@@ -520,5 +522,31 @@ def test_pipe_performance():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:rating_pressure_drop",
         units="Pa",
     ) == pytest.approx(1447.56, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_valve_sizing():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingValve(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:valve:mass",
+        units="kg",
+    ) == pytest.approx(0.924, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:valve:volume",
+        units="m**3",
+    ) == pytest.approx(0.000838, rel=1e-2)
 
     problem.check_partials(compact_print=True)

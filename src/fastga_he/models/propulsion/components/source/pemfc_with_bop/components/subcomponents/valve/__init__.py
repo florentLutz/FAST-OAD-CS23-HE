@@ -2,3 +2,4 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
+from .sizing_valve import SizingValve
