@@ -70,13 +70,16 @@ class PerformancesDragCorrelationFactor(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        design_mach = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
-        ]
-        air_mass_flow_ratio = inputs["air_mass_flow_ratio"]
-        drag_correlation_factor = self._cached_drag_correlation_factor
+        # Extract scalar values from numpy arrays for JAX compatibility
+        design_mach = float(
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:design_mach"
+            ]
+        )
+        air_mass_flow_ratio = float(inputs["air_mass_flow_ratio"])
+        drag_correlation_factor = float(self._cached_drag_correlation_factor)
 
         # Partial derivatives
         df_dcorr_drag = jax.grad(drag_correlation_equation_to_solve, argnums=0)  # ∂f/∂corr_drag

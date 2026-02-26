@@ -1,0 +1,559 @@
+# This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
+# Electric Aircraft.
+# Copyright (C) 2026 ISAE-SUPAERO
+
+import os.path as pth
+import pytest
+import numpy as np
+import openmdao.api as om
+
+from ..perf_max_inlet_boundary_layer_thickness import PerformancesMaxBoundaryLayerThickness
+from ..perf_throat_height_momentum_layer_thickness_ratio import (
+    PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio,
+)
+from ..perf_momentum_flow_correction_factor import PerformancesMomentumFlowCorrectionFactor
+from ..sizing_throat_height import SizingThroatHeight
+from ..sizing_inlet_geometry import SizingInletGeometry
+from ..perf_boundary_layer_thickness_highlight_height_ratio import (
+    PerformancesBoundaryLayerThicknessHighlightHeightRatio,
+)
+from ..perf_modified_mass_flow_ratio import PerformancesModifiedMassFlowRatio
+from ..perf_air_mass_flow_ratio import PerformancesAirMassFlowRatio
+from ..perf_drag_correlation_factor import PerformancesDragCorrelationFactor
+from ..perf_drag_ksp_factor import PerformancesDragKspFactor
+from ..perf_ramp_angle_factor import PerformancesRampAngleFactor
+from ..perf_mach_factor import PerformancesMachFactor
+from ..perf_drag_coefficient_zero import PerformancesCDZeroInletMassFlow
+from ..perf_inlet_drag import _PerformancesInletDrag, PerformancesInletDrag
+from ..perf_air_dynamic_pressure import PerformancesAirDynamicPressure
+from ..perf_max_ramp_pressure_efficiency import PerformancesMaxRamPressureEfficiency
+
+from tests.testing_utilities import run_system
+
+NB_POINTS_TEST = 10
+
+
+def test_inlet_max_boundary_layer_thickness():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "dynamic_viscosity",
+        units="Pa*s",
+        val=np.full(NB_POINTS_TEST, 1.79e-5),
+    )
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=np.full(NB_POINTS_TEST, 108.0),
+    )
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.225),
+    )
+    ivc.add_output(
+        "mach",
+        val=np.full(NB_POINTS_TEST, 0.33),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMaxBoundaryLayerThickness(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":max_boundary_layer_thickness",
+        units="m",
+    ) == pytest.approx(0.0158, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":max_momentum_boundary_layer_thickness",
+        units="m",
+    ) == pytest.approx(0.00158, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":design_air_density",
+        units="kg/m**3",
+    ) == pytest.approx(1.225, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":design_true_airspeed",
+        units="m/s",
+    ) == pytest.approx(108.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":design_dynamic_viscosity",
+        units="Pa*s",
+    ) == pytest.approx(1.79e-5, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet" ":design_mach",
+    ) == pytest.approx(0.33, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_throat_height_momentum_thickness_ratio():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_momentum_boundary_layer_thickness",
+        units="m",
+        val=0.00158,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_true_airspeed",
+        units="m/s",
+        val=108.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_air_density",
+        units="kg/m**3",
+        val=1.225,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        units="kg/s",
+        val=0.5,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(
+            pemfc_stack_bop_id="pemfc_stack_bop_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":throat_height_layer_thickness_ratio",
+    ) == pytest.approx(0.0398, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_throat_height():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height_layer_thickness_ratio",
+        val=0.0398,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_momentum_boundary_layer_thickness",
+        units="m",
+        val=0.00158,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingThroatHeight(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        units="m",
+    ) == pytest.approx(0.0398, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_geometry():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        val=0.0398,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingInletGeometry(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:highlight_width",
+        units="m",
+    ) == pytest.approx(0.1592, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_lip_thickness",
+        units="m",
+    ) == pytest.approx(0.00995, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_length",
+        units="m",
+    ) == pytest.approx(0.00995, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_floor_inlet_plane_distance",
+        units="m",
+    ) == pytest.approx(0.0485, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        units="m",
+    ) == pytest.approx(0.0436, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_capture_area",
+        units="ft**2",
+    ) == pytest.approx(0.00693, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_boundary_layer_thickness_highlight_height_ratio():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_boundary_layer_thickness",
+        units="m",
+        val=0.0158,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        units="m",
+        val=0.0436,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesBoundaryLayerThicknessHighlightHeightRatio(
+            pemfc_stack_bop_id="pemfc_stack_bop_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:layer_thickness_highlight_height_ratio",
+    ) == pytest.approx(0.362, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_momentum_flow_correction_factor():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:layer_thickness_highlight_height_ratio",
+        val=0.362,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        val=0.33,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesMomentumFlowCorrectionFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("momentum_flow_correction_factor") == pytest.approx(0.93, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_modified_mass_flow_ratio():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height_layer_thickness_ratio",
+        val=0.0398,
+    )
+
+    problem = run_system(
+        PerformancesModifiedMassFlowRatio(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("modified_mass_flow_ratio") == pytest.approx(0.613, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_air_mass_flow_ratio():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        units="m",
+        val=0.0398,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:inlet"
+        ":lip_ramp_floor_distance",
+        units="m",
+        val=0.0436,
+    )
+    ivc.add_output(
+        "modified_mass_flow_ratio",
+        val=0.613,
+    )
+
+    problem = run_system(
+        PerformancesAirMassFlowRatio(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("air_mass_flow_ratio") == pytest.approx(0.56, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_drag_correlation_factor():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("air_mass_flow_ratio", val=0.56)
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        val=0.33,
+    )
+
+    problem = run_system(
+        PerformancesDragCorrelationFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("drag_correlation_factor") == pytest.approx(-0.022, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_drag_ksp_factor():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        val=0.4,
+    )
+    ivc.add_output(
+        "air_mass_flow_ratio",
+        val=0.4,
+    )
+
+    problem = run_system(
+        PerformancesDragKspFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("k_sp_factor") == pytest.approx(-0.03, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_ramp_angle_factor():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_angle",
+        val=8.0,
+        units="deg",
+    )
+
+    problem = run_system(
+        PerformancesRampAngleFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("ramp_angle_factor") == pytest.approx(1.12, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_mach_factor():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        val=0.55,
+    )
+
+    problem = run_system(
+        PerformancesMachFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("mach_factor") == pytest.approx(1.09, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_cd0():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_length",
+        units="m",
+        val=0.00995,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        units="m",
+        val=0.0436,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_floor_inlet_plane_distance",
+        units="m",
+        val=0.0485,
+    )
+
+    problem = run_system(
+        PerformancesCDZeroInletMassFlow(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val("cd_zero_inlet_mass_flow") == pytest.approx(0.16, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_drag():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=np.full(NB_POINTS_TEST, 108.0),
+    )
+    ivc.add_output("mach_factor", val=1.09)
+    ivc.add_output("ramp_angle_factor", val=1.12)
+    ivc.add_output("k_sp_factor", val=-0.03)
+    ivc.add_output("drag_correlation_factor", val=-0.022)
+    ivc.add_output("cd_zero_inlet_mass_flow", val=0.16)
+    ivc.add_output("air_mass_flow_ratio", val=0.56)
+    ivc.add_output("momentum_flow_correction_factor", val=0.93)
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        units="kg/s",
+        val=0.5,
+    )
+
+    problem = run_system(
+        _PerformancesInletDrag(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_drag",
+        units="N",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 48.88), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_drag_group():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "altitude",
+        units="m",
+        val=np.full(NB_POINTS_TEST, 0.0),
+    )
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=108.0,
+        shape=NB_POINTS_TEST,
+    )
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.225),
+    )
+    ivc.add_output(
+        "mach",
+        val=np.full(NB_POINTS_TEST, 0.33),
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        units="kg/s",
+        val=0.5,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        units="m",
+        val=0.0398,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        units="m",
+        val=0.0436,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_floor_inlet_plane_distance",
+        units="m",
+        val=0.0485,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_length",
+        units="m",
+        val=0.00995,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesInletDrag(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_drag",
+        units="N",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 48.88), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_air_dynamic_pressure():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=np.full(NB_POINTS_TEST, 108.0),
+    )
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.225),
+    )
+
+    problem = run_system(
+        PerformancesAirDynamicPressure(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("dynamic_pressure", units="Pa") == pytest.approx(
+        np.full(NB_POINTS_TEST, 7144.2), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_max_ram_pressure_efficiency():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        ":throat_height_layer_thickness_ratio",
+        val=0.0398,
+    )
+
+    problem = run_system(
+        PerformancesMaxRamPressureEfficiency(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ram_pressure_efficiency"
+    ) == pytest.approx(0.9, rel=1e-2)
+
+    problem.check_partials(compact_print=True)

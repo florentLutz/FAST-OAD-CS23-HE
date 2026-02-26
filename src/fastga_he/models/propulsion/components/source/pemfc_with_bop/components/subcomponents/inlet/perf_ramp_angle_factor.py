@@ -25,7 +25,7 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
+            + ":air_inlet:ramp_angle",
             val=7.0,
             units="deg",
             desc="Ramp angle of the inlet, defined as the angle between the inlet walls and the "
@@ -34,7 +34,7 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
 
         self.add_output(
             "ramp_angle_factor",
-            val=1e-4,
+            val=1.0,
             units="unitless",
         )
 
@@ -47,7 +47,7 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
         ramp_angle = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle"
+            + ":air_inlet:ramp_angle"
         ]
 
         outputs["ramp_angle_factor"] = np.where(
@@ -60,12 +60,12 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
         ramp_angle = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle"
+            + ":air_inlet:ramp_angle"
         ]
 
         partials[
             "ramp_angle_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
+            + ":air_inlet:ramp_angle",
         ] = np.where(ramp_angle > 7.0, -0.0242 * ramp_angle + 0.3262, 1e-6)

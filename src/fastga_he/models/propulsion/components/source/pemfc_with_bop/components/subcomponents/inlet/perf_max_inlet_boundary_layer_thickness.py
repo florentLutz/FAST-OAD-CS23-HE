@@ -39,7 +39,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:ramp_length",
-            val=np.nan,
+            val=1.0,
             units="m",
         )
 
@@ -68,7 +68,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:design_true_airspeed",
-            val=20.0,
+            val=100.0,
             units="m/s",
         )
         self.add_output(
@@ -90,6 +90,8 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         number_of_points = self.options["number_of_points"]
 
+        # Partials for max_boundary_layer_thickness and max_momentum_boundary_layer_thickness
+        # with respect to vector inputs (density, true_airspeed, dynamic_viscosity, mach)
         self.declare_partials(
             [
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -99,17 +101,48 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
                 + pemfc_stack_bop_id
                 + ":air_inlet:max_momentum_boundary_layer_thickness",
             ],
-            "*",
+            ["density", "true_airspeed", "dynamic_viscosity", "mach"],
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
         )
+        # Partials for max_boundary_layer_thickness and max_momentum_boundary_layer_thickness
+        # with respect to scalar input (ramp_length)
         self.declare_partials(
-            of="*",
-            wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            [
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:max_boundary_layer_thickness",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:max_momentum_boundary_layer_thickness",
+            ],
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:ramp_length",
             method="exact",
+        )
+        # Partials for design outputs with respect to ramp_length (no dependency)
+        self.declare_partials(
+            [
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:design_air_density",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:design_true_airspeed",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:design_dynamic_viscosity",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:design_mach",
+            ],
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:ramp_length",
+            method="exact",
+            val=0.0,
         )
         self.declare_partials(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -223,7 +256,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "density",
         ] = np.where(
             max_layer_thickness == layer_thickness,
-            -0.07494 * ramp_length**0.8 / (density * true_airspeed / dynamic_viscosity) ** 1.2,
+            -0.07494 * ramp_length**0.8 / (true_airspeed / dynamic_viscosity) ** 0.2 / density**1.2,
             1e-6,
         )
 
@@ -234,7 +267,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "true_airspeed",
         ] = np.where(
             max_layer_thickness == layer_thickness,
-            -0.07494 * ramp_length**0.8 / (density * true_airspeed / dynamic_viscosity) ** 1.2,
+            -0.07494 * ramp_length**0.8 / (density / dynamic_viscosity) ** 0.2 / true_airspeed**1.2,
             1e-6,
         )
 
@@ -245,7 +278,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "dynamic_viscosity",
         ] = np.where(
             max_layer_thickness == layer_thickness,
-            0.07494 * ramp_length**0.8 / (density * true_airspeed / dynamic_viscosity) ** 1.2,
+            0.07494 * ramp_length**0.8 / (density * true_airspeed) ** 0.2 / dynamic_viscosity**0.8,
             1e-6,
         )
 
@@ -268,7 +301,10 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "density",
         ] = np.where(
             max_layer_thickness == layer_thickness,
-            -0.007494 * ramp_length**0.8 / (density * true_airspeed / dynamic_viscosity) ** 1.2,
+            -0.007494
+            * ramp_length**0.8
+            / (true_airspeed / dynamic_viscosity) ** 0.2
+            / density**1.2,
             1e-6,
         )
 
@@ -279,7 +315,10 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "true_airspeed",
         ] = np.where(
             max_layer_thickness == layer_thickness,
-            -0.007494 * ramp_length**0.8 / (density * true_airspeed / dynamic_viscosity) ** 1.2,
+            -0.007494
+            * ramp_length**0.8
+            / (density / dynamic_viscosity) ** 0.2
+            / true_airspeed**1.2,
             1e-6,
         )
 
@@ -290,7 +329,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             "dynamic_viscosity",
         ] = np.where(
             max_layer_thickness == layer_thickness,
-            0.007494 * ramp_length**0.8 / (density * true_airspeed / dynamic_viscosity) ** 1.2,
+            0.007494 * ramp_length**0.8 / (density * true_airspeed) ** 0.2 / dynamic_viscosity**0.8,
             1e-6,
         )
 
@@ -311,25 +350,25 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":air_inlet:design_air_density",
             "density",
-        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 0.0)
+        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:design_true_airspeed",
             "true_airspeed",
-        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 0.0)
+        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:design_dynamic_viscosity",
             "dynamic_viscosity",
-        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 0.0)
+        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:design_mach",
             "mach",
-        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 0.0)
+        ] = np.where(max_layer_thickness == layer_thickness, 1.0, 1e-6)

@@ -25,14 +25,14 @@ class SizingInletGeometry(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
+            + ":air_inlet:throat_height",
             val=np.nan,
             units="m",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_aspect_ratio",
+            + ":air_inlet:throat_aspect_ratio",
             val=4.0,
             units="unitless",
             desc="Aspect ratio of the inlet cross-section, defined as the ratio of the throat "
@@ -41,7 +41,7 @@ class SizingInletGeometry(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
+            + ":air_inlet:ramp_angle",
             val=np.deg2rad(7.0),
             units="rad",
             desc="Ramp angle of the inlet, defined as the angle between the inlet walls and the "
@@ -51,43 +51,43 @@ class SizingInletGeometry(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:highlight_width",
-            val=0.05,
+            + ":air_inlet:highlight_width",
+            val=0.16,
             units="m",
         )
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_lip_thickness",
-            val=0.05,
+            + ":air_inlet:throat_lip_thickness",
+            val=0.01,
             units="m",
         )
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_length",
-            val=0.05,
+            + ":air_inlet:lip_length",
+            val=0.01,
             units="m",
         )
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance",
-            val=0.05,
+            + ":air_inlet:ramp_floor_inlet_plane_distance",
+            val=0.049,
             units="m",
         )
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
-            val=0.05,
+            + ":air_inlet:lip_ramp_floor_distance",
+            val=0.044,
             units="m",
         )
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:inlet_capture_area",
-            val=0.05,
+            + ":air_inlet:inlet_capture_area",
+            val=0.007,
             units="ft**2",
         )
 
@@ -98,49 +98,52 @@ class SizingInletGeometry(om.ExplicitComponent):
             "*",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
+            + ":air_inlet:throat_height",
             method="exact",
         )
         self.declare_partials(
             [
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:highlight_width",
+                + ":air_inlet:highlight_width",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:inlet_capture_area",
+                + ":air_inlet:inlet_capture_area",
             ],
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_aspect_ratio",
+            + ":air_inlet:throat_aspect_ratio",
             method="exact",
         )
         self.declare_partials(
             [
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:ramp_floor_inlet_plane_distance",
+                + ":air_inlet:ramp_floor_inlet_plane_distance",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:lip_ramp_floor_distance",
+                + ":air_inlet:lip_ramp_floor_distance",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_inlet:inlet_capture_area",
             ],
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
+            + ":air_inlet:ramp_angle",
             method="exact",
         )
         self.declare_partials(
             [
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:throat_lip_thickness",
+                + ":air_inlet:throat_lip_thickness",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:lip_length",
+                + ":air_inlet:lip_length",
             ],
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
+            + ":air_inlet:throat_height",
             val=0.25,
         )
 
@@ -150,17 +153,17 @@ class SizingInletGeometry(om.ExplicitComponent):
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height"
+            + ":air_inlet:throat_height"
         ]
         aspect_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_aspect_ratio"
+            + ":air_inlet:throat_aspect_ratio"
         ]
         ramp_angle = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle"
+            + ":air_inlet:ramp_angle"
         ]
 
         highlight_width = throat_height * aspect_ratio
@@ -173,33 +176,33 @@ class SizingInletGeometry(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:highlight_width"
+            + ":air_inlet:highlight_width"
         ] = highlight_width
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_lip_thickness"
+            + ":air_inlet:throat_lip_thickness"
         ] = throat_lip_thickness
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_length"
+            + ":air_inlet:lip_length"
         ] = lip_length
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance"
+            + ":air_inlet:lip_ramp_floor_distance"
         ] = lip_ramp_floor_distance
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance"
+            + ":air_inlet:ramp_floor_inlet_plane_distance"
         ] = throat_height + throat_lip_thickness - lip_length * np.tan(ramp_angle)
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:inlet_capture_area"
+            + ":air_inlet:inlet_capture_area"
         ] = lip_ramp_floor_distance * highlight_width
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -208,17 +211,17 @@ class SizingInletGeometry(om.ExplicitComponent):
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height"
+            + ":air_inlet:throat_height"
         ]
         aspect_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_aspect_ratio"
+            + ":air_inlet:throat_aspect_ratio"
         ]
         ramp_angle = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle"
+            + ":air_inlet:ramp_angle"
         ]
 
         highlight_width = throat_height * aspect_ratio
@@ -231,80 +234,80 @@ class SizingInletGeometry(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:highlight_width",
+            + ":air_inlet:highlight_width",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
+            + ":air_inlet:throat_height",
         ] = aspect_ratio
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:highlight_width",
+            + ":air_inlet:highlight_width",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_aspect_ratio",
+            + ":air_inlet:throat_aspect_ratio",
         ] = throat_height
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
+            + ":air_inlet:lip_ramp_floor_distance",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
+            + ":air_inlet:throat_height",
         ] = 1.125 - 0.25 * np.tan(ramp_angle)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
+            + ":air_inlet:lip_ramp_floor_distance",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
-        ] = lip_length / np.cos(ramp_angle) ** 2.0
+            + ":air_inlet:ramp_angle",
+        ] = -lip_length / np.cos(ramp_angle) ** 2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance",
+            + ":air_inlet:ramp_floor_inlet_plane_distance",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
+            + ":air_inlet:throat_height",
         ] = 1.25 - 0.25 * np.tan(ramp_angle)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance",
+            + ":air_inlet:ramp_floor_inlet_plane_distance",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
-        ] = lip_length / np.cos(ramp_angle) ** 2.0
+            + ":air_inlet:ramp_angle",
+        ] = -lip_length / np.cos(ramp_angle) ** 2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:inlet_capture_area",
+            + ":air_inlet:inlet_capture_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_aspect_ratio",
+            + ":air_inlet:throat_aspect_ratio",
         ] = lip_ramp_floor_distance * throat_height
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:inlet_capture_area",
+            + ":air_inlet:inlet_capture_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
+            + ":air_inlet:ramp_angle",
         ] = -0.25 * aspect_ratio * throat_height**2.0 / np.cos(ramp_angle) ** 2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:inlet_capture_area",
+            + ":air_inlet:inlet_capture_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height",
-        ] = aspect_ratio * (2.5 * throat_height - 0.5 * throat_height * np.tan(ramp_angle))
+            + ":air_inlet:throat_height",
+        ] = aspect_ratio * (2.25 * throat_height - 0.5 * throat_height * np.tan(ramp_angle))

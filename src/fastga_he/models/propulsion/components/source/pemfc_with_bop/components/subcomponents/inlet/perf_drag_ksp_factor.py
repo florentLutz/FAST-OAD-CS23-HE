@@ -37,7 +37,7 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
 
         self.add_output(
             "k_sp_factor",
-            val=1e-4,
+            val=-0.03,
             units="unitless",
         )
 
@@ -112,7 +112,7 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
             dk_da = 1.3296 * air_mass_flow_ratio - 1.6882
         elif design_mach == 0.8 and air_mass_flow_ratio <= 0.656:
             dk_dm = 0.0
-            dk_da = 3.3984 * air_mass_flow_ratio - 2.638
+            dk_da = 3.3984 * air_mass_flow_ratio - 2.6385
         elif design_mach == 0.7 and air_mass_flow_ratio <= 0.4992:
             dk_dm = 0.0
             dk_da = 3.808 * air_mass_flow_ratio - 2.96

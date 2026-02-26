@@ -22,28 +22,36 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        self.add_input("design_air_density", units="kg/m**3", val=np.nan)
-        self.add_input("design_true_airspeed", units="m/s", val=np.nan)
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_air_density",
+            units="kg/m**3",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_true_airspeed",
+            units="m/s",
+            val=np.nan,
+        )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:max_momentum_boundary_layer_thickness",
-            val=1e-5,
+            val=np.nan,
             units="m",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:mass_flow_rate",
-            units="kg/s",
+            + ":air_consumption_max",
             val=np.nan,
+            units="kg/s",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
-            val=1e-4,
+            + ":air_inlet:throat_height_layer_thickness_ratio",
+            val=0.04,
             units="unitless",
         )
 
@@ -53,8 +61,12 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        density = inputs["design_air_density"]
-        velocity = inputs["design_true_airspeed"]
+        density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_air_density"
+        ]
+        velocity = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_true_airspeed"
+        ]
         max_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -63,20 +75,24 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:mass_flow_rate"
+            + ":air_consumption_max"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio"
+            + ":air_inlet:throat_height_layer_thickness_ratio"
         ] = 0.831 * (mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        density = inputs["design_air_density"]
-        velocity = inputs["design_true_airspeed"]
+        density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_air_density"
+        ]
+        velocity = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_true_airspeed"
+        ]
         max_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -85,13 +101,13 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:mass_flow_rate"
+            + ":air_consumption_max"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
+            + ":air_inlet:throat_height_layer_thickness_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:max_momentum_boundary_layer_thickness",
@@ -106,8 +122,8 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
-            "design_air_density",
+            + ":air_inlet:throat_height_layer_thickness_ratio",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_air_density",
         ] = (
             0.831
             * 0.415
@@ -118,8 +134,8 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
-            "design_true_airspeed",
+            + ":air_inlet:throat_height_layer_thickness_ratio",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_true_airspeed",
         ] = (
             0.831
             * 0.415
@@ -130,10 +146,10 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
+            + ":air_inlet:throat_height_layer_thickness_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":coolant:mass_flow_rate",
+            + ":air_consumption_max",
         ] = (
             -0.831
             * 0.415

@@ -4,7 +4,6 @@
 
 import numpy as np
 import openmdao.api as om
-from numpy.ma.core import masked
 
 
 class SizingValve(om.ExplicitComponent):

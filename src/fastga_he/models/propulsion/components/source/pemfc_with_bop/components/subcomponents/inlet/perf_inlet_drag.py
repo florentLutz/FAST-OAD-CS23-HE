@@ -49,102 +49,75 @@ class PerformancesInletDrag(om.Group):
         self.add_subsystem(
             "air_dynamic_viscosity",
             PerformancesAirDynamicViscosity(number_of_points=number_of_points),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "max_boundary_layer_thickness",
             PerformancesMaxBoundaryLayerThickness(
                 pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
             ),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "throat_height_momentum_layer_thickness_ratio",
             PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(
                 pemfc_stack_bop_id=pemfc_stack_bop_id
             ),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "boundary_layer_thickness_highlight_height_ratio",
             PerformancesBoundaryLayerThicknessHighlightHeightRatio(
                 pemfc_stack_bop_id=pemfc_stack_bop_id
             ),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "momentum_flow_correction_factor",
             PerformancesMomentumFlowCorrectionFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "modified_mass_flow_ratio",
             PerformancesModifiedMassFlowRatio(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "air_mass_flow_ratio",
             PerformancesAirMassFlowRatio(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "drag_correlation_factor",
             PerformancesDragCorrelationFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "drag_ksp_factor",
             PerformancesDragKspFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "ramp_angle_factor",
             PerformancesRampAngleFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "mach_factor",
             PerformancesMachFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "cd_zero_inlet_mass_flow",
             PerformancesCDZeroInletMassFlow(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "inlet_drag",
             _PerformancesInletDrag(
                 pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
             ),
-            promotes=["data:*"],
-        )
-
-        self.connect(
-            "air_dynamic_viscosity.dynamic_viscosity",
-            "max_boundary_layer_thickness.dynamic_viscosity",
-        )
-        self.connect(
-            "air_mass_flow_ratio.air_mass_flow_ratio", "drag_correlation_factor.air_mass_flow_ratio"
-        )
-        self.connect(
-            "modified_mass_flow_ratio.modified_mass_flow_ratio",
-            "air_mass_flow_ratio.modified_mass_flow_ratio",
-        )
-        self.connect(
-            "momentum_flow_correction_factor.momentum_flow_correction_factor",
-            "inlet_drag.momentum_flow_correction_factor",
-        )
-        self.connect("air_mass_flow_ratio.air_mass_flow_ratio", "inlet_drag.air_mass_flow_ratio")
-        self.connect(
-            "drag_correlation_factor.drag_correlation_factor", "inlet_drag.drag_correlation_factor"
-        )
-        self.connect("drag_ksp_factor.k_sp_factor", "inlet_drag.k_sp_factor")
-        self.connect("ramp_angle_factor.ramp_angle_factor", "inlet_drag.ramp_angle_factor")
-        self.connect("mach_factor.mach_factor", "inlet_drag.mach_factor")
-        self.connect(
-            "cd_zero_inlet_mass_flow.cd_zero_inlet_mass_flow",
-            "inlet_drag.cd_zero_inlet_mass_flow",
+            promotes=["*"],
         )
 
 
@@ -213,24 +186,31 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
 
         self.add_output(
-            "inlet_drag",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
             val=500.0,
             units="N",
             shape=number_of_points,
         )
 
     def setup_partials(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="inlet_drag",
+            of="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
             wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
         self.declare_partials(
-            of="inlet_drag",
+            of="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
             wrt="true_airspeed",
             method="exact",
             rows=np.arange(number_of_points),
@@ -254,7 +234,11 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":air_consumption_max"
         ]
 
-        outputs["inlet_drag"] = (
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag"
+        ] = (
             0.5
             * (
                 2.0 * momentum_flow_correction_factor * air_mass_flow_ratio
@@ -284,7 +268,12 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":air_consumption_max"
         ]
 
-        partials["inlet_drag", "true_airspeed"] = (
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "true_airspeed",
+        ] = (
             0.5
             * (
                 2.0 * momentum_flow_correction_factor * air_mass_flow_ratio
@@ -296,7 +285,12 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             / air_mass_flow_ratio
         )
 
-        partials["inlet_drag", "mach_factor"] = (
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "mach_factor",
+        ] = (
             0.5
             * k_sp_factor
             * ramp_angle_factor
@@ -306,7 +300,12 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             / air_mass_flow_ratio
         )
 
-        partials["inlet_drag", "air_mass_flow_ratio"] = (
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "air_mass_flow_ratio",
+        ] = (
             -0.5
             * (
                 k_sp_factor * ramp_angle_factor * mach_factor * cd_zero_inlet_mass_flow
@@ -317,11 +316,19 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             / air_mass_flow_ratio**2.0
         )
 
-        partials["inlet_drag", "drag_correlation_factor"] = (
-            0.5 * air_consumption_max / air_mass_flow_ratio * true_air_speed
-        )
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "drag_correlation_factor",
+        ] = 0.5 * air_consumption_max / air_mass_flow_ratio * true_air_speed
 
-        partials["inlet_drag", "k_sp_factor"] = (
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "k_sp_factor",
+        ] = (
             0.5
             * ramp_angle_factor
             * mach_factor
@@ -331,7 +338,12 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             / air_mass_flow_ratio
         )
 
-        partials["inlet_drag", "ramp_angle_factor"] = (
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "ramp_angle_factor",
+        ] = (
             0.5
             * k_sp_factor
             * mach_factor
@@ -341,11 +353,19 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             / air_mass_flow_ratio
         )
 
-        partials["inlet_drag", "momentum_flow_correction_factor"] = (
-            air_consumption_max * true_air_speed
-        )
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "momentum_flow_correction_factor",
+        ] = air_consumption_max * true_air_speed
 
-        partials["inlet_drag", "cd_zero_inlet_mass_flow"] = (
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
+            "cd_zero_inlet_mass_flow",
+        ] = (
             0.5
             * k_sp_factor
             * ramp_angle_factor
@@ -356,7 +376,9 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         )
 
         partials[
-            "inlet_drag",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:inlet_drag",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_consumption_max",

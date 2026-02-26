@@ -32,7 +32,7 @@ class PerformancesMachFactor(om.ExplicitComponent):
 
         self.add_output(
             "mach_factor",
-            val=1e-4,
+            val=1.0,
             units="unitless",
         )
 
@@ -45,11 +45,11 @@ class PerformancesMachFactor(om.ExplicitComponent):
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:design_mach"
+            + ":air_inlet:design_mach"
         ]
 
         outputs["mach_factor"] = np.where(
-            design_mach < 0.55, 16.5 * design_mach**2 - 19.75 * design_mach + 6.96, 1.0
+            design_mach >= 0.55, 16.5 * design_mach**2.0 - 19.75 * design_mach + 6.96, 1.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
@@ -58,12 +58,12 @@ class PerformancesMachFactor(om.ExplicitComponent):
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:design_mach"
+            + ":air_inlet:design_mach"
         ]
 
         partials[
-            "ramp_angle_factor",
+            "mach_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_angle",
-        ] = np.where(design_mach < 0.55, 33.0 * design_mach - 19.75, 0.0)
+            + ":air_inlet:design_mach",
+        ] = np.where(design_mach >= 0.55, 33.0 * design_mach - 19.75, 0.0)

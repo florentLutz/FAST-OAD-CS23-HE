@@ -26,7 +26,7 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
+            + ":air_inlet:throat_height_layer_thickness_ratio",
             val=np.nan,
             units="unitless",
         )
@@ -48,7 +48,7 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:throat_height_layer_thickness_ratio"
+                + ":air_inlet:throat_height_layer_thickness_ratio"
             ]
             ** -0.4068
         )
@@ -60,13 +60,13 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
             "modified_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:throat_height_layer_thickness_ratio",
+            + ":air_inlet:throat_height_layer_thickness_ratio",
         ] = (
             -0.06716268
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":inlet:throat_height_layer_thickness_ratio"
+                + ":air_inlet:throat_height_layer_thickness_ratio"
             ]
             ** -1.4068
         )

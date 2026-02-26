@@ -32,7 +32,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
+            + ":air_inlet:lip_ramp_floor_distance",
             val=np.nan,
             units="m",
         )
@@ -40,7 +40,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:layer_thickness_highlight_height_ratio",
+            + ":air_inlet:layer_thickness_highlight_height_ratio",
             val=1e-4,
             units="unitless",
         )
@@ -54,7 +54,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance"
+            + ":air_inlet:lip_ramp_floor_distance"
         ]
         max_boundary_layer_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -65,7 +65,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:layer_thickness_highlight_height_ratio"
+            + ":air_inlet:layer_thickness_highlight_height_ratio"
         ] = max_boundary_layer_thickness / lip_ramp_floor_distance
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -74,7 +74,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance"
+            + ":air_inlet:lip_ramp_floor_distance"
         ]
         max_boundary_layer_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -85,16 +85,16 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:layer_thickness_highlight_height_ratio",
+            + ":air_inlet:layer_thickness_highlight_height_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
+            + ":air_inlet:lip_ramp_floor_distance",
         ] = -max_boundary_layer_thickness / lip_ramp_floor_distance**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:layer_thickness_highlight_height_ratio",
+            + ":air_inlet:layer_thickness_highlight_height_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:max_boundary_layer_thickness",

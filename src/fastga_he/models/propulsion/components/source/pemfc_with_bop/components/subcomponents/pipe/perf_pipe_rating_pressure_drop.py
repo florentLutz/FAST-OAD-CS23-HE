@@ -4,9 +4,6 @@
 
 import numpy as np
 import openmdao.api as om
-from sympy.physics.units import volume
-
-from ..fluid_characteristics.fluid_density import FluidDensity
 
 
 class PerformancesPipeRatingPressureDrop(om.ExplicitComponent):

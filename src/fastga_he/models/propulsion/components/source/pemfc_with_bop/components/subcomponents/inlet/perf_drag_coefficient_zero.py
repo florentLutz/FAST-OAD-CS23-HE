@@ -25,28 +25,28 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_length",
+            + ":air_inlet:lip_length",
             val=np.nan,
             units="m",
         )
-        self.add_output(
+        self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance",
+            + ":air_inlet:ramp_floor_inlet_plane_distance",
             val=np.nan,
             units="m",
         )
-        self.add_output(
+        self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
+            + ":air_inlet:lip_ramp_floor_distance",
             val=np.nan,
             units="m",
         )
 
         self.add_output(
             "cd_zero_inlet_mass_flow",
-            val=1e-4,
+            val=0.16,
             units="unitless",
         )
 
@@ -59,17 +59,17 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
         lip_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_length"
+            + ":air_inlet:lip_length"
         ]
         ramp_floor_inlet_plane_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance"
+            + ":air_inlet:ramp_floor_inlet_plane_distance"
         ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance"
+            + ":air_inlet:lip_ramp_floor_distance"
         ]
 
         outputs["cd_zero_inlet_mass_flow"] = (
@@ -83,24 +83,24 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
         lip_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_length"
+            + ":air_inlet:lip_length"
         ]
         ramp_floor_inlet_plane_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance"
+            + ":air_inlet:ramp_floor_inlet_plane_distance"
         ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance"
+            + ":air_inlet:lip_ramp_floor_distance"
         ]
 
         partials[
             "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_length",
+            + ":air_inlet:lip_length",
         ] = (
             0.02999124
             * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
@@ -112,9 +112,9 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
             "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:ramp_floor_inlet_plane_distance",
+            + ":air_inlet:ramp_floor_inlet_plane_distance",
         ] = (
-            0.02999124
+            -0.02999124
             * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
             / lip_length
         )
@@ -123,9 +123,9 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
             "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":inlet:lip_ramp_floor_distance",
+            + ":air_inlet:lip_ramp_floor_distance",
         ] = (
-            -0.02999124
+            0.02999124
             * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
             / lip_length
         )
