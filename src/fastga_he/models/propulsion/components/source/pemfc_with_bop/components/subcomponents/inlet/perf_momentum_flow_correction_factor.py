@@ -39,9 +39,7 @@ class PerformancesMomentumFlowCorrectionFactor(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":inlet:momentum_flow_correction_factor",
+            "momentum_flow_correction_factor",
             val=1e-4,
             units="unitless",
         )
@@ -63,11 +61,7 @@ class PerformancesMomentumFlowCorrectionFactor(om.ExplicitComponent):
             + ":inlet:layer_thickness_highlight_height_ratio"
         ]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":inlet:momentum_flow_correction_factor"
-        ] = (
+        outputs["momentum_flow_correction_factor"] = (
             10 ** (-0.12877)
             * (
                 layer_thickness_highlight_height_ratio
@@ -96,9 +90,7 @@ class PerformancesMomentumFlowCorrectionFactor(om.ExplicitComponent):
         ]
 
         partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":inlet:momentum_flow_correction_factor",
+            "momentum_flow_correction_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:design_mach",
@@ -121,9 +113,7 @@ class PerformancesMomentumFlowCorrectionFactor(om.ExplicitComponent):
         )
 
         partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":inlet:momentum_flow_correction_factor",
+            "momentum_flow_correction_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":inlet:layer_thickness_highlight_height_ratio",

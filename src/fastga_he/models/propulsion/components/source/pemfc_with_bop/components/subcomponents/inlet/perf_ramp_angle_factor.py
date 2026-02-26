@@ -33,7 +33,7 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
         )
 
         self.add_output(
-            "air_mass_flow_ratio",
+            "ramp_angle_factor",
             val=1e-4,
             units="unitless",
         )
