@@ -6,11 +6,12 @@ import openmdao.api as om
 
 from .sizing_throat_height import SizingThroatHeight
 from .sizing_inlet_geometry import SizingInletGeometry
+from .sizing_inlet_weight import SizingInletWeight
 
 
 class SizingInlet(om.Group):
     """
-    Air inlet Drag computations.
+    Air inlet sizing computations.
     """
 
     def initialize(self):
@@ -32,5 +33,10 @@ class SizingInlet(om.Group):
         self.add_subsystem(
             "inlet_geometry",
             SizingInletGeometry(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "inlet_weight",
+            SizingInletWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )

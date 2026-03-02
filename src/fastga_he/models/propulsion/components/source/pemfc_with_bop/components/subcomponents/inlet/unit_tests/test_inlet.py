@@ -12,8 +12,6 @@ from ..perf_throat_height_momentum_layer_thickness_ratio import (
     PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio,
 )
 from ..perf_momentum_flow_correction_factor import PerformancesMomentumFlowCorrectionFactor
-from ..sizing_throat_height import SizingThroatHeight
-from ..sizing_inlet_geometry import SizingInletGeometry
 from ..perf_boundary_layer_thickness_highlight_height_ratio import (
     PerformancesBoundaryLayerThicknessHighlightHeightRatio,
 )
@@ -27,10 +25,51 @@ from ..perf_drag_coefficient_zero import PerformancesCDZeroInletMassFlow
 from ..perf_inlet_drag import _PerformancesInletDrag, PerformancesInletDrag
 from ..perf_air_dynamic_pressure import PerformancesAirDynamicPressure
 from ..perf_max_ramp_pressure_efficiency import PerformancesMaxRamPressureEfficiency
+from ..perf_pressure_efficiency_difference_factor import (
+    PerformancesPressureEfficiencyDifferenceFactor,
+)
+from ..perf_pressure_efficiency_difference import PerformancesPressureEfficiencyDifference
+from ..perf_inlet_efficiency import PerformancesInletEfficiency
+from ..perf_throat_airspeed import PerformancesThroatAirSpeed
+from ..perf_ambient_total_pressure import PerformancesAmbientTotalPressure
+from ..perf_throat_temperature import PerformancesThroatTemperature
+from ..perf_throat_pressure import PerformancesThroatPressure
+from ..perf_max_inlet_pressure_drop import PerformancesMaximumInletPressureDrop
+
+from ..sizing_throat_height import SizingThroatHeight
+from ..sizing_inlet_geometry import SizingInletGeometry
+from ..sizing_inlet_weight import SizingInletWeight
 
 from tests.testing_utilities import run_system
 
 NB_POINTS_TEST = 10
+
+
+def test_inlet_air_dynamic_pressure():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=np.full(NB_POINTS_TEST, 108.0),
+    )
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.225),
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesAirDynamicPressure(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("dynamic_pressure", units="Pa") == pytest.approx(
+        np.full(NB_POINTS_TEST, 7144.2), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
 
 
 def test_inlet_max_boundary_layer_thickness():
@@ -115,7 +154,7 @@ def test_inlet_throat_height_momentum_thickness_ratio():
         val=1.225,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        "design_air_mass_flow",
         units="kg/s",
         val=0.5,
     )
@@ -427,9 +466,9 @@ def test_inlet_drag():
     ivc.add_output("air_mass_flow_ratio", val=0.56)
     ivc.add_output("momentum_flow_correction_factor", val=0.93)
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        "air_mass_flow",
         units="kg/s",
-        val=0.5,
+        val=np.full(NB_POINTS_TEST, 0.5),
     )
 
     problem = run_system(
@@ -471,7 +510,12 @@ def test_inlet_drag_group():
         val=np.full(NB_POINTS_TEST, 0.33),
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        "air_mass_flow",
+        units="kg/s",
+        val=np.full(NB_POINTS_TEST, 0.5),
+    )
+    ivc.add_output(
+        "design_air_mass_flow",
         units="kg/s",
         val=0.5,
     )
@@ -512,32 +556,6 @@ def test_inlet_drag_group():
     problem.check_partials(compact_print=True)
 
 
-def test_air_dynamic_pressure():
-    # Research independent input value in .xml file
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "true_airspeed",
-        units="m/s",
-        val=np.full(NB_POINTS_TEST, 108.0),
-    )
-    ivc.add_output(
-        "density",
-        units="kg/m**3",
-        val=np.full(NB_POINTS_TEST, 1.225),
-    )
-
-    problem = run_system(
-        PerformancesAirDynamicPressure(number_of_points=NB_POINTS_TEST),
-        ivc,
-    )
-
-    assert problem.get_val("dynamic_pressure", units="Pa") == pytest.approx(
-        np.full(NB_POINTS_TEST, 7144.2), rel=1e-2
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_inlet_max_ram_pressure_efficiency():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
@@ -555,5 +573,272 @@ def test_inlet_max_ram_pressure_efficiency():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ram_pressure_efficiency"
     ) == pytest.approx(0.9, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_pressure_efficiency_difference_factor():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=np.full(NB_POINTS_TEST, 108.0),
+    )
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.225),
+    )
+    ivc.add_output("air_mass_flow", units="kg/s", val=np.full(NB_POINTS_TEST, 0.5))
+    ivc.add_output("dynamic_viscosity", units="Pa*s", val=np.full(NB_POINTS_TEST, 1.79e-5))
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        units="m",
+        val=0.0398,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:highlight_width",
+        units="m",
+        val=0.1592,
+    )
+
+    problem = run_system(
+        PerformancesPressureEfficiencyDifferenceFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("pressure_efficiency_difference_factor") == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.596), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_pressure_efficiency_difference():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "pressure_efficiency_difference_factor",
+        val=np.full(NB_POINTS_TEST, 0.596),
+    )
+
+    problem = run_system(
+        PerformancesPressureEfficiencyDifference(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val("pressure_efficiency_difference") == pytest.approx(
+        np.full(NB_POINTS_TEST, -0.054), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_efficiency():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ram_pressure_efficiency",
+        val=0.9,
+    )
+    ivc.add_output(
+        "pressure_efficiency_difference",
+        val=np.full(NB_POINTS_TEST, -0.054),
+    )
+
+    problem = run_system(
+        PerformancesInletEfficiency(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("inlet_efficiency") == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.846), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_throat_airspeed():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.225),
+    )
+    ivc.add_output(
+        "air_mass_flow",
+        units="kg/s",
+        val=np.full(NB_POINTS_TEST, 0.5),
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        units="m",
+        val=0.0398,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:highlight_width",
+        units="m",
+        val=0.1592,
+    )
+
+    problem = run_system(
+        PerformancesThroatAirSpeed(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "throat_air_speed",
+        units="m/s",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 64.4), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_ambient_total_pressure():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "mach",
+        val=np.full(NB_POINTS_TEST, 0.33),
+    )
+    ivc.add_output(
+        "ambient_pressure",
+        units="Pa",
+        val=np.full(NB_POINTS_TEST, 101325.0),
+    )
+
+    problem = run_system(
+        PerformancesAmbientTotalPressure(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "ambient_total_pressure",
+        units="Pa",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 109261.6), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_ambient_total_temperature():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "mach",
+        val=np.full(NB_POINTS_TEST, 0.33),
+    )
+    ivc.add_output(
+        "exterior_temperature",
+        units="K",
+        val=np.full(NB_POINTS_TEST, 288.15),
+    )
+
+    problem = run_system(
+        PerformancesThroatTemperature(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "throat_temperature",
+        units="K",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 294.4), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_throat_pressure():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "ambient_total_pressure",
+        units="Pa",
+        val=np.full(NB_POINTS_TEST, 109261.6),
+    )
+    ivc.add_output(
+        "ambient_pressure",
+        units="Pa",
+        val=np.full(NB_POINTS_TEST, 101325.0),
+    )
+    ivc.add_output(
+        "inlet_efficiency",
+        val=np.full(NB_POINTS_TEST, 0.846),
+    )
+
+    problem = run_system(
+        PerformancesThroatPressure(number_of_points=NB_POINTS_TEST),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "throat_pressure",
+        units="Pa",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 108039.36), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_max_pressure_drop():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("dynamic_pressure", units="Pa", val=np.full(NB_POINTS_TEST, 7144.2))
+    ivc.add_output("throat_pressure", units="Pa", val=np.full(NB_POINTS_TEST, 108039.36))
+
+    problem = run_system(
+        PerformancesMaximumInletPressureDrop(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
+        ":air_inlet:max_inlet_pressure_drop",
+        units="Pa",
+    ) == pytest.approx(-100895.16, rel=1e-2)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:"
+        "max_ambient_dynamic_pressure",
+        units="Pa",
+    ) == pytest.approx(7144.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_inlet_mass():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_capture_area",
+        units="m**2",
+        val=0.000643,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ambient_dynamic_pressure",
+        units="Pa",
+        val=7144.2,
+    )
+
+    problem = run_system(
+        SizingInletWeight(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:mass",
+        units="kg",
+    ) == pytest.approx(0.397, rel=1e-2)
 
     problem.check_partials(compact_print=True)

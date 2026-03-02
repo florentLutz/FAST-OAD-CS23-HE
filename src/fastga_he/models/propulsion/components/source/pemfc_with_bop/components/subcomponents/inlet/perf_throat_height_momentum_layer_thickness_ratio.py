@@ -40,9 +40,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             units="m",
         )
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":air_consumption_max",
+            "design_air_mass_flow",
             val=np.nan,
             units="kg/s",
         )
@@ -72,17 +70,13 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":air_inlet:max_momentum_boundary_layer_thickness"
         ]
-        mass_flow_rate = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":air_consumption_max"
-        ]
+        design_mass_flow_rate = inputs["design_air_mass_flow"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:throat_height_layer_thickness_ratio"
-        ] = 0.831 * (mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
+        ] = 0.831 * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -98,11 +92,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":air_inlet:max_momentum_boundary_layer_thickness"
         ]
-        mass_flow_rate = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":air_consumption_max"
-        ]
+        design_mass_flow_rate = inputs["design_air_mass_flow"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -115,7 +105,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             2.0
             * 0.831
             * 0.415
-            * (mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
+            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
             / max_thickness
         )
 
@@ -127,7 +117,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         ] = (
             0.831
             * 0.415
-            * (mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
+            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
             / density
         )
 
@@ -139,7 +129,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         ] = (
             0.831
             * 0.415
-            * (mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
+            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
             / velocity
         )
 
@@ -147,12 +137,10 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:throat_height_layer_thickness_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":air_consumption_max",
+            "design_air_mass_flow",
         ] = (
             -0.831
             * 0.415
-            * (mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
-            / mass_flow_rate
+            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
+            / design_mass_flow_rate
         )
