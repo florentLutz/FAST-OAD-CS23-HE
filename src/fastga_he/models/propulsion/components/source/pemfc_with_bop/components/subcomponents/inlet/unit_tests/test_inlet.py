@@ -352,10 +352,26 @@ def test_inlet_drag_correlation_factor():
         val=0.33,
     )
 
-    problem = run_system(
-        PerformancesDragCorrelationFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
-        ivc,
+    problem = om.Problem(reports=False)
+    model = problem.model
+    model.add_subsystem(
+        name="ivc",
+        subsys=ivc,
+        promotes=["*"],
     )
+    model.add_subsystem(
+        name="dc_current",
+        subsys=PerformancesDragCorrelationFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        promotes=["*"],
+    )
+    model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+    model.nonlinear_solver.options["iprint"] = 0
+    model.nonlinear_solver.options["maxiter"] = 200
+    model.nonlinear_solver.options["rtol"] = 1e-5
+    model.linear_solver = om.DirectSolver()
+
+    problem.setup()
+    problem.run_model()
 
     assert problem.get_val("drag_correlation_factor") == pytest.approx(-0.022, rel=1e-2)
 
@@ -514,6 +530,7 @@ def test_inlet_drag_group():
         units="kg/s",
         val=np.full(NB_POINTS_TEST, 0.5),
     )
+    ivc.add_output("dynamic_viscosity", units="Pa*s", val=np.full(NB_POINTS_TEST, 1.79e-5))
     ivc.add_output(
         "design_air_mass_flow",
         units="kg/s",
@@ -551,7 +568,7 @@ def test_inlet_drag_group():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_drag",
         units="N",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 48.88), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 98.456), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

@@ -4,11 +4,9 @@
 
 import numpy as np
 import openmdao.api as om
-import jax
-from scipy.optimize import fsolve
 
 
-class PerformancesDragCorrelationFactor(om.ExplicitComponent):
+class PerformancesDragCorrelationFactor(om.ImplicitComponent):
     """
     Computation of the drag correlation factor.
     """
@@ -39,14 +37,15 @@ class PerformancesDragCorrelationFactor(om.ExplicitComponent):
 
         self.add_output(
             "drag_correlation_factor",
-            val=1e-4,
             units="unitless",
         )
 
     def setup_partials(self):
         self.declare_partials("*", "*", method="exact")
 
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+    def apply_nonlinear(
+        self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
+    ):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         design_mach = inputs[
@@ -55,67 +54,52 @@ class PerformancesDragCorrelationFactor(om.ExplicitComponent):
             + ":air_inlet:design_mach"
         ]
         air_mass_flow_ratio = inputs["air_mass_flow_ratio"]
+        corr_drag = outputs["drag_correlation_factor"]
 
-        # Solve the implicit equation for the drag correlation factor
-        corr_drag_initial_guess = 0.1  # Initial guess for the drag correlation factor
-        self._cached_drag_correlation_factor = fsolve(
-            lambda corr_drag: drag_correlation_equation_to_solve(
-                corr_drag, design_mach, air_mass_flow_ratio
-            ),
-            corr_drag_initial_guess,
-        )[0]
+        residuals["drag_correlation_factor"] = (
+            0.99575
+            + 0.72927 * design_mach**2.0
+            + 34.61116 * corr_drag
+            - 36.33161 * corr_drag**2.0
+            + 154.13563 * corr_drag**3.0 * design_mach
+            + 2.35051 * design_mach**4.0
+            - 3.67345 * design_mach**3.0
+            - 53.10867 * corr_drag * design_mach
+            + 24.61205 * corr_drag * design_mach**3.0
+            - air_mass_flow_ratio
+        )
 
-        outputs["drag_correlation_factor"] = self._cached_drag_correlation_factor
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
+    def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        # Extract scalar values from numpy arrays for JAX compatibility
-        design_mach = float(
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":air_inlet:design_mach"
-            ]
-        )
-        air_mass_flow_ratio = float(inputs["air_mass_flow_ratio"])
-        drag_correlation_factor = float(self._cached_drag_correlation_factor)
+        design_mach = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_inlet:design_mach"
+        ]
+        air_mass_flow_ratio = inputs["air_mass_flow_ratio"]
+        corr_drag = outputs["drag_correlation_factor"]
 
-        # Partial derivatives
-        df_dcorr_drag = jax.grad(drag_correlation_equation_to_solve, argnums=0)  # ∂f/∂corr_drag
-        df_dmach = jax.grad(drag_correlation_equation_to_solve, argnums=1)  # ∂f/∂design_mach
-        df_dairflowratio = jax.grad(drag_correlation_equation_to_solve, argnums=2)
-        # ∂f/∂air_mass_flow_ratio
-
-        # Evaluate derivatives at solution point
-        denom = float(df_dcorr_drag(drag_correlation_factor, design_mach, air_mass_flow_ratio))
-        numer_mach = float(df_dmach(drag_correlation_factor, design_mach, air_mass_flow_ratio))
-        numer_airflowratio = float(
-            df_dairflowratio(drag_correlation_factor, design_mach, air_mass_flow_ratio)
+        jacobian["drag_correlation_factor", "drag_correlation_factor"] = (
+            34.61116
+            - 72.66322 * corr_drag
+            + 462.40689 * corr_drag**2.0 * design_mach
+            - 53.10867 * design_mach
+            + 24.61205 * design_mach**3.0
         )
 
-        # Implicit differentiation
-        partials[
+        jacobian["drag_correlation_factor", "air_mass_flow_ratio"] = -1.0
+
+        jacobian[
             "drag_correlation_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_inlet:design_mach",
-        ] = -numer_mach / denom
-
-        partials["drag_correlation_factor", "air_mass_flow_ratio"] = -numer_airflowratio / denom
-
-
-def drag_correlation_equation_to_solve(corr_drag, design_mach, air_mass_flow_ratio):
-    """Implicit equation: f(corr_drag, design_mach, air_mass_flow_ratio) = 0"""
-    return (
-        0.99575
-        + 0.72927 * design_mach**2.0
-        + 34.61116 * corr_drag
-        - 36.33161 * corr_drag**2.0
-        + 154.13563 * corr_drag**3.0 * design_mach
-        + 2.35051 * design_mach**4.0
-        - 3.67345 * design_mach**3.0
-        - 53.10867 * corr_drag * design_mach
-        + 24.61205 * corr_drag * design_mach**3.0
-        - air_mass_flow_ratio
-    )
+        ] = (
+            1.45854 * design_mach
+            + 154.13563 * corr_drag**3.0
+            + 9.40204 * design_mach**3.0
+            - 11.02035 * design_mach**2.0
+            - 53.10867 * corr_drag
+            + 73.83615 * corr_drag * design_mach**2.0
+        )
