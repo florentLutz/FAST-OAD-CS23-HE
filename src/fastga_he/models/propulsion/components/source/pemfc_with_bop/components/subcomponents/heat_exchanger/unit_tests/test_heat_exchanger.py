@@ -462,29 +462,12 @@ def test_sizing_heat_exchanger_flow_length():
     assert problem.get_val("UA_difference", units="W/K") == pytest.approx(0.0, abs=1e-3)
 
     # Sanity checks on outputs
-    assert (
-        0.05
-        <= problem.get_val(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:coolant_flow_length",
-            units="m",
-        )
-        <= 0.5
-    )
-    assert (
-        0.05
-        <= problem.get_val(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:air_flow_length",
-            units="m",
-        )
-        <= 0.5
-    )
-    assert problem.get_val("HEX_volume", units="m**3") > 0.0
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:coolant_flow_length",
+        units="m",
+    ) == pytest.approx(0.05, abs=1e-3)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:air_flow_length",
+        units="m",
+    ) == pytest.approx(0.0907, abs=1e-3)
 
-    print(problem.get_val(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:air_flow_length",
-            units="m",
-        ))
-    print(problem.get_val(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:coolant_flow_length",
-            units="m",
-        ))
