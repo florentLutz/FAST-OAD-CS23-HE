@@ -60,13 +60,13 @@ class PerformancesAirHeatCapacity(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         partials[
-            "coolant_heat_capacity",
+            "air_heat_capacity",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":heat_exchanger:air_flow_rate",
         ] = inputs["mean_air_specific_heat_capacity"]
 
-        partials["coolant_heat_capacity", "mean_air_specific_heat_capacity"] = inputs[
+        partials["air_heat_capacity", "mean_air_specific_heat_capacity"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":heat_exchanger:air_flow_rate"

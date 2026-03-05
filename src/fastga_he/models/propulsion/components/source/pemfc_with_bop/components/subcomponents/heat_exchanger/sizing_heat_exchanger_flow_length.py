@@ -46,7 +46,7 @@ class SizingHeatExchangerFlowLength(om.Group):
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
-        inner_group = _SizingHeatExchangerFlowLength(
+        inner_group = _HEXSizingFlowLengthInnerGroup(
             pemfc_stack_bop_id=pemfc_stack_bop_id,
             coolant_flow_length_lower=self.options["coolant_flow_length_lower"],
             coolant_flow_length_upper=self.options["coolant_flow_length_upper"],
@@ -54,10 +54,20 @@ class SizingHeatExchangerFlowLength(om.Group):
             air_flow_length_upper=self.options["air_flow_length_upper"],
         )
 
+        # Build the inner Problem that SubmodelComp requires.
+        # The driver and model are attached to this inner Problem, which is
+        # then passed as the sole argument to SubmodelComp.
+        inner_prob = om.Problem()
+        inner_prob.model = inner_group
+        inner_prob.driver = om.ScipyOptimizeDriver()
+        inner_prob.driver.options["optimizer"] = "SLSQP"
+        inner_prob.driver.options["tol"] = 1e-6
+        inner_prob.driver.options["maxiter"] = 100
+
         self.add_subsystem(
             name="hex_sizing",
             subsys=om.SubmodelComp(
-                model=inner_group,
+                problem=inner_prob,
                 inputs=[
                     "data:propulsion:he_power_train:PEMFC_stack_bop:"
                     + pemfc_stack_bop_id
@@ -82,32 +92,52 @@ class SizingHeatExchangerFlowLength(om.Group):
                     + ":heat_exchanger:mean_coolant_dynamic_viscosity",
                     "data:propulsion:he_power_train:PEMFC_stack_bop:"
                     + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_coolant_prandtl_number",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_coolant_thermal_conductivity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
                     + ":heat_exchanger:mean_air_dynamic_viscosity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_air_prandtl_number",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_air_thermal_conductivity",
                     "data:propulsion:he_power_train:PEMFC_stack_bop:"
                     + pemfc_stack_bop_id
                     + ":coolant:mass_flow_rate",
                     "data:propulsion:he_power_train:PEMFC_stack_bop:"
                     + pemfc_stack_bop_id
                     + ":heat_exchanger:air_flow_rate",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:fin_hydraulic_diameter",
                     "separating_plate_count",
                 ],
                 outputs=[
-                    "coolant_flow_length",
-                    "air_flow_length",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:air_flow_length",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:coolant_flow_length",
                     "HEX_volume",
                     "plate_area",
                     "total_transfer_area",
-                    "calculated_UA",
+                    "UA_difference",
                 ],
-                driver=om.ScipyOptimizeDriver(optimizer="SLSQP", tol=1e-6, maxiter=100),
             ),
             promotes=["*"],
         )
 
 
-class _SizingHeatExchangerFlowLength(om.Group):
+class _HEXSizingFlowLengthInnerGroup(om.Group):
     """
-    Computation of the air and coolant flow lengths.
+    Inner group containing all HEX physics subsystems. Registers design
+    variables, UA equality constraint, and HEX_volume objective so that
+    SubmodelComp can run SLSQP in full isolation from the parent driver.
     """
 
     def initialize(self):
@@ -140,6 +170,15 @@ class _SizingHeatExchangerFlowLength(om.Group):
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        # IndepVarComp owns the design variables so SLSQP has a proper
+        # output to drive. Without this, coolant_flow_length and
+        # air_flow_length have no source in the model and the optimizer
+        # cannot update them.
+        ivc = om.IndepVarComp()
+        ivc.add_output("coolant_flow_length", units="m", val=0.1)
+        ivc.add_output("air_flow_length", units="m", val=0.1)
+        self.add_subsystem(name="flow_length_ivc", subsys=ivc, promotes=["*"])
 
         self.add_subsystem(
             name="hex_volume",
@@ -191,6 +230,11 @@ class _SizingHeatExchangerFlowLength(om.Group):
             subsys=_UADifference(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )
+        self.add_subsystem(
+            name="flow_length_output",
+            subsys=_FlowLength(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
 
         # Both flow lengths are free design variables within physical bounds
         self.add_design_var(
@@ -206,8 +250,8 @@ class _SizingHeatExchangerFlowLength(om.Group):
             units="m",
         )
 
-        # Equality constraint: calculated_UA must match required_UA
-        self.add_constraint("calculated_UA", equals=0.0, units="W/K", alias="UA_residual")
+        # Equality constraint: UA_difference must be zero (calculated == required)
+        self.add_constraint("UA_difference", equals=0.0, units="W/K", alias="UA_residual")
 
         # Objective: find the smallest HEX that satisfies the UA constraint
         self.add_objective("HEX_volume", units="m**3")
@@ -1514,7 +1558,7 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
 
 class _UADifference(om.ExplicitComponent):
     """
-    Computation of the required UA and the calculated UA.
+    Computation of the calculated UA and the difference with respect to the required UA.
     """
 
     def initialize(self):
@@ -1686,23 +1730,113 @@ class _UADifference(om.ExplicitComponent):
             calculated_UA**2.0 * plate_thickness / (plate_thermally_conductivity * plate_area**2.0)
         )
 
-        partials["UA_difference", "total_transfer_area"] = -(calculated_UA**2.0) * (
-            (air_overall_surface_efficiency * air_heat_transfer_coefficient) ** -1.0
-            + (coolant_overall_surface_efficiency * coolant_heat_transfer_coefficient) ** -1.0
+        # dR/dAt = -1/(eta_oa*ha*At^2) - 1/(eta_oc*hc*At^2)
+        # dUA/dAt = -(UA^2) * dR/dAt = (UA^2) * (1/(eta_oa*ha) + 1/(eta_oc*hc)) / At^2
+        partials["UA_difference", "total_transfer_area"] = (
+            calculated_UA**2.0
+            * (
+                (air_overall_surface_efficiency * air_heat_transfer_coefficient) ** -1.0
+                + (coolant_overall_surface_efficiency * coolant_heat_transfer_coefficient) ** -1.0
+            )
+            / total_transfer_area**2.0
         )
 
-        partials["UA_difference", "air_heat_transfer_coefficient"] = -(calculated_UA**2.0) * (
-            (air_overall_surface_efficiency * total_transfer_area) ** -1.0
+        # dR/dha = -1/(eta_oa*ha^2*At)
+        # dUA/dha = -(UA^2)*dR/dha = (UA^2)/(eta_oa*ha^2*At)
+        partials["UA_difference", "air_heat_transfer_coefficient"] = calculated_UA**2.0 / (
+            air_overall_surface_efficiency
+            * air_heat_transfer_coefficient**2.0
+            * total_transfer_area
         )
 
-        partials["UA_difference", "coolant_heat_transfer_coefficient"] = -(calculated_UA**2.0) * (
-            (coolant_overall_surface_efficiency * total_transfer_area) ** -1.0
+        # dR/dhc = -1/(eta_oc*hc^2*At)
+        # dUA/dhc = (UA^2)/(eta_oc*hc^2*At)
+        partials["UA_difference", "coolant_heat_transfer_coefficient"] = calculated_UA**2.0 / (
+            coolant_overall_surface_efficiency
+            * coolant_heat_transfer_coefficient**2.0
+            * total_transfer_area
         )
 
-        partials["UA_difference", "air_overall_surface_efficiency"] = -(calculated_UA**2.0) * (
-            (air_heat_transfer_coefficient * total_transfer_area) ** -1.0
+        # dR/d(eta_oa) = -1/(eta_oa^2*ha*At)
+        # dUA/d(eta_oa) = (UA^2)/(eta_oa^2*ha*At)
+        partials["UA_difference", "air_overall_surface_efficiency"] = calculated_UA**2.0 / (
+            air_overall_surface_efficiency**2.0
+            * air_heat_transfer_coefficient
+            * total_transfer_area
         )
 
-        partials["UA_difference", "coolant_overall_surface_efficiency"] = -(calculated_UA**2.0) * (
-            (coolant_heat_transfer_coefficient * total_transfer_area) ** -1.0
+        # dR/d(eta_oc) = -1/(eta_oc^2*hc*At)
+        # dUA/d(eta_oc) = (UA^2)/(eta_oc^2*hc*At)
+        partials["UA_difference", "coolant_overall_surface_efficiency"] = calculated_UA**2.0 / (
+            coolant_overall_surface_efficiency**2.0
+            * coolant_heat_transfer_coefficient
+            * total_transfer_area
         )
+
+
+class _FlowLength(om.ExplicitComponent):
+    """
+    Flow length output
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        self.add_input("air_flow_length", units="m", val=np.nan)
+        self.add_input("coolant_flow_length", units="m", val=np.nan)
+
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:air_flow_length",
+            units="m",
+            val=0.1,
+        )
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:coolant_flow_length",
+            units="m",
+            val=0.05,
+        )
+
+    def setup_partials(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        self.declare_partials(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:air_flow_length",
+            "air_flow_length",
+            val=1.0,
+        )
+
+        self.declare_partials(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:coolant_flow_length",
+            "coolant_flow_length",
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:air_flow_length"
+        ] = inputs["air_flow_length"]
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:coolant_flow_length"
+        ] = inputs["coolant_flow_length"]

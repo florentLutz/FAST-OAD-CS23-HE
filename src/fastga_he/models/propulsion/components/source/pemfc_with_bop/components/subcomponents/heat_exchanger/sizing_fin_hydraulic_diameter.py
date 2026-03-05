@@ -59,6 +59,9 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
             val=2.38e-3,
         )
 
+    def setup_partials(self):
+        self.declare_partials("*", "*", method="exact")
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
@@ -170,7 +173,7 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":heat_exchanger:fin_hydraulic_diameter",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":heat_exchanger:fin_length",
         ] = (4.0 * fin_height * fin_spacing * (fin_spacing + 2.0 * fin_height) * fin_thickness) / (

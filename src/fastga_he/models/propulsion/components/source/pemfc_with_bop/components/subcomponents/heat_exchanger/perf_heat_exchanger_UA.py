@@ -65,19 +65,19 @@ class PerformancesHeatExchangerUA(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":heat_exchanger:UA",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA",
+            + ":heat_exchanger:NTU",
         ] = inputs["min_heat_capacity"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":heat_exchanger:UA",
             "min_heat_capacity",
         ] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA"
+            + ":heat_exchanger:NTU"
         ]

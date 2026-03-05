@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesHeatExchangerUA(om.ImplicitComponent):
+class PerformancesHeatExchangerNTU(om.ImplicitComponent):
     """
     Computation of the number of transfer unit of the heat exchanger.
     """

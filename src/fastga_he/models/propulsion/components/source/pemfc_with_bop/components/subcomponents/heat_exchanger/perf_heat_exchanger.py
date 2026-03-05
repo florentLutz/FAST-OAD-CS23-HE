@@ -8,6 +8,8 @@ from .perf_coolant_heat_capacity import PerformancesCoolantHeatCapacity
 from .perf_air_heat_capacity import PerformancesAirHeatCapacity
 from .perf_mean_air_temperature import PerformancesMeanAirTemperature
 from .perf_heat_capacity_ratio import PerformancesHeatCapacityRatio
+from .perf_heat_exchanger_NTU import PerformancesHeatExchangerNTU
+from .perf_heat_exchanger_UA import PerformancesHeatExchangerUA
 
 from ..fluid_characteristics import (
     FluidDensity,
@@ -279,5 +281,15 @@ class PerformancesHeatExchanger(om.Group):
         self.add_subsystem(
             "heat_capacity_ratio",
             PerformancesHeatCapacityRatio(),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "heat_exchanger_NTU",
+            PerformancesHeatExchangerNTU(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "heat_exchanger_UA",
+            PerformancesHeatExchangerUA(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )

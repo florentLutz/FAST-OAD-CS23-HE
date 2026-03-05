@@ -26,12 +26,12 @@ class PerformancesHeatCapacityRatio(om.ExplicitComponent):
         self.add_output(
             name="min_heat_capacity",
             units="W/K",
-            val=2.64,
+            val=700.0,
         )
         self.add_output(
             name="heat_capacity_ratio",
-            units=None,
-            val=0.8,
+            units="unitless",
+            val=0.05,
         )
 
     def setup_partials(self):

@@ -12,6 +12,7 @@ from .sizing_heat_exchanger_separating_plate_layer_count import (
 )
 from .sizing_heat_exchanger_no_flow_length import SizingHeatExchangerNoFlowLength
 from .sizing_fin_hydraulic_diameter import SizingHeatExchangerFinHydraulicDiameter
+from .sizing_heat_exchanger_flow_length import SizingHeatExchangerFlowLength
 
 
 class SizingHeatExchanger(om.Group):
@@ -58,5 +59,10 @@ class SizingHeatExchanger(om.Group):
         self.add_subsystem(
             "sizing_fin_hydraulic_diameter",
             SizingHeatExchangerFinHydraulicDiameter(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "sizing_heat_exchanger_flow_length",
+            SizingHeatExchangerFlowLength(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )
