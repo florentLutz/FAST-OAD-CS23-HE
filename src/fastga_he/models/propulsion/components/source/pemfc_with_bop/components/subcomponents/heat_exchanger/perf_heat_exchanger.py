@@ -95,7 +95,12 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":coolant:mean_temperature",
                 ),
-                ("fluid_thermal_conductivity", "mean_coolant_thermal_conductivity"),
+                (
+                    "fluid_thermal_conductivity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_coolant_thermal_conductivity",
+                ),
             ],
         )
         self.add_subsystem(
@@ -114,7 +119,12 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":coolant:mean_temperature",
                 ),
-                ("fluid_dynamic_viscosity", "mean_coolant_dynamic_viscosity"),
+                (
+                    "fluid_dynamic_viscosity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_coolant_dynamic_viscosity",
+                ),
             ],
         )
         self.add_subsystem(
@@ -133,7 +143,12 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":coolant:mean_temperature",
                 ),
-                ("fluid_prandtl_number", "mean_coolant_prandtl_number"),
+                (
+                    "fluid_prandtl_number",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_coolant_prandtl_number",
+                ),
             ],
         )
         self.add_subsystem(
@@ -200,7 +215,12 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":heat_exchanger:mean_air_temperature",
                 ),
-                ("fluid_thermal_conductivity", "mean_air_thermal_conductivity"),
+                (
+                    "fluid_thermal_conductivity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_air_thermal_conductivity",
+                ),
             ],
         )
         self.add_subsystem(
@@ -219,7 +239,12 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":heat_exchanger:mean_air_temperature",
                 ),
-                ("fluid_dynamic_viscosity", "mean_air_dynamic_viscosity"),
+                (
+                    "fluid_dynamic_viscosity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_air_dynamic_viscosity",
+                ),
             ],
         )
         self.add_subsystem(
@@ -238,7 +263,12 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":heat_exchanger:mean_air_temperature",
                 ),
-                ("fluid_prandtl_number", "mean_air_prandtl_number"),
+                (
+                    "fluid_prandtl_number",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:mean_air_prandtl_number",
+                ),
             ],
         )
         self.add_subsystem(

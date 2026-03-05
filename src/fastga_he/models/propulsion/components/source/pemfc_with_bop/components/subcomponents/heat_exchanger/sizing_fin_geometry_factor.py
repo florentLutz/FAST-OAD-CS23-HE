@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingHEXFinGeometry(om.ExplicitComponent):
+class SizingHeatExchangerFinFactor(om.ExplicitComponent):
     """
-    Fin geometry sizing for heat exchanger.
+    Fin factor calculation for heat exchanger sizing.
     """
 
     def initialize(self):

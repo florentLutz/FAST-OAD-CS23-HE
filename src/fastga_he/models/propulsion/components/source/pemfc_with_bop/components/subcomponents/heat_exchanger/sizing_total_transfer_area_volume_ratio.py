@@ -6,9 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingHeatExchangerFinGeometry(om.ExplicitComponent):
+class SizingTotalTransferAreaVolumeRatio(om.ExplicitComponent):
     """
-    Fin geometry sizing for heat exchanger.
+    Computation of the fraction of total heat transfer area and total volume for both side of the
+    heat exchange system.
     """
 
     def initialize(self):
@@ -32,61 +33,28 @@ class SizingHeatExchangerFinGeometry(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
-            units="m",
-            val=1.02e-4,
+            + ":heat_exchanger:surface_area_density",
+            units="1/m",
+            val=2254.0,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency",
-            units="1/m",
-            val=782,
+            + ":heat_exchanger:plate_thickness",
+            units="m",
+            val=8e-4,
         )
 
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
-            units="m",
-            val=6.25e-3,
-        )
-        self.add_output(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
-            units="m",
-            val=1.18e-3,
+            + ":heat_exchanger:transfer_area_volume_ratio",
+            units="1/m",
+            val=1.0,
         )
 
     def setup_partials(self):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-
-        self.declare_partials(
-            "*",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
-            val=-1.0,
-        )
-        self.declare_partials(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_spacing",
-            val=1.0,
-        )
-        self.declare_partials(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency",
-            method="exact",
-        )
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -96,44 +64,69 @@ class SizingHeatExchangerFinGeometry(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":heat_exchanger:plate_spacing"
         ]
-        fin_thickness = inputs[
+        surface_area_density = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness"
+            + ":heat_exchanger:surface_area_density"
         ]
-        fin_frequency = inputs[
+        plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency"
+            + ":heat_exchanger:plate_thickness"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height"
-        ] = plate_spacing - fin_thickness
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing"
-        ] = 1.0 / fin_frequency - fin_thickness
+            + ":heat_exchanger:transfer_area_volume_ratio"
+        ] = surface_area_density * plate_spacing / (2.0 * (plate_thickness + plate_spacing))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
+        plate_spacing = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:plate_spacing"
+        ]
+        surface_area_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:surface_area_density"
+        ]
+        plate_thickness = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:plate_thickness"
+        ]
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
+            + ":heat_exchanger:transfer_area_volume_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency",
+            + ":heat_exchanger:surface_area_density",
+        ] = plate_spacing / (2.0 * (plate_thickness + plate_spacing))
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:transfer_area_volume_ratio",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:plate_spacing",
         ] = (
-            -1.0
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":heat_exchanger:fin_frequency"
-            ]
-            ** 2.0
+            surface_area_density
+            * plate_thickness
+            / (2.0 * (plate_thickness + plate_spacing) ** 2.0)
         )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:transfer_area_volume_ratio",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":heat_exchanger:plate_thickness",
+        ] = -surface_area_density * plate_spacing / (2.0 * (plate_thickness + plate_spacing) ** 2.0)
