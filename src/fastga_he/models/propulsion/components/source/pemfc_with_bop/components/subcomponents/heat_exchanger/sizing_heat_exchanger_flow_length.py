@@ -278,7 +278,7 @@ class _HEXVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":heat_exchanger:no_flow_length",
             units="m",
-            val=0.3,
+            val=np.nan,
         )
         self.add_input(
             name="coolant_flow_length",
@@ -747,7 +747,9 @@ class _ReynoldsNumber(om.ExplicitComponent):
 
 class _ColburnNumber(om.ExplicitComponent):
     """
-    Computation of the Colburn number for both flow.
+    Computation of the Colburn number for both flow. Surrogate model
+    based on the Reynolds number of the flow, with a transition at 1500, obtained from
+    Valentine's thesis.
     """
 
     def setup(self):

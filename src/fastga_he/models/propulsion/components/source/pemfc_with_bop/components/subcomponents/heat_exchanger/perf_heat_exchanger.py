@@ -10,6 +10,14 @@ from .perf_mean_air_temperature import PerformancesMeanAirTemperature
 from .perf_heat_capacity_ratio import PerformancesHeatCapacityRatio
 from .perf_heat_exchanger_NTU import PerformancesHeatExchangerNTU
 from .perf_heat_exchanger_UA import PerformancesHeatExchangerUA
+from .perf_air_mass_velocity import PerformancesAirMassVelocity
+from .perf_coolant_mass_velocity import PerformancesCoolantMassVelocity
+from .perf_air_reynold_number import PerformancesAirReynoldsNumber
+from .perf_coolant_reynold_number import PerformancesCoolantReynoldsNumber
+from .perf_fanning_friction_factor import PerformancesFanningFrictionFactor
+from .perf_pressure_drop_coefficient import PerformancesPressureDropCoefficient
+from .perf_air_pressure_drop import PerformancesAirPressureDrop
+from .perf_coolant_pressure_drop import PerformancesCoolantPressureDrop
 
 from ..fluid_characteristics import (
     FluidDensity,
@@ -291,5 +299,121 @@ class PerformancesHeatExchanger(om.Group):
         self.add_subsystem(
             "heat_exchanger_UA",
             PerformancesHeatExchangerUA(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "air_mass_velocity",
+            PerformancesAirMassVelocity(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "coolant_mass_velocity",
+            PerformancesCoolantMassVelocity(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "air_reynolds_number",
+            PerformancesAirReynoldsNumber(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "coolant_reynolds_number",
+            PerformancesCoolantReynoldsNumber(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "fanning_friction_factor",
+            PerformancesFanningFrictionFactor(),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "pressure_drop_coefficient",
+            PerformancesPressureDropCoefficient(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "air_inlet_density_hex_performances",
+            FluidDensity(fluid="air"),
+            promotes=[
+                (
+                    "fluid_pressure",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:air_static_pressure",
+                ),
+                (
+                    "fluid_temperature",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:air_inlet_temperature",
+                ),
+                ("fluid_density", "air_inlet_density"),
+            ],
+        )
+        self.add_subsystem(
+            "air_outlet_density_hex_performances",
+            FluidDensity(fluid="air"),
+            promotes=[
+                (
+                    "fluid_pressure",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:air_static_pressure",
+                ),
+                (
+                    "fluid_temperature",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchanger:air_outlet_temperature",
+                ),
+                ("fluid_density", "air_outlet_density"),
+            ],
+        )
+        self.add_subsystem(
+            "air_pressure_drop",
+            PerformancesAirPressureDrop(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "coolant_inlet_density_hex_performances",
+            FluidDensity(fluid=fluid),
+            promotes=[
+                (
+                    "fluid_pressure",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":coolant:static_pressure",
+                ),
+                (
+                    "fluid_temperature",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchange:coolant_inlet_temperature",
+                ),
+                ("fluid_density", "coolant_inlet_density"),
+            ],
+        )
+        self.add_subsystem(
+            "coolant_outlet_density_hex_performances",
+            FluidDensity(fluid=fluid),
+            promotes=[
+                (
+                    "fluid_pressure",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":coolant:static_pressure",
+                ),
+                (
+                    "fluid_temperature",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":heat_exchange:coolant_outlet_temperature",
+                ),
+                ("fluid_density", "coolant_outlet_density"),
+            ],
+        )
+        self.add_subsystem(
+            "coolant_pressure_drop",
+            PerformancesCoolantPressureDrop(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )

@@ -470,4 +470,3 @@ def test_sizing_heat_exchanger_flow_length():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger:air_flow_length",
         units="m",
     ) == pytest.approx(0.0907, abs=1e-3)
-
