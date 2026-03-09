@@ -18,38 +18,59 @@ class SizingHeatExchangerFluidWeight(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
-            name="mean_air_density",
-            units="kg/m**3",
-            val=np.nan,
-        )
-        self.add_input(
-            name="mean_coolant_density",
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_density",
             units="kg/m**3",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_density",
+            units="kg/m**3",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length",
             units="m",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
             units="m",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
             units="m",
             val=np.nan,
         )
@@ -57,7 +78,9 @@ class SizingHeatExchangerFluidWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
             units="kg",
             val=2.0,
         )
@@ -67,89 +90,153 @@ class SizingHeatExchangerFluidWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length"
         ]
         coolant_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
-        air_density = inputs["mean_air_density"]
-        coolant_density = inputs["mean_coolant_density"]
+        air_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_density"
+        ]
+        coolant_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_density"
+        ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass"
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass"
         ] = (air_density + coolant_density) * air_flow_length * coolant_flow_length * no_flow_length
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length"
         ]
         coolant_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
-        air_density = inputs["mean_air_density"]
-        coolant_density = inputs["mean_coolant_density"]
+        air_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_density"
+        ]
+        coolant_density = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_density"
+        ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length",
         ] = (air_density + coolant_density) * coolant_flow_length * no_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
         ] = (air_density + coolant_density) * air_flow_length * no_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
         ] = (air_density + coolant_density) * air_flow_length * coolant_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
-            "mean_air_density",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_density",
         ] = air_flow_length * coolant_flow_length * no_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
-            "mean_coolant_density",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_density",
         ] = air_flow_length * coolant_flow_length * no_flow_length

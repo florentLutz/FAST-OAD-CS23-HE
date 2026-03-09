@@ -23,128 +23,9 @@ class SizingHeatExchangerFlowLength(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="coolant_flow_length_lower",
-            default=0.05,
-            desc="Lower bound for coolant flow length (m)",
-        )
-        self.options.declare(
-            name="coolant_flow_length_upper",
-            default=0.5,
-            desc="Upper bound for coolant flow length (m)",
-        )
-        self.options.declare(
-            name="air_flow_length_lower",
-            default=0.05,
-            desc="Lower bound for air flow length (m)",
-        )
-        self.options.declare(
-            name="air_flow_length_upper",
-            default=0.5,
-            desc="Upper bound for air flow length (m)",
-        )
-
-    def setup(self):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-
-        inner_group = _HEXSizingFlowLengthInnerGroup(
-            pemfc_stack_bop_id=pemfc_stack_bop_id,
-            coolant_flow_length_lower=self.options["coolant_flow_length_lower"],
-            coolant_flow_length_upper=self.options["coolant_flow_length_upper"],
-            air_flow_length_lower=self.options["air_flow_length_lower"],
-            air_flow_length_upper=self.options["air_flow_length_upper"],
-        )
-
-        # Build the inner Problem that SubmodelComp requires.
-        # The driver and model are attached to this inner Problem, which is
-        # then passed as the sole argument to SubmodelComp.
-        inner_prob = om.Problem()
-        inner_prob.model = inner_group
-        inner_prob.driver = om.ScipyOptimizeDriver()
-        inner_prob.driver.options["optimizer"] = "SLSQP"
-        inner_prob.driver.options["tol"] = 1e-6
-        inner_prob.driver.options["maxiter"] = 100
-
-        self.add_subsystem(
-            name="hex_sizing",
-            subsys=om.SubmodelComp(
-                problem=inner_prob,
-                inputs=[
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:no_flow_length",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:UA",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:transfer_area_volume_ratio",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:plate_thickness",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:plate_thermally_conductivity",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:fin_area_total_surface_ratio",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:mean_coolant_dynamic_viscosity",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:mean_coolant_prandtl_number",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:mean_coolant_thermal_conductivity",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:mean_air_dynamic_viscosity",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:mean_air_prandtl_number",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:mean_air_thermal_conductivity",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":coolant:mass_flow_rate",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:air_flow_rate",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:fin_hydraulic_diameter",
-                    "separating_plate_count",
-                ],
-                outputs=[
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:air_flow_length",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchanger:coolant_flow_length",
-                    "HEX_volume",
-                    "plate_area",
-                    "total_transfer_area",
-                    "UA_difference",
-                ],
-            ),
-            promotes=["*"],
-        )
-
-
-class _HEXSizingFlowLengthInnerGroup(om.Group):
-    """
-    Inner group containing all HEX physics subsystems. Registers design
-    variables, UA equality constraint, and HEX_volume objective so that
-    SubmodelComp can run SLSQP in full isolation from the parent driver.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            name="pemfc_stack_bop_id",
+            name="heat_exchanger_id",
             default=None,
-            desc="Identifier of the PEMFC stack",
+            desc="Identifier of the heat exchanger",
             allow_none=False,
         )
         self.options.declare(
@@ -170,6 +51,172 @@ class _HEXSizingFlowLengthInnerGroup(om.Group):
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
+
+        inner_group = _HEXSizingFlowLengthInnerGroup(
+            pemfc_stack_bop_id=pemfc_stack_bop_id,
+            heat_exchanger_id=heat_exchanger_id,
+            coolant_flow_length_lower=self.options["coolant_flow_length_lower"],
+            coolant_flow_length_upper=self.options["coolant_flow_length_upper"],
+            air_flow_length_lower=self.options["air_flow_length_lower"],
+            air_flow_length_upper=self.options["air_flow_length_upper"],
+        )
+
+        # Build the inner Problem that SubmodelComp requires.
+        # The driver and model are attached to this inner Problem, which is
+        # then passed as the sole argument to SubmodelComp.
+        inner_prob = om.Problem()
+        inner_prob.model = inner_group
+        inner_prob.driver = om.ScipyOptimizeDriver()
+        inner_prob.driver.options["optimizer"] = "SLSQP"
+        inner_prob.driver.options["tol"] = 1e-6
+        inner_prob.driver.options["maxiter"] = 100
+
+        self.add_subsystem(
+            name="hex_sizing",
+            subsys=om.SubmodelComp(
+                problem=inner_prob,
+                inputs=[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":no_flow_length",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":UA",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":transfer_area_volume_ratio",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":plate_thickness",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":plate_thermally_conductivity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":fin_area_total_surface_ratio",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":mean_coolant_dynamic_viscosity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":mean_coolant_prandtl_number",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":mean_coolant_thermal_conductivity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":mean_air_dynamic_viscosity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":mean_air_prandtl_number",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":mean_air_thermal_conductivity",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":coolant:mass_flow_rate",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":air_flow_rate",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":fin_hydraulic_diameter",
+                    "separating_plate_count",
+                ],
+                outputs=[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":air_flow_length",
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + heat_exchanger_id
+                    + ":coolant_flow_length",
+                    "HEX_volume",
+                    "plate_area",
+                    "total_transfer_area",
+                    "UA_difference",
+                ],
+            ),
+            promotes=["*"],
+        )
+
+
+class _HEXSizingFlowLengthInnerGroup(om.Group):
+    """
+    Inner group containing all HEX physics subsystems. Registers design
+    variables, UA equality constraint, and HEX_volume objective so that
+    SubmodelComp can run SLSQP in full isolation from the parent driver.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="coolant_flow_length_lower",
+            default=0.05,
+            desc="Lower bound for coolant flow length (m)",
+        )
+        self.options.declare(
+            name="coolant_flow_length_upper",
+            default=0.5,
+            desc="Upper bound for coolant flow length (m)",
+        )
+        self.options.declare(
+            name="air_flow_length_lower",
+            default=0.05,
+            desc="Lower bound for air flow length (m)",
+        )
+        self.options.declare(
+            name="air_flow_length_upper",
+            default=0.5,
+            desc="Upper bound for air flow length (m)",
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         # IndepVarComp owns the design variables so SLSQP has a proper
         # output to drive. Without this, coolant_flow_length and
@@ -182,7 +229,9 @@ class _HEXSizingFlowLengthInnerGroup(om.Group):
 
         self.add_subsystem(
             name="hex_volume",
-            subsys=_HEXVolume(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_HEXVolume(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -192,12 +241,16 @@ class _HEXSizingFlowLengthInnerGroup(om.Group):
         )
         self.add_subsystem(
             name="total_transfer_area",
-            subsys=_TotalTransferArea(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_TotalTransferArea(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="reynolds_number",
-            subsys=_ReynoldsNumber(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_ReynoldsNumber(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -207,32 +260,44 @@ class _HEXSizingFlowLengthInnerGroup(om.Group):
         )
         self.add_subsystem(
             name="heat_transfer_coefficient",
-            subsys=_HeatTransferCoefficient(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_HeatTransferCoefficient(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="dimensionless_intermediate_variables",
-            subsys=_DimensionlessIntermediateFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_DimensionlessIntermediateFactor(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="fin_effficiency",
-            subsys=_FinEfficiency(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_FinEfficiency(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="overall_efficiency",
-            subsys=_OverallSurfaceEfficiency(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_OverallSurfaceEfficiency(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="delta_UA",
-            subsys=_UADifference(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_UADifference(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             name="flow_length_output",
-            subsys=_FlowLength(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            subsys=_FlowLength(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
 
@@ -269,14 +334,23 @@ class _HEXVolume(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
             units="m",
             val=np.nan,
         )
@@ -302,26 +376,32 @@ class _HEXVolume(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         coolant_flow_length = inputs["coolant_flow_length"]
         air_flow_length = inputs["air_flow_length"]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
 
         outputs["HEX_volume"] = no_flow_length * coolant_flow_length * air_flow_length
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         coolant_flow_length = inputs["coolant_flow_length"]
         air_flow_length = inputs["air_flow_length"]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
 
         partials["HEX_volume", "coolant_flow_length"] = no_flow_length * air_flow_length
@@ -332,7 +412,9 @@ class _HEXVolume(om.ExplicitComponent):
             "HEX_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
         ] = coolant_flow_length * air_flow_length
 
 
@@ -398,14 +480,23 @@ class _TotalTransferArea(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio",
             units="1/m",
             val=np.nan,
         )
@@ -426,30 +517,38 @@ class _TotalTransferArea(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         outputs["total_transfer_area"] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:transfer_area_volume_ratio"
+                + ":"
+                + heat_exchanger_id
+                + ":transfer_area_volume_ratio"
             ]
             * inputs["HEX_volume"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         partials[
             "total_transfer_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio",
         ] = inputs["HEX_volume"]
 
         partials["total_transfer_area", "HEX_volume"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio"
         ]
 
 
@@ -465,14 +564,23 @@ class _ReynoldsNumber(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio",
             units="1/m",
             val=np.nan,
         )
@@ -489,21 +597,27 @@ class _ReynoldsNumber(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_dynamic_viscosity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_dynamic_viscosity",
             val=np.nan,
             units="Pa*s",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity",
             val=np.nan,
             units="Pa*s",
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
             units="m",
             val=np.nan,
         )
@@ -517,7 +631,9 @@ class _ReynoldsNumber(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate",
             units="kg/s",
             val=np.nan,
         )
@@ -535,16 +651,21 @@ class _ReynoldsNumber(om.ExplicitComponent):
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "*",
             [
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:transfer_area_volume_ratio",
+                + ":"
+                + heat_exchanger_id
+                + ":transfer_area_volume_ratio",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:no_flow_length",
+                + ":"
+                + heat_exchanger_id
+                + ":no_flow_length",
             ],
             method="exact",
         )
@@ -555,10 +676,14 @@ class _ReynoldsNumber(om.ExplicitComponent):
                 "air_flow_length",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:mean_air_dynamic_viscosity",
+                + ":"
+                + heat_exchanger_id
+                + ":mean_air_dynamic_viscosity",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:air_flow_rate",
+                + ":"
+                + heat_exchanger_id
+                + ":air_flow_rate",
             ],
             method="exact",
         )
@@ -569,7 +694,9 @@ class _ReynoldsNumber(om.ExplicitComponent):
                 "coolant_flow_length",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:mean_coolant_dynamic_viscosity",
+                + ":"
+                + heat_exchanger_id
+                + ":mean_coolant_dynamic_viscosity",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":coolant:mass_flow_rate",
@@ -579,23 +706,30 @@ class _ReynoldsNumber(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
         coolant_flow_length = inputs["coolant_flow_length"]
         air_flow_length = inputs["air_flow_length"]
         mean_coolant_dynamic_viscosity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_dynamic_viscosity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_dynamic_viscosity"
         ]
         mean_air_dynamic_viscosity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity"
         ]
         coolant_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -605,12 +739,16 @@ class _ReynoldsNumber(om.ExplicitComponent):
         air_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate"
         ]
         transfer_area_volume_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio"
         ]
 
         outputs["air_reynolds_number"] = (4.0 * air_mass_flow_rate) / (
@@ -629,23 +767,30 @@ class _ReynoldsNumber(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
         coolant_flow_length = inputs["coolant_flow_length"]
         air_flow_length = inputs["air_flow_length"]
         mean_coolant_dynamic_viscosity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_dynamic_viscosity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_dynamic_viscosity"
         ]
         mean_air_dynamic_viscosity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity"
         ]
         coolant_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -655,12 +800,16 @@ class _ReynoldsNumber(om.ExplicitComponent):
         air_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate"
         ]
         transfer_area_volume_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio"
         ]
 
         common_air_denominator = (
@@ -684,28 +833,36 @@ class _ReynoldsNumber(om.ExplicitComponent):
             "air_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity",
         ] = -(4.0 * air_mass_flow_rate) / (common_air_denominator * mean_air_dynamic_viscosity)
 
         partials[
             "air_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate",
         ] = 4.0 / common_air_denominator
 
         partials[
             "air_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
         ] = -(4.0 * air_mass_flow_rate) / (common_air_denominator * no_flow_length)
 
         partials[
             "air_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio",
         ] = -(4.0 * air_mass_flow_rate) / (common_air_denominator * transfer_area_volume_ratio)
 
         partials["coolant_reynolds_number", "coolant_flow_length"] = -(
@@ -716,7 +873,9 @@ class _ReynoldsNumber(om.ExplicitComponent):
             "coolant_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:transfer_area_volume_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":transfer_area_volume_ratio",
         ] = -(4.0 * coolant_mass_flow_rate) / (
             transfer_area_volume_ratio * common_coolant_denominator
         )
@@ -725,7 +884,9 @@ class _ReynoldsNumber(om.ExplicitComponent):
             "coolant_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_dynamic_viscosity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_dynamic_viscosity",
         ] = -(4.0 * coolant_mass_flow_rate) / (
             common_coolant_denominator * mean_coolant_dynamic_viscosity
         )
@@ -741,7 +902,9 @@ class _ReynoldsNumber(om.ExplicitComponent):
             "coolant_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
         ] = -(4.0 * coolant_mass_flow_rate) / (common_coolant_denominator * no_flow_length)
 
 
@@ -822,9 +985,16 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="air_colburn_number",
@@ -849,35 +1019,45 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_prandtl_number",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_prandtl_number",
             units="unitless",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_prandtl_number",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_prandtl_number",
             units="unitless",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_thermal_conductivity",
             units="W/m/K",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_thermal_conductivity",
             units="W/m/K",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             units="m",
             val=np.nan,
         )
@@ -895,12 +1075,15 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "*",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             method="exact",
         )
         self.declare_partials(
@@ -910,10 +1093,14 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
                 "air_reynolds_number",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:mean_air_prandtl_number",
+                + ":"
+                + heat_exchanger_id
+                + ":mean_air_prandtl_number",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:mean_air_thermal_conductivity",
+                + ":"
+                + heat_exchanger_id
+                + ":mean_air_thermal_conductivity",
             ],
             method="exact",
         )
@@ -924,16 +1111,21 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
                 "coolant_reynolds_number",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:mean_coolant_prandtl_number",
+                + ":"
+                + heat_exchanger_id
+                + ":mean_coolant_prandtl_number",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:mean_coolant_thermal_conductivity",
+                + ":"
+                + heat_exchanger_id
+                + ":mean_coolant_thermal_conductivity",
             ],
             method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_colburn_number = inputs["air_colburn_number"]
         coolant_colburn_number = inputs["coolant_colburn_number"]
@@ -942,27 +1134,37 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
         mean_air_prandtl_number = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_prandtl_number"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_prandtl_number"
         ]
         mean_coolant_prandtl_number = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_prandtl_number"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_prandtl_number"
         ]
         mean_air_thermal_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_thermal_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_thermal_conductivity"
         ]
         mean_coolant_thermal_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_thermal_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_thermal_conductivity"
         ]
         fin_hydraulic_diameter = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter"
         ]
 
         outputs["air_heat_transfer_coefficient"] = (
@@ -982,6 +1184,7 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_colburn_number = inputs["air_colburn_number"]
         coolant_colburn_number = inputs["coolant_colburn_number"]
@@ -990,27 +1193,37 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
         mean_air_prandtl_number = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_prandtl_number"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_prandtl_number"
         ]
         mean_coolant_prandtl_number = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_prandtl_number"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_prandtl_number"
         ]
         mean_air_thermal_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_thermal_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_thermal_conductivity"
         ]
         mean_coolant_thermal_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_thermal_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_thermal_conductivity"
         ]
         fin_hydraulic_diameter = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter"
         ]
 
         partials["air_heat_transfer_coefficient", "air_colburn_number"] = (
@@ -1031,7 +1244,9 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             "air_heat_transfer_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_prandtl_number",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_prandtl_number",
         ] = (
             air_colburn_number
             * air_reynolds_number
@@ -1044,7 +1259,9 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             "air_heat_transfer_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_thermal_conductivity",
         ] = (
             air_colburn_number
             * air_reynolds_number
@@ -1056,7 +1273,9 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             "air_heat_transfer_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
         ] = -(
             air_colburn_number
             * air_reynolds_number
@@ -1083,7 +1302,9 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             "coolant_heat_transfer_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_prandtl_number",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_prandtl_number",
         ] = (
             coolant_colburn_number
             * coolant_reynolds_number
@@ -1096,7 +1317,9 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             "coolant_heat_transfer_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_coolant_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_coolant_thermal_conductivity",
         ] = (
             coolant_colburn_number
             * coolant_reynolds_number
@@ -1108,7 +1331,9 @@ class _HeatTransferCoefficient(om.ExplicitComponent):
             "coolant_heat_transfer_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
         ] = -(
             coolant_colburn_number
             * coolant_reynolds_number
@@ -1130,9 +1355,16 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="air_heat_transfer_coefficient",
@@ -1147,7 +1379,9 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thermal_conductivity",
             units="W/m/K",
             val=237.0,
             desc="The thermal conductivity of the fin material, which is typically aluminum",
@@ -1155,7 +1389,9 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
             units="m",
             val=1.02e-4,
         )
@@ -1173,16 +1409,21 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "*",
             [
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:fin_thermal_conductivity",
+                + ":"
+                + heat_exchanger_id
+                + ":fin_thermal_conductivity",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:fin_thickness",
+                + ":"
+                + heat_exchanger_id
+                + ":fin_thickness",
             ],
             method="exact",
         )
@@ -1199,18 +1440,23 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_heat_transfer_coefficient = inputs["air_heat_transfer_coefficient"]
         coolant_heat_transfer_coefficient = inputs["coolant_heat_transfer_coefficient"]
         fin_thermal_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thermal_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thermal_conductivity"
         ]
         fin_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness"
         ]
 
         outputs["air_dimensionless_intermediate_factor"] = np.sqrt(
@@ -1222,18 +1468,23 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_heat_transfer_coefficient = inputs["air_heat_transfer_coefficient"]
         coolant_heat_transfer_coefficient = inputs["coolant_heat_transfer_coefficient"]
         fin_thermal_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thermal_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thermal_conductivity"
         ]
         fin_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness"
         ]
 
         partials["air_dimensionless_intermediate_factor", "air_heat_transfer_coefficient"] = (
@@ -1247,7 +1498,9 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
             "air_dimensionless_intermediate_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thermal_conductivity",
         ] = -(
             air_heat_transfer_coefficient
             / np.sqrt(
@@ -1259,7 +1512,9 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
             "air_dimensionless_intermediate_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
         ] = -(
             air_heat_transfer_coefficient
             / np.sqrt(
@@ -1277,7 +1532,9 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
             "coolant_dimensionless_intermediate_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thermal_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thermal_conductivity",
         ] = -(
             coolant_heat_transfer_coefficient
             / np.sqrt(
@@ -1292,7 +1549,9 @@ class _DimensionlessIntermediateFactor(om.ExplicitComponent):
             "coolant_dimensionless_intermediate_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
         ] = -(
             coolant_heat_transfer_coefficient
             / np.sqrt(
@@ -1316,14 +1575,23 @@ class _FinEfficiency(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
             units="m",
             val=6.25e-3,
         )
@@ -1351,12 +1619,15 @@ class _FinEfficiency(om.ExplicitComponent):
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "*",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
             method="exact",
         )
         self.declare_partials(
@@ -1372,11 +1643,14 @@ class _FinEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         fin_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height"
         ]
         air_dimensionless_intermediate_factor = inputs["air_dimensionless_intermediate_factor"]
         coolant_dimensionless_intermediate_factor = inputs[
@@ -1392,11 +1666,14 @@ class _FinEfficiency(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         fin_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height"
         ]
         air_dimensionless_intermediate_factor = inputs["air_dimensionless_intermediate_factor"]
         coolant_dimensionless_intermediate_factor = inputs[
@@ -1407,7 +1684,9 @@ class _FinEfficiency(om.ExplicitComponent):
             "air_fin_efficiency",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
         ] = np.cosh(
             0.5 * air_dimensionless_intermediate_factor * fin_height
         ) ** -2.0 / fin_height - (
@@ -1424,7 +1703,9 @@ class _FinEfficiency(om.ExplicitComponent):
             "coolant_fin_efficiency",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
         ] = np.cosh(
             0.5 * coolant_dimensionless_intermediate_factor * fin_height
         ) ** -2.0 / fin_height - (
@@ -1450,14 +1731,23 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_area_total_surface_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_area_total_surface_ratio",
             units="unitless",
             val=0.809,
         )
@@ -1485,12 +1775,15 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "*",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_area_total_surface_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_area_total_surface_ratio",
             method="exact",
         )
         self.declare_partials(
@@ -1506,11 +1799,14 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         fin_area_total_surface_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_area_total_surface_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_area_total_surface_ratio"
         ]
         air_fin_efficiency = inputs["air_fin_efficiency"]
         coolant_fin_efficiency = inputs["coolant_fin_efficiency"]
@@ -1524,11 +1820,14 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         fin_area_total_surface_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_area_total_surface_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_area_total_surface_ratio"
         ]
         air_fin_efficiency = inputs["air_fin_efficiency"]
         coolant_fin_efficiency = inputs["coolant_fin_efficiency"]
@@ -1537,7 +1836,9 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
             "air_overall_surface_efficiency",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_area_total_surface_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_area_total_surface_ratio",
         ] = -(1.0 - air_fin_efficiency)
 
         partials[
@@ -1549,7 +1850,9 @@ class _OverallSurfaceEfficiency(om.ExplicitComponent):
             "coolant_overall_surface_efficiency",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_area_total_surface_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_area_total_surface_ratio",
         ] = -(1.0 - coolant_fin_efficiency)
 
         partials[
@@ -1570,28 +1873,41 @@ class _UADifference(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA",
+            + ":"
+            + heat_exchanger_id
+            + ":UA",
             units="W/K",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness",
             units="m",
             val=8e-4,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thermally_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thermally_conductivity",
             units="W/m/K",
             val=237.0,
             desc="The thermal conductivity of the plate material, which is typically aluminum",
@@ -1638,21 +1954,28 @@ class _UADifference(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         required_UA = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA"
+            + ":"
+            + heat_exchanger_id
+            + ":UA"
         ]
         plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness"
         ]
         plate_thermally_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thermally_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thermally_conductivity"
         ]
         air_heat_transfer_coefficient = inputs["air_heat_transfer_coefficient"]
         coolant_heat_transfer_coefficient = inputs["coolant_heat_transfer_coefficient"]
@@ -1677,16 +2000,21 @@ class _UADifference(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness"
         ]
         plate_thermally_conductivity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thermally_conductivity"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thermally_conductivity"
         ]
         air_heat_transfer_coefficient = inputs["air_heat_transfer_coefficient"]
         coolant_heat_transfer_coefficient = inputs["coolant_heat_transfer_coefficient"]
@@ -1711,21 +2039,27 @@ class _UADifference(om.ExplicitComponent):
             "UA_difference",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA",
+            + ":"
+            + heat_exchanger_id
+            + ":UA",
         ] = -1.0
 
         partials[
             "UA_difference",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness",
         ] = -(calculated_UA**2.0) / (plate_thermally_conductivity * plate_area)
 
         partials[
             "UA_difference",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thermally_conductivity",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thermally_conductivity",
         ] = calculated_UA**2.0 * plate_thickness / (plate_thermally_conductivity**2.0 * plate_area)
 
         partials["UA_difference", "plate_area"] = (
@@ -1788,9 +2122,16 @@ class _FlowLength(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input("air_flow_length", units="m", val=np.nan)
         self.add_input("coolant_flow_length", units="m", val=np.nan)
@@ -1798,25 +2139,32 @@ class _FlowLength(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length",
             units="m",
             val=0.1,
         )
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
             units="m",
             val=0.05,
         )
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length",
             "air_flow_length",
             val=1.0,
         )
@@ -1824,21 +2172,28 @@ class _FlowLength(om.ExplicitComponent):
         self.declare_partials(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
             "coolant_flow_length",
             val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length"
         ] = inputs["air_flow_length"]
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ] = inputs["coolant_flow_length"]

@@ -18,14 +18,23 @@ class SizingHeatExchangerSeparatingPlateLayerCount(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:layer_count",
+            + ":"
+            + heat_exchanger_id
+            + ":layer_count",
             desc="Layer count of a single fluid in the exchanger, often referred to the cold "
             "fluid layer count",
             units="unitless",
@@ -54,26 +63,33 @@ class SizingHeatExchangerSeparatingPlateLayerCount(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         outputs["coolant_layer_count"] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:layer_count"
+                + ":"
+                + heat_exchanger_id
+                + ":layer_count"
             ]
             - 1.0
         )
         outputs["air_layer_count"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:layer_count"
+            + ":"
+            + heat_exchanger_id
+            + ":layer_count"
         ]
         outputs["separating_plate_count"] = (
             2.0
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:layer_count"
+                + ":"
+                + heat_exchanger_id
+                + ":layer_count"
             ]
             - 2.0
         )

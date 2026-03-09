@@ -18,21 +18,32 @@ class PerformancesMeanAirTemperature(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_temperature_in",
+            + ":"
+            + heat_exchanger_id
+            + ":air_temperature_in",
             units="K",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_temperature_out",
+            + ":"
+            + heat_exchanger_id
+            + ":air_temperature_out",
             units="K",
             val=np.nan,
         )
@@ -40,7 +51,9 @@ class PerformancesMeanAirTemperature(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_temperature",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_temperature",
             units="K",
             val=np.nan,
         )
@@ -50,20 +63,27 @@ class PerformancesMeanAirTemperature(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_temperature"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_temperature"
         ] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:air_temperature_out"
+                + ":"
+                + heat_exchanger_id
+                + ":air_temperature_out"
             ]
             + inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:air_temperature_in"
+                + ":"
+                + heat_exchanger_id
+                + ":air_temperature_in"
             ]
         ) / 2.0

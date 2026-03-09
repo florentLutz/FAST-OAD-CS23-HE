@@ -18,28 +18,41 @@ class SizingHeatExchangerFinGeometry(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_spacing",
             units="m",
             val=6.35e-3,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
             units="m",
             val=1.02e-4,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_frequency",
             units="1/m",
             val=782,
         )
@@ -47,93 +60,126 @@ class SizingHeatExchangerFinGeometry(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
             units="m",
             val=6.25e-3,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing",
             units="m",
             val=1.18e-3,
         )
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.declare_partials(
             "*",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
             val=-1.0,
         )
         self.declare_partials(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_spacing",
             val=1.0,
         )
         self.declare_partials(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_frequency",
             method="exact",
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         plate_spacing = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_spacing"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_spacing"
         ]
         fin_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness"
         ]
         fin_frequency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_frequency"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height"
         ] = plate_spacing - fin_thickness
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing"
         ] = 1.0 / fin_frequency - fin_thickness
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_frequency",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_frequency",
         ] = (
             -1.0
             / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:fin_frequency"
+                + ":"
+                + heat_exchanger_id
+                + ":fin_frequency"
             ]
             ** 2.0
         )

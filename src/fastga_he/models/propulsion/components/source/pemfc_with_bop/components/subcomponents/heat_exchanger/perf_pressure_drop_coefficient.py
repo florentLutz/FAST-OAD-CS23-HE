@@ -18,14 +18,23 @@ class PerformancesPressureDropCoefficient(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio",
             units="unitless",
             val=np.nan,
         )
@@ -46,11 +55,14 @@ class PerformancesPressureDropCoefficient(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         sigma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio"
         ]
 
         outputs["entrance_pressure_drop_coefficient"] = 0.5 * (1.0 - sigma) - 1.0 + sigma**2.0
@@ -58,23 +70,30 @@ class PerformancesPressureDropCoefficient(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         sigma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio"
         ]
 
         partials[
             "entrance_pressure_drop_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio",
         ] = -0.5 + 2.0 * sigma
 
         partials[
             "exit_pressure_drop_coefficient",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio",
         ] = -2.0

@@ -19,15 +19,24 @@ class PerformancesHeatExchangerUA(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input("min_heat_capacity", units="W/K", val=np.nan)
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
             units="unitless",
             val=np.nan,
         )
@@ -35,7 +44,9 @@ class PerformancesHeatExchangerUA(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA",
+            + ":"
+            + heat_exchanger_id
+            + ":UA",
             units="W/K",
             val=2.64,
         )
@@ -45,39 +56,53 @@ class PerformancesHeatExchangerUA(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA"
+            + ":"
+            + heat_exchanger_id
+            + ":UA"
         ] = (
             inputs["min_heat_capacity"]
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:NTU"
+                + ":"
+                + heat_exchanger_id
+                + ":NTU"
             ]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA",
+            + ":"
+            + heat_exchanger_id
+            + ":UA",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
         ] = inputs["min_heat_capacity"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:UA",
+            + ":"
+            + heat_exchanger_id
+            + ":UA",
             "min_heat_capacity",
         ] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU"
+            + ":"
+            + heat_exchanger_id
+            + ":NTU"
         ]

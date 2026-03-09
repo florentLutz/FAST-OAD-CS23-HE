@@ -32,67 +32,98 @@ class SizingHeatExchanger(om.Group):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_subsystem(
             "sizing_fin_geometry",
-            SizingHeatExchangerFinGeometry(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerFinGeometry(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_total_transfer_area_volume_ratio",
-            SizingTotalTransferAreaVolumeRatio(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingTotalTransferAreaVolumeRatio(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_fin_geometry_factor",
-            SizingHeatExchangerFinFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerFinFactor(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_separating_plate_layer_count",
-            SizingHeatExchangerSeparatingPlateLayerCount(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerSeparatingPlateLayerCount(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_no_flow_length",
-            SizingHeatExchangerNoFlowLength(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerNoFlowLength(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_fin_hydraulic_diameter",
-            SizingHeatExchangerFinHydraulicDiameter(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerFinHydraulicDiameter(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_flow_length",
-            SizingHeatExchangerFlowLength(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerFlowLength(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_free_flow_frontal_area_ratio",
-            SizingFreeFlowFrontalAreaRatio(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingFreeFlowFrontalAreaRatio(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_plate_weight",
-            SizingHeatExchangerPlateWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerPlateWeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_channel_weight",
-            SizingHeatExchangerChannelWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerChannelWeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_fluid_weight",
-            SizingHeatExchangerFluidWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerFluidWeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "sizing_heat_exchanger_wet_weight",
-            SizingHeatExchangerWetWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHeatExchangerWetWeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
+            ),
             promotes=["*"],
         )

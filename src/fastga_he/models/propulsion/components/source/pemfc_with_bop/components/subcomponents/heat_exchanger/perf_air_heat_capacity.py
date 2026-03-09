@@ -18,14 +18,23 @@ class PerformancesAirHeatCapacity(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate",
             units="kg/s",
             val=np.nan,
         )
@@ -46,28 +55,36 @@ class PerformancesAirHeatCapacity(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         outputs["air_heat_capacity"] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:air_flow_rate"
+                + ":"
+                + heat_exchanger_id
+                + ":air_flow_rate"
             ]
             * inputs["mean_air_specific_heat_capacity"]
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         partials[
             "air_heat_capacity",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate",
         ] = inputs["mean_air_specific_heat_capacity"]
 
         partials["air_heat_capacity", "mean_air_specific_heat_capacity"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_rate"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_rate"
         ]

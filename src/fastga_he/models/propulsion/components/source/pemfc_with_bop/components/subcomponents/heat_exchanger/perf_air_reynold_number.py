@@ -18,9 +18,16 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="air_mass_velocity",
@@ -30,14 +37,18 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             units="m",
             val=np.nan,
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity",
             val=np.nan,
             units="Pa*s",
         )
@@ -53,17 +64,22 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_mass_velocity = inputs["air_mass_velocity"]
         fin_hydraulic_diameter = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter"
         ]
         mean_air_dynamic_viscosity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity"
         ]
 
         outputs["air_reynolds_number"] = (
@@ -72,17 +88,22 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         air_mass_velocity = inputs["air_mass_velocity"]
         fin_hydraulic_diameter = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter"
         ]
         mean_air_dynamic_viscosity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity"
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity"
         ]
 
         partials["air_reynolds_number", "air_mass_velocity"] = (
@@ -93,12 +114,16 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
             "air_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
         ] = air_mass_velocity / mean_air_dynamic_viscosity
 
         partials[
             "air_reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:mean_air_dynamic_viscosity",
+            + ":"
+            + heat_exchanger_id
+            + ":mean_air_dynamic_viscosity",
         ] = -air_mass_velocity * fin_hydraulic_diameter / mean_air_dynamic_viscosity**2.0

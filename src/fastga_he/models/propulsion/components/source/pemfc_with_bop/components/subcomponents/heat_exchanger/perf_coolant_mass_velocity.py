@@ -18,9 +18,16 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -32,21 +39,27 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
             units="m",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
             units="m",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio",
             units="unitless",
             val=np.nan,
         )
@@ -62,6 +75,7 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         coolant_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -71,17 +85,23 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
         coolant_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
         free_flow_frontal_area_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio"
         ]
 
         outputs["coolant_mass_velocity"] = coolant_flow_rate / (
@@ -90,6 +110,7 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         coolant_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -99,17 +120,23 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
         coolant_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length"
         ]
         free_flow_frontal_area_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio"
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio"
         ]
 
         common_denominator = coolant_flow_length * free_flow_frontal_area_ratio * no_flow_length
@@ -125,19 +152,25 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
             "coolant_mass_velocity",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
         ] = -coolant_flow_rate / (common_denominator * coolant_flow_length)
 
         partials[
             "coolant_mass_velocity",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:no_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":no_flow_length",
         ] = -coolant_flow_rate / (common_denominator * no_flow_length)
 
         partials[
             "coolant_mass_velocity",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:free_flow_frontal_area_ratio",
+            + ":"
+            + heat_exchanger_id
+            + ":free_flow_frontal_area_ratio",
         ] = -coolant_flow_rate / (common_denominator * free_flow_frontal_area_ratio)

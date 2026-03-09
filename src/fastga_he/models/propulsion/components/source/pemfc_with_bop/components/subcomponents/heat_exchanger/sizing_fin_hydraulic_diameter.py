@@ -18,35 +18,50 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing",
             units="m",
             val=1.18e-3,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
             units="m",
             val=1.02e-4,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
             units="m",
             val=6.25e-3,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_length",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_length",
             units="m",
             val=3.175e-3,
         )
@@ -54,7 +69,9 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             units="m",
             val=2.38e-3,
         )
@@ -64,32 +81,43 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         fin_spacing = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing"
         ]
         fin_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness"
         ]
         fin_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height"
         ]
         fin_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_length"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_length"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter"
         ] = (
             4.0
             * fin_spacing
@@ -104,35 +132,48 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         fin_spacing = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing"
         ]
         fin_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness"
         ]
         fin_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height"
         ]
         fin_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_length"
+            + ":"
+            + heat_exchanger_id
+            + ":fin_length"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_spacing",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_spacing",
         ] = (8.0 * fin_height**2.0 * fin_length * (fin_thickness + fin_length)) / (
             (fin_thickness + 2.0 * fin_length) * fin_spacing
             + 2.0 * fin_height * fin_thickness
@@ -142,10 +183,14 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_thickness",
         ] = (
             -(4.0 * fin_height * fin_length * fin_spacing * (fin_spacing + 2.0 * fin_height))
             / (
@@ -159,10 +204,14 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_height",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_height",
         ] = (4.0 * fin_length * fin_spacing**2.0 * (fin_thickness + 2.0 * fin_length)) / (
             (2.0 * fin_thickness + 2.0 * fin_length) * fin_height
             + fin_spacing * fin_thickness
@@ -172,10 +221,14 @@ class SizingHeatExchangerFinHydraulicDiameter(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_hydraulic_diameter",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_hydraulic_diameter",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fin_length",
+            + ":"
+            + heat_exchanger_id
+            + ":fin_length",
         ] = (4.0 * fin_height * fin_spacing * (fin_spacing + 2.0 * fin_height) * fin_thickness) / (
             (2.0 * fin_spacing + 2.0 * fin_height) * fin_length
             + (fin_spacing + 2.0 * fin_height) * fin_thickness

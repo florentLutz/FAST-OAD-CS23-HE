@@ -28,18 +28,18 @@ class PerformancesFanningFrictionFactor(om.ExplicitComponent):
         self.add_output(
             name="air_fanning_friction_factor",
             units="unitless",
-            val=1e4,
+            val=0.42,
         )
         self.add_output(
             name="coolant_fanning_friction_factor",
             units="unitless",
-            val=1e4,
+            val=0.088,
         )
 
     def setup_partials(self):
         self.declare_partials("air_fanning_friction_factor", "air_reynolds_number", method="exact")
         self.declare_partials(
-            "air_fanning_friction_factor", "coolant_reynolds_number", method="exact"
+            "coolant_fanning_friction_factor", "coolant_reynolds_number", method="exact"
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

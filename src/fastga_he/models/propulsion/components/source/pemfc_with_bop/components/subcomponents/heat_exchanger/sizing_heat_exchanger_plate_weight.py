@@ -18,9 +18,16 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="separating_plate_count",
@@ -30,7 +37,9 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_material_density",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_material_density",
             units="kg/m**3",
             val=2710,
             desc="Density of the material of the separating plates, Aluminium 6061-T6 by default",
@@ -38,28 +47,36 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness",
             units="m",
             val=8e-4,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:end_plate_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":end_plate_thickness",
             units="m",
             val=6e-3,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length",
             units="m",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
             units="m",
             val=np.nan,
         )
@@ -67,7 +84,9 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             units="kg",
             val=2.0,
         )
@@ -77,38 +96,51 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         separating_plate_count = inputs["separating_plate_count"]
         plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness"
         ]
         end_plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:end_plate_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":end_plate_thickness"
         ]
         plate_density = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_material_density"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_material_density"
         ]
         air_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length"
         ]
         coolant_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass"
         ] = plate_density * (
             (separating_plate_count + 2.0) * plate_thickness * air_flow_length * coolant_flow_length
             + 2.0 * end_plate_thickness * air_flow_length * coolant_flow_length
@@ -116,66 +148,91 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         separating_plate_count = inputs["separating_plate_count"]
         plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness"
         ]
         end_plate_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:end_plate_thickness"
+            + ":"
+            + heat_exchanger_id
+            + ":end_plate_thickness"
         ]
         plate_density = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_material_density"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_material_density"
         ]
         air_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length"
         ]
         coolant_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length"
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             "separating_plate_count",
         ] = plate_density * plate_thickness * air_flow_length * coolant_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_thickness",
         ] = plate_density * (separating_plate_count + 2.0) * air_flow_length * coolant_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:end_plate_thickness",
+            + ":"
+            + heat_exchanger_id
+            + ":end_plate_thickness",
         ] = plate_density * 2.0 * air_flow_length * coolant_flow_length
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_material_density",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_material_density",
         ] = (
             (separating_plate_count + 2.0) * plate_thickness * air_flow_length * coolant_flow_length
             + 2.0 * end_plate_thickness * air_flow_length * coolant_flow_length
@@ -184,10 +241,14 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:air_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":air_flow_length",
         ] = plate_density * (
             (separating_plate_count + 2.0) * plate_thickness * coolant_flow_length
             + 2.0 * end_plate_thickness * coolant_flow_length
@@ -196,10 +257,14 @@ class SizingHeatExchangerPlateWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:coolant_flow_length",
+            + ":"
+            + heat_exchanger_id
+            + ":coolant_flow_length",
         ] = plate_density * (
             (separating_plate_count + 2.0) * plate_thickness * air_flow_length
             + 2.0 * end_plate_thickness * air_flow_length

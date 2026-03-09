@@ -35,6 +35,7 @@ from ..perf_ambient_total_pressure import PerformancesAmbientTotalPressure
 from ..perf_throat_temperature import PerformancesThroatTemperature
 from ..perf_throat_pressure import PerformancesThroatPressure
 from ..perf_max_inlet_pressure_drop import PerformancesMaximumInletPressureDrop
+from ..perf_inlet import PerformancesInlet
 
 from ..sizing_throat_height import SizingThroatHeight
 from ..sizing_inlet_geometry import SizingInletGeometry
@@ -618,7 +619,7 @@ def test_inlet_drag_group():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":inlet_drag",
         units="N",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 98.456), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 49.08), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

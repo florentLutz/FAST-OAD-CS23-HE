@@ -18,15 +18,24 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input("heat_capacity_ratio", units="unitless", val=np.nan)
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:effectiveness",
+            + ":"
+            + heat_exchanger_id
+            + ":effectiveness",
             units="unitless",
             val=0.98,
         )
@@ -34,7 +43,9 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
             units="unitless",
         )
 
@@ -45,25 +56,32 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
         self, inputs, outputs, residuals, discrete_inputs=None, discrete_outputs=None
     ):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         c_ratio = float(inputs["heat_capacity_ratio"])
         eps_hex = float(
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":heat_exchanger:effectiveness"
+                + ":"
+                + heat_exchanger_id
+                + ":effectiveness"
             ]
         )
         ntu = outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU"
+            + ":"
+            + heat_exchanger_id
+            + ":NTU"
         ]
 
         residuals[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU"
+            + ":"
+            + heat_exchanger_id
+            + ":NTU"
         ] = (
             1.0
             - np.exp((1.0 / c_ratio) * (ntu**0.22) * (np.exp(-c_ratio * ntu**0.78) - 1.0))
@@ -72,12 +90,15 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         c_ratio = inputs["heat_capacity_ratio"]
         ntu = outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU"
+            + ":"
+            + heat_exchanger_id
+            + ":NTU"
         ]
 
         # Intermediate quantities for clarity
@@ -89,10 +110,14 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
         jacobian[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:effectiveness",
+            + ":"
+            + heat_exchanger_id
+            + ":effectiveness",
         ] = -1.0
 
         dA_dCr = (
@@ -102,7 +127,9 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
         jacobian[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
             "heat_capacity_ratio",
         ] = -exp_A * dA_dCr
 
@@ -110,8 +137,12 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
         jacobian[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:NTU",
+            + ":"
+            + heat_exchanger_id
+            + ":NTU",
         ] = -exp_A * dA_dN

@@ -18,28 +18,41 @@ class SizingHeatExchangerWetWeight(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="heat_exchanger_id",
+            default=None,
+            desc="Identifier of the heat exchanger",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass",
             units="kg",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:channel_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":channel_mass",
             units="kg",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass",
             units="kg",
             val=np.nan,
         )
@@ -47,7 +60,9 @@ class SizingHeatExchangerWetWeight(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:wet_mass",
+            + ":"
+            + heat_exchanger_id
+            + ":wet_mass",
             units="kg",
             val=2.0,
         )
@@ -57,25 +72,34 @@ class SizingHeatExchangerWetWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
 
         plate_mass = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:plate_mass"
+            + ":"
+            + heat_exchanger_id
+            + ":plate_mass"
         ]
         channel_mass = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:channel_mass"
+            + ":"
+            + heat_exchanger_id
+            + ":channel_mass"
         ]
         fluid_mass = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:fluid_mass"
+            + ":"
+            + heat_exchanger_id
+            + ":fluid_mass"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":heat_exchanger:wet_mass"
+            + ":"
+            + heat_exchanger_id
+            + ":wet_mass"
         ] = plate_mass + channel_mass + fluid_mass
