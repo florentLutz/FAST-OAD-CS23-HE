@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponent):
+class PerformancesPumpVolumetricFlowRate(om.ExplicitComponent):
     """
-    Computation of the fraction between the boundary layer thickness and the inlet highlight height.
+    The design volumetric flow rate of the pump.
     """
 
     def initialize(self):
@@ -19,43 +19,46 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
             allow_none=False,
         )
         self.options.declare(
-            name="air_inlet_id",
+            name="pump_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the pump",
             allow_none=False,
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        air_inlet_id = self.options["air_inlet_id"]
+        pump_id = self.options["pump_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness",
+            name="coolant_density",
+            units="kg/m**3",
             val=np.nan,
-            units="m",
         )
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate",
+            units="kg/s",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":lip_ramp_floor_distance",
-            val=np.nan,
-            units="m",
+            + pump_id
+            + ":safety_factor",
+            units="unitless",
+            val=1.2,
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio",
+            + pump_id
+            + ":volumetric_flow_rate",
+            units="m**3/s",
             val=1e-4,
-            units="unitless",
         )
 
     def setup_partials(self):
@@ -63,72 +66,77 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        air_inlet_id = self.options["air_inlet_id"]
+        pump_id = self.options["pump_id"]
 
-        lip_ramp_floor_distance = inputs[
+        density = inputs["coolant_density"]
+        coolant_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":lip_ramp_floor_distance"
+            + ":coolant:mass_flow_rate"
         ]
-        max_boundary_layer_thickness = inputs[
+        safety_factor = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness"
+            + pump_id
+            + ":safety_factor"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio"
-        ] = max_boundary_layer_thickness / lip_ramp_floor_distance
+            + pump_id
+            + ":volumetric_flow_rate"
+        ] = safety_factor * coolant_mass_flow_rate / density
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        air_inlet_id = self.options["air_inlet_id"]
+        pump_id = self.options["pump_id"]
 
-        lip_ramp_floor_distance = inputs[
+        density = inputs["coolant_density"]
+        coolant_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":lip_ramp_floor_distance"
+            + ":coolant:mass_flow_rate"
         ]
-        max_boundary_layer_thickness = inputs[
+        safety_factor = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness"
+            + pump_id
+            + ":safety_factor"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":lip_ramp_floor_distance",
-        ] = -max_boundary_layer_thickness / lip_ramp_floor_distance**2.0
+            + pump_id
+            + ":volumetric_flow_rate",
+            "coolant_density",
+        ] = -safety_factor * coolant_mass_flow_rate / density**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio",
+            + pump_id
+            + ":volumetric_flow_rate",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate",
+        ] = safety_factor / density
+
+        partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness",
-        ] = 1.0 / lip_ramp_floor_distance
+            + pump_id
+            + ":volumetric_flow_rate",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":safety_factor",
+        ] = coolant_mass_flow_rate / density

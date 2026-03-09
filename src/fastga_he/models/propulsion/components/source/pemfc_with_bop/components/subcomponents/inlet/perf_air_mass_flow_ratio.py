@@ -18,9 +18,16 @@ class PerformancesAirMassFlowRatio(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "modified_mass_flow_ratio",
@@ -30,14 +37,18 @@ class PerformancesAirMassFlowRatio(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
             val=np.nan,
             units="m",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance",
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance",
             val=np.nan,
             units="m",
         )
@@ -53,17 +64,22 @@ class PerformancesAirMassFlowRatio(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         modified_mass_flow_ratio = inputs["modified_mass_flow_ratio"]
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height"
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
         ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance"
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance"
         ]
 
         outputs["air_mass_flow_ratio"] = (
@@ -72,17 +88,22 @@ class PerformancesAirMassFlowRatio(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         modified_mass_flow_ratio = inputs["modified_mass_flow_ratio"]
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height"
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
         ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance"
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance"
         ]
 
         partials["air_mass_flow_ratio", "modified_mass_flow_ratio"] = (
@@ -93,12 +114,16 @@ class PerformancesAirMassFlowRatio(om.ExplicitComponent):
             "air_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
         ] = modified_mass_flow_ratio / lip_ramp_floor_distance
 
         partials[
             "air_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance",
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance",
         ] = -modified_mass_flow_ratio * throat_height / lip_ramp_floor_distance**2.0

@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesMaxRamPressureEfficiency(om.ExplicitComponent):
+class SizingPumpWeight(om.ExplicitComponent):
     """
-    Computation of the maximum ramp pressure efficiency of the inlet.
+    The weight of the pump.
     """
 
     def initialize(self):
@@ -19,34 +19,34 @@ class PerformancesMaxRamPressureEfficiency(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="air_inlet_id",
+            name="pump_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the pump",
             allow_none=False,
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        air_inlet_id = self.options["air_inlet_id"]
+        pump_id = self.options["pump_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
+            + pump_id
+            + ":required_power",
+            units="W",
             val=np.nan,
-            units="unitless",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":max_ram_pressure_efficiency",
-            val=-0.03,
-            units="unitless",
+            + pump_id
+            + ":mass",
+            units="kg",
+            val=0.66,
         )
 
     def setup_partials(self):
@@ -54,54 +54,45 @@ class PerformancesMaxRamPressureEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        air_inlet_id = self.options["air_inlet_id"]
+        pump_id = self.options["pump_id"]
 
-        throat_height_layer_thickness_ratio = inputs[
+        pump_power = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height_layer_thickness_ratio"
+            + pump_id
+            + ":required_power"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":max_ram_pressure_efficiency"
-        ] = (
-            -5.3303 * throat_height_layer_thickness_ratio**3.0
-            + 6.1195 * throat_height_layer_thickness_ratio**2.0
-            - 2.8656 * throat_height_layer_thickness_ratio
-            + 1.0081
-        )
+            + pump_id
+            + ":mass"
+        ] = np.where(pump_power >= 80.0, 0.0138289 * pump_power - 0.366129, 0.66)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        air_inlet_id = self.options["air_inlet_id"]
+        pump_id = self.options["pump_id"]
 
-        throat_height_layer_thickness_ratio = inputs[
+        pump_power = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height_layer_thickness_ratio"
+            + pump_id
+            + ":required_power"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":max_ram_pressure_efficiency",
+            + pump_id
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-        ] = (
-            -15.9909 * throat_height_layer_thickness_ratio**2.0
-            + 12.239 * throat_height_layer_thickness_ratio
-            - 2.8656
-        )
+            + pump_id
+            + ":required_power",
+        ] = np.where(pump_power >= 80.0, 0.0138289, 0.0)

@@ -21,22 +21,29 @@ class SizingInlet(om.Group):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_subsystem(
             "throat_height",
-            SizingThroatHeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingThroatHeight(pemfc_stack_bop_id=pemfc_stack_bop_id, air_inlet_id=air_inlet_id),
             promotes=["*"],
         )
         self.add_subsystem(
             "inlet_geometry",
-            SizingInletGeometry(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingInletGeometry(pemfc_stack_bop_id=pemfc_stack_bop_id, air_inlet_id=air_inlet_id),
             promotes=["*"],
         )
         self.add_subsystem(
             "inlet_weight",
-            SizingInletWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingInletWeight(pemfc_stack_bop_id=pemfc_stack_bop_id, air_inlet_id=air_inlet_id),
             promotes=["*"],
         )

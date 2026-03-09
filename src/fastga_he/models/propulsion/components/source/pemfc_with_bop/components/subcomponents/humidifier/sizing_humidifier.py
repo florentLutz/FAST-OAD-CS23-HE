@@ -20,17 +20,28 @@ class SizingHumidifier(om.Group):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="humidifier_id",
+            default=None,
+            desc="Identifier of the humidifier",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        humidifier_id = self.options["humidifier_id"]
 
         self.add_subsystem(
             "humidifier_volume",
-            SizingHumidifierVolume(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHumidifierVolume(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, humidifier_id=humidifier_id
+            ),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "humidifier_weight",
-            SizingHumidifierWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingHumidifierWeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, humidifier_id=humidifier_id
+            ),
             promotes=["data:*"],
         )

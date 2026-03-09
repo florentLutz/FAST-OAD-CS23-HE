@@ -18,21 +18,32 @@ class SizingThroatHeight(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height_layer_thickness_ratio",
+            + ":"
+            + air_inlet_id
+            + ":throat_height_layer_thickness_ratio",
             val=np.nan,
             units="unitless",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_momentum_boundary_layer_thickness",
+            + ":"
+            + air_inlet_id
+            + ":max_momentum_boundary_layer_thickness",
             val=np.nan,
             units="m",
         )
@@ -40,7 +51,9 @@ class SizingThroatHeight(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
             val=0.05,
             units="m",
         )
@@ -50,52 +63,72 @@ class SizingThroatHeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         layer_thickness_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height_layer_thickness_ratio"
+            + ":"
+            + air_inlet_id
+            + ":throat_height_layer_thickness_ratio"
         ]
         max_momentum_boundary_layer_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_momentum_boundary_layer_thickness"
+            + ":"
+            + air_inlet_id
+            + ":max_momentum_boundary_layer_thickness"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height"
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
         ] = max_momentum_boundary_layer_thickness / layer_thickness_ratio
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         layer_thickness_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height_layer_thickness_ratio"
+            + ":"
+            + air_inlet_id
+            + ":throat_height_layer_thickness_ratio"
         ]
         max_momentum_boundary_layer_thickness = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_momentum_boundary_layer_thickness"
+            + ":"
+            + air_inlet_id
+            + ":max_momentum_boundary_layer_thickness"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height_layer_thickness_ratio",
+            + ":"
+            + air_inlet_id
+            + ":throat_height_layer_thickness_ratio",
         ] = -max_momentum_boundary_layer_thickness / layer_thickness_ratio**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_momentum_boundary_layer_thickness",
+            + ":"
+            + air_inlet_id
+            + ":max_momentum_boundary_layer_thickness",
         ] = 1.0 / layer_thickness_ratio

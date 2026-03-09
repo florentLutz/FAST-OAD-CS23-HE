@@ -18,28 +18,41 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_length",
+            + ":"
+            + air_inlet_id
+            + ":lip_length",
             val=np.nan,
             units="m",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_floor_inlet_plane_distance",
+            + ":"
+            + air_inlet_id
+            + ":ramp_floor_inlet_plane_distance",
             val=np.nan,
             units="m",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance",
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance",
             val=np.nan,
             units="m",
         )
@@ -55,21 +68,28 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         lip_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_length"
+            + ":"
+            + air_inlet_id
+            + ":lip_length"
         ]
         ramp_floor_inlet_plane_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_floor_inlet_plane_distance"
+            + ":"
+            + air_inlet_id
+            + ":ramp_floor_inlet_plane_distance"
         ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance"
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance"
         ]
 
         outputs["cd_zero_inlet_mass_flow"] = (
@@ -79,28 +99,37 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         lip_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_length"
+            + ":"
+            + air_inlet_id
+            + ":lip_length"
         ]
         ramp_floor_inlet_plane_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_floor_inlet_plane_distance"
+            + ":"
+            + air_inlet_id
+            + ":ramp_floor_inlet_plane_distance"
         ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance"
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance"
         ]
 
         partials[
             "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_length",
+            + ":"
+            + air_inlet_id
+            + ":lip_length",
         ] = (
             0.02999124
             * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
@@ -112,7 +141,9 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
             "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_floor_inlet_plane_distance",
+            + ":"
+            + air_inlet_id
+            + ":ramp_floor_inlet_plane_distance",
         ] = (
             -0.02999124
             * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
@@ -123,7 +154,9 @@ class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
             "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:lip_ramp_floor_distance",
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance",
         ] = (
             0.02999124
             * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202

@@ -18,14 +18,23 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach",
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
             val=np.nan,
             units="unitless",
         )
@@ -46,11 +55,14 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
         ]
         air_mass_flow_ratio = inputs["air_mass_flow_ratio"]
 
@@ -99,11 +111,14 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
         ]
         air_mass_flow_ratio = inputs["air_mass_flow_ratio"]
 
@@ -166,6 +181,8 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
             "k_sp_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach",
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
         ] = dk_dm
         partials["k_sp_factor", "air_mass_flow_ratio"] = dk_da

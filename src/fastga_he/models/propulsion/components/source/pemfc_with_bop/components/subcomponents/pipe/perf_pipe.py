@@ -6,7 +6,7 @@ import openmdao.api as om
 
 from .perf_pipe_reynolds_number import PerformancesPipeReynoldsNumber
 from .perf_pipe_darcy_friction_factor import PerformancesPipeDarcyFrictionFactor
-from .perf_pipe_rating_pressure_drop import PerformancesPipeRatingPressureDrop
+from .perf_pipe_coolant_pressure_drop import PerformancesPipeCoolantPressureDrop
 
 from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity
 
@@ -24,6 +24,12 @@ class PerformancesPipe(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            name="pipe_id",
+            default=None,
+            desc="Identifier of the pipe",
+            allow_none=False,
+        )
+        self.options.declare(
             "coolant_fluid_type",
             default="air",
             types=str,
@@ -32,6 +38,7 @@ class PerformancesPipe(om.Group):
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pipe_id = self.options["pipe_id"]
         fluid = self.options["coolant_fluid_type"]
 
         self.add_subsystem(
@@ -72,17 +79,21 @@ class PerformancesPipe(om.Group):
         )
         self.add_subsystem(
             "pipe_reynolds_number",
-            PerformancesPipeReynoldsNumber(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            PerformancesPipeReynoldsNumber(pemfc_stack_bop_id=pemfc_stack_bop_id, pipe_id=pipe_id),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "pipe_darcy_friction_factor",
-            PerformancesPipeDarcyFrictionFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            PerformancesPipeDarcyFrictionFactor(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, pipe_id=pipe_id
+            ),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "pipe_rating_pressure_drop",
-            PerformancesPipeRatingPressureDrop(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            PerformancesPipeCoolantPressureDrop(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, pipe_id=pipe_id
+            ),
             promotes=["data:*"],
         )
 

@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingPipeWeight(om.ExplicitComponent):
+class PerformancesPipeCoolantPressureDrop(om.ExplicitComponent):
     """
-    Weight computation of the humidifier.
+    Maximum pressure drop computation of the connection pipe during mission.
     """
 
     def initialize(self):
@@ -30,6 +30,21 @@ class SizingPipeWeight(om.ExplicitComponent):
         pipe_id = self.options["pipe_id"]
 
         self.add_input(
+            name="coolant_density",
+            units="kg/m**3",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":transport_velocity",
+            units="m/s",
+            val=1.5,
+            desc="Pipe flow velocity",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -43,19 +58,9 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":wall_thickness",
-            units="m",
+            + ":darcy_friction_factor",
+            units="unitless",
             val=np.nan,
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":material_density",
-            units="kg/m**3",
-            val=8960.0,
-            desc="Pipe material density, the default material is copper",
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -73,9 +78,9 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass",
-            units="kg",
-            val=2.0,
+            + ":coolant_pressure_drop",
+            units="Pa",
+            val=1e4,
         )
 
     def setup_partials(self):
@@ -85,6 +90,14 @@ class SizingPipeWeight(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         pipe_id = self.options["pipe_id"]
 
+        density = inputs["coolant_density"]
+        velocity = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":transport_velocity"
+        ]
         radius = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -92,19 +105,12 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pipe_id
             + ":radius"
         ]
-        wall_thickness = inputs[
+        darcy_friction_factor = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":wall_thickness"
-        ]
-        material_density = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":material_density"
+            + ":darcy_friction_factor"
         ]
         number_of_pipes = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -119,22 +125,21 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass"
-        ] = (
-            (radius**2.0 + 2.0 * radius * wall_thickness)
-            * np.pi
-            * material_density
-            * number_of_pipes
-            * 0.5
-        )
-
-        # Add M_ins = 1.39e3 * radius**2.0 + 2.20e2 * radius + 6.09e-1 (For cryogenics liquids that
-        # require thermal insulation)
+            + ":coolant_pressure_drop"
+        ] = darcy_friction_factor * 0.5 * number_of_pipes * density * velocity**2.0 / (4.0 * radius)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         pipe_id = self.options["pipe_id"]
 
+        density = inputs["coolant_density"]
+        velocity = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":transport_velocity"
+        ]
         radius = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -142,19 +147,12 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pipe_id
             + ":radius"
         ]
-        wall_thickness = inputs[
+        darcy_friction_factor = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":wall_thickness"
-        ]
-        material_density = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":material_density"
+            + ":darcy_friction_factor"
         ]
         number_of_pipes = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -169,49 +167,65 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass",
+            + ":coolant_pressure_drop",
+            "coolant_density",
+        ] = darcy_friction_factor * 0.5 * number_of_pipes * velocity**2.0 / (4.0 * radius)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":coolant_pressure_drop",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":transport_velocity",
+        ] = darcy_friction_factor * density * velocity * number_of_pipes / (4.0 * radius)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":coolant_pressure_drop",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
             + ":radius",
-        ] = (radius + wall_thickness) * np.pi * material_density * number_of_pipes
+        ] = (
+            -darcy_friction_factor
+            * 0.5
+            * number_of_pipes
+            * density
+            * velocity**2.0
+            / (4.0 * radius**2.0)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass",
+            + ":coolant_pressure_drop",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":wall_thickness",
-        ] = radius * np.pi * material_density * number_of_pipes
+            + ":darcy_friction_factor",
+        ] = 0.5 * number_of_pipes * density * velocity**2.0 / (4.0 * radius)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":material_density",
-        ] = (radius**2.0 + 2.0 * radius * wall_thickness) * np.pi * number_of_pipes * 0.5
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":mass",
+            + ":coolant_pressure_drop",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
             + ":number_of_pipes",
-        ] = (radius**2.0 + 2.0 * radius * wall_thickness) * np.pi * material_density * 0.5
+        ] = darcy_friction_factor * 0.5 * density * velocity**2.0 / (4.0 * radius)

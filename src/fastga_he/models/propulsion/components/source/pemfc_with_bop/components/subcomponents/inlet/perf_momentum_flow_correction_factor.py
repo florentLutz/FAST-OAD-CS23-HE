@@ -19,9 +19,16 @@ class PerformancesMomentumFlowCorrectionFactor(om.Group):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_subsystem(
             "log10_design_mach",
@@ -31,7 +38,9 @@ class PerformancesMomentumFlowCorrectionFactor(om.Group):
                     "x",
                     "data:propulsion:he_power_train:PEMFC_stack_bop:"
                     + pemfc_stack_bop_id
-                    + ":air_inlet:design_mach",
+                    + ":"
+                    + air_inlet_id
+                    + ":design_mach",
                 ),
                 ("log10_x", "log10_design_mach"),
             ],
@@ -44,7 +53,9 @@ class PerformancesMomentumFlowCorrectionFactor(om.Group):
                     "x",
                     "data:propulsion:he_power_train:PEMFC_stack_bop:"
                     + pemfc_stack_bop_id
-                    + ":air_inlet:layer_thickness_highlight_height_ratio",
+                    + ":"
+                    + air_inlet_id
+                    + ":layer_thickness_highlight_height_ratio",
                 ),
                 ("log10_x", "log10_layer_thickness_highlight_height_ratio"),
             ],
@@ -61,7 +72,9 @@ class PerformancesMomentumFlowCorrectionFactor(om.Group):
         )
         self.add_subsystem(
             "momentum_flow_correction_factor",
-            _MomentumFlowCorrectionFactor(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            _MomentumFlowCorrectionFactor(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, air_inlet_id=air_inlet_id
+            ),
             promotes=["*"],
         )
 
@@ -79,21 +92,32 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach",
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
             val=np.nan,
             units="unitless",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:layer_thickness_highlight_height_ratio",
+            + ":"
+            + air_inlet_id
+            + ":layer_thickness_highlight_height_ratio",
             val=np.nan,
             units="unitless",
         )
@@ -111,17 +135,22 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
         ]
         design_mach_power = inputs["design_mach_power"]
         layer_thickness_highlight_height_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:layer_thickness_highlight_height_ratio"
+            + ":"
+            + air_inlet_id
+            + ":layer_thickness_highlight_height_ratio"
         ]
         layer_thickness_highlight_height_ratio_power = inputs[
             "layer_thickness_highlight_height_ratio_power"
@@ -135,17 +164,22 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
         ]
         design_mach_power = inputs["design_mach_power"]
         layer_thickness_highlight_height_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:layer_thickness_highlight_height_ratio"
+            + ":"
+            + air_inlet_id
+            + ":layer_thickness_highlight_height_ratio"
         ]
         layer_thickness_highlight_height_ratio_power = inputs[
             "layer_thickness_highlight_height_ratio_power"
@@ -155,7 +189,9 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
             "momentum_flow_correction_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach",
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
         ] = (
             10**-0.12877
             * layer_thickness_highlight_height_ratio**layer_thickness_highlight_height_ratio_power
@@ -167,7 +203,9 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
             "momentum_flow_correction_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:layer_thickness_highlight_height_ratio",
+            + ":"
+            + air_inlet_id
+            + ":layer_thickness_highlight_height_ratio",
         ] = (
             10**-0.12877
             * layer_thickness_highlight_height_ratio

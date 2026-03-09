@@ -18,14 +18,23 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_angle",
+            + ":"
+            + air_inlet_id
+            + ":ramp_angle",
             val=7.0,
             units="deg",
             desc="Ramp angle of the inlet, defined as the angle between the inlet walls and the "
@@ -43,11 +52,14 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         ramp_angle = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_angle"
+            + ":"
+            + air_inlet_id
+            + ":ramp_angle"
         ]
 
         outputs["ramp_angle_factor"] = np.where(
@@ -56,16 +68,21 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         ramp_angle = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_angle"
+            + ":"
+            + air_inlet_id
+            + ":ramp_angle"
         ]
 
         partials[
             "ramp_angle_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_angle",
+            + ":"
+            + air_inlet_id
+            + ":ramp_angle",
         ] = np.where(ramp_angle > 7.0, -0.0242 * ramp_angle + 0.3262, 1e-6)

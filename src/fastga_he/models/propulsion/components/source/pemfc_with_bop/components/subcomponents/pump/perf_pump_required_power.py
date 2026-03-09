@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesPipeRatingPressureDrop(om.ExplicitComponent):
+class PerformancesPumpPower(om.ExplicitComponent):
     """
-    Maximum pressure drop computation of the humidifier during mission.
+    The required power of the pump.
     """
 
     def initialize(self):
@@ -18,51 +18,61 @@ class PerformancesPipeRatingPressureDrop(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="pump_id",
+            default=None,
+            desc="Identifier of the pump",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pump_id = self.options["pump_id"]
 
         self.add_input(
-            name="coolant_density",
-            units="kg/m**3",
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":pressure_drop",
+            units="Pa",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:transport_velocity",
-            units="m/s",
-            val=1.5,
-            desc="Pipe flow velocity",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":pipe:radius",
-            units="m",
-            val=np.nan,
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":pipe:darcy_friction_factor",
+            + ":"
+            + pump_id
+            + ":motor_efficiency",
             units="unitless",
-            val=np.nan,
+            val=0.9,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:number_of_pipes",
+            + ":"
+            + pump_id
+            + ":pump_efficiency",
             units="unitless",
+            val=0.65,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":volumetric_flow_rate",
+            units="m**3/s",
             val=np.nan,
-            desc="Number of the coolant pipes in the TMS",
         )
 
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop",
-            units="Pa",
+            + ":"
+            + pump_id
+            + ":required_power",
+            units="W",
             val=1e4,
         )
 
@@ -71,100 +81,126 @@ class PerformancesPipeRatingPressureDrop(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pump_id = self.options["pump_id"]
 
-        density = inputs["coolant_density"]
-        velocity = inputs[
+        pressure_drop = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:transport_velocity"
+            + ":"
+            + pump_id
+            + ":pressure_drop"
         ]
-        radius = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
-        ]
-        darcy_friction_factor = inputs[
+        motor_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:darcy_friction_factor"
+            + ":"
+            + pump_id
+            + ":motor_efficiency"
         ]
-        number_of_pipes = inputs[
+        pump_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:number_of_pipes"
+            + ":"
+            + pump_id
+            + ":pump_efficiency"
+        ]
+        volumetric_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":volumetric_flow_rate"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop"
-        ] = darcy_friction_factor * 0.5 * number_of_pipes * density * velocity**2.0 / (4.0 * radius)
+            + ":"
+            + pump_id
+            + ":required_power"
+        ] = volumetric_flow_rate * pressure_drop / (pump_efficiency * motor_efficiency)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pump_id = self.options["pump_id"]
 
-        density = inputs["coolant_density"]
-        velocity = inputs[
+        pressure_drop = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:transport_velocity"
+            + ":"
+            + pump_id
+            + ":pressure_drop"
         ]
-        radius = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
+        motor_efficiency = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":motor_efficiency"
         ]
-        darcy_friction_factor = inputs[
+        pump_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:darcy_friction_factor"
+            + ":"
+            + pump_id
+            + ":pump_efficiency"
         ]
-        number_of_pipes = inputs[
+        volumetric_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:number_of_pipes"
+            + ":"
+            + pump_id
+            + ":volumetric_flow_rate"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop",
-            "coolant_density",
-        ] = darcy_friction_factor * 0.5 * number_of_pipes * velocity**2.0 / (4.0 * radius)
+            + ":"
+            + pump_id
+            + ":required_power",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":pressure_drop",
+        ] = volumetric_flow_rate / (pump_efficiency * motor_efficiency)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop",
+            + ":"
+            + pump_id
+            + ":required_power",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:transport_velocity",
-        ] = darcy_friction_factor * density * velocity * number_of_pipes / (4.0 * radius)
+            + ":"
+            + pump_id
+            + ":motor_efficiency",
+        ] = -volumetric_flow_rate * pressure_drop / (pump_efficiency * motor_efficiency**2.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius",
-        ] = (
-            -darcy_friction_factor
-            * 0.5
-            * number_of_pipes
-            * density
-            * velocity**2.0
-            / (4.0 * radius**2.0)
-        )
+            + ":"
+            + pump_id
+            + ":required_power",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":pump_efficiency",
+        ] = -volumetric_flow_rate * pressure_drop / (pump_efficiency**2.0 * motor_efficiency)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop",
+            + ":"
+            + pump_id
+            + ":required_power",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:darcy_friction_factor",
-        ] = 0.5 * number_of_pipes * density * velocity**2.0 / (4.0 * radius)
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":pipe:rating_pressure_drop",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":pipe:number_of_pipes",
-        ] = darcy_friction_factor * 0.5 * density * velocity**2.0 / (4.0 * radius)
+            + ":"
+            + pump_id
+            + ":volumetric_flow_rate",
+        ] = pressure_drop / (pump_efficiency * motor_efficiency)

@@ -19,14 +19,23 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height_layer_thickness_ratio",
+            + ":"
+            + air_inlet_id
+            + ":throat_height_layer_thickness_ratio",
             val=np.nan,
             units="unitless",
         )
@@ -42,31 +51,39 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         outputs["modified_mass_flow_ratio"] = (
             0.1651
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":air_inlet:throat_height_layer_thickness_ratio"
+                + ":"
+                + air_inlet_id
+                + ":throat_height_layer_thickness_ratio"
             ]
             ** -0.4068
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         partials[
             "modified_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height_layer_thickness_ratio",
+            + ":"
+            + air_inlet_id
+            + ":throat_height_layer_thickness_ratio",
         ] = (
             -0.06716268
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":air_inlet:throat_height_layer_thickness_ratio"
+                + ":"
+                + air_inlet_id
+                + ":throat_height_layer_thickness_ratio"
             ]
             ** -1.4068
         )

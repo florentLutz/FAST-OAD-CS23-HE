@@ -18,9 +18,16 @@ class SizingHumidifierVolume(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="humidifier_id",
+            default=None,
+            desc="Identifier of the humidifier",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        humidifier_id = self.options["humidifier_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -33,7 +40,9 @@ class SizingHumidifierVolume(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":humidifier:volume",
+            + ":"
+            + humidifier_id
+            + ":volume",
             units="L",
             val=50.0,
         )
@@ -43,6 +52,7 @@ class SizingHumidifierVolume(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        humidifier_id = self.options["humidifier_id"]
 
         pemfc_power_rating = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
@@ -51,7 +61,9 @@ class SizingHumidifierVolume(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":humidifier:volume"
+            + ":"
+            + humidifier_id
+            + ":volume"
         ] = np.where(
             pemfc_power_rating <= 150.0,
             -4.058 * 1e-4 * pemfc_power_rating**2.0 + 0.151 * pemfc_power_rating + 2.019,
@@ -60,6 +72,7 @@ class SizingHumidifierVolume(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        humidifier_id = self.options["humidifier_id"]
 
         pemfc_power_rating = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_rating"
@@ -68,7 +81,9 @@ class SizingHumidifierVolume(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":humidifier:volume",
+            + ":"
+            + humidifier_id
+            + ":volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":power_rating",

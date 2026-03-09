@@ -37,11 +37,18 @@ class PerformancesInlet(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
+        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
         number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(
@@ -57,9 +64,11 @@ class PerformancesInlet(om.Group):
         self.add_subsystem(
             "inlet_drag",
             PerformancesInletDrag(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
-            promotes=["data:*", "dynamic_viscosity"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "air_dynamic_pressure",
@@ -68,15 +77,19 @@ class PerformancesInlet(om.Group):
         )
         self.add_subsystem(
             "max_ramp_pressure_efficiency",
-            PerformancesMaxRamPressureEfficiency(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["data:*"],
+            PerformancesMaxRamPressureEfficiency(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, air_inlet_id=air_inlet_id
+            ),
+            promotes=["*"],
         )
         self.add_subsystem(
             "pressure_efficiency_difference_factor",
             PerformancesPressureEfficiencyDifferenceFactor(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
-            promotes=["data:*", "dynamic_viscosity", "density", "true_airspeed", "air_mass_flow"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "pressure_efficiency_difference",
@@ -85,28 +98,36 @@ class PerformancesInlet(om.Group):
         self.add_subsystem(
             "inlet_efficiency",
             PerformancesInletEfficiency(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
-            promotes=["data:*"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "throat_airspeed",
             PerformancesThroatAirSpeed(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
-            promotes=["data:*", "dynamic_viscosity", "density", "true_airspeed", "air_mass_flow"],
+            promotes=["*"],
         )
         self.add_subsystem(
             "ambient_total_pressure",
             PerformancesAmbientTotalPressure(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
             promotes=["*"],
         )
         self.add_subsystem(
             "throat_temperature",
             PerformancesThroatTemperature(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
             promotes=["*"],
         )
@@ -118,16 +139,9 @@ class PerformancesInlet(om.Group):
         self.add_subsystem(
             "max_inlet_pressure_drop",
             PerformancesMaximumInletPressureDrop(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
             ),
             promotes=["*"],
-        )
-
-        self.connect(
-            "pressure_efficiency_difference_factor.pressure_efficiency_difference_factor",
-            "pressure_efficiency_difference.pressure_efficiency_difference_factor",
-        )
-        self.connect(
-            "pressure_efficiency_difference.pressure_efficiency_difference",
-            "inlet_efficiency.pressure_efficiency_difference",
         )

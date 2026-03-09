@@ -98,38 +98,40 @@ def test_inlet_max_boundary_layer_thickness():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesMaxBoundaryLayerThickness(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+            air_inlet_id="air_inlet_1",
         ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":max_boundary_layer_thickness",
         units="m",
     ) == pytest.approx(0.0158, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":max_momentum_boundary_layer_thickness",
         units="m",
     ) == pytest.approx(0.00158, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":design_air_density",
         units="kg/m**3",
     ) == pytest.approx(1.225, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":design_true_airspeed",
         units="m/s",
     ) == pytest.approx(108.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":design_dynamic_viscosity",
         units="Pa*s",
     ) == pytest.approx(1.79e-5, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet" ":design_mach",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:design_mach",
     ) == pytest.approx(0.33, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -139,17 +141,17 @@ def test_inlet_throat_height_momentum_thickness_ratio():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_momentum_boundary_layer_thickness",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:max_momentum_boundary_layer_thickness",
         units="m",
         val=0.00158,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_true_airspeed",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:design_true_airspeed",
         units="m/s",
         val=108.0,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_air_density",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:design_air_density",
         units="kg/m**3",
         val=1.225,
     )
@@ -162,13 +164,13 @@ def test_inlet_throat_height_momentum_thickness_ratio():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(
-            pemfc_stack_bop_id="pemfc_stack_bop_1"
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
         ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":throat_height_layer_thickness_ratio",
     ) == pytest.approx(0.0398, rel=1e-2)
 
@@ -179,23 +181,26 @@ def test_inlet_throat_height():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height_layer_thickness_ratio",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height_layer_thickness_ratio",
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_momentum_boundary_layer_thickness",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":max_momentum_boundary_layer_thickness",
         units="m",
         val=0.00158,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingThroatHeight(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        SizingThroatHeight(pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height",
         units="m",
     ) == pytest.approx(0.0398, rel=1e-2)
 
@@ -206,38 +211,45 @@ def test_inlet_geometry():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height",
         val=0.0398,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingInletGeometry(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        SizingInletGeometry(pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":highlight_width",
         units="m",
     ) == pytest.approx(0.1592, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_lip_thickness",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_lip_thickness",
         units="m",
     ) == pytest.approx(0.00995, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_length",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_length",
         units="m",
     ) == pytest.approx(0.00995, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_floor_inlet_plane_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":ramp_floor_inlet_plane_distance",
         units="m",
     ) == pytest.approx(0.0485, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_ramp_floor_distance",
         units="m",
     ) == pytest.approx(0.0436, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_capture_area",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":inlet_capture_area",
         units="ft**2",
     ) == pytest.approx(0.00693, rel=1e-2)
 
@@ -248,12 +260,14 @@ def test_inlet_boundary_layer_thickness_highlight_height_ratio():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_boundary_layer_thickness",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":max_boundary_layer_thickness",
         units="m",
         val=0.0158,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_ramp_floor_distance",
         units="m",
         val=0.0436,
     )
@@ -261,13 +275,14 @@ def test_inlet_boundary_layer_thickness_highlight_height_ratio():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesBoundaryLayerThicknessHighlightHeightRatio(
-            pemfc_stack_bop_id="pemfc_stack_bop_1"
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
         ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:layer_thickness_highlight_height_ratio",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":layer_thickness_highlight_height_ratio",
     ) == pytest.approx(0.362, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -277,17 +292,21 @@ def test_inlet_momentum_flow_correction_factor():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:layer_thickness_highlight_height_ratio",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":layer_thickness_highlight_height_ratio",
         val=0.362,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":design_mach",
         val=0.33,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesMomentumFlowCorrectionFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesMomentumFlowCorrectionFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
@@ -300,12 +319,15 @@ def test_inlet_modified_mass_flow_ratio():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height_layer_thickness_ratio",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height_layer_thickness_ratio",
         val=0.0398,
     )
 
     problem = run_system(
-        PerformancesModifiedMassFlowRatio(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesModifiedMassFlowRatio(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
@@ -318,12 +340,13 @@ def test_inlet_air_mass_flow_ratio():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height",
         units="m",
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":lip_ramp_floor_distance",
         units="m",
         val=0.0436,
@@ -334,7 +357,9 @@ def test_inlet_air_mass_flow_ratio():
     )
 
     problem = run_system(
-        PerformancesAirMassFlowRatio(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesAirMassFlowRatio(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
@@ -348,7 +373,8 @@ def test_inlet_drag_correlation_factor():
     ivc = om.IndepVarComp()
     ivc.add_output("air_mass_flow_ratio", val=0.56)
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":design_mach",
         val=0.33,
     )
 
@@ -361,7 +387,9 @@ def test_inlet_drag_correlation_factor():
     )
     model.add_subsystem(
         name="dc_current",
-        subsys=PerformancesDragCorrelationFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        subsys=PerformancesDragCorrelationFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         promotes=["*"],
     )
     model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
@@ -382,7 +410,8 @@ def test_inlet_drag_ksp_factor():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":design_mach",
         val=0.4,
     )
     ivc.add_output(
@@ -391,7 +420,9 @@ def test_inlet_drag_ksp_factor():
     )
 
     problem = run_system(
-        PerformancesDragKspFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesDragKspFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
@@ -404,13 +435,16 @@ def test_inlet_ramp_angle_factor():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_angle",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":ramp_angle",
         val=8.0,
         units="deg",
     )
 
     problem = run_system(
-        PerformancesRampAngleFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesRampAngleFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
@@ -423,12 +457,13 @@ def test_inlet_mach_factor():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:design_mach",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":design_mach",
         val=0.55,
     )
 
     problem = run_system(
-        PerformancesMachFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesMachFactor(pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"),
         ivc,
     )
 
@@ -441,23 +476,28 @@ def test_inlet_cd0():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_length",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_length",
         units="m",
         val=0.00995,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_ramp_floor_distance",
         units="m",
         val=0.0436,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_floor_inlet_plane_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":ramp_floor_inlet_plane_distance",
         units="m",
         val=0.0485,
     )
 
     problem = run_system(
-        PerformancesCDZeroInletMassFlow(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesCDZeroInletMassFlow(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
@@ -489,13 +529,16 @@ def test_inlet_drag():
 
     problem = run_system(
         _PerformancesInletDrag(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+            air_inlet_id="air_inlet_1",
         ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_drag",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":inlet_drag",
         units="N",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 48.88), rel=1e-2)
 
@@ -537,22 +580,26 @@ def test_inlet_drag_group():
         val=0.5,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height",
         units="m",
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_ramp_floor_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_ramp_floor_distance",
         units="m",
         val=0.0436,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:ramp_floor_inlet_plane_distance",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":ramp_floor_inlet_plane_distance",
         units="m",
         val=0.0485,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:lip_length",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":lip_length",
         units="m",
         val=0.00995,
     )
@@ -560,13 +607,16 @@ def test_inlet_drag_group():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesInletDrag(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            air_inlet_id="air_inlet_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_drag",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":inlet_drag",
         units="N",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 98.456), rel=1e-2)
 
@@ -577,18 +627,21 @@ def test_inlet_max_ram_pressure_efficiency():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":throat_height_layer_thickness_ratio",
         val=0.0398,
     )
 
     problem = run_system(
-        PerformancesMaxRamPressureEfficiency(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        PerformancesMaxRamPressureEfficiency(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"
+        ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ram_pressure_efficiency"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":max_ram_pressure_efficiency"
     ) == pytest.approx(0.9, rel=1e-2)
 
     problem.check_partials(compact_print=True)
@@ -610,19 +663,23 @@ def test_inlet_pressure_efficiency_difference_factor():
     ivc.add_output("air_mass_flow", units="kg/s", val=np.full(NB_POINTS_TEST, 0.5))
     ivc.add_output("dynamic_viscosity", units="Pa*s", val=np.full(NB_POINTS_TEST, 1.79e-5))
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height",
         units="m",
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":highlight_width",
         units="m",
         val=0.1592,
     )
 
     problem = run_system(
         PerformancesPressureEfficiencyDifferenceFactor(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            air_inlet_id="air_inlet_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -658,7 +715,8 @@ def test_inlet_efficiency():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ram_pressure_efficiency",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":max_ram_pressure_efficiency",
         val=0.9,
     )
     ivc.add_output(
@@ -668,7 +726,9 @@ def test_inlet_efficiency():
 
     problem = run_system(
         PerformancesInletEfficiency(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            air_inlet_id="air_inlet_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -694,19 +754,22 @@ def test_inlet_throat_airspeed():
         val=np.full(NB_POINTS_TEST, 0.5),
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:throat_height",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":throat_height",
         units="m",
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:highlight_width",
         units="m",
         val=0.1592,
     )
 
     problem = run_system(
         PerformancesThroatAirSpeed(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+            air_inlet_id="air_inlet_1",
         ),
         ivc,
     )
@@ -734,7 +797,9 @@ def test_inlet_ambient_total_pressure():
 
     problem = run_system(
         PerformancesAmbientTotalPressure(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+            air_inlet_id="air_inlet_1",
         ),
         ivc,
     )
@@ -762,7 +827,9 @@ def test_inlet_ambient_total_temperature():
 
     problem = run_system(
         PerformancesThroatTemperature(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+            air_inlet_id="air_inlet_1",
         ),
         ivc,
     )
@@ -814,19 +881,21 @@ def test_inlet_max_pressure_drop():
 
     problem = run_system(
         PerformancesMaximumInletPressureDrop(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+            air_inlet_id="air_inlet_1",
         ),
         ivc,
     )
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
-        ":air_inlet:max_inlet_pressure_drop",
+        ":air_inlet_1:air_pressure_drop",
         units="Pa",
     ) == pytest.approx(-100895.16, rel=1e-2)
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:"
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:"
         "max_ambient_dynamic_pressure",
         units="Pa",
     ) == pytest.approx(7144.2, rel=1e-2)
@@ -838,23 +907,23 @@ def test_inlet_mass():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:inlet_capture_area",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:inlet_capture_area",
         units="m**2",
         val=0.000643,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:max_ambient_dynamic_pressure",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:max_ambient_dynamic_pressure",
         units="Pa",
         val=7144.2,
     )
 
     problem = run_system(
-        SizingInletWeight(pemfc_stack_bop_id="pemfc_stack_bop_1"),
+        SizingInletWeight(pemfc_stack_bop_id="pemfc_stack_bop_1", air_inlet_id="air_inlet_1"),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet:mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:mass",
         units="kg",
     ) == pytest.approx(0.397, rel=1e-2)
 

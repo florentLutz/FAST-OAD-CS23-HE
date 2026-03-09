@@ -21,10 +21,17 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "pressure_efficiency_difference",
@@ -35,7 +42,9 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_ram_pressure_efficiency",
+            + ":"
+            + air_inlet_id
+            + ":max_ram_pressure_efficiency",
             val=np.nan,
             units="unitless",
         )
@@ -49,6 +58,7 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.declare_partials(
             of="*",
@@ -63,7 +73,9 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
             of="*",
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + self.options["pemfc_stack_bop_id"]
-            + ":air_inlet:max_ram_pressure_efficiency",
+            + ":"
+            + air_inlet_id
+            + ":max_ram_pressure_efficiency",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -72,12 +84,15 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         outputs["inlet_efficiency"] = (
             inputs["pressure_efficiency_difference"]
             + inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":air_inlet:max_ram_pressure_efficiency"
+                + ":"
+                + air_inlet_id
+                + ":max_ram_pressure_efficiency"
             ]
         )

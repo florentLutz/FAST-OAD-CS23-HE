@@ -21,17 +21,26 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input("mach", val=np.nan, shape=number_of_points)
         self.add_input("exterior_temperature", units="K", val=np.full(number_of_points, np.nan))
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:specific_heat_ratio",
+            + ":"
+            + air_inlet_id
+            + ":specific_heat_ratio",
             val=1.4,
             units="unitless",
         )
@@ -46,6 +55,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.declare_partials(
             of="*",
@@ -58,7 +68,9 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             of="*",
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:specific_heat_ratio",
+            + ":"
+            + air_inlet_id
+            + ":specific_heat_ratio",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -66,13 +78,16 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         exterior_temperature = inputs["exterior_temperature"]
         mach = inputs["mach"]
         gamma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:specific_heat_ratio"
+            + ":"
+            + air_inlet_id
+            + ":specific_heat_ratio"
         ]
 
         outputs["throat_temperature"] = exterior_temperature * (
@@ -81,13 +96,16 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         exterior_temperature = inputs["exterior_temperature"]
         mach = inputs["mach"]
         gamma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:specific_heat_ratio"
+            + ":"
+            + air_inlet_id
+            + ":specific_heat_ratio"
         ]
 
         partials["throat_temperature", "exterior_temperature"] = (
@@ -100,5 +118,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             "throat_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:specific_heat_ratio",
+            + ":"
+            + air_inlet_id
+            + ":specific_heat_ratio",
         ] = exterior_temperature * 0.5 * mach**2.0

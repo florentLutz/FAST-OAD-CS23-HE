@@ -18,9 +18,16 @@ class SizingValve(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="valve_id",
+            default=None,
+            desc="Identifier of the valve",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        valve_id = self.options["valve_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -33,39 +40,55 @@ class SizingValve(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":valve:volume",
+            + ":"
+            + valve_id
+            + ":volume",
             units="m**3",
             val=0.0011,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":valve:mass",
+            + ":"
+            + valve_id
+            + ":mass",
             units="kg",
             val=2.64,
         )
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        valve_id = self.options["valve_id"]
 
         self.declare_partials(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":valve:mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + valve_id
+            + ":mass",
             "*",
             val=1.1729e-1,
         )
         self.declare_partials(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":valve:volume",
+            + ":"
+            + valve_id
+            + ":volume",
             "*",
             val=1.899456e-4,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        valve_id = self.options["valve_id"]
 
         outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":valve:mass"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + valve_id
+            + ":mass"
         ] = (
             1.1729e-1
             * inputs[
@@ -76,7 +99,11 @@ class SizingValve(om.ExplicitComponent):
             + 4.433e-1
         )
         outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":valve:volume"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + valve_id
+            + ":volume"
         ] = (
             1.899456e-4
             * inputs[

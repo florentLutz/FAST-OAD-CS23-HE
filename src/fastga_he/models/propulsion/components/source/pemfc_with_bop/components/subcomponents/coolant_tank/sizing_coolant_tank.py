@@ -20,17 +20,28 @@ class SizingCoolantTank(om.Group):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="coolant_tank_id",
+            default=None,
+            desc="Identifier of the humidifier",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        coolant_tank_id = self.options["coolant_tank_id"]
 
         self.add_subsystem(
             "coolant_total_volume",
-            SizingCoolantTotalVolume(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingCoolantTotalVolume(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, coolant_tank_id=coolant_tank_id
+            ),
             promotes=["data:*"],
         )
         self.add_subsystem(
             "tank_weight",
-            SizingCoolantTankWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            SizingCoolantTankWeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, coolant_tank_id=coolant_tank_id
+            ),
             promotes=["data:*"],
         )

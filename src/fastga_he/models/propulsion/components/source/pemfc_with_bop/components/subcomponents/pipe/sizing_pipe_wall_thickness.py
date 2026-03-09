@@ -18,9 +18,16 @@ class SizingPipeWallThickness(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="pipe_id",
+            default=None,
+            desc="Identifier of the pipe",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pipe_id = self.options["pipe_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -32,14 +39,18 @@ class SizingPipeWallThickness(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:radius",
+            + ":"
+            + pipe_id
+            + ":radius",
             units="m",
             val=np.nan,
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:safety_factor",
+            + ":"
+            + pipe_id
+            + ":safety_factor",
             units="unitless",
             val=1.5,
             desc="Safety factor for the pipe wall thickness, default is 1.5",
@@ -47,7 +58,9 @@ class SizingPipeWallThickness(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:material_yield_strength",
+            + ":"
+            + pipe_id
+            + ":material_yield_strength",
             units="Pa",
             val=40e6,
             desc="Yield strength of the pipe material, default is 40.0 MPa for copper",
@@ -56,7 +69,9 @@ class SizingPipeWallThickness(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:wall_thickness",
+            + ":"
+            + pipe_id
+            + ":wall_thickness",
             units="m",
             val=0.005,
         )
@@ -66,19 +81,28 @@ class SizingPipeWallThickness(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pipe_id = self.options["pipe_id"]
 
         radius = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":radius"
         ]
         safety_factor = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:safety_factor"
+            + ":"
+            + pipe_id
+            + ":safety_factor"
         ]
         yield_strength = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:material_yield_strength"
+            + ":"
+            + pipe_id
+            + ":material_yield_strength"
         ]
         static_pressure = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -96,24 +120,35 @@ class SizingPipeWallThickness(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:wall_thickness"
+            + ":"
+            + pipe_id
+            + ":wall_thickness"
         ] = (static_pressure * radius * safety_factor) / (yield_strength - static_pressure)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        pipe_id = self.options["pipe_id"]
 
         radius = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":radius"
         ]
         safety_factor = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:safety_factor"
+            + ":"
+            + pipe_id
+            + ":safety_factor"
         ]
         yield_strength = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:material_yield_strength"
+            + ":"
+            + pipe_id
+            + ":material_yield_strength"
         ]
         static_pressure = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -124,32 +159,48 @@ class SizingPipeWallThickness(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:wall_thickness",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":pipe:radius",
+            + ":"
+            + pipe_id
+            + ":wall_thickness",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pipe_id
+            + ":radius",
         ] = (static_pressure * safety_factor) / (yield_strength - static_pressure)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:wall_thickness",
+            + ":"
+            + pipe_id
+            + ":wall_thickness",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:safety_factor",
+            + ":"
+            + pipe_id
+            + ":safety_factor",
         ] = (static_pressure * radius) / (yield_strength - static_pressure)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:wall_thickness",
+            + ":"
+            + pipe_id
+            + ":wall_thickness",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:material_yield_strength",
+            + ":"
+            + pipe_id
+            + ":material_yield_strength",
         ] = -(static_pressure * radius * safety_factor) / (yield_strength - static_pressure) ** 2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":pipe:wall_thickness",
+            + ":"
+            + pipe_id
+            + ":wall_thickness",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:static_pressure",

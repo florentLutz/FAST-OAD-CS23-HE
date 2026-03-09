@@ -19,6 +19,12 @@ class SizingCoolantTotalVolume(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="coolant_tank_id",
+            default=None,
+            desc="Identifier of the humidifier",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]

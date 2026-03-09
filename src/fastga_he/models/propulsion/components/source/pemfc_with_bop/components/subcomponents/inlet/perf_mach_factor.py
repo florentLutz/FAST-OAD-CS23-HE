@@ -18,14 +18,23 @@ class PerformancesMachFactor(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach",
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
             val=np.nan,
             units="unitless",
         )
@@ -41,11 +50,14 @@ class PerformancesMachFactor(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
         ]
 
         outputs["mach_factor"] = np.where(
@@ -54,16 +66,21 @@ class PerformancesMachFactor(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach"
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
         ]
 
         partials[
             "mach_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:design_mach",
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
         ] = np.where(design_mach >= 0.55, 33.0 * design_mach - 19.75, 0.0)

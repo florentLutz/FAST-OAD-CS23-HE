@@ -18,28 +18,41 @@ class SizingInletWeight(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_length",
+            + ":"
+            + air_inlet_id
+            + ":ramp_length",
             val=3.28084,
             units="ft",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:inlet_capture_area",
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area",
             val=np.nan,
             units="ft**2",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_ambient_dynamic_pressure",
+            + ":"
+            + air_inlet_id
+            + ":max_ambient_dynamic_pressure",
             val=np.nan,
             units="psi",
         )
@@ -47,7 +60,9 @@ class SizingInletWeight(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:mass",
+            + ":"
+            + air_inlet_id
+            + ":mass",
             val=10.0,
             units="lb",
         )
@@ -57,27 +72,36 @@ class SizingInletWeight(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         ramp_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_length"
+            + ":"
+            + air_inlet_id
+            + ":ramp_length"
         ]
         inlet_capture_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:inlet_capture_area"
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area"
         ]
         max_ambient_dynamic_pressure = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_ambient_dynamic_pressure"
+            + ":"
+            + air_inlet_id
+            + ":max_ambient_dynamic_pressure"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:mass"
+            + ":"
+            + air_inlet_id
+            + ":mass"
         ] = (
             0.32 * ramp_length * inlet_capture_area**0.65 * max_ambient_dynamic_pressure**0.6
             + 1.735
@@ -87,30 +111,41 @@ class SizingInletWeight(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         ramp_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_length"
+            + ":"
+            + air_inlet_id
+            + ":ramp_length"
         ]
         inlet_capture_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:inlet_capture_area"
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area"
         ]
         max_ambient_dynamic_pressure = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_ambient_dynamic_pressure"
+            + ":"
+            + air_inlet_id
+            + ":max_ambient_dynamic_pressure"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:mass",
+            + ":"
+            + air_inlet_id
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:ramp_length",
+            + ":"
+            + air_inlet_id
+            + ":ramp_length",
         ] = (
             0.32 * inlet_capture_area**0.65 * max_ambient_dynamic_pressure**0.6
             + 1.735
@@ -125,10 +160,14 @@ class SizingInletWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:mass",
+            + ":"
+            + air_inlet_id
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:inlet_capture_area",
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area",
         ] = (
             0.32
             * ramp_length
@@ -149,10 +188,14 @@ class SizingInletWeight(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:mass",
+            + ":"
+            + air_inlet_id
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:max_ambient_dynamic_pressure",
+            + ":"
+            + air_inlet_id
+            + ":max_ambient_dynamic_pressure",
         ] = (
             0.192 * ramp_length * inlet_capture_area**0.65 * max_ambient_dynamic_pressure**-0.4
             + 1.2719285

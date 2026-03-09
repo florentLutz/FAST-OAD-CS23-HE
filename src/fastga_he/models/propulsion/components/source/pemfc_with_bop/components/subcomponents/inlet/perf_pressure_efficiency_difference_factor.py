@@ -19,11 +19,18 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air inlet",
+            allow_none=False,
+        )
+        self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
         number_of_points = self.options["number_of_points"]
 
         self.add_input("density", units="kg/m**3", val=np.zeros(number_of_points))
@@ -37,14 +44,18 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
             val=np.nan,
             units="m",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:highlight_width",
+            + ":"
+            + air_inlet_id
+            + ":highlight_width",
             val=np.nan,
             units="m",
         )
@@ -77,6 +88,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
@@ -84,12 +96,16 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height"
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
         ]
         highlight_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:highlight_width"
+            + ":"
+            + air_inlet_id
+            + ":highlight_width"
         ]
         dynamic_viscosity = inputs["dynamic_viscosity"]
 
@@ -100,6 +116,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
 
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
@@ -107,12 +124,16 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height"
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
         ]
         highlight_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:highlight_width"
+            + ":"
+            + air_inlet_id
+            + ":highlight_width"
         ]
 
         partials["pressure_efficiency_difference_factor", "density"] = -air_mass_flow / (
@@ -135,12 +156,16 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
             "pressure_efficiency_difference_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:throat_height",
+            + ":"
+            + air_inlet_id
+            + ":throat_height",
         ] = -air_mass_flow / (density * true_airspeed * highlight_width * throat_height**2.0)
 
         partials[
             "pressure_efficiency_difference_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_inlet:highlight_width",
+            + ":"
+            + air_inlet_id
+            + ":highlight_width",
         ] = -air_mass_flow / (density * true_airspeed * highlight_width**2.0 * throat_height)
