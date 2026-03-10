@@ -30,20 +30,12 @@ class PerformancesMeanAirTemperature(om.ExplicitComponent):
         heat_exchanger_id = self.options["heat_exchanger_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":air_temperature_in",
+            name="air_inlet_temperature",
             units="K",
             val=np.nan,
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":air_temperature_out",
+            name="air_outlet_temperature",
             units="K",
             val=np.nan,
         )
@@ -71,19 +63,4 @@ class PerformancesMeanAirTemperature(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":mean_air_temperature"
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + heat_exchanger_id
-                + ":air_temperature_out"
-            ]
-            + inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + heat_exchanger_id
-                + ":air_temperature_in"
-            ]
-        ) / 2.0
+        ] = (inputs["air_outlet_temperature"] + inputs["air_inlet_temperature"]) / 2.0

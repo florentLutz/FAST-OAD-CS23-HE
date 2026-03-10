@@ -76,11 +76,7 @@ class PerformancesHeatExchanger(om.Group):
                 ),
                 (
                     "fluid_density",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":"
-                    + heat_exchanger_id
-                    + ":mean_coolant_density",
+                    "mean_coolant_density",
                 ),
             ],
         )
@@ -213,14 +209,7 @@ class PerformancesHeatExchanger(om.Group):
                     + heat_exchanger_id
                     + ":mean_air_temperature",
                 ),
-                (
-                    "fluid_density",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":"
-                    + heat_exchanger_id
-                    + ":mean_air_density",
-                ),
+                ("fluid_density", "mean_air_density"),
             ],
         )
         self.add_subsystem(
@@ -414,14 +403,7 @@ class PerformancesHeatExchanger(om.Group):
                     + heat_exchanger_id
                     + ":air_static_pressure",
                 ),
-                (
-                    "fluid_temperature",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":"
-                    + heat_exchanger_id
-                    + ":air_inlet_temperature",
-                ),
+                ("fluid_temperature", "air_inlet_temperature"),
                 ("fluid_density", "air_inlet_density"),
             ],
         )
@@ -437,14 +419,7 @@ class PerformancesHeatExchanger(om.Group):
                     + heat_exchanger_id
                     + ":air_static_pressure",
                 ),
-                (
-                    "fluid_temperature",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":"
-                    + heat_exchanger_id
-                    + ":air_outlet_temperature",
-                ),
+                ("fluid_temperature", "air_outlet_temperature"),
                 ("fluid_density", "air_outlet_density"),
             ],
         )
@@ -465,12 +440,7 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":coolant:static_pressure",
                 ),
-                (
-                    "fluid_temperature",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchange:coolant_inlet_temperature",
-                ),
+                ("fluid_temperature", "coolant_inlet_temperature"),
                 ("fluid_density", "coolant_inlet_density"),
             ],
         )
@@ -484,12 +454,7 @@ class PerformancesHeatExchanger(om.Group):
                     + pemfc_stack_bop_id
                     + ":coolant:static_pressure",
                 ),
-                (
-                    "fluid_temperature",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":heat_exchange:coolant_outlet_temperature",
-                ),
+                ("fluid_temperature", "coolant_outlet_temperature"),
                 ("fluid_density", "coolant_outlet_density"),
             ],
         )

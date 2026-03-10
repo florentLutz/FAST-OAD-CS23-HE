@@ -576,7 +576,8 @@ def test_inlet_drag_group():
     )
     ivc.add_output("dynamic_viscosity", units="Pa*s", val=np.full(NB_POINTS_TEST, 1.79e-5))
     ivc.add_output(
-        "design_air_mass_flow",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":design_air_mass_flow",
         units="kg/s",
         val=0.5,
     )

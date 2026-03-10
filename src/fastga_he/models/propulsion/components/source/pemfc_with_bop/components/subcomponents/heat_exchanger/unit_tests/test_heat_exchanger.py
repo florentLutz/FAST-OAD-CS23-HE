@@ -20,6 +20,7 @@ from ..perf_fanning_friction_factor import PerformancesFanningFrictionFactor
 from ..perf_pressure_drop_coefficient import PerformancesPressureDropCoefficient
 from ..perf_air_pressure_drop import PerformancesAirPressureDrop
 from ..perf_coolant_pressure_drop import PerformancesCoolantPressureDrop
+from ..perf_heat_exchanger import PerformancesHeatExchanger
 
 from ..sizing_fin_geometry import SizingHeatExchangerFinGeometry
 from ..sizing_fin_geometry_factor import SizingHeatExchangerFinFactor
@@ -194,16 +195,8 @@ def test_heat_exchanger_UA():
 def test_mean_air_temperature():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_temperature_out",
-        units="K",
-        val=400.0,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_temperature_in",
-        units="K",
-        val=250.0,
-    )
+    ivc.add_output("air_outlet_temperature", units="K", val=400.0)
+    ivc.add_output("air_inlet_temperature", units="K", val=250.0)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -525,6 +518,80 @@ def test_coolant_pressure_drop():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_pressure_drop",
         units="Pa",
     ) == pytest.approx(268.52, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_performance():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("air_outlet_temperature", units="K", val=300.0)
+    ivc.add_output("air_inlet_temperature", units="K", val=250.0)
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_rate",
+        units="kg/h",
+        val=2600.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_flow_length",
+        units="m",
+        val=0.05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:no_flow_length",
+        units="m",
+        val=0.719,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:free_flow_frontal_area_ratio",
+        units="unitless",
+        val=0.48,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_length",
+        units="m",
+        val=0.0907,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mean_temperature",
+        units="K",
+        val=348.2,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:fin_hydraulic_diameter",
+        units="m",
+        val=1.92e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":air_static_pressure",
+        units="Pa",
+        val=101325.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:static_pressure",
+        units="Pa",
+        val=200000.0,
+    )
+    ivc.add_output("coolant_outlet_temperature", units="K", val=340.0)
+    ivc.add_output("coolant_inlet_temperature", units="K", val=350.0)
+
+    problem = run_system(
+        PerformancesHeatExchanger(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_pressure_drop",
+        units="Pa",
+    ) == pytest.approx(38804.12, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
