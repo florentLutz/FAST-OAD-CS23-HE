@@ -53,7 +53,11 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             units="m",
         )
         self.add_input(
-            "design_air_mass_flow",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":design_air_mass_flow",
             val=np.nan,
             units="kg/s",
         )
@@ -92,7 +96,13 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + air_inlet_id
             + ":max_momentum_boundary_layer_thickness"
         ]
-        design_mass_flow_rate = inputs["design_air_mass_flow"]
+        design_mass_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":design_air_mass_flow"
+        ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -123,7 +133,13 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + air_inlet_id
             + ":max_momentum_boundary_layer_thickness"
         ]
-        design_mass_flow_rate = inputs["design_air_mass_flow"]
+        design_mass_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":design_air_mass_flow"
+        ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -182,7 +198,11 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + ":"
             + air_inlet_id
             + ":throat_height_layer_thickness_ratio",
-            "design_air_mass_flow",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":design_air_mass_flow",
         ] = (
             -0.831
             * 0.415

@@ -16,8 +16,8 @@ from .sizing_heat_exchanger_flow_length import SizingHeatExchangerFlowLength
 from .sizing_free_flow_frontal_area_ratio import SizingFreeFlowFrontalAreaRatio
 from .sizing_heat_exchanger_plate_weight import SizingHeatExchangerPlateWeight
 from .sizing_heat_exchanger_channel_weight import SizingHeatExchangerChannelWeight
-from .sizing_heat_exchanger_fluid_weight import SizingHeatExchangerFluidWeight
-from .sizing_heat_exchanger_wet_weight import SizingHeatExchangerWetWeight
+from .sizing_heat_exchanger_coolant_volume import SizingHeatExchangerCoolantVolume
+from .sizing_heat_exchanger_dry_weight import SizingHeatExchangerDryWeight
 
 
 class SizingHeatExchanger(om.Group):
@@ -115,14 +115,14 @@ class SizingHeatExchanger(om.Group):
         )
         self.add_subsystem(
             "sizing_heat_exchanger_fluid_weight",
-            SizingHeatExchangerFluidWeight(
+            SizingHeatExchangerCoolantVolume(
                 pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
             ),
             promotes=["*"],
         )
         self.add_subsystem(
-            "sizing_heat_exchanger_wet_weight",
-            SizingHeatExchangerWetWeight(
+            "sizing_heat_exchanger_dry_weight",
+            SizingHeatExchangerDryWeight(
                 pemfc_stack_bop_id=pemfc_stack_bop_id, heat_exchanger_id=heat_exchanger_id
             ),
             promotes=["*"],

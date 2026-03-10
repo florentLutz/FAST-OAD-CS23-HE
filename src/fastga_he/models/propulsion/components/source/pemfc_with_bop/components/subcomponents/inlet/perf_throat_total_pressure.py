@@ -34,7 +34,7 @@ class PerformancesThroatPressure(om.ExplicitComponent):
         )
 
         self.add_output(
-            "throat_pressure",
+            "throat_total_pressure",
             val=0.3,
             units="Pa",
             shape=number_of_points,
@@ -56,7 +56,7 @@ class PerformancesThroatPressure(om.ExplicitComponent):
         ambient_total_pressure = inputs["ambient_total_pressure"]
         inlet_efficiency = inputs["inlet_efficiency"]
 
-        outputs["throat_pressure"] = (
+        outputs["throat_total_pressure"] = (
             inlet_efficiency * (ambient_total_pressure - static_pressure) + static_pressure
         )
 
@@ -65,8 +65,10 @@ class PerformancesThroatPressure(om.ExplicitComponent):
         ambient_total_pressure = inputs["ambient_total_pressure"]
         inlet_efficiency = inputs["inlet_efficiency"]
 
-        partials["throat_pressure", "ambient_pressure"] = 1.0 - inlet_efficiency
+        partials["throat_total_pressure", "ambient_pressure"] = 1.0 - inlet_efficiency
 
-        partials["throat_pressure", "ambient_total_pressure"] = inlet_efficiency
+        partials["throat_total_pressure", "ambient_total_pressure"] = inlet_efficiency
 
-        partials["throat_pressure", "inlet_efficiency"] = ambient_total_pressure - static_pressure
+        partials["throat_total_pressure", "inlet_efficiency"] = (
+            ambient_total_pressure - static_pressure
+        )

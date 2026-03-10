@@ -33,7 +33,7 @@ from ..sizing_total_transfer_area_volume_ratio import SizingTotalTransferAreaVol
 from ..sizing_free_flow_frontal_area_ratio import SizingFreeFlowFrontalAreaRatio
 from ..sizing_heat_exchanger_plate_weight import SizingHeatExchangerPlateWeight
 from ..sizing_heat_exchanger_channel_weight import SizingHeatExchangerChannelWeight
-from ..sizing_heat_exchanger_fluid_weight import SizingHeatExchangerFluidWeight
+from ..sizing_heat_exchanger_coolant_volume import SizingHeatExchangerCoolantVolume
 from ..sizing_heat_exchanger import SizingHeatExchanger
 
 from tests.testing_utilities import run_system
@@ -906,7 +906,7 @@ def test_sizing_heat_exchanger_channel_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_sizing_heat_exchanger_fluid_weight():
+def test_sizing_heat_exchanger_coolant_volume():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
@@ -919,33 +919,19 @@ def test_sizing_heat_exchanger_fluid_weight():
         units="m",
         val=0.05,
     )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:no_flow_length",
-        units="m",
-        val=0.719,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_coolant_density",
-        units="kg/m**3",
-        val=1000.0,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_air_density",
-        units="kg/m**3",
-        val=1.225,
-    )
 
     problem = run_system(
-        SizingHeatExchangerFluidWeight(
+        SizingHeatExchangerCoolantVolume(
             pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
         ),
         ivc,
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:fluid_mass",
-        units="kg",
-    ) == pytest.approx(3.265, rel=1e-2)
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":coolant_volume",
+        units="m**3",
+    ) == pytest.approx(0.00139, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1046,6 +1032,7 @@ def test_sizing_heat_exchanger():
         units="m",
     ) == pytest.approx(0.0907, abs=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:wet_mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":dry_mass",
         units="kg",
-    ) == pytest.approx(4.4, rel=1e-2)
+    ) == pytest.approx(1.134, rel=1e-2)

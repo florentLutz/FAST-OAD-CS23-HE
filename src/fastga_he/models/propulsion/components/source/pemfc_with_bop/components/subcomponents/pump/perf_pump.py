@@ -10,7 +10,7 @@ from .perf_pump_required_power import PerformancesPumpPower
 from ..fluid_characteristics import FluidDensity
 
 
-class PerformancesPipe(om.Group):
+class PerformancesPump(om.Group):
     """
     Pump performance computation.
     """

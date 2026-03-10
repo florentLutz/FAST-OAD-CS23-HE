@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingHeatExchangerWetWeight(om.ExplicitComponent):
+class SizingHeatExchangerDryWeight(om.ExplicitComponent):
     """
     Computation of the wet weight of the heat exchanger.
     """
@@ -47,22 +47,13 @@ class SizingHeatExchangerWetWeight(om.ExplicitComponent):
             units="kg",
             val=np.nan,
         )
-        self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":fluid_mass",
-            units="kg",
-            val=np.nan,
-        )
 
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id
-            + ":wet_mass",
+            + ":dry_mass",
             units="kg",
             val=2.0,
         )
@@ -88,18 +79,11 @@ class SizingHeatExchangerWetWeight(om.ExplicitComponent):
             + heat_exchanger_id
             + ":channel_mass"
         ]
-        fluid_mass = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":fluid_mass"
-        ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id
-            + ":wet_mass"
-        ] = plate_mass + channel_mass + fluid_mass
+            + ":dry_mass"
+        ] = plate_mass + channel_mass

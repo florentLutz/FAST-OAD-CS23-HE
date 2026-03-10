@@ -52,9 +52,9 @@ class PerformancesCoolantSystemPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":pressure_drop",
+            + ":pressure_compensation",
             units="Pa",
-            val=1e4,
+            val=11.0e4,
         )
 
     def setup_partials(self):
@@ -69,5 +69,5 @@ class PerformancesCoolantSystemPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":pressure_drop"
-        ] = np.sum(inputs.values())
+            + ":pressure_compensation"
+        ] = np.sum(inputs.values()) + 1e5  # This is to consider the pressure drop from the valve

@@ -34,7 +34,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":pressure_drop",
+            + ":pressure_compensation",
             units="Pa",
             val=np.nan,
         )
@@ -83,12 +83,12 @@ class PerformancesPumpPower(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         pump_id = self.options["pump_id"]
 
-        pressure_drop = inputs[
+        pressure_compensation = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":pressure_drop"
+            + ":pressure_compensation"
         ]
         motor_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -118,18 +118,18 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":required_power"
-        ] = volumetric_flow_rate * pressure_drop / (pump_efficiency * motor_efficiency)
+        ] = volumetric_flow_rate * pressure_compensation / (pump_efficiency * motor_efficiency)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         pump_id = self.options["pump_id"]
 
-        pressure_drop = inputs[
+        pressure_compensation = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":pressure_drop"
+            + ":pressure_compensation"
         ]
         motor_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -163,7 +163,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":pressure_drop",
+            + ":pressure_compensation",
         ] = volumetric_flow_rate / (pump_efficiency * motor_efficiency)
 
         partials[
@@ -177,7 +177,11 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":motor_efficiency",
-        ] = -volumetric_flow_rate * pressure_drop / (pump_efficiency * motor_efficiency**2.0)
+        ] = (
+            -volumetric_flow_rate
+            * pressure_compensation
+            / (pump_efficiency * motor_efficiency**2.0)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -190,7 +194,11 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":pump_efficiency",
-        ] = -volumetric_flow_rate * pressure_drop / (pump_efficiency**2.0 * motor_efficiency)
+        ] = (
+            -volumetric_flow_rate
+            * pressure_compensation
+            / (pump_efficiency**2.0 * motor_efficiency)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -203,4 +211,4 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":volumetric_flow_rate",
-        ] = pressure_drop / (pump_efficiency * motor_efficiency)
+        ] = pressure_compensation / (pump_efficiency * motor_efficiency)

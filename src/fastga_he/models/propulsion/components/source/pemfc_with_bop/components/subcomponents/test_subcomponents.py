@@ -30,6 +30,10 @@ from .pipe.sizing_pipe_wall_thickness import SizingPipeWallThickness
 from .pipe.sizing_pipe import SizingPipe
 from .pipe.perf_pipe import PerformancesPipe
 
+from .pump.perf_pump_volumetric_flow_rate import PerformancesPumpVolumetricFlowRate
+from .pump.perf_pump import PerformancesPump
+from .pump.sizing_pump_weight import SizingPumpWeight
+
 from .valve.sizing_valve import SizingValve
 
 
@@ -284,37 +288,36 @@ def test_coolant_tank_sizing():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:HEX:coolant_volume",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_volume",
         units="m**3",
         val=0.02,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:radius",
-        units="m",
-        val=0.01,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe:number_of_pipes",
-        units="unitless",
-        val=5,
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe_1:coolant_volume",
+        units="m**3",
+        val=0.005,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        SizingCoolantTank(pemfc_stack_bop_id="pemfc_stack_bop_1", coolant_tank_id="coolant_tank_1"),
+        SizingCoolantTank(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            coolant_tank_id="coolant_tank_1",
+            coolant_component_names=["pipe_1", "heat_exchanger_1"],
+        ),
         ivc,
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
-        ":coolant_tank:coolant_volume",
+        ":coolant_tank_1:coolant_volume",
         units="m**3",
     ) == pytest.approx(0.025, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":coolant_tank:volume",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant_tank_1:volume",
         units="m**3",
     ) == pytest.approx(0.0274, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":coolant_tank:mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant_tank_1:mass",
         units="kg",
     ) == pytest.approx(6.585, rel=1e-2)
 
@@ -595,5 +598,119 @@ def test_valve_sizing():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:valve_1:volume",
         units="m**3",
     ) == pytest.approx(0.000838, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pump_volumetric_flow_rate():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+    ivc.add_output(
+        "coolant_density",
+        units="kg/m**3",
+        val=175.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPumpVolumetricFlowRate(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            pump_id="pump_1",
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:volumetric_flow_rate",
+        units="m**3/s",
+    ) == pytest.approx(0.0281, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pump_performance():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mean_temperature",
+        units="K",
+        val=345.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:static_pressure",
+        units="Pa",
+        val=200000.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe_1"
+        ":coolant_pressure_drop",
+        units="Pa",
+        val=1500.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":coolant_pressure_drop",
+        units="Pa",
+        val=1500.0,
+    )
+
+    problem = run_system(
+        PerformancesPump(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            pump_id="pump_1",
+            coolant_fluid_type="ethylene glycol",
+            coolant_component_names=["pipe_1", "heat_exchanger_1"],
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:volumetric_flow_rate",
+        units="m**3/s",
+    ) == pytest.approx(0.00477, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:pressure_compensation",
+        units="Pa",
+    ) == pytest.approx(103000.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:required_power",
+        units="W",
+    ) == pytest.approx(839.2, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_pump_weight():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:required_power",
+        units="W",
+        val=839.2,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPumpWeight(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            pump_id="pump_1",
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:mass",
+        units="kg",
+    ) == pytest.approx(11.24, rel=1e-2)
 
     problem.check_partials(compact_print=True)

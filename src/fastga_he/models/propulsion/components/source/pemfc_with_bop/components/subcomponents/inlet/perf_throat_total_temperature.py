@@ -46,7 +46,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
         )
 
         self.add_output(
-            "throat_temperature",
+            "throat_total_temperature",
             val=300.0,
             units="K",
             shape=number_of_points,
@@ -90,7 +90,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             + ":specific_heat_ratio"
         ]
 
-        outputs["throat_temperature"] = exterior_temperature * (
+        outputs["throat_total_temperature"] = exterior_temperature * (
             1.0 + (gamma - 1.0) * 0.5 * mach**2.0
         )
 
@@ -108,14 +108,14 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             + ":specific_heat_ratio"
         ]
 
-        partials["throat_temperature", "exterior_temperature"] = (
+        partials["throat_total_temperature", "exterior_temperature"] = (
             1.0 + (gamma - 1.0) * 0.5 * mach**2.0
         )
 
-        partials["throat_temperature", "mach"] = exterior_temperature * (gamma - 1.0) * mach
+        partials["throat_total_temperature", "mach"] = exterior_temperature * (gamma - 1.0) * mach
 
         partials[
-            "throat_temperature",
+            "throat_total_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

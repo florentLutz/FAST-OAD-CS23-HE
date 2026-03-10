@@ -7,6 +7,7 @@ import openmdao.api as om
 from .sizing_pipe_inner_radius import SizingPipeInnerRadius
 from .sizing_pipe_wall_thickness import SizingPipeWallThickness
 from .sizing_pipe_weight import SizingPipeWeight
+from .sizing_pipe_coolant_volume import SizingPipeCoolantVolume
 
 from ..fluid_characteristics import FluidDensity
 
@@ -72,6 +73,11 @@ class SizingPipe(om.Group):
         self.add_subsystem(
             "pipe_total_weight",
             SizingPipeWeight(pemfc_stack_bop_id=pemfc_stack_bop_id, pipe_id=pipe_id),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "pipe_coolant_volume",
+            SizingPipeCoolantVolume(pemfc_stack_bop_id=pemfc_stack_bop_id, pipe_id=pipe_id),
             promotes=["data:*"],
         )
 
