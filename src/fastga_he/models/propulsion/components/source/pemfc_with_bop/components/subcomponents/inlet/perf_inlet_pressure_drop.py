@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
+class PerformancesInletPressureDrop(om.ExplicitComponent):
     """
     Computation of the total throat pressure.
     """
@@ -47,7 +47,7 @@ class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":air_pressure_drop",
-            val=-1e6,
+            val=1e6,
             units="Pa",
         )
         self.add_output(
@@ -78,7 +78,7 @@ class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":air_pressure_drop",
-            wrt="throat_total_pressure",
+            wrt="*",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
@@ -97,7 +97,7 @@ class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":air_pressure_drop"
-        ] = -np.max(throat_total_pressure - dynamic_pressure)
+        ] = np.max(throat_total_pressure - dynamic_pressure)
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -113,7 +113,7 @@ class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
         dynamic_pressure = inputs["dynamic_pressure"]
         throat_total_pressure = inputs["throat_total_pressure"]
 
-        max_pressure_drop = -np.max(throat_total_pressure - dynamic_pressure)
+        max_pressure_drop = np.max(throat_total_pressure - dynamic_pressure)
         max_dynamic_pressure = np.max(dynamic_pressure)
 
         partials[
@@ -123,7 +123,7 @@ class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
             + air_inlet_id
             + ":air_pressure_drop",
             "dynamic_pressure",
-        ] = np.where(dynamic_pressure - throat_total_pressure == max_pressure_drop, 1.0, 1e-6)
+        ] = np.where(throat_total_pressure - dynamic_pressure == max_pressure_drop, -1.0, 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -132,7 +132,7 @@ class PerformancesMaximumInletPressureDrop(om.ExplicitComponent):
             + air_inlet_id
             + ":air_pressure_drop",
             "throat_total_pressure",
-        ] = np.where(dynamic_pressure - throat_total_pressure == max_pressure_drop, -1.0, 1e-6)
+        ] = np.where(throat_total_pressure - dynamic_pressure == max_pressure_drop, 1.0, 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

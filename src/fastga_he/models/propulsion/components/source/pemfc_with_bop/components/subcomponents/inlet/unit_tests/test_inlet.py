@@ -34,7 +34,7 @@ from ..perf_throat_airspeed import PerformancesThroatAirSpeed
 from ..perf_ambient_total_pressure import PerformancesAmbientTotalPressure
 from ..perf_throat_total_temperature import PerformancesThroatTemperature
 from ..perf_throat_total_pressure import PerformancesThroatPressure
-from ..perf_max_inlet_pressure_drop import PerformancesMaximumInletPressureDrop
+from ..perf_inlet_pressure_drop import PerformancesInletPressureDrop
 from ..perf_inlet import PerformancesInlet
 
 from ..sizing_throat_height import SizingThroatHeight
@@ -882,7 +882,7 @@ def test_inlet_max_pressure_drop():
     ivc.add_output("throat_total_pressure", units="Pa", val=np.full(NB_POINTS_TEST, 108039.36))
 
     problem = run_system(
-        PerformancesMaximumInletPressureDrop(
+        PerformancesInletPressureDrop(
             pemfc_stack_bop_id="pemfc_stack_bop_1",
             number_of_points=NB_POINTS_TEST,
             air_inlet_id="air_inlet_1",
@@ -894,7 +894,7 @@ def test_inlet_max_pressure_drop():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
         ":air_inlet_1:air_pressure_drop",
         units="Pa",
-    ) == pytest.approx(-100895.16, rel=1e-2)
+    ) == pytest.approx(100895.16, rel=1e-2)
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:"

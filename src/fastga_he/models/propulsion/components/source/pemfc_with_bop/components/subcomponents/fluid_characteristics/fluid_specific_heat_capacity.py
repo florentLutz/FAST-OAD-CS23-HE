@@ -16,6 +16,9 @@ class FluidSpecificHeatCapacity(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
             "fluid",
             default="air",
             types=str,
@@ -23,55 +26,109 @@ class FluidSpecificHeatCapacity(om.ExplicitComponent):
         )
 
     def setup(self):
-        self.add_input("fluid_temperature", val=np.nan, units="K")
-        self.add_input("fluid_pressure", val=np.nan, units="Pa")
+        number_of_points = self.options["number_of_points"]
 
-        self.add_output("fluid_specific_heat_capacity", val=1006.0, units="J/kg/K")
+        self.add_input("fluid_temperature", val=np.nan, units="K", shape=number_of_points)
+        self.add_input("fluid_pressure", val=np.nan, units="Pa", shape=number_of_points)
+
+        self.add_output(
+            "fluid_specific_heat_capacity", val=1006.0, units="J/kg/K", shape=number_of_points
+        )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", method="exact")
+        number_of_points = self.options["number_of_points"]
+
+        if number_of_points > 1:
+            self.declare_partials(
+                of="*",
+                wrt="*",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+            )
+        else:
+            self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        fluid = self.options["fluid"]
+        number_of_points = self.options["number_of_points"]
+
         temperature = inputs["fluid_temperature"]
         pressure = inputs["fluid_pressure"]
-        fluid = self.options["fluid"]
 
-        if fluid == "hydrogen" and temperature < 20.325:
-            outputs["fluid_specific_heat_capacity"] = 12018.0
-        elif fluid == "potassium formate" and not 173.15 <= temperature <= 313.15:
-            outputs["fluid_specific_heat_capacity"] = PropsSI(
-                "C", "T", 313.15, "P", pressure, fluid_name_dict[fluid]
-            )
-        elif fluid == "liquid hydrogen":
-            outputs["fluid_specific_heat_capacity"] = 9660.0
-        else:
-            if fluid not in fluid_name_dict:
-                raise ValueError(f"Unknown fluid: {fluid}")
+        if fluid not in fluid_name_dict:
+            raise ValueError(f"Unknown fluid: {fluid}")
 
-            outputs["fluid_specific_heat_capacity"] = PropsSI(
-                "C", "T", temperature, "P", pressure, fluid_name_dict[fluid]
-            )
+        default_specific_heat_capacity = np.array(
+            [
+                PropsSI("C", "T", t, "P", p, fluid_name_dict[fluid])
+                for t, p in zip(temperature, pressure)
+            ]
+        )
+
+        conditions = [
+            (fluid == "hydrogen") & (temperature < 20.325),
+            (fluid == "potassium formate") & ((temperature < 173.15) | (temperature > 313.15)),
+            fluid == "liquid hydrogen",
+        ]
+
+        choices = [
+            np.full(number_of_points, 1.323),
+            np.array([PropsSI("C", "T", 313.15, "P", p, fluid_name_dict[fluid]) for p in pressure]),
+            np.full(number_of_points, 70.78),
+        ]
+
+        outputs["fluid_specific_heat_capacity"] = np.select(
+            conditions, choices, default_specific_heat_capacity
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        fluid = self.options["fluid"]
+        number_of_points = self.options["number_of_points"]
+
         temperature = inputs["fluid_temperature"]
         pressure = inputs["fluid_pressure"]
-        fluid = self.options["fluid"]
 
-        if fluid == "hydrogen" and temperature < 20.325:
-            partials["fluid_specific_heat_capacity", "fluid_temperature"] = 0.0
-            partials["fluid_specific_heat_capacity", "fluid_pressure"] = 0.0
-        elif fluid == "potassium formate" and not 173.15 <= temperature <= 313.15:
-            partials["fluid_specific_heat_capacity", "fluid_temperature"] = 0.0
-            partials["fluid_specific_heat_capacity", "fluid_pressure"] = PropsSI(
-                "d(C)/d(P)|T", "T", temperature, "P", pressure, fluid_name_dict[fluid]
-            )
-        elif fluid == "liquid hydrogen":
-            partials["fluid_specific_heat_capacity", "fluid_temperature"] = 0.0
-            partials["fluid_specific_heat_capacity", "fluid_pressure"] = 0.0
-        else:
-            partials["fluid_specific_heat_capacity", "fluid_temperature"] = PropsSI(
-                "d(C)/d(T)|P", "T", temperature, "P", pressure, fluid_name_dict[fluid]
-            )
-            partials["fluid_specific_heat_capacity", "fluid_pressure"] = PropsSI(
-                "d(C)/d(P)|T", "T", temperature, "P", pressure, fluid_name_dict[fluid]
-            )
+        default_d_cp_dt = np.array(
+            [
+                PropsSI("d(C)/d(T)|P", "T", t, "P", p, fluid_name_dict[fluid])
+                for t, p in zip(temperature, pressure)
+            ]
+        )
+        default_d_cp_dp = np.array(
+            [
+                PropsSI("d(C)/d(P)|T", "T", t, "P", p, fluid_name_dict[fluid])
+                for t, p in zip(temperature, pressure)
+            ]
+        )
+
+        conditions = [
+            (fluid == "hydrogen") & (temperature < 20.325),
+            (fluid == "potassium formate") & ((temperature < 173.15) | (temperature > 313.15)),
+            fluid == "liquid hydrogen",
+        ]
+
+        choice_temperature = [
+            np.zeros(number_of_points),
+            np.zeros(number_of_points),
+            np.zeros(number_of_points),
+        ]
+
+        choice_pressure = [
+            np.zeros(number_of_points),
+            np.array(
+                [
+                    PropsSI("d(C)/d(P)|T", "T", 313.15, "P", p, fluid_name_dict[fluid])
+                    for p in pressure
+                ]
+            ),
+            np.zeros(number_of_points),
+        ]
+
+        partials["fluid_specific_heat_capacity", "fluid_temperature"] = np.select(
+            conditions, choice_temperature, default_d_cp_dt
+        )
+
+        partials["fluid_specific_heat_capacity", "fluid_pressure"] = np.select(
+            conditions, choice_pressure, default_d_cp_dp
+        )

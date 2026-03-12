@@ -16,6 +16,9 @@ class FluidThermalConductivity(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
             "fluid",
             default="air",
             types=str,
@@ -23,31 +26,47 @@ class FluidThermalConductivity(om.ExplicitComponent):
         )
 
     def setup(self):
-        self.add_input("fluid_temperature", val=np.nan, units="K")
-        self.add_input("fluid_pressure", val=np.nan, units="Pa")
+        number_of_points = self.options["number_of_points"]
 
-        self.add_output("fluid_thermal_conductivity", val=0.024, units="W/m/K")
+        self.add_input("fluid_temperature", val=np.nan, units="K", shape=number_of_points)
+        self.add_input("fluid_pressure", val=np.nan, units="Pa", shape=number_of_points)
+
+        self.add_output(
+            "fluid_thermal_conductivity", val=0.024, units="W/m/K", shape=number_of_points
+        )
 
     def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        fluid = self.options["fluid"]
+        number_of_points = self.options["number_of_points"]
+
         temperature = inputs["fluid_temperature"]
         pressure = inputs["fluid_pressure"]
-        fluid = self.options["fluid"]
 
-        if fluid == "hydrogen" and temperature < 20.325:
-            outputs["fluid_thermal_conductivity"] = 0.0175
-        elif fluid == "potassium formate" and not 173.15 <= temperature <= 313.15:
-            outputs["fluid_thermal_conductivity"] = PropsSI(
-                "L", "T", 313.15, "P", pressure, fluid_name_dict[fluid]
-            )
-        elif fluid == "liquid hydrogen":
-            outputs["fluid_thermal_conductivity"] = 0.09892
-        else:
-            if fluid not in fluid_name_dict:
-                raise ValueError(f"Unknown fluid: {fluid}")
+        if fluid not in fluid_name_dict:
+            raise ValueError(f"Unknown fluid: {fluid}")
 
-            outputs["fluid_thermal_conductivity"] = PropsSI(
-                "L", "T", temperature, "P", pressure, fluid_name_dict[fluid]
-            )
+        default_thermal_conductivity = np.array(
+            [
+                PropsSI("L", "T", t, "P", p, fluid_name_dict[fluid])
+                for t, p in zip(temperature, pressure)
+            ]
+        )
+
+        conditions = [
+            (fluid == "hydrogen") & (temperature < 20.325),
+            (fluid == "potassium formate") & ((temperature < 173.15) | (temperature > 313.15)),
+            fluid == "liquid hydrogen",
+        ]
+
+        choices = [
+            np.full(number_of_points, 1.323),
+            np.array([PropsSI("L", "T", 313.15, "P", p, fluid_name_dict[fluid]) for p in pressure]),
+            np.full(number_of_points, 70.78),
+        ]
+
+        outputs["fluid_thermal_conductivity"] = np.select(
+            conditions, choices, default=default_thermal_conductivity
+        )

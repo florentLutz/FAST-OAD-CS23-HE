@@ -4,6 +4,7 @@
 
 import pytest
 import openmdao.api as om
+import numpy as np
 from tests.testing_utilities import run_system
 
 from .fluid_characteristics.fluid_density import FluidDensity
@@ -36,6 +37,8 @@ from .pump.sizing_pump_weight import SizingPumpWeight
 
 from .valve.sizing_valve import SizingValve
 
+NB_POINTS_TEST = 10
+
 
 def test_fluid_density():
     # Research independent input value in .xml file
@@ -46,6 +49,18 @@ def test_fluid_density():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(FluidDensity(), ivc)
     assert problem.get_val("fluid_density", units="kg/m**3") == pytest.approx(1.177, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidDensity(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_density", units="kg/m**3") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1.177), rel=1e-2
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -64,6 +79,18 @@ def test_fluid_specific_heat_capacity():
 
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidSpecificHeatCapacity(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_specific_heat_capacity", units="J/kg/K") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1006.4), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_fluid_thermal_conductivity():
     # Research independent input value in .xml file
@@ -75,6 +102,16 @@ def test_fluid_thermal_conductivity():
     problem = run_system(FluidThermalConductivity(), ivc)
     assert problem.get_val("fluid_thermal_conductivity", units="W/m/K") == pytest.approx(
         0.0264, rel=1e-2
+    )
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidThermalConductivity(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_thermal_conductivity", units="W/m/K") == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.0264), rel=1e-2
     )
 
 
@@ -90,6 +127,16 @@ def test_fluid_dynamic_viscosity():
         1.85e-5, rel=1e-2
     )
 
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidDynamicViscosity(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_dynamic_viscosity", units="Pa*s") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1.85e-5), rel=1e-2
+    )
+
 
 def test_fluid_prandtl_number():
     # Research independent input value in .xml file
@@ -101,6 +148,16 @@ def test_fluid_prandtl_number():
     problem = run_system(FluidPrandtlNumber(), ivc)
     assert problem.get_val("fluid_prandtl_number", units="unitless") == pytest.approx(
         0.71, rel=1e-2
+    )
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidPrandtlNumber(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_prandtl_number", units="unitless") == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.71), rel=1e-2
     )
 
 
@@ -116,6 +173,18 @@ def test_fluid_enthalpy():
 
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidEnthalpy(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_enthalpy", units="J/kg") == pytest.approx(
+        np.full(NB_POINTS_TEST, 426297.77), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_fluid_specific_volume():
     # Research independent input value in .xml file
@@ -127,6 +196,18 @@ def test_fluid_specific_volume():
     problem = run_system(FluidSpecificVolume(), ivc)
     assert problem.get_val("fluid_specific_volume", units="m**3/kg") == pytest.approx(
         0.85, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidSpecificVolume(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_specific_volume", units="m**3/kg") == pytest.approx(
+        np.full(NB_POINTS_TEST, 0.85), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
