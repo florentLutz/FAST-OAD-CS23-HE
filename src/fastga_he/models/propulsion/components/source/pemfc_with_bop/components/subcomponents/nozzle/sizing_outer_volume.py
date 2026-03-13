@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingInnerVolume(om.ExplicitComponent):
+class SizingOuterVolume(om.ExplicitComponent):
     """
-    Computation of the inner volume of the diffuser.
+    Computation of the outer volume of the nozzle.
     """
 
     def initialize(self):
@@ -19,63 +19,31 @@ class SizingInnerVolume(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="diffuser_id",
+            name="nozzle_id",
             default=None,
-            desc="Identifier of the diffuser",
-            allow_none=False,
-        )
-        self.options.declare(
-            name="connected_heat_exchanger_id",
-            default=None,
-            desc="Identifier of the connected heat exchanger",
-            allow_none=False,
-        )
-        self.options.declare(
-            name="connected_air_inlet_id",
-            default=None,
-            desc="Identifier of the connected air inlet",
+            desc="Identifier of the nozzle",
             allow_none=False,
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        diffuser_id = self.options["diffuser_id"]
-        heat_exchanger_id = self.options["connected_heat_exchanger_id"]
-        air_inlet_id = self.options["connected_air_inlet_id"]
+        nozzle_id = self.options["nozzle_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":length",
             val=np.nan,
             units="m",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":no_flow_length",
-            units="m",
-            val=np.nan,
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":coolant_flow_length",
-            units="m",
-            val=np.nan,
-        )
-        self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height",
+            + nozzle_id
+            + ":inlet_side_height",
             val=np.nan,
             units="m",
         )
@@ -83,8 +51,26 @@ class SizingInnerVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + nozzle_id
+            + ":outlet_side_height",
+            val=np.nan,
+            units="m",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + nozzle_id
+            + ":inlet_side_width",
+            val=np.nan,
+            units="m",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + nozzle_id
+            + ":outlet_side_width",
             val=np.nan,
             units="m",
         )
@@ -93,8 +79,8 @@ class SizingInnerVolume(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
-            + ":inner_volume",
+            + nozzle_id
+            + ":outer_volume",
             val=1e-3,
             units="m**3",
         )
@@ -104,185 +90,166 @@ class SizingInnerVolume(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        diffuser_id = self.options["diffuser_id"]
-        heat_exchanger_id = self.options["connected_heat_exchanger_id"]
-        air_inlet_id = self.options["connected_air_inlet_id"]
+        nozzle_id = self.options["nozzle_id"]
 
         diffuser_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":length"
         ]
-        heat_exchanger_no_flow_length = inputs[
+        inlet_side_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + heat_exchanger_id
-            + ":no_flow_length"
+            + nozzle_id
+            + ":inlet_side_height"
         ]
-        heat_exchanger_coolant_flow_length = inputs[
+        outlet_side_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + heat_exchanger_id
-            + ":coolant_flow_length"
+            + nozzle_id
+            + ":outlet_side_height"
         ]
-        air_inlet_throat_height = inputs[
+        inlet_side_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height"
+            + nozzle_id
+            + ":inlet_side_width"
         ]
-        air_inlet_highlight_width = inputs[
+        outlet_side_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + nozzle_id
+            + ":outlet_side_width"
         ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":inner_volume"
         ] = (
             diffuser_length
             / 6.0
             * (
-                heat_exchanger_coolant_flow_length * air_inlet_throat_height
-                + heat_exchanger_no_flow_length * air_inlet_highlight_width
+                outlet_side_width * inlet_side_height
+                + inlet_side_width * outlet_side_height
                 + 2.0
-                * (
-                    air_inlet_highlight_width * air_inlet_throat_height
-                    + heat_exchanger_no_flow_length * heat_exchanger_coolant_flow_length
-                )
+                * (inlet_side_height * inlet_side_width + outlet_side_height * outlet_side_width)
             )
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        diffuser_id = self.options["diffuser_id"]
-        heat_exchanger_id = self.options["connected_heat_exchanger_id"]
-        air_inlet_id = self.options["connected_air_inlet_id"]
+        nozzle_id = self.options["nozzle_id"]
 
         diffuser_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":length"
         ]
-        heat_exchanger_no_flow_length = inputs[
+        inlet_side_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + heat_exchanger_id
-            + ":no_flow_length"
+            + nozzle_id
+            + ":inlet_side_height"
         ]
-        heat_exchanger_coolant_flow_length = inputs[
+        outlet_side_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + heat_exchanger_id
-            + ":coolant_flow_length"
+            + nozzle_id
+            + ":outlet_side_height"
         ]
-        air_inlet_throat_height = inputs[
+        inlet_side_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height"
+            + nozzle_id
+            + ":inlet_side_width"
         ]
-        air_inlet_highlight_width = inputs[
+        outlet_side_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + nozzle_id
+            + ":outlet_side_width"
         ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
-            + ":inner_volume",
+            + nozzle_id
+            + ":outer_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":length",
         ] = (
-            heat_exchanger_coolant_flow_length * air_inlet_throat_height
-            + heat_exchanger_no_flow_length * air_inlet_highlight_width
-            + 2.0
-            * (
-                air_inlet_highlight_width * air_inlet_throat_height
-                + heat_exchanger_no_flow_length * heat_exchanger_coolant_flow_length
-            )
+            outlet_side_width * inlet_side_height
+            + inlet_side_width * outlet_side_height
+            + 2.0 * (inlet_side_height * inlet_side_width + outlet_side_height * outlet_side_width)
         ) / 6.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":inner_volume",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + heat_exchanger_id
-            + ":no_flow_length",
-        ] = (
-            diffuser_length
-            / 6.0
-            * (air_inlet_highlight_width + 2.0 * heat_exchanger_coolant_flow_length)
-        )
+            + nozzle_id
+            + ":inlet_side_height",
+        ] = diffuser_length / 6.0 * (outlet_side_width + 2.0 * inlet_side_width)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":inner_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + heat_exchanger_id
-            + ":coolant_flow_length",
-        ] = diffuser_length / 6.0 * (air_inlet_throat_height + 2.0 * heat_exchanger_no_flow_length)
+            + nozzle_id
+            + ":inlet_side_width",
+        ] = diffuser_length / 6.0 * (outlet_side_height + 2.0 * inlet_side_height)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":inner_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":throat_height",
-        ] = (
-            diffuser_length
-            / 6.0
-            * (heat_exchanger_coolant_flow_length + 2.0 * air_inlet_highlight_width)
-        )
+            + nozzle_id
+            + ":outlet_side_height",
+        ] = diffuser_length / 6.0 * (inlet_side_width + 2.0 * outlet_side_width)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
+            + nozzle_id
             + ":inner_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
-        ] = diffuser_length / 6.0 * (heat_exchanger_no_flow_length + 2.0 * air_inlet_throat_height)
+            + nozzle_id
+            + ":outlet_side_width",
+        ] = diffuser_length / 6.0 * (inlet_side_height + 2.0 * outlet_side_height)
