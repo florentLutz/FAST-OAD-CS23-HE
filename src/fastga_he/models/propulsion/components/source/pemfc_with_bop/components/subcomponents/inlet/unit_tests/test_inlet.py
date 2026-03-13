@@ -968,6 +968,8 @@ def test_inlet_performance():
 
     problem.check_partials(compact_print=True)
 
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
 
 def test_inlet_mass():
     # Research independent input value in .xml file

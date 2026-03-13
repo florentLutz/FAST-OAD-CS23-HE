@@ -227,15 +227,18 @@ def test_performances_humidifier_rating_pressure_drop():
         val=1.0,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_consumption_max",
+        "air_consumption",
         units="kg/h",
         val=2600.0,
+        shape=NB_POINTS_TEST,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         PerformancesHumidifierRatingPressureDrop(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", humidifier_id="humidifier_1"
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            humidifier_id="humidifier_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -243,7 +246,7 @@ def test_performances_humidifier_rating_pressure_drop():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:humidifier_1"
         ":air_pressure_drop",
         units="MPa",
-    ) == pytest.approx(0.091, rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 0.091), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
