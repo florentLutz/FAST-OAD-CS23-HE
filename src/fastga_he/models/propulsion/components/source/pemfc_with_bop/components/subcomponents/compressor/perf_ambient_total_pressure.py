@@ -34,7 +34,7 @@ class PerformancesAmbientTotalPressure(om.ExplicitComponent):
         compressor_id = self.options["compressor_id"]
 
         self.add_input("mach", val=np.nan, shape=number_of_points)
-        self.add_input("ambient_pressure", units="Pa", val=np.full(number_of_points, np.nan))
+        self.add_input("ambient_pressure", units="Pa", val=np.nan, shape=number_of_points)
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id

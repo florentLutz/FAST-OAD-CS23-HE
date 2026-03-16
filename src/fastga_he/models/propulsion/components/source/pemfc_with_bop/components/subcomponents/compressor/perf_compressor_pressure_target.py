@@ -37,7 +37,7 @@ class PerformancesCompressorPressureTarget(om.ExplicitComponent):
 
         self.add_output(
             "compressor_pressure_target",
-            val=0.3,
+            val=101325.0,
             units="Pa",
             shape=number_of_points,
         )

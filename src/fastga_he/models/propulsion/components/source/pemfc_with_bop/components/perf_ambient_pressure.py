@@ -26,9 +26,7 @@ class PerformancesPEMFCStackBOPAmbientPressure(om.ExplicitComponent):
         self.add_input("altitude", units="m", val=np.zeros(number_of_points))
 
         self.add_output(
-            name="ambient_pressure",
-            units="Pa",
-            val=np.full(number_of_points, DEFAULT_PRESSURE),
+            name="ambient_pressure", units="Pa", val=DEFAULT_PRESSURE, shape=number_of_points
         )
 
         self.declare_partials(

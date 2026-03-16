@@ -100,7 +100,13 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="*",
+            wrt=[
+                "compressor_pressure_supply",
+                "ambient_total_pressure",
+                "ambient_total_temperature",
+                "compressed_air_specific_heat_capacity",
+                "air_consumption",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -258,7 +264,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         ] = -(
             compressed_air_specific_heat_capacity
             * ambient_total_temperature
-            / efficiency**2
+            / efficiency**2.0
             * (
                 (compressor_pressure_supply / ambient_total_pressure)
                 ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
@@ -286,7 +292,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             * np.log(compressor_pressure_supply / ambient_total_pressure)
             * (compressor_pressure_supply / ambient_total_pressure)
             ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
-            / specific_heat_ratio**2
+            / specific_heat_ratio**2.0
         )
 
         partials[

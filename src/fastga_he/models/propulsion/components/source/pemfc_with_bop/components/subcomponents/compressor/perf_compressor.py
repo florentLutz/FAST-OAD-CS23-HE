@@ -15,7 +15,7 @@ from ...perf_ambient_pressure import PerformancesPEMFCStackBOPAmbientPressure
 from ..fluid_characteristics import FluidSpecificHeatCapacity
 
 
-class PerformancesInlet(om.Group):
+class PerformancesCompressor(om.Group):
     """
     Air inlet Performances group.
     """
@@ -105,7 +105,7 @@ class PerformancesInlet(om.Group):
             promotes=[
                 ("fluid_temperature", "exterior_temperature"),
                 ("fluid_pressure", "compressor_pressure_target"),
-                ("specific_heat_capacity", "compressed_air_specific_heat_capacity"),
+                ("fluid_specific_heat_capacity", "compressed_air_specific_heat_capacity"),
             ],
         )
         self.add_subsystem(

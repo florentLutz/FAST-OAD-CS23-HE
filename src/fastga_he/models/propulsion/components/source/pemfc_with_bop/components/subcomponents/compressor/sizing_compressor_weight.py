@@ -34,7 +34,7 @@ class SizingCompressorWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + compressor_id
-            + ":power_required",
+            + ":power_rating",
             val=np.nan,
             units="kW",
         )
@@ -45,7 +45,7 @@ class SizingCompressorWeight(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":mass",
-            val=0.3,
+            val=5.0,
             units="kg",
         )
 

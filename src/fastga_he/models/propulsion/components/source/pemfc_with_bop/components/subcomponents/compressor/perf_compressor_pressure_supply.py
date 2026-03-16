@@ -53,7 +53,7 @@ class PerformancesCompressorPressureSupply(om.ExplicitComponent):
             + ":"
             + humidifier_id
             + ":air_pressure_drop",
-            val=1e4,
+            val=np.nan,
             units="Pa",
             shape=number_of_points,
         )
@@ -63,14 +63,14 @@ class PerformancesCompressorPressureSupply(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":air_pressure_drop",
-            val=1e4,
+            val=np.nan,
             units="Pa",
             shape=number_of_points,
         )
 
         self.add_output(
             "compressor_pressure_supply",
-            val=0.3,
+            val=1.2e5,
             units="Pa",
             shape=number_of_points,
         )
@@ -88,4 +88,4 @@ class PerformancesCompressorPressureSupply(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["compressor_pressure_supply"] = np.sum(inputs.value())
+        outputs["compressor_pressure_supply"] = np.sum(inputs.values())
