@@ -13,6 +13,8 @@ from .sizing_outer_volume import SizingOuterVolume
 from .sizing_nozzle_weight import SizingNozzleWeight
 from .sizing_entry_hydraulic_diameter import SizingEntryHydraulicDiameter
 from .sizing_nozzle_relative_roughness import SizingNozzleRelativeRoughness
+from .sizing_nozzle_exit_height_length_ratio import SizingNozzleExitHeightLengthRatio
+from .sizing_nozzle_alpha_angle import SizingNozzleAlphaAngle
 
 
 class SizingNozzle(om.Group):
@@ -127,6 +129,23 @@ class SizingNozzle(om.Group):
             SizingNozzleRelativeRoughness(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 nozzle_id=nozzle_id,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "sizing_nozzle_exit_height_length_ratio",
+            SizingNozzleExitHeightLengthRatio(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "sizing_nozzle_alpha_angle",
+            SizingNozzleAlphaAngle(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+                connected_heat_exchanger_id=connected_heat_exchanger_id,
             ),
             promotes=["*"],
         )

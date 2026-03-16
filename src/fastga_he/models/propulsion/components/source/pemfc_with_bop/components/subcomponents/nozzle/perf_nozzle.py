@@ -8,6 +8,10 @@ from .perf_nozzle_air_speed import PerformancesNozzleAirSpeed
 from .perf_nozzle_inlet_pressure import PerformancesNozzleInletPressure
 from .perf_nozzle_reynolds_number import PerformancesNozzleReynoldsNumber
 from .perf_nozzle_darcy_friction_factor import PerformancesNozzleDarcyFrictionFactor
+from .perf_nozzle_contraction_loss_coeff import PerformancesNozzleContractionLossCoefficient
+from .perf_nozzle_friction_loss_coeff import PerformancesNozzleFrictionLossCoefficient
+from .perf_nozzle_pressure_drop import PerformancesNozzlePressureDrop
+from .perf_nozzle_drag import PerformancesNozzleDrag
 
 from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity
 
@@ -98,5 +102,36 @@ class PerformancesDiffuser(om.Group):
                 nozzle_id=nozzle_id,
                 number_of_points=number_of_points,
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "nozzle_contraction_loss_coeff",
+            PerformancesNozzleContractionLossCoefficient(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "nozzle_friction_loss_coeff",
+            PerformancesNozzleFrictionLossCoefficient(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "nozzle_pressure_drop",
+            PerformancesNozzlePressureDrop(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "nozzle_drag",
+            PerformancesNozzleDrag(number_of_points=number_of_points),
             promotes=["*"],
         )
