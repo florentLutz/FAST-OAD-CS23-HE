@@ -49,7 +49,7 @@ class PerformancesDiffuserExitAirSpeed(om.ExplicitComponent):
             units="unitless",
         )
 
-        self.add_output("exit_air_speed", val=0.3, units="m/s")
+        self.add_output("exit_air_speed", val=50.0, units="m/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]

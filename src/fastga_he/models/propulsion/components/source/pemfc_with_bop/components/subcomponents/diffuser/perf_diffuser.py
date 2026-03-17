@@ -106,12 +106,20 @@ class PerformancesDiffuser(om.Group):
         )
         self.add_subsystem(
             "perf_diffuser_reynolds_number",
-            PerformancesDiffuserReynoldsNumber(number_of_points=number_of_points),
+            PerformancesDiffuserReynoldsNumber(
+                number_of_points=number_of_points,
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                diffuser_id=diffuser_id,
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
             "perf_diffuser_darcy_friction_factor",
-            PerformancesDiffuserDarcyFrictionFactor(number_of_points=number_of_points),
+            PerformancesDiffuserDarcyFrictionFactor(
+                number_of_points=number_of_points,
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                diffuser_id=diffuser_id,
+            ),
             promotes=["*"],
         )
         self.add_subsystem(

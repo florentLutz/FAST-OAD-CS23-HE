@@ -233,7 +233,7 @@ class SizingInnerVolume(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":inner_volume",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id

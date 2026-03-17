@@ -61,7 +61,7 @@ class PerformancesDiffuserReynoldsNumber(om.ExplicitComponent):
             units="m",
         )
 
-        self.add_output("air_reynolds_number", val=0.3, units="unitless", shape=number_of_points)
+        self.add_output("air_reynolds_number", val=3e5, units="unitless", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
@@ -69,14 +69,14 @@ class PerformancesDiffuserReynoldsNumber(om.ExplicitComponent):
         diffuser_id = self.options["diffuser_id"]
 
         self.declare_partials(
-            of="*",
-            wrt="*",
+            of="air_reynolds_number",
+            wrt=["average_air_speed", "diffuser_air_density", "diffuser_air_dynamic_viscosity"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="*",
+            of="air_reynolds_number",
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

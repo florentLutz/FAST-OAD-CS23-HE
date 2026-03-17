@@ -38,7 +38,7 @@ class PerformancesDiffuserExitTotalPressure(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             val=np.nan,
             units="Pa",
             shape=number_of_points,
@@ -76,7 +76,7 @@ class PerformancesDiffuserExitTotalPressure(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -94,6 +94,6 @@ class PerformancesDiffuserExitTotalPressure(om.ExplicitComponent):
                 + pemfc_stack_bop_id
                 + ":"
                 + diffuser_id
-                + "air_pressure_drop"
+                + ":air_pressure_drop"
             ]
         )

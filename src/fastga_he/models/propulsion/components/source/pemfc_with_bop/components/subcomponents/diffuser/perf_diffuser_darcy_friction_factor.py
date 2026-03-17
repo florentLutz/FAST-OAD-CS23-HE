@@ -35,7 +35,7 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
 
         self.add_input(
             "air_reynolds_number",
-            val=0.3,
+            val=np.nan,
             units="unitless",
             shape=number_of_points,
         )
@@ -46,12 +46,12 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
             + diffuser_id
             + ":relative_roughness",
             val=np.nan,
-            units="m",
+            units="unitless",
         )
 
         self.add_output(
             "diffuser_darcy_friction_factor",
-            val=0.3,
+            val=0.01,
             units="unitless",
             shape=number_of_points,
         )
@@ -62,14 +62,14 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
         diffuser_id = self.options["diffuser_id"]
 
         self.declare_partials(
-            of="*",
-            wrt="*",
+            of="*diffuser_darcy_friction_factor",
+            wrt="air_reynolds_number",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="*",
+            of="diffuser_darcy_friction_factor",
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -93,13 +93,11 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
             + ":relative_roughness"
         ]
 
-        if reynolds_number < 3000.0:
-            outputs["diffuser_darcy_friction_factor"] = 64.0 / reynolds_number
-        else:
-            # Haaland's equation
-            outputs["diffuser_darcy_friction_factor"] = (
-                -1.8 * np.log10((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number)
-            ) ** -2.0
+        outputs["diffuser_darcy_friction_factor"] = np.where(
+            reynolds_number < 3000.0,
+            64.0 / reynolds_number,
+            (-1.8 * np.log10((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number)) ** -2.0,
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -114,6 +112,12 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
             + ":relative_roughness"
         ]
 
+        haaland_common_denominator = (
+            3.24
+            * ((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number)
+            * np.log((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number) ** 3.0
+        )
+
         partials[
             "diffuser_darcy_friction_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -124,19 +128,15 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
         ] = np.where(
             reynolds_number < 3000.0,
             0.0,
-            2.0
-            * (-1.8 * np.log10((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number) ** -3.0)
-            * (1.8 / np.log(10))
-            * (1.11 / relative_roughness * (relative_roughness / 3.7) ** 1.11)
-            / (3.7 * ((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number)),
+            -2.0
+            * np.log(10) ** 2.0
+            * 1.11
+            * (relative_roughness / 3.7) ** 1.11
+            / (relative_roughness * haaland_common_denominator),
         )
 
         partials["diffuser_darcy_friction_factor", "air_reynolds_number"] = np.where(
             reynolds_number < 3000.0,
             -64.0 / reynolds_number**2,
-            2.0
-            * (-1.8 * np.log10((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number) ** -3.0)
-            * (1.8 / np.log(10))
-            * (6.9 / reynolds_number**2)
-            / ((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number),
+            2.0 * np.log(10) ** 2.0 * 6.9 / (reynolds_number**2.0 * haaland_common_denominator),
         )

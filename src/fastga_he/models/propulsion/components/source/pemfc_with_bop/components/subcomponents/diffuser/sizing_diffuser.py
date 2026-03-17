@@ -114,8 +114,6 @@ class SizingDiffuser(om.Group):
             SizingAreaRatio(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 diffuser_id=diffuser_id,
-                connected_heat_exchanger_id=heat_exchanger_id,
-                connected_air_inlet_id=air_inlet_id,
             ),
             promotes=["*"],
         )
@@ -124,6 +122,7 @@ class SizingDiffuser(om.Group):
             SizingDiffuserStallCheckRatios(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 diffuser_id=diffuser_id,
+                connected_air_inlet_id=air_inlet_id,
             ),
             promotes=["*"],
         )

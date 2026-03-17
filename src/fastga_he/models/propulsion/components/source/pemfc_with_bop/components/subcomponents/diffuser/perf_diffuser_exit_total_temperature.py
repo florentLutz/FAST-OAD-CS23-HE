@@ -38,7 +38,7 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             val=np.nan,
             units="Pa",
             shape=number_of_points,
@@ -106,7 +106,7 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop"
+            + ":air_pressure_drop"
         ]
 
         outputs["diffuser_exit_total_temperature"] = (
@@ -131,7 +131,7 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop"
+            + ":air_pressure_drop"
         ]
 
         partials["diffuser_exit_total_temperature", "throat_air_speed"] = (
@@ -162,5 +162,5 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
         ] = -1.0 / (diffuser_air_specific_heat_capacity * diffuser_air_density)

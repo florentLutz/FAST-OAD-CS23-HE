@@ -229,14 +229,14 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":highlight_width",
-        ] = diffuser_length / air_inlet_highlight_width**2.0
+        ] = -diffuser_length / air_inlet_highlight_width**2.0
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
             + ":length_width_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id

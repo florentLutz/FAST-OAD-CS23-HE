@@ -62,7 +62,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             val=0.3,
             units="Pa",
             shape=number_of_points,
@@ -73,7 +73,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="*",
+            wrt=["average_air_speed", "diffuser_air_density", "diffuser_friction_loss_coefficient"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -100,7 +100,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop"
+            + ":air_pressure_drop"
         ] = (
             0.5
             * diffuser_air_density
@@ -122,7 +122,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             "diffuser_friction_loss_coefficient",
         ] = 0.5 * diffuser_air_density * average_air_speed**2.0
 
@@ -131,7 +131,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             "diffuser_expansion_loss_coefficient",
         ] = 0.5 * diffuser_air_density * average_air_speed**2.0
 
@@ -140,7 +140,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             "average_air_speed",
         ] = (
             diffuser_air_density
@@ -153,7 +153,7 @@ class PerformancesDiffuserPressureDrop(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + "air_pressure_drop",
+            + ":air_pressure_drop",
             "diffuser_air_density",
         ] = (
             0.5

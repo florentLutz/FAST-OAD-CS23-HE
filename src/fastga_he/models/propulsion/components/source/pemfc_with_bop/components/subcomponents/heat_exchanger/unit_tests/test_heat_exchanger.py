@@ -5,6 +5,7 @@
 import pytest
 import numpy as np
 import openmdao.api as om
+import os.path as pth
 
 from ..perf_air_heat_capacity import PerformancesAirHeatCapacity
 from ..perf_coolant_heat_capacity import PerformancesCoolantHeatCapacity
@@ -595,6 +596,8 @@ def test_heat_exchanger_performance():
 
     problem.check_partials(compact_print=True)
 
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
 
 def test_sizing_fin_geometry():
     # Research independent input value in .xml file
@@ -1103,3 +1106,6 @@ def test_sizing_heat_exchanger():
         ":dry_mass",
         units="kg",
     ) == pytest.approx(1.134, rel=1e-2)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+

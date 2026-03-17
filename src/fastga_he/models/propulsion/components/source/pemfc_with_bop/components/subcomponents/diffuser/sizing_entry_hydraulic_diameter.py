@@ -61,7 +61,7 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":entry_hydraulic_diameter",
-            val=0.1,
+            val=0.05,
             units="m",
         )
 
@@ -133,7 +133,8 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height",
         ] = (
-            air_inlet_highlight_width**2.0
+            2.0
+            * air_inlet_highlight_width**2.0
             / (air_inlet_throat_height + air_inlet_highlight_width) ** 2.0
         )
         partials[
@@ -142,12 +143,13 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":entry_hydraulic_diameter",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
             + ":highlight_width",
         ] = (
-            air_inlet_throat_height**2.0
+            2.0
+            * air_inlet_throat_height**2.0
             / (air_inlet_throat_height + air_inlet_highlight_width) ** 2.0
         )
