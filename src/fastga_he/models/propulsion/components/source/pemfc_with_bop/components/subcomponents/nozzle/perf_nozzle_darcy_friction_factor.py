@@ -46,12 +46,12 @@ class PerformancesNozzleDarcyFrictionFactor(om.ExplicitComponent):
             + nozzle_id
             + ":relative_roughness",
             val=np.nan,
-            units="m",
+            units="unitless",
         )
 
         self.add_output(
             "nozzle_darcy_friction_factor",
-            val=0.3,
+            val=0.02,
             units="unitless",
             shape=number_of_points,
         )
@@ -62,14 +62,14 @@ class PerformancesNozzleDarcyFrictionFactor(om.ExplicitComponent):
         nozzle_id = self.options["nozzle_id"]
 
         self.declare_partials(
-            of="diffuser_darcy_friction_factor",
+            of="*",
             wrt="air_reynolds_number",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
-            of="diffuser_darcy_friction_factor",
+            of="*",
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -93,7 +93,7 @@ class PerformancesNozzleDarcyFrictionFactor(om.ExplicitComponent):
             + ":relative_roughness"
         ]
 
-        outputs["diffuser_darcy_friction_factor"] = np.where(
+        outputs["nozzle_darcy_friction_factor"] = np.where(
             reynolds_number < 3000.0,
             64.0 / reynolds_number,
             (-1.8 * np.log10((relative_roughness / 3.7) ** 1.11 + 6.9 / reynolds_number)) ** -2.0,

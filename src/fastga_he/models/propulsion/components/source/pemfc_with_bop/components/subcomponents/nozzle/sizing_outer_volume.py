@@ -133,7 +133,7 @@ class SizingOuterVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":inner_volume"
+            + ":outer_volume"
         ] = (
             diffuser_length
             / 6.0
@@ -207,7 +207,7 @@ class SizingOuterVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":inner_volume",
+            + ":outer_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -220,7 +220,7 @@ class SizingOuterVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":inner_volume",
+            + ":outer_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -233,7 +233,7 @@ class SizingOuterVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":inner_volume",
+            + ":outer_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -246,7 +246,7 @@ class SizingOuterVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":inner_volume",
+            + ":outer_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

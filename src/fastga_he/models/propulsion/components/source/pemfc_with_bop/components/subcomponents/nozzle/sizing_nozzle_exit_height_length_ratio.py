@@ -54,7 +54,7 @@ class SizingNozzleExitHeightLengthRatio(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":exit_height_length_ratio",
-            val=np.nan,
+            val=0.4,
             units="unitless",
         )
 

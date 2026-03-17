@@ -46,7 +46,7 @@ class SizingNozzleRelativeRoughness(om.ExplicitComponent):
             + nozzle_id
             + ":relative_roughness",
             val=1e-5,
-            units="m",
+            units="unitless",
         )
 
     def setup_partials(self):

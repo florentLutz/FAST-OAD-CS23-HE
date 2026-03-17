@@ -223,7 +223,7 @@ class SizingInnerVolume(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":inner_volume",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id
@@ -251,7 +251,7 @@ class SizingInnerVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":throat_height",
+            + ":exit_height",
         ] = nozzle_length / 6.0 * (heat_exchanger_coolant_flow_length + 2.0 * exit_width)
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -263,5 +263,5 @@ class SizingInnerVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":highlight_width",
+            + ":exit_width",
         ] = nozzle_length / 6.0 * (heat_exchanger_no_flow_length + 2.0 * exit_height)

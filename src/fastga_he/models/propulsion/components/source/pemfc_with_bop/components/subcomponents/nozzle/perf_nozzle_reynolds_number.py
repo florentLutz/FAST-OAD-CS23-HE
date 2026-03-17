@@ -70,7 +70,7 @@ class PerformancesNozzleReynoldsNumber(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="*",
+            wrt=["average_air_speed", "nozzle_air_density", "nozzle_air_dynamic_viscosity"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),

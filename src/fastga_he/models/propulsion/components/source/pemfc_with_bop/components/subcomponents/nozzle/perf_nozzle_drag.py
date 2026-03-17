@@ -38,7 +38,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.add_output("drag", val=0.3, units="N")
+        self.add_output("drag", val=0.3, units="N", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]

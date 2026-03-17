@@ -1108,4 +1108,3 @@ def test_sizing_heat_exchanger():
     ) == pytest.approx(1.134, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
-

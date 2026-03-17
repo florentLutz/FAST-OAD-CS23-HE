@@ -93,9 +93,9 @@ class SizingNozzleLength(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        diffuser_id = self.options["diffuser_id"]
+        diffuser_id = self.options["connected_diffuser_id"]
         heat_exchanger_id = self.options["connected_heat_exchanger_id"]
-        nozzle_id = self.options["connected_nozzle_id"]
+        nozzle_id = self.options["nozzle_id"]
 
         max_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

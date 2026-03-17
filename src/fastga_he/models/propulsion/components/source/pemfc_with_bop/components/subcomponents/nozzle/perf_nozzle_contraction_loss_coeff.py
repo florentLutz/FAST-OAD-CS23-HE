@@ -34,7 +34,7 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_length_height_ratio",
+            + ":exit_height_length_ratio",
             val=np.nan,
             units="unitless",
         )
@@ -70,12 +70,12 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
-        exit_length_height_ratio = inputs[
+        exit_height_length_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_length_height_ratio"
+            + ":exit_height_length_ratio"
         ]
         alpha = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -97,19 +97,19 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
             (
                 0.568
                 - 0.01002 * alpha
-                - 1.55 * exit_length_height_ratio
+                - 1.55 * exit_height_length_ratio
                 + 0.0001188 * alpha**2.0
-                + 0.00276 * alpha * exit_length_height_ratio
-                + 1.86 * exit_length_height_ratio**2.0
+                + 0.00276 * alpha * exit_height_length_ratio
+                + 1.86 * exit_height_length_ratio**2.0
             )
             * (1.0 - 1.0 / area_ratio),
             (
                 0.621
                 - 0.01886 * alpha
-                - 1.64 * exit_length_height_ratio
+                - 1.64 * exit_height_length_ratio
                 + 0.0003816 * alpha**2.0
-                - 0.00804 * alpha * exit_length_height_ratio
-                + 2.21 * exit_length_height_ratio**2.0
+                - 0.00804 * alpha * exit_height_length_ratio
+                + 2.21 * exit_height_length_ratio**2.0
             )
             * (1.0 - 1.0 / area_ratio),
         )
@@ -118,12 +118,12 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
-        exit_length_height_ratio = inputs[
+        exit_height_length_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_length_height_ratio"
+            + ":exit_height_length_ratio"
         ]
         alpha = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -146,11 +146,11 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_length_height_ratio",
+            + ":exit_height_length_ratio",
         ] = np.where(
             alpha > 30.0,
-            (-1.55 + 0.00276 * alpha + 3.72 * exit_length_height_ratio) * (1.0 - 1.0 / area_ratio),
-            (-1.64 - 0.00804 * alpha + 4.41 * exit_length_height_ratio) * (1.0 - 1.0 / area_ratio),
+            (-1.55 + 0.00276 * alpha + 3.72 * exit_height_length_ratio) * (1.0 - 1.0 / area_ratio),
+            (-1.64 - 0.00804 * alpha + 4.41 * exit_height_length_ratio) * (1.0 - 1.0 / area_ratio),
         )
         partials[
             "nozzle_contraction_loss_coefficient",
@@ -161,9 +161,9 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
             + ":alpha",
         ] = np.where(
             alpha > 30.0,
-            (-0.01002 + 0.0002376 * alpha + 0.00276 * exit_length_height_ratio)
+            (-0.01002 + 0.0002376 * alpha + 0.00276 * exit_height_length_ratio)
             * (1.0 - 1.0 / area_ratio),
-            (-0.01886 + 0.0007632 * alpha - 0.00804 * exit_length_height_ratio)
+            (-0.01886 + 0.0007632 * alpha - 0.00804 * exit_height_length_ratio)
             * (1.0 - 1.0 / area_ratio),
         )
         partials[
@@ -178,19 +178,19 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
             (
                 0.568
                 - 0.01002 * alpha
-                - 1.55 * exit_length_height_ratio
+                - 1.55 * exit_height_length_ratio
                 + 0.0001188 * alpha**2.0
-                + 0.00276 * alpha * exit_length_height_ratio
-                + 1.86 * exit_length_height_ratio**2.0
+                + 0.00276 * alpha * exit_height_length_ratio
+                + 1.86 * exit_height_length_ratio**2.0
             )
             * (1.0 / area_ratio**2.0),
             (
                 0.621
                 - 0.01886 * alpha
-                - 1.64 * exit_length_height_ratio
+                - 1.64 * exit_height_length_ratio
                 + 0.0003816 * alpha**2.0
-                - 0.00804 * alpha * exit_length_height_ratio
-                + 2.21 * exit_length_height_ratio**2.0
+                - 0.00804 * alpha * exit_height_length_ratio
+                + 2.21 * exit_height_length_ratio**2.0
             )
             * (1.0 / area_ratio**2.0),
         )

@@ -16,7 +16,7 @@ from .perf_nozzle_drag import PerformancesNozzleDrag
 from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity
 
 
-class PerformancesDiffuser(om.Group):
+class PerformancesNozzle(om.Group):
     """
     Diffuser performance computations.
     """
@@ -29,9 +29,9 @@ class PerformancesDiffuser(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="connected_diffuser_id",
+            name="nozzle_id",
             default=None,
-            desc="Identifier of the connected diffuser",
+            desc="Identifier of the connected nozzle",
             allow_none=False,
         )
         self.options.declare(
@@ -63,7 +63,7 @@ class PerformancesDiffuser(om.Group):
             "nozzle_inlet_pressure",
             PerformancesNozzleInletPressure(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                nozzle_connected_heat_exchanger_id=connected_heat_exchanger_id,
+                connected_heat_exchanger_id=connected_heat_exchanger_id,
                 number_of_points=number_of_points,
             ),
             promotes=["*"],

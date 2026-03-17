@@ -127,16 +127,16 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":no_flow_length",
-        ] = coolant_flow_length**2.0 / (no_flow_length + coolant_flow_length) ** 2.0
+        ] = 2.0 * coolant_flow_length**2.0 / (no_flow_length + coolant_flow_length) ** 2.0
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
             + ":entry_hydraulic_diameter",
-            "data:propulsion:he_power_train:PEMFC_stack_bOP:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id
             + ":coolant_flow_length",
-        ] = no_flow_length**2.0 / (no_flow_length + coolant_flow_length) ** 2.0
+        ] = 2.0 * no_flow_length**2.0 / (no_flow_length + coolant_flow_length) ** 2.0

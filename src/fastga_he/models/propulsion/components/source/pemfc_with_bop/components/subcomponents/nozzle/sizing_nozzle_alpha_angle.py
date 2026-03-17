@@ -152,7 +152,7 @@ class SizingNozzleAlphaAngle(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":length",
-        ] = 2.0 * (coolant_flow_length - exit_width) / common_denominator
+        ] = -2.0 * (coolant_flow_length - exit_width) / common_denominator
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
