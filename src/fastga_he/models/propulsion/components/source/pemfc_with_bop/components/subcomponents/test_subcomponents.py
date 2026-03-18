@@ -396,7 +396,7 @@ def test_coolant_tank_sizing():
         SizingCoolantTank(
             pemfc_stack_bop_id="pemfc_stack_bop_1",
             coolant_tank_id="coolant_tank_1",
-            coolant_component_names=["pipe_1", "heat_exchanger_1"],
+            coolant_component_ids=["pipe_1", "heat_exchanger_1"],
         ),
         ivc,
     )
@@ -762,7 +762,7 @@ def test_pump_performance():
             pemfc_stack_bop_id="pemfc_stack_bop_1",
             pump_id="pump_1",
             coolant_fluid_type="ethylene glycol",
-            coolant_component_names=["pipe_1", "heat_exchanger_1"],
+            coolant_component_ids=["pipe_1", "heat_exchanger_1"],
         ),
         ivc,
     )

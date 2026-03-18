@@ -35,7 +35,7 @@ class PerformancesPump(om.Group):
             desc="Fluid type: air, water, hydrogen, ammonia, etc.",
         )
         self.options.declare(
-            name="coolant_component_names",
+            name="coolant_component_ids",
             default="None",
             desc="A list of the TBS components that use coolant",
             allow_none=False,
@@ -45,7 +45,7 @@ class PerformancesPump(om.Group):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         fluid = self.options["coolant_fluid_type"]
         pump_id = self.options["pump_id"]
-        coolant_component_names = self.options["coolant_component_names"]
+        coolant_component_ids = self.options["coolant_component_ids"]
 
         self.add_subsystem(
             "pipe_coolant_density_performance",
@@ -81,7 +81,7 @@ class PerformancesPump(om.Group):
             PerformancesCoolantSystemPressureDrop(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 pump_id=pump_id,
-                coolant_component_names=coolant_component_names,
+                coolant_component_ids=coolant_component_ids,
             ),
             promotes=["*"],
         )

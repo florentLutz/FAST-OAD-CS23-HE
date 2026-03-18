@@ -220,7 +220,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             val=500.0,
             units="N",
             shape=number_of_points,
@@ -236,7 +236,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
@@ -247,7 +247,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             wrt=["true_airspeed", "air_mass_flow"],
             method="exact",
             rows=np.arange(number_of_points),
@@ -273,7 +273,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag"
+            + ":drag"
         ] = (
             0.5
             * (
@@ -305,7 +305,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "true_airspeed",
         ] = (
             0.5
@@ -323,7 +323,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "mach_factor",
         ] = (
             0.5
@@ -340,7 +340,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "air_mass_flow_ratio",
         ] = (
             -0.5
@@ -358,7 +358,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "drag_correlation_factor",
         ] = 0.5 * air_mass_flow / air_mass_flow_ratio * true_air_speed
 
@@ -367,7 +367,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "k_sp_factor",
         ] = (
             0.5
@@ -384,7 +384,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "ramp_angle_factor",
         ] = (
             0.5
@@ -401,7 +401,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "momentum_flow_correction_factor",
         ] = air_mass_flow * true_air_speed
 
@@ -410,7 +410,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "cd_zero_inlet_mass_flow",
         ] = (
             0.5
@@ -427,7 +427,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":inlet_drag",
+            + ":drag",
             "air_mass_flow",
         ] = (
             0.5

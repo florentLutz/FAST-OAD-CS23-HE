@@ -42,7 +42,7 @@ class SizingPEMFCBOP(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="coolant_component_names",
+            name="coolant_component_ids",
             default="None",
             desc="A list of the TBS components that use coolant",
             allow_none=False,
@@ -106,7 +106,7 @@ class SizingPEMFCBOP(om.Group):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         coolant_fluid_type = self.options["coolant_fluid_type"]
         compress_id = self.options["compressor_id"]
-        coolant_component_names = self.options["coolant_component_names"]
+        coolant_component_ids = self.options["coolant_component_ids"]
         pipe_id = self.options["pipe_id"]
         air_inlet_id = self.options["air_inlet_id"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
@@ -170,7 +170,7 @@ class SizingPEMFCBOP(om.Group):
             SizingPipe(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 pipe_id=pipe_id,
-                coolant_component_names=coolant_component_names,
+                coolant_component_ids=coolant_component_ids,
             ),
             promotes=["data:*"],
         )
@@ -179,7 +179,7 @@ class SizingPEMFCBOP(om.Group):
             SizingCoolantTank(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 coolant_fluid_type=coolant_fluid_type,
-                coolant_component_names=coolant_component_names,
+                coolant_component_ids=coolant_component_ids,
             ),
             promotes=["data:*"],
         )
@@ -198,7 +198,7 @@ class SizingPEMFCBOP(om.Group):
                 nozzle_id=nozzle_id,
                 connected_heat_exchanger_id=supplement_heat_exchanger_id,
                 connected_diffuser_id=diffuser_id,
-        ),
+            ),
             promotes=["data:*"],
         )
         self.add_subsystem(

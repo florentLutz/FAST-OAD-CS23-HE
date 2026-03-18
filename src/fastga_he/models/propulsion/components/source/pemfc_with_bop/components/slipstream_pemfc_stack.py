@@ -5,8 +5,10 @@
 import numpy as np
 import openmdao.api as om
 
+from .slipstream_delta_cd import SlipstreamPEMFCStackBOPDeltaCd
 
-class SlipstreamPEMFCStack(om.Group):
+
+class SlipstreamPEMFCStackBOP(om.Group):
     """
     Component that computes the variation of aerodynamic coefficient during the mission. This
     component is required as all components are required to provide one component that computes
@@ -30,7 +32,11 @@ class SlipstreamPEMFCStack(om.Group):
         ivc = om.IndepVarComp()
 
         ivc.add_output("delta_Cl", val=np.zeros(number_of_points))
-        ivc.add_output("delta_Cd", val=np.zeros(number_of_points))
         ivc.add_output("delta_Cm", val=np.zeros(number_of_points))
 
         self.add_subsystem(name="deltas", subsys=ivc, promotes=["*"])
+        self.add_subsystem(
+            name="delta_cd",
+            subsys=SlipstreamPEMFCStackBOPDeltaCd(number_of_points=number_of_points),
+            promotes=["*"],
+        )

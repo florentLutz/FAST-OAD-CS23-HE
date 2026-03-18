@@ -20,6 +20,7 @@ from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackBOPSingleLayerVoltageEmpirical,
     PerformancesPEMFCStackBOPSingleLayerVoltageAnalytical,
 )
+from .perf_pemfc_air_inlet_outlet_drag import PerformancesPEMFCStackBOPAirInletOutletDrag
 
 
 class PerformancesPEMFCStackBOP(om.Group):
@@ -55,6 +56,12 @@ class PerformancesPEMFCStackBOP(om.Group):
             desc="Select the polarization model between empirical and analytical. The "
             "Aerostak 200W empirical polarization model is set as default.",
         )
+        self.options.declare(
+            name="drag_component_ids",
+            default="None",
+            desc="A list of the TBS components that create drag",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -62,6 +69,7 @@ class PerformancesPEMFCStackBOP(om.Group):
         compressor_connection = self.options["compressor_connection"]
         direct_bus_connection = self.options["direct_bus_connection"]
         model_fidelity = self.options["model_fidelity"]
+        drag_component_ids = self.options["drag_component_ids"]
 
         self.add_subsystem(
             "pemfc_current_density",
@@ -171,4 +179,14 @@ class PerformancesPEMFCStackBOP(om.Group):
             "energy_consumed",
             energy_consumed,
             promotes=["non_consumable_energy_t"],
+        )
+
+        self.add_subsystem(
+            "air_inlet_outlet_drag",
+            PerformancesPEMFCStackBOPAirInletOutletDrag(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                drag_component_ids=drag_component_ids,
+            ),
+            promotes=["*"],
         )

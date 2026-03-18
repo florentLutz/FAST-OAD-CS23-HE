@@ -538,8 +538,7 @@ def test_inlet_drag():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
-        ":inlet_drag",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:drag",
         units="N",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 48.88), rel=1e-2)
 
@@ -617,8 +616,7 @@ def test_inlet_drag_group():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
-        ":inlet_drag",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:drag",
         units="N",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 49.08), rel=1e-2)
 

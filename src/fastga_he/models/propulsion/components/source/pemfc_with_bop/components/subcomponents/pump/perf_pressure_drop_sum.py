@@ -25,7 +25,7 @@ class PerformancesCoolantSystemPressureDrop(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="coolant_component_names",
+            name="coolant_component_ids",
             default="None",
             desc="A list of the TBS components that use coolant",
             allow_none=False,
@@ -33,15 +33,15 @@ class PerformancesCoolantSystemPressureDrop(om.ExplicitComponent):
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        coolant_component_names = self.options["coolant_component_names"]
+        coolant_component_ids = self.options["coolant_component_ids"]
         pump_id = self.options["pump_id"]
 
-        for name in coolant_component_names:
+        for coolant_component_id in coolant_component_ids:
             self.add_input(
                 name="data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + name
+                + coolant_component_id
                 + ":coolant_pressure_drop",
                 units="Pa",
                 val=np.nan,

@@ -132,6 +132,10 @@ class PerformancesNozzle(om.Group):
         )
         self.add_subsystem(
             "nozzle_drag",
-            PerformancesNozzleDrag(number_of_points=number_of_points),
+            PerformancesNozzleDrag(
+                number_of_points=number_of_points,
+                nozzle_id=nozzle_id,
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+            ),
             promotes=["*"],
         )
