@@ -34,19 +34,13 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         compressor_id = self.options["compressor_id"]
 
         self.add_input(
-            "compressor_pressure_supply",
+            "compressor_pressure_ratio",
             val=np.nan,
-            units="Pa",
+            units="unitless",
             shape=number_of_points,
         )
         self.add_input(
-            "ambient_total_pressure",
-            val=np.nan,
-            units="Pa",
-            shape=number_of_points,
-        )
-        self.add_input(
-            "ambient_total_temperature",
+            "exterior_temperature",
             val=np.nan,
             units="K",
             shape=number_of_points,
@@ -101,9 +95,8 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         self.declare_partials(
             of="*",
             wrt=[
-                "compressor_pressure_supply",
-                "ambient_total_pressure",
-                "ambient_total_temperature",
+                "compressor_pressure_ratio",
+                "exterior_temperature",
                 "compressed_air_specific_heat_capacity",
                 "air_consumption",
             ],
@@ -134,9 +127,8 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         compressor_id = self.options["compressor_id"]
 
-        compressor_pressure_supply = inputs["compressor_pressure_supply"]
-        ambient_total_pressure = inputs["ambient_total_pressure"]
-        ambient_total_temperature = inputs["ambient_total_temperature"]
+        exterior_temperature = inputs["exterior_temperature"]
+        compressor_pressure_ratio = inputs["compressor_pressure_ratio"]
         specific_heat_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -162,11 +154,10 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":power_required"
         ] = (
             compressed_air_specific_heat_capacity
-            * ambient_total_temperature
+            * exterior_temperature
             / efficiency
             * (
-                (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
             * air_consumption
@@ -176,9 +167,8 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         compressor_id = self.options["compressor_id"]
 
-        compressor_pressure_supply = inputs["compressor_pressure_supply"]
-        ambient_total_pressure = inputs["ambient_total_pressure"]
-        ambient_total_temperature = inputs["ambient_total_temperature"]
+        exterior_temperature = inputs["exterior_temperature"]
+        compressor_pressure_ratio = inputs["compressor_pressure_ratio"]
         specific_heat_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -202,13 +192,12 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_required",
-            "ambient_total_temperature",
+            "exterior_temperature",
         ] = (
             compressed_air_specific_heat_capacity
             / efficiency
             * (
-                (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
             * air_consumption
@@ -222,11 +211,10 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":power_required",
             "compressed_air_specific_heat_capacity",
         ] = (
-            ambient_total_temperature
+            exterior_temperature
             / efficiency
             * (
-                (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
             * air_consumption
@@ -241,11 +229,10 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             "air_consumption",
         ] = (
             compressed_air_specific_heat_capacity
-            * ambient_total_temperature
+            * exterior_temperature
             / efficiency
             * (
-                (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
         )
@@ -263,11 +250,10 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":efficiency",
         ] = -(
             compressed_air_specific_heat_capacity
-            * ambient_total_temperature
+            * exterior_temperature
             / efficiency**2.0
             * (
-                (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
             * air_consumption
@@ -286,13 +272,14 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":specific_heat_ratio",
         ] = (
             compressed_air_specific_heat_capacity
-            * ambient_total_temperature
-            * air_consumption
+            * exterior_temperature
             / efficiency
-            * np.log(compressor_pressure_supply / ambient_total_pressure)
-            * (compressor_pressure_supply / ambient_total_pressure)
-            ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
-            / specific_heat_ratio**2.0
+            * (
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                * np.log(compressor_pressure_ratio)
+                / specific_heat_ratio**2.0
+            )
+            * air_consumption
         )
 
         partials[
@@ -301,38 +288,12 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_required",
-            "compressor_pressure_supply",
+            "compressor_pressure_ratio",
         ] = (
             compressed_air_specific_heat_capacity
-            * ambient_total_temperature
+            * exterior_temperature
             * air_consumption
             / efficiency
-            * (
-                (specific_heat_ratio - 1.0)
-                / specific_heat_ratio
-                * (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
-                / compressor_pressure_supply
-            )
-        )
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + compressor_id
-            + ":power_required",
-            "ambient_total_pressure",
-        ] = -(
-            compressed_air_specific_heat_capacity
-            * ambient_total_temperature
-            * air_consumption
-            / efficiency
-            * (
-                (specific_heat_ratio - 1.0)
-                / specific_heat_ratio
-                * (compressor_pressure_supply / ambient_total_pressure)
-                ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
-                / ambient_total_pressure
-            )
+            * ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+            * compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio - 1.0)
         )

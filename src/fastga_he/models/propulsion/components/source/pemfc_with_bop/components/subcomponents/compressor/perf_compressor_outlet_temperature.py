@@ -6,9 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
+class PerformancesCompressorOutletTemperature(om.ExplicitComponent):
     """
-    Computation of the ambient throat temperature.
+    Computation of the outlet temperature of the compressor. This is calculated with the
+    isentropic flow assumption.
     """
 
     def initialize(self):
@@ -33,8 +34,13 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         compressor_id = self.options["compressor_id"]
 
-        self.add_input("mach", val=np.nan, shape=number_of_points)
         self.add_input("exterior_temperature", units="K", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "compressor_pressure_ratio",
+            val=np.nan,
+            units="unitless",
+            shape=number_of_points,
+        )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -44,9 +50,18 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
             val=1.4,
             units="unitless",
         )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":efficiency",
+            val=0.85,
+            units="unitless",
+        )
 
         self.add_output(
-            "ambient_total_temperature",
+            "compressor_outlet_temperature",
             val=300.0,
             units="K",
             shape=number_of_points,
@@ -59,18 +74,25 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt=["mach", "exterior_temperature"],
+            wrt=["compressor_pressure_ratio", "exterior_temperature"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="*",
-            wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + compressor_id
-            + ":specific_heat_ratio",
+            wrt=[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + compressor_id
+                + ":specific_heat_ratio",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + compressor_id
+                + ":efficiency",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -81,7 +103,6 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
         compressor_id = self.options["compressor_id"]
 
         exterior_temperature = inputs["exterior_temperature"]
-        mach = inputs["mach"]
         gamma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -89,9 +110,17 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
             + compressor_id
             + ":specific_heat_ratio"
         ]
+        efficiency = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":efficiency"
+        ]
+        pressure_ratio = inputs["compressor_pressure_ratio"]
 
-        outputs["ambient_total_temperature"] = exterior_temperature * (
-            1.0 + (gamma - 1.0) * 0.5 * mach**2.0
+        outputs["compressor_outlet_temperature"] = exterior_temperature * (
+            1.0 + (pressure_ratio ** ((gamma - 1.0) / gamma) - 1.0) / efficiency
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -99,7 +128,6 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
         compressor_id = self.options["compressor_id"]
 
         exterior_temperature = inputs["exterior_temperature"]
-        mach = inputs["mach"]
         gamma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -107,18 +135,49 @@ class PerformancesAmbientTotalTemperature(om.ExplicitComponent):
             + compressor_id
             + ":specific_heat_ratio"
         ]
+        efficiency = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":efficiency"
+        ]
+        pressure_ratio = inputs["compressor_pressure_ratio"]
 
-        partials["ambient_total_temperature", "exterior_temperature"] = (
-            1.0 + (gamma - 1.0) * 0.5 * mach**2.0
+        partials["compressor_outlet_temperature", "exterior_temperature"] = (
+            1.0 + (pressure_ratio ** ((gamma - 1.0) / gamma) - 1.0) / efficiency
         )
 
-        partials["ambient_total_temperature", "mach"] = exterior_temperature * (gamma - 1.0) * mach
+        partials["compressor_outlet_temperature", "compressor_pressure_ratio"] = (
+            2.0
+            * exterior_temperature
+            * (pressure_ratio ** ((gamma - 1.0) / gamma - 1.0) / efficiency)
+            * (gamma - 1.0)
+            / (gamma * pressure_ratio)
+        )
 
         partials[
-            "ambient_total_temperature",
+            "compressor_outlet_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + compressor_id
             + ":specific_heat_ratio",
-        ] = exterior_temperature * 0.5 * mach**2.0
+        ] = exterior_temperature * (
+            pressure_ratio ** ((gamma - 1.0) / gamma)
+            * np.log(pressure_ratio)
+            / (efficiency * gamma**2.0)
+        )
+
+        partials[
+            "compressor_outlet_temperature",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":efficiency",
+        ] = (
+            -exterior_temperature
+            * (pressure_ratio ** ((gamma - 1.0) / gamma) - 1.0)
+            / efficiency**2.0
+        )

@@ -2,8 +2,8 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
+import numpy as np
 
 from .compressor import SizingCompressorWeight
 from .coolant_tank import SizingCoolantTank
@@ -45,6 +45,12 @@ class SizingPEMFCBOP(om.Group):
             name="coolant_component_ids",
             default="None",
             desc="A list of the TBS components that use coolant",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sizing_component_ids",
+            default="None",
+            desc="A list of the TBS components that are in the sizing group",
             allow_none=False,
         )
         self.options.declare(
@@ -101,10 +107,15 @@ class SizingPEMFCBOP(om.Group):
             desc="Identifier of the pump",
             allow_none=False,
         )
+        self.options.declare(
+            name="coolant_tank_id",
+            default=None,
+            desc="Identifier of the humidifier",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        coolant_fluid_type = self.options["coolant_fluid_type"]
         compress_id = self.options["compressor_id"]
         coolant_component_ids = self.options["coolant_component_ids"]
         pipe_id = self.options["pipe_id"]
@@ -115,6 +126,9 @@ class SizingPEMFCBOP(om.Group):
         diffuser_id = self.options["diffuser_id"]
         nozzle_id = self.options["nozzle_id"]
         pump_id = self.options["pump_id"]
+        coolant_tank_id = self.options["coolant_tank_id"]
+        coolant_fluid_type = self.options["coolant_fluid_type"]
+        sizing_component_ids = self.options["sizing_component_ids"]
 
         self.add_subsystem(
             "compressor",
@@ -170,7 +184,7 @@ class SizingPEMFCBOP(om.Group):
             SizingPipe(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 pipe_id=pipe_id,
-                coolant_component_ids=coolant_component_ids,
+                coolant_fluid_type=coolant_fluid_type,
             ),
             promotes=["data:*"],
         )
@@ -178,8 +192,8 @@ class SizingPEMFCBOP(om.Group):
             "coolant_tank",
             SizingCoolantTank(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                coolant_fluid_type=coolant_fluid_type,
                 coolant_component_ids=coolant_component_ids,
+                coolant_tank_id=coolant_tank_id,
             ),
             promotes=["data:*"],
         )
@@ -209,3 +223,74 @@ class SizingPEMFCBOP(om.Group):
             ),
             promotes=["data:*"],
         )
+        self.add_subsystem(
+            "bop_mass",
+            SizingBOPMass(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, sizing_component_ids=sizing_component_ids
+            ),
+            promotes=["data:*"],
+        )
+
+
+class SizingBOPMass(om.ExplicitComponent):
+    """
+    Computes the mass of the PEMFC BOP by summing the mass of each component.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack BOP",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="sizing_component_ids",
+            default="None",
+            desc="A list of the TBS components that are in the sizing group",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        sizing_component_ids = self.options["sizing_component_ids"]
+
+        for component_id in sizing_component_ids:
+            self.add_input(
+                name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + component_id
+                + ":mass",
+                units="kg",
+                val=np.nan,
+            )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_mass",
+            units="kg",
+            val=10.0,
+        )
+
+    def setup_partials(self):
+        self.declare_partials("*", "*", val=1.0)
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        sizing_component_ids = self.options["sizing_component_ids"]
+        bop_mass = 0.0
+
+        for component_id in sizing_component_ids:
+            bop_mass += inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + component_id
+                + ":mass"
+            ]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_mass"
+        ] = bop_mass

@@ -35,13 +35,11 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
             val=np.nan,
             desc="Total number of layers in the PEMFC stack",
         )
-
         self.add_input(
             "settings:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":k_mass",
             val=1.0,
             desc="A tuning factor allows the PEMFC stack weight to be changed manually.",
         )
-
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -50,12 +48,18 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
             val=np.nan,
             desc="Effective area of the PEMFC's polymer electrolyte membrane",
         )
-
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":specific_power",
             units="kW/kg",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_mass",
+            units="kg",
             val=np.nan,
         )
 
@@ -66,6 +70,7 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
             desc="Mass of the PEMFC stack",
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -93,9 +98,16 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
 
         specific_power_ratio = DEFAULT_FC_SPECIFIC_POWER / specific_power
 
+        bop_mass = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_mass"
+        ]
+
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":mass"
-        ] = k_mass * CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
+        ] = (
+            k_mass * CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
+            + bop_mass
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -153,3 +165,8 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":mass",
             "settings:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":k_mass",
         ] = CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_mass",
+        ] = 1.0

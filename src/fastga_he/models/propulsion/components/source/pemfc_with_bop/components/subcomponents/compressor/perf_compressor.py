@@ -5,11 +5,13 @@
 import openmdao.api as om
 
 from .perf_compressor_pressure_supply import PerformancesCompressorPressureSupply
-from .perf_ambient_total_temperature import PerformancesAmbientTotalTemperature
-from .perf_ambient_total_pressure import PerformancesAmbientTotalPressure
 from .perf_compressor_pressure_target import PerformancesCompressorPressureTarget
 from .perf_compressor_power_required import PerformancesCompressorPowerRequired
 from .perf_compressor_power_rating import PerformancesCompressorPowerRating
+from .perf_compressor_mean_pressure import PerformancesCompressorMeanPressure
+from .perf_compressor_pressure_reatio import PerformancesCompressorPressureRatio
+from .perf_compressor_outlet_temperature import PerformancesCompressorOutletTemperature
+from .perf_compressor_mean_temperature import PerformancesCompressorMeanTemperature
 
 from ...perf_ambient_pressure import PerformancesPEMFCStackBOPAmbientPressure
 from ..fluid_characteristics import FluidSpecificHeatCapacity
@@ -79,20 +81,28 @@ class PerformancesCompressor(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "compressor_ambient_total_pressure",
-            PerformancesAmbientTotalPressure(
-                number_of_points=number_of_points,
+            "compressor_mean_pressure",
+            PerformancesCompressorMeanPressure(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "compressor_pressure_ratio",
+            PerformancesCompressorPressureRatio(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "compressor_outlet_temperature",
+            PerformancesCompressorOutletTemperature(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
                 compressor_id=compressor_id,
             ),
             promotes=["*"],
         )
         self.add_subsystem(
-            "compressor_ambient_total_temperature",
-            PerformancesAmbientTotalTemperature(
+            "compressor_mean_temperature",
+            PerformancesCompressorMeanTemperature(
                 number_of_points=number_of_points,
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                compressor_id=compressor_id,
             ),
             promotes=["*"],
         )
@@ -103,8 +113,8 @@ class PerformancesCompressor(om.Group):
                 fluid="air",
             ),
             promotes=[
-                ("fluid_temperature", "exterior_temperature"),
-                ("fluid_pressure", "compressor_pressure_target"),
+                ("fluid_temperature", "mean_compressor_temperature"),
+                ("fluid_pressure", "mean_compressor_pressure"),
                 ("fluid_specific_heat_capacity", "compressed_air_specific_heat_capacity"),
             ],
         )

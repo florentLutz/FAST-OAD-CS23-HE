@@ -18,6 +18,10 @@ from .fluid_characteristics.fluid_specific_volume import FluidSpecificVolume
 from .humidifier.perf_humidifier_air_pressure_drop import (
     PerformancesHumidifierRatingPressureDrop,
 )
+from .humidifier.perf_humidifier_oxidizer_temperature import (
+    PerformancesHumidifierOxidizerTemperature,
+)
+from .humidifier.perf_humidifier import PerformancesHumidifier
 from .humidifier.sizing_humidifier_volume import SizingHumidifierVolume
 from .humidifier.sizing_humidifier_weight import SizingHumidifierWeight
 from .humidifier.sizing_humidifier import SizingHumidifier
@@ -35,8 +39,10 @@ from .pump.perf_pump_volumetric_flow_rate import PerformancesPumpVolumetricFlowR
 from .pump.perf_pump import PerformancesPump
 from .pump.sizing_pump_weight import SizingPumpWeight
 
-from .compressor.perf_ambient_total_pressure import PerformancesAmbientTotalPressure
-from .compressor.perf_ambient_total_temperature import PerformancesAmbientTotalTemperature
+from .compressor.perf_compressor_pressure_reatio import PerformancesCompressorPressureRatio
+from .compressor.perf_compressor_mean_pressure import PerformancesCompressorMeanPressure
+from .compressor.perf_compressor_outlet_temperature import PerformancesCompressorOutletTemperature
+from .compressor.perf_compressor_mean_temperature import PerformancesCompressorMeanTemperature
 from .compressor.perf_compressor_pressure_target import PerformancesCompressorPressureTarget
 from .compressor.perf_compressor_pressure_supply import PerformancesCompressorPressureSupply
 from .compressor.perf_compressor_power_required import PerformancesCompressorPowerRequired
@@ -226,14 +232,10 @@ def test_performances_humidifier_rating_pressure_drop():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:oxidizer_temperature",
-        units="degC",
-        val=35.0,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:operating_pressure",
-        units="atm",
-        val=1.0,
+        "humidifier_air_density",
+        units="kg/m**3",
+        val=1.177,
+        shape=NB_POINTS_TEST,
     )
     ivc.add_output(
         "air_consumption",
@@ -251,6 +253,64 @@ def test_performances_humidifier_rating_pressure_drop():
         ),
         ivc,
     )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:humidifier_1"
+        ":air_pressure_drop",
+        units="MPa",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 0.0887), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_performances_humidifier_oxidizer_temperature():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:operating_temperature",
+        units="K",
+        val=300.0,
+    )
+
+    problem = run_system(
+        PerformancesHumidifierOxidizerTemperature(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            humidifier_id="humidifier_1",
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:humidifier_1:oxidizer_temperature",
+        units="K",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 310.0), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_performances_humidifier():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:operating_temperature",
+        units="K",
+        val=300.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:operating_pressure",
+        units="atm",
+        val=1.0,
+    )
+    ivc.add_output("air_consumption", units="kg/h", val=2600.0, shape=NB_POINTS_TEST)
+
+    problem = run_system(
+        PerformancesHumidifier(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            humidifier_id="humidifier_1",
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:humidifier_1"
         ":air_pressure_drop",
@@ -809,38 +869,57 @@ def test_pump_weight():
     problem.check_partials(compact_print=True)
 
 
-def test_compressor_performances_ambient_total_pressure():
+def test_compressor_performances_pressure_ratio():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("mach", units="unitless", val=0.3, shape=NB_POINTS_TEST)
+    ivc.add_output("compressor_pressure_supply", units="Pa", val=204587.23, shape=NB_POINTS_TEST)
     ivc.add_output("ambient_pressure", units="Pa", val=101325.0, shape=NB_POINTS_TEST)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAmbientTotalPressure(
+        PerformancesCompressorPressureRatio(
             number_of_points=NB_POINTS_TEST,
-            pemfc_stack_bop_id="pemfc_stack_bop_1",
-            compressor_id="compressor_1",
         ),
         ivc,
     )
 
-    assert problem.get_val("ambient_total_pressure", units="Pa") == pytest.approx(
-        np.full(NB_POINTS_TEST, 107853.4), rel=1e-2
+    assert problem.get_val("compressor_pressure_ratio", units="unitless") == pytest.approx(
+        np.full(NB_POINTS_TEST, 2.0), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
 
 
-def test_compressor_performances_ambient_total_temperature():
+def test_compressor_performances_mean_pressure():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("mach", units="unitless", val=0.3, shape=NB_POINTS_TEST)
-    ivc.add_output("exterior_temperature", units="K", val=288.15, shape=NB_POINTS_TEST)
+    ivc.add_output("compressor_pressure_supply", units="Pa", val=204587.23, shape=NB_POINTS_TEST)
+    ivc.add_output("ambient_pressure", units="Pa", val=101325.0, shape=NB_POINTS_TEST)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesAmbientTotalTemperature(
+        PerformancesCompressorMeanPressure(
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("mean_compressor_pressure", units="Pa") == pytest.approx(
+        np.full(NB_POINTS_TEST, 151988.0), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_compressor_performances_outlet_temperature():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("exterior_temperature", units="K", val=288.15, shape=NB_POINTS_TEST)
+    ivc.add_output("compressor_pressure_ratio", units="unitless", val=2.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesCompressorOutletTemperature(
             number_of_points=NB_POINTS_TEST,
             pemfc_stack_bop_id="pemfc_stack_bop_1",
             compressor_id="compressor_1",
@@ -848,8 +927,29 @@ def test_compressor_performances_ambient_total_temperature():
         ivc,
     )
 
-    assert problem.get_val("ambient_total_temperature", units="K") == pytest.approx(
-        np.full(NB_POINTS_TEST, 293.34), rel=1e-2
+    assert problem.get_val("compressor_outlet_temperature", units="K") == pytest.approx(
+        np.full(NB_POINTS_TEST, 362.4), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_compressor_performances_mean_temperature():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output("exterior_temperature", units="K", val=288.15, shape=NB_POINTS_TEST)
+    ivc.add_output("compressor_outlet_temperature", units="K", val=362.4, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesCompressorMeanTemperature(
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("mean_compressor_temperature", units="K") == pytest.approx(
+        np.full(NB_POINTS_TEST, 325.3), rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -919,9 +1019,8 @@ def test_compressor_performances_pressure_supply():
 def test_compressor_performances_power_required():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("compressor_pressure_supply", units="Pa", val=204587.23, shape=NB_POINTS_TEST)
-    ivc.add_output("ambient_total_pressure", units="Pa", val=107853.4, shape=NB_POINTS_TEST)
-    ivc.add_output("ambient_total_temperature", units="K", val=293.34, shape=NB_POINTS_TEST)
+    ivc.add_output("compressor_pressure_ratio", units="unitless", val=2.0, shape=NB_POINTS_TEST)
+    ivc.add_output("exterior_temperature", units="K", val=288.15, shape=NB_POINTS_TEST)
     ivc.add_output(
         "compressed_air_specific_heat_capacity", units="J/kg/K", val=1005.0, shape=NB_POINTS_TEST
     )
@@ -940,7 +1039,7 @@ def test_compressor_performances_power_required():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:power_required",
         units="W",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 50123.24), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 53724.14), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1011,7 +1110,7 @@ def test_compressor_performances():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:power_rating",
         units="W",
-    ) == pytest.approx(50123.24, rel=1e-2)
+    ) == pytest.approx(54714.5, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1022,7 +1121,7 @@ def test_sizing_compressor_weight():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:power_rating",
         units="W",
-        val=50123.24,
+        val=54714.5,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1037,6 +1136,6 @@ def test_sizing_compressor_weight():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:mass",
         units="kg",
-    ) == pytest.approx(7.18, rel=1e-2)
+    ) == pytest.approx(7.37, rel=1e-2)
 
     problem.check_partials(compact_print=True)

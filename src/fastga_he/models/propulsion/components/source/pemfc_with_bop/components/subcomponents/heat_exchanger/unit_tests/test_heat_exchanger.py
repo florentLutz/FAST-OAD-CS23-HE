@@ -461,7 +461,9 @@ def test_air_pressure_drop():
 
     problem = run_system(
         PerformancesAirPressureDrop(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            heat_exchanger_id="heat_exchanger_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -469,7 +471,7 @@ def test_air_pressure_drop():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_pressure_drop",
         units="Pa",
-    ) == pytest.approx(12262.23, rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 12262.23), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -569,8 +571,7 @@ def test_heat_exchanger_performance():
         val=1.92e-3,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
-        ":air_static_pressure",
+        "air_static_pressure",
         units="Pa",
         val=101325.0,
     )
@@ -584,7 +585,9 @@ def test_heat_exchanger_performance():
 
     problem = run_system(
         PerformancesHeatExchanger(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            heat_exchanger_id="heat_exchanger_1",
+            number_of_points=NB_POINTS_TEST,
         ),
         ivc,
     )
@@ -1102,8 +1105,7 @@ def test_sizing_heat_exchanger():
         units="m",
     ) == pytest.approx(0.0907, abs=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
-        ":dry_mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:dry_mass",
         units="kg",
     ) == pytest.approx(1.134, rel=1e-2)
 

@@ -5,67 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
-from ..fluid_characteristics import FluidDensity
 
-
-class PerformancesHumidifierRatingPressureDrop(om.Group):
-    """
-    Maximum pressure drop computation of the humidifier during mission.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
-        )
-        self.options.declare(
-            name="pemfc_stack_bop_id",
-            default=None,
-            desc="Identifier of the PEMFC stack",
-            allow_none=False,
-        )
-        self.options.declare(
-            name="humidifier_id",
-            default=None,
-            desc="Identifier of the humidifier",
-            allow_none=False,
-        )
-
-    def setup(self):
-        number_of_points = self.options["number_of_points"]
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        humidifier_id = self.options["humidifier_id"]
-
-        self.add_subsystem(
-            "compressed_air_density",
-            FluidDensity(),
-            promotes=[
-                (
-                    "fluid_pressure",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":operating_pressure",
-                ),
-                (
-                    "fluid_temperature",
-                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                    + pemfc_stack_bop_id
-                    + ":oxidizer_temperature",
-                ),
-                ("fluid_density", "compressed_air_density"),
-            ],
-        )
-        self.add_subsystem(
-            "humidifier_rating_pressure_drop",
-            _HumidifierRatingPressureDrop(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                humidifier_id=humidifier_id,
-                number_of_points=number_of_points,
-            ),
-            promotes=["*"],
-        )
-
-
-class _HumidifierRatingPressureDrop(om.ExplicitComponent):
+class PerformancesHumidifierRatingPressureDrop(om.ExplicitComponent):
     """
     Computes the maximum pressure drop of the humidifier during mission.
     """
@@ -93,9 +34,7 @@ class _HumidifierRatingPressureDrop(om.ExplicitComponent):
         humidifier_id = self.options["humidifier_id"]
 
         self.add_input(
-            "compressed_air_density",
-            val=np.nan,
-            units="kg/m**3",
+            "humidifier_air_density", val=np.nan, units="kg/m**3", shape=number_of_points
         )
         self.add_input(
             "air_consumption",
@@ -123,13 +62,6 @@ class _HumidifierRatingPressureDrop(om.ExplicitComponent):
             wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
-        )
-        self.declare_partials(
-            of="*",
-            wrt="air_consumption",
-            method="exact",
-            rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
 
@@ -137,9 +69,9 @@ class _HumidifierRatingPressureDrop(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         humidifier_id = self.options["humidifier_id"]
 
-        compressed_air_density = inputs["compressed_air_density"]
+        humidifier_air_density = inputs["humidifier_air_density"]
         air_consumption = inputs["air_consumption"]
-        volumetric_flow_rate = air_consumption / compressed_air_density
+        volumetric_flow_rate = air_consumption / humidifier_air_density
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -157,9 +89,9 @@ class _HumidifierRatingPressureDrop(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         humidifier_id = self.options["humidifier_id"]
 
-        compressed_air_density = inputs["compressed_air_density"]
+        humidifier_air_density = inputs["humidifier_air_density"]
         air_consumption = inputs["air_consumption"]
-        volumetric_flow_rate = air_consumption / compressed_air_density
+        volumetric_flow_rate = air_consumption / humidifier_air_density
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -167,11 +99,11 @@ class _HumidifierRatingPressureDrop(om.ExplicitComponent):
             + ":"
             + humidifier_id
             + ":air_pressure_drop",
-            "compressed_air_density",
+            "humidifier_air_density",
         ] = np.where(
             volumetric_flow_rate <= 0.06815,
-            0.0,
-            -air_consumption / compressed_air_density**2.0 * 12000.0 / 0.083,
+            np.zeros_like(air_consumption),
+            -air_consumption / humidifier_air_density**2.0 * 12000.0 / 0.083,
         )
 
         partials[
@@ -184,5 +116,5 @@ class _HumidifierRatingPressureDrop(om.ExplicitComponent):
         ] = np.where(
             volumetric_flow_rate <= 0.06815,
             -7.256 * 1e5 * air_consumption + 1.995 * 1e5,
-            12000.0 / 0.083 / compressed_air_density,
+            12000.0 / 0.083 / humidifier_air_density,
         )

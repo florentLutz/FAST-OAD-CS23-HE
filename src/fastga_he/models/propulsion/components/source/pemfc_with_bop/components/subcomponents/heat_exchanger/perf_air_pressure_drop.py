@@ -13,6 +13,9 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
             name="pemfc_stack_bop_id",
             default=None,
             desc="Identifier of the PEMFC stack",
@@ -28,6 +31,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         heat_exchanger_id = self.options["heat_exchanger_id"]
+        number_of_points = self.options["number_of_points"]
 
         self.add_input(
             name="entrance_pressure_drop_coefficient",
@@ -100,14 +104,24 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + ":air_pressure_drop",
             units="Pa",
             val=1e4,
+            shape=number_of_points,
         )
 
     def setup_partials(self):
-        self.declare_partials("*", "*", method="exact")
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            "*",
+            "*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         heat_exchanger_id = self.options["heat_exchanger_id"]
+        number_of_points = self.options["number_of_points"]
 
         k_entrance = inputs["entrance_pressure_drop_coefficient"]
         k_exit = inputs["exit_pressure_drop_coefficient"]
@@ -144,15 +158,20 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":air_pressure_drop"
-        ] = (0.5 * air_mass_velocity**2.0) * (
-            (-1.0 - sigma**2.0 + k_entrance) / rho_air_inlet
-            + 4.0 * air_fanning_factor * air_flow_length / (rho_air * fin_hydraulic_diameter)
-            + (1.0 + sigma**2.0 + k_exit) / rho_air_outlet
+        ] = (
+            (0.5 * air_mass_velocity**2.0)
+            * (
+                (-1.0 - sigma**2.0 + k_entrance) / rho_air_inlet
+                + 4.0 * air_fanning_factor * air_flow_length / (rho_air * fin_hydraulic_diameter)
+                + (1.0 + sigma**2.0 + k_exit) / rho_air_outlet
+            )
+            * np.ones(number_of_points)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         heat_exchanger_id = self.options["heat_exchanger_id"]
+        number_of_points = self.options["number_of_points"]
 
         k_entrance = inputs["entrance_pressure_drop_coefficient"]
         k_exit = inputs["exit_pressure_drop_coefficient"]
@@ -190,7 +209,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             "entrance_pressure_drop_coefficient",
-        ] = 0.5 * air_mass_velocity**2.0 / rho_air_inlet
+        ] = 0.5 * air_mass_velocity**2.0 / rho_air_inlet * np.ones(number_of_points)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -199,7 +218,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             "exit_pressure_drop_coefficient",
-        ] = 0.5 * air_mass_velocity**2.0 / rho_air_outlet
+        ] = 0.5 * air_mass_velocity**2.0 / rho_air_outlet * np.ones(number_of_points)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -212,7 +231,12 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":free_flow_frontal_area_ratio",
-        ] = air_mass_velocity**2.0 * sigma * (1.0 / rho_air_outlet - 1.0 / rho_air_inlet)
+        ] = (
+            air_mass_velocity**2.0
+            * sigma
+            * (1.0 / rho_air_outlet - 1.0 / rho_air_inlet)
+            * np.ones(number_of_points)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -221,11 +245,15 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             "air_mass_velocity",
-        ] = air_mass_velocity * (
-            (1.0 - sigma**2.0 + k_entrance) / rho_air_inlet
-            + 2.0 * (1.0 / rho_air_outlet - 1.0 / rho_air_inlet)
-            + 4 * air_fanning_factor * air_flow_length / (rho_air * fin_hydraulic_diameter)
-            - (1.0 - sigma**2.0 - k_exit) / rho_air_outlet
+        ] = (
+            air_mass_velocity
+            * (
+                (1.0 - sigma**2.0 + k_entrance) / rho_air_inlet
+                + 2.0 * (1.0 / rho_air_outlet - 1.0 / rho_air_inlet)
+                + 4 * air_fanning_factor * air_flow_length / (rho_air * fin_hydraulic_diameter)
+                - (1.0 - sigma**2.0 - k_exit) / rho_air_outlet
+            )
+            * np.ones(number_of_points)
         )
 
         partials[
@@ -235,7 +263,13 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             "air_fanning_friction_factor",
-        ] = 2.0 * air_mass_velocity**2.0 * air_flow_length / (rho_air * fin_hydraulic_diameter)
+        ] = (
+            2.0
+            * air_mass_velocity**2.0
+            * air_flow_length
+            / (rho_air * fin_hydraulic_diameter)
+            * np.ones(number_of_points)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -254,7 +288,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             * air_fanning_factor
             * air_flow_length
             / (rho_air * fin_hydraulic_diameter**2.0)
-        )
+        ) * np.ones(number_of_points)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -267,7 +301,13 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":air_flow_length",
-        ] = 2.0 * air_mass_velocity**2.0 * air_fanning_factor / (rho_air * fin_hydraulic_diameter)
+        ] = (
+            2.0
+            * air_mass_velocity**2.0
+            * air_fanning_factor
+            / (rho_air * fin_hydraulic_diameter)
+            * np.ones(number_of_points)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -282,7 +322,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             * air_fanning_factor
             * air_flow_length
             / (rho_air**2.0 * fin_hydraulic_diameter)
-        )
+        ) * np.ones(number_of_points)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -291,7 +331,13 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             "air_inlet_density",
-        ] = 0.5 * air_mass_velocity**2.0 * (1.0 + sigma**2.0 - k_entrance) / rho_air_inlet**2.0
+        ] = (
+            0.5
+            * air_mass_velocity**2.0
+            * (1.0 + sigma**2.0 - k_entrance)
+            / rho_air_inlet**2.0
+            * np.ones(number_of_points)
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -300,4 +346,10 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             "air_outlet_density",
-        ] = -0.5 * air_mass_velocity**2.0 * (1.0 + sigma**2.0 + k_exit) / rho_air_outlet**2.0
+        ] = (
+            -0.5
+            * air_mass_velocity**2.0
+            * (1.0 + sigma**2.0 + k_exit)
+            / rho_air_outlet**2.0
+            * np.ones(number_of_points)
+        )
