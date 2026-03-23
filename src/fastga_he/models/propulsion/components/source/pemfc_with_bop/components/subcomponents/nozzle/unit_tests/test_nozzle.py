@@ -539,7 +539,6 @@ def test_perf_nozzle_inlet_pressure():
     problem = run_system(
         PerformancesNozzleInletPressure(
             pemfc_stack_bop_id="pemfc_stack_bop_1",
-            nozzle_id="nozzle_1",
             connected_heat_exchanger_id="heat_exchanger_1",
             number_of_points=NB_POINTS_TEST,
         ),

@@ -268,13 +268,13 @@ class _SupplementAirFlowRate(om.ExplicitComponent):
 
     def setup_partials(self):
         self.declare_partials("*", "*", val=-1.0)
-        self.declare_partials("*", "total_air_mass_flow_rate", val=1.0)
+        self.declare_partials("*", "max_total_air_flow_rate", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         outputs["air_mass_flow_rate"] = (
-            inputs["total_air_mass_flow_rate"]
+            inputs["max_total_air_flow_rate"]
             - inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id

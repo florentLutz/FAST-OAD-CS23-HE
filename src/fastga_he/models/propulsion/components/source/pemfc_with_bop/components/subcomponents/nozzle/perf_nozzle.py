@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .perf_nozzle_air_speed import PerformancesNozzleAirSpeed
 from .perf_nozzle_inlet_pressure import PerformancesNozzleInletPressure
+from .perf_nozzle_inlet_temperature import PerformancesNozzleInletTemperature
 from .perf_nozzle_reynolds_number import PerformancesNozzleReynoldsNumber
 from .perf_nozzle_darcy_friction_factor import PerformancesNozzleDarcyFrictionFactor
 from .perf_nozzle_contraction_loss_coeff import PerformancesNozzleContractionLossCoefficient
@@ -66,6 +67,11 @@ class PerformancesNozzle(om.Group):
                 connected_heat_exchanger_id=connected_heat_exchanger_id,
                 number_of_points=number_of_points,
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "nozzle_inlet_temperature",
+            PerformancesNozzleInletTemperature(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

@@ -7,7 +7,6 @@ import numpy as np
 
 from .compressor import PerformancesCompressor
 from .inlet import PerformancesInlet
-from .pump import PerformancesPump
 from .heat_exchanger import PerformancesHeatExchanger
 from .humidifier import PerformancesHumidifier
 from .pipe import PerformancesPipe
@@ -19,7 +18,6 @@ from .perf_pemf_bop_supplement_hex_properties import (
     PerformancesSupplementHeatExchangerThermalBalance,
 )
 from .perf_pemf_bop_air_inlet_flow import PerformancesAirInletAirMassFlow
-from .fluid_characteristics import FluidSpecificHeatCapacity
 
 
 class PerformancesPEMFCBOP(om.Group):
@@ -47,12 +45,6 @@ class PerformancesPEMFCBOP(om.Group):
             name="compressor_id",
             default=None,
             desc="Identifier of the compressor",
-            allow_none=False,
-        )
-        self.options.declare(
-            name="coolant_component_ids",
-            default="None",
-            desc="A list of the TBS components that use coolant",
             allow_none=False,
         )
         self.options.declare(
@@ -109,12 +101,10 @@ class PerformancesPEMFCBOP(om.Group):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         coolant_fluid_type = self.options["coolant_fluid_type"]
         compress_id = self.options["compressor_id"]
-        coolant_component_ids = self.options["coolant_component_ids"]
         pipe_id = self.options["pipe_id"]
         air_inlet_id = self.options["air_inlet_id"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
         primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
-        valve_id = self.options["valve_id"]
         diffuser_id = self.options["diffuser_id"]
         nozzle_id = self.options["nozzle_id"]
         pump_id = self.options["pump_id"]
@@ -129,7 +119,7 @@ class PerformancesPEMFCBOP(om.Group):
                 connected_humidifier_id=humidifier_id,
                 connected_heat_exchanger_ids=primary_heat_exchanger_id,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "ambient_pressure", "exterior_temperature"],
         )
         self.add_subsystem(
             "humidifier",
@@ -148,7 +138,7 @@ class PerformancesPEMFCBOP(om.Group):
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "primary_heat_exchanger",
@@ -180,7 +170,7 @@ class PerformancesPEMFCBOP(om.Group):
                     supplement_heat_exchanger_id,
                 ],
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "ambient_pressure", "mach", "exterior_temperature"],
         )
         self.add_subsystem(
             "diffuser",
@@ -199,7 +189,7 @@ class PerformancesPEMFCBOP(om.Group):
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "ambient_pressure"],
         )
         self.add_subsystem(
             "supplement_heat_exchanger",
@@ -208,6 +198,39 @@ class PerformancesPEMFCBOP(om.Group):
                 heat_exchanger_id=supplement_heat_exchanger_id,
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "nozzle",
+            PerformancesNozzle(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+                number_of_points=number_of_points,
+                connected_heat_exchanger_id=supplement_heat_exchanger_id,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "pipe",
+            PerformancesPipe(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                pipe_id=pipe_id,
+                coolant_fluid_type=coolant_fluid_type,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "pump",
+            PerformancesPump(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                pump_id=pump_id,
+                coolant_fluid_type=coolant_fluid_type,
+                coolant_component_ids=[
+                    pipe_id,
+                    primary_heat_exchanger_id,
+                    supplement_heat_exchanger_id,
+                ],
             ),
             promotes=["data:*"],
         )
@@ -233,11 +256,27 @@ class PerformancesPEMFCBOP(om.Group):
             "primary_heat_exchanger.coolant_outlet_temperature",
         )
         self.connect("inlet_air_flow_rate.air_mass_flow", "inlet.air_mass_flow")
+        self.connect("inlet.throat_total_pressure", "diffuser.throat_air_pressure")
+        self.connect("inlet.throat_total_temperature", "diffuser.throat_air_temperature")
         self.connect(
-            "inlet.throat_total_pressure",
-            "diffuser.throat_air_pressure",
+            "supplement_heat_exchanger_properties.air_inlet_temperature",
+            "supplement_heat_exchanger.air_inlet_temperature",
         )
         self.connect(
-            "inlet.throat_total_temperature",
-            "diffuser.throat_air_temperature",
+            "supplement_heat_exchanger_properties.air_outlet_temperature",
+            "supplement_heat_exchanger.air_outlet_temperature",
         )
+        self.connect(
+            "supplement_heat_exchanger_properties.air_static_pressure",
+            "supplement_heat_exchanger.air_static_pressure",
+        )
+        self.connect(
+            "supplement_heat_exchanger_properties.coolant_inlet_temperature",
+            "supplement_heat_exchanger.coolant_inlet_temperature",
+        )
+        self.connect(
+            "supplement_heat_exchanger_properties.coolant_outlet_temperature",
+            "supplement_heat_exchanger.coolant_outlet_temperature",
+        )
+        self.connect("diffuser.diffuser_exit_total_pressure", "nozzle.diffuser_exit_pressure")
+        self.connect("diffuser.diffuser_exit_total_temperature", "nozzle.diffuser_exit_temperature")

@@ -22,12 +22,6 @@ class PerformancesNozzleInletPressure(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="nozzle_id",
-            default=None,
-            desc="Identifier of the nozzle",
-            allow_none=False,
-        )
-        self.options.declare(
             name="connected_heat_exchanger_id",
             default=None,
             desc="Identifier of the connected heat exchanger",
