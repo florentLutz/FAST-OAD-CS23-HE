@@ -1,0 +1,127 @@
+<FASTOAD_model>
+    <data>
+        <aerodynamics>
+          <cruise>
+              <mach is_input="False">0.13748362313391627<!--mach number representative of high speed aerodynamics--></mach>
+              <unit_reynolds units="1/m" is_input="False">2948053.940803294<!--unitary reynolds number representative of high speed aerodynamics--></unit_reynolds>
+          </cruise>
+          <low_speed>
+            <mach is_input="False">0.11791720574958639<!--mach number representative of low speed aerodynamics--></mach>
+            <unit_reynolds units="1/m" is_input="False">2746998.9244866637<!--unitary reynolds number representative of low speed aerodynamics--></unit_reynolds>
+          </low_speed>
+            <fuselage>
+                <cruise>
+                  <CD0 is_input="False">0.01194819286123646<!--profile drag coefficient for fuselage in cruise conditions--></CD0>
+                </cruise>
+                <low_speed>
+                  <CD0 is_input="False">0.012114342193164637<!--profile drag coefficient for fuselage in low speed conditions--></CD0>
+                </low_speed>
+            </fuselage>
+        </aerodynamics>
+        <geometry>
+            <cabin>
+                <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
+            </cabin>
+            <fuselage>
+                <wet_area units="m**2" is_input="False">23.873036515818036<!--fuselage wet area--></wet_area>
+                <maximum_width units="m" is_input="False">1.1978<!--maximum width of the fuselage--></maximum_width>
+                <front_length units="m" is_input="False">0.5<!--length of the front cone of the aircraft--></front_length>
+                <rear_length units="m" is_input="False">5.6489614700284925<!--length of the rear cone of the aircraft--></rear_length>
+            </fuselage>
+            <wing>
+                <area units="m**2" is_input="False">7.105673586278243<!--wing area--></area>
+                <MAC>
+                  <length units="m" is_input="False">0.7672311779752662<!--length of mean aerodynamic chord of wing--></length>
+                  <at25percent>
+                    <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
+                  </at25percent>
+                </MAC>
+                <root>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing root--></chord>
+                </root>
+                <tip>
+                    <chord units="m" is_input="False">0.7672311779752663<!--chord length at wing tip--></chord>
+                </tip>
+                <span units="m" is_input="False">9.237463382822208<!--wing span--></span>
+            </wing>
+        </geometry>
+        <propulsion>
+            <he_power_train>
+                <PEMFC_stack_bop>
+                    <pemfc_stack_bop_1>
+                        <power_rating units="kW">0.2</power_rating>
+                        <specific_power units="kW/kg">0.345</specific_power>
+                        <power_density units="kW/m**3">124</power_density>
+                        <number_of_layers>35.0</number_of_layers>
+                        <hydrogen_reactant_pressure units="atm">1.0</hydrogen_reactant_pressure>
+                        <effective_area units="cm**2">16.8</effective_area>
+                        <operating_pressure units="atm">1.2</operating_pressure>
+                        <dimension>
+                            <length units="m">0.11998</length>
+                            <width units="m">0.1162</width>
+                            <height units="m">0.1162</height>
+                        </dimension>
+                        <volume units="L">1.62</volume>
+                        <CG>
+                            <y_ratio>0.34</y_ratio>
+                        </CG>
+                        <air_inlet_1>
+                            <throat_height_layer_thickness_ratio>0.0398</throat_height_layer_thickness_ratio>
+                            <max_momentum_boundary_layer_thickness units="m">0.0016</max_momentum_boundary_layer_thickness>
+                            <max_ambient_dynamic_pressure units="Pa">7145.0</max_ambient_dynamic_pressure>
+                        </air_inlet_1>
+                        <coolant>
+                            <static_pressure units="Pa">200000.0</static_pressure>
+                            <mass_flow_rate units="kg/s">4.1</mass_flow_rate>
+                            <mean_temperature units="K">345.0</mean_temperature>
+                        </coolant>
+                        <pipe_1>
+                            <number_of_pipes>5</number_of_pipes>
+                        </pipe_1>
+                        <pump_1>
+                            <power_rating units="kW">0.02</power_rating>
+                        </pump_1>
+                        <compressor_1>
+                            <power_rating units="kW">0.01</power_rating>
+                        </compressor_1>
+                        <diffuser_1>
+                            <length units="m">1.0</length>
+                            <wall_thickness units="m">0.01</wall_thickness>
+                        </diffuser_1>
+                        <nozzle_1>
+                            <wall_thickness units="m">0.01</wall_thickness>
+                        </nozzle_1>
+                        <heat_exchanger_1>
+                            <layer_count>20.0</layer_count>
+                            <UA units="W/K">3060.0</UA>
+                            <plate_thermal_conductivity units="W/m/K">237.0</plate_thermal_conductivity>
+                            <mean_coolant_dynamic_viscosity units="kg/m/s">1.75e-3</mean_coolant_dynamic_viscosity>
+                            <mean_coolant_thermal_conductivity units="W/m/K">0.27</mean_coolant_thermal_conductivity>
+                            <mean_coolant_prandtl_number>10.0</mean_coolant_prandtl_number>
+                            <mean_air_dynamic_viscosity units="kg/m/s">1.8e-5</mean_air_dynamic_viscosity>
+                            <mean_air_thermal_conductivity units="W/m/K">0.025</mean_air_thermal_conductivity>
+                            <mean_air_density units="kg/m**3">1.225</mean_air_density>
+                            <mean_air_prandtl_number>0.7</mean_air_prandtl_number>
+                            <air_flow_rate units="kg/s">0.72</air_flow_rate>
+                            <mean_coolant_density units="kg/m**3">1000.0</mean_coolant_density>
+                        </heat_exchanger_1>
+                        <heat_exchanger_2>
+                            <layer_count>20.0</layer_count>
+                            <UA units="W/K">1020.0</UA>
+                            <mean_coolant_density units="kg/m**3">1000.0</mean_coolant_density>
+                            <plate_thermal_conductivity units="W/m/K">237.0</plate_thermal_conductivity>
+                            <mean_coolant_dynamic_viscosity units="kg/m/s">1.75e-3</mean_coolant_dynamic_viscosity>
+                            <mean_coolant_thermal_conductivity units="W/m/K">0.27</mean_coolant_thermal_conductivity>
+                            <mean_coolant_prandtl_number>10.0</mean_coolant_prandtl_number>
+                            <mean_air_prandtl_number>0.7</mean_air_prandtl_number>
+                            <mean_air_dynamic_viscosity units="kg/m/s">1.8e-5</mean_air_dynamic_viscosity>
+                            <mean_air_thermal_conductivity units="W/m/K">0.025</mean_air_thermal_conductivity>
+                            <air_flow_rate units="kg/s">0.24</air_flow_rate>
+                            <mean_air_density units="kg/m**3">1.225</mean_air_density>
+                        </heat_exchanger_2>
+                    </pemfc_stack_bop_1>
+                </PEMFC_stack_bop>
+            </he_power_train>
+        </propulsion>
+    </data>
+</FASTOAD_model>

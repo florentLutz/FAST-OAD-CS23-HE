@@ -42,18 +42,6 @@ class SizingPEMFCBOP(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="coolant_component_ids",
-            default="None",
-            desc="A list of the TBS components that use coolant",
-            allow_none=False,
-        )
-        self.options.declare(
-            name="sizing_component_ids",
-            default="None",
-            desc="A list of the TBS components that are in the sizing group",
-            allow_none=False,
-        )
-        self.options.declare(
             name="pipe_id",
             default=None,
             desc="Identifier of the pipe",
@@ -116,8 +104,7 @@ class SizingPEMFCBOP(om.Group):
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        compress_id = self.options["compressor_id"]
-        coolant_component_ids = self.options["coolant_component_ids"]
+        compressor_id = self.options["compressor_id"]
         pipe_id = self.options["pipe_id"]
         air_inlet_id = self.options["air_inlet_id"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
@@ -128,12 +115,26 @@ class SizingPEMFCBOP(om.Group):
         pump_id = self.options["pump_id"]
         coolant_tank_id = self.options["coolant_tank_id"]
         coolant_fluid_type = self.options["coolant_fluid_type"]
-        sizing_component_ids = self.options["sizing_component_ids"]
+        humidifier_id = self.options["humidifier_id"]
+        sizing_component_ids = [
+            compressor_id,
+            air_inlet_id,
+            diffuser_id,
+            primary_heat_exchanger_id,
+            supplement_heat_exchanger_id,
+            valve_id,
+            nozzle_id,
+            pump_id,
+            coolant_tank_id,
+            pipe_id,
+            humidifier_id,
+        ]
+        coolant_component_ids = [primary_heat_exchanger_id, supplement_heat_exchanger_id, pipe_id]
 
         self.add_subsystem(
             "compressor",
             SizingCompressorWeight(
-                compressor_id=compress_id, pemfc_stack_bop_id=pemfc_stack_bop_id
+                compressor_id=compressor_id, pemfc_stack_bop_id=pemfc_stack_bop_id
             ),
             promotes=["data:*"],
         )
@@ -175,7 +176,7 @@ class SizingPEMFCBOP(om.Group):
             "humidifier",
             SizingHumidifier(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                humidifier_id="humidifier",
+                humidifier_id=humidifier_id,
             ),
             promotes=["data:*"],
         )
@@ -194,6 +195,7 @@ class SizingPEMFCBOP(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 coolant_component_ids=coolant_component_ids,
                 coolant_tank_id=coolant_tank_id,
+                coolant_fluid_type=coolant_fluid_type,
             ),
             promotes=["data:*"],
         )

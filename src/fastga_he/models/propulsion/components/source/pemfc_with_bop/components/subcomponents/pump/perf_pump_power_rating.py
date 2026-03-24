@@ -71,7 +71,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
             units="W",
             val=1e4,
         )
@@ -117,7 +117,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power"
+            + ":power_rating"
         ] = volumetric_flow_rate * pressure_compensation / (pump_efficiency * motor_efficiency)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -158,7 +158,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -171,7 +171,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -188,7 +188,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -205,7 +205,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

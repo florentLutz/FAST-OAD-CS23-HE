@@ -836,7 +836,7 @@ def test_sizing_heat_exchanger_flow_length():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
         ":mean_air_prandtl_number",
         units="unitless",
-        val=1006.0,
+        val=0.7,
     )
     # Operating conditions
     ivc.add_output(
@@ -878,11 +878,11 @@ def test_sizing_heat_exchanger_flow_length():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_flow_length",
         units="m",
-    ) == pytest.approx(0.05, abs=1e-3)
+    ) == pytest.approx(0.327, abs=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_length",
         units="m",
-    ) == pytest.approx(0.0907, abs=1e-3)
+    ) == pytest.approx(0.05, abs=1e-3)
 
 
 def test_sizing_free_flow_frontal_area_ratio():
@@ -1058,7 +1058,7 @@ def test_sizing_heat_exchanger():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
         ":mean_air_prandtl_number",
         units="unitless",
-        val=1006.0,
+        val=0.7,
     )
     # Operating conditions
     ivc.add_output(
@@ -1099,14 +1099,14 @@ def test_sizing_heat_exchanger():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_flow_length",
         units="m",
-    ) == pytest.approx(0.05, abs=1e-3)
+    ) == pytest.approx(0.328, abs=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_length",
         units="m",
-    ) == pytest.approx(0.0907, abs=1e-3)
+    ) == pytest.approx(0.05, abs=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:dry_mass",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mass",
         units="kg",
-    ) == pytest.approx(1.134, rel=1e-2)
+    ) == pytest.approx(4.09, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

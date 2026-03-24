@@ -34,7 +34,7 @@ class SizingPumpWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
             units="W",
             val=np.nan,
         )
@@ -61,7 +61,7 @@ class SizingPumpWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power"
+            + ":power_rating"
         ]
 
         outputs[
@@ -81,7 +81,7 @@ class SizingPumpWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power"
+            + ":power_rating"
         ]
 
         partials[
@@ -94,5 +94,5 @@ class SizingPumpWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pump_id
-            + ":required_power",
+            + ":power_rating",
         ] = np.where(pump_power >= 80.0, 0.0138289, 0.0)

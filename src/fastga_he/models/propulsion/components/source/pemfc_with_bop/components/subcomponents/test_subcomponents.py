@@ -3,9 +3,12 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 import pytest
+import os.path as pth
 import openmdao.api as om
 import numpy as np
-from tests.testing_utilities import run_system
+
+from fastga_he.models.cost.unit_tests.test_cost import XML_FILE
+from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from .fluid_characteristics.fluid_density import FluidDensity
 from .fluid_characteristics.fluid_specific_heat_capacity import FluidSpecificHeatCapacity
@@ -52,7 +55,11 @@ from .compressor.sizing_compressor_weight import SizingCompressorWeight
 
 from .valve.sizing_valve import SizingValve
 
+from .sizing_pemfc_bop import SizingPEMFCBOP
+from .perf_pemfc_bop import PerformancesPEMFCBOP
+
 NB_POINTS_TEST = 10
+XML_FILE = "sample_pemfc_stack_with_bop.xml"
 
 
 def test_fluid_density():
@@ -836,7 +843,7 @@ def test_pump_performance():
         units="Pa",
     ) == pytest.approx(103000.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:required_power",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:power_rating",
         units="W",
     ) == pytest.approx(839.2, rel=1e-2)
 
@@ -847,7 +854,7 @@ def test_pump_weight():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:required_power",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1:power_rating",
         units="W",
         val=839.2,
     )
@@ -1139,3 +1146,55 @@ def test_sizing_compressor_weight():
     ) == pytest.approx(7.37, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+
+def test_bop_sizing():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingPEMFCBOP(
+                pemfc_stack_bop_id="pemfc_stack_bop_1",
+                coolant_fluid_type="ethylene glycol",
+                compressor_id="compressor_1",
+                pump_id="pump_1",
+                valve_id="valve_1",
+                pipe_id="pipe_1",
+                humidifier_id="humidifier_1",
+                primary_heat_exchanger_id="heat_exchanger_1",
+                supplement_heat_exchanger_id="heat_exchanger_2",
+                nozzle_id="nozzle_1",
+                diffuser_id="diffuser_1",
+                air_inlet_id="air_inlet_1",
+                coolant_tank_id="coolant_tank_1",
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPEMFCBOP(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            coolant_fluid_type="ethylene glycol",
+            compressor_id="compressor_1",
+            pump_id="pump_1",
+            valve_id="valve_1",
+            pipe_id="pipe_1",
+            humidifier_id="humidifier_1",
+            primary_heat_exchanger_id="heat_exchanger_1",
+            supplement_heat_exchanger_id="heat_exchanger_2",
+            coolant_tank_id="coolant_tank_1",
+            nozzle_id="nozzle_1",
+            diffuser_id="diffuser_1",
+            air_inlet_id="air_inlet_1",
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_mass",
+        units="kg",
+    ) == pytest.approx(203.16, rel=1e-2)
+
+    problem.write_outputs()

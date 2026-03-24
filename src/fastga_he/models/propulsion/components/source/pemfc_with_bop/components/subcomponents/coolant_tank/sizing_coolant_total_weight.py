@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingCoolantTankWeight(om.ExplicitComponent):
+class SizingCoolantTotalWeight(om.ExplicitComponent):
     """
-    Coolant tank weight and volume calculation for the TMS.
+    Computation of the coolant tank weight including all the coolant in the TMS.
     """
 
     def initialize(self):
@@ -43,10 +43,15 @@ class SizingCoolantTankWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
-            + ":material_density",
+            + ":tank_mass",
+            units="kg",
+            val=np.nan,
+        )
+        self.add_input(
+            "coolant_density",
+            val=np.nan,
             units="kg/m**3",
-            val=2640.0,
-            desc="material density of the coolant tank",
+            desc="Density of the coolant",
         )
 
         self.add_output(
@@ -54,135 +59,86 @@ class SizingCoolantTankWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
-            + ":volume",
-            units="m**3",
-            val=0.0011,
-        )
-        self.add_output(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + coolant_tank_id
-            + ":tank_mass",
+            + ":mass",
             units="kg",
-            val=2.64,
+            val=3.0,
         )
 
     def setup_partials(self):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        coolant_tank_id = self.options["coolant_tank_id"]
-
-        self.declare_partials(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + coolant_tank_id
-            + ":tank_mass",
-            "*",
-            method="exact",
-        )
-        self.declare_partials(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + coolant_tank_id
-            + ":volume",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + coolant_tank_id
-            + ":coolant_volume",
-            val=1.1,
-        )
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         coolant_tank_id = self.options["coolant_tank_id"]
 
-        outputs[
+        coolant_volume = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
-            + ":volume"
-        ] = (
-            1.1
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + coolant_tank_id
-                + ":coolant_volume"
-            ]
-        )
-        outputs[
+            + ":coolant_volume"
+        ]
+        tank_mass = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
             + ":tank_mass"
-        ] = (
-            0.1
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + coolant_tank_id
-                + ":coolant_volume"
-            ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + coolant_tank_id
-                + ":material_density"
-            ]
-        )
+        ]
+        coolant_density = inputs["coolant_density"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + coolant_tank_id
+            + ":mass"
+        ] = tank_mass + coolant_volume * coolant_density
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         coolant_tank_id = self.options["coolant_tank_id"]
 
-        partials[
+        coolant_volume = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
-            + ":tank_mass",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + coolant_tank_id
-            + ":coolant_volume",
-        ] = (
-            0.1
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + coolant_tank_id
-                + ":material_density"
-            ]
-        )
+            + ":coolant_volume"
+        ]
+        coolant_density = inputs["coolant_density"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
-            + ":tank_mass",
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + coolant_tank_id
-            + ":material_density",
-        ] = (
-            0.1
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + coolant_tank_id
-                + ":coolant_volume"
-            ]
-        )
+            + ":coolant_volume",
+        ] = coolant_density
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + coolant_tank_id
+            + ":mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + coolant_tank_id
+            + ":tank_mass",
+        ] = 1.0
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + coolant_tank_id
+            + ":mass",
+            "coolant_density",
+        ] = coolant_volume

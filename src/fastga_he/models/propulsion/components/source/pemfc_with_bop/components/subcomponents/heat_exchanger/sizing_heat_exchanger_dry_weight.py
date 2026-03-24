@@ -53,7 +53,7 @@ class SizingHeatExchangerDryWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id
-            + ":dry_mass",
+            + ":mass",
             units="kg",
             val=2.0,
         )
@@ -85,5 +85,5 @@ class SizingHeatExchangerDryWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + heat_exchanger_id
-            + ":dry_mass"
+            + ":mass"
         ] = plate_mass + channel_mass

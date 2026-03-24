@@ -6,7 +6,7 @@ import openmdao.api as om
 
 from .perf_pump_volumetric_flow_rate import PerformancesPumpVolumetricFlowRate
 from .perf_pressure_drop_sum import PerformancesCoolantSystemPressureDrop
-from .perf_pump_required_power import PerformancesPumpPower
+from .perf_pump_power_rating import PerformancesPumpPower
 from ..fluid_characteristics import FluidDensity
 
 
@@ -86,7 +86,7 @@ class PerformancesPump(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "pump_required_power",
+            "pump_power_rating",
             PerformancesPumpPower(pemfc_stack_bop_id=pemfc_stack_bop_id, pump_id=pump_id),
             promotes=["*"],
         )
