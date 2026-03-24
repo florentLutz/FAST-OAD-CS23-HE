@@ -232,6 +232,69 @@ def test_search_engine_energy_intensity():
     print("2040 design, impact per kWh", impact_per_kwh_of_energy_used_2040)
 
 
+def test_lca_bar_chart_relative_contribution_li_ion():
+    fig = lca_impacts_bar_chart_with_contributors(
+        RESULTS_FOLDER_PATH / "oad_process_outputs_elec_with_lca.xml",
+        name_aircraft="2025 w/ Li-Ion",
+        impact_step="normalized",
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",  # Just a renaming, should work as well,
+            "Electricity production": "electricity_for_mission",  # Just a renaming, should work as well,
+            "Power electronics": [
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "inverter_1",
+                "dc_dc_converter_1",
+                "dc_dc_converter_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+            ],
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": ["propeller_1", "harness_1", "gearbox_1", "manufacturing", "distribution"],
+        },
+        impact_filter_list=[
+            "acidification",
+            "climate_change",
+            "ecotoxicity_freshwater",
+            "energy_resources_non-renewable",
+            "eutrophication_freshwater",
+            "eutrophication_marine",
+            "eutrophication_terrestrial",
+            "human_toxicity_carcinogenic",
+            "human_toxicity_non-carcinogenic",
+            "ionising_radiation_human_health",
+            "land_use",
+            "material_resources_metals_minerals",
+            "ozone_depletion",
+            "particulate_matter_formation",
+            "photochemical_oxidant_formation_human_health",
+            "water_use",
+        ],
+    )
+
+    fig.update_layout(
+        title=None,
+        showlegend=True,
+        margin=dict(l=5, r=5, t=60, b=5),
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        # legend=dict(yanchor="top", y=0.99, xanchor="right", x=1.0),
+        width=1800,
+        height=800,
+    )
+    fig.update_xaxes(
+        title_font=dict(size=15),
+    )
+    fig.update_yaxes(
+        title_font=dict(size=15),
+    )
+    fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["yaxis"]["tickfont"]["size"] = 20
+    fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
+    fig["layout"]["xaxis"]["tickfont"]["size"] = 20
+
+    fig.show()
+
 def test_lca_bar_chart_relative_contribution_lis():
     fig = lca_impacts_bar_chart_with_contributors(
         RESULTS_FOLDER_PATH / "oad_process_outputs_elec_lis_with_lca.xml",

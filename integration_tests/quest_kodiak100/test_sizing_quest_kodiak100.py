@@ -17,6 +17,7 @@ import fastoad.api as oad
 import plotly.graph_objects as go
 
 from utils.filter_residuals import filter_residuals
+from fastga.utils.postprocessing.analysis_and_plots import mass_breakdown_bar_plot
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 RESULTS_FOLDER_PATH = pth.join(pth.dirname(__file__), "results")
@@ -290,6 +291,80 @@ def test_sizing_kodiak_100_full_electric_future_lis_with_lca():
         2.14826485e-06, rel=1e-2
     )
 
+
+def test_sizing_kodiak_100_full_electric_future_lis_with_lca_optimistic_ssp():
+    """
+    This test does the sizing of a future aircraft with similar requirement to the electric
+    Kodiak 100. Range will we adjusted to see what is possible. Assumes:
+    - SiC based power converters with higher switching frequencies.
+    - Future materials for electric motors
+    - Li-S batteries with practical energy densities of 1300 Wh/kg
+    - For lack of accurate process for the Li-S LCA the default process will be used.
+    - The airframe will be assumed to be made with additive manufacturing thus a BtF of 1 for
+    metallic materials
+    - Optimistic SSP (SSP1)
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_elec_kodiak100_lis.xml"
+    process_file_name = "full_sizing_kodiak100_elec_lis_with_lca_french_mix.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+    problem = configurator.get_problem()
+
+    # Load inputs
+    ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # Not a lot is known about Li-S cell, so we will assumed some characteristics that allow use to
+    # reach the target energy density of 1300 Wh/kg. The C-rate caliber will be set as one at the
+    # beginning, but might change if this cause the cell to be sized for power. The cell weight will
+    # be set equal to that of the Ampirius cell and capacity will be changed accordingly
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 6.91,
+        "cell_weight_ref": 11.7e-3,
+        "reference_curve_current": [100.0, 1000.0, 3000.0, 6900.0],
+        "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=1.0,
+        units="h**-1",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
+        val=1.0,
+        units="h**-1",
+    )
+
+    # According to research papers, renewal rates of 1000 cycles can be achieved in certain
+    # conditions
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=1000.0
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=1000.0
+    )
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        1.94638357e-06, rel=1e-2
+    )
 
 def test_sizing_kodiak_100_full_electric_future_lis_with_lca_custom_process():
     """
@@ -1188,3 +1263,18 @@ def test_operational_mission_kodiak_100_hefa():
     assert problem.get_val(
         "data:environmental_impact:operational:emission_factor"
     ) == pytest.approx(0.5415, abs=1e-2)
+
+
+def test_compare_designs():
+
+    ref_design_output_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ref.xml")
+    hybrid_design_output_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_he_with_lca.xml")
+    elec_design_output_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_elec_with_lca.xml")
+
+    fig = mass_breakdown_bar_plot(
+        ref_design_output_file, name="Reference Kodiak 100 on design mission"
+    )
+    fig = mass_breakdown_bar_plot(hybrid_design_output_file, name="Hybrid Kodiak 100 on design mission", fig=fig)
+    fig = mass_breakdown_bar_plot(elec_design_output_file, name="Electric design on design mission", fig=fig)
+    fig.update_layout(font=dict(size=20))
+    fig.show()
