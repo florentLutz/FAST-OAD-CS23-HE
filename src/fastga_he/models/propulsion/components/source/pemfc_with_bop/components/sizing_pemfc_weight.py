@@ -60,7 +60,7 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":bop_mass",
             units="kg",
-            val=np.nan,
+            val=0.0,
         )
 
         self.add_output(
@@ -158,7 +158,7 @@ class SizingPEMFCStackBOPWeight(om.ExplicitComponent):
             * DEFAULT_FC_SPECIFIC_POWER
             * number_of_layers
             * effective_area
-            / specific_power**2
+            / specific_power**2.0
         )
 
         partials[

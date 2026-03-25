@@ -13,23 +13,44 @@ class SlipstreamPEMFCStackBOPDeltaCd(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         self.add_input("density", units="kg/m**3", val=np.nan, shape=number_of_points)
         self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
         self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
-        self.add_input("air_inlet_outlet_drag", units="N", val=np.nan, shape=number_of_points)
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_drag",
+            units="N",
+            val=np.nan,
+            shape=number_of_points,
+        )
 
         self.add_output("delta_Cd", val=1e-5, shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         self.declare_partials(
             of="delta_Cd",
-            wrt=["density", "true_airspeed", "air_inlet_outlet_drag"],
+            wrt=[
+                "density",
+                "true_airspeed",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":bop_drag",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -43,32 +64,44 @@ class SlipstreamPEMFCStackBOPDeltaCd(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
         wing_area = inputs["data:geometry:wing:area"]
 
-        air_inlet_outlet_drag = inputs["air_inlet_outlet_drag"]
+        bop_drag = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag"
+        ]
 
-        delta_cd = -air_inlet_outlet_drag / (0.5 * density * true_airspeed**2.0 * wing_area)
+        delta_cd = -bop_drag / (0.5 * density * true_airspeed**2.0 * wing_area)
 
         outputs["delta_Cd"] = delta_cd
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
         wing_area = inputs["data:geometry:wing:area"]
 
-        air_inlet_outlet_drag = inputs["air_inlet_outlet_drag"]
+        bop_drag = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag"
+        ]
 
-        partials["delta_Cd", "density"] = air_inlet_outlet_drag / (
+        partials["delta_Cd", "density"] = bop_drag / (
             0.5 * density**2.0 * true_airspeed**2.0 * wing_area
         )
+
         partials["delta_Cd", "true_airspeed"] = 2.0 * (
-            air_inlet_outlet_drag / (0.5 * density * true_airspeed**3.0 * wing_area)
+            bop_drag / (0.5 * density * true_airspeed**3.0 * wing_area)
         )
-        partials["delta_Cd", "data:geometry:wing:area"] = air_inlet_outlet_drag / (
+
+        partials["delta_Cd", "data:geometry:wing:area"] = bop_drag / (
             0.5 * density * true_airspeed**2.0 * wing_area**2.0
         )
-        partials["delta_Cd", "air_inlet_outlet_drag"] = -(
-            1.0 / (0.5 * density * true_airspeed**2.0 * wing_area)
-        )
+
+        partials[
+            "delta_Cd",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag",
+        ] = -(1.0 / (0.5 * density * true_airspeed**2.0 * wing_area))
