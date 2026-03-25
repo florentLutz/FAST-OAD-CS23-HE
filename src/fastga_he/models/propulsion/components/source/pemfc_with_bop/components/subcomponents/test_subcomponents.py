@@ -3,7 +3,7 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 import pytest
-import os.path as pth
+import pathlib
 import openmdao.api as om
 import numpy as np
 
@@ -60,6 +60,7 @@ from .perf_pemfc_bop import PerformancesPEMFCBOP
 
 NB_POINTS_TEST = 10
 XML_FILE = "sample_pemfc_stack_with_bop.xml"
+RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
 
 def test_fluid_density():
@@ -1196,5 +1197,72 @@ def test_bop_sizing():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_mass",
         units="kg",
     ) == pytest.approx(203.16, rel=1e-2)
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "test_bop_sizing_outputs.xml"
+
+    problem.write_outputs()
+
+
+def test_bop_performances():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            PerformancesPEMFCBOP(
+                number_of_points=NB_POINTS_TEST,
+                pemfc_stack_bop_id="pemfc_stack_bop_1",
+                compressor_id="compressor_1",
+                pump_id="pump_1",
+                air_inlet_id="air_inlet_1",
+                primary_heat_exchanger_id="heat_exchanger_1",
+                supplement_heat_exchanger_id="heat_exchanger_2",
+                humidifier_id="humidifier_1",
+                pipe_id="pipe_1",
+                diffuser_id="diffuser_1",
+                nozzle_id="nozzle_1",
+                coolant_fluid_type="ethylene glycol",
+            )
+        ),
+        __file__,
+        "test_bop_perf_inputs.xml",
+    )
+    ivc.add_output("mach", units="unitless", val=0.3, shape=NB_POINTS_TEST)
+    ivc.add_output("exterior_temperature", units="K", val=288.15, shape=NB_POINTS_TEST)
+    ivc.add_output("altitude", units="m", val=1000.0, shape=NB_POINTS_TEST)
+    ivc.add_output("true_airspeed", units="m/s", val=100.0, shape=NB_POINTS_TEST)
+    ivc.add_output("density", units="kg/m**3", val=1.112, shape=NB_POINTS_TEST)
+    ivc.add_output("air_consumption", units="kg/s", val=0.72, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCBOP(
+            number_of_points=NB_POINTS_TEST,
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            compressor_id="compressor_1",
+            pump_id="pump_1",
+            air_inlet_id="air_inlet_1",
+            primary_heat_exchanger_id="heat_exchanger_1",
+            supplement_heat_exchanger_id="heat_exchanger_2",
+            humidifier_id="humidifier_1",
+            pipe_id="pipe_1",
+            diffuser_id="diffuser_1",
+            nozzle_id="nozzle_1",
+            coolant_fluid_type="ethylene glycol",
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pump_1"
+        ":pressure_compensation",
+        units="kPa",
+    ) == pytest.approx(100.87, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:power_rating",
+        units="kW",
+    ) == pytest.approx(71.77, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "test_bop_performance_outputs.xml"
 
     problem.write_outputs()

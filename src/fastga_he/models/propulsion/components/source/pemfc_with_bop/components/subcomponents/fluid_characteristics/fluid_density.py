@@ -85,18 +85,46 @@ class FluidDensity(om.ExplicitComponent):
         temperature = inputs["fluid_temperature"]
         pressure = inputs["fluid_pressure"]
 
-        default_d_rho_dt = np.array(
-            [
-                PropsSI("d(D)/d(T)|P", "T", t, "P", p, fluid_name_dict[fluid])
-                for t, p in zip(temperature, pressure)
-            ]
-        )
-        default_d_rho_dp = np.array(
-            [
-                PropsSI("d(D)/d(P)|T", "T", t, "P", p, fluid_name_dict[fluid])
-                for t, p in zip(temperature, pressure)
-            ]
-        )
+        fluid_string = fluid_name_dict[fluid]
+        is_incompressible = fluid_string.startswith("INCOMP::")
+
+        if is_incompressible:
+            dt = 1e-3
+            dp = 1.0
+
+            default_d_rho_dt = np.array(
+                [
+                    (
+                        PropsSI("D", "T", t + dt, "P", p, fluid_string)
+                        - PropsSI("D", "T", t - dt, "P", p, fluid_string)
+                    )
+                    / (2.0 * dt)
+                    for t, p in zip(temperature, pressure)
+                ]
+            )
+            default_d_rho_dp = np.array(
+                [
+                    (
+                        PropsSI("D", "T", t, "P", p + dp, fluid_string)
+                        - PropsSI("D", "T", t, "P", p - dp, fluid_string)
+                    )
+                    / (2.0 * dp)
+                    for t, p in zip(temperature, pressure)
+                ]
+            )
+        else:
+            default_d_rho_dt = np.array(
+                [
+                    PropsSI("d(D)/d(T)|P", "T", t, "P", p, fluid_name_dict[fluid])
+                    for t, p in zip(temperature, pressure)
+                ]
+            )
+            default_d_rho_dp = np.array(
+                [
+                    PropsSI("d(D)/d(P)|T", "T", t, "P", p, fluid_name_dict[fluid])
+                    for t, p in zip(temperature, pressure)
+                ]
+            )
 
         conditions = [
             (fluid == "hydrogen") & (temperature < 20.325),
@@ -114,7 +142,15 @@ class FluidDensity(om.ExplicitComponent):
             np.zeros(number_of_points),
             np.array(
                 [
-                    PropsSI("d(D)/d(P)|T", "T", 313.15, "P", p, fluid_name_dict[fluid])
+                    (
+                        (
+                            PropsSI("D", "T", 313.15, "P", p + 1.0, fluid_string)
+                            - PropsSI("D", "T", 313.15, "P", p - 1.0, fluid_string)
+                        )
+                        / 2.0
+                        if is_incompressible
+                        else PropsSI("d(D)/d(P)|T", "T", 313.15, "P", p, fluid_string)
+                    )
                     for p in pressure
                 ]
             ),

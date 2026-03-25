@@ -17,7 +17,7 @@ from .perf_pemf_bop_primary_hex_properties import PerformancesPrimaryHeatExchang
 from .perf_pemf_bop_supplement_hex_properties import (
     PerformancesSupplementHeatExchangerThermalBalance,
 )
-from .perf_pemf_bop_air_inlet_flow import PerformancesAirInletAirMassFlow
+from .perf_pemf_bop_inlet_air_inlet_flow import PerformancesAirInletAirMassFlow
 
 
 class PerformancesPEMFCBOP(om.Group):
@@ -117,9 +117,9 @@ class PerformancesPEMFCBOP(om.Group):
                 compressor_id=compress_id,
                 number_of_points=number_of_points,
                 connected_humidifier_id=humidifier_id,
-                connected_heat_exchanger_ids=primary_heat_exchanger_id,
+                connected_heat_exchanger_id=primary_heat_exchanger_id,
             ),
-            promotes=["data:*", "ambient_pressure", "exterior_temperature"],
+            promotes=["data:*", "altitude", "exterior_temperature", "air_consumption"],
         )
         self.add_subsystem(
             "humidifier",
@@ -128,13 +128,13 @@ class PerformancesPEMFCBOP(om.Group):
                 humidifier_id=humidifier_id,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "air_consumption"],
         )
         self.add_subsystem(
             "primary_heat_exchanger_air_properties",
             PerformancesPrimaryHeatExchangerThermalBalance(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                heat_exchanger_id=primary_heat_exchanger_id,
+                primary_heat_exchanger_id=primary_heat_exchanger_id,
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
@@ -157,7 +157,7 @@ class PerformancesPEMFCBOP(om.Group):
                 air_inlet_id=air_inlet_id,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "air_consumption"],
         )
         self.add_subsystem(
             "inlet",
@@ -165,12 +165,15 @@ class PerformancesPEMFCBOP(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 air_inlet_id=air_inlet_id,
                 number_of_points=number_of_points,
-                supplied_heat_exchanger_ids=[
-                    primary_heat_exchanger_id,
-                    supplement_heat_exchanger_id,
-                ],
             ),
-            promotes=["data:*", "ambient_pressure", "mach", "exterior_temperature"],
+            promotes=[
+                "data:*",
+                "mach",
+                "exterior_temperature",
+                "altitude",
+                "true_airspeed",
+                "density",
+            ],
         )
         self.add_subsystem(
             "diffuser",
@@ -182,14 +185,14 @@ class PerformancesPEMFCBOP(om.Group):
             promotes=["data:*"],
         )
         self.add_subsystem(
-            "supplement_heat_exchanger_properties",
+            "supplement_heat_exchanger_air_properties",
             PerformancesSupplementHeatExchangerThermalBalance(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                heat_exchanger_id=supplement_heat_exchanger_id,
+                supplement_heat_exchanger_id=supplement_heat_exchanger_id,
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "ambient_pressure"],
+            promotes=["data:*", "exterior_temperature", "air_consumption"],
         )
         self.add_subsystem(
             "supplement_heat_exchanger",
@@ -209,7 +212,7 @@ class PerformancesPEMFCBOP(om.Group):
                 number_of_points=number_of_points,
                 connected_heat_exchanger_id=supplement_heat_exchanger_id,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "exterior_temperature", "true_airspeed"],
         )
         self.add_subsystem(
             "pipe",
@@ -231,6 +234,25 @@ class PerformancesPEMFCBOP(om.Group):
                     primary_heat_exchanger_id,
                     supplement_heat_exchanger_id,
                 ],
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "bop_drag",
+            PerformancesBOPDrag(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                drag_component_ids=[air_inlet_id, nozzle_id],
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "bop_power",
+            PerformancesBOPPower(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                compressor_id=compress_id,
+                pump_id=pump_id,
+                number_of_points=number_of_points,
             ),
             promotes=["data:*"],
         )
@@ -256,27 +278,265 @@ class PerformancesPEMFCBOP(om.Group):
             "primary_heat_exchanger.coolant_outlet_temperature",
         )
         self.connect("inlet_air_flow_rate.air_mass_flow", "inlet.air_mass_flow")
+        self.connect(
+            "inlet_air_flow_rate.air_mass_flow",
+            "supplement_heat_exchanger_air_properties.total_air_mass_flow_rate",
+        )
         self.connect("inlet.throat_total_pressure", "diffuser.throat_air_pressure")
         self.connect("inlet.throat_total_temperature", "diffuser.throat_air_temperature")
+        self.connect("inlet.throat_air_speed", "diffuser.throat_air_speed")
         self.connect(
-            "supplement_heat_exchanger_properties.air_inlet_temperature",
+            "supplement_heat_exchanger_air_properties.air_inlet_temperature",
             "supplement_heat_exchanger.air_inlet_temperature",
         )
         self.connect(
-            "supplement_heat_exchanger_properties.air_outlet_temperature",
+            "supplement_heat_exchanger_air_properties.air_outlet_temperature",
             "supplement_heat_exchanger.air_outlet_temperature",
         )
         self.connect(
-            "supplement_heat_exchanger_properties.air_static_pressure",
+            "supplement_heat_exchanger_air_properties.air_static_pressure",
             "supplement_heat_exchanger.air_static_pressure",
         )
         self.connect(
-            "supplement_heat_exchanger_properties.coolant_inlet_temperature",
+            "supplement_heat_exchanger_air_properties.coolant_inlet_temperature",
             "supplement_heat_exchanger.coolant_inlet_temperature",
         )
         self.connect(
-            "supplement_heat_exchanger_properties.coolant_outlet_temperature",
+            "supplement_heat_exchanger_air_properties.coolant_outlet_temperature",
             "supplement_heat_exchanger.coolant_outlet_temperature",
         )
         self.connect("diffuser.diffuser_exit_total_pressure", "nozzle.diffuser_exit_pressure")
         self.connect("diffuser.diffuser_exit_total_temperature", "nozzle.diffuser_exit_temperature")
+        self.connect(
+            "inlet.ambient_pressure", "supplement_heat_exchanger_air_properties.ambient_pressure"
+        )
+        self.connect(
+            "compressor.compressor_pressure_supply",
+            "primary_heat_exchanger_air_properties.compressor_pressure_supply",
+        )
+        self.connect(
+            "humidifier.oxidizer_temperature",
+            "primary_heat_exchanger_air_properties.oxidizer_temperature",
+        )
+        self.connect(
+            "humidifier.oxidizer_pressure",
+            "primary_heat_exchanger_air_properties.oxidizer_pressure",
+        )
+        self.connect(
+            "compressor.compressor_outlet_temperature",
+            "primary_heat_exchanger_air_properties.compressor_outlet_temperature",
+        )
+        self.connect(
+            "diffuser.diffuser_exit_total_pressure",
+            "supplement_heat_exchanger_air_properties.diffuser_exit_total_pressure",
+        )
+        self.connect(
+            "diffuser.diffuser_exit_total_temperature",
+            "supplement_heat_exchanger_air_properties.diffuser_exit_total_temperature",
+        )
+        self.connect("diffuser.exit_air_speed", "nozzle.entry_air_speed")
+        self.connect(
+            "supplement_heat_exchanger_air_properties.air_mass_flow", "nozzle.air_mass_flow_rate"
+        )
+
+
+class PerformancesBOPDrag(om.ExplicitComponent):
+    """
+    Computes the mass of the PEMFC BOP by summing the mass of each component.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack BOP",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="drag_component_ids",
+            default="None",
+            desc="A list of the TBS components that induce drag",
+            allow_none=False,
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        drag_component_ids = self.options["drag_component_ids"]
+
+        for component_id in drag_component_ids:
+            self.add_input(
+                name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + component_id
+                + ":drag",
+                units="N",
+                val=np.nan,
+                shape=number_of_points,
+            )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_drag",
+            units="N",
+            val=10.0,
+            shape=number_of_points,
+        )
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            "*",
+            "*",
+            val=1.0,
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        drag_component_ids = self.options["drag_component_ids"]
+
+        bop_drag = np.zeros(number_of_points)
+
+        for component_id in drag_component_ids:
+            bop_drag += inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + component_id
+                + ":drag"
+            ]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag"
+        ] = bop_drag
+
+
+class PerformancesBOPPower(om.ExplicitComponent):
+    """
+    Computes the mass of the PEMFC BOP by summing the mass of each component.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack BOP",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="pump_id",
+            default="None",
+            desc="Identifier of the pump in the TMS",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="compressor_id",
+            default="None",
+            desc="Identifier of the compressor in the TMS",
+            allow_none=False,
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        compressor_id = self.options["compressor_id"]
+        pump_id = self.options["pump_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":power_required",
+            units="kW",
+            val=np.nan,
+            shape=number_of_points,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":power_rating",
+            units="kW",
+            val=np.nan,
+        )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required",
+            units="kW",
+            val=10.0,
+            shape=number_of_points,
+        )
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        compressor_id = self.options["compressor_id"]
+        pump_id = self.options["pump_id"]
+
+        self.declare_partials(
+            "*",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":power_required",
+            val=1.0,
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            "*",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":power_rating",
+            val=1.0,
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        compressor_id = self.options["compressor_id"]
+        pump_id = self.options["pump_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required"
+        ] = (
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + compressor_id
+                + ":power_required"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + pump_id
+                + ":power_rating"
+            ]
+        )

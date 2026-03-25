@@ -77,7 +77,6 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
@@ -107,7 +106,6 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 

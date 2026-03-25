@@ -19,7 +19,12 @@ class PerformancesCompressorMeanTemperature(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("exterior_temperature", units="K", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "exterior_temperature",
+            val=np.nan,
+            units="K",
+            shape=number_of_points,
+        )
         self.add_input(
             "compressor_outlet_temperature",
             val=np.nan,

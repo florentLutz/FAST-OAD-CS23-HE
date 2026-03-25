@@ -34,7 +34,12 @@ class PerformancesCompressorOutletTemperature(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         compressor_id = self.options["compressor_id"]
 
-        self.add_input("exterior_temperature", units="K", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "exterior_temperature",
+            val=np.nan,
+            units="K",
+            shape=number_of_points,
+        )
         self.add_input(
             "compressor_pressure_ratio",
             val=np.nan,

@@ -40,7 +40,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
-            "true_air_speed",
+            "true_airspeed",
             val=np.nan,
             units="m/s",
             shape=number_of_points,
@@ -75,7 +75,6 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
@@ -85,10 +84,9 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":drag"
-        ] = inputs["air_mass_flow_rate"] * (inputs["exit_air_speed"] - inputs["true_air_speed"])
+        ] = inputs["air_mass_flow_rate"] * (inputs["exit_air_speed"] - inputs["true_airspeed"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
@@ -99,7 +97,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + nozzle_id
             + ":drag",
             "air_mass_flow_rate",
-        ] = inputs["exit_air_speed"] - inputs["true_air_speed"]
+        ] = inputs["exit_air_speed"] - inputs["true_airspeed"]
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -114,5 +112,5 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":drag",
-            "true_air_speed",
+            "true_airspeed",
         ] = -inputs["air_mass_flow_rate"]

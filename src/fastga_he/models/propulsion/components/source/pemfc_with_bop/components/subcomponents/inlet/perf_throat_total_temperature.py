@@ -34,7 +34,12 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
         air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input("mach", val=np.nan, shape=number_of_points)
-        self.add_input("exterior_temperature", units="K", val=np.full(number_of_points, np.nan))
+        self.add_input(
+            "exterior_temperature",
+            val=np.nan,
+            units="K",
+            shape=number_of_points,
+        )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id

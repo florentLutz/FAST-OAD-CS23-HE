@@ -58,7 +58,7 @@ class PerformancesPrimaryHeatExchangerThermalBalance(om.Group):
             promotes=[
                 ("fluid_pressure", "air_static_pressure"),
                 ("fluid_temperature", "mean_air_temperature"),
-                ("fluid_specific_heat_capacity", "mean_air_specific_heat_capacity"),
+                ("fluid_specific_heat_capacity", "air_mean_specific_heat_capacity"),
             ],
         )
         self.add_subsystem(
@@ -81,6 +81,11 @@ class PerformancesPrimaryHeatExchangerThermalBalance(om.Group):
             ],
         )
         self.add_subsystem(
+            "minimum_heat_capacity",
+            _MinimumHeatCapacity(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             "coolant_intermediate_temperature_hex_performances",
             _CoolantIntermediateTemperate(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
@@ -92,7 +97,6 @@ class PerformancesPrimaryHeatExchangerThermalBalance(om.Group):
             "coolant_temperature_hex_performances",
             _CoolantTemperature(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                primary_heat_exchanger_id=primary_heat_exchanger_id,
             ),
             promotes=["*"],
         )
@@ -120,7 +124,7 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
         self.add_input(
             "exterior_temperature",
             val=np.nan,
-            units="Pa",
+            units="K",
             shape=number_of_points,
         )
         self.add_input(
@@ -131,6 +135,12 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
         )
         self.add_input(
             "oxidizer_pressure",
+            val=np.nan,
+            units="Pa",
+            shape=number_of_points,
+        )
+        self.add_input(
+            "compressor_pressure_supply",
             val=np.nan,
             units="Pa",
             shape=number_of_points,
@@ -163,21 +173,21 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
+            val=1.0 / (2.0 * number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        number_of_points = self.options["number_of_points"]
+
         outputs["air_inlet_temperature"] = np.max(inputs["compressor_outlet_temperature"])
         outputs["air_outlet_temperature"] = np.min(inputs["oxidizer_temperature"])
-        outputs["air_static_pressure"] = (
-            np.mean(inputs["compressor_pressure_supply"] + inputs["oxidizer_pressure"]) / 2.0
-        )
+        outputs["air_static_pressure"] = np.sum(
+            inputs["compressor_pressure_supply"] + inputs["oxidizer_pressure"]
+        ) / (2.0 * number_of_points)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         max_inlet_temperature = np.max(inputs["compressor_outlet_temperature"])
         min_outlet_temperature = np.min(inputs["oxidizer_temperature"])
-        mean_static_pressure = (
-            np.mean(inputs["compressor_pressure_supply"] + inputs["oxidizer_pressure"]) / 2.0
-        )
 
         partials["air_inlet_temperature", "compressor_outlet_temperature"] = np.where(
             inputs["compressor_outlet_temperature"] == max_inlet_temperature, 1.0, 1e-6
@@ -185,20 +195,6 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
 
         partials["air_outlet_temperature", "oxidizer_temperature"] = np.where(
             inputs["oxidizer_temperature"] == min_outlet_temperature, 1.0, 1e-6
-        )
-
-        partials["air_static_pressure", "compressor_pressure_supply"] = np.where(
-            inputs["compressor_pressure_supply"] + inputs["oxidizer_pressure"]
-            == 2.0 * mean_static_pressure,
-            0.5,
-            1e-6,
-        )
-
-        partials["air_static_pressure", "oxidizer_pressure"] = np.where(
-            inputs["compressor_pressure_supply"] + inputs["oxidizer_pressure"]
-            == 2.0 * mean_static_pressure,
-            0.5,
-            1e-6,
         )
 
 
@@ -425,8 +421,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             val=np.nan,
             units="K",
@@ -459,8 +453,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature"
         ] = air_inlet_temperature + air_consumption_max * air_mean_specific_heat_capacity * (
             air_outlet_temperature - air_inlet_temperature
@@ -490,8 +482,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             "air_inlet_temperature",
         ] = 1.0 - (
@@ -503,8 +493,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             "air_outlet_temperature",
         ] = (
@@ -516,8 +504,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -531,8 +517,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             "air_mean_specific_heat_capacity",
         ] = (
@@ -544,8 +528,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             "minimum_heat_capacity",
         ] = -(
@@ -558,8 +540,6 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -586,22 +566,13 @@ class _CoolantTemperature(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
-        self.options.declare(
-            name="primary_heat_exchanger_id",
-            default=None,
-            desc="Identifier of the primary heat exchanger",
-            allow_none=False,
-        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             val=np.nan,
             units="K",
@@ -609,62 +580,50 @@ class _CoolantTemperature(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:inlet_temperature",
             val=np.nan,
             units="K",
         )
 
         self.add_output(
-            name="inlet_coolant_temperature",
+            name="coolant_inlet_temperature",
             val=np.nan,
             units="K",
         )
         self.add_output(
-            name="outlet_coolant_temperature",
+            name="coolant_outlet_temperature",
             val=np.nan,
             units="K",
         )
 
     def setup_partials(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
 
         self.declare_partials(
-            "inlet_coolant_temperature",
+            "coolant_inlet_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature",
             val=1.0,
         )
         self.declare_partials(
-            "outlet_coolant_temperature",
+            "coolant_outlet_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:inlet_temperature",
             val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
 
-        outputs["inlet_coolant_temperature"] = inputs[
+        outputs["coolant_inlet_temperature"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:intermediate_temperature"
         ]
-        outputs["outlet_coolant_temperature"] = inputs[
+        outputs["coolant_outlet_temperature"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + primary_heat_exchanger_id
             + ":coolant:inlet_temperature"
         ]
