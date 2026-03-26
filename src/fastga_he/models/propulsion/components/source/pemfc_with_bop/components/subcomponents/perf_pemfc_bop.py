@@ -244,7 +244,7 @@ class PerformancesPEMFCBOP(om.Group):
                 drag_component_ids=[air_inlet_id, nozzle_id],
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "bop_drag"],
         )
         self.add_subsystem(
             "bop_power",
@@ -380,9 +380,7 @@ class PerformancesBOPDrag(om.ExplicitComponent):
             )
 
         self.add_output(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":bop_drag",
+            name="bop_drag",
             units="N",
             val=10.0,
             shape=number_of_points,
@@ -416,9 +414,7 @@ class PerformancesBOPDrag(om.ExplicitComponent):
                 + ":drag"
             ]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag"
-        ] = bop_drag
+        outputs["bop_drag"] = bop_drag
 
 
 class PerformancesBOPPower(om.ExplicitComponent):

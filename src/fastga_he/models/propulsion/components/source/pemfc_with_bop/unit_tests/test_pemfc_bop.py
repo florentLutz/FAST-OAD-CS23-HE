@@ -61,6 +61,8 @@ from ..components.cstr_enforce import (
 from ..components.lcc_pemfc_cost import LCCPEMFCStackBOPCost
 from ..components.lcc_pemfc_operational_cost import LCCPEMFCStackBOPOperationalCost
 
+from ..components.slipstream_pemfc_stack import SlipstreamPEMFCStackBOP
+
 from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
@@ -1223,7 +1225,7 @@ def test_performances_pemfc_stack_analytical_add_bop():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_drag",
+        "bop_drag",
         units="N",
     ) == pytest.approx(
         [0.162, 0.163, 0.164, 0.165, 0.166, 0.167, 0.168, 0.17, 0.171, 0.172], rel=1e-2
@@ -1289,5 +1291,34 @@ def test_operational_cost():
         800.0,
         rel=1e-2,
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_slipstream():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "true_airspeed",
+        units="m/s",
+        val=np.full(NB_POINTS_TEST, 108.0),
+    )
+    ivc.add_output(
+        "density",
+        units="kg/m**3",
+        val=np.full(NB_POINTS_TEST, 1.112),
+    )
+    ivc.add_output("bop_drag", units="N", val=np.full(NB_POINTS_TEST, 0.17))
+    ivc.add_output("data:geometry:wing:area", units="m**2", val=16.2)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SlipstreamPEMFCStackBOP(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("delta_Cd") == pytest.approx([1.62e-6] * NB_POINTS_TEST, rel=1e-2)
 
     problem.check_partials(compact_print=True)
