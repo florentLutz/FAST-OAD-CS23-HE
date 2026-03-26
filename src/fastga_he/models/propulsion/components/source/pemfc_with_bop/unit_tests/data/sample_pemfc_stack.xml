@@ -65,6 +65,129 @@
                         <CG>
                             <y_ratio>0.34</y_ratio>
                         </CG>
+                        <air_inlet_1>
+                          <air_pressure_drop units="Pa" is_input="False">87851.71749746636</air_pressure_drop>
+                          <design_air_density units="kg/m**3" is_input="False">1.112</design_air_density>
+                          <design_air_mass_flow units="kg/s" is_input="False">1.08</design_air_mass_flow>
+                          <design_dynamic_viscosity units="kg/m/s" is_input="False">1.757864864661911e-05</design_dynamic_viscosity>
+                          <design_mach units="unitless" is_input="False">0.3</design_mach>
+                          <design_true_airspeed units="m/s" is_input="False">100.0</design_true_airspeed>
+                          <drag units="N" is_input="False">[98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548, 98.48512981986548]</drag>
+                          <highlight_width units="m" is_input="True">0.16080402010050251</highlight_width>
+                          <layer_thickness_highlight_height_ratio units="unitless" is_input="False">0.37160795494548243</layer_thickness_highlight_height_ratio>
+                          <lip_length units="m" is_input="True">0.010050251256281407</lip_length>
+                          <lip_ramp_floor_distance units="m" is_input="True">0.04399211496579995</lip_ramp_floor_distance>
+                          <mass_flow_ratio units="unitless" is_input="True">1.5</mass_flow_ratio>
+                          <max_ambient_dynamic_pressure units="Pa" is_input="False">5560.000000000001</max_ambient_dynamic_pressure>
+                          <max_boundary_layer_thickness units="m" is_input="False">0.01634781987616747</max_boundary_layer_thickness>
+                          <max_momentum_boundary_layer_thickness units="m" is_input="False">0.0016347819876167471</max_momentum_boundary_layer_thickness>
+                          <max_ram_pressure_efficiency units="unitless" is_input="False">0.9333769591464287</max_ram_pressure_efficiency>
+                          <ramp_angle units="rad" is_input="True">0.12217304763960307<!--Ramp angle of the inlet, defined as the angle between the inlet walls and the horizontal plane--></ramp_angle>
+                          <ramp_floor_inlet_plane_distance units="m" is_input="True">0.04901724059394066</ramp_floor_inlet_plane_distance>
+                          <ramp_length units="ft" is_input="True">3.28084</ramp_length>
+                          <specific_heat_ratio units="unitless" is_input="True">1.4</specific_heat_ratio>
+                          <throat_height units="m" is_input="True">0.04020100502512563</throat_height>
+                          <throat_height_layer_thickness_ratio units="unitless" is_input="False">0.027671666978487417</throat_height_layer_thickness_ratio>
+                        </air_inlet_1>
+                        <compressor_1>
+                          <efficiency units="unitless" is_input="True">0.85</efficiency>
+                          <power_rating units="W" is_input="False">71776.75307615961</power_rating>
+                          <power_required units="W" is_input="False">[71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961, 71776.75307615961]</power_required>
+                          <specific_heat_ratio units="unitless" is_input="True">1.4</specific_heat_ratio>
+                        </compressor_1>
+                        <coolant>
+                          <inlet_temperature units="degK" is_input="True">338.0</inlet_temperature>
+                          <intermediate_temperature units="degK" is_input="False">359.4498845945693</intermediate_temperature>
+                          <mass_flow_rate units="kg/s" is_input="True">4.1</mass_flow_rate>
+                          <mean_temperature units="degK" is_input="True">345.0</mean_temperature>
+                          <outlet_temperature units="degK" is_input="True">350.0</outlet_temperature>
+                          <static_pressure units="Pa" is_input="True">200000.0</static_pressure>
+                        </coolant>
+                        <diffuser_1>
+                          <air_pressure_drop units="Pa" is_input="False">[572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779]</air_pressure_drop>
+                          <alpha units="rad" is_input="True">0.1291761705310541</alpha>
+                          <appreciable_stall_alpha units="deg" is_input="False">3.6290792225466206</appreciable_stall_alpha>
+                          <appreciable_stall_beta units="deg" is_input="False">7.001206459560972</appreciable_stall_beta>
+                          <area_ratio units="unitless" is_input="True">0.43096554800804693</area_ratio>
+                          <beta units="rad" is_input="True">-0.05534543088756342</beta>
+                          <entry_hydraulic_diameter units="m" is_input="True">0.064321608040201</entry_hydraulic_diameter>
+                          <first_stall_alpha units="deg" is_input="False">2.082112443857347</first_stall_alpha>
+                          <first_stall_beta units="deg" is_input="False">4.904302551260198</first_stall_beta>
+                          <length_height_ratio units="unitless" is_input="True">24.875</length_height_ratio>
+                          <length_width_ratio units="unitless" is_input="True">6.21875</length_width_ratio>
+                          <relative_roughness units="unitless" is_input="True">0.0015546875000000003</relative_roughness>
+                        </diffuser_1>
+                        <primary_heat_exchanger_1>
+                          <NTU units="unitless" is_input="False">4.220793864851085</NTU>
+                          <UA units="W/degK" is_input="False">3076.312103991994</UA>
+                          <air_flow_length units="m" is_input="True">0.05800020852298081</air_flow_length>
+                          <air_flow_rate units="kg/s" is_input="True">0.72</air_flow_rate>
+                          <air_pressure_drop units="Pa" is_input="False">[7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123, 7900.297337025123]</air_pressure_drop>
+                          <coolant_flow_length units="m" is_input="True">0.5</coolant_flow_length>
+                          <coolant_pressure_drop units="Pa" is_input="False">172.30715231065554</coolant_pressure_drop>
+                          <effectiveness units="unitless" is_input="True">0.98</effectiveness>
+                          <fin_hydraulic_diameter units="m" is_input="True">0.0019236240206009904</fin_hydraulic_diameter>
+                          <free_flow_frontal_area_ratio units="unitless" is_input="True">0.4813398294485999</free_flow_frontal_area_ratio>
+                          <heat_exchanger_efficiency units="unitless" is_input="True">0.98</heat_exchanger_efficiency>
+                          <mean_air_dynamic_viscosity units="Pa*s" is_input="False">2.192420876783559e-05</mean_air_dynamic_viscosity>
+                          <mean_air_prandtl_number units="unitless" is_input="False">0.7007898108558872</mean_air_prandtl_number>
+                          <mean_air_temperature units="degK" is_input="False">373.4778274330515</mean_air_temperature>
+                          <mean_air_thermal_conductivity units="W/m/degK" is_input="False">0.03166940509781992</mean_air_thermal_conductivity>
+                          <mean_coolant_dynamic_viscosity units="Pa*s" is_input="False">0.0011115937467744703</mean_coolant_dynamic_viscosity>
+                          <mean_coolant_prandtl_number units="unitless" is_input="False">9.378702280006285</mean_coolant_prandtl_number>
+                          <mean_coolant_thermal_conductivity units="W/m/degK" is_input="False">0.4208973169495547</mean_coolant_thermal_conductivity>
+                          <no_flow_length units="m" is_input="True">0.29005</no_flow_length>
+                        </primary_heat_exchanger_1>
+                        <supplement_heat_exchanger_1>
+                          <NTU units="unitless" is_input="False">4.0086299308981435</NTU>
+                          <UA units="W/degK" is_input="False">968.1754753097949</UA>
+                          <air_flow_length units="m" is_input="True">0.05</air_flow_length>
+                          <air_flow_rate units="kg/s" is_input="True">0.24</air_flow_rate>
+                          <air_pressure_drop units="Pa" is_input="False">[2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707, 2549.2923490929707]</air_pressure_drop>
+                          <coolant_flow_length units="m" is_input="True">0.247004086459597</coolant_flow_length>
+                          <coolant_pressure_drop units="Pa" is_input="False">288.6433883586573</coolant_pressure_drop>
+                          <effectiveness units="unitless" is_input="True">0.98</effectiveness>
+                          <fin_hydraulic_diameter units="m" is_input="True">0.0019236240206009904</fin_hydraulic_diameter>
+                          <free_flow_frontal_area_ratio units="unitless" is_input="True">0.4813398294485999</free_flow_frontal_area_ratio>
+                          <heat_exchanger_efficiency units="unitless" is_input="True">0.98</heat_exchanger_efficiency>
+                          <mean_air_dynamic_viscosity units="Pa*s" is_input="False">1.869473290615439e-05</mean_air_dynamic_viscosity>
+                          <mean_air_prandtl_number units="unitless" is_input="False">0.7065709991581811</mean_air_prandtl_number>
+                          <mean_air_temperature units="degK" is_input="False">303.30325</mean_air_temperature>
+                          <mean_air_thermal_conductivity units="W/m/degK" is_input="False">0.026626269747620817</mean_air_thermal_conductivity>
+                          <mean_coolant_dynamic_viscosity units="Pa*s" is_input="False">0.0011115937467744703</mean_coolant_dynamic_viscosity>
+                          <mean_coolant_prandtl_number units="unitless" is_input="False">9.378702280006285</mean_coolant_prandtl_number>
+                          <mean_coolant_thermal_conductivity units="W/m/degK" is_input="False">0.4208973169495547</mean_coolant_thermal_conductivity>
+                          <no_flow_length units="m" is_input="True">0.29005</no_flow_length>
+                        </supplement_heat_exchanger_1>
+                        <humidifier_1>
+                          <air_pressure_drop units="Pa" is_input="False">[53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684]</air_pressure_drop>
+                        </humidifier_1>
+                        <nozzle_1>
+                          <air_pressure_drop units="Pa" is_input="False">[756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553]</air_pressure_drop>
+                          <alpha units="rad" is_input="True">-0.01905982212712133</alpha>
+                          <area_ratio units="unitless" is_input="True">2.0</area_ratio>
+                          <drag units="N" is_input="False">[10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217, 10.618705035971217]</drag>
+                          <entry_hydraulic_diameter units="m" is_input="True">0.2668019370261171</entry_hydraulic_diameter>
+                          <exit_height_length_ratio units="unitless" is_input="True">0.6</exit_height_length_ratio>
+                          <relative_roughness units="unitless" is_input="True">0.0003748098725018292</relative_roughness>
+                        </nozzle_1>
+                        <pipe_1>
+                          <coolant_pressure_drop units="Pa" is_input="False">404.6559928358105</coolant_pressure_drop>
+                          <darcy_friction_factor units="unitless" is_input="False">0.008093017480452071</darcy_friction_factor>
+                          <material_absolute_roughness units="m" is_input="True">1.5e-06<!--Absolute roughness of the pipe material, default is the absolute roughness of copper--></material_absolute_roughness>
+                          <number_of_pipes is_input="True">5.0<!--Number of the coolant pipes in the TMS--></number_of_pipes>
+                          <radius units="m" is_input="True">0.029031975416268386</radius>
+                          <reynolds_number units="unitless" is_input="False">80880.02880284692<!--Reynolds number of the flow in the pipe--></reynolds_number>
+                          <transport_velocity units="m/s" is_input="True">1.5<!--Pipe flow velocity--></transport_velocity>
+                        </pipe_1>
+                        <pump_1>
+                          <motor_efficiency units="unitless" is_input="True">0.9</motor_efficiency>
+                          <power_rating units="W" is_input="False">821.7936686456337</power_rating>
+                          <pressure_compensation units="Pa" is_input="False">100865.60653350512</pressure_compensation>
+                          <pump_efficiency units="unitless" is_input="True">0.65</pump_efficiency>
+                          <safety_factor units="unitless" is_input="True">1.2</safety_factor>
+                          <volumetric_flow_rate units="m**3/s" is_input="False">0.004766236110403029</volumetric_flow_rate>
+                        </pump_1>
                     </pemfc_stack_bop_1>
                 </PEMFC_stack_bop>
             </he_power_train>

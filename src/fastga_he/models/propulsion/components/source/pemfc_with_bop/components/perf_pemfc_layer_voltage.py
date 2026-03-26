@@ -53,7 +53,9 @@ class PerformancesPEMFCStackBOPSingleLayerVoltageEmpirical(om.Group):
         self.add_subsystem(
             "pemfc_operating_pressure",
             PerformancesPEMFCStackBOPOperatingPressure(
-                number_of_points=number_of_points, compressor_connection=compressor_connection
+                number_of_points=number_of_points,
+                compressor_connection=compressor_connection,
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
             ),
             promotes=["*"],
         )
@@ -107,7 +109,9 @@ class PerformancesPEMFCStackBOPSingleLayerVoltageAnalytical(om.Group):
         self.add_subsystem(
             "pemfc_operating_pressure",
             PerformancesPEMFCStackBOPOperatingPressure(
-                number_of_points=number_of_points, compressor_connection=compressor_connection
+                number_of_points=number_of_points,
+                compressor_connection=compressor_connection,
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
             ),
             promotes=["*"],
         )

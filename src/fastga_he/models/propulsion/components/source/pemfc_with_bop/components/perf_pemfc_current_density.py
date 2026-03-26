@@ -41,7 +41,7 @@ class PerformancesPEMFCStackBOPCurrentDensity(om.ExplicitComponent):
         else:
             max_current_density = MAX_CURRENT_DENSITY_EMPIRICAL
 
-        self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input("pemfc_dc_current", units="A", val=np.full(number_of_points, np.nan))
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -71,7 +71,7 @@ class PerformancesPEMFCStackBOPCurrentDensity(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="dc_current_out",
+            wrt="pemfc_dc_current",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -81,7 +81,7 @@ class PerformancesPEMFCStackBOPCurrentDensity(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         outputs["fc_current_density"] = (
-            inputs["dc_current_out"]
+            inputs["pemfc_dc_current"]
             / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
@@ -93,14 +93,14 @@ class PerformancesPEMFCStackBOPCurrentDensity(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         number_of_points = self.options["number_of_points"]
 
-        partials["fc_current_density", "dc_current_out"] = np.full(
+        partials["fc_current_density", "pemfc_dc_current"] = np.full(
             number_of_points,
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":effective_area"
             ]
-            ** -1,
+            ** -1.0,
         )
 
         partials[
@@ -109,11 +109,11 @@ class PerformancesPEMFCStackBOPCurrentDensity(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":effective_area",
         ] = (
-            -inputs["dc_current_out"]
+            -inputs["pemfc_dc_current"]
             / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":effective_area"
             ]
-            ** 2
+            ** 2.0
         )

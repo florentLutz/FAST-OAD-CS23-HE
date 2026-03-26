@@ -137,6 +137,6 @@ class PerformancesDiffuserDarcyFrictionFactor(om.ExplicitComponent):
 
         partials["diffuser_darcy_friction_factor", "air_reynolds_number"] = np.where(
             reynolds_number < 3000.0,
-            -64.0 / reynolds_number**2,
+            -64.0 / reynolds_number**2.0,
             2.0 * np.log(10) ** 2.0 * 6.9 / (reynolds_number**2.0 * haaland_common_denominator),
         )

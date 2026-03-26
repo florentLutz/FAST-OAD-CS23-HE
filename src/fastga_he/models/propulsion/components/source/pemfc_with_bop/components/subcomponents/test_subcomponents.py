@@ -633,13 +633,16 @@ def test_pipe_darcy_friction_factor():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPipeDarcyFrictionFactor(pemfc_stack_bop_id="pemfc_stack_bop_1"), ivc
+        PerformancesPipeDarcyFrictionFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", pipe_id="pipe_1"
+        ),
+        ivc,
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe_1"
         ":darcy_friction_factor",
         units="unitless",
-    ) == pytest.approx(0.00997, rel=1e-2)
+    ) == pytest.approx(0.0378, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -727,12 +730,12 @@ def test_pipe_performance():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe_1"
         ":darcy_friction_factor",
         units="unitless",
-    ) == pytest.approx(0.00997, rel=1e-2)
+    ) == pytest.approx(0.0239, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe_1"
         ":coolant_pressure_drop",
         units="Pa",
-    ) == pytest.approx(1447.56, rel=1e-2)
+    ) == pytest.approx(3465.83, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

@@ -30,7 +30,7 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
 
         self.add_input("power_out", units="kW", val=np.full(number_of_points, np.nan))
         self.add_input("thermal_power", units="kW", val=np.full(number_of_points, np.nan))
-        self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
+        self.add_input("pemfc_dc_current", units="A", val=np.full(number_of_points, np.nan))
         self.add_input("air_consumption", units="kg/s", val=np.full(number_of_points, np.nan))
 
         self.add_output(
@@ -83,7 +83,7 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
             of="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":current_max",
-            wrt="dc_current_out",
+            wrt="pemfc_dc_current",
             method="exact",
         )
         self.declare_partials(
@@ -107,7 +107,7 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
         ] = np.max(inputs["thermal_power"])
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":current_max"
-        ] = np.max(inputs["dc_current_out"])
+        ] = np.max(inputs["pemfc_dc_current"])
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -131,8 +131,8 @@ class PerformancesPEMFCStackBOPMaximum(om.ExplicitComponent):
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":current_max",
-            "dc_current_out",
-        ] = np.where(inputs["dc_current_out"] == np.max(inputs["dc_current_out"]), 1.0, 0.0)
+            "pemfc_dc_current",
+        ] = np.where(inputs["pemfc_dc_current"] == np.max(inputs["pemfc_dc_current"]), 1.0, 0.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

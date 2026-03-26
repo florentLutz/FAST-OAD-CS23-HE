@@ -32,7 +32,7 @@ class SlipstreamPEMFCStackBOPDeltaCd(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":bop_drag",
             units="N",
-            val=np.nan,
+            val=0.0,
             shape=number_of_points,
         )
 

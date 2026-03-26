@@ -20,7 +20,8 @@ from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackBOPSingleLayerVoltageEmpirical,
     PerformancesPEMFCStackBOPSingleLayerVoltageAnalytical,
 )
-from .perf_pemfc_air_inlet_outlet_drag import PerformancesPEMFCStackBOPAirInletOutletDrag
+from .perf_pemfc_bop_current_supply import PerformancesPEMFCStackBOPCurrentSupply
+from .subcomponents.perf_pemfc_bop import PerformancesPEMFCBOP
 
 
 class PerformancesPEMFCStackBOP(om.Group):
@@ -57,10 +58,10 @@ class PerformancesPEMFCStackBOP(om.Group):
             "Aerostak 200W empirical polarization model is set as default.",
         )
         self.options.declare(
-            name="drag_component_ids",
-            default="None",
-            desc="A list of the TBS components that create drag",
-            allow_none=False,
+            "coolant_fluid_type",
+            default="air",
+            types=str,
+            desc="Fluid type: air, water, hydrogen, ammonia, etc.",
         )
 
     def setup(self):
@@ -69,7 +70,7 @@ class PerformancesPEMFCStackBOP(om.Group):
         compressor_connection = self.options["compressor_connection"]
         direct_bus_connection = self.options["direct_bus_connection"]
         model_fidelity = self.options["model_fidelity"]
-        drag_component_ids = self.options["drag_component_ids"]
+        coolant_fluid_type = self.options["coolant_fluid_type"]
 
         self.add_subsystem(
             "pemfc_current_density",
@@ -181,12 +182,37 @@ class PerformancesPEMFCStackBOP(om.Group):
             promotes=["non_consumable_energy_t"],
         )
 
+        if compressor_connection:
+            self.add_subsystem(
+                "pemfc_bop",
+                PerformancesPEMFCBOP(
+                    pemfc_stack_bop_id=pemfc_stack_bop_id,
+                    number_of_points=number_of_points,
+                    coolant_fluid_type=coolant_fluid_type,
+                    compressor_id="compressor_1",
+                    pipe_id="pipe_1",
+                    air_inlet_id="air_inlet_1",
+                    primary_heat_exchanger_id="primary_heat_exchanger_1",
+                    supplement_heat_exchanger_id="supplement_heat_exchanger_1",
+                    humidifier_id="humidifier_1",
+                    diffuser_id="diffuser_1",
+                    nozzle_id="nozzle_1",
+                    pump_id="pump_1",
+                ),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
-            "air_inlet_outlet_drag",
-            PerformancesPEMFCStackBOPAirInletOutletDrag(
+            "supply_current",
+            PerformancesPEMFCStackBOPCurrentSupply(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 number_of_points=number_of_points,
-                drag_component_ids=drag_component_ids,
             ),
             promotes=["*"],
         )
+
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 50
+        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.linear_solver = om.DirectSolver()

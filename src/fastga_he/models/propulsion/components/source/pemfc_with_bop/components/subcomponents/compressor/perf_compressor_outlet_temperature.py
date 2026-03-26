@@ -154,11 +154,9 @@ class PerformancesCompressorOutletTemperature(om.ExplicitComponent):
         )
 
         partials["compressor_outlet_temperature", "compressor_pressure_ratio"] = (
-            2.0
-            * exterior_temperature
-            * (pressure_ratio ** ((gamma - 1.0) / gamma - 1.0) / efficiency)
+            exterior_temperature
             * (gamma - 1.0)
-            / (gamma * pressure_ratio)
+            / (gamma * pressure_ratio ** (1.0 / gamma) * efficiency)
         )
 
         partials[
