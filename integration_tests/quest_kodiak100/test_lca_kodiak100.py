@@ -20,6 +20,7 @@ from fastga_he.gui.lca_impact import (
     lca_impacts_search_table,
 )
 
+DATA_WO_LCA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 WORKDIR_FOLDER_PATH = pathlib.Path(__file__).parent / "workdir"
@@ -130,6 +131,148 @@ def test_lifespan_sensitivity_hybrid_kodiak100():
         file_name = xml_file_name + "_" + str(int(airframe_hours)) + ".xml"
         problem.output_file_path = RESULTS_SENSITIVITY_FOLDER_PATH / file_name
         problem.write_outputs()
+
+
+def test_hybrid_kodiak_sizing_with_lca_current_tech():
+    """
+    This is the case I'm presenting in my thesis, I'm just re-adding it for convenience since the
+    future scenario will be below.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_kodiak_with_lca_current.xml"
+    process_file_name = "hybrid_kodiak_retrofit_with_lca_current.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_WO_LCA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_WO_LCA_FOLDER_PATH / xml_file_name
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "hybrid_kodiak_n2.html"))
+
+    # Change battery pack characteristics so that they match those of a high power,
+    # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
+    # Pipistrel battery. Assumes same polarization curve
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 45.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    # I want to correct some input data without changing the input file which might be shared
+    problem.set_val("data:TLAR:max_airframe_hours", val=7077.0, units="h")
+    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=7.5)
+
+    problem.run_model()
+    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_sizing_with_lca_current_tech_out.xml"
+    problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        7.981102867555266e-06, rel=1e-2
+    )
+
+
+def test_hybrid_kodiak_sizing_with_lca_future_tech():
+    """
+    This test does the sizing of a future hybrid aircraft with similar requirement to the Kodiak
+    100. A design from scratch approach will be adopted as we don't expect rapid EIS. Given the
+    results on the existing Kodiak 100 and seeing the improvement possible, a feasible
+    design in highly plausible.  Max payload was selected with a range of 600 nm covering 99% of
+    the mission of the Kodiak 100. Please note this is outside the capabilities of the Kodiak
+    100 which is limited to 400 nm at this payload. Future tech will assume:
+    - SiC based power converters with higher switching frequencies.
+    - Future materials for electric motors
+    - Na-Ion batteries with practical energy densities of 700 Wh/kg and lifecycles of 12000 cycles
+    - For lack of accurate process for the Na-Ion LCA the default process will be used. It is worth
+    noting that doing so we will over-estimate the score of the battery pack as Sodium Ion batteries
+    are expected to have lower impacts (and costs)
+    - The airframe will be assumed to be made with additive manufacturing thus a BtF of 1 for
+    metallic materials
+    - An improvement of the turboshaft's sfc of -15% will be assumed according to the numbers
+    presented in Clean Sky's 2 Next gen small Turboprop (https://clean-aviation.eu/research-and-
+    innovation/clean-sky-2/clean-sky-2-achievement-report/clean-sky-2s-key-achievements/next-gen-
+    small-turboprop)
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_hybrid_kodiak_with_lca_future.xml"
+    process_file_name = "hybrid_kodiak_full_sizing_with_lca_future.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_WO_LCA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_WO_LCA_FOLDER_PATH / xml_file_name
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    # om.n2(problem, outfile=pth.join(RESULTS_FOLDER_PATH, "hybrid_kodiak_n2.html"))
+
+    # Change battery pack characteristics so that they match those of a high power,
+    # lower capacity cell like the Samsung INR18650-25R, we also take the weight fraction of the
+    # Pipistrel battery. Adjust the cell weight so that it reaches energy densities close to values
+    # matching a Sodium-Ion cell.
+    problem.model_options["*"] = {
+        "cell_capacity_ref": 2.5,
+        "cell_weight_ref": 10.0e-3,
+        "reference_curve_current": [500, 5000, 10000, 15000, 20000],
+        "reference_curve_relative_capacity": [1.0, 0.97, 1.0, 0.97, 0.95],
+    }
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:number_modules", val=30.0
+    )
+    problem.set_val("data:weight:aircraft:MTOW", val=3000.0, units="kg")
+    problem.set_val("data:geometry:wing:area", val=22.5, units="m**2")
+
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+        val=8.0,
+        units="h**-1",
+    )
+
+    # I want to correct some input data without changing the input file which might be shared
+    problem.set_val("data:TLAR:max_airframe_hours", val=7077.0, units="h")
+    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=1.0)
+    problem.set_val(
+        "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=12000.0
+    )
+
+    problem.run_model()
+    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_sizing_with_lca_future_tech_out.xml"
+    problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        5.79842067e-06, rel=1e-2
+    )
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")

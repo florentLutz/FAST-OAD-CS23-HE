@@ -474,7 +474,7 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
 
-    # Not a lot is known about Li-S cell, so we will assumed some characteristics that allow use to
+    # Not a lot is known about SIB cell, so we will assumed some characteristics that allow use to
     # reach the target energy density of 1300 Wh/kg. The C-rate caliber will be set as one at the
     # beginning, but might change if this cause the cell to be sized for power. The cell weight will
     # be set equal to that of the Ampirius cell and capacity will be changed accordingly
