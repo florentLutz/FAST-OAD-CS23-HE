@@ -338,6 +338,60 @@ def test_pemfc_stack_sizing():
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
+def test_pemfc_stack_sizing_with_bop():
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(
+            SizingPEMFCStackBOP(
+                pemfc_stack_bop_id="pemfc_stack_bop_1",
+                compressor_connection=True,
+                coolant_fluid_type="ethylene glycol",
+                model_fidelity="analytical",
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:current_max",
+        val=11.76,
+        units="A",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:power_max",
+        val=0.84417,
+        units="kW",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingPEMFCStackBOP(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            compressor_connection=True,
+            coolant_fluid_type="ethylene glycol",
+            model_fidelity="analytical",
+        ),
+        ivc,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:mass", units="kg"
+    ) == pytest.approx(119.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:CG:x", units="m"
+    ) == pytest.approx(2.037, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:CG:y", units="m"
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:low_speed:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:cruise:CD0",
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
 def test_constraints_enforce_effective_area():
     ivc = om.IndepVarComp()
     ivc.add_output(

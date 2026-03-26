@@ -30,7 +30,19 @@ from ..sizing_heat_exchanger_separating_plate_layer_count import (
     SizingHeatExchangerSeparatingPlateLayerCount,
 )
 from ..sizing_heat_exchanger_no_flow_length import SizingHeatExchangerNoFlowLength
-from ..sizing_heat_exchanger_flow_length import SizingHeatExchangerFlowLength
+from ..sizing_heat_exchanger_flow_length import (
+    SizingHeatExchangerFlowLength,
+    _HEXVolume,
+    _PlateArea,
+    _TotalTransferArea,
+    _ReynoldsNumber,
+    _ColburnNumber,
+    _HeatTransferCoefficient,
+    _DimensionlessIntermediateFactor,
+    _FinEfficiency,
+    _OverallSurfaceEfficiency,
+    _UADifference,
+)
 from ..sizing_total_transfer_area_volume_ratio import SizingTotalTransferAreaVolumeRatio
 from ..sizing_free_flow_frontal_area_ratio import SizingFreeFlowFrontalAreaRatio
 from ..sizing_heat_exchanger_plate_weight import SizingHeatExchangerPlateWeight
@@ -1110,3 +1122,303 @@ def test_sizing_heat_exchanger():
     ) == pytest.approx(4.09, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_heat_exchanger_hex_volume():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "air_flow_length",
+        units="m",
+        val=0.0907,
+    )
+    ivc.add_output(
+        "coolant_flow_length",
+        units="m",
+        val=0.05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:no_flow_length",
+        units="m",
+        val=0.719,
+    )
+
+    problem = run_system(
+        _HEXVolume(pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "HEX_volume",
+        units="m**3",
+    ) == pytest.approx(0.00328, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_plate_area():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "separating_plate_count",
+        units="unitless",
+        val=98.0,
+    )
+    ivc.add_output("coolant_flow_length", units="m", val=0.05)
+    ivc.add_output("air_flow_length", units="m", val=0.0907)
+
+    problem = run_system(
+        _PlateArea(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "plate_area",
+        units="m**2",
+    ) == pytest.approx(0.444, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_total_transfer_area():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "HEX_volume", units="m**3", val=0.00328
+    )  # from test_heat_exchanger_hex_volume result
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:transfer_area_volume_ratio",
+        units="1/m",
+        val=1000.9,
+    )  # from test_sizing_total_transfer_area_volume_ratio result
+
+    problem = run_system(
+        _TotalTransferArea(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "total_transfer_area",
+        units="m**2",
+    ) == pytest.approx(3.28, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_reynolds_number():
+    ivc = om.IndepVarComp()
+    ivc.add_output("coolant_flow_length", units="m", val=0.05)
+    ivc.add_output("air_flow_length", units="m", val=0.0907)
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:transfer_area_volume_ratio",
+        units="1/m",
+        val=1000.9,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_coolant_dynamic_viscosity",
+        units="Pa*s",
+        val=1.75e-3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_air_dynamic_viscosity",
+        units="Pa*s",
+        val=1.83e-5,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:no_flow_length",
+        units="m",
+        val=0.719,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:coolant:mass_flow_rate",
+        units="kg/s",
+        val=4.1,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_rate",
+        units="kg/h",
+        val=2600.0,  # convert from kg/h
+    )
+
+    problem = run_system(
+        _ReynoldsNumber(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "coolant_reynolds_number",
+        units="unitless",
+    ) == pytest.approx(260.45, rel=1e-2)
+    assert problem.get_val(
+        "air_reynolds_number",
+        units="unitless",
+    ) == pytest.approx(2418.54, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_colburn_number():
+    ivc = om.IndepVarComp()
+    ivc.add_output("coolant_reynolds_number", units="unitless", val=260.45)
+    ivc.add_output("air_reynolds_number", units="unitless", val=2418.54)
+
+    problem = run_system(
+        _ColburnNumber(),
+        ivc,
+    )
+
+    assert problem.get_val("coolant_colburn_number", units="unitless") == pytest.approx(
+        0.0305, rel=1e-2
+    )
+    assert problem.get_val("air_colburn_number", units="unitless") == pytest.approx(
+        0.0114, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_heat_transfer_coefficient():
+    ivc = om.IndepVarComp()
+    ivc.add_output("coolant_colburn_number", units="unitless", val=0.0305)
+    ivc.add_output("air_colburn_number", units="unitless", val=0.0114)
+    ivc.add_output("air_reynolds_number", units="unitless", val=2418.54)
+    ivc.add_output("coolant_reynolds_number", units="unitless", val=260.45)
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":mean_air_prandtl_number",
+        units="unitless",
+        val=0.7,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_coolant_prandtl_number",
+        units="unitless",
+        val=10.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_coolant_thermal_conductivity",
+        units="W/m/K",
+        val=0.27,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mean_air_thermal_conductivity",
+        units="W/m/K",
+        val=0.024,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:fin_hydraulic_diameter",
+        units="m",
+        val=1.92e-3,
+    )
+
+    problem = run_system(
+        _HeatTransferCoefficient(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "coolant_heat_transfer_coefficient",
+        units="W/m**2/K",
+    ) == pytest.approx(2406.69, rel=1e-2)
+    assert problem.get_val(
+        "air_heat_transfer_coefficient",
+        units="W/m**2/K",
+    ) == pytest.approx(306.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_dimensionless_intermediate_variables():
+    ivc = om.IndepVarComp()
+    ivc.add_output("air_heat_transfer_coefficient", units="W/m**2/K", val=306.0)
+    ivc.add_output("coolant_heat_transfer_coefficient", units="W/m**2/K", val=2406.69)
+
+    problem = run_system(
+        _DimensionlessIntermediateFactor(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "air_dimensionless_intermediate_factor", units="unitless"
+    ) == pytest.approx(159.11, rel=1e-2)
+    assert problem.get_val(
+        "coolant_dimensionless_intermediate_factor", units="unitless"
+    ) == pytest.approx(446.22, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_fin_efficiency():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "air_dimensionless_intermediate_factor",
+        units="unitless",
+        val=159.11,
+    )
+    ivc.add_output(
+        "coolant_dimensionless_intermediate_factor",
+        units="unitless",
+        val=446.22,
+    )
+
+    problem = run_system(
+        _FinEfficiency(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("air_fin_efficiency", units="unitless") == pytest.approx(0.925, rel=1e-2)
+    assert problem.get_val("coolant_fin_efficiency", units="unitless") == pytest.approx(
+        0.634, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_overall_surface_efficiency():
+    ivc = om.IndepVarComp()
+    ivc.add_output("air_fin_efficiency", units="unitless", val=0.925)
+    ivc.add_output("coolant_fin_efficiency", units="unitless", val=0.634)
+
+    problem = run_system(
+        _OverallSurfaceEfficiency(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("air_overall_surface_efficiency", units="unitless") == pytest.approx(
+        0.939, rel=1e-2
+    )
+    assert problem.get_val("coolant_overall_surface_efficiency", units="unitless") == pytest.approx(
+        0.704, rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_ua_difference():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:UA",
+        units="W/K",
+        val=3058.1,
+    )
+    ivc.add_output("air_overall_surface_efficiency", units="unitless", val=0.939)
+    ivc.add_output("coolant_overall_surface_efficiency", units="unitless", val=0.704)
+    ivc.add_output("air_heat_transfer_coefficient", units="W/m**2/K", val=306.0)
+    ivc.add_output("coolant_heat_transfer_coefficient", units="W/m**2/K", val=2406.69)
+    ivc.add_output("plate_area", units="m**2", val=0.444)
+    ivc.add_output("total_transfer_area", units="m**2", val=3.28)
+
+    problem = run_system(
+        _UADifference(pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"),
+        ivc,
+    )
+
+    problem.check_partials(compact_print=True)

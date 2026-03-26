@@ -104,6 +104,7 @@
                           <static_pressure units="Pa" is_input="True">200000.0</static_pressure>
                         </coolant>
                         <diffuser_1>
+                            <length units="m" is_input="True">1.0</length>
                           <air_pressure_drop units="Pa" is_input="False">[572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779, 572.1355973583779]</air_pressure_drop>
                           <alpha units="rad" is_input="True">0.1291761705310541</alpha>
                           <appreciable_stall_alpha units="deg" is_input="False">3.6290792225466206</appreciable_stall_alpha>
@@ -116,6 +117,7 @@
                           <length_height_ratio units="unitless" is_input="True">24.875</length_height_ratio>
                           <length_width_ratio units="unitless" is_input="True">6.21875</length_width_ratio>
                           <relative_roughness units="unitless" is_input="True">0.0015546875000000003</relative_roughness>
+                            <wall_thickness units="m" is_input="True">0.001</wall_thickness>
                         </diffuser_1>
                         <primary_heat_exchanger_1>
                           <NTU units="unitless" is_input="False">4.220793864851085</NTU>
@@ -163,6 +165,7 @@
                           <air_pressure_drop units="Pa" is_input="False">[53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684, 53791.55244861684]</air_pressure_drop>
                         </humidifier_1>
                         <nozzle_1>
+                            <wall_thickness units="m" is_input="True">0.001</wall_thickness>
                           <air_pressure_drop units="Pa" is_input="False">[756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553, 756.5925304281553]</air_pressure_drop>
                           <alpha units="rad" is_input="True">-0.01905982212712133</alpha>
                           <area_ratio units="unitless" is_input="True">2.0</area_ratio>
