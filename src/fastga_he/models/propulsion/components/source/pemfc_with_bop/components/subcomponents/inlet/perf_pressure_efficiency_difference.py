@@ -28,7 +28,7 @@ class PerformancesPressureEfficiencyDifference(om.ExplicitComponent):
 
         self.add_output(
             "pressure_efficiency_difference",
-            val=-0.03,
+            val=-0.05,
             units="unitless",
             shape=number_of_points,
         )

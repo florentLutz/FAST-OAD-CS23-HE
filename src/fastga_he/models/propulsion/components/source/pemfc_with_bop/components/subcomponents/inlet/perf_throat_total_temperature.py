@@ -52,7 +52,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
 
         self.add_output(
             "throat_total_temperature",
-            val=300.0,
+            val=295.0,
             units="K",
             shape=number_of_points,
         )

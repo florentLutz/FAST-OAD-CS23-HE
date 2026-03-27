@@ -45,6 +45,7 @@ class SizingHumidifierWeight(om.ExplicitComponent):
             + humidifier_id
             + ":mass",
             units="kg",
+            val=0.5,
         )
 
     def setup_partials(self):

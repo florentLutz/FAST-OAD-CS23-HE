@@ -69,7 +69,7 @@ class PerformancesAirMassVelocity(om.ExplicitComponent):
         self.add_output(
             name="air_mass_velocity",
             units="kg/s/m**2",
-            val=2.64,
+            val=23.0,
         )
 
     def setup_partials(self):

@@ -80,7 +80,7 @@ class PerformancesPipeCoolantPressureDrop(om.ExplicitComponent):
             + pipe_id
             + ":coolant_pressure_drop",
             units="Pa",
-            val=1e4,
+            val=1e3,
         )
 
     def setup_partials(self):

@@ -69,6 +69,8 @@
                             <throat_height_layer_thickness_ratio>0.0398</throat_height_layer_thickness_ratio>
                             <max_momentum_boundary_layer_thickness units="m">0.0016</max_momentum_boundary_layer_thickness>
                             <max_ambient_dynamic_pressure units="Pa">7145.0</max_ambient_dynamic_pressure>
+                            <ramp_length units="m">1.0</ramp_length>
+                            <ramp_angle units="deg">7.0</ramp_angle>
                         </air_inlet_1>
                         <coolant>
                             <static_pressure units="Pa">200000.0</static_pressure>

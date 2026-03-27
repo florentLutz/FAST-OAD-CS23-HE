@@ -66,7 +66,7 @@ class PerformancesPipeReynoldsNumber(om.ExplicitComponent):
             + pipe_id
             + ":reynolds_number",
             units="unitless",
-            val=3000.0,
+            val=2.7e4,
         )
 
     def setup_partials(self):

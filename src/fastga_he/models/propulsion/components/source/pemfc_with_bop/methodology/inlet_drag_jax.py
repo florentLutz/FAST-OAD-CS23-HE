@@ -49,17 +49,18 @@ def solve_with_sensitivities(Mach, mflowratio, initial_guess=0.1):
     return corr_x, dcorr_x_dMach, dcorr_x_dmflowratio
 
 
-# Example
-Mach = 0.8
-mflowratio = 0.4
+if __name__ == "__main__":
+    # Example
+    Mach = 0.8
+    mflowratio = 0.4
 
-corr_x, d_mach, d_mflowratio = solve_with_sensitivities(Mach, mflowratio)
+    corr_x, d_mach, d_mflowratio = solve_with_sensitivities(Mach, mflowratio)
 
-print(f"Inputs: Mach={Mach}, mflowratio={mflowratio}")
-print(f"\nOutput: corr_x = {corr_x:.8f}")
-print("\nSensitivities:")
-print(f"  ∂corr_x/∂Mach = {d_mach:.6f}")
-print(f"  ∂corr_x/∂mflowratio = {d_mflowratio:.6f}")
-print("\nInterpretation:")
-print(f"  If Mach increases by 0.01, corr_x changes by {d_mach * 0.01:.6f}")
-print(f"  If mflowratio increases by 0.01, corr_x changes by {d_mflowratio * 0.01:.6f}")
+    print(f"Inputs: Mach={Mach}, mflowratio={mflowratio}")
+    print(f"\nOutput: corr_x = {corr_x:.8f}")
+    print("\nSensitivities:")
+    print(f"  ∂corr_x/∂Mach = {d_mach:.6f}")
+    print(f"  ∂corr_x/∂mflowratio = {d_mflowratio:.6f}")
+    print("\nInterpretation:")
+    print(f"  If Mach increases by 0.01, corr_x changes by {d_mach * 0.01:.6f}")
+    print(f"  If mflowratio increases by 0.01, corr_x changes by {d_mflowratio * 0.01:.6f}")

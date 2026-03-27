@@ -1191,7 +1191,7 @@ PEMFC_STACK_BOP = {
     ATT: ["model_fidelity", "compressor_connection", "coolant_fluid_type"],
     PT: ["time_step", "altitude", "true_airspeed", "density", "exterior_temperature", "mach"],
     SPT: [],
-    PTS: ["bop_drag"],
+    PTS: [],
     IN: [(None, "fuel_consumed_t"), (None, "fuel_consumption")],
     OUT: [(None, "voltage_out"), ("dc_current_out", None)],
     CTC: "source",

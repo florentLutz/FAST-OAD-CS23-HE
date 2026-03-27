@@ -54,7 +54,7 @@ class SizingNozzleExitDimension(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":exit_width",
-            val=np.nan,
+            val=0.36,
             units="m",
             desc="Inner width of the nozzle exit",
         )
@@ -64,7 +64,7 @@ class SizingNozzleExitDimension(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":exit_height",
-            val=np.nan,
+            val=0.09,
             units="m",
             desc="Inner height of the nozzle exit",
         )

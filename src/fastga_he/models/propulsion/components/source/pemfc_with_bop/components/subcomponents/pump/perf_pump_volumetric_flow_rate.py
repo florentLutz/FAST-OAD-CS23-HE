@@ -58,7 +58,7 @@ class PerformancesPumpVolumetricFlowRate(om.ExplicitComponent):
             + pump_id
             + ":volumetric_flow_rate",
             units="m**3/s",
-            val=1e-4,
+            val=0.02,
         )
 
     def setup_partials(self):

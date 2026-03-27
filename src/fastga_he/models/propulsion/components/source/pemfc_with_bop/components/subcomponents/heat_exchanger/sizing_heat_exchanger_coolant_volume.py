@@ -69,7 +69,7 @@ class SizingHeatExchangerCoolantVolume(om.ExplicitComponent):
             + heat_exchanger_id
             + ":coolant_volume",
             units="m**3",
-            val=2.0,
+            val=0.003,
         )
 
     def setup_partials(self):

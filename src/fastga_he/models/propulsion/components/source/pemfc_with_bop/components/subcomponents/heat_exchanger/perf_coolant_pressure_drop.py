@@ -99,7 +99,7 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":coolant_pressure_drop",
             units="Pa",
-            val=1e4,
+            val=200.0,
         )
 
     def setup_partials(self):

@@ -35,7 +35,7 @@ class PerformancesThroatPressure(om.ExplicitComponent):
 
         self.add_output(
             "throat_total_pressure",
-            val=0.3,
+            val=12e4,
             units="Pa",
             shape=number_of_points,
         )

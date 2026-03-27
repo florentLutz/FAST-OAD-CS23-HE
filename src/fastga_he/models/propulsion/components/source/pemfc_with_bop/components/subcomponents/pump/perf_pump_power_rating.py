@@ -73,7 +73,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + pump_id
             + ":power_rating",
             units="W",
-            val=1e4,
+            val=300.0,
         )
 
     def setup_partials(self):

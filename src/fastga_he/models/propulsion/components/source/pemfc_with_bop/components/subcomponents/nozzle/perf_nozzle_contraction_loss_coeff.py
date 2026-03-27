@@ -59,7 +59,7 @@ class PerformancesNozzleContractionLossCoefficient(om.ExplicitComponent):
 
         self.add_output(
             "nozzle_contraction_loss_coefficient",
-            val=0.3,
+            val=0.18,
             units="unitless",
         )
 

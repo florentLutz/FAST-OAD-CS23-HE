@@ -90,7 +90,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":inlet_side_height",
-            val=np.nan,
+            val=0.721,
             units="m",
         )
         self.add_output(
@@ -99,7 +99,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":outlet_side_height",
-            val=np.nan,
+            val=0.092,
             units="m",
         )
         self.add_output(
@@ -108,7 +108,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":inlet_side_width",
-            val=np.nan,
+            val=0.093,
             units="m",
         )
         self.add_output(
@@ -117,7 +117,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":outlet_side_width",
-            val=np.nan,
+            val=0.36,
             units="m",
         )
 

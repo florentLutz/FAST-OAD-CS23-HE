@@ -73,7 +73,7 @@ class SizingHeatExchangerFinFactor(om.ExplicitComponent):
             + heat_exchanger_id
             + ":fin_spacing_height_ratio",
             units="unitless",
-            val=0.01,
+            val=0.19,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -82,7 +82,7 @@ class SizingHeatExchangerFinFactor(om.ExplicitComponent):
             + heat_exchanger_id
             + ":fin_thickness_length_ratio",
             units="unitless",
-            val=0.01,
+            val=0.03,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -91,7 +91,7 @@ class SizingHeatExchangerFinFactor(om.ExplicitComponent):
             + heat_exchanger_id
             + ":fin_thickness_spacing_ratio",
             units="unitless",
-            val=0.01,
+            val=0.08,
         )
 
     def setup_partials(self):

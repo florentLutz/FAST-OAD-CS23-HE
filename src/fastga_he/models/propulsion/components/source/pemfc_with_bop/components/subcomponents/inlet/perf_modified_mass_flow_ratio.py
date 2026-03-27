@@ -42,7 +42,7 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
 
         self.add_output(
             "modified_mass_flow_ratio",
-            val=1e-4,
+            val=0.6,
             units="unitless",
         )
 

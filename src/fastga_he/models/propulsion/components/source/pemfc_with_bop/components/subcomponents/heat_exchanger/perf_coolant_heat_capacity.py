@@ -38,7 +38,7 @@ class PerformancesCoolantHeatCapacity(om.ExplicitComponent):
         self.add_output(
             name="coolant_heat_capacity",
             units="W/K",
-            val=2.64,
+            val=14600.0,
         )
 
     def setup_partials(self):

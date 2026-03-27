@@ -47,6 +47,7 @@ class PerformancesHeatExchangerNTU(om.ImplicitComponent):
             + heat_exchanger_id
             + ":NTU",
             units="unitless",
+            val=4.2,
         )
 
     def setup_partials(self):

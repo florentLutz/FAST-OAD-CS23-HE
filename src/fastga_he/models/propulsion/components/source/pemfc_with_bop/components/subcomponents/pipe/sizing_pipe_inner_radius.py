@@ -59,7 +59,7 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
             + pipe_id
             + ":radius",
             units="m",
-            val=0.001,
+            val=0.03,
         )
 
     def setup_partials(self):

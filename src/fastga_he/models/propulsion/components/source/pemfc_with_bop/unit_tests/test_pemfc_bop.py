@@ -1106,7 +1106,7 @@ def test_performances_pemfc_dc_current():
     ivc = om.IndepVarComp()
     ivc.add_output("dc_current_out", np.linspace(1.68, 9.24, NB_POINTS_TEST), units="A")
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":bop_power_required",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
         units="W",
         val=30.0,
         shape=NB_POINTS_TEST,
@@ -1225,7 +1225,7 @@ def test_performances_pemfc_stack_analytical_add_bop():
     )
 
     assert problem.get_val(
-        "bop_drag",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_drag",
         units="N",
     ) == pytest.approx(
         [0.162, 0.163, 0.164, 0.165, 0.166, 0.167, 0.168, 0.17, 0.171, 0.172], rel=1e-2
@@ -1307,7 +1307,11 @@ def test_slipstream():
         units="kg/m**3",
         val=np.full(NB_POINTS_TEST, 1.112),
     )
-    ivc.add_output("bop_drag", units="N", val=np.full(NB_POINTS_TEST, 0.17))
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_drag",
+        units="N",
+        val=np.full(NB_POINTS_TEST, 0.17),
+    )
     ivc.add_output("data:geometry:wing:area", units="m**2", val=16.2)
 
     # Run problem and check obtained value(s) is/(are) correct

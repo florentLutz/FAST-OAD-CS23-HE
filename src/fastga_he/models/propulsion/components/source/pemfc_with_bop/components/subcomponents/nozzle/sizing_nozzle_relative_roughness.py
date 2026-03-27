@@ -45,7 +45,7 @@ class SizingNozzleRelativeRoughness(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":relative_roughness",
-            val=1e-5,
+            val=6e-4,
             units="unitless",
         )
 

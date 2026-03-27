@@ -47,7 +47,7 @@ class PerformancesInletPressureDrop(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":air_pressure_drop",
-            val=1e6,
+            val=1e4,
             units="Pa",
         )
         self.add_output(

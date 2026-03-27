@@ -48,7 +48,7 @@ class PerformancesHeatExchangerUA(om.ExplicitComponent):
             + heat_exchanger_id
             + ":UA",
             units="W/K",
-            val=2.64,
+            val=3000.0,
         )
 
     def setup_partials(self):

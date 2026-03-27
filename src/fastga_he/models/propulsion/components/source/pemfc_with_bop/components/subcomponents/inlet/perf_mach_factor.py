@@ -41,7 +41,7 @@ class PerformancesMachFactor(om.ExplicitComponent):
 
         self.add_output(
             "mach_factor",
-            val=1.0,
+            val=1.1,
             units="unitless",
         )
 

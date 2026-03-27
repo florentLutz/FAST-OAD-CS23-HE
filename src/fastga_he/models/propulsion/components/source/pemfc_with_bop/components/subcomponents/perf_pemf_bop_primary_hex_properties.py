@@ -146,9 +146,9 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.add_output("air_inlet_temperature", val=np.nan, units="K")
-        self.add_output("air_outlet_temperature", val=np.nan, units="K")
-        self.add_output("air_static_pressure", val=np.nan, units="Pa")
+        self.add_output("air_inlet_temperature", val=300.0, units="K")
+        self.add_output("air_outlet_temperature", val=360.0, units="K")
+        self.add_output("air_static_pressure", val=101325, units="Pa")
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
@@ -217,7 +217,7 @@ class _PrimaryHeatExchangerMeanAirTemperature(om.ExplicitComponent):
 
         self.add_output(
             "mean_air_temperature",
-            val=np.nan,
+            val=330.0,
             units="K",
         )
 
@@ -273,7 +273,7 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
 
         self.add_output(
             name="minimum_heat_capacity",
-            val=np.nan,
+            val=300.0,
             units="W/K",
         )
 
@@ -422,7 +422,7 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:intermediate_temperature",
-            val=np.nan,
+            val=330.0,
             units="K",
         )
 
@@ -587,12 +587,12 @@ class _CoolantTemperature(om.ExplicitComponent):
 
         self.add_output(
             name="coolant_inlet_temperature",
-            val=np.nan,
+            val=360.0,
             units="K",
         )
         self.add_output(
             name="coolant_outlet_temperature",
-            val=np.nan,
+            val=330.0,
             units="K",
         )
 

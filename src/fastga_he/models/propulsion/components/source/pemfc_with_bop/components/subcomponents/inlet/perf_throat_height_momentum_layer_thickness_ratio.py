@@ -68,7 +68,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + ":"
             + air_inlet_id
             + ":throat_height_layer_thickness_ratio",
-            val=0.04,
+            val=0.037,
             units="unitless",
         )
 

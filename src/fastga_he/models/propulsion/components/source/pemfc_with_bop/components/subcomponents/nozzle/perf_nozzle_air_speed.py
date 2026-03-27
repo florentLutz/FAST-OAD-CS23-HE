@@ -49,8 +49,8 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
             val=2.0,
         )
 
-        self.add_output("average_air_speed", val=60, units="m/s", shape=number_of_points)
-        self.add_output("exit_air_speed", val=80, units="m/s", shape=number_of_points)
+        self.add_output("average_air_speed", val=100, units="m/s", shape=number_of_points)
+        self.add_output("exit_air_speed", val=140, units="m/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]

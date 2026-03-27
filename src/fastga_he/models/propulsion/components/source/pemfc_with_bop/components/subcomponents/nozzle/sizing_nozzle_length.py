@@ -75,7 +75,7 @@ class SizingNozzleLength(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":length",
-            val=np.nan,
+            val=2.0,
             units="m",
         )
 

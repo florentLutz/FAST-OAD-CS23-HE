@@ -51,7 +51,7 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
 
         self.add_output(
             "inlet_efficiency",
-            val=0.3,
+            val=0.85,
             units="unitless",
             shape=number_of_points,
         )

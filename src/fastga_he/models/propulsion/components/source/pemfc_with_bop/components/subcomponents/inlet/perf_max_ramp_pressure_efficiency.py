@@ -45,7 +45,7 @@ class PerformancesMaxRamPressureEfficiency(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":max_ram_pressure_efficiency",
-            val=-0.03,
+            val=0.9,
             units="unitless",
         )
 

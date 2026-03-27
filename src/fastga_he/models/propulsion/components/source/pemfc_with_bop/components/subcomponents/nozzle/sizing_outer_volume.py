@@ -81,7 +81,7 @@ class SizingOuterVolume(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":outer_volume",
-            val=1e-3,
+            val=0.266,
             units="m**3",
         )
 

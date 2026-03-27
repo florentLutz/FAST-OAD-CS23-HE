@@ -163,6 +163,13 @@ from .source.pemfc import (
     LCCPEMFCStackCost,
     LCCPEMFCStackOperationalCost,
 )
+from .source.pemfc_with_bop import (
+    SizingPEMFCStackBOP,
+    PerformancesPEMFCStackBOP,
+    SlipstreamPEMFCStackBOP,
+    LCCPEMFCStackBOPCost,
+    LCCPEMFCStackBOPOperationalCost,
+)
 from .tanks.fuel_tanks import (
     SizingFuelTank,
     PerformancesFuelTank,

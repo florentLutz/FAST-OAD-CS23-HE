@@ -73,7 +73,7 @@ class SizingPipeWallThickness(om.ExplicitComponent):
             + pipe_id
             + ":wall_thickness",
             units="m",
-            val=0.005,
+            val=0.0001,
         )
 
     def setup_partials(self):

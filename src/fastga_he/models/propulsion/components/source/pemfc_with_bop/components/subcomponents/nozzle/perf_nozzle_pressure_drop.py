@@ -63,7 +63,7 @@ class PerformancesNozzlePressureDrop(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":air_pressure_drop",
-            val=0.3,
+            val=2000.0,
             units="Pa",
             shape=number_of_points,
         )

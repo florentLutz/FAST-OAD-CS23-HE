@@ -126,7 +126,7 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
 
         self.add_output(
             "momentum_flow_correction_factor",
-            val=1e-4,
+            val=0.93,
             units="unitless",
         )
 

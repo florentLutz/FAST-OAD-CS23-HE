@@ -221,7 +221,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            val=500.0,
+            val=50.0,
             units="N",
             shape=number_of_points,
         )

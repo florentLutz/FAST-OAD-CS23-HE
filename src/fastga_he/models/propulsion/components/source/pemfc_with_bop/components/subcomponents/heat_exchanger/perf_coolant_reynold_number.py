@@ -56,7 +56,7 @@ class PerformancesCoolantReynoldsNumber(om.ExplicitComponent):
         self.add_output(
             name="coolant_reynolds_number",
             units="unitless",
-            val=1e4,
+            val=500.0,
         )
 
     def setup_partials(self):

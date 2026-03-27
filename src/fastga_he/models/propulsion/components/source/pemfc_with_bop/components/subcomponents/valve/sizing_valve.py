@@ -44,7 +44,7 @@ class SizingValve(om.ExplicitComponent):
             + valve_id
             + ":volume",
             units="m**3",
-            val=0.0011,
+            val=0.0005,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -53,7 +53,7 @@ class SizingValve(om.ExplicitComponent):
             + valve_id
             + ":mass",
             units="kg",
-            val=2.64,
+            val=1.0,
         )
 
     def setup_partials(self):

@@ -46,7 +46,7 @@ class PerformancesInletDesignAirFlow(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":design_air_mass_flow",
-            val=np.nan,
+            val=1.0,
             units="kg/s",
         )
 

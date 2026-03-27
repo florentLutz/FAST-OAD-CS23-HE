@@ -48,7 +48,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":ramp_length",
-            val=1.0,
+            val=np.nan,
             units="m",
         )
 

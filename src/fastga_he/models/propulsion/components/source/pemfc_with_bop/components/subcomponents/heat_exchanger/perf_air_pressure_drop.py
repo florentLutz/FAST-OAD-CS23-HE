@@ -103,7 +103,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + heat_exchanger_id
             + ":air_pressure_drop",
             units="Pa",
-            val=1e4,
+            val=1.2e4,
             shape=number_of_points,
         )
 

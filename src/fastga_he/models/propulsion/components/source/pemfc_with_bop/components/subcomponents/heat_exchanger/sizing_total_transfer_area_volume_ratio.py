@@ -65,7 +65,7 @@ class SizingTotalTransferAreaVolumeRatio(om.ExplicitComponent):
             + heat_exchanger_id
             + ":transfer_area_volume_ratio",
             units="1/m",
-            val=1.0,
+            val=1000.0,
         )
 
     def setup_partials(self):

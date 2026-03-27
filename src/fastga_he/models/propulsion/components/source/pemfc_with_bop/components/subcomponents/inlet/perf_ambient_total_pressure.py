@@ -47,7 +47,7 @@ class PerformancesAmbientTotalPressure(om.ExplicitComponent):
 
         self.add_output(
             "ambient_total_pressure",
-            val=0.3,
+            val=11e4,
             units="Pa",
             shape=number_of_points,
         )

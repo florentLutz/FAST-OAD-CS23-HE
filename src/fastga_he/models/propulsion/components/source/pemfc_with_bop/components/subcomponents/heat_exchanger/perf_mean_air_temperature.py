@@ -47,7 +47,7 @@ class PerformancesMeanAirTemperature(om.ExplicitComponent):
             + heat_exchanger_id
             + ":mean_air_temperature",
             units="K",
-            val=np.nan,
+            val=300.0,
         )
 
     def setup_partials(self):

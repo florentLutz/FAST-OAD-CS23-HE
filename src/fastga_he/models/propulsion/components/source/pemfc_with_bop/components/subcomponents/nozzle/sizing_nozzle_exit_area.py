@@ -70,7 +70,7 @@ class SizingNozzleExitArea(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":exit_area",
-            val=np.nan,
+            val=0.033,
             units="m**2",
         )
 

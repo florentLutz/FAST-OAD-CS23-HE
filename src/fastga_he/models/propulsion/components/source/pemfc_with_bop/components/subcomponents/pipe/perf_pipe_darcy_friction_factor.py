@@ -314,7 +314,7 @@ class _PipeDarcyFrictionFactor(om.ExplicitComponent):
             + pipe_id
             + ":darcy_friction_factor",
             units="unitless",
-            val=0.001,
+            val=0.035,
         )
 
     def setup_partials(self):

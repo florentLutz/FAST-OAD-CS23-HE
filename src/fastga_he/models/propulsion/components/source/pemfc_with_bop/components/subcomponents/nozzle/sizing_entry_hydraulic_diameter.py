@@ -61,7 +61,7 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":entry_hydraulic_diameter",
-            val=0.1,
+            val=0.16,
             units="m",
         )
 

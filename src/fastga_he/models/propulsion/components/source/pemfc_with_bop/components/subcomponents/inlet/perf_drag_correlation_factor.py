@@ -47,6 +47,7 @@ class PerformancesDragCorrelationFactor(om.ImplicitComponent):
         self.add_output(
             "drag_correlation_factor",
             units="unitless",
+            val=-0.022,
         )
 
     def setup_partials(self):

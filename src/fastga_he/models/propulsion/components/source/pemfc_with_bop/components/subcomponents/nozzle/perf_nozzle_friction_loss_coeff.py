@@ -60,7 +60,7 @@ class PerformancesNozzleFrictionLossCoefficient(om.ExplicitComponent):
 
         self.add_output(
             "nozzle_friction_loss_coefficient",
-            val=0.3,
+            val=0.03,
             units="unitless",
             shape=number_of_points,
         )

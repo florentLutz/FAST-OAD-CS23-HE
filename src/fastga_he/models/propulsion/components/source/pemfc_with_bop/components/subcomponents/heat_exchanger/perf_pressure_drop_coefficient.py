@@ -42,7 +42,7 @@ class PerformancesPressureDropCoefficient(om.ExplicitComponent):
         self.add_output(
             name="entrance_pressure_drop_coefficient",
             units="unitless",
-            val=2.64,
+            val=0.5,
         )
         self.add_output(
             name="exit_pressure_drop_coefficient",

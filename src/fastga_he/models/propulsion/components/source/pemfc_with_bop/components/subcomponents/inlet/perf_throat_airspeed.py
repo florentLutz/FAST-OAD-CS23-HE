@@ -62,7 +62,7 @@ class PerformancesThroatAirSpeed(om.ExplicitComponent):
 
         self.add_output(
             "throat_air_speed",
-            val=0.3,
+            val=65.0,
             units="m/s",
             shape=number_of_points,
         )

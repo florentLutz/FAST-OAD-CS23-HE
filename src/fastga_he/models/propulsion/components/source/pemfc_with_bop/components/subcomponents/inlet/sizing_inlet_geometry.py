@@ -55,7 +55,7 @@ class SizingInletGeometry(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":ramp_angle",
-            val=np.deg2rad(7.0),
+            val=np.nan,
             units="rad",
             desc="Ramp angle of the inlet, defined as the angle between the inlet walls and the "
             "horizontal plane",

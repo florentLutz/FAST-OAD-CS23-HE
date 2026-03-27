@@ -35,7 +35,7 @@ class SizingInletWeight(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":ramp_length",
-            val=3.28084,
+            val=np.nan,
             units="ft",
         )
         self.add_input(

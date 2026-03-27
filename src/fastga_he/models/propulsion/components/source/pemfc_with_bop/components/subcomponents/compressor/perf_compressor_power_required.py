@@ -82,7 +82,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_required",
-            val=0.3,
+            val=50.0,
             units="W",
             shape=number_of_points,
         )

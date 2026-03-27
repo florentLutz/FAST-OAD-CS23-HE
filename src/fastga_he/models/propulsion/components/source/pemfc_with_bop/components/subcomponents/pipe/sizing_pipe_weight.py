@@ -75,7 +75,7 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pipe_id
             + ":mass",
             units="kg",
-            val=2.0,
+            val=5.0,
         )
 
     def setup_partials(self):

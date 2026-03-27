@@ -50,7 +50,7 @@ class PerformancesNozzleInletPressure(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.add_output("nozzle_inlet_pressure", val=100.0, units="Pa", shape=number_of_points)
+        self.add_output("nozzle_inlet_pressure", val=1e5, units="Pa", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]

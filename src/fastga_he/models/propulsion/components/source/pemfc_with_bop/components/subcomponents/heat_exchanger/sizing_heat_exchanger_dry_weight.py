@@ -55,7 +55,7 @@ class SizingHeatExchangerDryWeight(om.ExplicitComponent):
             + heat_exchanger_id
             + ":mass",
             units="kg",
-            val=2.0,
+            val=6.0,
         )
 
     def setup_partials(self):

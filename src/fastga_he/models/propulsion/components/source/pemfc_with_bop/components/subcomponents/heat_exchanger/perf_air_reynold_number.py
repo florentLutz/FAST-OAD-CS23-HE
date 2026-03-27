@@ -56,7 +56,7 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
         self.add_output(
             name="air_reynolds_number",
             units="unitless",
-            val=1e4,
+            val=2400.0,
         )
 
     def setup_partials(self):

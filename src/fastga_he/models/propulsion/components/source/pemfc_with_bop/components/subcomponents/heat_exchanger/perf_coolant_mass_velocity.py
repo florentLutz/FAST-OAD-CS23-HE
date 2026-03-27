@@ -67,7 +67,7 @@ class PerformancesCoolantMassVelocity(om.ExplicitComponent):
         self.add_output(
             name="coolant_mass_velocity",
             units="kg/s/m**2",
-            val=2.64,
+            val=230.0,
         )
 
     def setup_partials(self):

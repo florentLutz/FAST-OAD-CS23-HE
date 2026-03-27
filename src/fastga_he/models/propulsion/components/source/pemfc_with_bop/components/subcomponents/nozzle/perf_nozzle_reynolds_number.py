@@ -61,7 +61,7 @@ class PerformancesNozzleReynoldsNumber(om.ExplicitComponent):
             units="m",
         )
 
-        self.add_output("air_reynolds_number", val=0.3, units="unitless", shape=number_of_points)
+        self.add_output("air_reynolds_number", val=1.3e6, units="unitless", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]

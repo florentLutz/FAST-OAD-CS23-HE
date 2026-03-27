@@ -47,7 +47,7 @@ class PerformancesAirHeatCapacity(om.ExplicitComponent):
         self.add_output(
             name="air_heat_capacity",
             units="W/K",
-            val=2.64,
+            val=500.0,
         )
 
     def setup_partials(self):

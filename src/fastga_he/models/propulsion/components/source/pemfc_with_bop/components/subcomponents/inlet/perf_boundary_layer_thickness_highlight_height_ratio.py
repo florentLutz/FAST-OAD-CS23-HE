@@ -54,7 +54,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
             + ":"
             + air_inlet_id
             + ":layer_thickness_highlight_height_ratio",
-            val=1e-4,
+            val=0.37,
             units="unitless",
         )
 

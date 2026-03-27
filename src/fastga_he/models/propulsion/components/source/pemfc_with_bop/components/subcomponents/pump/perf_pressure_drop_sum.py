@@ -54,7 +54,7 @@ class PerformancesCoolantSystemPressureDrop(om.ExplicitComponent):
             + pump_id
             + ":pressure_compensation",
             units="Pa",
-            val=11.0e4,
+            val=1e5,
         )
 
     def setup_partials(self):

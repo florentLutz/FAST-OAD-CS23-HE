@@ -35,7 +35,7 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":ramp_angle",
-            val=7.0,
+            val=np.nan,
             units="deg",
             desc="Ramp angle of the inlet, defined as the angle between the inlet walls and the "
             "horizontal plane",
@@ -43,7 +43,7 @@ class PerformancesRampAngleFactor(om.ExplicitComponent):
 
         self.add_output(
             "ramp_angle_factor",
-            val=1.0,
+            val=1.1,
             units="unitless",
         )
 

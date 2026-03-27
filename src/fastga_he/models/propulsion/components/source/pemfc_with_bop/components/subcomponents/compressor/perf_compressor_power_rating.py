@@ -50,7 +50,7 @@ class PerformancesCompressorPowerRating(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_rating",
-            val=0.3,
+            val=30.0,
             units="W",
         )
 

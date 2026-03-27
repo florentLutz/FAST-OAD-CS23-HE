@@ -58,7 +58,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":drag",
-            val=0.3,
+            val=30.0,
             units="N",
             shape=number_of_points,
         )

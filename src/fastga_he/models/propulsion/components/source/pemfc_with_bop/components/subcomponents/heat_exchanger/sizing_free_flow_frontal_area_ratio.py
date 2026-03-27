@@ -56,7 +56,7 @@ class SizingFreeFlowFrontalAreaRatio(om.ExplicitComponent):
             + heat_exchanger_id
             + ":free_flow_frontal_area_ratio",
             units="unitless",
-            val=0.3,
+            val=0.5,
         )
 
     def setup_partials(self):

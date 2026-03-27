@@ -70,7 +70,7 @@ class SizingNozzleAlphaAngle(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":alpha",
-            val=np.nan,
+            val=0.035,
             units="rad",
         )
 
