@@ -275,6 +275,56 @@ def test_hybrid_kodiak_sizing_with_lca_future_tech():
     )
 
 
+def test_thermal_kodiak_sizing_with_lca_future_tech():
+    """
+    This test does the sizing of a future thermal aircraft with similar requirement to the Kodiak
+    100. Max payload was selected with a range of 600 nm covering 99% of the mission of the Kodiak
+    100. Please note this is outside the capabilities of the Kodiak 100 which is limited to
+    400 nm at this payload. Future tech will assume:
+    - The airframe will be assumed to be made with additive manufacturing thus a BtF of 1 for
+    metallic materials
+    - An improvement of the turboshaft's sfc of -15% will be assumed according to the numbers
+    presented in Clean Sky's 2 Next gen small Turboprop (https://clean-aviation.eu/research-and-
+    innovation/clean-sky-2/clean-sky-2-achievement-report/clean-sky-2s-key-achievements/next-gen-
+    small-turboprop)
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+    logging.getLogger("bw2data").disabled = True
+    logging.getLogger("bw2calc").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_kodiak100_with_lca_future.xml"
+    process_file_name = "full_sizing_kodiak100_with_lca_future.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_WO_LCA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_WO_LCA_FOLDER_PATH / xml_file_name
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+
+    problem.setup()
+
+    # I want to correct some input data without changing the input file which might be shared
+    problem.set_val("data:TLAR:max_airframe_hours", val=7077.0, units="h")
+    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=1.0)
+
+    problem.run_model()
+    problem.output_file_path = RESULTS_FOLDER_PATH / "thermal_kodiak_sizing_with_lca_future_tech_out.xml"
+    problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        7.86589636e-06, rel=1e-2
+    )
+    # For the aircraft with current tech on same design mission it 9.52e-06 and not 8 something as
+    # on the other case due to the projections made by premise.
+
+
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_single_score_sensitivity_analysis_two_plots():
     # Check that we can create a plot
