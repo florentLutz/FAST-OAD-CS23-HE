@@ -32,6 +32,7 @@ RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_2 = pth.join(
 RESULTS_FULL_SIZING_SENSITIVITY_FOLDER_PATH_3 = pth.join(
     pth.dirname(__file__), "results_sensitivity_full_sizing_3"
 )
+RESULTS_TIME_SENSITIVITY = pth.join(RESULTS_FOLDER_PATH, "time_sensitivity")
 
 
 @pytest.fixture(scope="module")
@@ -366,6 +367,7 @@ def test_sizing_kodiak_100_full_electric_future_lis_with_lca_optimistic_ssp():
         1.94638357e-06, rel=1e-2
     )
 
+
 def test_sizing_kodiak_100_full_electric_future_lis_with_lca_custom_process():
     """
     This test does the sizing of a future aircraft with similar requirement to the electric
@@ -475,11 +477,11 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     problem.read_inputs()
 
     # Not a lot is known about SIB cell, so we will assumed some characteristics that allow use to
-    # reach the target energy density of 1300 Wh/kg. The C-rate caliber will be set as one at the
+    # reach the target energy density of 700 Wh/kg. The C-rate caliber will be set as one at the
     # beginning, but might change if this cause the cell to be sized for power. The cell weight will
     # be set equal to that of the Ampirius cell and capacity will be changed accordingly
     problem.model_options["*"] = {
-        "cell_capacity_ref": 3.72,
+        "cell_capacity_ref": 3.03,
         "cell_weight_ref": 11.7e-3,
         "reference_curve_current": [100.0, 1000.0, 3000.0, 3720.0],
         "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
@@ -489,12 +491,12 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
 
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
-        val=1.0,
+        val=1.2,
         units="h**-1",
     )
     problem.set_val(
         "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
-        val=1.0,
+        val=1.2,
         units="h**-1",
     )
 
@@ -517,6 +519,104 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
         1.747306946521163e-06, rel=1e-2
     )
+
+
+def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca_time_sensitivity():
+    """
+    This test explores the sensitivity of the single score of the electric K100 with Na-ion cell
+    to the cell density and expected lifespan. It will sweep values fom current tech (395 Wh/kg,
+    150 cycles) to futuristic techs (values representative of Li-S and SIB). Each time, the design
+    range will be adjusted to what is possible given the cell energy density. This will be done
+    based on the results obtained with the electric aircraft and their different cell chemistry
+    (likely via a polynomial function). One thing to keep in mind is that the cell chemistry is a
+    discrete variable, which I can't change as continuous variable like I plan to do on cell
+    longevity and energy density. So the same manufacturing process and cell voltage will be used
+    for all points of the upcoming graph. Therefore, what I will mark a Li-S and Si-NMC will not
+    actually be those chemistry (so not the same results) bu something close. As a future work, it
+    would be interesting to look into the space created to see where each battery is actually
+    located and change the processes accordingly.
+    """
+
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_elec_kodiak100_na_ion.xml"
+    process_file_name = "full_sizing_kodiak100_elec_na_ion_with_lca.yml"
+
+    investigated_energy_densities = np.array([700.0])  # As a proof of concept
+    # investigated_energy_densities = np.array([395.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1100.0, 1200.0, 1300.0])
+    # investigated_lifespans = np.array(
+    #     [
+    #         150.0,
+    #         1000.0,
+    #         2000.0,
+    #         3000.0,
+    #         4000.0,
+    #         5000.0,
+    #         6000.0,
+    #         7000.0,
+    #         8000.0,
+    #         9000.0,
+    #         10000.0,
+    #         11000.0,
+    #         12000.0,
+    #     ]
+    # )
+    investigated_lifespans = np.array(
+        [
+            12000.0,
+        ]
+    )
+
+    for investigated_energy_density in investigated_energy_densities:
+
+        # The cell has a nominal voltage of 2.7 V
+        cell_capacity_ref = investigated_energy_density * 11.7e-3 / 2.7
+
+        configurator = oad.FASTOADProblemConfigurator(pth.join(DATA_FOLDER_PATH, process_file_name))
+        problem = configurator.get_problem()
+
+        # Load inputs
+        ref_inputs = pth.join(DATA_FOLDER_PATH, xml_file_name)
+
+        problem.write_needed_inputs(ref_inputs)
+        problem.read_inputs()
+
+        problem.model_options["*"] = {
+            "cell_capacity_ref": 3.72,
+            "cell_weight_ref": 11.7e-3,
+            "reference_curve_current": [100.0, 1000.0, 3000.0, 3720.0],
+            "reference_curve_relative_capacity": [1.0, 0.99, 0.98, 0.97],
+        }
+
+        problem.setup()
+
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:cell:c_rate_caliber",
+            val=1.0,
+            units="h**-1",
+        )
+        problem.set_val(
+            "data:propulsion:he_power_train:battery_pack:battery_pack_2:cell:c_rate_caliber",
+            val=1.0,
+            units="h**-1",
+        )
+
+        for investigated_lifespan in investigated_lifespans:
+
+            problem.set_val(
+                "data:propulsion:he_power_train:battery_pack:battery_pack_1:lifespan", val=investigated_lifespan
+            )
+            problem.set_val(
+                "data:propulsion:he_power_train:battery_pack:battery_pack_2:lifespan", val=investigated_lifespan
+            )
+
+            problem.run_model()
+            file_name = str(int(investigated_energy_density)) + "_wh_per_kg_" + str(int(investigated_lifespan)) + "_cycles.xml"
+            problem.output_file_path = pth.join(RESULTS_TIME_SENSITIVITY, file_name)
+            problem.write_outputs()
 
 
 def test_operational_mission_kodiak_100():
@@ -1266,7 +1366,6 @@ def test_operational_mission_kodiak_100_hefa():
 
 
 def test_compare_designs():
-
     ref_design_output_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_ref.xml")
     hybrid_design_output_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_he_with_lca.xml")
     elec_design_output_file = pth.join(RESULTS_FOLDER_PATH, "oad_process_outputs_elec_with_lca.xml")
@@ -1274,7 +1373,11 @@ def test_compare_designs():
     fig = mass_breakdown_bar_plot(
         ref_design_output_file, name="Reference Kodiak 100 on design mission"
     )
-    fig = mass_breakdown_bar_plot(hybrid_design_output_file, name="Hybrid Kodiak 100 on design mission", fig=fig)
-    fig = mass_breakdown_bar_plot(elec_design_output_file, name="Electric design on design mission", fig=fig)
+    fig = mass_breakdown_bar_plot(
+        hybrid_design_output_file, name="Hybrid Kodiak 100 on design mission", fig=fig
+    )
+    fig = mass_breakdown_bar_plot(
+        elec_design_output_file, name="Electric design on design mission", fig=fig
+    )
     fig.update_layout(font=dict(size=20))
     fig.show()

@@ -183,7 +183,9 @@ def test_hybrid_kodiak_sizing_with_lca_current_tech():
     problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=7.5)
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_sizing_with_lca_current_tech_out.xml"
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "hybrid_kodiak_sizing_with_lca_current_tech_out.xml"
+    )
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
@@ -267,7 +269,9 @@ def test_hybrid_kodiak_sizing_with_lca_future_tech():
     )
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "hybrid_kodiak_sizing_with_lca_future_tech_out.xml"
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "hybrid_kodiak_sizing_with_lca_future_tech_out.xml"
+    )
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
@@ -315,7 +319,9 @@ def test_thermal_kodiak_sizing_with_lca_future_tech():
     problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=1.0)
 
     problem.run_model()
-    problem.output_file_path = RESULTS_FOLDER_PATH / "thermal_kodiak_sizing_with_lca_future_tech_out.xml"
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "thermal_kodiak_sizing_with_lca_future_tech_out.xml"
+    )
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(

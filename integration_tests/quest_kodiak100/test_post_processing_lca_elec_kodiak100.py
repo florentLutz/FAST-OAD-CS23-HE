@@ -176,16 +176,18 @@ def test_search_engine_airframe():
 
 
 def test_search_engine_energy_intensity():
-
     design_datafile_2025 = oad.DataFile(
         RESULTS_FOLDER_PATH / "oad_process_outputs_elec_with_lca.xml"
     )
     flights_per_fu_2025_design = design_datafile_2025[
         "data:environmental_impact:flight_per_fu"
     ].value[0]
-    electricity_used_2025_design = design_datafile_2025[
-        "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route"
-    ].value[0] * 2.0
+    electricity_used_2025_design = (
+        design_datafile_2025[
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route"
+        ].value[0]
+        * 2.0
+    )
     electricity_unit = design_datafile_2025[
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route"
     ].units
@@ -200,7 +202,7 @@ def test_search_engine_energy_intensity():
         rel=False,
     )
 
-    impact_one_flight_2025= impacts_value_2025_design[0] * fu_per_flights_2025_design
+    impact_one_flight_2025 = impacts_value_2025_design[0] * fu_per_flights_2025_design
     impact_per_kwh_of_energy_used_2025 = impact_one_flight_2025 / electricity_used_2025_design
     print("2025 design, impact per kWh", impact_per_kwh_of_energy_used_2025)
 
@@ -210,9 +212,12 @@ def test_search_engine_energy_intensity():
     flights_per_fu_2040_design = design_datafile_2040[
         "data:environmental_impact:flight_per_fu"
     ].value[0]
-    electricity_used_2040_design = design_datafile_2040[
-                                       "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route"
-                                   ].value[0] * 2.0
+    electricity_used_2040_design = (
+        design_datafile_2040[
+            "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route"
+        ].value[0]
+        * 2.0
+    )
     electricity_unit = design_datafile_2040[
         "data:propulsion:he_power_train:battery_pack:battery_pack_1:energy_consumed_main_route"
     ].units
@@ -294,6 +299,7 @@ def test_lca_bar_chart_relative_contribution_li_ion():
     fig["layout"]["xaxis"]["tickfont"]["size"] = 20
 
     fig.show()
+
 
 def test_lca_bar_chart_relative_contribution_lis():
     fig = lca_impacts_bar_chart_with_contributors(
