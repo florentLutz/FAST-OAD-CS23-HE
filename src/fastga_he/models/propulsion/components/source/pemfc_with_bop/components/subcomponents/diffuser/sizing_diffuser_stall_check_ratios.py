@@ -70,7 +70,7 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":length_height_ratio",
-            val=np.nan,
+            val=2.0,
             units="unitless",
         )
         self.add_output(
@@ -79,7 +79,7 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":length_width_ratio",
-            val=np.nan,
+            val=2.0,
             units="unitless",
         )
 

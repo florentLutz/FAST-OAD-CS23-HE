@@ -129,7 +129,7 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
         )
         self.add_input(
             "exterior_temperature",
-            val=np.nan,
+            val=297.15,
             units="K",
             shape=number_of_points,
         )
@@ -140,7 +140,7 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
-            "total_air_mass_flow_rate",
+            "total_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -152,11 +152,11 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.add_output("air_inlet_temperature", val=np.nan, units="K")
-        self.add_output("mean_air_temperature", val=np.nan, units="K")
-        self.add_output("air_static_pressure", val=np.nan, units="Pa")
-        self.add_output("max_total_air_flow_rate", val=np.nan, units="kg/s")
-        self.add_output("air_mass_flow", val=np.nan, units="kg/s", shape=number_of_points)
+        self.add_output("air_inlet_temperature", val=300.0, units="K")
+        self.add_output("mean_air_temperature", val=320.0, units="K")
+        self.add_output("air_static_pressure", val=101325.0, units="Pa")
+        self.add_output("max_total_air_flow_rate", val=1.08, units="kg/s")
+        self.add_output("air_mass_flow", val=0.36, units="kg/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
@@ -186,14 +186,14 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
         )
         self.declare_partials(
             of="max_total_air_flow_rate",
-            wrt="total_air_mass_flow_rate",
+            wrt="total_air_mass_flow",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
         )
         self.declare_partials(
             of="air_mass_flow",
-            wrt="total_air_mass_flow_rate",
+            wrt="total_air_mass_flow",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -214,7 +214,7 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
         exterior_temperature = inputs["exterior_temperature"]
         diffuser_exit_total_pressure = inputs["diffuser_exit_total_pressure"]
         ambient_pressure = inputs["ambient_pressure"]
-        total_air_mass_flow_rate = inputs["total_air_mass_flow_rate"]
+        total_air_mass_flow = inputs["total_air_mass_flow"]
         air_consumption = inputs["air_consumption"]
 
         outputs["mean_air_temperature"] = np.sum(
@@ -224,22 +224,22 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
             2.0 * number_of_points
         )
         outputs["air_inlet_temperature"] = np.max(exterior_temperature)
-        outputs["max_total_air_flow_rate"] = np.max(total_air_mass_flow_rate)
-        outputs["air_mass_flow"] = total_air_mass_flow_rate - air_consumption
+        outputs["max_total_air_flow_rate"] = np.max(total_air_mass_flow)
+        outputs["air_mass_flow"] = total_air_mass_flow - air_consumption
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         exterior_temperature = inputs["exterior_temperature"]
-        total_air_mass_flow_rate = inputs["total_air_mass_flow_rate"]
+        total_air_mass_flow = inputs["total_air_mass_flow"]
 
         air_inlet_temperature = np.max(exterior_temperature)
-        max_air_flow_rate = np.max(total_air_mass_flow_rate)
+        max_air_flow_rate = np.max(total_air_mass_flow)
 
         partials["air_inlet_temperature", "exterior_temperature"] = np.where(
             air_inlet_temperature == exterior_temperature, 1.0, 0.0
         )
 
-        partials["max_total_air_flow_rate", "total_air_mass_flow_rate"] = np.where(
-            max_air_flow_rate == total_air_mass_flow_rate, 1.0, 0.0
+        partials["max_total_air_flow_rate", "total_air_mass_flow"] = np.where(
+            max_air_flow_rate == total_air_mass_flow, 1.0, 0.0
         )
 
 
@@ -274,7 +274,7 @@ class _SupplementAirFlowRate(om.ExplicitComponent):
 
         self.add_output(
             "air_mass_flow_rate",
-            val=np.nan,
+            val=0.36,
             units="kg/s",
         )
 
@@ -336,7 +336,7 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
 
         self.add_output(
             name="minimum_heat_capacity",
-            val=np.nan,
+            val=300.0,
             units="W/K",
         )
 
@@ -469,7 +469,7 @@ class _AirOutletTemperate(om.ExplicitComponent):
 
         self.add_output(
             "air_outlet_temperature",
-            val=np.nan,
+            val=340.0,
             units="K",
         )
 
@@ -624,12 +624,12 @@ class _CoolantTemperature(om.ExplicitComponent):
 
         self.add_output(
             name="coolant_inlet_temperature",
-            val=np.nan,
+            val=345.0,
             units="K",
         )
         self.add_output(
             name="coolant_outlet_temperature",
-            val=np.nan,
+            val=350.0,
             units="K",
         )
 

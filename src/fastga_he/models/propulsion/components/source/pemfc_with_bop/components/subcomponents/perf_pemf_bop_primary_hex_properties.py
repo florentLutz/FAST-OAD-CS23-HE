@@ -122,12 +122,6 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
-            "exterior_temperature",
-            val=np.nan,
-            units="K",
-            shape=number_of_points,
-        )
-        self.add_input(
             "oxidizer_temperature",
             val=np.nan,
             units="K",

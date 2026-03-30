@@ -1228,7 +1228,6 @@ def test_bop_performances():
         __file__,
         "test_bop_perf_inputs.xml",
     )
-    ivc.add_output("mach", units="unitless", val=0.3, shape=NB_POINTS_TEST)
     ivc.add_output("exterior_temperature", units="K", val=288.15, shape=NB_POINTS_TEST)
     ivc.add_output("altitude", units="m", val=1000.0, shape=NB_POINTS_TEST)
     ivc.add_output("true_airspeed", units="m/s", val=100.0, shape=NB_POINTS_TEST)
@@ -1262,7 +1261,7 @@ def test_bop_performances():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:power_rating",
         units="kW",
-    ) == pytest.approx(71.77, rel=1e-2)
+    ) == pytest.approx(72.6, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

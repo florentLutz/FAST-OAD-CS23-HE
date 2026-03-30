@@ -183,7 +183,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             units="unitless",
         )
         self.add_input(
-            "air_mass_flow",
+            "total_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -248,7 +248,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            wrt=["true_airspeed", "air_mass_flow"],
+            wrt=["true_airspeed", "total_air_mass_flow"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -266,7 +266,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         ramp_angle_factor = inputs["ramp_angle_factor"]
         momentum_flow_correction_factor = inputs["momentum_flow_correction_factor"]
         cd_zero_inlet_mass_flow = inputs["cd_zero_inlet_mass_flow"]
-        air_mass_flow = inputs["air_mass_flow"]
+        air_mass_flow = inputs["total_air_mass_flow"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -298,7 +298,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         ramp_angle_factor = inputs["ramp_angle_factor"]
         momentum_flow_correction_factor = inputs["momentum_flow_correction_factor"]
         cd_zero_inlet_mass_flow = inputs["cd_zero_inlet_mass_flow"]
-        air_mass_flow = inputs["air_mass_flow"]
+        air_mass_flow = inputs["total_air_mass_flow"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -428,7 +428,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            "air_mass_flow",
+            "total_air_mass_flow",
         ] = (
             0.5
             * (

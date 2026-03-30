@@ -9,7 +9,100 @@ from CoolProp.CoolProp import PropsSI
 from .constant import fluid_name_dict
 
 
-class FluidPrandtlNumber(om.ExplicitComponent):
+class FluidPrandtlNumber(om.Group):
+    """
+    Fluid Prandtl number calculation for heat transfer models.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            "fluid",
+            default="air",
+            types=str,
+            desc="Fluid type: air, water, hydrogen, ammonia, etc.",
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        fluid = self.options["fluid"]
+
+        self.add_subsystem(
+            "property_check",
+            _PropertyCheck(number_of_points=number_of_points),
+            promotes=["fluid_temperature", "fluid_pressure"],
+        )
+        self.add_subsystem(
+            "prandtl_number",
+            _PrandtlNumber(number_of_points=number_of_points, fluid=fluid),
+            promotes=["fluid_prandtl_number"],
+        )
+
+        self.connect("property_check.temperature", "prandtl_number.temperature")
+        self.connect("property_check.pressure", "prandtl_number.pressure")
+
+
+class _PropertyCheck(om.ExplicitComponent):
+    """
+    Fluid property check.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+
+        self.add_input("fluid_temperature", val=np.nan, units="K", shape=number_of_points)
+        self.add_input("fluid_pressure", val=np.nan, units="Pa", shape=number_of_points)
+
+        self.add_output("temperature", val=300.0, units="K", shape=number_of_points)
+        self.add_output("pressure", val=101325.0, units="Pa", shape=number_of_points)
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
+        if number_of_points > 1:
+            self.declare_partials(
+                of="temperature",
+                wrt="fluid_temperature",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+            )
+            self.declare_partials(
+                of="pressure",
+                wrt="fluid_pressure",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+            )
+        else:
+            self.declare_partials(of="temperature", wrt="fluid_temperature", method="exact")
+            self.declare_partials(of="pressure", wrt="fluid_pressure", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        outputs["temperature"] = np.clip(inputs["fluid_temperature"], 200.0, 450.0)
+        outputs["pressure"] = np.clip(inputs["fluid_pressure"], 1e3, 1e8)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        clipped_temperature = np.clip(inputs["fluid_temperature"], 200.0, 450.0)
+        clipped_pressure = np.clip(inputs["fluid_pressure"], 1e3, 1e8)
+
+        partials["temperature", "fluid_temperature"] = np.where(
+            clipped_temperature == inputs["fluid_temperature"], 1.0, 0.0
+        )
+
+        partials["pressure", "fluid_pressure"] = np.where(
+            clipped_pressure == inputs["fluid_pressure"], 1.0, 0.0
+        )
+
+
+class _PrandtlNumber(om.ExplicitComponent):
     """
     Fluid Prandtl number calculation for heat transfer models.
     """
@@ -28,8 +121,8 @@ class FluidPrandtlNumber(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("fluid_temperature", val=np.nan, units="K", shape=number_of_points)
-        self.add_input("fluid_pressure", val=np.nan, units="Pa", shape=number_of_points)
+        self.add_input("temperature", val=np.nan, units="K", shape=number_of_points)
+        self.add_input("pressure", val=np.nan, units="Pa", shape=number_of_points)
 
         self.add_output(
             "fluid_prandtl_number", val=1006.0, units="unitless", shape=number_of_points
@@ -42,8 +135,8 @@ class FluidPrandtlNumber(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = inputs["fluid_temperature"]
-        pressure = inputs["fluid_pressure"]
+        temperature = inputs["temperature"]
+        pressure = inputs["pressure"]
 
         if fluid not in fluid_name_dict:
             raise ValueError(f"Unknown fluid: {fluid}")

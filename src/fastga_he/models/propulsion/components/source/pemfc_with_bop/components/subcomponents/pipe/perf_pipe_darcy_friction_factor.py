@@ -254,7 +254,7 @@ class _Log10(om.ExplicitComponent):
         self.add_input("log10_term1", units="unitless", val=np.nan)
         self.add_input("log10_term2", units="unitless", val=np.nan)
 
-        self.add_output("log10", units="unitless", val=np.nan)
+        self.add_output("log10", units="unitless", val=-2.0)
 
     def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")

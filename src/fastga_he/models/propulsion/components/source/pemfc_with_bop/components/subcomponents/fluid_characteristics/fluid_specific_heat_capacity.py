@@ -9,7 +9,100 @@ from CoolProp.CoolProp import PropsSI
 from .constant import fluid_name_dict
 
 
-class FluidSpecificHeatCapacity(om.ExplicitComponent):
+class FluidSpecificHeatCapacity(om.Group):
+    """
+    Fluid specific heat capacity calculation for heat transfer models.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            "fluid",
+            default="air",
+            types=str,
+            desc="Fluid type: air, water, hydrogen, ammonia, etc.",
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        fluid = self.options["fluid"]
+
+        self.add_subsystem(
+            "property_check",
+            _PropertyCheck(number_of_points=number_of_points),
+            promotes=["fluid_temperature", "fluid_pressure"],
+        )
+        self.add_subsystem(
+            "specific_heat_capacity",
+            _SpecificHeatCapacity(number_of_points=number_of_points, fluid=fluid),
+            promotes=["fluid_specific_heat_capacity"],
+        )
+
+        self.connect("property_check.temperature", "specific_heat_capacity.temperature")
+        self.connect("property_check.pressure", "specific_heat_capacity.pressure")
+
+
+class _PropertyCheck(om.ExplicitComponent):
+    """
+    Fluid property check.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+
+        self.add_input("fluid_temperature", val=np.nan, units="K", shape=number_of_points)
+        self.add_input("fluid_pressure", val=np.nan, units="Pa", shape=number_of_points)
+
+        self.add_output("temperature", val=300.0, units="K", shape=number_of_points)
+        self.add_output("pressure", val=101325.0, units="Pa", shape=number_of_points)
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
+        if number_of_points > 1:
+            self.declare_partials(
+                of="temperature",
+                wrt="fluid_temperature",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+            )
+            self.declare_partials(
+                of="pressure",
+                wrt="fluid_pressure",
+                method="exact",
+                rows=np.arange(number_of_points),
+                cols=np.arange(number_of_points),
+            )
+        else:
+            self.declare_partials(of="temperature", wrt="fluid_temperature", method="exact")
+            self.declare_partials(of="pressure", wrt="fluid_pressure", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        outputs["temperature"] = np.clip(inputs["fluid_temperature"], 200.0, 450.0)
+        outputs["pressure"] = np.clip(inputs["fluid_pressure"], 1e3, 1e8)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        clipped_temperature = np.clip(inputs["fluid_temperature"], 200.0, 450.0)
+        clipped_pressure = np.clip(inputs["fluid_pressure"], 1e3, 1e8)
+
+        partials["temperature", "fluid_temperature"] = np.where(
+            clipped_temperature == inputs["fluid_temperature"], 1.0, 0.0
+        )
+
+        partials["pressure", "fluid_pressure"] = np.where(
+            clipped_pressure == inputs["fluid_pressure"], 1.0, 0.0
+        )
+
+
+class _SpecificHeatCapacity(om.ExplicitComponent):
     """
     Fluid specific heat capacity calculation for heat transfer models.
     """
@@ -28,8 +121,8 @@ class FluidSpecificHeatCapacity(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("fluid_temperature", val=np.nan, units="K", shape=number_of_points)
-        self.add_input("fluid_pressure", val=np.nan, units="Pa", shape=number_of_points)
+        self.add_input("temperature", val=np.nan, units="K", shape=number_of_points)
+        self.add_input("pressure", val=np.nan, units="Pa", shape=number_of_points)
 
         self.add_output(
             "fluid_specific_heat_capacity", val=1006.0, units="J/kg/K", shape=number_of_points
@@ -53,8 +146,8 @@ class FluidSpecificHeatCapacity(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = inputs["fluid_temperature"]
-        pressure = inputs["fluid_pressure"]
+        temperature = inputs["temperature"]
+        pressure = inputs["pressure"]
 
         if fluid not in fluid_name_dict:
             raise ValueError(f"Unknown fluid: {fluid}")
@@ -86,8 +179,8 @@ class FluidSpecificHeatCapacity(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = inputs["fluid_temperature"]
-        pressure = inputs["fluid_pressure"]
+        temperature = inputs["temperature"]
+        pressure = inputs["pressure"]
 
         fluid_string = fluid_name_dict[fluid]
         is_incompressible = fluid_string.startswith("INCOMP::")
@@ -161,10 +254,10 @@ class FluidSpecificHeatCapacity(om.ExplicitComponent):
             np.zeros(number_of_points),
         ]
 
-        partials["fluid_specific_heat_capacity", "fluid_temperature"] = np.select(
+        partials["fluid_specific_heat_capacity", "temperature"] = np.select(
             conditions, choice_temperature, default=default_d_cp_dt
         )
 
-        partials["fluid_specific_heat_capacity", "fluid_pressure"] = np.select(
+        partials["fluid_specific_heat_capacity", "pressure"] = np.select(
             conditions, choice_pressure, default=default_d_cp_dp
         )

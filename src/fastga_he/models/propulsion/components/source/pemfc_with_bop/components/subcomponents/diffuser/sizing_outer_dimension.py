@@ -95,7 +95,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":inlet_side_height",
-            val=np.nan,
+            val=0.06,
             units="m",
         )
         self.add_output(
@@ -104,7 +104,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":outlet_side_height",
-            val=np.nan,
+            val=0.74,
             units="m",
         )
         self.add_output(
@@ -113,7 +113,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":inlet_side_width",
-            val=np.nan,
+            val=0.18,
             units="m",
         )
         self.add_output(
@@ -122,7 +122,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":outlet_side_width",
-            val=np.nan,
+            val=0.2,
             units="m",
         )
 

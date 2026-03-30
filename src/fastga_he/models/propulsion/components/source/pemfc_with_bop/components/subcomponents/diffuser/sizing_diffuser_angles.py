@@ -95,7 +95,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":alpha",
-            val=np.nan,
+            val=0.035,
             units="rad",
         )
         self.add_output(
@@ -104,7 +104,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":beta",
-            val=np.nan,
+            val=0.035,
             units="rad",
         )
 

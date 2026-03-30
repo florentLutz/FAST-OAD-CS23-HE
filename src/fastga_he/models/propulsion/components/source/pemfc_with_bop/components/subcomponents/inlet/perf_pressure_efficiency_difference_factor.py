@@ -36,7 +36,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
         self.add_input("density", units="kg/m**3", val=np.zeros(number_of_points))
         self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
         self.add_input(
-            "air_mass_flow",
+            "total_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -80,7 +80,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
         )
         self.declare_partials(
             of="pressure_efficiency_difference_factor",
-            wrt=["true_airspeed", "air_mass_flow", "density", "dynamic_viscosity"],
+            wrt=["true_airspeed", "total_air_mass_flow", "density", "dynamic_viscosity"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -92,7 +92,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
 
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
-        air_mass_flow = inputs["air_mass_flow"]
+        air_mass_flow = inputs["total_air_mass_flow"]
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -120,7 +120,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
 
         density = inputs["density"]
         true_airspeed = inputs["true_airspeed"]
-        air_mass_flow = inputs["air_mass_flow"]
+        air_mass_flow = inputs["total_air_mass_flow"]
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -144,7 +144,7 @@ class PerformancesPressureEfficiencyDifferenceFactor(om.ExplicitComponent):
             density * true_airspeed**2.0 * highlight_width * throat_height
         )
 
-        partials["pressure_efficiency_difference_factor", "air_mass_flow"] = 1.0 / (
+        partials["pressure_efficiency_difference_factor", "total_air_mass_flow"] = 1.0 / (
             density * true_airspeed * highlight_width * throat_height
         )
 

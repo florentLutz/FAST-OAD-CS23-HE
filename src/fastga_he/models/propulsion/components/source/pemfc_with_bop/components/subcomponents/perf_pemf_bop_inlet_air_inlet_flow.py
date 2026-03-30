@@ -51,14 +51,14 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
             units="unitless",
         )
 
-        self.add_output("air_mass_flow", val=np.nan, units="kg/s", shape=number_of_points)
+        self.add_output("total_air_mass_flow", val=1.0, units="kg/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials("*", "*", method="exact")
         self.declare_partials(
-            "air_mass_flow",
+            "total_air_mass_flow",
             "air_consumption",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -68,7 +68,7 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        outputs["air_mass_flow"] = (
+        outputs["total_air_mass_flow"] = (
             inputs["air_consumption"]
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -84,7 +84,7 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
         air_inlet_id = self.options["air_inlet_id"]
         number_of_points = self.options["number_of_points"]
 
-        partials["air_mass_flow", "air_consumption"] = inputs[
+        partials["total_air_mass_flow", "air_consumption"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -93,7 +93,7 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
         ] * np.ones(number_of_points)
 
         partials[
-            "air_mass_flow",
+            "total_air_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
