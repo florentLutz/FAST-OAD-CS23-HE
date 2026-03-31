@@ -83,8 +83,8 @@ class SizingOuterDimension(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
             val=np.nan,
             units="m",
         )
@@ -176,8 +176,8 @@ class SizingOuterDimension(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
             val=1.0,
         )
         self.declare_partials(
@@ -228,12 +228,12 @@ class SizingOuterDimension(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
 
         outputs[
@@ -256,7 +256,7 @@ class SizingOuterDimension(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":inlet_side_width"
-        ] = highlight_width + 2.0 * wall_thickness
+        ] = inner_inlet_width + 2.0 * wall_thickness
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id

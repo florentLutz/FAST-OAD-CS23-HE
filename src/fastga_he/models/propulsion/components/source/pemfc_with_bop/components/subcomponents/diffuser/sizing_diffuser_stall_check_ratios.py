@@ -58,8 +58,8 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
             val=np.nan,
             units="m",
         )
@@ -119,8 +119,8 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
             method="exact",
         )
 
@@ -143,12 +143,12 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        air_inlet_highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
 
         outputs[
@@ -164,7 +164,7 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":length_width_ratio"
-        ] = diffuser_length / air_inlet_highlight_width
+        ] = diffuser_length / inner_inlet_width
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -185,12 +185,12 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        air_inlet_highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
 
         partials[
@@ -227,9 +227,9 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
-        ] = -diffuser_length / air_inlet_highlight_width**2.0
+            + diffuser_id
+            + ":inner_inlet_width",
+        ] = -diffuser_length / inner_inlet_width**2.0
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -241,4 +241,4 @@ class SizingDiffuserStallCheckRatios(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":length",
-        ] = 1.0 / air_inlet_highlight_width
+        ] = 1.0 / inner_inlet_width

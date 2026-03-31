@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingEntryHydraulicDiameter(om.ExplicitComponent):
+class SizingInletSideInnerWidth(om.ExplicitComponent):
     """
-    Computation of the entry hydraulic diameter.
+    Computation of the inner width of the inlet side.
     """
 
     def initialize(self):
@@ -41,7 +41,7 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height",
+            + ":highlight_width",
             val=np.nan,
             units="m",
         )
@@ -49,10 +49,10 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
-            + ":inner_inlet_width",
-            val=np.nan,
-            units="m",
+            + air_inlet_id
+            + ":mass_flow_ratio",
+            val=1.5,
+            units="unitless",
         )
 
         self.add_output(
@@ -60,8 +60,8 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + ":entry_hydraulic_diameter",
-            val=0.05,
+            + ":inner_inlet_width",
+            val=0.02,
             units="m",
         )
 
@@ -73,19 +73,19 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
         diffuser_id = self.options["diffuser_id"]
         air_inlet_id = self.options["connected_air_inlet_id"]
 
-        air_inlet_throat_height = inputs[
+        air_inlet_highlight_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height"
+            + ":highlight_width"
         ]
-        inner_inlet_width = inputs[
+        mass_flow_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
-            + ":inner_inlet_width"
+            + air_inlet_id
+            + ":mass_flow_ratio"
         ]
 
         outputs[
@@ -93,32 +93,27 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + ":entry_hydraulic_diameter"
-        ] = (
-            2.0
-            * air_inlet_throat_height
-            * inner_inlet_width
-            / (air_inlet_throat_height + inner_inlet_width)
-        )
+            + ":inner_inlet_width"
+        ] = (mass_flow_ratio - 1.0) * air_inlet_highlight_width
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         diffuser_id = self.options["diffuser_id"]
         air_inlet_id = self.options["connected_air_inlet_id"]
 
-        air_inlet_throat_height = inputs[
+        air_inlet_highlight_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height"
+            + ":highlight_width"
         ]
-        inner_inlet_width = inputs[
+        mass_flow_ratio = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
-            + ":inner_inlet_width"
+            + air_inlet_id
+            + ":mass_flow_ratio"
         ]
 
         partials[
@@ -126,26 +121,23 @@ class SizingEntryHydraulicDiameter(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + ":entry_hydraulic_diameter",
+            + ":inner_inlet_width",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height",
-        ] = 2.0 * inner_inlet_width**2.0 / (air_inlet_throat_height + inner_inlet_width) ** 2.0
+            + ":highlight_width",
+        ] = mass_flow_ratio - 1.0
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + diffuser_id
-            + ":entry_hydraulic_diameter",
+            + ":inner_inlet_width",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + diffuser_id
-            + ":inner_inlet_width",
-        ] = (
-            2.0
-            * air_inlet_throat_height**2.0
-            / (air_inlet_throat_height + inner_inlet_width) ** 2.0
-        )
+            + air_inlet_id
+            + ":mass_flow_ratio",
+        ] = air_inlet_highlight_width

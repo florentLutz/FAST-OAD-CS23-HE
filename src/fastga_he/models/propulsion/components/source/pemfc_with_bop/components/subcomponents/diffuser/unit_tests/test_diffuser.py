@@ -20,6 +20,7 @@ from ..perf_diffuser_exit_total_pressure import PerformancesDiffuserExitTotalPre
 from ..perf_diffuser_exit_total_temperature import PerformancesDiffuserExitTotalTemperature
 from ..perf_diffuser import PerformancesDiffuser
 
+from ..sizing_width_inlet_side import SizingInletSideInnerWidth
 from ..sizing_diffuser_angles import SizingDiffuserAngles
 from ..sizing_outer_dimension import SizingOuterDimension
 from ..sizing_inner_volume import SizingInnerVolume
@@ -63,10 +64,9 @@ def test_diffuser_angles():
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
-        ":highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
         units="m",
-        val=0.1592,
+        val=0.0796,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -81,13 +81,40 @@ def test_diffuser_angles():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":diffuser_1:alpha",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:alpha",
         units="deg",
     ) == pytest.approx(18.76, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1" ":diffuser_1:beta",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:beta",
         units="deg",
-    ) == pytest.approx(-3.13, rel=1e-2)
+    ) == pytest.approx(-0.848, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_diffuser_inlet_side_width():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
+        ":highlight_width",
+        units="m",
+        val=0.1592,
+    )
+
+    problem = run_system(
+        SizingInletSideInnerWidth(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            diffuser_id="diffuser_1",
+            connected_air_inlet_id="air_inlet_1",
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
+        units="m",
+    ) == pytest.approx(0.0796, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -118,10 +145,9 @@ def test_diffuser_outer_dimension():
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
-        ":highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
         units="m",
-        val=0.1592,
+        val=0.0796,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -154,7 +180,7 @@ def test_diffuser_outer_dimension():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1"
         ":diffuser_1:inlet_side_width",
         units="m",
-    ) == pytest.approx(0.1792, rel=1e-2)
+    ) == pytest.approx(0.0996, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -185,10 +211,9 @@ def test_diffuser_inner_volume():
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
-        ":highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
         units="m",
-        val=0.1592,
+        val=0.0796,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -205,7 +230,7 @@ def test_diffuser_inner_volume():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_volume",
         units="m**3",
-    ) == pytest.approx(0.0335, rel=1e-2)
+    ) == pytest.approx(0.023, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -296,9 +321,9 @@ def test_diffuser_cross_section_area():
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
         units="m",
-        val=0.1592,
+        val=0.0796,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:no_flow_length",
@@ -324,7 +349,7 @@ def test_diffuser_cross_section_area():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:entrance_area",
         units="m**2",
-    ) == pytest.approx(0.00634, rel=1e-2)
+    ) == pytest.approx(0.00317, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:exit_area",
         units="m**2",
@@ -377,9 +402,9 @@ def test_diffuser_stall_check_ratios():
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
         units="m",
-        val=0.1592,
+        val=0.0796,
     )
 
     problem = run_system(
@@ -399,7 +424,7 @@ def test_diffuser_stall_check_ratios():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1"
         ":length_width_ratio",
         units="unitless",
-    ) == pytest.approx(6.27, rel=1e-2)
+    ) == pytest.approx(12.56, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -413,9 +438,9 @@ def test_diffuser_entry_hydraulic_diameter():
         val=0.0398,
     )
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:highlight_width",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:inner_inlet_width",
         units="m",
-        val=0.1592,
+        val=0.0796,
     )
 
     problem = run_system(
@@ -430,7 +455,7 @@ def test_diffuser_entry_hydraulic_diameter():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:entry_hydraulic_diameter",
         units="m",
-    ) == pytest.approx(0.0634, rel=1e-2)
+    ) == pytest.approx(0.053, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -506,7 +531,7 @@ def test_sizing_diffuser():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:mass",
         units="kg",
-    ) == pytest.approx(27.0, rel=1e-2)
+    ) == pytest.approx(25.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

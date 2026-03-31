@@ -14,6 +14,7 @@ from .sizing_diffuser_stall_check_ratios import SizingDiffuserStallCheckRatios
 from .sizing_cross_section_area import SizingCrossSectionArea
 from .sizing_entry_hydraulic_diameter import SizingEntryHydraulicDiameter
 from .sizing_diffuser_relative_roughness import SizingDiffuserRelativeRoughness
+from .sizing_width_inlet_side import SizingInletSideInnerWidth
 
 
 class SizingDiffuser(om.Group):
@@ -53,6 +54,15 @@ class SizingDiffuser(om.Group):
         heat_exchanger_id = self.options["connected_heat_exchanger_id"]
         air_inlet_id = self.options["connected_air_inlet_id"]
 
+        self.add_subsystem(
+            "sizing_inlet_side_inner_width",
+            SizingInletSideInnerWidth(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                diffuser_id=diffuser_id,
+                connected_air_inlet_id=air_inlet_id,
+            ),
+            promotes=["*"],
+        )
         self.add_subsystem(
             "sizing_diffuser_angles",
             SizingDiffuserAngles(

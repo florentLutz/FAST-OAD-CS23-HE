@@ -83,8 +83,8 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
             val=np.nan,
             units="m",
         )
@@ -154,8 +154,8 @@ class SizingDiffuserAngles(om.ExplicitComponent):
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + air_inlet_id
-                + ":highlight_width",
+                + diffuser_id
+                + ":inner_inlet_width",
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
@@ -199,12 +199,12 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        air_inlet_highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
 
         outputs[
@@ -223,7 +223,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + diffuser_id
             + ":beta"
         ] = np.arctan(
-            (heat_exchanger_coolant_flow_length - air_inlet_highlight_width) / (2 * diffuser_length)
+            (heat_exchanger_coolant_flow_length - inner_inlet_width) / (2 * diffuser_length)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -260,19 +260,19 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        air_inlet_highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
 
         common_denominator_alpha = (
             heat_exchanger_no_flow_length - air_inlet_throat_height
         ) ** 2.0 + 4.0 * diffuser_length**2.0
         common_denominator_beta = (
-            heat_exchanger_coolant_flow_length - air_inlet_highlight_width
+            heat_exchanger_coolant_flow_length - inner_inlet_width
         ) ** 2.0 + 4.0 * diffuser_length**2.0
 
         partials[
@@ -287,6 +287,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + heat_exchanger_id
             + ":no_flow_length",
         ] = (2.0 * diffuser_length) / common_denominator_alpha
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -299,6 +300,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height",
         ] = -(2.0 * diffuser_length) / common_denominator_alpha
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -328,6 +330,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + heat_exchanger_id
             + ":coolant_flow_length",
         ] = (2.0 * diffuser_length) / common_denominator_beta
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -337,9 +340,10 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
         ] = -(2.0 * diffuser_length) / common_denominator_beta
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -353,6 +357,6 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + ":length",
         ] = (
             -2.0
-            * (heat_exchanger_coolant_flow_length - air_inlet_highlight_width)
+            * (heat_exchanger_coolant_flow_length - inner_inlet_width)
             / common_denominator_beta
         )

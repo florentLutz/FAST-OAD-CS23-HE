@@ -74,8 +74,8 @@ class SizingCrossSectionArea(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
             val=np.nan,
             units="m",
         )
@@ -120,8 +120,8 @@ class SizingCrossSectionArea(om.ExplicitComponent):
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + air_inlet_id
-                + ":highlight_width",
+                + diffuser_id
+                + ":inner_inlet_width",
             ],
             method="exact",
         )
@@ -159,12 +159,12 @@ class SizingCrossSectionArea(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -187,7 +187,7 @@ class SizingCrossSectionArea(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":entrance_area"
-        ] = thraot_height * highlight_width
+        ] = thraot_height * inner_inlet_width
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -210,12 +210,12 @@ class SizingCrossSectionArea(om.ExplicitComponent):
             + air_inlet_id
             + ":throat_height"
         ]
-        highlight_width = inputs[
+        inner_inlet_width = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width"
+            + diffuser_id
+            + ":inner_inlet_width"
         ]
         no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -243,7 +243,7 @@ class SizingCrossSectionArea(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":throat_height",
-        ] = highlight_width
+        ] = inner_inlet_width
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -253,8 +253,8 @@ class SizingCrossSectionArea(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + air_inlet_id
-            + ":highlight_width",
+            + diffuser_id
+            + ":inner_inlet_width",
         ] = thraot_height
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
