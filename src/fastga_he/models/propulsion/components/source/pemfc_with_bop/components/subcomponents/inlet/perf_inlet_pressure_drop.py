@@ -47,7 +47,7 @@ class PerformancesInletPressureDrop(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":air_pressure_drop",
-            val=1e4,
+            val=9e4,
             units="Pa",
         )
         self.add_output(
@@ -56,7 +56,7 @@ class PerformancesInletPressureDrop(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":max_ambient_dynamic_pressure",
-            val=7200.0,
+            val=5560.0,
             units="Pa",
         )
 

@@ -74,7 +74,11 @@ class SlipstreamPEMFCStackBOPDeltaCd(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag"
         ]
 
-        outputs["delta_Cd"] = tms_bop_delta_drag / (0.5 * density * true_airspeed**2.0 * wing_area)
+        clipped_tms_bop_delta_drag = np.clip(tms_bop_delta_drag, 0.0, np.inf)
+
+        outputs["delta_Cd"] = clipped_tms_bop_delta_drag / (
+            0.5 * density * true_airspeed**2.0 * wing_area
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -86,20 +90,25 @@ class SlipstreamPEMFCStackBOPDeltaCd(om.ExplicitComponent):
         tms_bop_delta_drag = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag"
         ]
+        clipped_tms_bop_delta_drag = np.clip(tms_bop_delta_drag, 0.0, np.inf)
 
         partials["delta_Cd", "density"] = -tms_bop_delta_drag / (
             0.5 * density**2.0 * true_airspeed**2.0 * wing_area
         )
 
         partials["delta_Cd", "true_airspeed"] = -2.0 * (
-            tms_bop_delta_drag / (0.5 * density * true_airspeed**3.0 * wing_area)
+            clipped_tms_bop_delta_drag / (0.5 * density * true_airspeed**3.0 * wing_area)
         )
 
-        partials["delta_Cd", "data:geometry:wing:area"] = -tms_bop_delta_drag / (
+        partials["delta_Cd", "data:geometry:wing:area"] = -clipped_tms_bop_delta_drag / (
             0.5 * density * true_airspeed**2.0 * wing_area**2.0
         )
 
         partials[
             "delta_Cd",
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_drag",
-        ] = 1.0 / (0.5 * density * true_airspeed**2.0 * wing_area)
+        ] = np.where(
+            tms_bop_delta_drag == clipped_tms_bop_delta_drag,
+            1.0 / (0.5 * density * true_airspeed**2.0 * wing_area),
+            1e-6,
+        )

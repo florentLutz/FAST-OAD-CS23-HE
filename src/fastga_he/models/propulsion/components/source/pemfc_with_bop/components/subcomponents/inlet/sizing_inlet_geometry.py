@@ -67,7 +67,7 @@ class SizingInletGeometry(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":highlight_width",
-            val=0.16,
+            val=0.32,
             units="m",
         )
         self.add_output(
@@ -94,7 +94,7 @@ class SizingInletGeometry(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":ramp_floor_inlet_plane_distance",
-            val=0.049,
+            val=0.096,
             units="m",
         )
         self.add_output(
@@ -103,7 +103,7 @@ class SizingInletGeometry(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":lip_ramp_floor_distance",
-            val=0.044,
+            val=0.086,
             units="m",
         )
         self.add_output(

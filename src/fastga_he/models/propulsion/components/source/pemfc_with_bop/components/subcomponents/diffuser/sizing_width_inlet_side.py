@@ -53,6 +53,7 @@ class SizingInletSideInnerWidth(om.ExplicitComponent):
             + ":mass_flow_ratio",
             val=1.5,
             units="unitless",
+            desc="The fraction of total air supply divided by pemfc air consumption",
         )
 
         self.add_output(

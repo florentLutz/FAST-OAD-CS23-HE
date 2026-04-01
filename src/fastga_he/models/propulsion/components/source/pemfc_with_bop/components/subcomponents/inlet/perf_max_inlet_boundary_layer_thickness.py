@@ -58,7 +58,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":max_boundary_layer_thickness",
-            val=1e-4,
+            val=0.016,
             units="m",
         )
         self.add_output(
@@ -67,7 +67,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":max_momentum_boundary_layer_thickness",
-            val=1e-5,
+            val=0.0016,
             units="m",
         )
         self.add_output(
@@ -94,7 +94,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":design_dynamic_viscosity",
-            val=1.81e-5,
+            val=1.8e-5,
             units="kg/m/s",
         )
         self.add_output(

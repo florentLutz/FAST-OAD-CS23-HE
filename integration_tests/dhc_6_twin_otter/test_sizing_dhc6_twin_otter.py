@@ -4,7 +4,7 @@
 
 import pathlib
 import logging
-
+from shutil import copy
 import pytest
 
 import openmdao.api as om
@@ -122,12 +122,14 @@ def test_sizing_twin_otter_pemfc_h2_with_bop():
 
     problem.model_options["*propeller_*"] = {"mass_as_input": True}
 
-    problem.write_needed_inputs(ref_inputs)
+    # Load inputs
+    copy(
+        DATA_FOLDER_PATH / "input_h2_pemfc_twin_otter_with_bop.xml",
+        RESULTS_FOLDER_PATH / "oad_process_inputs_pemfc_h2_gas_with_bop.xml",
+    )
+
     problem.read_inputs()
     problem.setup()
-
-    problem.set_val(name="data:weight:aircraft:MTOW", units="kg", val=6000.0)
-    problem.set_val(name="data:geometry:wing:area", units="m**2", val=50.0)
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 
@@ -135,7 +137,5 @@ def test_sizing_twin_otter_pemfc_h2_with_bop():
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
-
-    print(residuals.keys())
 
     problem.write_outputs()

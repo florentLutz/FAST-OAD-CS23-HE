@@ -1199,7 +1199,7 @@ def test_bop_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_mass",
         units="kg",
-    ) == pytest.approx(203.16, rel=1e-2)
+    ) == pytest.approx(120.3, rel=1e-2)
 
     problem.output_file_path = RESULTS_FOLDER_PATH / "test_bop_sizing_outputs.xml"
 
@@ -1261,10 +1261,14 @@ def test_bop_performances():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:compressor_1:power_rating",
         units="kW",
-    ) == pytest.approx(72.6, rel=1e-2)
+    ) == pytest.approx(85.7, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
     problem.output_file_path = RESULTS_FOLDER_PATH / "test_bop_performance_outputs.xml"
 
     problem.write_outputs()
+
+    n2_path = RESULTS_FOLDER_PATH / "n2_bop_performance.html"
+
+    om.n2(problem, show_browser=False, outfile=n2_path)

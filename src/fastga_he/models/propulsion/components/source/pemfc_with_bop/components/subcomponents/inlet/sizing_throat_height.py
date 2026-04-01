@@ -54,7 +54,7 @@ class SizingThroatHeight(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":throat_height",
-            val=0.05,
+            val=0.08,
             units="m",
         )
 

@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 from CoolProp.CoolProp import PropsSI
 
-from .constant import fluid_name_dict
+from .constant import fluid_name_dict, fluid_prandtl_number_dict
 
 
 class FluidPrandtlNumber(om.Group):
@@ -86,19 +86,50 @@ class _PropertyCheck(om.ExplicitComponent):
             self.declare_partials(of="pressure", wrt="fluid_pressure", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["temperature"] = np.clip(inputs["fluid_temperature"], 200.0, 450.0)
-        outputs["pressure"] = np.clip(inputs["fluid_pressure"], 1e3, 1e8)
+        temperature = inputs["fluid_temperature"]
+        pressure = inputs["fluid_pressure"]
+
+        temperature_conditions = [
+            temperature < 250.0,
+            temperature > 450.0,
+            np.isnan(temperature),
+        ]
+        pressure_conditions = [pressure < 1e3, pressure > 1e8, np.isnan(pressure)]
+
+        clipped_temperature = [250.0, 450.0, 300.0]
+        clipped_pressure = [1e3, 1e8, 101325.0]
+
+        outputs["temperature"] = np.select(
+            temperature_conditions, clipped_temperature, default=temperature
+        )
+        outputs["pressure"] = np.select(pressure_conditions, clipped_pressure, default=pressure)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        clipped_temperature = np.clip(inputs["fluid_temperature"], 200.0, 450.0)
-        clipped_pressure = np.clip(inputs["fluid_pressure"], 1e3, 1e8)
+        temperature = inputs["fluid_temperature"]
+        pressure = inputs["fluid_pressure"]
+
+        temperature_conditions = [
+            temperature < 250.0,
+            temperature > 450.0,
+            np.isnan(temperature),
+        ]
+        pressure_conditions = [pressure < 1e3, pressure > 1e8, np.isnan(pressure)]
+
+        clipped_temperature = [250.0, 450.0, 300.0]
+        clipped_pressure = [1e3, 1e8, 101325.0]
 
         partials["temperature", "fluid_temperature"] = np.where(
-            clipped_temperature == inputs["fluid_temperature"], 1.0, 0.0
+            np.select(temperature_conditions, clipped_temperature, default=temperature)
+            == inputs["fluid_temperature"],
+            1.0,
+            1e-6,
         )
 
         partials["pressure", "fluid_pressure"] = np.where(
-            clipped_pressure == inputs["fluid_pressure"], 1.0, 0.0
+            np.select(pressure_conditions, clipped_pressure, default=pressure)
+            == inputs["fluid_pressure"],
+            1.0,
+            1e-6,
         )
 
 
@@ -120,12 +151,16 @@ class _PrandtlNumber(om.ExplicitComponent):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
+        fluid = self.options["fluid"]
 
         self.add_input("temperature", val=np.nan, units="K", shape=number_of_points)
         self.add_input("pressure", val=np.nan, units="Pa", shape=number_of_points)
 
         self.add_output(
-            "fluid_prandtl_number", val=1006.0, units="unitless", shape=number_of_points
+            "fluid_prandtl_number",
+            val=fluid_prandtl_number_dict[fluid],
+            units="unitless",
+            shape=number_of_points,
         )
 
     def setup_partials(self):

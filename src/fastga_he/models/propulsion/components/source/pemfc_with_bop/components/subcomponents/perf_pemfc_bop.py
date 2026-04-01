@@ -113,52 +113,24 @@ class PerformancesPEMFCBOP(om.Group):
         humidifier_id = self.options["humidifier_id"]
 
         self.add_subsystem(
+            "primary_heat_exchanger_loop",
+            PerformancesPrimaryHeatExchangerLoop(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                coolant_fluid_type=coolant_fluid_type,
+                compressor_id=compress_id,
+                primary_heat_exchanger_id=primary_heat_exchanger_id,
+                humidifier_id=humidifier_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*", "altitude", "exterior_temperature", "air_consumption"],
+        )
+        self.add_subsystem(
             "speed_of_sound",
             PerformancesAirSpeedOfSound(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
             "mach", PerformancesAirMach(number_of_points=number_of_points), promotes=["*"]
-        )
-        self.add_subsystem(
-            "compressor",
-            PerformancesCompressor(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                compressor_id=compress_id,
-                number_of_points=number_of_points,
-                connected_humidifier_id=humidifier_id,
-                connected_heat_exchanger_id=primary_heat_exchanger_id,
-            ),
-            promotes=["data:*", "altitude", "exterior_temperature", "air_consumption"],
-        )
-        self.add_subsystem(
-            "humidifier",
-            PerformancesHumidifier(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                humidifier_id=humidifier_id,
-                number_of_points=number_of_points,
-            ),
-            promotes=["data:*", "air_consumption"],
-        )
-        self.add_subsystem(
-            "primary_heat_exchanger_air_properties",
-            PerformancesPrimaryHeatExchangerThermalBalance(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                primary_heat_exchanger_id=primary_heat_exchanger_id,
-                coolant_fluid_type=coolant_fluid_type,
-                number_of_points=number_of_points,
-            ),
-            promotes=["data:*"],
-        )
-        self.add_subsystem(
-            "primary_heat_exchanger",
-            PerformancesHeatExchanger(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                heat_exchanger_id=primary_heat_exchanger_id,
-                coolant_fluid_type=coolant_fluid_type,
-                number_of_points=number_of_points,
-            ),
-            promotes=["data:*"],
         )
         self.add_subsystem(
             "inlet_air_flow_rate",
@@ -269,29 +241,6 @@ class PerformancesPEMFCBOP(om.Group):
         )
 
         self.connect(
-            "primary_heat_exchanger_air_properties.air_inlet_temperature",
-            "primary_heat_exchanger.air_inlet_temperature",
-        )
-        self.connect(
-            "primary_heat_exchanger_air_properties.air_outlet_temperature",
-            "primary_heat_exchanger.air_outlet_temperature",
-        )
-        self.connect(
-            "primary_heat_exchanger_air_properties.air_static_pressure",
-            "primary_heat_exchanger.air_static_pressure",
-        )
-        self.connect(
-            "primary_heat_exchanger_air_properties.coolant_inlet_temperature",
-            "primary_heat_exchanger.coolant_inlet_temperature",
-        )
-        self.connect(
-            "primary_heat_exchanger_air_properties.coolant_outlet_temperature",
-            "primary_heat_exchanger.coolant_outlet_temperature",
-        )
-        self.connect("air_inlet.throat_total_pressure", "diffuser.throat_air_pressure")
-        self.connect("air_inlet.throat_total_temperature", "diffuser.throat_air_temperature")
-        self.connect("air_inlet.throat_air_speed", "diffuser.throat_air_speed")
-        self.connect(
             "supplement_heat_exchanger_air_properties.air_inlet_temperature",
             "supplement_heat_exchanger.air_inlet_temperature",
         )
@@ -314,26 +263,6 @@ class PerformancesPEMFCBOP(om.Group):
         self.connect("diffuser.diffuser_exit_total_pressure", "nozzle.diffuser_exit_pressure")
         self.connect("diffuser.diffuser_exit_total_temperature", "nozzle.diffuser_exit_temperature")
         self.connect(
-            "air_inlet.ambient_pressure",
-            "supplement_heat_exchanger_air_properties.ambient_pressure",
-        )
-        self.connect(
-            "compressor.compressor_pressure_supply",
-            "primary_heat_exchanger_air_properties.compressor_pressure_supply",
-        )
-        self.connect(
-            "humidifier.oxidizer_temperature",
-            "primary_heat_exchanger_air_properties.oxidizer_temperature",
-        )
-        self.connect(
-            "humidifier.oxidizer_pressure",
-            "primary_heat_exchanger_air_properties.oxidizer_pressure",
-        )
-        self.connect(
-            "compressor.compressor_outlet_temperature",
-            "primary_heat_exchanger_air_properties.compressor_outlet_temperature",
-        )
-        self.connect(
             "diffuser.diffuser_exit_total_pressure",
             "supplement_heat_exchanger_air_properties.diffuser_exit_total_pressure",
         )
@@ -344,6 +273,13 @@ class PerformancesPEMFCBOP(om.Group):
         self.connect("diffuser.exit_air_speed", "nozzle.entry_air_speed")
         self.connect(
             "supplement_heat_exchanger_air_properties.air_mass_flow", "nozzle.air_mass_flow_rate"
+        )
+        self.connect("air_inlet.throat_total_pressure", "diffuser.throat_air_pressure")
+        self.connect("air_inlet.throat_total_temperature", "diffuser.throat_air_temperature")
+        self.connect("air_inlet.throat_air_speed", "diffuser.throat_air_speed")
+        self.connect(
+            "air_inlet.ambient_pressure",
+            "supplement_heat_exchanger_air_properties.ambient_pressure",
         )
 
 
@@ -542,4 +478,137 @@ class PerformancesBOPPower(om.ExplicitComponent):
                 + pump_id
                 + ":power_rating"
             ]
+        )
+
+
+class PerformancesPrimaryHeatExchangerLoop(om.Group):
+    """
+    Group to compute the performances of the primary heat exchanger loop of the PEMFC BOP.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            "coolant_fluid_type",
+            default="air",
+            types=str,
+            desc="Fluid type: air, water, hydrogen, ammonia, etc.",
+        )
+        self.options.declare(
+            name="compressor_id",
+            default=None,
+            desc="Identifier of the compressor",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="primary_heat_exchanger_id",
+            default=None,
+            desc="Identifier of the primary heat exchanger",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="humidifier_id",
+            default=None,
+            desc="Identifier of the humidifier",
+            allow_none=False,
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        coolant_fluid_type = self.options["coolant_fluid_type"]
+        compress_id = self.options["compressor_id"]
+        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
+        humidifier_id = self.options["humidifier_id"]
+
+        self.add_subsystem(
+            "compressor",
+            PerformancesCompressor(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                compressor_id=compress_id,
+                number_of_points=number_of_points,
+                connected_humidifier_id=humidifier_id,
+                connected_heat_exchanger_id=primary_heat_exchanger_id,
+            ),
+            promotes=["data:*", "altitude", "exterior_temperature", "air_consumption"],
+        )
+        self.add_subsystem(
+            "humidifier",
+            PerformancesHumidifier(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                humidifier_id=humidifier_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*", "air_consumption"],
+        )
+        self.add_subsystem(
+            "primary_heat_exchanger_air_properties",
+            PerformancesPrimaryHeatExchangerThermalBalance(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                primary_heat_exchanger_id=primary_heat_exchanger_id,
+                coolant_fluid_type=coolant_fluid_type,
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "primary_heat_exchanger",
+            PerformancesHeatExchanger(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                heat_exchanger_id=primary_heat_exchanger_id,
+                coolant_fluid_type=coolant_fluid_type,
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*"],
+        )
+
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.linear_solver = om.DirectSolver()
+
+        self.connect(
+            "compressor.compressor_outlet_temperature",
+            "primary_heat_exchanger_air_properties.compressor_outlet_temperature",
+        )
+        self.connect(
+            "compressor.compressor_pressure_supply",
+            "primary_heat_exchanger_air_properties.compressor_pressure_supply",
+        )
+        self.connect(
+            "humidifier.oxidizer_temperature",
+            "primary_heat_exchanger_air_properties.oxidizer_temperature",
+        )
+        self.connect(
+            "humidifier.oxidizer_pressure",
+            "primary_heat_exchanger_air_properties.oxidizer_pressure",
+        )
+        self.connect(
+            "primary_heat_exchanger_air_properties.air_inlet_temperature",
+            "primary_heat_exchanger.air_inlet_temperature",
+        )
+        self.connect(
+            "primary_heat_exchanger_air_properties.air_outlet_temperature",
+            "primary_heat_exchanger.air_outlet_temperature",
+        )
+        self.connect(
+            "primary_heat_exchanger_air_properties.air_static_pressure",
+            "primary_heat_exchanger.air_static_pressure",
+        )
+        self.connect(
+            "primary_heat_exchanger_air_properties.coolant_inlet_temperature",
+            "primary_heat_exchanger.coolant_inlet_temperature",
+        )
+        self.connect(
+            "primary_heat_exchanger_air_properties.coolant_outlet_temperature",
+            "primary_heat_exchanger.coolant_outlet_temperature",
         )

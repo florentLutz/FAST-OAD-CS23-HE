@@ -49,6 +49,7 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
             + ":mass_flow_ratio",
             val=1.5,
             units="unitless",
+            desc="The fraction of total air supply divided by pemfc air consumption",
         )
 
         self.add_output("total_air_mass_flow", val=1.0, units="kg/s", shape=number_of_points)

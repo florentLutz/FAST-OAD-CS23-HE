@@ -88,4 +88,24 @@ class PerformancesCompressorPressureSupply(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["compressor_pressure_supply"] = np.sum(inputs.values())
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        humidifier_id = self.options["connected_humidifier_id"]
+        heat_exchanger_id = self.options["connected_heat_exchanger_id"]
+
+        outputs["compressor_pressure_supply"] = (
+            inputs["compressor_pressure_target"]
+            + inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + humidifier_id
+                + ":air_pressure_drop"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + heat_exchanger_id
+                + ":air_pressure_drop"
+            ]
+        )
