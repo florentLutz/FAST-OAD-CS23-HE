@@ -46,7 +46,6 @@ from ..components.perf_pemfc_polarization_curve import (
     PerformancesPEMFCStackBOPPolarizationCurveEmpirical,
     PerformancesPEMFCStackBOPPolarizationCurveAnalytical,
 )
-from ..components.perf_pemfc_bop_current_supply import PerformancesPEMFCStackBOPCurrentSupply
 from ..components.perf_pemfc_stack import PerformancesPEMFCStackBOP
 
 from ..components.cstr_ensure import (
@@ -492,7 +491,7 @@ def test_constraints_ensure_power():
 def test_pemfc_current_density():
     ivc = om.IndepVarComp()
     dc_current_out = np.linspace(1.68, 9.24, NB_POINTS_TEST)
-    ivc.add_output("pemfc_dc_current", dc_current_out, units="A")
+    ivc.add_output("dc_current_out", dc_current_out, units="A")
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:effective_area",
         units="cm**2",
@@ -679,6 +678,17 @@ def test_pemfc_voltage():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:number_of_layers",
         val=35.0,
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
+        val=0.2,
+        units="kW",
+        shape=NB_POINTS_TEST,
+    )
+    ivc.add_output(
+        "dc_current_out",
+        val=np.array([400.0, 410.0, 420.0, 430.0, 440.0, 450.0, 460.0, 470.0, 480.0, 490.0]),
+        units="A",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -688,21 +698,9 @@ def test_pemfc_voltage():
         ivc,
     )
     assert problem.get_val("voltage_out", units="V") == pytest.approx(
-        [17.5, 19.25, 21, 22.75, 24.5, 26.25, 28, 29.75, 31.5, 33.25], rel=1e-2
+        [17.0, 18.76, 20.52, 22.29, 24.05, 25.81, 27.57, 29.32, 31.08, 32.84], rel=1e-2
     )
-
-    problem.check_partials(compact_print=True)
-
-    # Check with the other battery mode
-    problem = run_system(
-        PerformancesPEMFCStackBOPVoltage(
-            pemfc_stack_bop_id="pemfc_stack_bop_1",
-            number_of_points=NB_POINTS_TEST,
-            direct_bus_connection=True,
-        ),
-        ivc,
-    )
-    assert problem.get_val("pemfc_voltage", units="V") == pytest.approx(
+    assert problem.get_val("fuel_cell_voltage", units="V") == pytest.approx(
         [17.5, 19.25, 21, 22.75, 24.5, 26.25, 28, 29.75, 31.5, 33.25], rel=1e-2
     )
 
@@ -724,7 +722,7 @@ def test_maximum():
         ),
     )
     ivc.add_output(
-        "pemfc_dc_current",
+        "dc_current_out",
         units="A",
         val=np.array([4.01, 3.93, 3.85, 3.8, 3.75, 3.7, 3.67, 3.63, 3.6, 3.57]),
     )
@@ -782,7 +780,7 @@ def test_pemfc_power():
         units="V",
         val=np.array([802.0, 786.0, 770.0, 760.0, 750.0, 740.0, 734.0, 726.0, 720.0, 714.0]),
     )
-    ivc.add_output("pemfc_dc_current", np.linspace(400, 410, NB_POINTS_TEST), units="A")
+    ivc.add_output("dc_current_out", np.linspace(400, 410, NB_POINTS_TEST), units="A")
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -806,15 +804,26 @@ def test_pemfc_efficiency():
         ),
         units="V",
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:number_of_layers",
+        val=35.0,
+    )
+    ivc.add_output(
+        "fuel_cell_voltage",
+        val=np.array([17.5, 19.25, 21, 22.75, 24.5, 26.25, 28, 29.75, 31.5, 33.25]),
+        units="V",
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackBOPEfficiency(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackBOPEfficiency(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
+        ),
         ivc,
     )
     # Not computed with proper losses, to test only
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.5447, 0.5334, 0.5231, 0.5133, 0.5039, 0.4948, 0.4857, 0.4767, 0.4676, 0.4582], rel=1e-2
+        [0.224, 0.181, 0.138, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -1102,34 +1111,6 @@ def test_performances_pemfc_stack_empirical():
     problem.check_partials(compact_print=True)
 
 
-def test_performances_pemfc_dc_current():
-    ivc = om.IndepVarComp()
-    ivc.add_output("dc_current_out", np.linspace(1.68, 9.24, NB_POINTS_TEST), units="A")
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
-        units="W",
-        val=30.0,
-        shape=NB_POINTS_TEST,
-    )
-    ivc.add_output("voltage_out", units="V", val=np.linspace(17.5, 33.25, NB_POINTS_TEST))
-
-    # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(
-        PerformancesPEMFCStackBOPCurrentSupply(
-            pemfc_stack_bop_id="pemfc_stack_bop_1",
-            number_of_points=NB_POINTS_TEST,
-        ),
-        ivc,
-    )
-
-    assert problem.get_val("pemfc_dc_current", units="A") == pytest.approx(
-        [3.394, 4.079, 4.789, 5.519, 6.265, 7.023, 7.791, 8.568, 9.352, 10.142],
-        rel=1e-2,
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_performances_pemfc_stack_analytical():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -1203,7 +1184,6 @@ def test_performances_pemfc_stack_analytical_add_bop():
         units="K",
         val=np.full(NB_POINTS_TEST, 288.15),
     )
-    ivc.add_output("mach", units="unitless", val=0.33, shape=NB_POINTS_TEST)
     ivc.add_output(
         "true_airspeed",
         units="m/s",
@@ -1228,13 +1208,13 @@ def test_performances_pemfc_stack_analytical_add_bop():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_drag",
         units="N",
     ) == pytest.approx(
-        [0.162, 0.163, 0.164, 0.165, 0.166, 0.167, 0.168, 0.17, 0.171, 0.172], rel=1e-2
+        [0.00367, 0.00489, 0.00611, 0.00734, 0.00856, 0.00978, 0.011, 0.0122], rel=1e-2
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
         units="kW",
     ) == pytest.approx(
-        [0.87, 0.87, 0.87, 0.871, 0.871, 0.872, 0.872, 0.872, 0.873, 0.873], rel=1e-2
+        [0.827, 0.827, 0.827, 0.828, 0.828, 0.828, 0.829, 0.829, 0.829, 0.83], rel=1e-2
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

@@ -20,7 +20,6 @@ from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackBOPSingleLayerVoltageEmpirical,
     PerformancesPEMFCStackBOPSingleLayerVoltageAnalytical,
 )
-from .perf_pemfc_bop_current_supply import PerformancesPEMFCStackBOPCurrentSupply
 from .subcomponents.perf_pemfc_bop import PerformancesPEMFCBOP
 
 
@@ -148,7 +147,9 @@ class PerformancesPEMFCStackBOP(om.Group):
         )
         self.add_subsystem(
             "pemfc_efficiency",
-            PerformancesPEMFCStackBOPEfficiency(number_of_points=number_of_points),
+            PerformancesPEMFCStackBOPEfficiency(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+            ),
             promotes=["*"],
         )
 
@@ -201,18 +202,3 @@ class PerformancesPEMFCStackBOP(om.Group):
                 ),
                 promotes=["*"],
             )
-
-        self.add_subsystem(
-            "supply_current",
-            PerformancesPEMFCStackBOPCurrentSupply(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                number_of_points=number_of_points,
-            ),
-            promotes=["*"],
-        )
-
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 20
-        self.nonlinear_solver.options["rtol"] = 1e-5
-        self.linear_solver = om.DirectSolver()

@@ -58,9 +58,21 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
             val=np.nan,
             desc="Total number of layers in the PEMFC stack",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required",
+            units="W",
+            val=0.0,
+            shape=number_of_points,
+        )
+        self.add_input("dc_current_out", units="A", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             self.output_name, units="V", val=np.full(number_of_points, DEFAULT_STACK_VOLTAGE)
+        )
+        self.add_output(
+            "fuel_cell_voltage", units="V", val=np.full(number_of_points, DEFAULT_STACK_VOLTAGE)
         )
 
         self.declare_partials(
@@ -72,10 +84,38 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
         )
+        self.declare_partials(
+            of="fuel_cell_voltage",
+            wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":number_of_layers",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+        )
 
         self.declare_partials(
             of=self.output_name,
-            wrt="single_layer_pemfc_voltage",
+            wrt=[
+                "single_layer_pemfc_voltage",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":bop_power_required",
+                "dc_current_out",
+            ],
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="fuel_cell_voltage",
+            wrt=[
+                "single_layer_pemfc_voltage",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":bop_power_required",
+                "dc_current_out",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -84,26 +124,43 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
+        single_layer_voltage = inputs["single_layer_pemfc_voltage"]
+        number_of_layers = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":number_of_layers"
+        ]
+        bop_power_required = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required"
+        ]
+        dc_current_out = inputs["dc_current_out"]
+
         outputs[self.output_name] = (
-            inputs["single_layer_pemfc_voltage"]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":number_of_layers"
-            ]
+            single_layer_voltage * number_of_layers - bop_power_required / dc_current_out
         )
+        outputs["fuel_cell_voltage"] = single_layer_voltage * number_of_layers
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         number_of_points = self.options["number_of_points"]
 
-        partials[self.output_name, "single_layer_pemfc_voltage"] = (
-            np.ones(number_of_points)
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":number_of_layers"
-            ]
+        single_layer_voltage = inputs["single_layer_pemfc_voltage"]
+        number_of_layers = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":number_of_layers"
+        ]
+        bop_power_required = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required"
+        ]
+        dc_current_out = inputs["dc_current_out"]
+
+        partials[self.output_name, "single_layer_pemfc_voltage"] = np.full(
+            number_of_points, number_of_layers
         )
 
         partials[
@@ -111,4 +168,24 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":number_of_layers",
-        ] = inputs["single_layer_pemfc_voltage"]
+        ] = single_layer_voltage
+
+        partials[
+            self.output_name,
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required",
+        ] = -1.0 / dc_current_out
+
+        partials[self.output_name, "dc_current_out"] = bop_power_required / dc_current_out**2.0
+
+        partials["fuel_cell_voltage", "single_layer_pemfc_voltage"] = np.full(
+            number_of_points, number_of_layers
+        )
+
+        partials[
+            "fuel_cell_voltage",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":number_of_layers",
+        ] = single_layer_voltage

@@ -138,4 +138,6 @@ def test_sizing_twin_otter_pemfc_h2_with_bop():
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
 
+    print(residuals.keys())
+
     problem.write_outputs()
