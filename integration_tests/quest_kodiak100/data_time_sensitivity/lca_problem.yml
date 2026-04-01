@@ -5,65 +5,16 @@ module_folders:
 
 
 # Input and output files
-input_file: ../results/oad_process_inputs_elec_na_ion_with_lca.xml
-output_file: ../results/oad_process_outputs_elec_na_ion_with_lca.xml
+input_file: ../results_time_sensitivity/lca_problem_inputs.xml
+output_file: ../results_time_sensitivity/lca_problem_outputs.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
 
 model:
-    aircraft_sizing:
-        nonlinear_solver: om.NonlinearBlockGS(maxiter=30, iprint=2, rtol=1e-5, debug_print=True, reraise_child_analysiserror=True, use_aitken=True, aitken_max_factor=0.8, aitken_min_factor=0.33, aitken_initial_factor=0.8)
-        linear_solver: om.DirectSolver()
-        geometry:
-            id: fastga.geometry.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            cabin_sizing: 0.0
-        aerodynamics_lowspeed:
-            id: fastga.aerodynamics.lowspeed.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            result_folder_path: ../workdir
-            use_openvsp: false
-        aerodynamics_highspeed:
-            id: fastga.aerodynamics.highspeed.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            result_folder_path: ../workdir
-            compute_mach_interpolation: false
-            use_openvsp: false
-        power_train_sizing:
-            id: fastga_he.power_train.sizing
-            power_train_file_path: ./elec_kodiak_assembly_na_ion.yml
-        weight:
-            id: fastga.weight.legacy
-            propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-        performances:
-            id: fastga_he.performances.mission_vector
-            number_of_points_climb: 30
-            number_of_points_cruise: 30
-            number_of_points_descent: 20
-            number_of_points_reserve: 10
-            power_train_file_path: ./elec_kodiak_assembly_na_ion.yml
-            out_file: ../results/elec_kodiak_na_ion_propulsion.csv
-            use_linesearch: False
-            pre_condition_pt: False
-            use_apply_nonlinear: True
-            sort_component: True
-        mtow:
-            id: fastga.loop.mtow
-        hq:
-            tail_sizing:
-                id: fastga.handling_qualities.tail_sizing
-                propulsion_id: fastga.wrapper.propulsion.basicTurboprop
-            static_margin:
-                id: fastga.handling_qualities.static_margin
-        wing_position:
-            id: fastga.loop.wing_position
-        wing_area:
-            id: fastga.loop.wing_area
-
     lca:
         id: fastga_he.lca.legacy
-        power_train_file_path: ./elec_kodiak_assembly_na_ion.yml
+        power_train_file_path: ./assembly.yml
         component_level_breakdown: true
         airframe_material: aluminium
         delivery_method: flight
@@ -72,7 +23,7 @@ model:
         weighting: true
         aircraft_lifespan_in_hours: true
         write_lca_conf: false
-        lca_conf_file_path: ./elec_kodiak_assembly_na_ion_lca.yml
+        lca_conf_file_path: ./lca_conf_file.yml
 
 submodels:
     submodel.geometry.wing.thickness_ratio: null

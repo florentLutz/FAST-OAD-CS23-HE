@@ -1,0 +1,54 @@
+<FASTOAD_model>
+  <data>
+    <TLAR>
+      <flight_hours_per_year units="h" is_input="True">283.2<!--Expected number of hours flown per year--></flight_hours_per_year>
+      <max_airframe_hours units="h" is_input="True">7077.285714285714<!--Expected lifetime of the aircraft expressed in airframe hours--></max_airframe_hours>
+    </TLAR>
+    <propulsion>
+      <he_power_train>
+        <DC_DC_converter>
+          <dc_dc_converter_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the DC_DC_converter, typically around 15 year--></lifespan>
+          </dc_dc_converter_1>
+          <dc_dc_converter_2>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the DC_DC_converter, typically around 15 year--></lifespan>
+          </dc_dc_converter_2>
+        </DC_DC_converter>
+        <SM_PMSM>
+          <motor_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the SM PMSM, typically around 15 year--></lifespan>
+          </motor_1>
+        </SM_PMSM>
+        <battery_pack>
+          <battery_pack_1>
+            <lifespan is_input="True">500.0<!--Expected lifetime of the battery pack, expressed in cycles. Default value is the number of cycle required for the reference cell to reach 60% nominal capacity--></lifespan>
+          </battery_pack_1>
+          <battery_pack_2>
+            <lifespan is_input="True">500.0<!--Expected lifetime of the battery pack, expressed in cycles. Default value is the number of cycle required for the reference cell to reach 60% nominal capacity--></lifespan>
+          </battery_pack_2>
+        </battery_pack>
+        <inverter>
+          <inverter_1>
+            <lifespan units="year" is_input="True">15.0<!--Expected lifetime of the inverter, typically around 15 year--></lifespan>
+          </inverter_1>
+        </inverter>
+        <propeller>
+          <propeller_1>
+            <material is_input="True">1.0<!--1.0 for composite, 0.0 for aluminium--></material>
+          </propeller_1>
+        </propeller>
+      </he_power_train>
+    </propulsion>
+    <environmental_impact>
+      <line_test>
+        <duration units="h" is_input="True">10.0<!--Duration of line tests--></duration>
+      </line_test>
+      <delivery>
+        <distance units="km" is_input="True">8000.0<!--Distance between the site of assembly of the aircraft and the site of delivery. The variable will have the same name regardless of whether the delivery is done by the air or by land.--></distance>
+      </delivery>
+      <buy_to_fly>
+        <metallic is_input="True">1.0<!--Ratio of the amount of material purchased to to what is really put into the manufactured parts. Typical value for metallic material is between 5 and 10--></metallic>
+      </buy_to_fly>
+    </environmental_impact>
+  </data>
+</FASTOAD_model>
