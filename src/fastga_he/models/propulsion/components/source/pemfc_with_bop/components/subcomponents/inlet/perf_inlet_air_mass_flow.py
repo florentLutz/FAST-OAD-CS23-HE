@@ -5,7 +5,9 @@
 import openmdao.api as om
 import numpy as np
 
-from .fluid_characteristics import FluidSpecificHeatCapacity
+from fastga_he.models.propulsion.components.source.pemfc_with_bop.components.subcomponents.fluid_characteristics import (
+    FluidSpecificHeatCapacity,
+)
 
 
 class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
@@ -46,20 +48,19 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":mass_flow_ratio",
-            val=1.5,
+            + ":mass_flow_factor",
+            val=10.0,
             units="unitless",
-            desc="The fraction of total air supply divided by pemfc air consumption",
         )
 
-        self.add_output("total_air_mass_flow", val=1.0, units="kg/s", shape=number_of_points)
+        self.add_output("inlet_air_mass_flow", val=5.0, units="kg/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials("*", "*", method="exact")
         self.declare_partials(
-            "total_air_mass_flow",
+            "inlet_air_mass_flow",
             "air_consumption",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -69,14 +70,14 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        outputs["total_air_mass_flow"] = (
+        outputs["inlet_air_mass_flow"] = (
             inputs["air_consumption"]
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
                 + air_inlet_id
-                + ":mass_flow_ratio"
+                + ":mass_flow_factor"
             ]
         )
 
@@ -85,19 +86,19 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
         air_inlet_id = self.options["air_inlet_id"]
         number_of_points = self.options["number_of_points"]
 
-        partials["total_air_mass_flow", "air_consumption"] = inputs[
+        partials["inlet_air_mass_flow", "air_consumption"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":mass_flow_ratio"
+            + ":mass_flow_factor"
         ] * np.ones(number_of_points)
 
         partials[
-            "total_air_mass_flow",
+            "inlet_air_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":mass_flow_ratio",
+            + ":mass_flow_factor",
         ] = inputs["air_consumption"]

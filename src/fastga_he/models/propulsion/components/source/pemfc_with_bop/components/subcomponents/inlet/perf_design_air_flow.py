@@ -34,7 +34,7 @@ class PerformancesInletDesignAirFlow(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "total_air_mass_flow",
+            "inlet_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -71,13 +71,13 @@ class PerformancesInletDesignAirFlow(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":design_air_mass_flow"
-        ] = np.max(inputs["total_air_mass_flow"])
+        ] = np.max(inputs["inlet_air_mass_flow"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        design_air_mass_flow = np.max(inputs["total_air_mass_flow"])
+        design_air_mass_flow = np.max(inputs["inlet_air_mass_flow"])
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -85,5 +85,5 @@ class PerformancesInletDesignAirFlow(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":design_air_mass_flow",
-            "total_air_mass_flow",
-        ] = np.where(design_air_mass_flow == inputs["total_air_mass_flow"], 1.0, 0.0)
+            "inlet_air_mass_flow",
+        ] = np.where(design_air_mass_flow == inputs["inlet_air_mass_flow"], 1.0, 0.0)

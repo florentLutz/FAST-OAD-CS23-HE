@@ -534,7 +534,7 @@ def test_inlet_drag():
     ivc.add_output("air_mass_flow_ratio", val=0.56)
     ivc.add_output("momentum_flow_correction_factor", val=0.93)
     ivc.add_output(
-        "total_air_mass_flow",
+        "inlet_air_mass_flow",
         units="kg/s",
         val=np.full(NB_POINTS_TEST, 0.5),
     )
@@ -580,7 +580,7 @@ def test_inlet_drag_group():
         val=np.full(NB_POINTS_TEST, 0.33),
     )
     ivc.add_output(
-        "total_air_mass_flow",
+        "inlet_air_mass_flow",
         units="kg/s",
         val=np.full(NB_POINTS_TEST, 0.5),
     )
@@ -681,7 +681,7 @@ def test_inlet_pressure_efficiency_difference_factor():
         units="kg/m**3",
         val=np.full(NB_POINTS_TEST, 1.225),
     )
-    ivc.add_output("total_air_mass_flow", units="kg/s", val=np.full(NB_POINTS_TEST, 0.5))
+    ivc.add_output("inlet_air_mass_flow", units="kg/s", val=np.full(NB_POINTS_TEST, 0.5))
     ivc.add_output("dynamic_viscosity", units="Pa*s", val=np.full(NB_POINTS_TEST, 1.79e-5))
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
@@ -770,7 +770,7 @@ def test_inlet_throat_airspeed():
         val=np.full(NB_POINTS_TEST, 1.225),
     )
     ivc.add_output(
-        "total_air_mass_flow",
+        "inlet_air_mass_flow",
         units="kg/s",
         val=np.full(NB_POINTS_TEST, 0.5),
     )
@@ -932,9 +932,9 @@ def test_inlet_performance():
     ivc.add_output("density", units="kg/m**3", val=np.full(NB_POINTS_TEST, 1.225))
     ivc.add_output("mach", val=np.full(NB_POINTS_TEST, 0.33))
     ivc.add_output(
-        "total_air_mass_flow",
+        "air_consumption",
         units="kg/s",
-        val=np.full(NB_POINTS_TEST, 0.5),
+        val=np.full(NB_POINTS_TEST, 0.05),
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"

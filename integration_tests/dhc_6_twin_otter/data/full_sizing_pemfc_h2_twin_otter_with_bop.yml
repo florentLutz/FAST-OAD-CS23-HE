@@ -50,7 +50,7 @@ model:
             number_of_points_reserve: 10
             power_train_file_path: ./pemfc_h2_with_bop_propulsion.yml
             out_file: ../results/pemfc_h2_with_bop_propulsion.csv
-            use_linesearch: False
+            use_linesearch: True
             pre_condition_pt: False
             use_apply_nonlinear: True
         mtow:

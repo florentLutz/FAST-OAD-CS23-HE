@@ -277,7 +277,7 @@ class SizingBOPMass(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials("*", "*", val=1.0)
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -295,4 +295,32 @@ class SizingBOPMass(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_mass"
-        ] = bop_mass
+        ] = np.clip(bop_mass, 0.0, 1000.0)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        sizing_component_ids = self.options["sizing_component_ids"]
+        bop_mass = 0.0
+
+        for component_id in sizing_component_ids:
+            bop_mass += inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + component_id
+                + ":mass"
+            ]
+
+        clipped_bop_mass = np.clip(bop_mass, 0.0, 1000.0)
+
+        for component_id in sizing_component_ids:
+            partials[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":bop_mass",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + component_id
+                + ":mass",
+            ] = np.where(bop_mass == clipped_bop_mass, 1.0, 1e-6)

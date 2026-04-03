@@ -20,6 +20,9 @@ from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackBOPSingleLayerVoltageEmpirical,
     PerformancesPEMFCStackBOPSingleLayerVoltageAnalytical,
 )
+from ..components.perf_pemfc_coolant_mass_flow_rate import (
+    PerformancesPEMFCStackBOPCoolantMassFlowRate,
+)
 from .subcomponents.perf_pemfc_bop import PerformancesPEMFCBOP
 
 
@@ -171,6 +174,14 @@ class PerformancesPEMFCStackBOP(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
             ),
             promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "coolant_mass_flow_rate",
+            PerformancesPEMFCStackBOPCoolantMassFlowRate(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, coolant_fluid_type=coolant_fluid_type
+            ),
+            promotes=["data:*"],
         )
 
         energy_consumed = om.IndepVarComp()

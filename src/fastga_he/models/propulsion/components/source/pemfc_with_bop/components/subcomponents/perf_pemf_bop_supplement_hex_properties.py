@@ -35,12 +35,19 @@ class PerformancesSupplementHeatExchangerThermalBalance(om.Group):
             desc="Identifier of the supplement heat exchanger",
             allow_none=False,
         )
+        self.options.declare(
+            name="connected_air_inlet_id",
+            default=None,
+            desc="Identifier of the connected air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         coolant_fluid_type = self.options["coolant_fluid_type"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
 
         self.add_subsystem(
             "supplement_heat_exchanger_air_properties",
@@ -76,13 +83,10 @@ class PerformancesSupplementHeatExchangerThermalBalance(om.Group):
             ],
         )
         self.add_subsystem(
-            "supplement_air_flow_rate",
-            _SupplementAirFlowRate(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
             "minimum_heat_capacity",
-            _MinimumHeatCapacity(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            _MinimumHeatCapacity(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, connected_air_inlet_id=connected_air_inlet_id
+            ),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -139,24 +143,10 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
             units="Pa",
             shape=number_of_points,
         )
-        self.add_input(
-            "total_air_mass_flow",
-            val=np.nan,
-            units="kg/s",
-            shape=number_of_points,
-        )
-        self.add_input(
-            "air_consumption",
-            val=np.nan,
-            units="kg/s",
-            shape=number_of_points,
-        )
 
         self.add_output("air_inlet_temperature", val=300.0, units="K")
         self.add_output("mean_air_temperature", val=320.0, units="K")
         self.add_output("air_static_pressure", val=101325.0, units="Pa")
-        self.add_output("max_total_air_flow_rate", val=1.08, units="kg/s")
-        self.add_output("air_mass_flow", val=0.36, units="kg/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
@@ -184,38 +174,14 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
         )
-        self.declare_partials(
-            of="max_total_air_flow_rate",
-            wrt="total_air_mass_flow",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
-        self.declare_partials(
-            of="air_mass_flow",
-            wrt="total_air_mass_flow",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-            val=1.0,
-        )
-        self.declare_partials(
-            of="air_mass_flow",
-            wrt="air_consumption",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.arange(number_of_points),
-            val=-1.0,
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         number_of_points = self.options["number_of_points"]
+
         diffuser_exit_total_temperature = inputs["diffuser_exit_total_temperature"]
         exterior_temperature = inputs["exterior_temperature"]
         diffuser_exit_total_pressure = inputs["diffuser_exit_total_pressure"]
         ambient_pressure = inputs["ambient_pressure"]
-        total_air_mass_flow = inputs["total_air_mass_flow"]
-        air_consumption = inputs["air_consumption"]
 
         outputs["mean_air_temperature"] = np.sum(
             diffuser_exit_total_temperature + exterior_temperature
@@ -224,74 +190,13 @@ class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
             2.0 * number_of_points
         )
         outputs["air_inlet_temperature"] = np.max(exterior_temperature)
-        outputs["max_total_air_flow_rate"] = np.max(total_air_mass_flow)
-        outputs["air_mass_flow"] = total_air_mass_flow - air_consumption
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         exterior_temperature = inputs["exterior_temperature"]
-        total_air_mass_flow = inputs["total_air_mass_flow"]
-
         air_inlet_temperature = np.max(exterior_temperature)
-        max_air_flow_rate = np.max(total_air_mass_flow)
 
         partials["air_inlet_temperature", "exterior_temperature"] = np.where(
             air_inlet_temperature == exterior_temperature, 1.0, 0.0
-        )
-
-        partials["max_total_air_flow_rate", "total_air_mass_flow"] = np.where(
-            max_air_flow_rate == total_air_mass_flow, 1.0, 0.0
-        )
-
-
-class _SupplementAirFlowRate(om.ExplicitComponent):
-    """
-    Compute the air mass flow rate at the supplement heat exchanger inlet.
-    """
-
-    def initialize(self):
-        self.options.declare(
-            name="pemfc_stack_bop_id",
-            default=None,
-            desc="Identifier of the PEMFC stack",
-            allow_none=False,
-        )
-
-    def setup(self):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":air_consumption_max",
-            units="kg/s",
-            val=np.nan,
-        )
-        self.add_input(
-            "max_total_air_flow_rate",
-            val=np.nan,
-            units="kg/s",
-        )
-
-        self.add_output(
-            "air_mass_flow_rate",
-            val=0.36,
-            units="kg/s",
-        )
-
-    def setup_partials(self):
-        self.declare_partials("*", "*", val=-1.0)
-        self.declare_partials("*", "max_total_air_flow_rate", val=1.0)
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-
-        outputs["air_mass_flow_rate"] = (
-            inputs["max_total_air_flow_rate"]
-            - inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":air_consumption_max"
-            ]
         )
 
 
@@ -307,12 +212,23 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
             desc="Identifier of the PEMFC stack",
             allow_none=False,
         )
+        self.options.declare(
+            name="connected_air_inlet_id",
+            default=None,
+            desc="Identifier of the connected air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
 
         self.add_input(
-            "air_mass_flow_rate",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow",
             val=np.nan,
             units="kg/s",
         )
@@ -345,8 +261,15 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
 
-        air_mass_flow_rate = inputs["air_mass_flow_rate"]
+        air_mass_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow"
+        ]
         mean_air_specific_heat_capacity = inputs["mean_air_specific_heat_capacity"]
         coolant_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -362,8 +285,15 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
 
-        air_mass_flow_rate = inputs["air_mass_flow_rate"]
+        air_mass_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow"
+        ]
         mean_air_specific_heat_capacity = inputs["mean_air_specific_heat_capacity"]
         coolant_mass_flow_rate = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -377,9 +307,14 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
         )
 
         if air_mass_flow_rate * mean_air_specific_heat_capacity == min_heat_capacity:
-            partials["minimum_heat_capacity", "air_mass_flow_rate"] = (
-                mean_air_specific_heat_capacity
-            )
+            partials[
+                "minimum_heat_capacity",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + connected_air_inlet_id
+                + ":design_air_mass_flow",
+            ] = mean_air_specific_heat_capacity
             partials["minimum_heat_capacity", "mean_air_specific_heat_capacity"] = (
                 air_mass_flow_rate
             )
@@ -392,7 +327,14 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
             partials["minimum_heat_capacity", "mean_coolant_specific_heat_capacity"] = 0.0
 
         else:
-            partials["minimum_heat_capacity", "air_mass_flow_rate"] = 0.0
+            partials[
+                "minimum_heat_capacity",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + connected_air_inlet_id
+                + ":design_air_mass_flow",
+            ] = 0.0
             partials["minimum_heat_capacity", "mean_air_specific_heat_capacity"] = 0.0
             partials[
                 "minimum_heat_capacity",

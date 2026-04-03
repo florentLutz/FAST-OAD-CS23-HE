@@ -87,6 +87,18 @@ def test_fluid_density():
 
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=200.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=-1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidDensity(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_density", units="kg/m**3") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1.177), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_fluid_specific_heat_capacity():
     # Research independent input value in .xml file
@@ -105,6 +117,18 @@ def test_fluid_specific_heat_capacity():
     ivc = om.IndepVarComp()
     ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
     ivc.add_output("fluid_pressure", units="atm", val=1.0, shape=NB_POINTS_TEST)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(FluidSpecificHeatCapacity(number_of_points=NB_POINTS_TEST), ivc)
+    assert problem.get_val("fluid_specific_heat_capacity", units="J/kg/K") == pytest.approx(
+        np.full(NB_POINTS_TEST, 1006.4), rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+    ivc.add_output("fluid_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("fluid_pressure", units="atm", val=-1.0, shape=NB_POINTS_TEST)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(FluidSpecificHeatCapacity(number_of_points=NB_POINTS_TEST), ivc)
@@ -553,7 +577,7 @@ def test_sizing_pipe():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:pipe_1:mass",
         units="kg",
-    ) == pytest.approx(60.2, rel=1e-2)
+    ) == pytest.approx(0.9, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

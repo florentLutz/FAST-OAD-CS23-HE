@@ -112,13 +112,17 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":volumetric_flow_rate"
         ]
 
+        unclipped_power_required = (
+            volumetric_flow_rate * pressure_compensation / (pump_efficiency * motor_efficiency)
+        )
+
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + pump_id
             + ":power_rating"
-        ] = volumetric_flow_rate * pressure_compensation / (pump_efficiency * motor_efficiency)
+        ] = np.clip(unclipped_power_required, 0.0, 10000.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -153,6 +157,10 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":volumetric_flow_rate"
         ]
 
+        unclipped_power_required = (
+            volumetric_flow_rate * pressure_compensation / (pump_efficiency * motor_efficiency)
+        )
+        clipped_required_power = np.clip(unclipped_power_required, 0.0, 10000.0)
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -164,7 +172,11 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":pressure_compensation",
-        ] = volumetric_flow_rate / (pump_efficiency * motor_efficiency)
+        ] = np.where(
+            unclipped_power_required == clipped_required_power,
+            volumetric_flow_rate / (pump_efficiency * motor_efficiency),
+            1e-6,
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -177,10 +189,12 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":motor_efficiency",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_required_power,
             -volumetric_flow_rate
             * pressure_compensation
-            / (pump_efficiency * motor_efficiency**2.0)
+            / (pump_efficiency * motor_efficiency**2.0),
+            1e-6,
         )
 
         partials[
@@ -194,10 +208,12 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":pump_efficiency",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_required_power,
             -volumetric_flow_rate
             * pressure_compensation
-            / (pump_efficiency**2.0 * motor_efficiency)
+            / (pump_efficiency**2.0 * motor_efficiency),
+            1e-6,
         )
 
         partials[
@@ -211,4 +227,8 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":volumetric_flow_rate",
-        ] = pressure_compensation / (pump_efficiency * motor_efficiency)
+        ] = np.where(
+            unclipped_power_required == clipped_required_power,
+            pressure_compensation / (pump_efficiency * motor_efficiency),
+            1e-6,
+        )

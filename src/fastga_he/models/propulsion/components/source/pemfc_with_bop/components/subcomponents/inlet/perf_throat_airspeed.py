@@ -35,7 +35,7 @@ class PerformancesThroatAirSpeed(om.ExplicitComponent):
 
         self.add_input("density", units="kg/m**3", val=np.zeros(number_of_points))
         self.add_input(
-            "total_air_mass_flow",
+            "inlet_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -79,7 +79,7 @@ class PerformancesThroatAirSpeed(om.ExplicitComponent):
         )
         self.declare_partials(
             of="*",
-            wrt=["density", "total_air_mass_flow"],
+            wrt=["density", "inlet_air_mass_flow"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -90,7 +90,7 @@ class PerformancesThroatAirSpeed(om.ExplicitComponent):
         air_inlet_id = self.options["air_inlet_id"]
 
         density = inputs["density"]
-        air_mass_flow = inputs["total_air_mass_flow"]
+        air_mass_flow = inputs["inlet_air_mass_flow"]
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -113,7 +113,7 @@ class PerformancesThroatAirSpeed(om.ExplicitComponent):
         air_inlet_id = self.options["air_inlet_id"]
 
         density = inputs["density"]
-        air_mass_flow = inputs["total_air_mass_flow"]
+        air_mass_flow = inputs["inlet_air_mass_flow"]
         throat_height = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -133,7 +133,7 @@ class PerformancesThroatAirSpeed(om.ExplicitComponent):
             density**2.0 * throat_height * highlight_width
         )
 
-        partials["throat_air_speed", "total_air_mass_flow"] = 1.0 / (
+        partials["throat_air_speed", "inlet_air_mass_flow"] = 1.0 / (
             density * throat_height * highlight_width
         )
 

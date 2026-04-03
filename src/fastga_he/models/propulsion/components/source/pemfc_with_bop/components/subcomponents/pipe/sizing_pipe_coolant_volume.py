@@ -113,7 +113,7 @@ class SizingPipeCoolantVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass",
+            + ":coolant_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -126,7 +126,7 @@ class SizingPipeCoolantVolume(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + pipe_id
-            + ":mass",
+            + ":coolant_volume",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

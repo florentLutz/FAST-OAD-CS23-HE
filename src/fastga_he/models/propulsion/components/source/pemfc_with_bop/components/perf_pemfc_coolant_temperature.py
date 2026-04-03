@@ -45,21 +45,21 @@ class PerformancesPEMFCStackBOPCoolantTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:inlet_temperature",
             units="K",
-            val=300.0,
+            val=339.8,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:outlet_temperature",
             units="K",
-            val=310.0,
+            val=349.8,
         )
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:mean_temperature",
             units="K",
-            val=305.0,
+            val=344.8,
         )
 
     def setup_partials(self):

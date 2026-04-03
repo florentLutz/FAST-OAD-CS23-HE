@@ -89,48 +89,34 @@ class _PropertyCheck(om.ExplicitComponent):
         temperature = inputs["fluid_temperature"]
         pressure = inputs["fluid_pressure"]
 
-        temperature_conditions = [
-            temperature < 250.0,
-            temperature > 450.0,
-            np.isnan(temperature),
-        ]
-        pressure_conditions = [pressure < 1e3, pressure > 1e8, np.isnan(pressure)]
-
-        clipped_temperature = [250.0, 450.0, 300.0]
-        clipped_pressure = [1e3, 1e8, 101325.0]
-
-        outputs["temperature"] = np.select(
-            temperature_conditions, clipped_temperature, default=temperature
+        condition = (
+            (temperature > 250.0)
+            & (temperature < 373.15)
+            & (pressure > 1e3)
+            & (pressure < 1e8)
+            & ~np.isnan(temperature)
+            & ~np.isnan(pressure)
         )
-        outputs["pressure"] = np.select(pressure_conditions, clipped_pressure, default=pressure)
+
+        outputs["temperature"] = np.where(condition, temperature, 300.0)
+        outputs["pressure"] = np.where(condition, pressure, 101325.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         temperature = inputs["fluid_temperature"]
         pressure = inputs["fluid_pressure"]
 
-        temperature_conditions = [
-            temperature < 250.0,
-            temperature > 450.0,
-            np.isnan(temperature),
-        ]
-        pressure_conditions = [pressure < 1e3, pressure > 1e8, np.isnan(pressure)]
-
-        clipped_temperature = [250.0, 450.0, 300.0]
-        clipped_pressure = [1e3, 1e8, 101325.0]
-
-        partials["temperature", "fluid_temperature"] = np.where(
-            np.select(temperature_conditions, clipped_temperature, default=temperature)
-            == inputs["fluid_temperature"],
-            1.0,
-            1e-6,
+        condition = (
+            (temperature > 250.0)
+            & (temperature < 373.15)
+            & (pressure > 1e3)
+            & (pressure < 1e8)
+            & ~np.isnan(temperature)
+            & ~np.isnan(pressure)
         )
 
-        partials["pressure", "fluid_pressure"] = np.where(
-            np.select(pressure_conditions, clipped_pressure, default=pressure)
-            == inputs["fluid_pressure"],
-            1.0,
-            1e-6,
-        )
+        partials["temperature", "fluid_temperature"] = np.where(condition, 1.0, 1e-6)
+
+        partials["pressure", "fluid_pressure"] = np.where(condition, 1.0, 1e-6)
 
 
 class _SpecificHeatCapacity(om.ExplicitComponent):
@@ -181,8 +167,8 @@ class _SpecificHeatCapacity(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = inputs["temperature"]
-        pressure = inputs["pressure"]
+        temperature = np.clip(inputs["temperature"], 250.0, 373.15)
+        pressure = np.clip(inputs["pressure"], 1e3, 1e8)
 
         if fluid not in fluid_name_dict:
             raise ValueError(f"Unknown fluid: {fluid}")
@@ -214,8 +200,8 @@ class _SpecificHeatCapacity(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = inputs["temperature"]
-        pressure = inputs["pressure"]
+        temperature = np.clip(inputs["temperature"], 250.0, 373.15)
+        pressure = np.clip(inputs["pressure"], 1e3, 1e8)
 
         fluid_string = fluid_name_dict[fluid]
         is_incompressible = fluid_string.startswith("INCOMP::")

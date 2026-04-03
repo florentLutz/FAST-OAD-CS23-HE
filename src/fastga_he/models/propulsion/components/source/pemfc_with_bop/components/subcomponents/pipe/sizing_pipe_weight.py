@@ -121,7 +121,7 @@ class SizingPipeWeight(om.ExplicitComponent):
             + pipe_id
             + ":mass"
         ] = (
-            (radius**2.0 + 2.0 * radius * wall_thickness)
+            (wall_thickness**2.0 + 2.0 * radius * wall_thickness)
             * np.pi
             * material_density
             * number_of_pipes
@@ -175,7 +175,7 @@ class SizingPipeWeight(om.ExplicitComponent):
             + ":"
             + pipe_id
             + ":radius",
-        ] = (radius + wall_thickness) * np.pi * material_density * number_of_pipes
+        ] = wall_thickness * np.pi * material_density * number_of_pipes
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -188,7 +188,7 @@ class SizingPipeWeight(om.ExplicitComponent):
             + ":"
             + pipe_id
             + ":wall_thickness",
-        ] = radius * np.pi * material_density * number_of_pipes
+        ] = (wall_thickness + radius) * np.pi * material_density * number_of_pipes
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -201,7 +201,7 @@ class SizingPipeWeight(om.ExplicitComponent):
             + ":"
             + pipe_id
             + ":material_density",
-        ] = (radius**2.0 + 2.0 * radius * wall_thickness) * np.pi * number_of_pipes * 0.5
+        ] = (wall_thickness**2.0 + 2.0 * radius * wall_thickness) * np.pi * number_of_pipes * 0.5
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -214,4 +214,4 @@ class SizingPipeWeight(om.ExplicitComponent):
             + ":"
             + pipe_id
             + ":number_of_pipes",
-        ] = (radius**2.0 + 2.0 * radius * wall_thickness) * np.pi * material_density * 0.5
+        ] = (wall_thickness**2.0 + 2.0 * radius * wall_thickness) * np.pi * material_density * 0.5

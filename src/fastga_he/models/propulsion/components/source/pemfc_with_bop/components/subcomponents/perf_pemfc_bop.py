@@ -17,7 +17,6 @@ from .perf_pemf_bop_primary_hex_properties import PerformancesPrimaryHeatExchang
 from .perf_pemf_bop_supplement_hex_properties import (
     PerformancesSupplementHeatExchangerThermalBalance,
 )
-from .perf_pemf_bop_inlet_air_inlet_flow import PerformancesAirInletAirMassFlow
 from .perf_pemf_bop_speed_of_sound import PerformancesAirSpeedOfSound
 from .perf_pemf_bop_mach import PerformancesAirMach
 
@@ -133,15 +132,6 @@ class PerformancesPEMFCBOP(om.Group):
             "mach", PerformancesAirMach(number_of_points=number_of_points), promotes=["*"]
         )
         self.add_subsystem(
-            "inlet_air_flow_rate",
-            PerformancesAirInletAirMassFlow(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                air_inlet_id=air_inlet_id,
-                number_of_points=number_of_points,
-            ),
-            promotes=["*"],
-        )
-        self.add_subsystem(
             "air_inlet",
             PerformancesInlet(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
@@ -155,7 +145,7 @@ class PerformancesPEMFCBOP(om.Group):
                 "altitude",
                 "true_airspeed",
                 "density",
-                "total_air_mass_flow",
+                "air_consumption",
             ],
         )
         self.add_subsystem(
@@ -172,10 +162,11 @@ class PerformancesPEMFCBOP(om.Group):
             PerformancesSupplementHeatExchangerThermalBalance(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 supplement_heat_exchanger_id=supplement_heat_exchanger_id,
+                connected_air_inlet_id=air_inlet_id,
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "exterior_temperature", "air_consumption", "total_air_mass_flow"],
+            promotes=["data:*", "exterior_temperature"],
         )
         self.add_subsystem(
             "supplement_heat_exchanger",
@@ -271,9 +262,7 @@ class PerformancesPEMFCBOP(om.Group):
             "supplement_heat_exchanger_air_properties.diffuser_exit_total_temperature",
         )
         self.connect("diffuser.exit_air_speed", "nozzle.entry_air_speed")
-        self.connect(
-            "supplement_heat_exchanger_air_properties.air_mass_flow", "nozzle.air_mass_flow_rate"
-        )
+        self.connect("air_inlet.inlet_air_mass_flow", "nozzle.air_mass_flow_rate")
         self.connect("air_inlet.throat_total_pressure", "diffuser.throat_air_pressure")
         self.connect("air_inlet.throat_total_temperature", "diffuser.throat_air_temperature")
         self.connect("air_inlet.throat_air_speed", "diffuser.throat_air_speed")
@@ -572,7 +561,7 @@ class PerformancesPrimaryHeatExchangerLoop(om.Group):
 
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["maxiter"] = 5
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.DirectSolver()
 

@@ -245,10 +245,16 @@ class _Log10(om.ExplicitComponent):
         self.declare_partials("log10_x", "x", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["log10_x"] = np.log10(inputs["x"])
+        x_unclipped = inputs["x"]
+        outputs["log10_x"] = np.log10(np.clip(x_unclipped, 1e-5, 1.0))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["log10_x", "x"] = 1 / (inputs["x"] * np.log(10))
+        x_unclipped = inputs["x"]
+        x_clipped = np.clip(x_unclipped, 1e-5, 1.0)
+
+        partials["log10_x", "x"] = np.where(
+            x_unclipped == x_clipped, 1.0 / (inputs["x"] * np.log(10)), 1e-6
+        )
 
 
 class _LayerThicknessHighlightHeightRatioPower(om.ExplicitComponent):

@@ -140,7 +140,7 @@ class PerformancesInletDrag(om.Group):
 
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["maxiter"] = 5
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.DirectSolver()
 
@@ -183,7 +183,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             units="unitless",
         )
         self.add_input(
-            "total_air_mass_flow",
+            "inlet_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -248,7 +248,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            wrt=["true_airspeed", "total_air_mass_flow"],
+            wrt=["true_airspeed", "inlet_air_mass_flow"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -266,15 +266,9 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         ramp_angle_factor = inputs["ramp_angle_factor"]
         momentum_flow_correction_factor = inputs["momentum_flow_correction_factor"]
         cd_zero_inlet_mass_flow = inputs["cd_zero_inlet_mass_flow"]
-        air_mass_flow = inputs["total_air_mass_flow"]
+        air_mass_flow = inputs["inlet_air_mass_flow"]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":drag"
-        ] = (
+        unclipped_drag = (
             0.5
             * (
                 2.0 * momentum_flow_correction_factor * air_mass_flow_ratio
@@ -285,6 +279,14 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             / air_mass_flow_ratio
             * true_air_speed
         )
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":drag"
+        ] = np.clip(unclipped_drag, 0.0, 100)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -298,16 +300,9 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         ramp_angle_factor = inputs["ramp_angle_factor"]
         momentum_flow_correction_factor = inputs["momentum_flow_correction_factor"]
         cd_zero_inlet_mass_flow = inputs["cd_zero_inlet_mass_flow"]
-        air_mass_flow = inputs["total_air_mass_flow"]
+        air_mass_flow = inputs["inlet_air_mass_flow"]
 
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":drag",
-            "true_airspeed",
-        ] = (
+        unclipped_drag = (
             0.5
             * (
                 2.0 * momentum_flow_correction_factor * air_mass_flow_ratio
@@ -316,6 +311,29 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             )
             * air_mass_flow
             / air_mass_flow_ratio
+            * true_air_speed
+        )
+
+        clipped_drag = np.clip(unclipped_drag, 0.0, 100)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":drag",
+            "true_airspeed",
+        ] = np.where(
+            unclipped_drag == clipped_drag,
+            0.5
+            * (
+                2.0 * momentum_flow_correction_factor * air_mass_flow_ratio
+                + k_sp_factor * ramp_angle_factor * mach_factor * cd_zero_inlet_mass_flow
+                + drag_correlation_factor
+            )
+            * air_mass_flow
+            / air_mass_flow_ratio,
+            1e-6,
         )
 
         partials[
@@ -325,14 +343,16 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + air_inlet_id
             + ":drag",
             "mach_factor",
-        ] = (
+        ] = np.where(
+            unclipped_drag == clipped_drag,
             0.5
             * k_sp_factor
             * ramp_angle_factor
             * cd_zero_inlet_mass_flow
             * air_mass_flow
             * true_air_speed
-            / air_mass_flow_ratio
+            / air_mass_flow_ratio,
+            1e-6,
         )
 
         partials[
@@ -342,7 +362,8 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + air_inlet_id
             + ":drag",
             "air_mass_flow_ratio",
-        ] = (
+        ] = np.where(
+            unclipped_drag == clipped_drag,
             -0.5
             * (
                 k_sp_factor * ramp_angle_factor * mach_factor * cd_zero_inlet_mass_flow
@@ -350,7 +371,8 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             )
             * air_mass_flow
             * true_air_speed
-            / air_mass_flow_ratio**2.0
+            / air_mass_flow_ratio**2.0,
+            1e-6,
         )
 
         partials[
@@ -360,7 +382,11 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + air_inlet_id
             + ":drag",
             "drag_correlation_factor",
-        ] = 0.5 * air_mass_flow / air_mass_flow_ratio * true_air_speed
+        ] = np.where(
+            unclipped_drag == clipped_drag,
+            0.5 * air_mass_flow / air_mass_flow_ratio * true_air_speed,
+            1e-6,
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -369,14 +395,16 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + air_inlet_id
             + ":drag",
             "k_sp_factor",
-        ] = (
+        ] = np.where(
+            unclipped_drag == clipped_drag,
             0.5
             * ramp_angle_factor
             * mach_factor
             * cd_zero_inlet_mass_flow
             * air_mass_flow
             * true_air_speed
-            / air_mass_flow_ratio
+            / air_mass_flow_ratio,
+            1e-6,
         )
 
         partials[
@@ -386,14 +414,16 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + air_inlet_id
             + ":drag",
             "ramp_angle_factor",
-        ] = (
+        ] = np.where(
+            unclipped_drag == clipped_drag,
             0.5
             * k_sp_factor
             * mach_factor
             * cd_zero_inlet_mass_flow
             * air_mass_flow
             * true_air_speed
-            / air_mass_flow_ratio
+            / air_mass_flow_ratio,
+            1e-6,
         )
 
         partials[
@@ -412,14 +442,16 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + air_inlet_id
             + ":drag",
             "cd_zero_inlet_mass_flow",
-        ] = (
+        ] = np.where(
+            unclipped_drag == clipped_drag,
             0.5
             * k_sp_factor
             * ramp_angle_factor
             * mach_factor
             * air_mass_flow
             * true_air_speed
-            / air_mass_flow_ratio
+            / air_mass_flow_ratio,
+            1e-6,
         )
 
         partials[
@@ -428,8 +460,9 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            "total_air_mass_flow",
-        ] = (
+            "inlet_air_mass_flow",
+        ] = np.where(
+            unclipped_drag == clipped_drag,
             0.5
             * (
                 2.0 * momentum_flow_correction_factor * air_mass_flow_ratio
@@ -437,5 +470,6 @@ class _PerformancesInletDrag(om.ExplicitComponent):
                 + drag_correlation_factor
             )
             * true_air_speed
-            / air_mass_flow_ratio
+            / air_mass_flow_ratio,
+            1e-6,
         )

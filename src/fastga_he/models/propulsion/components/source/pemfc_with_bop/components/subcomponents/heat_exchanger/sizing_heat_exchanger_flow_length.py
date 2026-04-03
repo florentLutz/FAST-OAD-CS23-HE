@@ -70,7 +70,7 @@ class SizingHeatExchangerFlowLength(om.Group):
         inner_prob.driver = om.ScipyOptimizeDriver()
         inner_prob.driver.options["optimizer"] = "SLSQP"
         inner_prob.driver.options["tol"] = 1e-5
-        inner_prob.driver.options["maxiter"] = 20
+        inner_prob.driver.options["maxiter"] = 10
 
         self.add_subsystem(
             name="hex_sizing",

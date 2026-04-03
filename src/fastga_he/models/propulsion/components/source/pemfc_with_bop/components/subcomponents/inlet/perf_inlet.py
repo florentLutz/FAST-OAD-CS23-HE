@@ -18,6 +18,7 @@ from .perf_ambient_total_pressure import PerformancesAmbientTotalPressure
 from .perf_throat_total_temperature import PerformancesThroatTemperature
 from .perf_throat_total_pressure import PerformancesThroatPressure
 from .perf_inlet_pressure_drop import PerformancesInletPressureDrop
+from .perf_inlet_air_mass_flow import PerformancesAirInletAirMassFlow
 
 from ......loads.sm_pmsm.components.perf_air_dynamic_viscosity import (
     PerformancesAirDynamicViscosity,
@@ -65,6 +66,15 @@ class PerformancesInlet(om.Group):
         self.add_subsystem(
             "inlet_ambient_pressure",
             PerformancesPEMFCStackBOPAmbientPressure(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "inlet_air_flow",
+            PerformancesAirInletAirMassFlow(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                air_inlet_id=air_inlet_id,
+            ),
             promotes=["*"],
         )
         self.add_subsystem(

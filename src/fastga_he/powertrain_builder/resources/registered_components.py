@@ -1199,6 +1199,7 @@ PEMFC_STACK_BOP = {
         {"fc_current_density": "A/cm**2"},
         {"voltage_out": "V"},
         {"fuel_consumption": "kg/h"},
+        {"air_consumption": "kg/s"},
         {"efficiency": None},
         {"power_out": "kW"},
     ],

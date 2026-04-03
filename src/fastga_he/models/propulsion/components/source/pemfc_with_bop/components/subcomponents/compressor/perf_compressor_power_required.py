@@ -82,7 +82,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_required",
-            val=50.0,
+            val=0.0,
             units="W",
             shape=number_of_points,
         )
@@ -146,13 +146,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         compressed_air_specific_heat_capacity = inputs["compressed_air_specific_heat_capacity"]
         air_consumption = inputs["air_consumption"]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + compressor_id
-            + ":power_required"
-        ] = (
+        unclipped_power_required = (
             compressed_air_specific_heat_capacity
             * exterior_temperature
             / efficiency
@@ -162,6 +156,14 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             )
             * air_consumption
         )
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":power_required"
+        ] = np.clip(unclipped_power_required, 0.0, 10000)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -186,6 +188,19 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
         compressed_air_specific_heat_capacity = inputs["compressed_air_specific_heat_capacity"]
         air_consumption = inputs["air_consumption"]
 
+        unclipped_power_required = (
+            compressed_air_specific_heat_capacity
+            * exterior_temperature
+            / efficiency
+            * (
+                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                - 1.0
+            )
+            * air_consumption
+        )
+
+        clipped_power_required = np.clip(unclipped_power_required, 0.0, 10000)
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -193,14 +208,16 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + compressor_id
             + ":power_required",
             "exterior_temperature",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_power_required,
             compressed_air_specific_heat_capacity
             / efficiency
             * (
                 compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
-            * air_consumption
+            * air_consumption,
+            1e-6,
         )
 
         partials[
@@ -210,14 +227,16 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + compressor_id
             + ":power_required",
             "compressed_air_specific_heat_capacity",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_power_required,
             exterior_temperature
             / efficiency
             * (
                 compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
             )
-            * air_consumption
+            * air_consumption,
+            1e-6,
         )
 
         partials[
@@ -227,14 +246,16 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + compressor_id
             + ":power_required",
             "air_consumption",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_power_required,
             compressed_air_specific_heat_capacity
             * exterior_temperature
             / efficiency
             * (
                 compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
                 - 1.0
-            )
+            ),
+            1e-6,
         )
 
         partials[
@@ -248,15 +269,19 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":efficiency",
-        ] = -(
-            compressed_air_specific_heat_capacity
-            * exterior_temperature
-            / efficiency**2.0
-            * (
-                compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
-                - 1.0
-            )
-            * air_consumption
+        ] = np.where(
+            unclipped_power_required == clipped_power_required,
+            -(
+                compressed_air_specific_heat_capacity
+                * exterior_temperature
+                / efficiency**2.0
+                * (
+                    compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio)
+                    - 1.0
+                )
+                * air_consumption
+            ),
+            1e-6,
         )
 
         partials[
@@ -270,7 +295,8 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":specific_heat_ratio",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_power_required,
             compressed_air_specific_heat_capacity
             * exterior_temperature
             / efficiency
@@ -279,7 +305,8 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
                 * np.log(compressor_pressure_ratio)
                 / specific_heat_ratio**2.0
             )
-            * air_consumption
+            * air_consumption,
+            1e-6,
         )
 
         partials[
@@ -289,11 +316,14 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + compressor_id
             + ":power_required",
             "compressor_pressure_ratio",
-        ] = (
+        ] = np.where(
+            unclipped_power_required == clipped_power_required,
             compressed_air_specific_heat_capacity
             * exterior_temperature
             * air_consumption
             / efficiency
             * ((specific_heat_ratio - 1.0) / specific_heat_ratio)
-            * compressor_pressure_ratio ** ((specific_heat_ratio - 1.0) / specific_heat_ratio - 1.0)
+            * compressor_pressure_ratio
+            ** ((specific_heat_ratio - 1.0) / specific_heat_ratio - 1.0),
+            1e-6,
         )

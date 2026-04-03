@@ -137,10 +137,13 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
         ]
         dc_current_out = inputs["dc_current_out"]
 
-        outputs[self.output_name] = (
+        unclipped_voltage = (
             single_layer_voltage * number_of_layers - bop_power_required / dc_current_out
         )
-        outputs["fuel_cell_voltage"] = single_layer_voltage * number_of_layers
+        unclipped_fuel_cell_voltage = single_layer_voltage * number_of_layers
+
+        outputs[self.output_name] = np.clip(unclipped_voltage, 5.0, np.inf)
+        outputs["fuel_cell_voltage"] = np.clip(unclipped_fuel_cell_voltage, 5.0, np.inf)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -159,8 +162,16 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
         ]
         dc_current_out = inputs["dc_current_out"]
 
-        partials[self.output_name, "single_layer_pemfc_voltage"] = np.full(
-            number_of_points, number_of_layers
+        unclipped_voltage = (
+            single_layer_voltage * number_of_layers - bop_power_required / dc_current_out
+        )
+        unclipped_fuel_cell_voltage = single_layer_voltage * number_of_layers
+
+        clipped_voltage = np.clip(unclipped_voltage, 5.0, np.inf)
+        clipped_fuel_cell_voltage = np.clip(unclipped_fuel_cell_voltage, 5.0, np.inf)
+
+        partials[self.output_name, "single_layer_pemfc_voltage"] = np.where(
+            clipped_voltage == unclipped_voltage, np.full(number_of_points, number_of_layers), 1e-6
         )
 
         partials[
@@ -168,19 +179,23 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":number_of_layers",
-        ] = single_layer_voltage
+        ] = np.where(clipped_voltage == unclipped_voltage, single_layer_voltage, 1e-6)
 
         partials[
             self.output_name,
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":bop_power_required",
-        ] = -1.0 / dc_current_out
+        ] = np.where(clipped_voltage == unclipped_voltage, -1.0 / dc_current_out, 1e-6)
 
-        partials[self.output_name, "dc_current_out"] = bop_power_required / dc_current_out**2.0
+        partials[self.output_name, "dc_current_out"] = np.where(
+            clipped_voltage == unclipped_voltage, bop_power_required / dc_current_out**2.0, 1e-6
+        )
 
-        partials["fuel_cell_voltage", "single_layer_pemfc_voltage"] = np.full(
-            number_of_points, number_of_layers
+        partials["fuel_cell_voltage", "single_layer_pemfc_voltage"] = np.where(
+            clipped_fuel_cell_voltage == unclipped_fuel_cell_voltage,
+            np.full(number_of_points, number_of_layers),
+            1e-6,
         )
 
         partials[
@@ -188,4 +203,6 @@ class PerformancesPEMFCStackBOPVoltage(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":number_of_layers",
-        ] = single_layer_voltage
+        ] = np.where(
+            clipped_fuel_cell_voltage == unclipped_fuel_cell_voltage, single_layer_voltage, 1e-6
+        )
