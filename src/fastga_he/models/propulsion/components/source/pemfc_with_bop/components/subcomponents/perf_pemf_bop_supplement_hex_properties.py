@@ -94,6 +94,7 @@ class PerformancesSupplementHeatExchangerThermalBalance(om.Group):
             _AirOutletTemperate(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 supplement_heat_exchanger_id=supplement_heat_exchanger_id,
+                connected_air_inlet_id=connected_air_inlet_id,
             ),
             promotes=["*"],
         )
@@ -365,10 +366,17 @@ class _AirOutletTemperate(om.ExplicitComponent):
             desc="Identifier of the supplement heat exchanger",
             allow_none=False,
         )
+        self.options.declare(
+            name="connected_air_inlet_id",
+            default=None,
+            desc="Identifier of the connected air inlet",
+            allow_none=False,
+        )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
 
         self.add_input(
             "air_inlet_temperature",
@@ -385,9 +393,11 @@ class _AirOutletTemperate(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max",
-            units="kg/s",
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow",
             val=np.nan,
+            units="kg/s",
         )
         self.add_input(
             "mean_air_specific_heat_capacity",
@@ -420,6 +430,7 @@ class _AirOutletTemperate(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
 
         air_inlet_temperature = inputs["air_inlet_temperature"]
@@ -428,10 +439,12 @@ class _AirOutletTemperate(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:outlet_temperature"
         ]
-        air_consumption_max = inputs[
+        design_air_mass_flow = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max"
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow"
         ]
         mean_air_specific_heat_capacity = inputs["mean_air_specific_heat_capacity"]
         mini_heat_capacity = inputs["minimum_heat_capacity"]
@@ -448,11 +461,12 @@ class _AirOutletTemperate(om.ExplicitComponent):
             + heat_exchanger_efficiency
             * mini_heat_capacity
             * (coolant_outlet_temperature - air_inlet_temperature)
-            / (air_consumption_max * mean_air_specific_heat_capacity)
+            / (design_air_mass_flow * mean_air_specific_heat_capacity)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
         supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
 
         air_inlet_temperature = inputs["air_inlet_temperature"]
@@ -461,10 +475,12 @@ class _AirOutletTemperate(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:outlet_temperature"
         ]
-        air_consumption_max = inputs[
+        design_air_mass_flow = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max"
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow"
         ]
         mean_air_specific_heat_capacity = inputs["mean_air_specific_heat_capacity"]
         mini_heat_capacity = inputs["minimum_heat_capacity"]
@@ -480,7 +496,7 @@ class _AirOutletTemperate(om.ExplicitComponent):
             1.0
             - heat_exchanger_efficiency
             * mini_heat_capacity
-            / (air_consumption_max * mean_air_specific_heat_capacity)
+            / (design_air_mass_flow * mean_air_specific_heat_capacity)
         )
 
         partials[
@@ -491,32 +507,34 @@ class _AirOutletTemperate(om.ExplicitComponent):
         ] = (
             heat_exchanger_efficiency
             * mini_heat_capacity
-            / (air_consumption_max * mean_air_specific_heat_capacity)
+            / (design_air_mass_flow * mean_air_specific_heat_capacity)
         )
 
         partials[
             "air_outlet_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max",
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow",
         ] = (
             -heat_exchanger_efficiency
             * mini_heat_capacity
             * (coolant_outlet_temperature - air_inlet_temperature)
-            / (air_consumption_max**2.0 * mean_air_specific_heat_capacity)
+            / (design_air_mass_flow**2.0 * mean_air_specific_heat_capacity)
         )
 
         partials["air_outlet_temperature", "mean_air_specific_heat_capacity"] = (
             -heat_exchanger_efficiency
             * mini_heat_capacity
             * (coolant_outlet_temperature - air_inlet_temperature)
-            / (air_consumption_max * mean_air_specific_heat_capacity**2.0)
+            / (design_air_mass_flow * mean_air_specific_heat_capacity**2.0)
         )
 
         partials["air_outlet_temperature", "minimum_heat_capacity"] = (
             heat_exchanger_efficiency
             * (coolant_outlet_temperature - air_inlet_temperature)
-            / (air_consumption_max * mean_air_specific_heat_capacity)
+            / (design_air_mass_flow * mean_air_specific_heat_capacity)
         )
 
         partials[
@@ -529,7 +547,7 @@ class _AirOutletTemperate(om.ExplicitComponent):
         ] = (
             mini_heat_capacity
             * (coolant_outlet_temperature - air_inlet_temperature)
-            / (air_consumption_max * mean_air_specific_heat_capacity)
+            / (design_air_mass_flow * mean_air_specific_heat_capacity)
         )
 
 
@@ -566,12 +584,12 @@ class _CoolantTemperature(om.ExplicitComponent):
 
         self.add_output(
             name="coolant_inlet_temperature",
-            val=345.0,
+            val=349.6,
             units="K",
         )
         self.add_output(
             name="coolant_outlet_temperature",
-            val=350.0,
+            val=331.0,
             units="K",
         )
 

@@ -32,10 +32,10 @@
             </compressor_1>
             <coolant>
               <mass_flow_rate units="kg/s" is_input="True">4.1</mass_flow_rate>
-              <mean_temperature units="degK" is_input="True">345.0</mean_temperature>
+              <mean_temperature units="degK" is_input="True">339.6</mean_temperature>
               <static_pressure units="Pa" is_input="True">200000.0</static_pressure>
-              <inlet_temperature units="degK" is_input="True">340.0</inlet_temperature>
-              <outlet_temperature units="degK" is_input="True">350.0</outlet_temperature>
+              <inlet_temperature units="degK" is_input="True">329.6</inlet_temperature>
+              <outlet_temperature units="degK" is_input="True">349.6</outlet_temperature>
             </coolant>
             <coolant_tank_1>
               <coolant_volume units="m**3" is_input="False">0.0123936808836272</coolant_volume>

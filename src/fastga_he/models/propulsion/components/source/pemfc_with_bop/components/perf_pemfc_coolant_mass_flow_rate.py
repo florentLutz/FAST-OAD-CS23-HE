@@ -102,6 +102,13 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
             desc="Maximum total thermal power of the PEMFC stack has to provide during the mission",
         )
         self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_rating",
+            units="kW",
+            val=0.0,
+        )
+        self.add_input(
             "mean_coolant_specific_heat_capacity",
             units="kJ/kg/K",
             val=np.nan,
@@ -132,13 +139,21 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":thermal_power_max"
         ]
+        bop_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_rating"
+        ]
+
+        unclipped_heat_dissipation = thermal_power_max - power_max - bop_power
+        clipped_heat_dissipation = np.clip(unclipped_heat_dissipation, 0.0, 240.0)
         mean_coolant_specific_heat_capacity = inputs["mean_coolant_specific_heat_capacity"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:mass_flow_rate"
-        ] = (thermal_power_max - power_max) / (
+        ] = clipped_heat_dissipation / (
             mean_coolant_specific_heat_capacity * coolant_temperature_gradiant
         )
 
@@ -154,14 +169,39 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":thermal_power_max"
         ]
+        bop_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_rating"
+        ]
         mean_coolant_specific_heat_capacity = inputs["mean_coolant_specific_heat_capacity"]
+
+        unclipped_heat_dissipation = thermal_power_max - power_max - bop_power
+        clipped_heat_dissipation = np.clip(unclipped_heat_dissipation, 0.0, 240.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:mass_flow_rate",
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_max",
-        ] = -1.0 / (mean_coolant_specific_heat_capacity * coolant_temperature_gradiant)
+        ] = np.where(
+            unclipped_heat_dissipation == clipped_heat_dissipation,
+            -1.0 / (mean_coolant_specific_heat_capacity * coolant_temperature_gradiant),
+            1e-6,
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_rating",
+        ] = np.where(
+            unclipped_heat_dissipation == clipped_heat_dissipation,
+            -1.0 / (mean_coolant_specific_heat_capacity * coolant_temperature_gradiant),
+            1e-6,
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -170,13 +210,17 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":thermal_power_max",
-        ] = 1.0 / (mean_coolant_specific_heat_capacity * coolant_temperature_gradiant)
+        ] = np.where(
+            unclipped_heat_dissipation == clipped_heat_dissipation,
+            1.0 / (mean_coolant_specific_heat_capacity * coolant_temperature_gradiant),
+            1e-6,
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:mass_flow_rate",
             "mean_coolant_specific_heat_capacity",
-        ] = -(thermal_power_max - power_max) / (
+        ] = -clipped_heat_dissipation / (
             mean_coolant_specific_heat_capacity**2.0 * coolant_temperature_gradiant
         )

@@ -65,6 +65,11 @@ class PerformancesPEMFCStackBOP(om.Group):
             types=str,
             desc="Fluid type: air, water, hydrogen, ammonia, etc.",
         )
+        self.options.declare(
+            "coolant_temperature_gradiant",
+            default=10.0,
+            desc="The temperature difference of the PEMFC coolant I/O [K]",
+        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
@@ -73,6 +78,7 @@ class PerformancesPEMFCStackBOP(om.Group):
         direct_bus_connection = self.options["direct_bus_connection"]
         model_fidelity = self.options["model_fidelity"]
         coolant_fluid_type = self.options["coolant_fluid_type"]
+        coolant_temperature_gradiant = self.options["coolant_temperature_gradiant"]
 
         self.add_subsystem(
             "pemfc_current_density",
@@ -86,7 +92,10 @@ class PerformancesPEMFCStackBOP(om.Group):
 
         self.add_subsystem(
             "coolant_temperature",
-            PerformancesPEMFCStackBOPCoolantTemperature(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            PerformancesPEMFCStackBOPCoolantTemperature(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                coolant_temperature_gradiant=coolant_temperature_gradiant,
+            ),
             promotes=["*"],
         )
 
@@ -150,9 +159,7 @@ class PerformancesPEMFCStackBOP(om.Group):
         )
         self.add_subsystem(
             "pemfc_efficiency",
-            PerformancesPEMFCStackBOPEfficiency(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
-            ),
+            PerformancesPEMFCStackBOPEfficiency(number_of_points=number_of_points),
             promotes=["*"],
         )
 
@@ -164,7 +171,9 @@ class PerformancesPEMFCStackBOP(om.Group):
 
         self.add_subsystem(
             "pemfc_total_thermal_power",
-            PerformancesPEMFCStackBOPThermalPower(number_of_points=number_of_points),
+            PerformancesPEMFCStackBOPThermalPower(
+                number_of_points=number_of_points, pemfc_stack_bop_id=pemfc_stack_bop_id
+            ),
             promotes=["*"],
         )
 
@@ -179,7 +188,9 @@ class PerformancesPEMFCStackBOP(om.Group):
         self.add_subsystem(
             "coolant_mass_flow_rate",
             PerformancesPEMFCStackBOPCoolantMassFlowRate(
-                pemfc_stack_bop_id=pemfc_stack_bop_id, coolant_fluid_type=coolant_fluid_type
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                coolant_fluid_type=coolant_fluid_type,
+                coolant_temperature_gradiant=coolant_temperature_gradiant,
             ),
             promotes=["data:*"],
         )

@@ -25,30 +25,15 @@ class PerformancesPEMFCStackBOPEfficiency(om.ExplicitComponent):
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
-        self.options.declare(
-            name="pemfc_stack_bop_id",
-            default=None,
-            desc="Identifier of the PEMFC stack",
-            allow_none=False,
-        )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         self.add_input(
             "single_layer_pemfc_voltage",
             units="V",
             val=np.full(number_of_points, np.nan),
         )
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":number_of_layers",
-            val=np.nan,
-            desc="Total number of layers in the PEMFC stack",
-        )
-        self.add_input("fuel_cell_voltage", units="V", val=np.full(number_of_points, np.nan))
 
         self.add_output(
             name="efficiency",
@@ -57,38 +42,18 @@ class PerformancesPEMFCStackBOPEfficiency(om.ExplicitComponent):
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         self.declare_partials(
             of="efficiency",
-            wrt=["single_layer_pemfc_voltage", "fuel_cell_voltage"],
+            wrt="single_layer_pemfc_voltage",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
         )
-        self.declare_partials(
-            of="efficiency",
-            wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":number_of_layers",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
-        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-
-        single_layer_pemfc_voltage = inputs["single_layer_pemfc_voltage"]
-        number_of_layers = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":number_of_layers"
-        ]
-        fuel_cell_voltage = inputs["fuel_cell_voltage"]
-
         clipped_efficiency = np.clip(
-            (single_layer_pemfc_voltage - fuel_cell_voltage / number_of_layers)
+            inputs["single_layer_pemfc_voltage"]
             * FUEL_UTILIZATION_COEFFICIENT
             / HHV_HYDROGEN_EQUIVALENT_VOLTAGE,
             0.1,
@@ -98,45 +63,16 @@ class PerformancesPEMFCStackBOPEfficiency(om.ExplicitComponent):
         outputs["efficiency"] = clipped_efficiency
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-
-        single_layer_pemfc_voltage = inputs["single_layer_pemfc_voltage"]
-        number_of_layers = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":number_of_layers"
-        ]
-        fuel_cell_voltage = inputs["fuel_cell_voltage"]
-
         efficiency = (
-            (single_layer_pemfc_voltage - fuel_cell_voltage / number_of_layers)
+            inputs["single_layer_pemfc_voltage"]
             * FUEL_UTILIZATION_COEFFICIENT
             / HHV_HYDROGEN_EQUIVALENT_VOLTAGE
         )
 
         clipped_efficiency = np.clip(efficiency, 0.1, 0.7)
 
-        partials["efficiency", "single_layer_pemfc_voltage"] = np.clip(
+        partials["efficiency", "single_layer_pemfc_voltage"] = np.where(
             efficiency == clipped_efficiency,
             FUEL_UTILIZATION_COEFFICIENT / HHV_HYDROGEN_EQUIVALENT_VOLTAGE,
-            1e-6,
-        )
-
-        partials["efficiency", "fuel_cell_voltage"] = np.clip(
-            efficiency == clipped_efficiency,
-            -FUEL_UTILIZATION_COEFFICIENT / (number_of_layers * HHV_HYDROGEN_EQUIVALENT_VOLTAGE),
-            1e-6,
-        )
-
-        partials[
-            "efficiency",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":number_of_layers",
-        ] = np.clip(
-            efficiency == clipped_efficiency,
-            fuel_cell_voltage
-            * FUEL_UTILIZATION_COEFFICIENT
-            / (number_of_layers**2.0 * HHV_HYDROGEN_EQUIVALENT_VOLTAGE),
             1e-6,
         )

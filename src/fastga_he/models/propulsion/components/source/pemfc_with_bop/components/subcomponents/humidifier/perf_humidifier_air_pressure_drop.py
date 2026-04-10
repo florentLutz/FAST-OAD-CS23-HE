@@ -73,17 +73,23 @@ class PerformancesHumidifierRatingPressureDrop(om.ExplicitComponent):
         air_consumption = inputs["air_consumption"]
         volumetric_flow_rate = air_consumption / humidifier_air_density
 
+        conditions = [
+            (volumetric_flow_rate > 0.054) & (volumetric_flow_rate <= 0.06815),
+            volumetric_flow_rate > 0.06815,
+        ]
+
+        choices = [
+            -3.628 * 1e5 * air_consumption**2.0 + 1.995 * 1e5 * air_consumption - 4000.0,
+            volumetric_flow_rate * 12000.0 / 0.083,
+        ]
+
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + humidifier_id
             + ":air_pressure_drop"
-        ] = np.where(
-            volumetric_flow_rate <= 0.06815,
-            -3.628 * 1e5 * air_consumption**2.0 + 1.995 * 1e5 * air_consumption - 4000.0,
-            volumetric_flow_rate * 12000.0 / 0.083,
-        )
+        ] = np.select(conditions, choices, default=0.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -93,6 +99,21 @@ class PerformancesHumidifierRatingPressureDrop(om.ExplicitComponent):
         air_consumption = inputs["air_consumption"]
         volumetric_flow_rate = air_consumption / humidifier_air_density
 
+        conditions = [
+            (volumetric_flow_rate > 0.054) & (volumetric_flow_rate <= 0.06815),
+            volumetric_flow_rate > 0.06815,
+        ]
+
+        drho = [
+            np.zeros_like(air_consumption),
+            -air_consumption / humidifier_air_density**2.0 * 12000.0 / 0.083,
+        ]
+
+        dair_consumption = [
+            -7.256 * 1e5 * air_consumption + 1.995 * 1e5,
+            12000.0 / 0.083 / humidifier_air_density,
+        ]
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -100,11 +121,7 @@ class PerformancesHumidifierRatingPressureDrop(om.ExplicitComponent):
             + humidifier_id
             + ":air_pressure_drop",
             "humidifier_air_density",
-        ] = np.where(
-            volumetric_flow_rate <= 0.06815,
-            np.zeros_like(air_consumption),
-            -air_consumption / humidifier_air_density**2.0 * 12000.0 / 0.083,
-        )
+        ] = np.select(conditions, drho, default=0.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -113,8 +130,4 @@ class PerformancesHumidifierRatingPressureDrop(om.ExplicitComponent):
             + humidifier_id
             + ":air_pressure_drop",
             "air_consumption",
-        ] = np.where(
-            volumetric_flow_rate <= 0.06815,
-            -7.256 * 1e5 * air_consumption + 1.995 * 1e5,
-            12000.0 / 0.083 / humidifier_air_density,
-        )
+        ] = np.select(conditions, dair_consumption, default=0.0)

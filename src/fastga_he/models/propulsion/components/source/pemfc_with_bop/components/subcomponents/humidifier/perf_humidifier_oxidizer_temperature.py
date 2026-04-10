@@ -29,15 +29,15 @@ class PerformancesHumidifierOxidizerTemperature(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":operating_temperature",
+            + ":oxidizer_temperature",
             units="K",
-            val=350,
+            val=310.0,
             desc="standard operating temperature for the PEMFC",
         )
 
         self.add_output(
             "oxidizer_temperature",
-            val=360.0,
+            val=310.0,
             units="K",
             shape=number_of_points,
         )
@@ -63,7 +63,6 @@ class PerformancesHumidifierOxidizerTemperature(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":operating_temperature"
-            ]
-            + 10.0,
+                + ":oxidizer_temperature"
+            ],
         )

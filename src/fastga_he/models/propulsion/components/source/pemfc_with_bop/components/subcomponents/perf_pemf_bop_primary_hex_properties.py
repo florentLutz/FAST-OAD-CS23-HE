@@ -416,7 +416,7 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:intermediate_temperature",
-            val=330.0,
+            val=331.0,
             units="K",
         )
 

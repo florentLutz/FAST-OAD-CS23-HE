@@ -122,7 +122,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":power_rating"
-        ] = np.clip(unclipped_power_required, 0.0, 10000.0)
+        ] = np.clip(unclipped_power_required, 0.0, 50000.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -160,7 +160,7 @@ class PerformancesPumpPower(om.ExplicitComponent):
         unclipped_power_required = (
             volumetric_flow_rate * pressure_compensation / (pump_efficiency * motor_efficiency)
         )
-        clipped_required_power = np.clip(unclipped_power_required, 0.0, 10000.0)
+        clipped_required_power = np.clip(unclipped_power_required, 0.0, 50000.0)
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id

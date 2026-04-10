@@ -316,7 +316,7 @@ class PerformancesBOPDrag(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":bop_drag",
             units="N",
-            val=10.0,
+            val=0.0,
             shape=number_of_points - 2,
         )
 
@@ -425,7 +425,6 @@ class PerformancesBOPPower(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_required",
-            val=1.0,
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -437,7 +436,6 @@ class PerformancesBOPPower(om.ExplicitComponent):
             + ":"
             + pump_id
             + ":power_rating",
-            val=1.0,
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
@@ -452,7 +450,31 @@ class PerformancesBOPPower(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":bop_power_required"
-        ] = (
+        ] = np.clip(
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + compressor_id
+                + ":power_required"
+            ]
+            + inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + pump_id
+                + ":power_rating"
+            ],
+            0.0,
+            240.0,
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        compressor_id = self.options["compressor_id"]
+        pump_id = self.options["pump_id"]
+
+        unclipped_power_required = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
@@ -468,6 +490,30 @@ class PerformancesBOPPower(om.ExplicitComponent):
                 + ":power_rating"
             ]
         )
+
+        clipped_power_required = np.clip(unclipped_power_required, 0.0, 240.0)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + compressor_id
+            + ":power_required",
+        ] = np.where(unclipped_power_required == clipped_power_required, 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":bop_power_required",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + pump_id
+            + ":power_rating",
+        ] = np.where(unclipped_power_required == clipped_power_required, 1.0, 0.0)
 
 
 class PerformancesPrimaryHeatExchangerLoop(om.Group):

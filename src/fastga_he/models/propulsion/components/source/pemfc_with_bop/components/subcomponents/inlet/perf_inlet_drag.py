@@ -221,9 +221,10 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            val=50.0,
+            val=0.0,
             units="N",
             shape=number_of_points,
+            lower=0.0,
         )
 
     def setup_partials(self):
@@ -286,7 +287,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag"
-        ] = np.clip(unclipped_drag, 0.0, 100)
+        ] = np.clip(unclipped_drag, 0.0, 150)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -314,7 +315,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             * true_air_speed
         )
 
-        clipped_drag = np.clip(unclipped_drag, 0.0, 100)
+        clipped_drag = np.clip(unclipped_drag, 0.0, 150.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

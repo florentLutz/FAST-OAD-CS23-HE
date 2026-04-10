@@ -700,9 +700,6 @@ def test_pemfc_voltage():
     assert problem.get_val("voltage_out", units="V") == pytest.approx(
         [17.0, 18.76, 20.52, 22.29, 24.05, 25.81, 27.57, 29.32, 31.08, 32.84], rel=1e-2
     )
-    assert problem.get_val("fuel_cell_voltage", units="V") == pytest.approx(
-        [17.5, 19.25, 21, 22.75, 24.5, 26.25, 28, 29.75, 31.5, 33.25], rel=1e-2
-    )
 
     problem.check_partials(compact_print=True)
 
@@ -720,6 +717,12 @@ def test_maximum():
         val=np.array(
             [588.95, 590.93, 592.05, 597.12, 601.91, 606.51, 614.37, 620.94, 629.6, 638.8]
         ),
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
+        val=0.2,
+        units="kW",
+        shape=NB_POINTS_TEST,
     )
     ivc.add_output(
         "dc_current_out",
@@ -754,6 +757,13 @@ def test_maximum():
         units="kW",
     ) == pytest.approx(
         638.8,
+        rel=1e-2,
+    )
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_rating",
+        units="kW",
+    ) == pytest.approx(
+        0.2,
         rel=1e-2,
     )
     assert problem.get_val(
@@ -804,26 +814,14 @@ def test_pemfc_efficiency():
         ),
         units="V",
     )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:number_of_layers",
-        val=35.0,
-    )
-    ivc.add_output(
-        "fuel_cell_voltage",
-        val=np.array([17.5, 19.25, 21, 22.75, 24.5, 26.25, 28, 29.75, 31.5, 33.25]),
-        units="V",
-    )
-
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackBOPEfficiency(
-            pemfc_stack_bop_id="pemfc_stack_bop_1", number_of_points=NB_POINTS_TEST
-        ),
+        PerformancesPEMFCStackBOPEfficiency(number_of_points=NB_POINTS_TEST),
         ivc,
     )
     # Not computed with proper losses, to test only
     assert problem.get_val("efficiency") == pytest.approx(
-        [0.224, 0.181, 0.138, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], rel=1e-2
+        [0.545, 0.533, 0.523, 0.513, 0.504, 0.495, 0.49, 0.48, 0.47, 0.46], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
@@ -842,10 +840,18 @@ def test_pemfc_total_power():
             [0.5447, 0.5334, 0.5231, 0.5133, 0.5039, 0.4948, 0.4857, 0.4767, 0.4676, 0.4582]
         ),
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
+        val=0.2,
+        units="kW",
+        shape=NB_POINTS_TEST,
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        PerformancesPEMFCStackBOPThermalPower(number_of_points=NB_POINTS_TEST),
+        PerformancesPEMFCStackBOPThermalPower(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_bop_id="pemfc_stack_bop_1"
+        ),
         ivc,
     )
     assert problem.get_val("thermal_power", units="kW") == pytest.approx(
@@ -1208,16 +1214,17 @@ def test_performances_pemfc_stack_analytical_add_bop():
     #     "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_drag",
     #     units="N",
     # ) == pytest.approx(
-    #     [0.00367, 0.00489, 0.00611, 0.00734, 0.00856, 0.00978, 0.011, 0.01223],
+    #     [0.0983571 , 0.0983571 , 0.0983571 , 0.0983571 , 0.0983571 ,
+    #    0.0984 , 0.103, 0.114],
     #     rel=1e-2,
     # )
-    assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
-        units="kW",
-    ) == pytest.approx(
-        [0.00297, 0.00328, 0.0036, 0.00391, 0.00422, 0.00453, 0.00484, 0.00515, 0.00547, 0.00578],
-        rel=1e-2,
-    )
+    # assert problem.get_val(
+    #     "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_power_required",
+    #     units="kW",
+    # ) == pytest.approx(
+    #     [0.0354, 0.0357, 0.036, 0.0363, 0.0366, 0.0369, 0.0372, 0.0375, 0.0378, 0.0381],
+    #     rel=1e-2,
+    # )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 

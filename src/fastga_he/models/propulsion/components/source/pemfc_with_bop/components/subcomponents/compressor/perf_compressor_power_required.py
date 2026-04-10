@@ -163,7 +163,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             + ":"
             + compressor_id
             + ":power_required"
-        ] = np.clip(unclipped_power_required, 0.0, 10000)
+        ] = np.clip(unclipped_power_required, 0.0, 120000.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -199,7 +199,7 @@ class PerformancesCompressorPowerRequired(om.ExplicitComponent):
             * air_consumption
         )
 
-        clipped_power_required = np.clip(unclipped_power_required, 0.0, 10000)
+        clipped_power_required = np.clip(unclipped_power_required, 0.0, 120000.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

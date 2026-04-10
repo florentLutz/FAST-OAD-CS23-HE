@@ -79,7 +79,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
         nozzle_id = self.options["nozzle_id"]
 
         unclipped_drag = inputs["air_mass_flow_rate"] * (
-            inputs["exit_air_speed"] - inputs["true_airspeed"]
+            inputs["true_airspeed"] - inputs["exit_air_speed"]
         )
 
         outputs[
@@ -88,17 +88,17 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":drag"
-        ] = np.clip(unclipped_drag, 0.0, 100)
+        ] = np.clip(unclipped_drag, -np.inf, 0.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
         unclipped_drag = inputs["air_mass_flow_rate"] * (
-            inputs["exit_air_speed"] - inputs["true_airspeed"]
+            inputs["true_airspeed"] - inputs["exit_air_speed"]
         )
 
-        clipped_drag = np.clip(unclipped_drag, 0.0, 100)
+        clipped_drag = np.clip(unclipped_drag, -np.inf, 0.0)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -108,7 +108,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":drag",
             "air_mass_flow_rate",
         ] = np.where(
-            unclipped_drag == clipped_drag, inputs["exit_air_speed"] - inputs["true_airspeed"], 1e-6
+            unclipped_drag == clipped_drag, inputs["true_airspeed"] - inputs["exit_air_speed"], 1e-6
         )
 
         partials[
@@ -118,7 +118,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + nozzle_id
             + ":drag",
             "exit_air_speed",
-        ] = np.where(unclipped_drag == clipped_drag, inputs["air_mass_flow_rate"], 1e-6)
+        ] = np.where(unclipped_drag == clipped_drag, -inputs["air_mass_flow_rate"], 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -127,4 +127,4 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + nozzle_id
             + ":drag",
             "true_airspeed",
-        ] = np.where(unclipped_drag == clipped_drag, -inputs["air_mass_flow_rate"], 1e-6)
+        ] = np.where(unclipped_drag == clipped_drag, inputs["air_mass_flow_rate"], 1e-6)
