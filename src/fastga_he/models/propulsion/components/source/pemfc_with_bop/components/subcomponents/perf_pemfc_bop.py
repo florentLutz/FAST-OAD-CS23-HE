@@ -318,6 +318,7 @@ class PerformancesBOPDrag(om.ExplicitComponent):
             units="N",
             val=0.0,
             shape=number_of_points - 2,
+            lower=0.0,
         )
 
     def setup_partials(self):

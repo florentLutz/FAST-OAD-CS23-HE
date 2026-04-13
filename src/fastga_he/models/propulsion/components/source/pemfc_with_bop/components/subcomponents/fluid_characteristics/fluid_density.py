@@ -88,7 +88,7 @@ class _PropertyCheck(om.ExplicitComponent):
 
         condition = (
             (temperature > 250.0)
-            & (temperature < 373.15)
+            & (temperature < 373.1)
             & (pressure > 1e3)
             & (pressure < 1e8)
             & ~np.isnan(temperature)
@@ -104,7 +104,7 @@ class _PropertyCheck(om.ExplicitComponent):
 
         condition = (
             (temperature > 250.0)
-            & (temperature < 373.15)
+            & (temperature < 373.1)
             & (pressure > 1e3)
             & (pressure < 1e8)
             & ~np.isnan(temperature)
@@ -161,7 +161,7 @@ class _FluidDensity(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = np.clip(inputs["temperature"], 250.0, 373.15)
+        temperature = np.clip(inputs["temperature"], 250.0, 373.1)
         pressure = np.clip(inputs["pressure"], 1e3, 1e8)
 
         if fluid not in fluid_name_dict:
@@ -192,7 +192,7 @@ class _FluidDensity(om.ExplicitComponent):
         fluid = self.options["fluid"]
         number_of_points = self.options["number_of_points"]
 
-        temperature = np.clip(inputs["temperature"], 250.0, 373.15)
+        temperature = np.clip(inputs["temperature"], 250.0, 373.1)
         pressure = np.clip(inputs["pressure"], 1e3, 1e8)
 
         fluid_string = fluid_name_dict[fluid]
