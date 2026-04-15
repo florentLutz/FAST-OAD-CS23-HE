@@ -113,7 +113,7 @@ class SizingInletGeometry(om.ExplicitComponent):
             + air_inlet_id
             + ":inlet_capture_area",
             val=0.007,
-            units="ft**2",
+            units="m**2",
         )
 
     def setup_partials(self):
