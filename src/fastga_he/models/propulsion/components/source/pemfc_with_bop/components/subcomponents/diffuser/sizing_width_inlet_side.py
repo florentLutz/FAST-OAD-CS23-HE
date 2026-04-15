@@ -45,16 +45,6 @@ class SizingInletSideInnerWidth(om.ExplicitComponent):
             val=np.nan,
             units="m",
         )
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":mass_flow_ratio",
-            val=1.5,
-            units="unitless",
-            desc="The fraction of total air supply divided by pemfc air consumption",
-        )
 
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -67,7 +57,7 @@ class SizingInletSideInnerWidth(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials("*", "*", method="exact")
+        self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -81,13 +71,6 @@ class SizingInletSideInnerWidth(om.ExplicitComponent):
             + air_inlet_id
             + ":highlight_width"
         ]
-        mass_flow_ratio = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":mass_flow_ratio"
-        ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -95,50 +78,4 @@ class SizingInletSideInnerWidth(om.ExplicitComponent):
             + ":"
             + diffuser_id
             + ":inner_inlet_width"
-        ] = (mass_flow_ratio - 1.0) * air_inlet_highlight_width
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        diffuser_id = self.options["diffuser_id"]
-        air_inlet_id = self.options["connected_air_inlet_id"]
-
-        air_inlet_highlight_width = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":highlight_width"
-        ]
-        mass_flow_ratio = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":mass_flow_ratio"
-        ]
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + diffuser_id
-            + ":inner_inlet_width",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":highlight_width",
-        ] = mass_flow_ratio - 1.0
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + diffuser_id
-            + ":inner_inlet_width",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":mass_flow_ratio",
         ] = air_inlet_highlight_width
