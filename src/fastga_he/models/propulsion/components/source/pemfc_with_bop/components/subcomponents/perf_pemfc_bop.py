@@ -186,7 +186,7 @@ class PerformancesPEMFCBOP(om.Group):
                 number_of_points=number_of_points,
                 connected_heat_exchanger_id=supplement_heat_exchanger_id,
             ),
-            promotes=["data:*", "exterior_temperature", "true_airspeed"],
+            promotes=["data:*", "exterior_temperature", "true_airspeed", "nozzle_exit_air_speed"],
         )
         self.add_subsystem(
             "pipe",

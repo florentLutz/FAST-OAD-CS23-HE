@@ -105,6 +105,15 @@ class PerformancesSupplementHeatExchangerThermalBalance(om.Group):
             ),
             promotes=["*"],
         )
+        self.add_subsystem(
+            "air_flow_rate_hex_performances",
+            _AirFlowRate(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                connected_air_inlet_id=connected_air_inlet_id,
+                supplement_heat_exchanger_id=supplement_heat_exchanger_id,
+            ),
+            promotes=["*"],
+        )
 
 
 class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
@@ -624,3 +633,121 @@ class _CoolantTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:outlet_temperature"
         ]
+
+
+class _AirFlowRate(om.ExplicitComponent):
+    """
+    Compute the air mass flow rate at the supplement heat exchanger inlet.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="connected_air_inlet_id",
+            default=None,
+            desc="Identifier of the connected air inlet",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="supplement_heat_exchanger_id",
+            default=None,
+            desc="Identifier of the supplement heat exchanger",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
+        supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow",
+            val=np.nan,
+            units="kg/s",
+        )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + supplement_heat_exchanger_id
+            + ":air_flow_rate",
+            units="kg/s",
+            val=0.6,
+        )
+
+    def setup_partials(self):
+        self.declare_partials("*", "*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
+        supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + supplement_heat_exchanger_id
+            + ":air_flow_rate"
+        ] = np.clip(
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + connected_air_inlet_id
+                + ":design_air_mass_flow"
+            ],
+            0.0,
+            2.0,
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
+        supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
+
+        clipped_flow_rate = np.clip(
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + connected_air_inlet_id
+                + ":design_air_mass_flow"
+            ],
+            0.0,
+            2.0,
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + supplement_heat_exchanger_id
+            + ":air_flow_rate",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_air_inlet_id
+            + ":design_air_mass_flow",
+        ] = np.where(
+            clipped_flow_rate
+            == inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + connected_air_inlet_id
+                + ":design_air_mass_flow"
+            ],
+            1.0,
+            1e-6,
+        )

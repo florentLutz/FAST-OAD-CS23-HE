@@ -513,7 +513,7 @@ def test_perf_nozzle_air_speed():
     ) == pytest.approx(np.full(NB_POINTS_TEST, 120.0), rel=1e-2)
 
     assert problem.get_val(
-        "exit_air_speed",
+        "nozzle_exit_air_speed",
         units="m/s",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 160.0), rel=1e-2)
 
@@ -752,7 +752,7 @@ def test_perf_nozzle_pressure_drop():
 def test_perf_nozzle_drag():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("exit_air_speed", val=160.0, units="m/s", shape=NB_POINTS_TEST)
+    ivc.add_output("nozzle_exit_air_speed", val=160.0, units="m/s", shape=NB_POINTS_TEST)
     ivc.add_output("true_air_speed", val=80.0, units="m/s", shape=NB_POINTS_TEST)
     ivc.add_output("air_mass_flow_rate", val=0.5, units="kg/s", shape=NB_POINTS_TEST)
 

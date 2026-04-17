@@ -50,7 +50,7 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
         )
 
         self.add_output("average_air_speed", val=100, units="m/s", shape=number_of_points)
-        self.add_output("exit_air_speed", val=140, units="m/s", shape=number_of_points)
+        self.add_output("nozzle_exit_air_speed", val=140, units="m/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
@@ -94,7 +94,7 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
             )
             / 2.0
         )
-        outputs["exit_air_speed"] = (
+        outputs["nozzle_exit_air_speed"] = (
             inputs["entry_air_speed"]
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -129,7 +129,7 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
             + ":area_ratio",
         ] = inputs["entry_air_speed"] / 2.0
 
-        partials["exit_air_speed", "entry_air_speed"] = inputs[
+        partials["nozzle_exit_air_speed", "entry_air_speed"] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -138,7 +138,7 @@ class PerformancesNozzleAirSpeed(om.ExplicitComponent):
         ]
 
         partials[
-            "exit_air_speed",
+            "nozzle_exit_air_speed",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

@@ -376,7 +376,7 @@ def test_pemfc_stack_sizing_with_bop():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:mass", units="kg"
-    ) == pytest.approx(119.0, rel=1e-2)
+    ) == pytest.approx(536.4, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:CG:x", units="m"
     ) == pytest.approx(2.037, rel=1e-2)
@@ -391,6 +391,8 @@ def test_pemfc_stack_sizing_with_bop():
     ) == pytest.approx(0.0, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
 
 
 def test_constraints_enforce_effective_area():

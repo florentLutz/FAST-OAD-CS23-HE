@@ -4,18 +4,18 @@
       <he_power_train>
         <PEMFC_stack_bop>
           <pemfc_stack_bop_1>
-            <bop_mass units="kg" is_input="False">120.28467834888757</bop_mass>
+            <bop_mass units="kg" is_input="False">82.92880899007457</bop_mass>
             <max_air_subsystem_length units="m" is_input="True">4.5</max_air_subsystem_length>
             <power_rating units="kW" is_input="True">0.2</power_rating>
-            <operating_pressure units="Pa" is_input="True">200000.0</operating_pressure>
-            <air_consumption_max units="kg/s" is_input="True">0.72</air_consumption_max>
+            <air_consumption_max units="kg/s" is_input="True">0.5</air_consumption_max>
+            <operating_pressure units="Pa" is_input="True">200000.0<!--Input anode pressure if applicable--></operating_pressure>
             <air_inlet_1>
               <highlight_width units="m" is_input="False">0.31507356070979614</highlight_width>
-              <inlet_capture_area units="ft**2" is_input="False">0.027158255000457415</inlet_capture_area>
+              <inlet_capture_area units="m**2" is_input="False">0.027158255000457415</inlet_capture_area>
               <lip_length units="m" is_input="False">0.01969209754436226</lip_length>
               <lip_ramp_floor_distance units="m" is_input="False">0.08619655339938849</lip_ramp_floor_distance>
-              <mass units="lbm" is_input="False">1.2328405075696212</mass>
-              <mass_flow_ratio units="unitless" is_input="True">3.0<!--The fraction of total air supply divided by pemfc air consumption--></mass_flow_ratio>
+              <mass units="lbm" is_input="False">3.1489256698369434</mass>
+              <mass_flow_factor units="unitless" is_input="True">10.0</mass_flow_factor>
               <max_ambient_dynamic_pressure units="Pa" is_input="True">5560.000000000001</max_ambient_dynamic_pressure>
               <max_momentum_boundary_layer_thickness units="m" is_input="True">0.0016347819876167471</max_momentum_boundary_layer_thickness>
               <ramp_angle units="rad" is_input="True">0.12217304763960307<!--Ramp angle of the inlet, defined as the angle between the inlet walls and the horizontal plane--></ramp_angle>
@@ -32,48 +32,49 @@
             </compressor_1>
             <coolant>
               <mass_flow_rate units="kg/s" is_input="True">4.1</mass_flow_rate>
-              <mean_temperature units="degK" is_input="True">339.6</mean_temperature>
+              <mean_temperature units="degK" is_input="True">345.0</mean_temperature>
               <static_pressure units="Pa" is_input="True">200000.0</static_pressure>
-              <inlet_temperature units="degK" is_input="True">329.6</inlet_temperature>
-              <outlet_temperature units="degK" is_input="True">349.6</outlet_temperature>
+              <inlet_temperature units="degK" is_input="True">339.0</inlet_temperature>
+              <outlet_temperature units="degK" is_input="True">349.0</outlet_temperature>
             </coolant>
             <coolant_tank_1>
-              <coolant_volume units="m**3" is_input="False">0.0123936808836272</coolant_volume>
-              <mass units="kg" is_input="False">16.06544607674018</mass>
+              <coolant_volume units="m**3" is_input="False">0.02386490636994072</coolant_volume>
+              <mass units="kg" is_input="False">30.935149130653414</mass>
               <material_density units="kg/m**3" is_input="True">2640.0<!--material density of the coolant tank--></material_density>
-              <tank_mass units="kg" is_input="False">3.271931753277581</tank_mass>
-              <volume units="m**3" is_input="False">0.013633048971989921</volume>
+              <tank_mass units="kg" is_input="False">6.30033528166435</tank_mass>
+              <volume units="m**3" is_input="False">0.026251397006934792</volume>
             </coolant_tank_1>
             <diffuser_1>
-              <alpha units="rad" is_input="False">0.1101679287332707</alpha>
-              <area_ratio units="unitless" is_input="False">3.3090449552783197</area_ratio>
-              <beta units="rad" is_input="False">-0.2823252748199796</beta>
-              <entrance_area units="m**2" is_input="False">0.049635674329174796</entrance_area>
-              <entry_hydraulic_diameter units="m" is_input="False">0.14003269364879828</entry_hydraulic_diameter>
-              <exit_area units="m**2" is_input="False">0.015</exit_area>
+              <alpha units="rad" is_input="False">0.30983066511187846</alpha>
+              <area_ratio units="unitless" is_input="False">0.690295171812458</area_ratio>
+              <beta units="rad" is_input="False">-0.13176881138878183</beta>
+              <entrance_area units="m**2" is_input="False">0.024817837164587398</entrance_area>
+              <entry_hydraulic_diameter units="m" is_input="False">0.12602942428391845</entry_hydraulic_diameter>
+              <exit_area units="m**2" is_input="False">0.0359525</exit_area>
               <inlet_side_height units="m" is_input="False">0.08076839017744904</inlet_side_height>
-              <inlet_side_width units="m" is_input="False">0.6321471214195923</inlet_side_width>
-              <inner_inlet_width units="m" is_input="False">0.6301471214195923</inner_inlet_width>
-              <inner_volume units="m**3" is_input="False">0.05370898409884995</inner_volume>
+              <inlet_side_width units="m" is_input="False">0.31707356070979614</inlet_side_width>
+              <inner_inlet_width units="m" is_input="False">0.31507356070979614</inner_inlet_width>
+              <inner_volume units="m**3" is_input="False">0.058672122944404353</inner_volume>
               <length units="m" is_input="True">1.0</length>
               <length_height_ratio units="unitless" is_input="False">12.695447980429776</length_height_ratio>
-              <length_width_ratio units="unitless" is_input="False">1.586930997553722</length_width_ratio>
-              <mass units="kg" is_input="False">2.869871881312027</mass>
+              <length_width_ratio units="unitless" is_input="False">3.173861995107444</length_width_ratio>
+              <mass units="kg" is_input="False">3.1506082673955675</mass>
               <material_density units="kg/m**3" is_input="True">2700.0<!--Density of the diffuser material, three options are suggested: 2700 [kg/m**3] for aluminum, 1600 [kg/m**3] for carbon fiber reinforced polymer and 7800 [kg/m**3] for steel--></material_density>
-              <outer_volume units="m**3" is_input="False">0.054771899610447</outer_volume>
-              <outlet_side_height units="m" is_input="False">0.302</outlet_side_height>
+              <outer_volume units="m**3" is_input="False">0.0598390148952916</outer_volume>
+              <outlet_side_height units="m" is_input="False">0.72105</outlet_side_height>
               <outlet_side_width units="m" is_input="False">0.052000000000000005</outlet_side_width>
-              <relative_roughness units="unitless" is_input="False">0.000714118948899175</relative_roughness>
+              <relative_roughness units="unitless" is_input="False">0.0007934654987768611</relative_roughness>
               <wall_thickness units="m" is_input="True">0.001</wall_thickness>
             </diffuser_1>
             <heat_exchanger_1>
               <UA units="W/degK" is_input="True">3080.365486658209</UA>
-              <air_flow_length units="m" is_input="False">0.050000000000000024</air_flow_length>
+              <air_flow_length units="m" is_input="False">0.8506281376362587</air_flow_length>
               <air_flow_rate units="kg/s" is_input="True">0.72</air_flow_rate>
-              <channel_mass units="kg" is_input="False">0.0048514071267543955</channel_mass>
-              <coolant_flow_length units="m" is_input="False">0.2440839195021328</coolant_flow_length>
-              <coolant_volume units="m**3" is_input="False">0.0037363390061708503</coolant_volume>
+              <channel_mass units="kg" is_input="False">0.01690706793615834</channel_mass>
+              <coolant_flow_length units="m" is_input="False">0.05</coolant_flow_length>
+              <coolant_volume units="m**3" is_input="False">0.013021075279680792</coolant_volume>
               <end_plate_thickness units="m" is_input="True">0.006</end_plate_thickness>
+              <expansion_area_ratio is_input="True">1.1</expansion_area_ratio>
               <fin_area_total_surface_ratio units="unitless" is_input="True">0.809</fin_area_total_surface_ratio>
               <fin_frequency units="1/m" is_input="True">782.0</fin_frequency>
               <fin_height units="m" is_input="False">0.006248</fin_height>
@@ -82,12 +83,13 @@
               <fin_material_density units="kg/m**3" is_input="True">2710.0<!--Density of the material of the fins, Aluminium 6061-T6 by default--></fin_material_density>
               <fin_spacing units="m" is_input="False">0.001176772378516624</fin_spacing>
               <fin_spacing_height_ratio units="unitless" is_input="False">0.1883438505948502</fin_spacing_height_ratio>
+              <fin_thermal_conductivity units="W/m/degK" is_input="True">237.0<!--The thermal conductivity of the fin material, which is typically aluminum--></fin_thermal_conductivity>
               <fin_thickness units="m" is_input="True">0.000102</fin_thickness>
               <fin_thickness_length_ratio units="unitless" is_input="False">0.032125984251968505</fin_thickness_length_ratio>
               <fin_thickness_spacing_ratio units="unitless" is_input="False">0.08667776526890927</fin_thickness_spacing_ratio>
               <free_flow_frontal_area_ratio units="unitless" is_input="False">0.4813398294485999</free_flow_frontal_area_ratio>
               <layer_count units="unitless" is_input="True">50.0<!--Layer count of a single fluid in the exchanger, often referred to the cold fluid layer count--></layer_count>
-              <mass units="kg" is_input="False">3.0476015476403435</mass>
+              <mass units="kg" is_input="False">10.620837431709758</mass>
               <mean_air_dynamic_viscosity units="Pa*s" is_input="True">2.2403719935932422e-05</mean_air_dynamic_viscosity>
               <mean_air_prandtl_number units="unitless" is_input="True">0.7002390596901497</mean_air_prandtl_number>
               <mean_air_thermal_conductivity units="W/m/degK" is_input="True">0.03242693420447056</mean_air_thermal_conductivity>
@@ -95,22 +97,23 @@
               <mean_coolant_prandtl_number units="unitless" is_input="True">9.378702280006285</mean_coolant_prandtl_number>
               <mean_coolant_thermal_conductivity units="W/m/degK" is_input="True">0.4208973169495547</mean_coolant_thermal_conductivity>
               <no_flow_length units="m" is_input="False">0.71905</no_flow_length>
-              <plate_mass units="kg" is_input="False">3.042750140513589</plate_mass>
+              <plate_mass units="kg" is_input="False">10.6039303637736</plate_mass>
               <plate_material_density units="kg/m**3" is_input="True">2710.0<!--Density of the material of the separating plates, Aluminium 6061-T6 by default--></plate_material_density>
               <plate_spacing units="m" is_input="True">0.00635</plate_spacing>
-              <plate_thermally_conductivity units="W/m/degK" is_input="True">237.0</plate_thermally_conductivity>
+              <plate_thermally_conductivity units="W/m/degK" is_input="True">237.0<!--The thermal conductivity of the plate material, which is typically aluminum--></plate_thermally_conductivity>
               <plate_thickness units="m" is_input="True">0.0008</plate_thickness>
               <surface_area_density units="1/m" is_input="True">2254.0</surface_area_density>
               <transfer_area_volume_ratio units="1/m" is_input="False">1000.9020979020978</transfer_area_volume_ratio>
             </heat_exchanger_1>
             <heat_exchanger_2>
               <UA units="W/degK" is_input="True">970.6602354082004</UA>
-              <air_flow_length units="m" is_input="False">0.05000000000000002</air_flow_length>
+              <air_flow_length units="m" is_input="False">0.27594519811728563</air_flow_length>
               <air_flow_rate units="kg/s" is_input="True">0.24</air_flow_rate>
-              <channel_mass units="kg" is_input="False">0.002645659076018676</channel_mass>
-              <coolant_flow_length units="m" is_input="False">0.13310835806374524</coolant_flow_length>
-              <coolant_volume units="m**3" is_input="False">0.002037569501896587</coolant_volume>
+              <channel_mass units="kg" is_input="False">0.005484681266469726</channel_mass>
+              <coolant_flow_length units="m" is_input="False">0.05</coolant_flow_length>
+              <coolant_volume units="m**3" is_input="False">0.004224058714700161</coolant_volume>
               <end_plate_thickness units="m" is_input="True">0.006</end_plate_thickness>
+              <expansion_area_ratio is_input="True">1.1</expansion_area_ratio>
               <fin_area_total_surface_ratio units="unitless" is_input="True">0.809</fin_area_total_surface_ratio>
               <fin_frequency units="1/m" is_input="True">782.0</fin_frequency>
               <fin_height units="m" is_input="False">0.006248</fin_height>
@@ -119,12 +122,13 @@
               <fin_material_density units="kg/m**3" is_input="True">2710.0<!--Density of the material of the fins, Aluminium 6061-T6 by default--></fin_material_density>
               <fin_spacing units="m" is_input="False">0.001176772378516624</fin_spacing>
               <fin_spacing_height_ratio units="unitless" is_input="False">0.1883438505948502</fin_spacing_height_ratio>
+              <fin_thermal_conductivity units="W/m/degK" is_input="True">237.0<!--The thermal conductivity of the fin material, which is typically aluminum--></fin_thermal_conductivity>
               <fin_thickness units="m" is_input="True">0.000102</fin_thickness>
               <fin_thickness_length_ratio units="unitless" is_input="False">0.032125984251968505</fin_thickness_length_ratio>
               <fin_thickness_spacing_ratio units="unitless" is_input="False">0.08667776526890927</fin_thickness_spacing_ratio>
               <free_flow_frontal_area_ratio units="unitless" is_input="False">0.4813398294485999</free_flow_frontal_area_ratio>
               <layer_count units="unitless" is_input="True">50.0<!--Layer count of a single fluid in the exchanger, often referred to the cold fluid layer count--></layer_count>
-              <mass units="kg" is_input="False">1.6619744506986676</mass>
+              <mass units="kg" is_input="False">3.4454175209965525</mass>
               <mean_air_dynamic_viscosity units="Pa*s" is_input="True">2.0808384744032594e-05</mean_air_dynamic_viscosity>
               <mean_air_prandtl_number units="unitless" is_input="True">0.7018692906611748</mean_air_prandtl_number>
               <mean_air_thermal_conductivity units="W/m/degK" is_input="True">0.029909863463328447</mean_air_thermal_conductivity>
@@ -132,10 +136,10 @@
               <mean_coolant_prandtl_number units="unitless" is_input="True">9.378702280006285</mean_coolant_prandtl_number>
               <mean_coolant_thermal_conductivity units="W/m/degK" is_input="True">0.4208973169495547</mean_coolant_thermal_conductivity>
               <no_flow_length units="m" is_input="False">0.71905</no_flow_length>
-              <plate_mass units="kg" is_input="False">1.659328791622649</plate_mass>
+              <plate_mass units="kg" is_input="False">3.4399328397300826</plate_mass>
               <plate_material_density units="kg/m**3" is_input="True">2710.0<!--Density of the material of the separating plates, Aluminium 6061-T6 by default--></plate_material_density>
               <plate_spacing units="m" is_input="True">0.00635</plate_spacing>
-              <plate_thermally_conductivity units="W/m/degK" is_input="True">237.0</plate_thermally_conductivity>
+              <plate_thermally_conductivity units="W/m/degK" is_input="True">237.0<!--The thermal conductivity of the plate material, which is typically aluminum--></plate_thermally_conductivity>
               <plate_thickness units="m" is_input="True">0.0008</plate_thickness>
               <surface_area_density units="1/m" is_input="True">2254.0</surface_area_density>
               <transfer_area_volume_ratio units="1/m" is_input="False">1000.9020979020978</transfer_area_volume_ratio>
@@ -145,29 +149,29 @@
               <volume units="L" is_input="False">2.0491837680000002</volume>
             </humidifier_1>
             <nozzle_1>
-              <alpha units="rad" is_input="False">-0.04408893704200393</alpha>
+              <alpha units="rad" is_input="False">-0.03381888897088183</alpha>
               <area_ratio units="unitless" is_input="True">2.0</area_ratio>
               <aspect_ratio units="unitless" is_input="True">4.0</aspect_ratio>
-              <entry_hydraulic_diameter units="m" is_input="False">0.2246332831451883</entry_hydraulic_diameter>
-              <exit_area units="m**2" is_input="False">0.047855782432868005</exit_area>
-              <exit_height units="m" is_input="False">0.10937982267409745<!--Inner height of the nozzle exit--></exit_height>
+              <entry_hydraulic_diameter units="m" is_input="False">0.09349847214095312</entry_hydraulic_diameter>
+              <exit_area units="m**2" is_input="False">0.01797625</exit_area>
+              <exit_height units="m" is_input="False">0.06703776920512794<!--Inner height of the nozzle exit--></exit_height>
               <exit_height_length_ratio units="unitless" is_input="False">0.6</exit_height_length_ratio>
-              <exit_width units="m" is_input="False">0.4375192906963898<!--Inner width of the nozzle exit--></exit_width>
+              <exit_width units="m" is_input="False">0.26815107682051176<!--Inner width of the nozzle exit--></exit_width>
               <inlet_side_height units="m" is_input="False">0.72105</inlet_side_height>
-              <inlet_side_width units="m" is_input="False">0.13510835806374524</inlet_side_width>
-              <inner_volume units="m**3" is_input="False">0.35436807777499246</inner_volume>
-              <length units="m" is_input="False">3.45</length>
-              <mass units="kg" is_input="False">13.069480346409684</mass>
+              <inlet_side_width units="m" is_input="False">0.052000000000000005</inlet_side_width>
+              <inner_volume units="m**3" is_input="False">0.16336469465591952</inner_volume>
+              <length units="m" is_input="False">3.224054801882714</length>
+              <mass units="kg" is_input="False">9.647161487537293</mass>
               <material_density units="kg/m**3" is_input="True">2700.0<!--Density of the diffuser material, three options are suggested: 2700 [kg/m**3] for aluminum, 1600 [kg/m**3] for carbon fiber reinforced polymer and 7800 [kg/m**3] for steel--></material_density>
-              <outer_volume units="m**3" is_input="False">0.3592086260514405</outer_volume>
-              <outlet_side_height units="m" is_input="False">0.11137982267409745</outlet_side_height>
-              <outlet_side_width units="m" is_input="False">0.4395192906963898</outlet_side_width>
-              <relative_roughness units="unitless" is_input="False">0.0004451700059753235</relative_roughness>
+              <outer_volume units="m**3" is_input="False">0.16693771742908148</outer_volume>
+              <outlet_side_height units="m" is_input="False">0.06903776920512794</outlet_side_height>
+              <outlet_side_width units="m" is_input="False">0.27015107682051176</outlet_side_width>
+              <relative_roughness units="unitless" is_input="False">0.001069536193588763</relative_roughness>
               <wall_thickness units="m" is_input="True">0.001</wall_thickness>
             </nozzle_1>
             <pipe_1>
               <coolant_volume units="m**3" is_input="False">0.006619772375559763</coolant_volume>
-              <mass units="kg" is_input="False">60.2073287335333</mass>
+              <mass units="kg" is_input="False">0.8975382293539436</mass>
               <material_density units="kg/m**3" is_input="True">8960.0<!--Pipe material density, the default material is copper--></material_density>
               <material_yield_strength units="Pa" is_input="True">40000000.0<!--Yield strength of the pipe material, default is 40.0 MPa for copper--></material_yield_strength>
               <number_of_pipes is_input="True">5.0<!--Number of the coolant pipes in the TMS--></number_of_pipes>

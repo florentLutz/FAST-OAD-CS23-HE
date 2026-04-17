@@ -147,12 +147,10 @@ class SizingPEMFCBOP(om.Group):
             promotes=["data:*"],
         )
         self.add_subsystem(
-            "diffuser",
-            SizingDiffuser(
+            "heat_exchanger_air_flow_area",
+            _HeatExchangerAirFlowArea(
+                air_inlet_id=air_inlet_id,
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                diffuser_id=diffuser_id,
-                connected_heat_exchanger_id=supplement_heat_exchanger_id,
-                connected_air_inlet_id=air_inlet_id,
             ),
             promotes=["data:*"],
         )
@@ -169,6 +167,16 @@ class SizingPEMFCBOP(om.Group):
             SizingHeatExchanger(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 heat_exchanger_id=supplement_heat_exchanger_id,
+            ),
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "diffuser",
+            SizingDiffuser(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                diffuser_id=diffuser_id,
+                connected_heat_exchanger_id=supplement_heat_exchanger_id,
+                connected_air_inlet_id=air_inlet_id,
             ),
             promotes=["data:*"],
         )
@@ -233,6 +241,15 @@ class SizingPEMFCBOP(om.Group):
             promotes=["data:*"],
         )
 
+        self.connect(
+            "heat_exchanger_air_flow_area.primary_heat_exchanger_air_flow_area",
+            "primary_heat_exchanger.air_flow_area",
+        )
+        self.connect(
+            "heat_exchanger_air_flow_area.supplement_heat_exchanger_air_flow_area",
+            "supplement_heat_exchanger.air_flow_area",
+        )
+
 
 class SizingBOPMass(om.ExplicitComponent):
     """
@@ -277,7 +294,7 @@ class SizingBOPMass(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials("*", "*", method="exact")
+        self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -295,32 +312,153 @@ class SizingBOPMass(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":bop_mass"
-        ] = np.clip(bop_mass, 0.0, 600.0)
+        ] = bop_mass
+
+
+class _HeatExchangerAirFlowArea(om.ExplicitComponent):
+    """
+    Computes the air flow area of the primary heat exchanger.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack BOP",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="air_inlet_id",
+            default=None,
+            desc="Identifier of the air_inlet",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area",
+            units="m**2",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":mass_flow_factor",
+            val=10.0,
+            units="unitless",
+        )
+
+        self.add_output(
+            name="primary_heat_exchanger_air_flow_area",
+            units="m**2",
+            val=0.009,
+        )
+        self.add_output(
+            name="supplement_heat_exchanger_air_flow_area",
+            units="m**2",
+            val=0.009,
+        )
+
+    def setup_partials(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
+
+        self.declare_partials(
+            of="primary_heat_exchanger_air_flow_area",
+            wrt="*",
+            method="exact",
+        )
+        self.declare_partials(
+            of="supplement_heat_exchanger_air_flow_area",
+            wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area",
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        air_inlet_id = self.options["air_inlet_id"]
+
+        outputs["primary_heat_exchanger_air_flow_area"] = (
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + air_inlet_id
+                + ":inlet_capture_area"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + air_inlet_id
+                + ":mass_flow_factor"
+            ]
+        )
+
+        outputs["supplement_heat_exchanger_air_flow_area"] = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area"
+        ]
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        sizing_component_ids = self.options["sizing_component_ids"]
-        bop_mass = 0.0
+        air_inlet_id = self.options["air_inlet_id"]
 
-        for component_id in sizing_component_ids:
-            bop_mass += inputs[
+        partials[
+            "primary_heat_exchanger_air_flow_area",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area",
+        ] = (
+            1.0
+            / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + component_id
-                + ":mass"
+                + air_inlet_id
+                + ":mass_flow_factor"
             ]
+        )
 
-        clipped_bop_mass = np.clip(bop_mass, 0.0, 600.0)
-
-        for component_id in sizing_component_ids:
-            partials[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":bop_mass",
+        partials[
+            "primary_heat_exchanger_air_flow_area",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":mass_flow_factor",
+        ] = (
+            -inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + component_id
-                + ":mass",
-            ] = np.where(bop_mass == clipped_bop_mass, 1.0, 1e-6)
+                + air_inlet_id
+                + ":inlet_capture_area"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + air_inlet_id
+                + ":mass_flow_factor"
+            ]
+            ** 2.0
+        )

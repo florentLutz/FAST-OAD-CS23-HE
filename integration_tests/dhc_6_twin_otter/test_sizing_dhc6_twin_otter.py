@@ -128,6 +128,7 @@ def test_sizing_twin_otter_pemfc_h2_with_bop():
         RESULTS_FOLDER_PATH / "oad_process_inputs_pemfc_h2_gas_with_bop.xml",
     )
 
+    # problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
     problem.setup()
 

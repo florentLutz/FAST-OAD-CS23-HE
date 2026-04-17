@@ -100,6 +100,14 @@ class PerformancesPrimaryHeatExchangerThermalBalance(om.Group):
             ),
             promotes=["*"],
         )
+        self.add_subsystem(
+            "air_flow_rate_hex_performances",
+            _AirFlowRate(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                primary_heat_exchanger_id=primary_heat_exchanger_id,
+            ),
+            promotes=["*"],
+        )
 
 
 class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
@@ -621,3 +629,102 @@ class _CoolantTemperature(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:inlet_temperature"
         ]
+
+
+class _AirFlowRate(om.ExplicitComponent):
+    """
+    Compute the air mass flow rate at the supplement heat exchanger inlet.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="primary_heat_exchanger_id",
+            default=None,
+            desc="Identifier of the primary heat exchanger",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_consumption_max",
+            units="kg/s",
+            val=np.nan,
+        )
+
+        self.add_output(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + primary_heat_exchanger_id
+            + ":air_flow_rate",
+            units="kg/s",
+            val=0.72,
+        )
+
+    def setup_partials(self):
+        self.declare_partials("*", "*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + primary_heat_exchanger_id
+            + ":air_flow_rate"
+        ] = np.clip(
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_consumption_max"
+            ],
+            0.6,
+            np.inf,
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
+
+        clipped_flow_rate = np.clip(
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_consumption_max"
+            ],
+            0.6,
+            np.inf,
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + primary_heat_exchanger_id
+            + ":air_flow_rate",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":air_consumption_max",
+        ] = np.where(
+            clipped_flow_rate
+            == inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":air_consumption_max"
+            ],
+            1.0,
+            1e-6,
+        )

@@ -1202,6 +1202,7 @@ PEMFC_STACK_BOP = {
         {"air_consumption": "kg/s"},
         {"efficiency": None},
         {"power_out": "kW"},
+        {"nozzle_exit_air_speed": "m/s"},
     ],
     SMP: [
         {"delta_Cd": None},

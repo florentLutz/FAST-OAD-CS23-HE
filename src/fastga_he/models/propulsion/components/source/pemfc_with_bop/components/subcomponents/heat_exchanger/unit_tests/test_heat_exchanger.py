@@ -867,34 +867,30 @@ def test_sizing_heat_exchanger_flow_length():
         units="m",
         val=1.92e-3,
     )
+    ivc.add_output("air_flow_area", units="m**2", val=0.21374)
 
-    # Manual problem setup needed — run_system won't work with SubmodelComp + driver
-    problem = om.Problem(reports=False)
-    model = problem.model
-    model.add_subsystem("ivc", ivc, promotes=["*"])
-    model.add_subsystem(
-        "flow_length",
+    problem = run_system(
         SizingHeatExchangerFlowLength(
             pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
         ),
-        promotes=["*"],
+        ivc,
     )
 
-    problem.setup()
-    problem.run_driver()  # NOT run_model — the inner SLSQP is a driver
-
-    # Primary check: optimizer converged (UA_difference == 0)
+    # Primary check: Newton converged (UA_difference == 0)
     assert problem.get_val("UA_difference", units="W/K") == pytest.approx(0.0, abs=1e-3)
 
-    # Sanity checks on outputs
+    # Sanity check on coolant_flow_length output
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_flow_length",
         units="m",
     ) == pytest.approx(0.327, abs=1e-3)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_length",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":air_flow_length",
         units="m",
     ) == pytest.approx(0.05, abs=1e-3)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_sizing_free_flow_frontal_area_ratio():
@@ -1024,6 +1020,7 @@ def test_sizing_heat_exchanger_coolant_volume():
 def test_sizing_heat_exchanger():
     ivc = om.IndepVarComp()
 
+    ivc.add_output("air_flow_area", units="m**2", val=0.21374)
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:layer_count",
         units="unitless",
@@ -1094,24 +1091,17 @@ def test_sizing_heat_exchanger():
         val=1.225,
     )
 
-    problem = om.Problem(reports=False)
-    model = problem.model
-    model.add_subsystem("ivc", ivc, promotes=["*"])
-    model.add_subsystem(
-        "sizing",
+    problem = run_system(
         SizingHeatExchanger(
             pemfc_stack_bop_id="pemfc_stack_bop_1", heat_exchanger_id="heat_exchanger_1"
         ),
-        promotes=["*"],
+        ivc,
     )
-
-    problem.setup()
-    problem.run_model()
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_flow_length",
         units="m",
-    ) == pytest.approx(0.328, abs=1e-3)
+    ) == pytest.approx(0.327, abs=1e-3)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_length",
         units="m",
@@ -1119,7 +1109,9 @@ def test_sizing_heat_exchanger():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:mass",
         units="kg",
-    ) == pytest.approx(4.09, rel=1e-2)
+    ) == pytest.approx(4.1, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
