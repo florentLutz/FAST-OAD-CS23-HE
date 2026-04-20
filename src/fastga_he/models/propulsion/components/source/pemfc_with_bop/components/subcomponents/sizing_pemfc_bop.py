@@ -353,7 +353,7 @@ class _HeatExchangerAirFlowArea(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":mass_flow_factor",
-            val=10.0,
+            val=3.0,
             units="unitless",
         )
 

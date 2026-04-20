@@ -16,8 +16,8 @@ from .perf_diffuser_singular_pressure_loss_coeff import (
 from .perf_diffuser_expansion_loss_coeff import PerformancesDiffuserExpansionLossCoefficient
 from .perf_diffuser_friction_loss_coeff import PerformancesDiffuserFrictionLossCoefficient
 from .perf_diffuser_pressure_drop import PerformancesDiffuserPressureDrop
-from .perf_diffuser_exit_total_pressure import PerformancesDiffuserExitTotalPressure
-from .perf_diffuser_exit_total_temperature import PerformancesDiffuserExitTotalTemperature
+from .perf_diffuser_exit_pressure import PerformancesDiffuserExitPressure
+from .perf_diffuser_exit_temperature import PerformancesDiffuserExitTemperature
 
 from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity, FluidSpecificHeatCapacity
 
@@ -155,8 +155,8 @@ class PerformancesDiffuser(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "perf_diffuser_exit_total_pressure",
-            PerformancesDiffuserExitTotalPressure(
+            "perf_diffuser_exit_pressure",
+            PerformancesDiffuserExitPressure(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 diffuser_id=diffuser_id,
                 number_of_points=number_of_points,
@@ -164,8 +164,8 @@ class PerformancesDiffuser(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "perf_diffuser_exit_total_temperature",
-            PerformancesDiffuserExitTotalTemperature(
+            "perf_diffuser_exit_temperature",
+            PerformancesDiffuserExitTemperature(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 diffuser_id=diffuser_id,
                 number_of_points=number_of_points,

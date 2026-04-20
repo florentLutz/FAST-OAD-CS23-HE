@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesDiffuserExitTotalPressure(om.ExplicitComponent):
+class PerformancesDiffuserExitPressure(om.ExplicitComponent):
     """
-    Computation of the exit total pressure of the diffuser.
+    Computation of the exit pressure of the diffuser.
     """
 
     def initialize(self):
@@ -51,7 +51,7 @@ class PerformancesDiffuserExitTotalPressure(om.ExplicitComponent):
         )
 
         self.add_output(
-            "diffuser_exit_total_pressure",
+            "diffuser_exit_pressure",
             val=0.3,
             units="Pa",
             shape=number_of_points,
@@ -87,7 +87,7 @@ class PerformancesDiffuserExitTotalPressure(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         diffuser_id = self.options["diffuser_id"]
 
-        outputs["diffuser_exit_total_pressure"] = (
+        outputs["diffuser_exit_pressure"] = (
             inputs["throat_air_pressure"]
             - inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"

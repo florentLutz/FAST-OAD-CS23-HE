@@ -93,7 +93,6 @@ class PerformancesDragCorrelationFactor(om.ImplicitComponent):
             + air_inlet_id
             + ":design_mach"
         ]
-        air_mass_flow_ratio = inputs["air_mass_flow_ratio"]
         corr_drag = outputs["drag_correlation_factor"]
 
         jacobian["drag_correlation_factor", "drag_correlation_factor"] = (

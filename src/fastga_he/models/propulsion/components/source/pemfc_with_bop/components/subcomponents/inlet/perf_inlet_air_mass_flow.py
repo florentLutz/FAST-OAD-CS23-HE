@@ -49,18 +49,19 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":mass_flow_factor",
-            val=10.0,
+            val=3.0,
             units="unitless",
         )
 
-        self.add_output("inlet_air_mass_flow", val=5.0, units="kg/s", shape=number_of_points)
+        self.add_output("inlet_air_mass_flow", val=1.8, units="kg/s", shape=number_of_points)
+        self.add_output("total_air_mass_flow", val=2.1, units="kg/s", shape=number_of_points)
 
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials("*", "*", method="exact")
         self.declare_partials(
-            "inlet_air_mass_flow",
+            "*",
             "air_consumption",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -82,6 +83,21 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
             0.001,
             np.inf,
         )
+        outputs["total_air_mass_flow"] = np.clip(
+            inputs["air_consumption"]
+            * (
+                inputs[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + air_inlet_id
+                    + ":mass_flow_factor"
+                ]
+                + 1.0
+            ),
+            0.001,
+            np.inf,
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -98,8 +114,19 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
                 + ":mass_flow_factor"
             ]
         )
+        inclipped_total_air_mass_flow = inputs["air_consumption"] * (
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + air_inlet_id
+                + ":mass_flow_factor"
+            ]
+            + 1.0
+        )
 
         clipped_air_mass_flow = np.clip(unclipped_air_mass_flow, 0.001, np.inf)
+        clipped_total_air_mass_flow = np.clip(inclipped_total_air_mass_flow, 0.001, np.inf)
 
         partials["inlet_air_mass_flow", "air_consumption"] = np.where(
             unclipped_air_mass_flow == clipped_air_mass_flow,
@@ -123,4 +150,33 @@ class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
             + ":mass_flow_factor",
         ] = np.where(
             unclipped_air_mass_flow == clipped_air_mass_flow, inputs["air_consumption"], 1e-6
+        )
+
+        partials["total_air_mass_flow", "air_consumption"] = np.where(
+            inclipped_total_air_mass_flow == clipped_total_air_mass_flow,
+            (
+                inputs[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + air_inlet_id
+                    + ":mass_flow_factor"
+                ]
+                + 1.0
+            )
+            * np.ones(number_of_points),
+            1e-6,
+        )
+
+        partials[
+            "total_air_mass_flow",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":mass_flow_factor",
+        ] = np.where(
+            inclipped_total_air_mass_flow == clipped_total_air_mass_flow,
+            inputs["air_consumption"],
+            1e-6,
         )

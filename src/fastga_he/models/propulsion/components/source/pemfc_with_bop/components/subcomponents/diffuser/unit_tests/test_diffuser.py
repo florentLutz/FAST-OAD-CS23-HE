@@ -16,8 +16,8 @@ from ..perf_diffuser_singular_pressure_loss_coeff import (
 from ..perf_diffuser_expansion_loss_coeff import PerformancesDiffuserExpansionLossCoefficient
 from ..perf_diffuser_friction_loss_coeff import PerformancesDiffuserFrictionLossCoefficient
 from ..perf_diffuser_pressure_drop import PerformancesDiffuserPressureDrop
-from ..perf_diffuser_exit_total_pressure import PerformancesDiffuserExitTotalPressure
-from ..perf_diffuser_exit_total_temperature import PerformancesDiffuserExitTotalTemperature
+from ..perf_diffuser_exit_pressure import PerformancesDiffuserExitPressure
+from ..perf_diffuser_exit_temperature import PerformancesDiffuserExitTemperature
 from ..perf_diffuser import PerformancesDiffuser
 
 from ..sizing_width_inlet_side import SizingInletSideInnerWidth
@@ -836,7 +836,7 @@ def test_diffuser_pressure_drop():
     problem.check_partials(compact_print=True)
 
 
-def test_diffuser_exit_total_pressure():
+def test_diffuser_exit_pressure():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
@@ -853,7 +853,7 @@ def test_diffuser_exit_total_pressure():
     )
 
     problem = run_system(
-        PerformancesDiffuserExitTotalPressure(
+        PerformancesDiffuserExitPressure(
             pemfc_stack_bop_id="pemfc_stack_bop_1",
             diffuser_id="diffuser_1",
             number_of_points=NB_POINTS_TEST,
@@ -862,14 +862,14 @@ def test_diffuser_exit_total_pressure():
     )
 
     assert problem.get_val(
-        "diffuser_exit_total_pressure",
+        "diffuser_exit_pressure",
         units="Pa",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 101077.63), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
-def test_diffuser_exit_total_temperature():
+def test_diffuser_exit_temperature():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output("exit_air_speed", units="m/s", val=50.0, shape=NB_POINTS_TEST)
@@ -888,7 +888,7 @@ def test_diffuser_exit_total_temperature():
     ivc.add_output("throat_air_speed", units="m/s", val=100.0, shape=NB_POINTS_TEST)
 
     problem = run_system(
-        PerformancesDiffuserExitTotalTemperature(
+        PerformancesDiffuserExitTemperature(
             pemfc_stack_bop_id="pemfc_stack_bop_1",
             diffuser_id="diffuser_1",
             number_of_points=NB_POINTS_TEST,
@@ -897,7 +897,7 @@ def test_diffuser_exit_total_temperature():
     )
 
     assert problem.get_val(
-        "diffuser_exit_total_temperature",
+        "diffuser_exit_temperature",
         units="K",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 303.5), rel=1e-2)
 
@@ -957,7 +957,7 @@ def test_diffuser_performance():
     )
 
     assert problem.get_val(
-        "diffuser_exit_total_temperature",
+        "diffuser_exit_temperature",
         units="K",
     ) == pytest.approx(np.full(NB_POINTS_TEST, 303.5), rel=1e-2)
 

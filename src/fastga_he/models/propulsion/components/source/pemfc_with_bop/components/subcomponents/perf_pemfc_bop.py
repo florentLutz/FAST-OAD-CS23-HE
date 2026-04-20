@@ -166,7 +166,7 @@ class PerformancesPEMFCBOP(om.Group):
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "exterior_temperature"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "supplement_heat_exchanger",
@@ -251,25 +251,21 @@ class PerformancesPEMFCBOP(om.Group):
             "supplement_heat_exchanger_air_properties.coolant_outlet_temperature",
             "supplement_heat_exchanger.coolant_outlet_temperature",
         )
-        self.connect("diffuser.diffuser_exit_total_pressure", "nozzle.diffuser_exit_pressure")
-        self.connect("diffuser.diffuser_exit_total_temperature", "nozzle.diffuser_exit_temperature")
+        self.connect("diffuser.diffuser_exit_pressure", "nozzle.diffuser_exit_pressure")
+        self.connect("diffuser.diffuser_exit_temperature", "nozzle.diffuser_exit_temperature")
         self.connect(
-            "diffuser.diffuser_exit_total_pressure",
-            "supplement_heat_exchanger_air_properties.diffuser_exit_total_pressure",
+            "diffuser.diffuser_exit_pressure",
+            "supplement_heat_exchanger_air_properties.diffuser_exit_pressure",
         )
         self.connect(
-            "diffuser.diffuser_exit_total_temperature",
-            "supplement_heat_exchanger_air_properties.diffuser_exit_total_temperature",
+            "diffuser.diffuser_exit_temperature",
+            "supplement_heat_exchanger_air_properties.diffuser_exit_temperature",
         )
         self.connect("diffuser.exit_air_speed", "nozzle.entry_air_speed")
         self.connect("air_inlet.inlet_air_mass_flow", "nozzle.air_mass_flow_rate")
         self.connect("air_inlet.throat_total_pressure", "diffuser.throat_air_pressure")
         self.connect("air_inlet.throat_total_temperature", "diffuser.throat_air_temperature")
         self.connect("air_inlet.throat_air_speed", "diffuser.throat_air_speed")
-        self.connect(
-            "air_inlet.ambient_pressure",
-            "supplement_heat_exchanger_air_properties.ambient_pressure",
-        )
 
 
 class PerformancesBOPDrag(om.ExplicitComponent):

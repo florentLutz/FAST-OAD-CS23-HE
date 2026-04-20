@@ -183,7 +183,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             units="unitless",
         )
         self.add_input(
-            "inlet_air_mass_flow",
+            "total_air_mass_flow",
             val=np.nan,
             units="kg/s",
             shape=number_of_points,
@@ -249,7 +249,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            wrt=["true_airspeed", "inlet_air_mass_flow"],
+            wrt=["true_airspeed", "total_air_mass_flow"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -267,7 +267,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         ramp_angle_factor = inputs["ramp_angle_factor"]
         momentum_flow_correction_factor = inputs["momentum_flow_correction_factor"]
         cd_zero_inlet_mass_flow = inputs["cd_zero_inlet_mass_flow"]
-        air_mass_flow = inputs["inlet_air_mass_flow"]
+        air_mass_flow = inputs["total_air_mass_flow"]
 
         unclipped_drag = (
             0.5
@@ -301,7 +301,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
         ramp_angle_factor = inputs["ramp_angle_factor"]
         momentum_flow_correction_factor = inputs["momentum_flow_correction_factor"]
         cd_zero_inlet_mass_flow = inputs["cd_zero_inlet_mass_flow"]
-        air_mass_flow = inputs["inlet_air_mass_flow"]
+        air_mass_flow = inputs["total_air_mass_flow"]
 
         unclipped_drag = (
             0.5
@@ -461,7 +461,7 @@ class _PerformancesInletDrag(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":drag",
-            "inlet_air_mass_flow",
+            "total_air_mass_flow",
         ] = np.where(
             unclipped_drag == clipped_drag,
             0.5

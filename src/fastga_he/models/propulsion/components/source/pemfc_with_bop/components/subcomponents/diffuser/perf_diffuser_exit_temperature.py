@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
+class PerformancesDiffuserExitTemperature(om.ExplicitComponent):
     """
-    Computation of the exit total temperature of the diffuser.
+    Computation of the exit temperature of the diffuser.
     """
 
     def initialize(self):
@@ -75,7 +75,7 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
         )
 
         self.add_output(
-            "diffuser_exit_total_temperature",
+            "diffuser_exit_temperature",
             val=300.0,
             units="K",
             shape=number_of_points,
@@ -109,7 +109,7 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             + ":air_pressure_drop"
         ]
 
-        outputs["diffuser_exit_total_temperature"] = (
+        outputs["diffuser_exit_temperature"] = (
             throat_air_temperature
             + (
                 0.5 * (throat_air_speed**2.0 - exit_air_speed**2.0)
@@ -134,17 +134,17 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             + ":air_pressure_drop"
         ]
 
-        partials["diffuser_exit_total_temperature", "throat_air_speed"] = (
+        partials["diffuser_exit_temperature", "throat_air_speed"] = (
             throat_air_speed / diffuser_air_specific_heat_capacity
         )
 
-        partials["diffuser_exit_total_temperature", "exit_air_speed"] = (
+        partials["diffuser_exit_temperature", "exit_air_speed"] = (
             -exit_air_speed / diffuser_air_specific_heat_capacity
         )
 
-        partials["diffuser_exit_total_temperature", "throat_air_temperature"] = 1.0
+        partials["diffuser_exit_temperature", "throat_air_temperature"] = 1.0
 
-        partials["diffuser_exit_total_temperature", "diffuser_air_specific_heat_capacity"] = (
+        partials["diffuser_exit_temperature", "diffuser_air_specific_heat_capacity"] = (
             -(
                 0.5 * (throat_air_speed**2.0 - exit_air_speed**2.0)
                 - pressure_drop / diffuser_air_density
@@ -152,12 +152,12 @@ class PerformancesDiffuserExitTotalTemperature(om.ExplicitComponent):
             / diffuser_air_specific_heat_capacity**2.0
         )
 
-        partials["diffuser_exit_total_temperature", "diffuser_air_density"] = pressure_drop / (
+        partials["diffuser_exit_temperature", "diffuser_air_density"] = pressure_drop / (
             diffuser_air_specific_heat_capacity * diffuser_air_density**2.0
         )
 
         partials[
-            "diffuser_exit_total_temperature",
+            "diffuser_exit_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
