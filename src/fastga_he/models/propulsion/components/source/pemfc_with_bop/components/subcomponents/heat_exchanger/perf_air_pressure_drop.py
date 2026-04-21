@@ -5,6 +5,8 @@
 import numpy as np
 import openmdao.api as om
 
+MINOR_LOSS_FACTOR = 0.15
+
 
 class PerformancesAirPressureDrop(om.ExplicitComponent):
     """
@@ -95,6 +97,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             units="kg/m**3",
             val=np.nan,
         )
+        self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
 
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -108,14 +111,47 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
         )
 
     def setup_partials(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        heat_exchanger_id = self.options["heat_exchanger_id"]
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
             "*",
-            "*",
+            [
+                "entrance_pressure_drop_coefficient",
+                "exit_pressure_drop_coefficient",
+                "air_mass_velocity",
+                "air_fanning_friction_factor",
+                "mean_air_density",
+                "air_inlet_density",
+                "air_outlet_density",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + heat_exchanger_id
+                + ":free_flow_frontal_area_ratio",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + heat_exchanger_id
+                + ":fin_hydraulic_diameter",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + heat_exchanger_id
+                + ":air_flow_length",
+            ],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
+        )
+
+        self.declare_partials(
+            "*",
+            "true_airspeed",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.arange(number_of_points),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -151,6 +187,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
         rho_air = inputs["mean_air_density"]
         rho_air_inlet = inputs["air_inlet_density"]
         rho_air_outlet = inputs["air_outlet_density"]
+        true_airspeed = inputs["true_airspeed"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -166,6 +203,8 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
                 + (1.0 + sigma**2.0 + k_exit) / rho_air_outlet
             )
             * np.ones(number_of_points)
+            + MINOR_LOSS_FACTOR * rho_air * true_airspeed**2.0
+            # Minor loss due to sudden contraction and expansion
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -201,6 +240,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
         rho_air = inputs["mean_air_density"]
         rho_air_inlet = inputs["air_inlet_density"]
         rho_air_outlet = inputs["air_outlet_density"]
+        true_airspeed = inputs["true_airspeed"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -322,7 +362,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             * air_fanning_factor
             * air_flow_length
             / (rho_air**2.0 * fin_hydraulic_diameter)
-        ) * np.ones(number_of_points)
+        ) * np.ones(number_of_points) + MINOR_LOSS_FACTOR * true_airspeed**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -353,3 +393,12 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             / rho_air_outlet**2.0
             * np.ones(number_of_points)
         )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + heat_exchanger_id
+            + ":air_pressure_drop",
+            "true_airspeed",
+        ] = MINOR_LOSS_FACTOR * 2.0 * rho_air * true_airspeed

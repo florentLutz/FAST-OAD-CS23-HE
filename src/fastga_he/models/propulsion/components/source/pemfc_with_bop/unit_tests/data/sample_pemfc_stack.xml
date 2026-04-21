@@ -118,6 +118,7 @@
                           <length_width_ratio units="unitless" is_input="True">6.21875</length_width_ratio>
                           <relative_roughness units="unitless" is_input="True">0.0015546875000000003</relative_roughness>
                             <wall_thickness units="m" is_input="True">0.001</wall_thickness>
+                            <exit_area units="m**2" is_input="True">0.003141592653589793</exit_area>
                         </diffuser_1>
                         <primary_heat_exchanger_1>
                           <NTU units="unitless" is_input="False">4.220793864851085</NTU>
@@ -173,6 +174,7 @@
                           <entry_hydraulic_diameter units="m" is_input="True">0.2668019370261171</entry_hydraulic_diameter>
                           <exit_height_length_ratio units="unitless" is_input="True">0.6</exit_height_length_ratio>
                           <relative_roughness units="unitless" is_input="True">0.0003748098725018292</relative_roughness>
+                            <exit_area units="m**2" is_input="True">0.008042477193873741</exit_area>
                         </nozzle_1>
                         <pipe_1>
                           <coolant_pressure_drop units="Pa" is_input="False">404.6559928358105</coolant_pressure_drop>

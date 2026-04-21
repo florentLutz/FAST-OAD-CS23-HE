@@ -18,6 +18,7 @@ from .perf_fanning_friction_factor import PerformancesFanningFrictionFactor
 from .perf_pressure_drop_coefficient import PerformancesPressureDropCoefficient
 from .perf_air_pressure_drop import PerformancesAirPressureDrop
 from .perf_coolant_pressure_drop import PerformancesCoolantPressureDrop
+from .perf_heat_exchanger_drag import PerformancesHeatExchangerDrag
 
 from ..fluid_characteristics import (
     FluidDensity,
@@ -381,6 +382,15 @@ class PerformancesHeatExchanger(om.Group):
         self.add_subsystem(
             "air_pressure_drop",
             PerformancesAirPressureDrop(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                heat_exchanger_id=heat_exchanger_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "heat_exchanger_drag",
+            PerformancesHeatExchangerDrag(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 heat_exchanger_id=heat_exchanger_id,
                 number_of_points=number_of_points,

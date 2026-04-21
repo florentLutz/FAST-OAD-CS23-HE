@@ -20,10 +20,9 @@ class PerformancesNozzleInletTemperature(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            name="diffuser_exit_temperature",
+            name="heat_exchanger_exit_temperature",
             units="K",
             val=np.nan,
-            shape=number_of_points,
         )
         self.add_input(
             "exterior_temperature",
@@ -39,16 +38,22 @@ class PerformancesNozzleInletTemperature(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="*",
+            wrt="exterior_temperature",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
             val=0.5,
         )
+        self.declare_partials(
+            of="*",
+            wrt="heat_exchanger_exit_temperature",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=0.5,
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        number_of_points = self.options["number_of_points"]
-
         outputs["nozzle_inlet_temperature"] = 0.5 * (
-            inputs["diffuser_exit_temperature"] + inputs["exterior_temperature"]
+            inputs["heat_exchanger_exit_temperature"] + inputs["exterior_temperature"]
         )

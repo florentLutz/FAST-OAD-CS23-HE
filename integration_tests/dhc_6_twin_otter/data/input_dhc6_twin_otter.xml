@@ -402,7 +402,7 @@
           <climb>
             <v_eas units="knot" is_input="True">130.0</v_eas>
             <climb_rate>
-              <cruise_level units="ft/min" is_input="True">500.0<!--target climb rate at the end of climb--></cruise_level>
+              <cruise_level units="ft/min" is_input="True">1000.0<!--target climb rate at the end of climb--></cruise_level>
               <sea_level units="ft/min" is_input="True">1600.0<!--target climb rate at sea level--></sea_level>
             </climb_rate>
           </climb>

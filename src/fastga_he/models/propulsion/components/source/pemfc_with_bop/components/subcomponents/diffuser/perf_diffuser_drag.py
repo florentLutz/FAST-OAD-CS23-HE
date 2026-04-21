@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesNozzleDrag(om.ExplicitComponent):
+class PerformancesDiffuserDrag(om.ExplicitComponent):
     """
-    Computation of the nozzle drag.
+    Computation of the drag produced from the diffuser.
     """
 
     def initialize(self):
@@ -22,7 +22,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="nozzle_id",
+            name="diffuser_id",
             default=None,
             desc="Identifier of the diffuser",
             allow_none=False,
@@ -31,13 +31,13 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        nozzle_id = self.options["nozzle_id"]
+        diffuser_id = self.options["diffuser_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":air_pressure_drop",
             val=np.nan,
             units="Pa",
@@ -47,7 +47,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":exit_area",
             val=np.nan,
             units="m**2",
@@ -57,9 +57,9 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":drag",
-            val=0.0,
+            val=0.3,
             units="N",
             shape=number_of_points,
         )
@@ -67,14 +67,14 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
     def setup_partials(self):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        nozzle_id = self.options["nozzle_id"]
+        diffuser_id = self.options["diffuser_id"]
 
         self.declare_partials(
             of="*",
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":air_pressure_drop",
             method="exact",
             rows=np.arange(number_of_points),
@@ -85,7 +85,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":exit_area",
             method="exact",
             rows=np.arange(number_of_points),
@@ -94,27 +94,27 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        nozzle_id = self.options["nozzle_id"]
+        diffuser_id = self.options["diffuser_id"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":drag"
         ] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + nozzle_id
+                + diffuser_id
                 + ":air_pressure_drop"
             ]
             * inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + nozzle_id
+                + diffuser_id
                 + ":exit_area"
             ]
         )
@@ -122,18 +122,18 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        nozzle_id = self.options["nozzle_id"]
+        diffuser_id = self.options["diffuser_id"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":drag",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":air_pressure_drop",
         ] = np.full(
             number_of_points,
@@ -141,7 +141,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
-                + nozzle_id
+                + diffuser_id
                 + ":exit_area"
             ],
         )
@@ -150,17 +150,17 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":drag",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":exit_area",
         ] = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + nozzle_id
+            + diffuser_id
             + ":air_pressure_drop"
         ]

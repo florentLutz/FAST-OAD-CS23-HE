@@ -752,9 +752,17 @@ def test_perf_nozzle_pressure_drop():
 def test_perf_nozzle_drag():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
-    ivc.add_output("nozzle_exit_air_speed", val=160.0, units="m/s", shape=NB_POINTS_TEST)
-    ivc.add_output("true_air_speed", val=80.0, units="m/s", shape=NB_POINTS_TEST)
-    ivc.add_output("air_mass_flow_rate", val=0.5, units="kg/s", shape=NB_POINTS_TEST)
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:nozzle_1:air_pressure_drop",
+        val=1889.24,
+        units="Pa",
+        shape=NB_POINTS_TEST,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:nozzle_1:exit_area",
+        val=0.0326,
+        units="m**2",
+    )
 
     problem = run_system(
         PerformancesNozzleDrag(
@@ -768,7 +776,7 @@ def test_perf_nozzle_drag():
     # Research expected output value in .xml file
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:nozzle_1:drag", units="N"
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 40.0), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 61.6), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -805,7 +813,12 @@ def test_perf_nozzle():
         val=0.161,
     )
     ivc.add_output(
-        "nozzle_inlet_temperature",
+        "heat_exchanger_exit_temperature",
+        val=330.0,
+        units="K",
+    )
+    ivc.add_output(
+        "exterior_temperature",
         val=300.0,
         units="K",
         shape=NB_POINTS_TEST,
@@ -814,12 +827,6 @@ def test_perf_nozzle():
         "true_air_speed",
         val=80.0,
         units="m/s",
-        shape=NB_POINTS_TEST,
-    )
-    ivc.add_output(
-        "air_mass_flow_rate",
-        val=0.5,
-        units="kg/s",
         shape=NB_POINTS_TEST,
     )
     ivc.add_output(
@@ -837,6 +844,11 @@ def test_perf_nozzle():
         val=6.21e-4,
         units="unitless",
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:nozzle_1:exit_area",
+        val=0.0326,
+        units="m**2",
+    )
 
     problem = run_system(
         PerformancesNozzle(
@@ -851,6 +863,6 @@ def test_perf_nozzle():
     # Research expected output value in .xml file
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:nozzle_1:drag", units="N"
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 40.0), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 55.4), rel=1e-2)
 
     problem.check_partials(compact_print=True)

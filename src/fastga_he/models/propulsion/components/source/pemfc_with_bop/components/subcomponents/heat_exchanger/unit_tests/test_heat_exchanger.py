@@ -21,6 +21,7 @@ from ..perf_fanning_friction_factor import PerformancesFanningFrictionFactor
 from ..perf_pressure_drop_coefficient import PerformancesPressureDropCoefficient
 from ..perf_air_pressure_drop import PerformancesAirPressureDrop
 from ..perf_coolant_pressure_drop import PerformancesCoolantPressureDrop
+from ..perf_heat_exchanger_drag import PerformancesHeatExchangerDrag
 from ..perf_heat_exchanger import PerformancesHeatExchanger
 
 from ..sizing_fin_geometry import SizingHeatExchangerFinGeometry
@@ -440,6 +441,7 @@ def test_pressure_drop_coefficient():
 def test_air_pressure_drop():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
+    ivc.add_output("true_airspeed", units="m/s", val=108.0, shape=NB_POINTS_TEST)
     ivc.add_output("entrance_pressure_drop_coefficient", units="unitless", val=-0.5096)
     ivc.add_output("exit_pressure_drop_coefficient", units="unitless", val=1.04)
     ivc.add_output(
@@ -483,7 +485,50 @@ def test_air_pressure_drop():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_pressure_drop",
         units="Pa",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 12262.23), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 22759.83), rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_exchanger_drag():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:no_flow_length",
+        units="m",
+        val=0.719,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:free_flow_frontal_area_ratio",
+        units="unitless",
+        val=0.48,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:coolant_flow_length",
+        units="m",
+        val=0.05,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1"
+        ":air_pressure_drop",
+        units="Pa",
+        val=22759.83,
+        shape=NB_POINTS_TEST,
+    )
+
+    problem = run_system(
+        PerformancesHeatExchangerDrag(
+            pemfc_stack_bop_id="pemfc_stack_bop_1",
+            heat_exchanger_id="heat_exchanger_1",
+            number_of_points=NB_POINTS_TEST,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:drag",
+        units="N",
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 392.7), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -542,6 +587,7 @@ def test_heat_exchanger_performance():
     ivc = om.IndepVarComp()
     ivc.add_output("air_outlet_temperature", units="K", val=300.0)
     ivc.add_output("air_inlet_temperature", units="K", val=250.0)
+    ivc.add_output("true_airspeed", units="m/s", val=108.0, shape=NB_POINTS_TEST)
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_flow_rate",
         units="kg/h",
