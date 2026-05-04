@@ -693,3 +693,38 @@ def test_lca_bar_chart_absolute_phase_hybrid():
     fig.write_image(FIGURE_FOLDER_PATH / "ga_component_contribution_ref.pdf")
     time.sleep(3)
     fig.write_image(FIGURE_FOLDER_PATH / "ga_component_contribution_ref.pdf")
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_presentation():
+    fig = lca_impacts_bar_chart_with_components_absolute(
+        RESULTS_SENSITIVITY_FOLDER_PATH / "hybrid_kodiak_lca.xml_7077.xml",
+        name_aircraft="Hybrid Kodiak 100",
+        detailed_component_contributions=True,
+        cutoff_criteria=2.5,
+        legend_rename={
+            "battery pack: production": "Battery pack production",
+            "airframe: production": "Airframe production",
+            "turboshaft: operation": "Kerosene combustion",
+            "kerosene for mission: operation": "Kerosene production",
+        },
+    )
+    fig.update_layout(title_text=None)
+    fig.update_layout(height=800, width=1600, font=dict(size=20))
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_search_engine_presentation():
+    impact_list = ["*"]
+    phase_list = ["*"]
+    component_list = ["battery_pack_1"]
+
+    impacts_value = lca_impacts_search_table(
+        RESULTS_SENSITIVITY_FOLDER_PATH / "hybrid_kodiak_lca.xml_7077.xml",
+        impact_list,
+        phase_list,
+        component_list,
+        rel=True,
+    )
+    print(impacts_value)

@@ -1278,7 +1278,7 @@ def test_compare_designs():
         hybrid_design_output_file, name="Hybrid Kodiak 100 on design mission", fig=fig
     )
     fig = mass_breakdown_bar_plot(
-        elec_design_output_file, name="Electric design on design mission", fig=fig
+        elec_design_output_file, name="Electric Kodiak-like on design mission", fig=fig
     )
     fig.update_layout(font=dict(size=20))
     fig.show()
