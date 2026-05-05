@@ -1290,9 +1290,9 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:current_ac_caliber",
-        units="A",
-        val=150.0,
+        "data:propulsion:he_power_train:rectifier:rectifier_1:number_of_diodes",
+        units="unitless",
+        val=6.0,
     )
 
     problem = run_system(
@@ -1302,7 +1302,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost", units="USD"
-    ) == pytest.approx(2292.0, rel=1e-2)
+    ) == pytest.approx(2700.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 

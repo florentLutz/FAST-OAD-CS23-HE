@@ -1560,9 +1560,9 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        name="data:propulsion:he_power_train:inverter:inverter_1:ac_power_out_rating",
-        val=200.0,
-        units="kW",
+        name="data:propulsion:he_power_train:inverter:inverter_1:number_of_switches",
+        val=18.0,
+        units="unitless",
     )
 
     problem = run_system(
@@ -1572,7 +1572,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:purchase_cost", units="USD"
-    ) == pytest.approx(7629.22, rel=1e-3)
+    ) == pytest.approx(10350.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

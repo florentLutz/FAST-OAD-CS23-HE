@@ -1409,9 +1409,9 @@ def test_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_rating",
-        364.0,
-        units="kW",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:number_of_switches",
+        4.0,
+        units="unitless",
     )
 
     problem = run_system(
@@ -1422,7 +1422,7 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
         units="USD",
-    ) == pytest.approx(6617.61, rel=1e-2)
+    ) == pytest.approx(4600.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
