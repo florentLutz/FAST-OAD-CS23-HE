@@ -17,6 +17,7 @@ from fastga_he.powertrain_builder.powertrain import FASTGAHEPowerTrainConfigurat
 
 from .simple_assembly.performances_simple_assembly_gh2_pemfc import PerformancesAssembly
 from .simple_assembly.sizing_simple_assembly_gh2_pemfc import SizingAssembly
+from .simple_assembly.full_simple_bop_assembly import FullSimpleBOPAssembly
 from .simple_assembly.full_simple_assembly_gh2_pemfc import FullSimpleAssembly, FullSimpleAssemblyPT
 
 from ..assemblers.sizing_from_pt_file import PowerTrainSizingFromFile
@@ -910,3 +911,57 @@ def test_slipstream_from_pt_file():
         ),
         rel=1e-3,
     )
+
+
+def test_performances_sizing_assembly_pemfc_gh2_bop():
+    oad.RegisterSubmodel.active_models["submodel.propulsion.constraints.pmsm.rpm"] = (
+        "fastga_he.submodel.propulsion.constraints.pmsm.rpm.ensure"
+    )
+
+    ivc = get_indep_var_comp(
+        list_inputs(FullSimpleAssembly(number_of_points=NB_POINTS_TEST)),
+        __file__,
+        XML_FILE,
+    )
+    altitude = np.full(NB_POINTS_TEST, 0.0)
+    ivc.add_output("altitude", val=altitude, units="m")
+    ivc.add_output("density", val=Atmosphere(altitude).density, units="kg/m**3")
+    ivc.add_output("true_airspeed", val=np.linspace(81.8, 90.5, NB_POINTS_TEST), units="m/s")
+    ivc.add_output("thrust", val=np.linspace(1550, 1450, NB_POINTS_TEST), units="N")
+    ivc.add_output(
+        "exterior_temperature",
+        units="degK",
+        val=Atmosphere(altitude, altitude_in_feet=False).temperature,
+    )
+    ivc.add_output("time_step", units="s", val=np.full(NB_POINTS_TEST, 500))
+
+    problem = oad.FASTOADProblem(reports=False)
+    model = problem.model
+    model.add_subsystem(name="inputs", subsys=ivc, promotes=["*"])
+    model.add_subsystem(
+        name="full", subsys=FullSimpleAssembly(number_of_points=NB_POINTS_TEST), promotes=["*"]
+    )
+
+    problem.setup()
+    # om.n2(problem)
+    # Run problem and check obtained value(s) is/(are) correct
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+
+    write_outputs(
+        pth.join(outputs.__path__[0], "full_assembly_sizing_pemfc_gh2_enforce.xml"),
+        problem,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
+    ) == pytest.approx(30.85, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg"
+    ) == pytest.approx(117.5, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:effective_area", units="cm**2"
+    ) == pytest.approx(932.32, rel=1e-2)

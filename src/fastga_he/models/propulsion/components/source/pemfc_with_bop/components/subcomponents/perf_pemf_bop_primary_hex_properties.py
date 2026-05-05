@@ -148,8 +148,8 @@ class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
             shape=number_of_points,
         )
 
-        self.add_output("air_inlet_temperature", val=300.0, units="K")
-        self.add_output("air_outlet_temperature", val=360.0, units="K")
+        self.add_output("air_inlet_temperature", val=370.0, units="K")
+        self.add_output("air_outlet_temperature", val=345.0, units="K")
         self.add_output("air_static_pressure", val=101325, units="Pa")
 
     def setup_partials(self):
@@ -275,7 +275,7 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
 
         self.add_output(
             name="minimum_heat_capacity",
-            val=300.0,
+            val=500.0,
             units="W/K",
         )
 
@@ -389,19 +389,21 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             units="K",
         )
         self.add_input(
-            "air_outlet_temperature",
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:inlet_temperature",
             val=np.nan,
             units="K",
         )
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max",
-            units="kg/s",
+            + ":coolant:mass_flow_rate",
             val=np.nan,
+            units="kg/s",
         )
         self.add_input(
-            "air_mean_specific_heat_capacity",
+            name="mean_coolant_specific_heat_capacity",
             val=np.nan,
             units="J/kg/K",
         )
@@ -436,13 +438,17 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
         primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
 
         air_inlet_temperature = inputs["air_inlet_temperature"]
-        air_outlet_temperature = inputs["air_outlet_temperature"]
-        air_consumption_max = inputs[
+        coolant_inlet_temperature = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max"
+            + ":coolant:inlet_temperature"
         ]
-        air_mean_specific_heat_capacity = inputs["air_mean_specific_heat_capacity"]
+        coolant_mass_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate"
+        ]
+        mean_coolant_specific_heat_capacity = inputs["mean_coolant_specific_heat_capacity"]
         mini_heat_capacity = inputs["minimum_heat_capacity"]
         heat_exchanger_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -456,22 +462,30 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:intermediate_temperature"
-        ] = air_inlet_temperature + air_consumption_max * air_mean_specific_heat_capacity * (
-            air_outlet_temperature - air_inlet_temperature
-        ) / (mini_heat_capacity * heat_exchanger_efficiency)
+        ] = (
+            mean_coolant_specific_heat_capacity * coolant_mass_flow_rate * coolant_inlet_temperature
+            - heat_exchanger_efficiency * mini_heat_capacity * air_inlet_temperature
+        ) / (
+            mean_coolant_specific_heat_capacity * coolant_mass_flow_rate
+            - heat_exchanger_efficiency * mini_heat_capacity
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         primary_heat_exchanger_id = self.options["primary_heat_exchanger_id"]
 
         air_inlet_temperature = inputs["air_inlet_temperature"]
-        air_outlet_temperature = inputs["air_outlet_temperature"]
-        air_consumption_max = inputs[
+        coolant_inlet_temperature = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max"
+            + ":coolant:inlet_temperature"
         ]
-        air_mean_specific_heat_capacity = inputs["air_mean_specific_heat_capacity"]
+        coolant_mass_flow_rate = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate"
+        ]
+        mean_coolant_specific_heat_capacity = inputs["mean_coolant_specific_heat_capacity"]
         mini_heat_capacity = inputs["minimum_heat_capacity"]
         heat_exchanger_efficiency = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -481,27 +495,17 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             + ":heat_exchanger_efficiency"
         ]
 
+        common_denominator = (
+            mean_coolant_specific_heat_capacity * coolant_mass_flow_rate
+            - heat_exchanger_efficiency * mini_heat_capacity
+        )
+
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:intermediate_temperature",
             "air_inlet_temperature",
-        ] = 1.0 - (
-            air_consumption_max
-            * air_mean_specific_heat_capacity
-            / (mini_heat_capacity * heat_exchanger_efficiency)
-        )
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:intermediate_temperature",
-            "air_outlet_temperature",
-        ] = (
-            air_consumption_max
-            * air_mean_specific_heat_capacity
-            / (mini_heat_capacity * heat_exchanger_efficiency)
-        )
+        ] = -mini_heat_capacity * heat_exchanger_efficiency / common_denominator
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -509,22 +513,35 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             + ":coolant:intermediate_temperature",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":air_consumption_max",
-        ] = (
-            air_mean_specific_heat_capacity
-            * (air_outlet_temperature - air_inlet_temperature)
-            / (mini_heat_capacity * heat_exchanger_efficiency)
+            + ":coolant:inlet_temperature",
+        ] = mean_coolant_specific_heat_capacity * coolant_mass_flow_rate / common_denominator
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:intermediate_temperature",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate",
+        ] = -(
+            mean_coolant_specific_heat_capacity
+            * mini_heat_capacity
+            * heat_exchanger_efficiency
+            * (coolant_inlet_temperature - air_inlet_temperature)
+            / common_denominator**2.0
         )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":coolant:intermediate_temperature",
-            "air_mean_specific_heat_capacity",
-        ] = (
-            air_consumption_max
-            * (air_outlet_temperature - air_inlet_temperature)
-            / (mini_heat_capacity * heat_exchanger_efficiency)
+            "mean_coolant_specific_heat_capacity",
+        ] = -(
+            coolant_mass_flow_rate
+            * mini_heat_capacity
+            * heat_exchanger_efficiency
+            * (coolant_inlet_temperature - air_inlet_temperature)
+            / common_denominator**2.0
         )
 
         partials[
@@ -532,11 +549,12 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":coolant:intermediate_temperature",
             "minimum_heat_capacity",
-        ] = -(
-            air_consumption_max
-            * air_mean_specific_heat_capacity
-            * (air_outlet_temperature - air_inlet_temperature)
-            / (mini_heat_capacity**2.0 * heat_exchanger_efficiency)
+        ] = (
+            mean_coolant_specific_heat_capacity
+            * coolant_mass_flow_rate
+            * heat_exchanger_efficiency
+            * (coolant_inlet_temperature - air_inlet_temperature)
+            / common_denominator**2.0
         )
 
         partials[
@@ -548,11 +566,12 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
             + ":"
             + primary_heat_exchanger_id
             + ":heat_exchanger_efficiency",
-        ] = -(
-            air_consumption_max
-            * air_mean_specific_heat_capacity
-            * (air_outlet_temperature - air_inlet_temperature)
-            / (mini_heat_capacity * heat_exchanger_efficiency**2.0)
+        ] = (
+            mean_coolant_specific_heat_capacity
+            * coolant_mass_flow_rate
+            * mini_heat_capacity
+            * (coolant_inlet_temperature - air_inlet_temperature)
+            / common_denominator**2.0
         )
 
 
@@ -589,12 +608,12 @@ class _CoolantTemperature(om.ExplicitComponent):
 
         self.add_output(
             name="coolant_inlet_temperature",
-            val=360.0,
+            val=330.0,
             units="K",
         )
         self.add_output(
             name="coolant_outlet_temperature",
-            val=330.0,
+            val=334.0,
             units="K",
         )
 
@@ -691,7 +710,7 @@ class _AirFlowRate(om.ExplicitComponent):
                 + pemfc_stack_bop_id
                 + ":air_consumption_max"
             ],
-            0.6,
+            0.001,
             np.inf,
         )
 
@@ -705,7 +724,7 @@ class _AirFlowRate(om.ExplicitComponent):
                 + pemfc_stack_bop_id
                 + ":air_consumption_max"
             ],
-            0.6,
+            0.001,
             np.inf,
         )
 

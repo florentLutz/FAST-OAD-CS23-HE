@@ -2,19 +2,16 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
+import numpy as np
 
 
-class PerformancesHumidifierOxidizerTemperature(om.ExplicitComponent):
+class PerformancesPEMFCStackBOPOxidizerTemperature(om.ExplicitComponent):
     """
-    Computes the air temperature of the humidifier.
+    Oxidizer temperature computation of the PEMFC stack, using for BOP and TMS sizing.
     """
 
     def initialize(self):
-        self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
-        )
         self.options.declare(
             name="pemfc_stack_bop_id",
             default=None,
@@ -23,46 +20,40 @@ class PerformancesHumidifierOxidizerTemperature(om.ExplicitComponent):
         )
 
     def setup(self):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":oxidizer_temperature",
+            + ":coolant:inlet_temperature",
             units="K",
             val=np.nan,
             desc="standard operating temperature for the PEMFC",
         )
 
         self.add_output(
-            "oxidizer_temperature",
-            val=335.0,
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":oxidizer_temperature",
             units="K",
-            shape=number_of_points,
+            val=320.0,
         )
 
     def setup_partials(self):
-        number_of_points = self.options["number_of_points"]
-
-        self.declare_partials(
-            of="*",
-            wrt="*",
-            method="exact",
-            rows=np.arange(number_of_points),
-            cols=np.zeros(number_of_points),
-            val=1.0,
-        )
+        self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        number_of_points = self.options["number_of_points"]
 
-        outputs["oxidizer_temperature"] = np.full(
-            number_of_points,
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":oxidizer_temperature"
+        ] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":oxidizer_temperature"
-            ],
+                + ":coolant:inlet_temperature"
+            ]
+            + 1.0
         )

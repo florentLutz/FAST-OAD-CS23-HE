@@ -44,9 +44,7 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity",
+            + ":coolant:transport_velocity",
             units="m/s",
             val=1.5,
             desc="Pipe flow velocity",
@@ -78,9 +76,7 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
         flow_velocity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity"
+            + ":coolant:transport_velocity"
         ]
 
         outputs[
@@ -104,9 +100,7 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
         flow_velocity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity"
+            + ":coolant:transport_velocity"
         ]
 
         partials[
@@ -137,7 +131,5 @@ class SizingPipeInnerRadius(om.ExplicitComponent):
             + ":radius",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity",
+            + ":coolant:transport_velocity",
         ] = -0.5 * np.sqrt(mass_flow / (np.pi * density * flow_velocity**3.0))

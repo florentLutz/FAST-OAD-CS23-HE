@@ -49,6 +49,12 @@ class PerformancesNozzleInletPressure(om.ExplicitComponent):
             val=np.nan,
             shape=number_of_points,
         )
+        self.add_input(
+            "ambient_pressure",
+            units="Pa",
+            val=np.nan,
+            shape=number_of_points,
+        )
 
         self.add_output("nozzle_inlet_pressure", val=1e5, units="Pa", shape=number_of_points)
 
@@ -59,11 +65,11 @@ class PerformancesNozzleInletPressure(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="diffuser_exit_pressure",
+            wrt=["diffuser_exit_pressure", "ambient_pressure"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
-            val=1.0,
+            val=0.5,
         )
         self.declare_partials(
             of="*",
@@ -75,15 +81,14 @@ class PerformancesNozzleInletPressure(om.ExplicitComponent):
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
-            val=-1.0,
+            val=-0.5,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         heat_exchanger_id = self.options["connected_heat_exchanger_id"]
 
-        outputs["nozzle_inlet_pressure"] = (
+        outputs["nozzle_inlet_pressure"] = 0.5 * (
             inputs["diffuser_exit_pressure"]
             - inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -92,4 +97,5 @@ class PerformancesNozzleInletPressure(om.ExplicitComponent):
                 + heat_exchanger_id
                 + ":air_pressure_drop"
             ]
+            + inputs["ambient_pressure"]
         )

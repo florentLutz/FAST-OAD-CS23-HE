@@ -34,11 +34,13 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
         nozzle_id = self.options["nozzle_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + nozzle_id
-            + ":air_pressure_drop",
+            "exit_pressure",
+            val=np.nan,
+            units="Pa",
+            shape=number_of_points,
+        )
+        self.add_input(
+            "ambient_pressure",
             val=np.nan,
             units="Pa",
             shape=number_of_points,
@@ -71,11 +73,7 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + nozzle_id
-            + ":air_pressure_drop",
+            wrt=["exit_pressure", "ambient_pressure"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -96,33 +94,39 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
 
+        exit_area = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + nozzle_id
+            + ":exit_area"
+        ]
+        pressure_difference = inputs["ambient_pressure"] - inputs["exit_pressure"]
+
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
             + ":drag"
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + nozzle_id
-                + ":air_pressure_drop"
-            ]
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + nozzle_id
-                + ":exit_area"
-            ]
-        )
+        ] = np.clip(exit_area * pressure_difference, 0.0, np.inf)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         nozzle_id = self.options["nozzle_id"]
+
+        exit_area = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + nozzle_id
+            + ":exit_area"
+        ]
+        exit_pressure = inputs["exit_pressure"]
+        ambient_pressure = inputs["ambient_pressure"]
+        drag = exit_area * (ambient_pressure - exit_pressure)
+        clipped_drag = np.clip(drag, 0.0, np.inf)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -130,21 +134,24 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":drag",
+            "exit_pressure",
+        ] = np.where(
+            drag == clipped_drag,
+            np.full(
+                number_of_points,
+                exit_area,
+            ),
+            1e-6,
+        )
+
+        partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":air_pressure_drop",
-        ] = np.full(
-            number_of_points,
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + nozzle_id
-                + ":exit_area"
-            ],
-        )
+            + ":drag",
+            "exit_pressure",
+        ] = np.where(drag == clipped_drag, np.full(number_of_points, -exit_area), 1e-6)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -157,10 +164,4 @@ class PerformancesNozzleDrag(om.ExplicitComponent):
             + ":"
             + nozzle_id
             + ":exit_area",
-        ] = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + nozzle_id
-            + ":air_pressure_drop"
-        ]
+        ] = np.where(drag == clipped_drag, ambient_pressure - exit_pressure, 1e-6)

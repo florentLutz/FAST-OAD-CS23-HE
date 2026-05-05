@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 from .compressor import PerformancesCompressor
-from .inlet import PerformancesInlet
+from .scoop_inlet import PerformancesScoopInlet
 from .heat_exchanger import PerformancesHeatExchanger
 from .humidifier import PerformancesHumidifier
 from .pipe import PerformancesPipe
@@ -17,6 +17,7 @@ from .perf_pemf_bop_primary_hex_properties import PerformancesPrimaryHeatExchang
 from .perf_pemf_bop_supplement_hex_properties import (
     PerformancesSupplementHeatExchangerThermalBalance,
 )
+from .perf_air_cooling_flow_rate import PerformancesAirCoolingFlowRate
 from .perf_pemf_bop_speed_of_sound import PerformancesAirSpeedOfSound
 from .perf_pemf_bop_mach import PerformancesAirMach
 
@@ -112,6 +113,42 @@ class PerformancesPEMFCBOP(om.Group):
         humidifier_id = self.options["humidifier_id"]
 
         self.add_subsystem(
+            "speed_of_sound",
+            PerformancesAirSpeedOfSound(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "mach", PerformancesAirMach(number_of_points=number_of_points), promotes=["*"]
+        )
+        self.add_subsystem(
+            "air_cooling_flow_rate",
+            PerformancesAirCoolingFlowRate(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                number_of_points=number_of_points,
+                connected_inlet_id=air_inlet_id,
+                coolant_fluid_type=coolant_fluid_type,
+                connected_heat_exchanger_id=supplement_heat_exchanger_id,
+            ),
+            promotes=["data:*", "air_consumption"],
+        )
+        self.add_subsystem(
+            "air_inlet",
+            PerformancesScoopInlet(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                air_inlet_id=air_inlet_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=[
+                "data:*",
+                "mach",
+                "altitude",
+                "true_airspeed",
+                "density",
+                "air_consumption",
+                "throat_air_speed",
+            ],
+        )
+        self.add_subsystem(
             "primary_heat_exchanger_loop",
             PerformancesPrimaryHeatExchangerLoop(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
@@ -126,32 +163,7 @@ class PerformancesPEMFCBOP(om.Group):
                 "altitude",
                 "exterior_temperature",
                 "air_consumption",
-                "true_airspeed",
-            ],
-        )
-        self.add_subsystem(
-            "speed_of_sound",
-            PerformancesAirSpeedOfSound(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "mach", PerformancesAirMach(number_of_points=number_of_points), promotes=["*"]
-        )
-        self.add_subsystem(
-            "air_inlet",
-            PerformancesInlet(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                air_inlet_id=air_inlet_id,
-                number_of_points=number_of_points,
-            ),
-            promotes=[
-                "data:*",
-                "mach",
-                "exterior_temperature",
-                "altitude",
-                "true_airspeed",
-                "density",
-                "air_consumption",
+                "throat_air_speed",
             ],
         )
         self.add_subsystem(
@@ -161,7 +173,7 @@ class PerformancesPEMFCBOP(om.Group):
                 diffuser_id=diffuser_id,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "throat_air_speed", "exterior_temperature"],
         )
         self.add_subsystem(
             "supplement_heat_exchanger_air_properties",
@@ -182,7 +194,7 @@ class PerformancesPEMFCBOP(om.Group):
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "true_airspeed"],
+            promotes=["data:*", "throat_air_speed"],
         )
         self.add_subsystem(
             "nozzle",
@@ -192,7 +204,7 @@ class PerformancesPEMFCBOP(om.Group):
                 number_of_points=number_of_points,
                 connected_heat_exchanger_id=supplement_heat_exchanger_id,
             ),
-            promotes=["data:*", "exterior_temperature", "nozzle_exit_air_speed"],
+            promotes=["data:*", "exterior_temperature", "true_airspeed"],
         )
         self.add_subsystem(
             "pipe",
@@ -221,12 +233,7 @@ class PerformancesPEMFCBOP(om.Group):
             "bop_drag",
             PerformancesBOPDrag(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
-                drag_component_ids=[
-                    air_inlet_id,
-                    diffuser_id,
-                    supplement_heat_exchanger_id,
-                    nozzle_id,
-                ],
+                drag_component_ids=[nozzle_id],
                 number_of_points=number_of_points,
             ),
             promotes=["data:*"],
@@ -276,9 +283,18 @@ class PerformancesPEMFCBOP(om.Group):
             "supplement_heat_exchanger_air_properties.diffuser_exit_temperature",
         )
         self.connect("diffuser.exit_air_speed", "nozzle.entry_air_speed")
-        self.connect("air_inlet.throat_total_pressure", "diffuser.throat_air_pressure")
-        self.connect("air_inlet.throat_total_temperature", "diffuser.throat_air_temperature")
-        self.connect("air_inlet.throat_air_speed", "diffuser.throat_air_speed")
+        self.connect("diffuser.diffuser_exit_total_pressure", "nozzle.diffuser_exit_total_pressure")
+        self.connect("air_inlet.ambient_pressure", "diffuser.ambient_pressure")
+        self.connect("air_inlet.ambient_pressure", "nozzle.ambient_pressure")
+        self.connect("air_inlet.ambient_pressure", "air_cooling_flow_rate.ambient_pressure")
+
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.options["iprint"] = 2
+        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["rtol"] = 1e-4
+        self.nonlinear_solver.options["stall_limit"] = 10
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
+        self.linear_solver = om.DirectSolver()
 
 
 class PerformancesBOPDrag(om.ExplicitComponent):
@@ -438,6 +454,7 @@ class PerformancesBOPPower(om.ExplicitComponent):
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
+            val=1.0,
         )
         self.declare_partials(
             "*",
@@ -449,6 +466,7 @@ class PerformancesBOPPower(om.ExplicitComponent):
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.zeros(number_of_points),
+            val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -460,31 +478,7 @@ class PerformancesBOPPower(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":bop_power_required"
-        ] = np.clip(
-            inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + compressor_id
-                + ":power_required"
-            ]
-            + inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + pump_id
-                + ":power_rating"
-            ],
-            0.0,
-            240.0,
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        compressor_id = self.options["compressor_id"]
-        pump_id = self.options["pump_id"]
-
-        unclipped_power_required = (
+        ] = (
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
@@ -500,30 +494,6 @@ class PerformancesBOPPower(om.ExplicitComponent):
                 + ":power_rating"
             ]
         )
-
-        clipped_power_required = np.clip(unclipped_power_required, 0.0, 240.0)
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":bop_power_required",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + compressor_id
-            + ":power_required",
-        ] = np.where(unclipped_power_required == clipped_power_required, 1.0, 0.0)
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":bop_power_required",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + pump_id
-            + ":power_rating",
-        ] = np.where(unclipped_power_required == clipped_power_required, 1.0, 0.0)
 
 
 class PerformancesPrimaryHeatExchangerLoop(om.Group):
@@ -575,6 +545,15 @@ class PerformancesPrimaryHeatExchangerLoop(om.Group):
         humidifier_id = self.options["humidifier_id"]
 
         self.add_subsystem(
+            "humidifier",
+            PerformancesHumidifier(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                humidifier_id=humidifier_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["data:*", "air_consumption"],
+        )
+        self.add_subsystem(
             "compressor",
             PerformancesCompressor(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
@@ -584,15 +563,6 @@ class PerformancesPrimaryHeatExchangerLoop(om.Group):
                 connected_heat_exchanger_id=primary_heat_exchanger_id,
             ),
             promotes=["data:*", "altitude", "exterior_temperature", "air_consumption"],
-        )
-        self.add_subsystem(
-            "humidifier",
-            PerformancesHumidifier(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                humidifier_id=humidifier_id,
-                number_of_points=number_of_points,
-            ),
-            promotes=["data:*", "air_consumption"],
         )
         self.add_subsystem(
             "primary_heat_exchanger_air_properties",
@@ -612,13 +582,15 @@ class PerformancesPrimaryHeatExchangerLoop(om.Group):
                 coolant_fluid_type=coolant_fluid_type,
                 number_of_points=number_of_points,
             ),
-            promotes=["data:*", "true_airspeed"],
+            promotes=["data:*", "throat_air_speed"],
         )
 
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 5
-        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["rtol"] = 1e-4
+        self.nonlinear_solver.options["stall_limit"] = 10
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
         self.linear_solver = om.DirectSolver()
 
         self.connect(

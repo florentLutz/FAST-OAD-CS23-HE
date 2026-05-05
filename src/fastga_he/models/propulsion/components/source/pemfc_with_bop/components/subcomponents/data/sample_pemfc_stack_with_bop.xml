@@ -56,6 +56,7 @@
                         <hydrogen_reactant_pressure units="atm">1.0</hydrogen_reactant_pressure>
                         <effective_area units="cm**2">16.8</effective_area>
                         <operating_pressure units="atm">1.2</operating_pressure>
+                        <oxidizer_temperature units="degC">65.0</oxidizer_temperature>
                         <dimension>
                             <length units="m">0.11998</length>
                             <width units="m">0.1162</width>
@@ -66,29 +67,32 @@
                             <y_ratio>0.34</y_ratio>
                         </CG>
                         <air_inlet_1>
-              <air_pressure_drop units="Pa" is_input="False">63269.39240649933</air_pressure_drop>
-              <design_air_density units="kg/m**3" is_input="False">1.112</design_air_density>
-              <design_air_mass_flow units="kg/s" is_input="False">2.16</design_air_mass_flow>
-              <design_dynamic_viscosity units="kg/m/s" is_input="False">1.757864864661911e-05</design_dynamic_viscosity>
-              <design_mach units="unitless" is_input="False">0.2972340295561672</design_mach>
-              <design_true_airspeed units="m/s" is_input="False">100.0</design_true_airspeed>
-              <drag units="N" is_input="False">[197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059]</drag>
-              <highlight_width units="m" is_input="True">0.16080402010050251</highlight_width>
-              <layer_thickness_highlight_height_ratio units="unitless" is_input="False">0.37160795494548243</layer_thickness_highlight_height_ratio>
-              <lip_length units="m" is_input="True">0.010050251256281407</lip_length>
-              <lip_ramp_floor_distance units="m" is_input="True">0.04399211496579995</lip_ramp_floor_distance>
-              <mass_flow_ratio units="unitless" is_input="True">3.0<!--The fraction of total air supply divided by pemfc air consumption--></mass_flow_ratio>
-              <max_ambient_dynamic_pressure units="Pa" is_input="False">5560.000000000001</max_ambient_dynamic_pressure>
-              <max_boundary_layer_thickness units="m" is_input="False">0.01634781987616747</max_boundary_layer_thickness>
-              <max_momentum_boundary_layer_thickness units="m" is_input="False">0.0016347819876167471</max_momentum_boundary_layer_thickness>
-              <max_ram_pressure_efficiency units="unitless" is_input="False">0.951214772862814</max_ram_pressure_efficiency>
-              <ramp_angle units="rad" is_input="True">0.12217304763960307<!--Ramp angle of the inlet, defined as the angle between the inlet walls and the horizontal plane--></ramp_angle>
-              <ramp_floor_inlet_plane_distance units="m" is_input="True">0.04901724059394066</ramp_floor_inlet_plane_distance>
-              <ramp_length units="ft" is_input="True">3.28084</ramp_length>
-              <specific_heat_ratio units="unitless" is_input="True">1.4</specific_heat_ratio>
-              <throat_height units="m" is_input="True">0.04020100502512563</throat_height>
-              <throat_height_layer_thickness_ratio units="unitless" is_input="False">0.020754289683132008</throat_height_layer_thickness_ratio>
-            </air_inlet_1>
+                          <air_pressure_drop units="Pa" is_input="False">63269.39240649933</air_pressure_drop>
+                            <design_flow_area units="m**2" is_input="False">0.2135</design_flow_area>
+                            <length units="m" is_input="True">0.3</length>
+                            <design_ambient_dynamic_pressure units="Pa" is_input="False">101325</design_ambient_dynamic_pressure>
+                          <design_air_density units="kg/m**3" is_input="False">1.112</design_air_density>
+                          <design_air_mass_flow units="kg/s" is_input="False">2.16</design_air_mass_flow>
+                          <design_dynamic_viscosity units="kg/m/s" is_input="False">1.757864864661911e-05</design_dynamic_viscosity>
+                          <design_mach units="unitless" is_input="False">0.2972340295561672</design_mach>
+                          <design_true_airspeed units="m/s" is_input="False">100.0</design_true_airspeed>
+                          <drag units="N" is_input="False">[197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059, 197.8260544164059]</drag>
+                          <highlight_width units="m" is_input="True">0.16080402010050251</highlight_width>
+                          <layer_thickness_highlight_height_ratio units="unitless" is_input="False">0.37160795494548243</layer_thickness_highlight_height_ratio>
+                          <lip_length units="m" is_input="True">0.010050251256281407</lip_length>
+                          <lip_ramp_floor_distance units="m" is_input="True">0.04399211496579995</lip_ramp_floor_distance>
+                          <mass_flow_ratio units="unitless" is_input="True">3.0<!--The fraction of total air supply divided by pemfc air consumption--></mass_flow_ratio>
+                          <max_ambient_dynamic_pressure units="Pa" is_input="False">5560.000000000001</max_ambient_dynamic_pressure>
+                          <max_boundary_layer_thickness units="m" is_input="False">0.01634781987616747</max_boundary_layer_thickness>
+                          <max_momentum_boundary_layer_thickness units="m" is_input="False">0.0016347819876167471</max_momentum_boundary_layer_thickness>
+                          <max_ram_pressure_efficiency units="unitless" is_input="False">0.951214772862814</max_ram_pressure_efficiency>
+                          <ramp_angle units="rad" is_input="True">0.12217304763960307<!--Ramp angle of the inlet, defined as the angle between the inlet walls and the horizontal plane--></ramp_angle>
+                          <ramp_floor_inlet_plane_distance units="m" is_input="True">0.04901724059394066</ramp_floor_inlet_plane_distance>
+                          <ramp_length units="ft" is_input="True">3.28084</ramp_length>
+                          <specific_heat_ratio units="unitless" is_input="True">1.4</specific_heat_ratio>
+                          <throat_height units="m" is_input="True">0.04020100502512563</throat_height>
+                          <throat_height_layer_thickness_ratio units="unitless" is_input="False">0.020754289683132008</throat_height_layer_thickness_ratio>
+                        </air_inlet_1>
                         <compressor_1>
                           <efficiency units="unitless" is_input="True">0.85</efficiency>
                           <power_rating units="W" is_input="False">87786.74159569303</power_rating>

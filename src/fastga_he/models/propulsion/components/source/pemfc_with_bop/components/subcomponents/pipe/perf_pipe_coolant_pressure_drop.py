@@ -37,9 +37,7 @@ class PerformancesPipeCoolantPressureDrop(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity",
+            + ":coolant:transport_velocity",
             units="m/s",
             val=1.5,
             desc="Pipe flow velocity",
@@ -94,9 +92,7 @@ class PerformancesPipeCoolantPressureDrop(om.ExplicitComponent):
         velocity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity"
+            + ":coolant:transport_velocity"
         ]
         radius = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -136,9 +132,7 @@ class PerformancesPipeCoolantPressureDrop(om.ExplicitComponent):
         velocity = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity"
+            + ":coolant:transport_velocity"
         ]
         radius = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -179,9 +173,7 @@ class PerformancesPipeCoolantPressureDrop(om.ExplicitComponent):
             + ":coolant_pressure_drop",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + pipe_id
-            + ":transport_velocity",
+            + ":coolant:transport_velocity",
         ] = darcy_friction_factor * density * velocity * number_of_pipes / (4.0 * radius)
 
         partials[

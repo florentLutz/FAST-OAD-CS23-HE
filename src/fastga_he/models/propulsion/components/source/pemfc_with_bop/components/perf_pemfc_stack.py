@@ -7,6 +7,9 @@ import openmdao.api as om
 
 from ..components.perf_direct_bus_connection import PerformancesPEMFCStackDirectBusConnection
 from ..components.perf_pemfc_power import PerformancesPEMFCStackBOPPower
+from ..components.perf_pemfc_oxidizer_temperature import (
+    PerformancesPEMFCStackBOPOxidizerTemperature,
+)
 from ..components.perf_pemfc_thermal_power import PerformancesPEMFCStackBOPThermalPower
 from ..components.perf_pemfc_coolant_temperature import PerformancesPEMFCStackBOPCoolantTemperature
 from ..components.perf_maximum import PerformancesPEMFCStackBOPMaximum
@@ -67,7 +70,7 @@ class PerformancesPEMFCStackBOP(om.Group):
         )
         self.options.declare(
             "coolant_temperature_gradiant",
-            default=10.0,
+            default=20.0,
             desc="The temperature difference of the PEMFC coolant I/O [K]",
         )
 
@@ -96,6 +99,11 @@ class PerformancesPEMFCStackBOP(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 coolant_temperature_gradiant=coolant_temperature_gradiant,
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "oxidizer_temperature",
+            PerformancesPEMFCStackBOPOxidizerTemperature(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )
 
@@ -190,9 +198,10 @@ class PerformancesPEMFCStackBOP(om.Group):
             PerformancesPEMFCStackBOPCoolantMassFlowRate(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 coolant_fluid_type=coolant_fluid_type,
+                number_of_points=number_of_points,
                 coolant_temperature_gradiant=coolant_temperature_gradiant,
             ),
-            promotes=["data:*"],
+            promotes=["data:*", "coolant_mass_flow_rate"],
         )
 
         energy_consumed = om.IndepVarComp()

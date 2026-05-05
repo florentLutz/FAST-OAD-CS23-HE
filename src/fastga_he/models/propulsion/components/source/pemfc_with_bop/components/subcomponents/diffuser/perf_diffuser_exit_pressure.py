@@ -44,7 +44,7 @@ class PerformancesDiffuserExitPressure(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
-            "throat_air_pressure",
+            "ambient_pressure",
             val=np.nan,
             units="Pa",
             shape=number_of_points,
@@ -52,7 +52,7 @@ class PerformancesDiffuserExitPressure(om.ExplicitComponent):
 
         self.add_output(
             "diffuser_exit_pressure",
-            val=0.3,
+            val=7000.0,
             units="Pa",
             shape=number_of_points,
         )
@@ -64,7 +64,7 @@ class PerformancesDiffuserExitPressure(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="throat_air_pressure",
+            wrt="ambient_pressure",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -88,7 +88,7 @@ class PerformancesDiffuserExitPressure(om.ExplicitComponent):
         diffuser_id = self.options["diffuser_id"]
 
         outputs["diffuser_exit_pressure"] = (
-            inputs["throat_air_pressure"]
+            inputs["ambient_pressure"]
             - inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id

@@ -3,6 +3,7 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 import os.path as pth
+import pathlib
 import pytest
 import numpy as np
 import openmdao.api as om
@@ -68,6 +69,7 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "sample_pemfc_stack.xml"
 NB_POINTS_TEST = 10
+RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
 
 def test_pemfc_weight():
@@ -1167,6 +1169,10 @@ def test_performances_pemfc_stack_analytical():
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
     problem.check_partials(compact_print=True)
+
+    # problem.output_file_path = RESULTS_FOLDER_PATH / "test_pemfc _performance_outputs.xml"
+    #
+    # problem.write_outputs()
 
 
 def test_performances_pemfc_stack_analytical_add_bop():

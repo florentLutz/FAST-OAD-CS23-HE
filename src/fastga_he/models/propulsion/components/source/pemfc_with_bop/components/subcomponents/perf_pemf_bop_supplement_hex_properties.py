@@ -220,7 +220,7 @@ class _MeanAirTemperature(om.ExplicitComponent):
             units="K",
         )
 
-        self.add_output("mean_air_temperature", val=310.0, units="K")
+        self.add_output("mean_air_temperature", val=318.0, units="K")
 
     def setup_partials(self):
         self.declare_partials("*", "*", val=0.5)
@@ -282,7 +282,7 @@ class _DesignAirMassFlow(om.ExplicitComponent):
 
         self.add_output(
             "design_air_mass_flow",
-            val=1.8,
+            val=4.0,
             units="kg/s",
         )
 
@@ -391,7 +391,7 @@ class _MinimumHeatCapacity(om.ExplicitComponent):
 
         self.add_output(
             name="minimum_heat_capacity",
-            val=300.0,
+            val=3000.0,
             units="W/K",
         )
 
@@ -522,7 +522,7 @@ class _AirOutletTemperate(om.ExplicitComponent):
 
         self.add_output(
             "air_outlet_temperature",
-            val=340.0,
+            val=335.0,
             units="K",
         )
 
@@ -660,7 +660,7 @@ class _TMSAirOutletTemperate(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":air_outlet_temperature",
-            val=340.0,
+            val=335.0,
             units="K",
         )
 
@@ -792,7 +792,7 @@ class _AirFlowRate(om.ExplicitComponent):
         )
 
     def setup_partials(self):
-        self.declare_partials("*", "*", method="exact")
+        self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -804,19 +804,4 @@ class _AirFlowRate(om.ExplicitComponent):
             + ":"
             + supplement_heat_exchanger_id
             + ":air_flow_rate"
-        ] = np.clip(inputs["design_air_mass_flow"], 0.0, 2.5)
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        supplement_heat_exchanger_id = self.options["supplement_heat_exchanger_id"]
-
-        clipped_flow_rate = np.clip(inputs["design_air_mass_flow"], 0.0, 2.5)
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + supplement_heat_exchanger_id
-            + ":air_flow_rate",
-            "design_air_mass_flow",
-        ] = np.where(clipped_flow_rate == inputs["design_air_mass_flow"], 1.0, 1e-6)
+        ] = inputs["design_air_mass_flow"]

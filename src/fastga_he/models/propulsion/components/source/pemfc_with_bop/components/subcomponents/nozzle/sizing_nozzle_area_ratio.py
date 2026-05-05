@@ -6,7 +6,7 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingNozzleExitArea(om.ExplicitComponent):
+class SizingNozzleAreaRatio(om.ExplicitComponent):
     """
     Computation of the outlet area of the nozzle.
     """
@@ -19,9 +19,9 @@ class SizingNozzleExitArea(om.ExplicitComponent):
             allow_none=False,
         )
         self.options.declare(
-            name="connected_air_inlet_id",
+            name="connected_heat_exchanger_id",
             default=None,
-            desc="Identifier of the connected air inlet",
+            desc="Identifier of the connected heat exchanger",
             allow_none=False,
         )
         self.options.declare(
@@ -33,26 +33,35 @@ class SizingNozzleExitArea(om.ExplicitComponent):
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        connected_air_inlet_id = self.options["connected_air_inlet_id"]
+        connected_heat_exchanger_id = self.options["connected_heat_exchanger_id"]
         nozzle_id = self.options["nozzle_id"]
 
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":design_flow_area",
-            units="m**2",
+            + connected_heat_exchanger_id
+            + ":no_flow_length",
+            units="m",
             val=np.nan,
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":mass_flow_factor",
-            units="unitless",
-            val=3.0,
+            + connected_heat_exchanger_id
+            + ":coolant_flow_length",
+            units="m",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + nozzle_id
+            + ":exit_area",
+            val=np.nan,
+            units="m**2",
         )
 
         self.add_output(
@@ -60,9 +69,9 @@ class SizingNozzleExitArea(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_area",
-            val=0.033,
-            units="m**2",
+            + ":area_ratio",
+            units="unitless",
+            val=2.0,
         )
 
     def setup_partials(self):
@@ -70,22 +79,29 @@ class SizingNozzleExitArea(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        connected_air_inlet_id = self.options["connected_air_inlet_id"]
+        connected_heat_exchanger_id = self.options["connected_heat_exchanger_id"]
         nozzle_id = self.options["nozzle_id"]
 
-        mass_flow_factor = inputs[
+        exit_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":mass_flow_factor"
+            + nozzle_id
+            + ":exit_area"
         ]
-        design_flow_area = inputs[
+        no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":design_flow_area"
+            + connected_heat_exchanger_id
+            + ":no_flow_length"
+        ]
+        coolant_flow_length = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_heat_exchanger_id
+            + ":coolant_flow_length"
         ]
 
         outputs[
@@ -93,27 +109,34 @@ class SizingNozzleExitArea(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_area"
-        ] = design_flow_area * (mass_flow_factor - 1.0) / mass_flow_factor
+            + ":area_ratio"
+        ] = (no_flow_length * coolant_flow_length) / exit_area
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
-        connected_air_inlet_id = self.options["connected_air_inlet_id"]
+        connected_heat_exchanger_id = self.options["connected_heat_exchanger_id"]
         nozzle_id = self.options["nozzle_id"]
 
-        mass_flow_factor = inputs[
+        exit_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":mass_flow_factor"
+            + nozzle_id
+            + ":exit_area"
         ]
-        design_flow_area = inputs[
+        no_flow_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":design_flow_area"
+            + connected_heat_exchanger_id
+            + ":no_flow_length"
+        ]
+        coolant_flow_length = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_heat_exchanger_id
+            + ":coolant_flow_length"
         ]
 
         partials[
@@ -121,23 +144,36 @@ class SizingNozzleExitArea(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_area",
+            + ":area_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":design_flow_area",
-        ] = (mass_flow_factor - 1.0) / mass_flow_factor
+            + nozzle_id
+            + ":exit_area",
+        ] = -(no_flow_length * coolant_flow_length) / exit_area**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + nozzle_id
-            + ":exit_area",
+            + ":area_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
-            + connected_air_inlet_id
-            + ":mass_flow_factor",
-        ] = design_flow_area / mass_flow_factor**2.0
+            + connected_heat_exchanger_id
+            + ":no_flow_length",
+        ] = coolant_flow_length / exit_area
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + nozzle_id
+            + ":area_ratio",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + connected_heat_exchanger_id
+            + ":coolant_flow_length",
+        ] = no_flow_length / exit_area

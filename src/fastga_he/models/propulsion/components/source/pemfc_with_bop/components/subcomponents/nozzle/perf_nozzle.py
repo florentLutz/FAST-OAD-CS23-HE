@@ -12,9 +12,10 @@ from .perf_nozzle_darcy_friction_factor import PerformancesNozzleDarcyFrictionFa
 from .perf_nozzle_contraction_loss_coeff import PerformancesNozzleContractionLossCoefficient
 from .perf_nozzle_friction_loss_coeff import PerformancesNozzleFrictionLossCoefficient
 from .perf_nozzle_pressure_drop import PerformancesNozzlePressureDrop
+from .perf_nozzle_exit_pressure import PerformancesNozzleExitPressure
 from .perf_nozzle_drag import PerformancesNozzleDrag
 
-from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity
+from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity, FluidSpecificHeatCapacity
 
 
 class PerformancesNozzle(om.Group):
@@ -93,6 +94,15 @@ class PerformancesNozzle(om.Group):
             ],
         )
         self.add_subsystem(
+            "nozzle_air_specific_heat_capacity",
+            FluidSpecificHeatCapacity(number_of_points=number_of_points),
+            promotes=[
+                ("fluid_temperature", "nozzle_inlet_temperature"),
+                ("fluid_pressure", "nozzle_inlet_pressure"),
+                ("fluid_specific_heat_capacity", "nozzle_air_specific_heat_capacity"),
+            ],
+        )
+        self.add_subsystem(
             "nozzle_reynolds_number",
             PerformancesNozzleReynoldsNumber(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
@@ -132,6 +142,16 @@ class PerformancesNozzle(om.Group):
             PerformancesNozzlePressureDrop(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 nozzle_id=nozzle_id,
+                number_of_points=number_of_points,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "nozzle_exit_pressure",
+            PerformancesNozzleExitPressure(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                nozzle_id=nozzle_id,
+                connected_heat_exchanger_id=connected_heat_exchanger_id,
                 number_of_points=number_of_points,
             ),
             promotes=["*"],

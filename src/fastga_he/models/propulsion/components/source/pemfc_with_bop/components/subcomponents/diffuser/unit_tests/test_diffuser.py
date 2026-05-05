@@ -18,7 +18,6 @@ from ..perf_diffuser_friction_loss_coeff import PerformancesDiffuserFrictionLoss
 from ..perf_diffuser_pressure_drop import PerformancesDiffuserPressureDrop
 from ..perf_diffuser_exit_pressure import PerformancesDiffuserExitPressure
 from ..perf_diffuser_exit_temperature import PerformancesDiffuserExitTemperature
-from ..perf_diffuser_drag import PerformancesDiffuserDrag
 from ..perf_diffuser import PerformancesDiffuser
 
 from ..sizing_width_inlet_side import SizingInletSideInnerWidth
@@ -905,39 +904,6 @@ def test_diffuser_exit_temperature():
     problem.check_partials(compact_print=True)
 
 
-def test_diffuser_drag():
-    # Research independent input value in .xml file
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1"
-        ":air_pressure_drop",
-        units="Pa",
-        val=247.37,
-        shape=NB_POINTS_TEST,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:exit_area",
-        units="m**2",
-        val=0.03595,
-    )
-
-    problem = run_system(
-        PerformancesDiffuserDrag(
-            pemfc_stack_bop_id="pemfc_stack_bop_1",
-            diffuser_id="diffuser_1",
-            number_of_points=NB_POINTS_TEST,
-        ),
-        ivc,
-    )
-
-    assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:drag",
-        units="N",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 8.89), rel=1e-2)
-
-    problem.check_partials(compact_print=True)
-
-
 def test_diffuser_performance():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
@@ -947,8 +913,8 @@ def test_diffuser_performance():
         units="unitless",
         val=0.5,
     )
-    ivc.add_output("throat_air_pressure", units="Pa", val=101325.0, shape=NB_POINTS_TEST)
-    ivc.add_output("throat_air_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
+    ivc.add_output("ambient_pressure", units="Pa", val=101325.0, shape=NB_POINTS_TEST)
+    ivc.add_output("exterior_temperature", units="K", val=300.0, shape=NB_POINTS_TEST)
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:diffuser_1:alpha",
         units="deg",

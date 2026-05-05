@@ -56,7 +56,7 @@ class PerformancesDiffuserExitTemperature(om.ExplicitComponent):
             shape=number_of_points,
         )
         self.add_input(
-            "throat_air_temperature",
+            "exterior_temperature",
             val=np.nan,
             units="K",
             shape=number_of_points,
@@ -98,7 +98,7 @@ class PerformancesDiffuserExitTemperature(om.ExplicitComponent):
 
         throat_air_speed = inputs["throat_air_speed"]
         exit_air_speed = inputs["exit_air_speed"]
-        throat_air_temperature = inputs["throat_air_temperature"]
+        exterior_temperature = inputs["exterior_temperature"]
         diffuser_air_specific_heat_capacity = inputs["diffuser_air_specific_heat_capacity"]
         diffuser_air_density = inputs["diffuser_air_density"]
         pressure_drop = inputs[
@@ -110,7 +110,7 @@ class PerformancesDiffuserExitTemperature(om.ExplicitComponent):
         ]
 
         outputs["diffuser_exit_temperature"] = (
-            throat_air_temperature
+            exterior_temperature
             + (
                 0.5 * (throat_air_speed**2.0 - exit_air_speed**2.0)
                 - pressure_drop / diffuser_air_density
@@ -142,7 +142,7 @@ class PerformancesDiffuserExitTemperature(om.ExplicitComponent):
             -exit_air_speed / diffuser_air_specific_heat_capacity
         )
 
-        partials["diffuser_exit_temperature", "throat_air_temperature"] = 1.0
+        partials["diffuser_exit_temperature", "exterior_temperature"] = 1.0
 
         partials["diffuser_exit_temperature", "diffuser_air_specific_heat_capacity"] = (
             -(

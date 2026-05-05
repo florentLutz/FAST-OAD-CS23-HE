@@ -214,7 +214,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + diffuser_id
             + ":alpha"
         ] = np.arctan(
-            (heat_exchanger_no_flow_length - air_inlet_throat_height) / (2 * diffuser_length)
+            (heat_exchanger_no_flow_length - air_inlet_throat_height) / (2.0 * diffuser_length)
         )
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -223,7 +223,7 @@ class SizingDiffuserAngles(om.ExplicitComponent):
             + diffuser_id
             + ":beta"
         ] = np.arctan(
-            (heat_exchanger_coolant_flow_length - inner_inlet_width) / (2 * diffuser_length)
+            (heat_exchanger_coolant_flow_length - inner_inlet_width) / (2.0 * diffuser_length)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):

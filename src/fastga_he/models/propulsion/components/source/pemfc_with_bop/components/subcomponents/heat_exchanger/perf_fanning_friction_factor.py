@@ -52,7 +52,7 @@ class PerformancesFanningFrictionFactor(om.ExplicitComponent):
             0.36 * air_reynolds_number**-0.28,
         )
         outputs["coolant_fanning_friction_factor"] = np.where(
-            air_reynolds_number < 1500,
+            coolant_reynolds_number < 1500,
             6.04 * coolant_reynolds_number**-0.68,
             0.36 * coolant_reynolds_number**-0.28,
         )

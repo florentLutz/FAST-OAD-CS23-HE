@@ -134,10 +134,12 @@ class SizingHeatExchangerFlowLength(om.Group):
         # feeds through the explicit chain back to UA_difference, which is
         # read by the implicit component.
         newton = self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
-        newton.options["atol"] = 1e-8
-        newton.options["rtol"] = 1e-8
+        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+        newton.options["rtol"] = 1e-4
         newton.options["maxiter"] = 10
         newton.options["iprint"] = 0
+        self.nonlinear_solver.options["stall_limit"] = 5
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
 
         self.linear_solver = om.DirectSolver()
 
@@ -233,7 +235,7 @@ class _CoolantFlowLength(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":coolant_flow_length"
-        ] = np.clip(air_flow_area * expansion_area_ratio / no_flow_length, 0.05, 1.0)
+        ] = np.clip(air_flow_area * expansion_area_ratio / no_flow_length, 0.05, np.inf)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -256,7 +258,7 @@ class _CoolantFlowLength(om.ExplicitComponent):
         ]
 
         coolant_flow_length = air_flow_area * expansion_area_ratio / no_flow_length
-        clipped_coolant_flow_length = np.clip(coolant_flow_length, 0.05, 1.0)
+        clipped_coolant_flow_length = np.clip(coolant_flow_length, 0.05, np.inf)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -329,7 +331,7 @@ class _AirFlowLengthImplicit(om.ImplicitComponent):
     def setup(self):
         self.add_input(name="UA_difference", units="W/K", val=0.0)
 
-        self.add_output(name="air_flow_length", units="m", val=0.1)
+        self.add_output(name="air_flow_length", units="m", val=0.05)
 
     def setup_partials(self):
         self.declare_partials("air_flow_length", "UA_difference", val=1.0)
@@ -2284,13 +2286,13 @@ class _FlowLengthOutput(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":air_flow_length"
-        ] = np.clip(inputs["air_flow_length"], 0.05, 1.0)
+        ] = np.clip(inputs["air_flow_length"], 0.05, np.inf)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         heat_exchanger_id = self.options["heat_exchanger_id"]
 
-        clipped_air_flow_length = np.clip(inputs["air_flow_length"], 0.05, 1.0)
+        clipped_air_flow_length = np.clip(inputs["air_flow_length"], 0.05, np.inf)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

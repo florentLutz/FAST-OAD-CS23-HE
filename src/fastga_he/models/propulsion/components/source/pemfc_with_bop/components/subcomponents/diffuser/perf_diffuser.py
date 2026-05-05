@@ -18,7 +18,7 @@ from .perf_diffuser_friction_loss_coeff import PerformancesDiffuserFrictionLossC
 from .perf_diffuser_pressure_drop import PerformancesDiffuserPressureDrop
 from .perf_diffuser_exit_pressure import PerformancesDiffuserExitPressure
 from .perf_diffuser_exit_temperature import PerformancesDiffuserExitTemperature
-from .perf_diffuser_drag import PerformancesDiffuserDrag
+from .perf_diffuser_exit_total_pressure import PerformancesDiffuserExitTotalPressure
 
 from ..fluid_characteristics import FluidDensity, FluidDynamicViscosity, FluidSpecificHeatCapacity
 
@@ -82,8 +82,8 @@ class PerformancesDiffuser(om.Group):
             "diffuser_air_density",
             FluidDensity(number_of_points=number_of_points),
             promotes=[
-                ("fluid_temperature", "throat_air_temperature"),
-                ("fluid_pressure", "throat_air_pressure"),
+                ("fluid_temperature", "exterior_temperature"),
+                ("fluid_pressure", "ambient_pressure"),
                 ("fluid_density", "diffuser_air_density"),
             ],
         )
@@ -91,8 +91,8 @@ class PerformancesDiffuser(om.Group):
             "diffuser_air_dynamic_viscosity",
             FluidDynamicViscosity(number_of_points=number_of_points),
             promotes=[
-                ("fluid_temperature", "throat_air_temperature"),
-                ("fluid_pressure", "throat_air_pressure"),
+                ("fluid_temperature", "exterior_temperature"),
+                ("fluid_pressure", "ambient_pressure"),
                 ("fluid_dynamic_viscosity", "diffuser_air_dynamic_viscosity"),
             ],
         )
@@ -100,8 +100,8 @@ class PerformancesDiffuser(om.Group):
             "diffuser_air_specific_heat_capacity",
             FluidSpecificHeatCapacity(number_of_points=number_of_points),
             promotes=[
-                ("fluid_temperature", "throat_air_temperature"),
-                ("fluid_pressure", "throat_air_pressure"),
+                ("fluid_temperature", "exterior_temperature"),
+                ("fluid_pressure", "ambient_pressure"),
                 ("fluid_specific_heat_capacity", "diffuser_air_specific_heat_capacity"),
             ],
         )
@@ -174,10 +174,8 @@ class PerformancesDiffuser(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
-            "perf_diffuser_drag",
-            PerformancesDiffuserDrag(
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                diffuser_id=diffuser_id,
+            "perf_diffuser_exit_total_pressure",
+            PerformancesDiffuserExitTotalPressure(
                 number_of_points=number_of_points,
             ),
             promotes=["*"],

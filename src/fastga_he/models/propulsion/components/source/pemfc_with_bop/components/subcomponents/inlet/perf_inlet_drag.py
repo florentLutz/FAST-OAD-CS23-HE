@@ -140,8 +140,10 @@ class PerformancesInletDrag(om.Group):
 
         self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 5
-        self.nonlinear_solver.options["rtol"] = 1e-5
+        self.nonlinear_solver.options["maxiter"] = 10
+        self.nonlinear_solver.options["rtol"] = 1e-4
+        self.nonlinear_solver.options["stall_limit"] = 5
+        self.nonlinear_solver.options["stall_tol"] = 1e-5
         self.linear_solver = om.DirectSolver()
 
 

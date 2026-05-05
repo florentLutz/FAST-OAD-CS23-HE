@@ -10,7 +10,7 @@ from .coolant_tank import SizingCoolantTank
 from .diffuser import SizingDiffuser
 from .heat_exchanger import SizingHeatExchanger
 from .humidifier import SizingHumidifier
-from .inlet import SizingInlet
+from .scoop_inlet import SizingScoopInlet
 from .nozzle import SizingNozzle
 from .pipe import SizingPipe
 from .pump import SizingPumpWeight
@@ -140,7 +140,7 @@ class SizingPEMFCBOP(om.Group):
         )
         self.add_subsystem(
             "air_inlet",
-            SizingInlet(
+            SizingScoopInlet(
                 air_inlet_id=air_inlet_id,
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
             ),
@@ -222,6 +222,7 @@ class SizingPEMFCBOP(om.Group):
                 nozzle_id=nozzle_id,
                 connected_heat_exchanger_id=supplement_heat_exchanger_id,
                 connected_diffuser_id=diffuser_id,
+                connected_air_inlet_id=air_inlet_id,
             ),
             promotes=["data:*"],
         )
@@ -317,7 +318,7 @@ class SizingBOPMass(om.ExplicitComponent):
 
 class _HeatExchangerAirFlowArea(om.ExplicitComponent):
     """
-    Computes the air flow area of the primary heat exchanger.
+    Computes the air flow area (before expansion) of the primary heat exchanger.
     """
 
     def initialize(self):
@@ -391,21 +392,21 @@ class _HeatExchangerAirFlowArea(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        outputs["primary_heat_exchanger_air_flow_area"] = (
+        outputs["primary_heat_exchanger_air_flow_area"] = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":inlet_capture_area"
+        ] / (
             inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + air_inlet_id
-                + ":inlet_capture_area"
-            ]
-            / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
                 + air_inlet_id
                 + ":mass_flow_factor"
             ]
+            + 1.0
         )
 
         outputs["supplement_heat_exchanger_air_flow_area"] = inputs[
@@ -427,15 +428,15 @@ class _HeatExchangerAirFlowArea(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":inlet_capture_area",
-        ] = (
-            1.0
-            / inputs[
+        ] = 1.0 / (
+            inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
                 + ":"
                 + air_inlet_id
                 + ":mass_flow_factor"
             ]
+            + 1.0
         )
 
         partials[
@@ -453,12 +454,15 @@ class _HeatExchangerAirFlowArea(om.ExplicitComponent):
                 + air_inlet_id
                 + ":inlet_capture_area"
             ]
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + air_inlet_id
-                + ":mass_flow_factor"
-            ]
+            / (
+                inputs[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + air_inlet_id
+                    + ":mass_flow_factor"
+                ]
+                + 1.0
+            )
             ** 2.0
         )

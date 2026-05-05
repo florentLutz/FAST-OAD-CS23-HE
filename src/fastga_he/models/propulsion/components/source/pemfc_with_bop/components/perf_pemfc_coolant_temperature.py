@@ -19,7 +19,7 @@ class PerformancesPEMFCStackBOPCoolantTemperature(om.ExplicitComponent):
         )
         self.options.declare(
             "coolant_temperature_gradiant",
-            default=10.0,
+            default=20.0,
             desc="The temperature difference of the PEMFC coolant I/O [K]",
         )
         self.options.declare(

@@ -5,7 +5,7 @@
 import numpy as np
 import openmdao.api as om
 
-MINOR_LOSS_FACTOR = 0.15
+MINOR_LOSS_FACTOR = 0.375
 
 
 class PerformancesAirPressureDrop(om.ExplicitComponent):
@@ -97,7 +97,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             units="kg/m**3",
             val=np.nan,
         )
-        self.add_input("true_airspeed", units="m/s", val=np.nan, shape=number_of_points)
+        self.add_input("throat_air_speed", units="m/s", val=np.nan, shape=number_of_points)
 
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -148,7 +148,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
 
         self.declare_partials(
             "*",
-            "true_airspeed",
+            "throat_air_speed",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -187,7 +187,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
         rho_air = inputs["mean_air_density"]
         rho_air_inlet = inputs["air_inlet_density"]
         rho_air_outlet = inputs["air_outlet_density"]
-        true_airspeed = inputs["true_airspeed"]
+        throat_air_speed = inputs["throat_air_speed"]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -203,7 +203,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
                 + (1.0 + sigma**2.0 + k_exit) / rho_air_outlet
             )
             * np.ones(number_of_points)
-            + MINOR_LOSS_FACTOR * rho_air * true_airspeed**2.0
+            + MINOR_LOSS_FACTOR * rho_air * throat_air_speed**2.0
             # Minor loss due to sudden contraction and expansion
         )
 
@@ -240,7 +240,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
         rho_air = inputs["mean_air_density"]
         rho_air_inlet = inputs["air_inlet_density"]
         rho_air_outlet = inputs["air_outlet_density"]
-        true_airspeed = inputs["true_airspeed"]
+        throat_air_speed = inputs["throat_air_speed"]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -362,7 +362,7 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             * air_fanning_factor
             * air_flow_length
             / (rho_air**2.0 * fin_hydraulic_diameter)
-        ) * np.ones(number_of_points) + MINOR_LOSS_FACTOR * true_airspeed**2.0
+        ) * np.ones(number_of_points) + MINOR_LOSS_FACTOR * throat_air_speed**2.0
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -400,5 +400,5 @@ class PerformancesAirPressureDrop(om.ExplicitComponent):
             + ":"
             + heat_exchanger_id
             + ":air_pressure_drop",
-            "true_airspeed",
-        ] = MINOR_LOSS_FACTOR * 2.0 * rho_air * true_airspeed
+            "throat_air_speed",
+        ] = MINOR_LOSS_FACTOR * 2.0 * rho_air * throat_air_speed

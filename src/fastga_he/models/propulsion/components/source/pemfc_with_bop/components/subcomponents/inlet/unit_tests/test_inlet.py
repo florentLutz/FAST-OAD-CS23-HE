@@ -164,7 +164,7 @@ def test_inlet_throat_height_momentum_thickness_ratio():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1:design_air_mass_flow",
         units="kg/s",
-        val=0.5,
+        val=8.448,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -178,7 +178,7 @@ def test_inlet_throat_height_momentum_thickness_ratio():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:air_inlet_1"
         ":throat_height_layer_thickness_ratio",
-    ) == pytest.approx(0.0398, rel=1e-2)
+    ) == pytest.approx(0.0123, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -407,7 +407,7 @@ def test_inlet_drag_correlation_factor():
     model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
     model.nonlinear_solver.options["iprint"] = 0
     model.nonlinear_solver.options["maxiter"] = 200
-    model.nonlinear_solver.options["rtol"] = 1e-5
+    model.nonlinear_solver.options["rtol"] = 1e-4
     model.linear_solver = om.DirectSolver()
 
     problem.setup()

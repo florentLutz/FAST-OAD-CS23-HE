@@ -6,6 +6,7 @@ import openmdao.api as om
 
 from .sizing_nozzle_length import SizingNozzleLength
 from .sizing_nozzle_exit_area import SizingNozzleExitArea
+from .sizing_nozzle_area_ratio import SizingNozzleAreaRatio
 from .sizing_nozzle_exit_dimension import SizingNozzleExitDimension
 from .sizing_outer_dimension import SizingOuterDimension
 from .sizing_inner_volume import SizingInnerVolume
@@ -36,6 +37,12 @@ class SizingNozzle(om.Group):
             allow_none=False,
         )
         self.options.declare(
+            name="connected_air_inlet_id",
+            default=None,
+            desc="Identifier of the connected air inlet",
+            allow_none=False,
+        )
+        self.options.declare(
             name="connected_heat_exchanger_id",
             default=None,
             desc="Identifier of the connected heat exchanger",
@@ -52,6 +59,7 @@ class SizingNozzle(om.Group):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         connected_diffuser_id = self.options["connected_diffuser_id"]
         connected_heat_exchanger_id = self.options["connected_heat_exchanger_id"]
+        connected_air_inlet_id = self.options["connected_air_inlet_id"]
         nozzle_id = self.options["nozzle_id"]
 
         self.add_subsystem(
@@ -67,6 +75,15 @@ class SizingNozzle(om.Group):
         self.add_subsystem(
             "sizing_nozzle_outlet_inner_area",
             SizingNozzleExitArea(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                connected_air_inlet_id=connected_air_inlet_id,
+                nozzle_id=nozzle_id,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "sizing_nozzle_area_ratio",
+            SizingNozzleAreaRatio(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 connected_heat_exchanger_id=connected_heat_exchanger_id,
                 nozzle_id=nozzle_id,

@@ -5,13 +5,10 @@
 import numpy as np
 import openmdao.api as om
 
-from ..constants import H2_MOL_PER_KG, O2_KG_PER_MOL, DEFAULT_AIR_CONSUMPTION
 
-
-class PerformancesPEMFCStackBOPAirConsumption(om.ExplicitComponent):
+class PerformancesThroatAirSpeed(om.ExplicitComponent):
     """
-    Computation of the oxidizer consumption for the PEMFC stack, based on the hydrogen
-    consumption per flight point.
+    Computation of the inlet throat airspeed.
     """
 
     def initialize(self):
@@ -23,16 +20,16 @@ class PerformancesPEMFCStackBOPAirConsumption(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "fuel_consumption",
-            units="kg/s",
+            "true_airspeed",
             val=np.nan,
+            units="m/s",
             shape=number_of_points,
         )
 
         self.add_output(
-            "air_consumption",
-            units="kg/s",
-            val=DEFAULT_AIR_CONSUMPTION,
+            "throat_air_speed",
+            val=120.0,
+            units="m/s",
             shape=number_of_points,
         )
 
@@ -40,15 +37,13 @@ class PerformancesPEMFCStackBOPAirConsumption(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.declare_partials(
-            of="air_consumption",
-            wrt="fuel_consumption",
+            of="*",
+            wrt="*",
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
-            val=H2_MOL_PER_KG * O2_KG_PER_MOL / (2.0 * 0.232),
+            val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["air_consumption"] = (
-            inputs["fuel_consumption"] * H2_MOL_PER_KG * O2_KG_PER_MOL / (2.0 * 0.232)
-        )
+        outputs["throat_air_speed"] = inputs["true_airspeed"]

@@ -1188,7 +1188,11 @@ PEMFC_STACK_BOP = {
     CN: "PEMFCStackBOP",
     CN_ID: "pemfc_stack_bop_id",
     CT: "PEMFC_stack_bop",
-    ATT: ["model_fidelity", "compressor_connection", "coolant_fluid_type"],
+    ATT: [
+        "model_fidelity",
+        "compressor_connection",
+        "coolant_fluid_type",
+    ],
     PT: ["time_step", "altitude", "true_airspeed", "density", "exterior_temperature"],
     SPT: ["data:*", "true_airspeed", "density"],
     PTS: [],
@@ -1200,9 +1204,9 @@ PEMFC_STACK_BOP = {
         {"voltage_out": "V"},
         {"fuel_consumption": "kg/h"},
         {"air_consumption": "kg/s"},
+        {"coolant_mass_flow_rate": "kg/s"},
         {"efficiency": None},
         {"power_out": "kW"},
-        {"nozzle_exit_air_speed": "m/s"},
     ],
     SMP: [
         {"delta_Cd": None},

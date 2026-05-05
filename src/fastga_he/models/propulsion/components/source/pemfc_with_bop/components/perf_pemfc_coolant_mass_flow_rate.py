@@ -22,7 +22,7 @@ class PerformancesPEMFCStackBOPCoolantMassFlowRate(om.Group):
         )
         self.options.declare(
             "coolant_temperature_gradiant",
-            default=10.0,
+            default=20.0,
             desc="The temperature difference of the PEMFC coolant I/O [K]",
         )
         self.options.declare(
@@ -31,11 +31,15 @@ class PerformancesPEMFCStackBOPCoolantMassFlowRate(om.Group):
             types=str,
             desc="Fluid type: air, water, hydrogen, ammonia, etc.",
         )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
 
     def setup(self):
         coolant_temperature_gradiant = self.options["coolant_temperature_gradiant"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         coolant_type = self.options["coolant_fluid_type"]
+        number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(
             "coolant_specific_heat_capacity",
@@ -64,6 +68,13 @@ class PerformancesPEMFCStackBOPCoolantMassFlowRate(om.Group):
             ),
             promotes=["*"],
         )
+        self.add_subsystem(
+            "coolant_flow_csv",
+            _CoolantFlowCSV(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, number_of_points=number_of_points
+            ),
+            promotes=["*"],
+        )
 
 
 class _CoolantMassFlowRate(om.ExplicitComponent):
@@ -80,7 +91,7 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
         )
         self.options.declare(
             "coolant_temperature_gradiant",
-            default=10.0,
+            default=20.0,
             desc="The temperature difference of the PEMFC coolant I/O [K]",
         )
 
@@ -146,7 +157,7 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
         ]
 
         unclipped_heat_dissipation = thermal_power_max - power_max - bop_power
-        clipped_heat_dissipation = np.clip(unclipped_heat_dissipation, 0.0, 240.0)
+        clipped_heat_dissipation = np.clip(unclipped_heat_dissipation, 0.0, np.inf)
         mean_coolant_specific_heat_capacity = inputs["mean_coolant_specific_heat_capacity"]
 
         outputs[
@@ -177,7 +188,7 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
         mean_coolant_specific_heat_capacity = inputs["mean_coolant_specific_heat_capacity"]
 
         unclipped_heat_dissipation = thermal_power_max - power_max - bop_power
-        clipped_heat_dissipation = np.clip(unclipped_heat_dissipation, 0.0, 240.0)
+        clipped_heat_dissipation = np.clip(unclipped_heat_dissipation, 0.0, np.inf)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -223,4 +234,66 @@ class _CoolantMassFlowRate(om.ExplicitComponent):
             "mean_coolant_specific_heat_capacity",
         ] = -clipped_heat_dissipation / (
             mean_coolant_specific_heat_capacity**2.0 * coolant_temperature_gradiant
+        )
+
+
+class _CoolantFlowCSV(om.ExplicitComponent):
+    """
+    Coolant mass flow to show in PT watcher.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":coolant:mass_flow_rate",
+            units="kg/s",
+            val=np.nan,
+            desc="Mass flow rate of the PEMFC coolant during the mission",
+        )
+
+        self.add_output(
+            "coolant_mass_flow_rate",
+            units="kg/s",
+            val=4.1,
+            shape=number_of_points,
+            desc="Mass flow rate of the PEMFC coolant during the mission, for PT watcher",
+        )
+
+    def setup_partials(self):
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            "*",
+            "*",
+            method="exact",
+            rows=np.arange(number_of_points),
+            cols=np.zeros(number_of_points),
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        number_of_points = self.options["number_of_points"]
+
+        outputs["coolant_mass_flow_rate"] = np.full(
+            number_of_points,
+            inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + self.options["pemfc_stack_bop_id"]
+                + ":coolant:mass_flow_rate"
+            ],
         )
