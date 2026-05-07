@@ -12,9 +12,6 @@ from .perf_inlet_air_mass_flow import PerformancesAirInletAirMassFlow
 from .perf_design_flow_area import PerformancesInletDesignFlowArea
 from .perf_inlet_design_dynamic_pressure import PerformancesInletDesignDynamicPressure
 
-from ......loads.sm_pmsm.components.perf_air_dynamic_viscosity import (
-    PerformancesAirDynamicViscosity,
-)
 from ...perf_ambient_pressure import PerformancesPEMFCStackBOPAmbientPressure
 
 
@@ -48,11 +45,6 @@ class PerformancesScoopInlet(om.Group):
         self.add_subsystem(
             "inlet_air_dynamic_pressure",
             PerformancesAirDynamicPressure(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            "inlet_air_dynamic_viscosity",
-            PerformancesAirDynamicViscosity(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(

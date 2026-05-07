@@ -6,7 +6,7 @@ from stdatm import AtmosphereWithPartials
 SUBMODEL_CONSTRAINTS_PEMFC_EFFECTIVE_AREA = "submodel.propulsion.constraints.pemfc.effective_area"
 SUBMODEL_CONSTRAINTS_PEMFC_POWER = "submodel.propulsion.constraints.pemfc.power"
 
-POSSIBLE_POSITION = ["in_the_front", "wing_pod", "underbelly", "in_the_back"]
+POSSIBLE_POSITION = ["in_the_front", "wing_pod", "underbelly", "in_the_back", "in_the_cabin"]
 
 DEFAULT_PRESSURE = AtmosphereWithPartials(0).pressure  # [Pa]
 FARADAY_CONSTANT = 96485.3321  # [C/mol]

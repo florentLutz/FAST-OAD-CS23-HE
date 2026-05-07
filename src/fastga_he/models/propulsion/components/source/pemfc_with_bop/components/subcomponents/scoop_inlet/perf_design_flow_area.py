@@ -58,7 +58,7 @@ class PerformancesInletDesignFlowArea(om.ExplicitComponent):
             + ":"
             + air_inlet_id
             + ":design_flow_area",
-            val=1.0,
+            val=0.4,
             units="m**2",
         )
 
