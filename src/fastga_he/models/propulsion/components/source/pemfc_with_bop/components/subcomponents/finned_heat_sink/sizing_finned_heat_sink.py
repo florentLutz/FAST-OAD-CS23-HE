@@ -6,9 +6,10 @@ import openmdao.api as om
 
 from .sizing_heat_sink_fin_thickness import SizingHeatSinkFinThickness
 from .sizing_heat_sink_length import SizingHeatSinkFinLength
-from .sizing_heat_sink_fin_height import SizingHeatSinkFinLength
+from .sizing_heat_sink_fin_height import SizingHeatSinkFinHeight
 from .sizing_heat_sink_weight import SizingHeatSinkMass
 from .sizing_heat_sink_added_wet_area import SizingHeatSinkWetArea
+from .sizing_heat_sink_fin_spacing import SizingHeatSinkFinSpacing
 
 
 class SizingFinnedHeatSink(om.Group):
@@ -40,7 +41,7 @@ class SizingFinnedHeatSink(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),
-            promotes=["*"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "sizing_heat_sink_fin_length",
@@ -48,15 +49,23 @@ class SizingFinnedHeatSink(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),
-            promotes=["*"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
-            "sizing_heat_sink_fin_height",
-            SizingHeatSinkFinLength(
+            "sizing_heat_sink_fin_spacing",
+            SizingHeatSinkFinSpacing(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),
-            promotes=["*"],
+            promotes=["data:*"],
+        )
+        self.add_subsystem(
+            "sizing_heat_sink_fin_height",
+            SizingHeatSinkFinHeight(
+                pemfc_stack_bop_id=pemfc_stack_bop_id,
+                finned_heat_sink_id=finned_heat_sink_id,
+            ),
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "sizing_heat_sink_weight",
@@ -64,7 +73,7 @@ class SizingFinnedHeatSink(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),
-            promotes=["*"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             "sizing_heat_sink_added_wet_area",
@@ -72,13 +81,5 @@ class SizingFinnedHeatSink(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),
-            promotes=["*"],
+            promotes=["data:*"],
         )
-
-    def setup_solvers(self):
-        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=False)
-        self.nonlinear_solver.options["iprint"] = 2
-        self.nonlinear_solver.options["maxiter"] = 50
-        self.nonlinear_solver.options["atol"] = 1e-8
-        self.nonlinear_solver.options["rtol"] = 1e-8
-        self.linear_solver = om.DirectSolver()

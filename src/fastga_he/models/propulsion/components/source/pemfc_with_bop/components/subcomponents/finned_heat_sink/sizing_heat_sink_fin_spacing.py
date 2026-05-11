@@ -40,10 +40,9 @@ class SizingHeatSinkFinSpacing(om.ExplicitComponent):
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":dimension:height",
+            + ":dimension:width",
             units="m",
             val=np.nan,
-            desc="Height of the PEMFC stack, as in the size of the PEMFC stack along the Z-axis",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -129,13 +128,6 @@ class SizingHeatSinkFinSpacing(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":dimension:width"
         ]
-        fin_thickness = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":fin_thickness"
-        ]
         number_of_fins = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -190,4 +182,4 @@ class SizingHeatSinkFinSpacing(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":number_of_fins",
-        ] = (2.0 * pemfc_height + pemfc_width) / number_of_fins**2.0
+        ] = -(2.0 * pemfc_height + pemfc_width) / number_of_fins**2.0

@@ -44,7 +44,7 @@ class PerformancesAirThermalConductivity(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":air_conduction_coefficient",
             units="W/m/K",
-            val=0.01,
+            val=0.025,
         )
 
     def setup_partials(self):

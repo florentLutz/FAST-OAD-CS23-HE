@@ -9,7 +9,9 @@ from .perf_base_temperature_difference import PerformancesFinBaseTemperatureDiff
 from .perf_air_reynold_number import PerformancesAirReynoldsNumber
 from .perf_air_nusselt_number import PerformancesAirNusseltNumber
 from .perf_air_thermal_conductivity import PerformancesAirThermalConductivity
-from .perf_air_convection_heat_transfer_coefficient import PerformancesAirConvectionHeatTransferCoefficient
+from .perf_air_convection_heat_transfer_coefficient import (
+    PerformancesAirConvectionHeatTransferCoefficient,
+)
 from .perf_fin_parameter import PerformancesFinParameter
 from .perf_fin_heat_transfer_parameter import PerformancesFinHeatTransferParameter
 from .perf_design_dissipation_power import PerformancesDesignDissipationPower
@@ -81,14 +83,12 @@ class PerformancesFinnedHeatSink(om.Group):
         self.add_subsystem(
             "ambient_pressure",
             PerformancesPEMFCStackBOPAmbientPressure(number_of_points=number_of_points),
-            promotes="*",
+            promotes=["*"],
         )
         self.add_subsystem(
             "air_prandtl_number",
             FluidPrandtlNumber(
                 number_of_points=number_of_points,
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                finned_heat_sink_id=finned_heat_sink_id,
             ),
             promotes=[
                 ("fluid_temperature", "exterior_temperature"),
@@ -105,8 +105,6 @@ class PerformancesFinnedHeatSink(om.Group):
             "air_thermal_conductivity",
             FluidThermalConductivity(
                 number_of_points=number_of_points,
-                pemfc_stack_bop_id=pemfc_stack_bop_id,
-                finned_heat_sink_id=finned_heat_sink_id,
             ),
             promotes=[
                 ("fluid_temperature", "exterior_temperature"),
@@ -155,4 +153,3 @@ class PerformancesFinnedHeatSink(om.Group):
             ),
             promotes=["*"],
         )
-

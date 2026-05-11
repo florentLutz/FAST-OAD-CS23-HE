@@ -93,7 +93,7 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
         ]
         mean_air_dynamic_viscosity = inputs["dynamic_viscosity"]
 
-        outputs["air_reynolds_number"] = (
+        outputs["reynolds_number"] = (
             fin_spacing**2.0 * air_velocity / (mean_air_dynamic_viscosity * fin_length)
         )
 
@@ -119,7 +119,7 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
         mean_air_dynamic_viscosity = inputs["dynamic_viscosity"]
 
         partials[
-            "air_reynolds_number",
+            "reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -127,16 +127,16 @@ class PerformancesAirReynoldsNumber(om.ExplicitComponent):
             + ":fin_spacing",
         ] = fin_spacing * 2.0 * air_velocity / (mean_air_dynamic_viscosity * fin_length)
 
-        partials["air_reynolds_number", "dynamic_viscosity"] = (
+        partials["reynolds_number", "dynamic_viscosity"] = (
             -(fin_spacing**2.0) * air_velocity / (mean_air_dynamic_viscosity**2.0 * fin_length)
         )
 
-        partials["air_reynolds_number", "true_airspeed"] = fin_spacing**2.0 / (
+        partials["reynolds_number", "true_airspeed"] = fin_spacing**2.0 / (
             mean_air_dynamic_viscosity * fin_length
         )
 
         partials[
-            "air_reynolds_number",
+            "reynolds_number",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

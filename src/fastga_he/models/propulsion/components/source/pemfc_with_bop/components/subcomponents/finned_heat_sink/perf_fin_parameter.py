@@ -36,7 +36,8 @@ class PerformancesFinParameter(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":conduction_coefficient",
             units="W/m/K",
-            val=np.nan,
+            val=150.0,
+            desc="Thermal conductivity for 6061 aluminum alloy",
         )
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"

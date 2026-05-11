@@ -69,7 +69,7 @@ class PerformancesDesignDissipationPower(om.ExplicitComponent):
         self.declare_partials(
             "*",
             "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_max",
-            -1.0,
+            val=-1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

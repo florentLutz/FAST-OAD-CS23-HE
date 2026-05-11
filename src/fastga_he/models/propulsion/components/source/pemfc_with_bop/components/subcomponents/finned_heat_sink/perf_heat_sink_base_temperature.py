@@ -45,7 +45,7 @@ class PerformancesHeatSinkBasedTemperature(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":base_temperature",
             units="K",
-            val=320.0,
+            val=340.0,
         )
 
     def setup_partials(self):

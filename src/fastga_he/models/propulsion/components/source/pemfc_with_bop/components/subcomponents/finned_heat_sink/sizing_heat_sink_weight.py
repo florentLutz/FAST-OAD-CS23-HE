@@ -64,6 +64,7 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":material_density",
             units="kg/m**3",
             val=2700.0,
+            desc="Density of the 6061 aluminium alloy used for the finned heat sink.",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
