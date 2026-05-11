@@ -55,6 +55,7 @@
                         <number_of_layers>35.0</number_of_layers>
                         <hydrogen_reactant_pressure units="atm">1.0</hydrogen_reactant_pressure>
                         <effective_area units="cm**2">16.8</effective_area>
+                        <added_wet_area units="m**2">10.0</added_wet_area>
                         <operating_pressure units="atm">1.2</operating_pressure>
                         <dimension>
                             <length units="m">0.11998</length>
@@ -120,6 +121,12 @@
                             <wall_thickness units="m" is_input="True">0.001</wall_thickness>
                             <exit_area units="m**2" is_input="True">0.003141592653589793</exit_area>
                         </diffuser_1>
+                        <finned_heat_sink_1>
+                            <fin_length units="m" is_input="True">0.11998</fin_length>
+                            <fin_thickness units="m" is_input="True">0.0001162</fin_thickness>
+                            <fin_spacing units="m" is_input="True">0.00336</fin_spacing>
+                            <number_of_fins units="unitless" is_input="True">100.0</number_of_fins>
+                        </finned_heat_sink_1>
                         <primary_heat_exchanger_1>
                           <NTU units="unitless" is_input="False">4.220793864851085</NTU>
                           <UA units="W/degK" is_input="False">3076.312103991994</UA>

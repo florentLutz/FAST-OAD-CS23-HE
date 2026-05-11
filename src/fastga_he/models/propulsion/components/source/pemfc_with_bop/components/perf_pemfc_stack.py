@@ -26,11 +26,22 @@ from ..components.perf_pemfc_layer_voltage import (
 from ..components.perf_pemfc_coolant_mass_flow_rate import (
     PerformancesPEMFCStackBOPCoolantMassFlowRate,
 )
-from .subcomponents.perf_pemfc_bop import PerformancesPEMFCBOP
+from .subcomponents.perf_pemfc_bop_simplified import PerformancesPEMFCBOPSimplified
 
 
 class PerformancesPEMFCStackBOP(om.Group):
     """Class that regroups all the subcomponents for the PEMFC stack performance computations."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Solvers setup
+        self.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
+        self.nonlinear_solver.linesearch = om.ArmijoGoldsteinLS()
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 200
+        self.nonlinear_solver.options["rtol"] = 1e-4
+        self.linear_solver = om.DirectSolver()
 
     def initialize(self):
         self.options.declare(
@@ -216,20 +227,13 @@ class PerformancesPEMFCStackBOP(om.Group):
 
         if compressor_connection:
             self.add_subsystem(
-                "pemfc_bop",
-                PerformancesPEMFCBOP(
+                "pemfc_bop_simplified",
+                PerformancesPEMFCBOPSimplified(
                     pemfc_stack_bop_id=pemfc_stack_bop_id,
                     number_of_points=number_of_points,
-                    coolant_fluid_type=coolant_fluid_type,
                     compressor_id="compressor_1",
-                    pipe_id="pipe_1",
-                    air_inlet_id="air_inlet_1",
-                    primary_heat_exchanger_id="primary_heat_exchanger_1",
-                    supplement_heat_exchanger_id="supplement_heat_exchanger_1",
                     humidifier_id="humidifier_1",
-                    diffuser_id="diffuser_1",
-                    nozzle_id="nozzle_1",
-                    pump_id="pump_1",
+                    finned_heat_sink_id="finned_heat_sink_1",
                 ),
                 promotes=["*"],
             )

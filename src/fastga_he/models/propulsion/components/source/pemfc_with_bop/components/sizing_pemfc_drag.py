@@ -73,6 +73,14 @@ class SizingPEMFCStackBOPDrag(om.ExplicitComponent):
 
             self.add_input("data:aerodynamics:fuselage:" + ls_tag + ":CD0", val=np.nan)
 
+            self.add_input(
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":added_wet_area",
+                units="m**2",
+                val=0.0,
+            )
+
         elif position == "wing_pod":
             self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
 
@@ -137,13 +145,19 @@ class SizingPEMFCStackBOPDrag(om.ExplicitComponent):
                 + ":dimension:height"
             ]
 
+            bop_added_wet_area = inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":added_wet_area"
+            ]
+
             added_wet_area = (
                 belly_length * belly_width
                 + 2.0 * belly_length * belly_height
                 + 2.0 * belly_height * belly_width
             )
 
-            cd0 = added_wet_area / wet_area * cd0_fus
+            cd0 = (added_wet_area + bop_added_wet_area) / wet_area * cd0_fus
 
         else:
             cd0 = 0.0
@@ -206,6 +220,11 @@ class SizingPEMFCStackBOPDrag(om.ExplicitComponent):
         elif position == "underbelly":
             cd0_fus = inputs["data:aerodynamics:fuselage:" + ls_tag + ":CD0"]
             wet_area = inputs["data:geometry:fuselage:wet_area"]
+            bop_added_wet_area = inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":added_wet_area"
+            ]
 
             belly_width = inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -271,7 +290,7 @@ class SizingPEMFCStackBOPDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:geometry:fuselage:wet_area",
-            ] = -added_wet_area / wet_area**2.0 * cd0_fus
+            ] = -(added_wet_area + bop_added_wet_area) / wet_area**2.0 * cd0_fus
 
             partials[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -280,7 +299,18 @@ class SizingPEMFCStackBOPDrag(om.ExplicitComponent):
                 + ls_tag
                 + ":CD0",
                 "data:aerodynamics:fuselage:" + ls_tag + ":CD0",
-            ] = added_wet_area / wet_area
+            ] = (added_wet_area + bop_added_wet_area) / wet_area
+
+            partials[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + ls_tag
+                + ":CD0",
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":added_wet_area",
+            ] = 1.0 / wet_area * cd0_fus
 
         else:
             partials[

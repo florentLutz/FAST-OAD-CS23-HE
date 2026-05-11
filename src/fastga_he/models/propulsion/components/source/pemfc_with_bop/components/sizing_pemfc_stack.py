@@ -12,7 +12,7 @@ from .sizing_pemfc_volume import SizingPEMFCStackBOPVolume
 from .sizing_pemfc_cg_x import SizingPEMFCStackBOPCGX
 from .sizing_pemfc_cg_y import SizingPEMFCStackBOPCGY
 from .sizing_pemfc_drag import SizingPEMFCStackBOPDrag
-from .subcomponents.sizing_pemfc_bop import SizingPEMFCBOP
+from .subcomponents.sizing_pemfc_bop_simplified import SizingPEMFCBOPSimplified
 from .cstr_pemfc_stack import ConstraintsPEMFCStack
 
 from ..constants import POSSIBLE_POSITION
@@ -42,14 +42,14 @@ class SizingPEMFCStackBOP(om.Group):
             desc="Select the polarization model between empirical and analytical. The "
             "Aerostak 200W empirical polarization model is set as default.",
         )
+
+        # The followong option(s) is/are dummy option(s) to ensure compatibility
         self.options.declare(
             "coolant_fluid_type",
             default="air",
             types=str,
             desc="Fluid type: air, water, hydrogen, ammonia, etc.",
         )
-
-        # The followong option(s) is/are dummy option(s) to ensure compatibility
         self.options.declare(
             name="direct_bus_connection",
             default=False,
@@ -69,7 +69,6 @@ class SizingPEMFCStackBOP(om.Group):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         position = self.options["position"]
         model_fidelity = self.options["model_fidelity"]
-        coolant_fluid_type = self.options["coolant_fluid_type"]
         compressor_connection = self.options["compressor_connection"]
         # It was decided to add the constraints computation at the beginning of the sizing to
         # ensure that both are ran along and to avoid having an additional id to add in the
@@ -94,21 +93,12 @@ class SizingPEMFCStackBOP(om.Group):
 
         if compressor_connection:
             self.add_subsystem(
-                name="pemfc_bop",
-                subsys=SizingPEMFCBOP(
+                name="pemfc_bop_simplified",
+                subsys=SizingPEMFCBOPSimplified(
                     pemfc_stack_bop_id=pemfc_stack_bop_id,
-                    coolant_fluid_type=coolant_fluid_type,
                     compressor_id="compressor_1",
-                    pipe_id="pipe_1",
-                    air_inlet_id="air_inlet_1",
-                    primary_heat_exchanger_id="primary_heat_exchanger_1",
-                    supplement_heat_exchanger_id="supplement_heat_exchanger_1",
                     humidifier_id="humidifier_1",
-                    diffuser_id="diffuser_1",
-                    nozzle_id="nozzle_1",
-                    pump_id="pump_1",
-                    valve_id="valve_1",
-                    coolant_tank_id="coolant_tank_1",
+                    finned_heat_sink_id="finned_heat_sink_1",
                 ),
                 promotes=["*"],
             )

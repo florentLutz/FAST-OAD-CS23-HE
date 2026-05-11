@@ -256,8 +256,8 @@ def test_pemfc_cg_y():
 
 
 def test_pemfc_drag():
-    expected_ls_drag = [0.0, 0.0002985, 3.493e-5, 0.0]
-    expected_cruise_drag = [0.0, 0.0002985, 3.445e-5, 0.0]
+    expected_ls_drag = [0.0, 0.0002985, 0.0051, 0.0]
+    expected_cruise_drag = [0.0, 0.0002985, 0.00504, 0.0]
 
     for option, ls_drag, cruise_drag in zip(
         POSSIBLE_POSITION, expected_ls_drag, expected_cruise_drag
@@ -350,6 +350,7 @@ def test_pemfc_stack_sizing_with_bop():
                 compressor_connection=True,
                 coolant_fluid_type="ethylene glycol",
                 model_fidelity="analytical",
+                position="underbelly",
             )
         ),
         __file__,
@@ -373,6 +374,7 @@ def test_pemfc_stack_sizing_with_bop():
             compressor_connection=True,
             coolant_fluid_type="ethylene glycol",
             model_fidelity="analytical",
+            position="underbelly",
         ),
         ivc,
     )

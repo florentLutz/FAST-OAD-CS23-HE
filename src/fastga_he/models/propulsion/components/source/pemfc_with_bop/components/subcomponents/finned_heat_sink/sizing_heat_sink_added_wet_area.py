@@ -69,9 +69,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":wet_area",
+            + ":added_wet_area",
             units="m**2",
             val=15.0,
         )
@@ -115,9 +113,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":wet_area"
+            + ":added_wet_area"
         ] = number_of_fins * (2.0 * fin_height * fin_length + fin_thickness * fin_height)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -156,9 +152,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":wet_area",
+            + ":added_wet_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -169,9 +163,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":wet_area",
+            + ":added_wet_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -182,9 +174,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":wet_area",
+            + ":added_wet_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
@@ -195,9 +185,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":wet_area",
+            + ":added_wet_area",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"

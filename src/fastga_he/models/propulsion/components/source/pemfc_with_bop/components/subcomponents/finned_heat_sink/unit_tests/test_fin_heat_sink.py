@@ -245,8 +245,7 @@ def test_heat_sink_added_wet_area():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
-        ":wet_area",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:added_wet_area",
         units="m**2",
     ) == pytest.approx(315.8, rel=1e-2)
 
@@ -332,7 +331,7 @@ def test_sizing_finned_heat_sink():
         units="kg",
     ) == pytest.approx(306.7, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:wet_area",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:added_wet_area",
         units="m**2",
     ) == pytest.approx(315.8, rel=1e-2)
 
