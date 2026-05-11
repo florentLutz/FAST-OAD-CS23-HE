@@ -38,9 +38,11 @@ class PerformancesFinBaseTemperatureDifference(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":operating_temperature",
+            + ":"
+            + finned_heat_sink_id
+            + ":base_temperature",
             units="K",
-            val=350,
+            val=np.nan,
             desc="standard operating temperature for the PEMFC",
         )
 
@@ -71,10 +73,11 @@ class PerformancesFinBaseTemperatureDifference(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":operating_temperature"
+                + ":"
+                + finned_heat_sink_id
+                + ":base_temperature"
             ]
             - inputs["exterior_temperature"]
-            - 10.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -85,7 +88,9 @@ class PerformancesFinBaseTemperatureDifference(om.ExplicitComponent):
             inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
                 + pemfc_stack_bop_id
-                + ":operating_temperature"
+                + ":"
+                + finned_heat_sink_id
+                + ":base_temperature"
             ]
             - inputs["exterior_temperature"]
         )
@@ -98,7 +103,9 @@ class PerformancesFinBaseTemperatureDifference(om.ExplicitComponent):
             + ":base_temperature_difference",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":operating_temperature",
+            + ":"
+            + finned_heat_sink_id
+            + ":base_temperature",
         ] = 1.0
 
         partials[

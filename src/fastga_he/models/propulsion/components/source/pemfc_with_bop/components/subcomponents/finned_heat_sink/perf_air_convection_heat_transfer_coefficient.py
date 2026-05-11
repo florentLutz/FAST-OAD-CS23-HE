@@ -13,9 +13,6 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
-        )
-        self.options.declare(
             name="pemfc_stack_bop_id",
             default=None,
             desc="Identifier of the PEMFC stack",
@@ -29,7 +26,6 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
         )
 
     def setup(self):
-        number_of_points = self.options["number_of_points"]
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         finned_heat_sink_id = self.options["finned_heat_sink_id"]
 
@@ -39,7 +35,7 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + finned_heat_sink_id
-            + ":conduction_coefficient",
+            + ":air_conduction_coefficient",
             units="W/m/K",
             val=np.nan,
         )
@@ -78,12 +74,12 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":fin_spacing"
         ]
-        conduction_coefficient = inputs[
+        air_conduction_coefficient = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + finned_heat_sink_id
-            + ":conduction_coefficient"
+            + ":air_conduction_coefficient"
         ]
 
         outputs[
@@ -92,7 +88,7 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":convection_heat_transfer_coefficient"
-        ] = nusselt_number * conduction_coefficient / fin_spacing
+        ] = nusselt_number * air_conduction_coefficient / fin_spacing
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -106,12 +102,12 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":fin_spacing"
         ]
-        conduction_coefficient = inputs[
+        air_conduction_coefficient = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + finned_heat_sink_id
-            + ":conduction_coefficient"
+            + ":air_conduction_coefficient"
         ]
 
         partials[
@@ -121,7 +117,7 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":convection_heat_transfer_coefficient",
             "nusselt_number",
-        ] = conduction_coefficient / fin_spacing
+        ] = air_conduction_coefficient / fin_spacing
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -133,7 +129,7 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + finned_heat_sink_id
-            + ":conduction_coefficient",
+            + ":air_conduction_coefficient",
         ] = nusselt_number / fin_spacing
 
         partials[
@@ -147,4 +143,4 @@ class PerformancesAirConvectionHeatTransferCoefficient(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_spacing",
-        ] = -nusselt_number * conduction_coefficient / fin_spacing**2.0
+        ] = -nusselt_number * air_conduction_coefficient / fin_spacing**2.0

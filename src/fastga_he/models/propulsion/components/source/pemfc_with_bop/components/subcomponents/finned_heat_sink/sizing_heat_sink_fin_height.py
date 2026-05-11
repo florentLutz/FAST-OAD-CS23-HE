@@ -30,18 +30,13 @@ class SizingHeatSinkFinLength(om.ImplicitComponent):
         finned_heat_sink_id = self.options["finned_heat_sink_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_max",
-            units="W",
-            val=np.nan,
-            desc="Maximum power of the PEMFC stack has to provide during the mission",
-        )
-        self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":thermal_power_max",
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power",
             units="W",
             val=np.nan,
-            desc="Maximum total thermal power of the PEMFC stack has to provide during the mission",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -69,6 +64,7 @@ class SizingHeatSinkFinLength(om.ImplicitComponent):
             + ":conduction_coefficient",
             units="W/m/K",
             val=np.nan,
+            desc="Thermal conductivity of the fin material",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -96,7 +92,7 @@ class SizingHeatSinkFinLength(om.ImplicitComponent):
             + finned_heat_sink_id
             + ":fin_height",
             units="m",
-            val=2.0,
+            val=0.1,
         )
 
     def setup_partials(self):
@@ -108,13 +104,12 @@ class SizingHeatSinkFinLength(om.ImplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         finned_heat_sink_id = self.options["finned_heat_sink_id"]
 
-        power_max = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_max"
-        ]
-        thermal_power_max = inputs[
+        design_dissipation_power = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
-            + ":thermal_power_max"
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power"
         ]
         number_of_fins = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -165,21 +160,27 @@ class SizingHeatSinkFinLength(om.ImplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_height"
-        ] = number_of_fins * fin_heat_transfer_parameter * (
-            np.sinh(fin_parameter * fin_height)
-            + (
-                convection_heat_transfer_coefficient
-                / (fin_parameter * conduction_coefficient)
-                * np.cosh(fin_parameter * fin_height)
+        ] = (
+            number_of_fins
+            * fin_heat_transfer_parameter
+            * (
+                np.sinh(fin_parameter * fin_height)
+                + (
+                    convection_heat_transfer_coefficient
+                    / (fin_parameter * conduction_coefficient)
+                    * np.cosh(fin_parameter * fin_height)
+                )
             )
-        ) / (
-            np.cosh(fin_parameter * fin_height)
-            + (
-                convection_heat_transfer_coefficient
-                / (fin_parameter * conduction_coefficient)
-                * np.sinh(fin_parameter * fin_height)
+            / (
+                np.cosh(fin_parameter * fin_height)
+                + (
+                    convection_heat_transfer_coefficient
+                    / (fin_parameter * conduction_coefficient)
+                    * np.sinh(fin_parameter * fin_height)
+                )
             )
-        ) - (thermal_power_max - power_max)
+            - design_dissipation_power
+        )
 
     def linearize(self, inputs, outputs, jacobian, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -327,18 +328,11 @@ class SizingHeatSinkFinLength(om.ImplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_height",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:" + pemfc_stack_bop_id + ":power_max",
-        ] = 1.0
-
-        jacobian[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + finned_heat_sink_id
-            + ":fin_height",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":thermal_power_max",
+            + ":design_dissipation_power",
         ] = -1.0
 
         jacobian[
