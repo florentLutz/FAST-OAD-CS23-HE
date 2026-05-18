@@ -43,6 +43,7 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
             val=350.0,
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

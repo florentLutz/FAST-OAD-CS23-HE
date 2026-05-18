@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
@@ -1312,7 +1312,7 @@ def test_operational_cost():
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost",
         units="USD",
-        val=2292.0,
+        val=2700.0,
     )
 
     problem = run_system(
@@ -1322,6 +1322,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(152.8, rel=1e-2)
+    ) == pytest.approx(60.7, rel=1e-2)
 
     problem.check_partials(compact_print=True)
