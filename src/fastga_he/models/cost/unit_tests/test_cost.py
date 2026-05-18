@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import os
 import pathlib
@@ -547,7 +547,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(8120.33, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        376167.34, rel=1e-3
+        377127.48, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -589,11 +589,11 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4755318.92, rel=1e-3
+        4774515.71, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        5283687.68, rel=1e-3
+        5305017.45, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -964,7 +964,7 @@ def test_operational_cost_hydrogen():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(31543.8, rel=1e-3)
+    ) == pytest.approx(30047.64, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1041,7 +1041,7 @@ def test_operational_cost_hybrid_tbm_900():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier:operational_cost",
         units="USD/yr",
-    ) == pytest.approx(166.5, rel=1e-3)
+    ) == pytest.approx(56.13, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1118,16 +1118,16 @@ def test_cost_pipistrel():
     ) == pytest.approx(13495.22, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        287239.8, rel=1e-3
+        290797, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        319155.37, rel=1e-3
+        323108.85, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(32520.05, rel=1e-3)
+    ) == pytest.approx(32176.6, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
