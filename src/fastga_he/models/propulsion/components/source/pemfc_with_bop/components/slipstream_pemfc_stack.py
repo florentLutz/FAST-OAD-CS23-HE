@@ -28,18 +28,18 @@ class SlipstreamPEMFCStackBOP(om.Group):
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
 
         ivc = om.IndepVarComp()
 
         ivc.add_output("delta_Cl", val=np.zeros(number_of_points))
+        ivc.add_output("delta_Cd", val=np.zeros(number_of_points))
         ivc.add_output("delta_Cm", val=np.zeros(number_of_points))
 
         self.add_subsystem(name="deltas", subsys=ivc, promotes=["*"])
-        self.add_subsystem(
-            name="delta_cd",
-            subsys=SlipstreamPEMFCStackBOPDeltaCd(
-                number_of_points=number_of_points, pemfc_stack_bop_id=pemfc_stack_bop_id
-            ),
-            promotes=["*"],
-        )
+        # self.add_subsystem(
+        #     name="delta_cd",
+        #     subsys=SlipstreamPEMFCStackBOPDeltaCd(
+        #         number_of_points=number_of_points, pemfc_stack_bop_id=pemfc_stack_bop_id
+        #     ),
+        #     promotes=["*"],
+        # )

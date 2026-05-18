@@ -6,6 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
+FLOW_AREA_RATIO = 0.6
+COOLANT_DENSITY = 1034.547  # [kg/m**3]
+
+
 class SizingHeatSinkMass(om.ExplicitComponent):
     """
     Computing heat sink mass based on PEMFC length.
@@ -135,7 +139,13 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":mass"
-        ] = fin_length * fin_thickness * fin_height * material_density * number_of_fins
+        ] = (
+            fin_length
+            * fin_thickness
+            * fin_height
+            * number_of_fins
+            * (FLOW_AREA_RATIO * material_density + (1.0 - FLOW_AREA_RATIO * COOLANT_DENSITY))
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -188,7 +198,12 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_length",
-        ] = fin_thickness * fin_height * material_density * number_of_fins
+        ] = (
+            fin_thickness
+            * fin_height
+            * number_of_fins
+            * (FLOW_AREA_RATIO * material_density + (1.0 - FLOW_AREA_RATIO * COOLANT_DENSITY))
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -201,7 +216,12 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_thickness",
-        ] = fin_length * fin_height * material_density * number_of_fins
+        ] = (
+            fin_length
+            * fin_height
+            * number_of_fins
+            * (FLOW_AREA_RATIO * material_density + (1.0 - FLOW_AREA_RATIO * COOLANT_DENSITY))
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -214,7 +234,12 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_height",
-        ] = fin_length * fin_thickness * material_density * number_of_fins
+        ] = (
+            fin_length
+            * fin_thickness
+            * number_of_fins
+            * (FLOW_AREA_RATIO * material_density + (1.0 - FLOW_AREA_RATIO * COOLANT_DENSITY))
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -227,7 +252,7 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":material_density",
-        ] = fin_length * fin_thickness * fin_height * number_of_fins
+        ] = fin_length * fin_thickness * fin_height * number_of_fins * FLOW_AREA_RATIO
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -240,4 +265,9 @@ class SizingHeatSinkMass(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":number_of_fins",
-        ] = fin_length * fin_thickness * fin_height * material_density
+        ] = (
+            fin_length
+            * fin_thickness
+            * fin_height
+            * (FLOW_AREA_RATIO * material_density + (1.0 - FLOW_AREA_RATIO * COOLANT_DENSITY))
+        )

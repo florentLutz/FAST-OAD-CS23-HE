@@ -15,11 +15,13 @@ from .perf_air_convection_heat_transfer_coefficient import (
 from .perf_fin_parameter import PerformancesFinParameter
 from .perf_fin_heat_transfer_parameter import PerformancesFinHeatTransferParameter
 from .perf_design_dissipation_power import PerformancesDesignDissipationPower
+from .perf_fin_efficiency import PerformancesFinEfficiency
 from ...perf_ambient_pressure import PerformancesPEMFCStackBOPAmbientPressure
 from ......loads.sm_pmsm.components.perf_air_dynamic_viscosity import (
     PerformancesAirDynamicViscosity,
 )
-
+from ..perf_pemf_bop_speed_of_sound import PerformancesAirSpeedOfSound
+from .perf_design_mach import PerformancesDesignMach
 from ..fluid_characteristics import FluidPrandtlNumber, FluidThermalConductivity
 
 
@@ -66,6 +68,16 @@ class PerformancesFinnedHeatSink(om.Group):
             ),
             promotes=["*"],
         )
+        # self.add_subsystem(
+        #     "speed_of_sound",
+        #     PerformancesAirSpeedOfSound(number_of_points=number_of_points),
+        #     promotes=["*"],
+        # )
+        # self.add_subsystem(
+        #     "design_mach",
+        #     PerformancesDesignMach(number_of_points=number_of_points),
+        #     promotes=["*"]
+        # )
         self.add_subsystem(
             "air_dynamic_viscosity",
             PerformancesAirDynamicViscosity(number_of_points=number_of_points),
@@ -97,11 +109,6 @@ class PerformancesFinnedHeatSink(om.Group):
             ],
         )
         self.add_subsystem(
-            "air_nusselt_number",
-            PerformancesAirNusseltNumber(number_of_points=number_of_points),
-            promotes=["*"],
-        )
-        self.add_subsystem(
             "air_thermal_conductivity",
             FluidThermalConductivity(
                 number_of_points=number_of_points,
@@ -119,6 +126,11 @@ class PerformancesFinnedHeatSink(om.Group):
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "air_nusselt_number",
+            PerformancesAirNusseltNumber(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -145,6 +157,14 @@ class PerformancesFinnedHeatSink(om.Group):
             ),
             promotes=["*"],
         )
+        # self.add_subsystem(
+        #     "fin_efficiency",
+        #     PerformancesFinEfficiency(
+        #         pemfc_stack_bop_id=pemfc_stack_bop_id,
+        #         finned_heat_sink_id=finned_heat_sink_id,
+        #     ),
+        #     promotes=["*"],
+        # )
         self.add_subsystem(
             "design_dissipation_power",
             PerformancesDesignDissipationPower(

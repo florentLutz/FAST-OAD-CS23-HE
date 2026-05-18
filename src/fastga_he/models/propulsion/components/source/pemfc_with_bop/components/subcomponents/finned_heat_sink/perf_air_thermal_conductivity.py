@@ -75,7 +75,7 @@ class PerformancesAirThermalConductivity(om.ExplicitComponent):
         finned_heat_sink_id = self.options["finned_heat_sink_id"]
 
         conductivity = inputs["air_thermal_conductivity"]
-        max_conductivity = np.min(conductivity)
+        max_conductivity = np.max(conductivity)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"

@@ -380,19 +380,19 @@ def test_pemfc_stack_sizing_with_bop():
     )
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:mass", units="kg"
-    ) == pytest.approx(536.4, rel=1e-2)
+    ) == pytest.approx(10.32, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:CG:x", units="m"
-    ) == pytest.approx(2.037, rel=1e-2)
+    ) == pytest.approx(1.24, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:CG:y", units="m"
     ) == pytest.approx(0.0, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:low_speed:CD0",
-    ) == pytest.approx(0.0, rel=1e-2)
+    ) == pytest.approx(0.000177, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:cruise:CD0",
-    ) == pytest.approx(0.0, rel=1e-2)
+    ) == pytest.approx(0.000174, rel=1e-2)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 

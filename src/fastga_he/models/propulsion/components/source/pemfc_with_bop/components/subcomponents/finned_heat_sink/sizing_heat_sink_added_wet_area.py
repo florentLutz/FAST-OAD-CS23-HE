@@ -114,7 +114,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":added_wet_area"
-        ] = number_of_fins * (2.0 * fin_height * fin_length + fin_thickness * fin_height)
+        ] = 2.0 * number_of_fins * fin_height * (fin_length + fin_thickness)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -169,7 +169,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_thickness",
-        ] = number_of_fins * fin_height
+        ] = 2.0 * fin_height * number_of_fins
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -180,7 +180,7 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":fin_height",
-        ] = number_of_fins * (2.0 * fin_length + fin_thickness)
+        ] = 2.0 * number_of_fins * (fin_length + fin_thickness)
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -191,4 +191,4 @@ class SizingHeatSinkWetArea(om.ExplicitComponent):
             + ":"
             + finned_heat_sink_id
             + ":number_of_fins",
-        ] = 2.0 * fin_height * fin_length + fin_thickness * fin_height
+        ] = 2.0 * fin_height * (fin_length + fin_thickness)

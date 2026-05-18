@@ -448,13 +448,7 @@ class _FinHeight(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         finned_heat_sink_id = self.options["finned_heat_sink_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + finned_heat_sink_id
-            + ":fin_height"
-        ] = (
+        unclipped_height = (
             inputs["inverse_hyperbolic_tangent"]
             / inputs[
                 "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -465,9 +459,28 @@ class _FinHeight(om.ExplicitComponent):
             ]
         )
 
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height"
+        ] = np.clip(unclipped_height, 0.001, np.inf)
+
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        unclipped_height = (
+            inputs["inverse_hyperbolic_tangent"]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + finned_heat_sink_id
+                + ":fin_parameter"
+            ]
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -477,14 +490,18 @@ class _FinHeight(om.ExplicitComponent):
             + ":fin_height",
             "inverse_hyperbolic_tangent",
         ] = (
-            1.0
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + finned_heat_sink_id
-                + ":fin_parameter"
-            ]
+            (
+                1.0
+                / inputs[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + finned_heat_sink_id
+                    + ":fin_parameter"
+                ]
+            )
+            if 0.001 < unclipped_height
+            else 1e-6
         )
 
         partials[
@@ -499,13 +516,666 @@ class _FinHeight(om.ExplicitComponent):
             + finned_heat_sink_id
             + ":fin_parameter",
         ] = (
-            -inputs["inverse_hyperbolic_tangent"]
-            / inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + finned_heat_sink_id
-                + ":fin_parameter"
-            ]
-            ** 2.0
+            (
+                -inputs["inverse_hyperbolic_tangent"]
+                / inputs[
+                    "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                    + pemfc_stack_bop_id
+                    + ":"
+                    + finned_heat_sink_id
+                    + ":fin_parameter"
+                ]
+                ** 2.0
+            )
+            if 0.001 < unclipped_height
+            else 1e-6
+        )
+
+
+class SizingHeatSinkFinHeightAdiabatic(om.Group):
+    """
+    Computing the fin height from the design dissipation power, without regularization.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="finned_heat_sink_id",
+            default=None,
+            desc="Identifier of the finned heat sink",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        self.add_subsystem(
+            "inverse_hyperbolic_tangent_adiabatic",
+            _InverseHyperbolicTangentAdiabatic(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, finned_heat_sink_id=finned_heat_sink_id
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "fin_height_adiabatic",
+            _FinHeightAdiabatic(
+                pemfc_stack_bop_id=pemfc_stack_bop_id, finned_heat_sink_id=finned_heat_sink_id
+            ),
+            promotes=["*"],
+        )
+
+
+class _InverseHyperbolicTangentAdiabatic(om.ExplicitComponent):
+    """
+    Computing the fin height from the design dissipation power, without regularization.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="finned_heat_sink_id",
+            default=None,
+            desc="Identifier of the finned heat sink",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power",
+            units="W",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_heat_transfer_parameter",
+            units="W/K",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins",
+            units="unitless",
+            val=np.nan,
+        )
+
+        self.add_output(
+            "inverse_hyperbolic_tangent",
+            units="unitless",
+            val=1.0,
+        )
+
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        design_dissipation_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power"
+        ]
+        fin_heat_transfer_parameter = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_heat_transfer_parameter"
+        ]
+        number_of_fins = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins"
+        ]
+
+        clipped_value = np.clip(
+            design_dissipation_power / (number_of_fins * fin_heat_transfer_parameter),
+            -0.999999,
+            0.999999,
+        )
+
+        outputs["inverse_hyperbolic_tangent"] = np.arctanh(clipped_value)
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        design_dissipation_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power"
+        ]
+        fin_heat_transfer_parameter = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_heat_transfer_parameter"
+        ]
+        number_of_fins = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins"
+        ]
+
+        original_value = design_dissipation_power / (number_of_fins * fin_heat_transfer_parameter)
+        clipped_value = np.clip(original_value, -0.999999, 0.999999)
+
+        common_denominator = (
+            design_dissipation_power**2.0 + fin_heat_transfer_parameter**2.0 * number_of_fins**2.0
+        )
+
+        partials[
+            "inverse_hyperbolic_tangent",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power",
+        ] = (
+            fin_heat_transfer_parameter * number_of_fins / common_denominator
+            if (original_value == clipped_value)
+            else 1e-6
+        )
+
+        partials[
+            "inverse_hyperbolic_tangent",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_heat_transfer_parameter",
+        ] = (
+            -design_dissipation_power * number_of_fins / common_denominator
+            if (original_value == clipped_value)
+            else 1e-6
+        )
+
+        partials[
+            "inverse_hyperbolic_tangent",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins",
+        ] = (
+            -design_dissipation_power * fin_heat_transfer_parameter / common_denominator
+            if (original_value == clipped_value)
+            else 1e-6
+        )
+
+
+class _FinHeightAdiabatic(om.ExplicitComponent):
+    """
+    Computing the fin height from the design dissipation power, without regularization.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="finned_heat_sink_id",
+            default=None,
+            desc="Identifier of the finned heat sink",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        self.add_input(
+            "inverse_hyperbolic_tangent",
+            units="unitless",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_parameter",
+            units="m**-1",
+            val=np.nan,
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            units="m",
+            val=0.1,
+        )
+
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        fin_parameter = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_parameter"
+        ]
+        arctan_term = inputs["inverse_hyperbolic_tangent"]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height"
+        ] = np.clip(
+            arctan_term / fin_parameter,
+            0.01,
+            0.5,
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        fin_parameter = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_parameter"
+        ]
+        arctan_term = inputs["inverse_hyperbolic_tangent"]
+        clipped_value = np.clip(
+            arctan_term / fin_parameter,
+            0.01,
+            0.5,
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "inverse_hyperbolic_tangent",
+        ] = 1.0 / fin_parameter if clipped_value == (arctan_term / fin_parameter) else 1e-6
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_parameter",
+        ] = (
+            -arctan_term / (fin_parameter**2.0)
+            if clipped_value == (arctan_term / fin_parameter)
+            else 1e-6
+        )
+
+
+class SizingHeatSinkFinHeightSimplified(om.ExplicitComponent):
+    """
+    Computing the fin height from the design dissipation power, without regularization.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_bop_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+        self.options.declare(
+            name="finned_heat_sink_id",
+            default=None,
+            desc="Identifier of the finned heat sink",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power",
+            units="W",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":convection_heat_transfer_coefficient",
+            units="W/m**2/K",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins",
+            units="unitless",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":base_temperature_difference",
+            units="K",
+            val=np.nan,
+        )
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_length",
+            units="m",
+            val=np.nan,
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            units="m",
+            val=0.1,
+        )
+
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        design_dissipation_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power"
+        ]
+        number_of_fins = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins"
+        ]
+        convection_heat_transfer_coefficient = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":convection_heat_transfer_coefficient"
+        ]
+        base_temperature_difference = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":base_temperature_difference"
+        ]
+        fin_length = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_length"
+        ]
+
+        outputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height"
+        ] = np.clip(
+            0.5
+            * design_dissipation_power
+            / (
+                convection_heat_transfer_coefficient
+                * number_of_fins
+                * fin_length
+                * base_temperature_difference
+            ),
+            0.0,
+            np.inf,
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
+        finned_heat_sink_id = self.options["finned_heat_sink_id"]
+
+        design_dissipation_power = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power"
+        ]
+        number_of_fins = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins"
+        ]
+        convection_heat_transfer_coefficient = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":convection_heat_transfer_coefficient"
+        ]
+        base_temperature_difference = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":base_temperature_difference"
+        ]
+        fin_length = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_length"
+        ]
+
+        height = (
+            0.5
+            * design_dissipation_power
+            / (
+                convection_heat_transfer_coefficient
+                * number_of_fins
+                * fin_length
+                * base_temperature_difference
+            )
+        )
+
+        clipped_height = np.clip(height, 0.0, np.inf)
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":design_dissipation_power",
+        ] = (
+            0.5
+            / (
+                convection_heat_transfer_coefficient
+                * number_of_fins
+                * fin_length
+                * base_temperature_difference
+            )
+            if (height == clipped_height)
+            else 1e-6
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":convection_heat_transfer_coefficient",
+        ] = (
+            (
+                -0.5
+                * design_dissipation_power
+                / (
+                    convection_heat_transfer_coefficient**2.0
+                    * number_of_fins
+                    * fin_length
+                    * base_temperature_difference
+                )
+            )
+            if (height == clipped_height)
+            else 1e-6
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":number_of_fins",
+        ] = (
+            (
+                -0.5
+                * design_dissipation_power
+                / (
+                    convection_heat_transfer_coefficient
+                    * number_of_fins**2.0
+                    * fin_length
+                    * base_temperature_difference
+                )
+            )
+            if (height == clipped_height)
+            else 1e-6
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":base_temperature_difference",
+        ] = (
+            (
+                -0.5
+                * design_dissipation_power
+                / (
+                    convection_heat_transfer_coefficient
+                    * number_of_fins
+                    * fin_length
+                    * base_temperature_difference**2.0
+                )
+            )
+            if (height == clipped_height)
+            else 1e-6
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_height",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + finned_heat_sink_id
+            + ":fin_length",
+        ] = (
+            (
+                -0.5
+                * design_dissipation_power
+                / (
+                    convection_heat_transfer_coefficient
+                    * number_of_fins
+                    * fin_length**2.0
+                    * base_temperature_difference
+                )
+            )
+            if (height == clipped_height)
+            else 1e-6
         )

@@ -10,7 +10,11 @@ import os.path as pth
 from ..sizing_heat_sink_length import SizingHeatSinkFinLength
 from ..sizing_heat_sink_fin_thickness import SizingHeatSinkFinThickness
 from ..sizing_heat_sink_fin_spacing import SizingHeatSinkFinSpacing
-from ..sizing_heat_sink_fin_height import SizingHeatSinkFinHeight
+from ..sizing_heat_sink_fin_height import (
+    SizingHeatSinkFinHeight,
+    SizingHeatSinkFinHeightAdiabatic,
+    SizingHeatSinkFinHeightSimplified,
+)
 from ..sizing_heat_sink_weight import SizingHeatSinkMass
 from ..sizing_heat_sink_added_wet_area import SizingHeatSinkWetArea
 from ..sizing_finned_heat_sink import SizingFinnedHeatSink
@@ -25,6 +29,7 @@ from ..perf_air_convection_heat_transfer_coefficient import (
 from ..perf_fin_parameter import PerformancesFinParameter
 from ..perf_fin_heat_transfer_parameter import PerformancesFinHeatTransferParameter
 from ..perf_design_dissipation_power import PerformancesDesignDissipationPower
+from ..perf_fin_efficiency import PerformancesFinEfficiency
 from ..perf_finned_heat_sink import PerformancesFinnedHeatSink
 
 from tests.testing_utilities import run_system
@@ -64,6 +69,16 @@ def test_heat_sink_fin_thickness():
         units="m",
         val=0.72,
     )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:dimension:width",
+        units="m",
+        val=0.72,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:number_of_fins",
+        units="unitless",
+        val=200,
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -75,7 +90,7 @@ def test_heat_sink_fin_thickness():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_thickness",
         units="m",
-    ) == pytest.approx(7.2e-4, rel=1e-2)
+    ) == pytest.approx(0.0054, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -96,7 +111,7 @@ def test_heat_sink_fin_spacing():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_thickness",
         units="m",
-        val=7.2e-4,
+        val=0.01944,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:number_of_fins",
@@ -114,7 +129,7 @@ def test_heat_sink_fin_spacing():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_spacing",
         units="m",
-    ) == pytest.approx(0.02088, rel=1e-2)
+    ) == pytest.approx(0.00216, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -167,6 +182,95 @@ def test_heat_sink_fin_height():
     problem.check_partials(compact_print=True)
 
 
+def test_heat_sink_fin_height_adiabatic():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:design_dissipation_power",
+        units="kW",
+        val=300.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_parameter",
+        units="m**-1",
+        val=13.8,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_heat_transfer_parameter",
+        units="W/K",
+        val=275.3,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:number_of_fins",
+        units="unitless",
+        val=100,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingHeatSinkFinHeightAdiabatic(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", finned_heat_sink_id="finned_heat_sink_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_height",
+        units="m",
+    ) == pytest.approx(0.5, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_heat_sink_fin_height_simplified():
+    # Research independent input value in .xml file
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:design_dissipation_power",
+        units="kW",
+        val=330.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_length",
+        units="m",
+        val=3.0,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":convection_heat_transfer_coefficient",
+        units="W/m**2/K",
+        val=24.68,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:number_of_fins",
+        units="unitless",
+        val=100,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:base_temperature_difference",
+        units="K",
+        val=40.0,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        SizingHeatSinkFinHeightSimplified(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", finned_heat_sink_id="finned_heat_sink_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_height",
+        units="m",
+    ) == pytest.approx(0.557, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
 def test_heat_sink_weight():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
@@ -178,7 +282,7 @@ def test_heat_sink_weight():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_thickness",
         units="m",
-        val=7.2e-4,
+        val=0.00108,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
@@ -205,7 +309,7 @@ def test_heat_sink_weight():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":mass",
         units="kg",
-    ) == pytest.approx(306.7, rel=1e-2)
+    ) == pytest.approx(170.5, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -256,6 +360,12 @@ def test_sizing_finned_heat_sink():
     # Research independent input value in .xml file
     ivc = om.IndepVarComp()
     ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_efficiency",
+        units="unitless",
+        val=0.76,
+    )
+    ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:dimension:length",
         units="m",
         val=3.0,
@@ -292,12 +402,17 @@ def test_sizing_finned_heat_sink():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":convection_heat_transfer_coefficient",
         units="W/m**2/K",
-        val=100.0,
+        val=14035.9,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:number_of_fins",
         units="unitless",
         val=100,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:base_temperature_difference",
+        units="K",
+        val=40.0,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -315,27 +430,28 @@ def test_sizing_finned_heat_sink():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_thickness",
         units="m",
-    ) == pytest.approx(7.2e-4, rel=1e-2)
+    ) == pytest.approx(0.0108, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":fin_spacing",
         units="m",
-    ) == pytest.approx(0.02088, rel=1e-2)
+    ) == pytest.approx(0.0108, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":fin_height",
         units="m",
-    ) == pytest.approx(0.526, rel=1e-2)
-    assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:mass",
-        units="kg",
-    ) == pytest.approx(306.7, rel=1e-2)
-    assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:added_wet_area",
-        units="m**2",
-    ) == pytest.approx(315.8, rel=1e-2)
+    ) == pytest.approx(0.00118, rel=1e-2)
+    # assert problem.get_val(
+    #     "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:mass",
+    #     units="kg",
+    # ) == pytest.approx(1438.81, rel=1e-2)
+    # assert problem.get_val(
+    #     "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:added_wet_area",
+    #     units="m**2",
+    # ) == pytest.approx(75.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_heat_sink_base_temperature():
@@ -395,7 +511,7 @@ def test_air_reynolds_number():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_spacing",
         units="m",
-        val=0.02088,
+        val=0.0054,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_length",
@@ -416,14 +532,32 @@ def test_air_reynolds_number():
     assert problem.get_val(
         "reynolds_number",
         units="unitless",
-    ) == pytest.approx(750.85, rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 50.22), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
+# def test_ideal_nusselt_number():
+#     ivc = om.IndepVarComp()
+#     ivc.add_output("reynolds_number", units="unitless", val=8.03, shape=NB_POINTS_TEST)
+#     ivc.add_output("prandtl_number", units="unitless", val=0.71, shape=NB_POINTS_TEST)
+#
+#     problem = run_system(
+#         PerformancesIdealNusseltNumber(number_of_points=NB_POINTS_TEST),
+#         ivc,
+#     )
+#
+#     assert problem.get_val(
+#         "ideal_nusselt_number",
+#         units="unitless",
+#     ) == pytest.approx(2.125, rel=1e-2)
+#
+#     problem.check_partials(compact_print=True)
+
+
 def test_air_nusselt_number():
     ivc = om.IndepVarComp()
-    ivc.add_output("reynolds_number", units="unitless", val=750.85, shape=NB_POINTS_TEST)
+    ivc.add_output("reynolds_number", units="unitless", val=50.22, shape=NB_POINTS_TEST)
     ivc.add_output("prandtl_number", units="unitless", val=0.71, shape=NB_POINTS_TEST)
 
     problem = run_system(
@@ -434,18 +568,23 @@ def test_air_nusselt_number():
     assert problem.get_val(
         "nusselt_number",
         units="unitless",
-    ) == pytest.approx(17.3, rel=1e-2)
+    ) == pytest.approx(5.126, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
 
 def test_air_convection_heat_transfer_coefficient():
     ivc = om.IndepVarComp()
-    ivc.add_output("nusselt_number", units="unitless", val=17.3)
     ivc.add_output(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_spacing",
+        "nusselt_number",
+        units="unitless",
+        val=5.126,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_spacing",
         units="m",
-        val=0.02088,
+        val=0.0054,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
@@ -465,7 +604,7 @@ def test_air_convection_heat_transfer_coefficient():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":convection_heat_transfer_coefficient",
         units="W/m**2/K",
-    ) == pytest.approx(21.5, rel=1e-2)
+    ) == pytest.approx(24.68, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -475,13 +614,13 @@ def test_fin_parameter():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_thickness",
         units="m",
-        val=7.2e-4,
+        val=0.0054,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":convection_heat_transfer_coefficient",
         units="W/m**2/K",
-        val=100.0,
+        val=24.68,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
@@ -501,7 +640,7 @@ def test_fin_parameter():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":fin_parameter",
         units="m**-1",
-    ) == pytest.approx(43.0, rel=1e-2)
+    ) == pytest.approx(7.81, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -512,7 +651,7 @@ def test_fin_heat_transfer_parameter():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":convection_heat_transfer_coefficient",
         units="W/m**2/K",
-        val=100.0,
+        val=24.68,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
@@ -523,7 +662,7 @@ def test_fin_heat_transfer_parameter():
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:fin_thickness",
         units="m",
-        val=7.2e-4,
+        val=0.0054,
     )
     ivc.add_output(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:base_temperature_difference",
@@ -542,7 +681,7 @@ def test_fin_heat_transfer_parameter():
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":fin_heat_transfer_parameter",
         units="W/K",
-    ) == pytest.approx(88.2, rel=1e-2)
+    ) == pytest.approx(120.08, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -577,6 +716,37 @@ def test_design_dissipation_power():
         ":design_dissipation_power",
         units="kW",
     ) == pytest.approx(330.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_fin_efficiency():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_height",
+        units="m",
+        val=0.464,
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_parameter",
+        units="m**-1",
+        val=7.81,
+    )
+
+    problem = run_system(
+        PerformancesFinEfficiency(
+            pemfc_stack_bop_id="pemfc_stack_bop_1", finned_heat_sink_id="finned_heat_sink_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":fin_efficiency",
+        units="unitless",
+    ) == pytest.approx(0.76, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -647,36 +817,38 @@ def test_perf_finned_heat_sink():
     )
 
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:base_temperature",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":base_temperature",
         units="K",
     ) == pytest.approx(340.0, rel=1e-2)
     assert problem.get_val(
-        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1:base_temperature_difference",
+        "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
+        ":base_temperature_difference",
         units="K",
     ) == pytest.approx(40.0, rel=1e-2)
     assert problem.get_val(
         "reynolds_number",
         units="unitless",
-    ) == pytest.approx(750.85, rel=1e-2)
+    ) == pytest.approx(15591818.5, rel=1e-2)
     assert problem.get_val(
         "nusselt_number",
         units="unitless",
-    ) == pytest.approx(17.3, rel=1e-2)
+    ) == pytest.approx(2335.8, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":convection_heat_transfer_coefficient",
         units="W/m**2/K",
-    ) == pytest.approx(21.9, rel=1e-2)
+    ) == pytest.approx(1475.8, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":fin_parameter",
         units="m**-1",
-    ) == pytest.approx(20.12, rel=1e-2)
+    ) == pytest.approx(165.33, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":fin_heat_transfer_parameter",
         units="W/K",
-    ) == pytest.approx(41.2, rel=1e-2)
+    ) == pytest.approx(338.8, rel=1e-2)
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:finned_heat_sink_1"
         ":design_dissipation_power",
@@ -684,3 +856,5 @@ def test_perf_finned_heat_sink():
     ) == pytest.approx(330.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

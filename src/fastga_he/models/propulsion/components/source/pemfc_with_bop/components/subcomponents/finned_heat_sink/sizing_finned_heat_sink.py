@@ -6,7 +6,7 @@ import openmdao.api as om
 
 from .sizing_heat_sink_fin_thickness import SizingHeatSinkFinThickness
 from .sizing_heat_sink_length import SizingHeatSinkFinLength
-from .sizing_heat_sink_fin_height import SizingHeatSinkFinHeight
+from .sizing_heat_sink_fin_height import SizingHeatSinkFinHeightSimplified
 from .sizing_heat_sink_weight import SizingHeatSinkMass
 from .sizing_heat_sink_added_wet_area import SizingHeatSinkWetArea
 from .sizing_heat_sink_fin_spacing import SizingHeatSinkFinSpacing
@@ -61,7 +61,7 @@ class SizingFinnedHeatSink(om.Group):
         )
         self.add_subsystem(
             "sizing_heat_sink_fin_height",
-            SizingHeatSinkFinHeight(
+            SizingHeatSinkFinHeightSimplified(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 finned_heat_sink_id=finned_heat_sink_id,
             ),

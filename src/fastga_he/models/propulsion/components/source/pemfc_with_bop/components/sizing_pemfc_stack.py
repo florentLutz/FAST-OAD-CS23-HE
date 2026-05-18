@@ -90,6 +90,16 @@ class SizingPEMFCStackBOP(om.Group):
             subsys=SizingPEMFCStackBOPPowerDensity(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )
+        self.add_subsystem(
+            name="pemfc_volume",
+            subsys=SizingPEMFCStackBOPVolume(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="pemfc_dimension",
+            subsys=SizingPEMFCStackBOPDimensions(pemfc_stack_bop_id=pemfc_stack_bop_id),
+            promotes=["*"],
+        )
 
         if compressor_connection:
             self.add_subsystem(
@@ -108,16 +118,7 @@ class SizingPEMFCStackBOP(om.Group):
             subsys=SizingPEMFCStackBOPWeight(pemfc_stack_bop_id=pemfc_stack_bop_id),
             promotes=["*"],
         )
-        self.add_subsystem(
-            name="pemfc_volume",
-            subsys=SizingPEMFCStackBOPVolume(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="pemfc_dimension",
-            subsys=SizingPEMFCStackBOPDimensions(pemfc_stack_bop_id=pemfc_stack_bop_id),
-            promotes=["*"],
-        )
+
         self.add_subsystem(
             name="pemfc_CG_x",
             subsys=SizingPEMFCStackBOPCGX(pemfc_stack_bop_id=pemfc_stack_bop_id, position=position),

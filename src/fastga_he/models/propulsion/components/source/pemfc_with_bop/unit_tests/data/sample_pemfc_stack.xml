@@ -122,10 +122,16 @@
                             <exit_area units="m**2" is_input="True">0.003141592653589793</exit_area>
                         </diffuser_1>
                         <finned_heat_sink_1>
+                            <base_temperature_difference units="degK" is_input="True">40.0</base_temperature_difference>
+                            <fin_height units="m" is_input="True">0.1</fin_height>
                             <fin_length units="m" is_input="True">0.11998</fin_length>
                             <fin_thickness units="m" is_input="True">0.0001162</fin_thickness>
                             <fin_spacing units="m" is_input="True">0.00336</fin_spacing>
                             <number_of_fins units="unitless" is_input="True">100.0</number_of_fins>
+                            <design_dissipation_power units="kW" is_input="False">0.9</design_dissipation_power>
+                            <fin_parameter units="1/m">13.8</fin_parameter>
+                            <fin_heat_transfer_parameter units="W/K">200.0</fin_heat_transfer_parameter>
+                            <convection_heat_transfer_coefficient units="W/m**2/degK" is_input="False">100.0</convection_heat_transfer_coefficient>
                         </finned_heat_sink_1>
                         <primary_heat_exchanger_1>
                           <NTU units="unitless" is_input="False">4.220793864851085</NTU>
