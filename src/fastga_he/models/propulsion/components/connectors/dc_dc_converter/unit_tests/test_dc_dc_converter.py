@@ -1432,7 +1432,7 @@ def test_operational_cost():
 
     ivc.add_output(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
-        6617.61,
+        4600.0,
         units="USD",
     )
 
@@ -1444,6 +1444,6 @@ def test_operational_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:operational_cost",
         units="USD/yr",
-    ) == pytest.approx(441.17, rel=1e-2)
+    ) == pytest.approx(31.02, rel=1e-2)
 
     problem.check_partials(compact_print=True)
