@@ -25,9 +25,7 @@ class LCCRectifierCost(om.ExplicitComponent):
         rectifier_id = self.options["rectifier_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_DC_converter:"
-            + rectifier_id
-            + ":number_of_diodes",
+            name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":number_of_diodes",
             val=6.0,
             units="unitless",
             desc="Number of diodes in the rectifier based on the architecture (e.g., "
@@ -50,9 +48,7 @@ class LCCRectifierCost(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"] = (
             90.0
             * inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + rectifier_id
-                + ":number_of_diodes"
+                "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":number_of_diodes"
             ]
             / 0.2
         )

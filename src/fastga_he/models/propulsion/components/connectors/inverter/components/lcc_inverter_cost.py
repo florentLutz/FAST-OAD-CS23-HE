@@ -26,9 +26,7 @@ class LCCInverterCost(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:DC_DC_converter:"
-            + inverter_id
-            + ":number_of_switches",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":number_of_switches",
             val=18.0,
             units="unitless",
             desc="Number of switches in the inverter based on the architecture (e.g., "
@@ -51,9 +49,7 @@ class LCCInverterCost(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"] = (
             115.0
             * inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + inverter_id
-                + ":number_of_switches"
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":number_of_switches"
             ]
             / 0.2
         )
