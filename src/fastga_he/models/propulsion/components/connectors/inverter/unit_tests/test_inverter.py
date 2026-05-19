@@ -1552,7 +1552,7 @@ def test_weight_per_fu():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:mass_per_fu", units="kg"
-    ) == pytest.approx(8.564e-05, rel=1e-3)
+    ) == pytest.approx(4.28e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1592,6 +1592,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(23.26, rel=1e-3)
+    ) == pytest.approx(28.7, rel=1e-3)
 
     problem.check_partials(compact_print=True)

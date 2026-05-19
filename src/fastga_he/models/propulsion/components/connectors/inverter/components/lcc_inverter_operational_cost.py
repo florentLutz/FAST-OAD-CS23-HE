@@ -37,14 +37,14 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
         self.add_input(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan",
             units="h",
-            val=4.2e4,
+            val=3.4e4,
             desc="Expected lifetime of the inverter, based on the lifespan of the IGBTs",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             units="USD/yr",
-            val=23.26,
+            val=28.7,
         )
 
     def setup_partials(self):

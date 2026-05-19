@@ -41,7 +41,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":lifespan",
             units="h",
-            val=4.2e4,
+            val=3.4e4,
             desc="Expected lifetime of the DC_DC_converter, based on the lifespan of the IGBTs",
         )
 
@@ -50,7 +50,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":operational_cost",
             units="USD/yr",
-            val=31.02,
+            val=38.3,
         )
 
     def setup_partials(self):
