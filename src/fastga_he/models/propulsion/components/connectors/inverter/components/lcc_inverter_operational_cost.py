@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-EXPECTED_LIFESPAN = 4.2e4  # Expected lifespan of the IGBTs in hours, with a safety factor of 1.5
-
 
 class LCCInverterOperationalCost(om.ExplicitComponent):
     """
@@ -36,6 +34,12 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
             units="h",
             desc="Expected number of hours flown per year",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan",
+            units="h",
+            val=4.2e4,
+            desc="Expected lifetime of the inverter, based on the lifespan of the IGBTs",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
@@ -49,24 +53,36 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"
+        ]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
+
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost"] = (
-            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"]
-            * inputs["data:TLAR:flight_hours_per_year"]
-            / EXPECTED_LIFESPAN
+            purchase_cost * flight_hours_per_year / lifespan
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
 
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"
+        ]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
+
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
-        ] = inputs["data:TLAR:flight_hours_per_year"] / EXPECTED_LIFESPAN
+        ] = flight_hours_per_year / lifespan
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = (
-            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"]
-            / EXPECTED_LIFESPAN
-        )
+        ] = purchase_cost / lifespan
+
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan",
+        ] = -purchase_cost * flight_hours_per_year / lifespan**2.0

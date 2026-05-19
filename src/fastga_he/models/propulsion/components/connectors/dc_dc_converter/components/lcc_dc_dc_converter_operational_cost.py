@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-EXPECTED_LIFESPAN = 4.2e4  # Expected lifespan of the IGBTs in hours, with a safety factor of 1.5
-
 
 class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
     """
@@ -38,6 +36,14 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             units="h",
             desc="Expected number of hours flown per year",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":lifespan",
+            units="h",
+            val=4.2e4,
+            desc="Expected lifetime of the DC_DC_converter, based on the lifespan of the IGBTs",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -53,22 +59,34 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":purchase_cost"
+        ]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+        ]
+
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":operational_cost"
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":purchase_cost"
-            ]
-            * inputs["data:TLAR:flight_hours_per_year"]
-            / EXPECTED_LIFESPAN
-        )
+        ] = purchase_cost * flight_hours_per_year / lifespan
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
+
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":purchase_cost"
+        ]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+        ]
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
@@ -77,18 +95,18 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":purchase_cost",
-        ] = inputs["data:TLAR:flight_hours_per_year"] / EXPECTED_LIFESPAN
+        ] = flight_hours_per_year / lifespan
 
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = (
-            inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:"
-                + dc_dc_converter_id
-                + ":purchase_cost"
-            ]
-            / EXPECTED_LIFESPAN
-        )
+        ] = purchase_cost / lifespan
+
+        partials[
+            "data:propulsion:he_power_train:DC_DC_converter:"
+            + dc_dc_converter_id
+            + ":operational_cost",
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan",
+        ] = -purchase_cost * flight_hours_per_year / lifespan**2.0
