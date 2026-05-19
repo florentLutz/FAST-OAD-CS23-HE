@@ -109,9 +109,9 @@ class PreLCAInverterProdWeightPerFU(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass_per_fu",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass",
-        ] = mass * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
+        ] = aircraft_per_fu * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = aircraft_per_fu * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
+        ] = mass * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
