@@ -1,5 +1,8 @@
 <FASTOAD_model>
     <data>
+        <TLAR>
+            <v_cruise units="m/s">30.0</v_cruise>
+        </TLAR>
         <geometry>
             <cabin>
                 <length units="m" is_input="False">1.477417183742213<!--cabin length--></length>
@@ -10,6 +13,7 @@
             </fuselage>
             <wing>
                 <span units="m">8.0</span>
+                <area units="m**2">10.0</area>
                 <MAC>
                     <at25percent>
                         <x units="m" is_input="False">2.692856507431314<!--X-position of the 25% of mean aerodynamic chord of wing w.r.t. aircraft nose (drives position of wing along fuselage)--></x>
@@ -21,10 +25,12 @@
             <he_power_train>
                 <aux_load>
                     <aux_load_1>
+                        <cruise_air_density units="kg/m**3">1.2</cruise_air_density>
                         <power_in_mission units="kW">10.0</power_in_mission>
                         <power_max units="kW">10.0</power_max>
                         <power_rating units="kW">11.0</power_rating>
                         <power_density units="kW/kg">20.0</power_density>
+                        <mass units="kg" is_input="False">0.5<!--mass of the auxiliary load--></mass>
                         <CG>
                             <y_ratio>0.5</y_ratio>
                         </CG>

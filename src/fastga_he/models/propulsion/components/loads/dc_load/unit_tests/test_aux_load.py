@@ -20,6 +20,7 @@ from ..components.cstr_aux_load import ConstraintsDCAuxLoad
 from ..components.sizing_aux_load_weight import SizingDCAuxLoadWeight
 from ..components.sizing_aux_load_cg_y import SizingDCAuxLoadCGY
 from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
+from ..components.sizing_aux_load_drag import SizingDCAuxLoadDrag
 
 from ..components.sizing_aux_load import SizingDCAuxLoad
 
@@ -86,6 +87,7 @@ def test_current_in():
 def test_maximum():
     ivc = om.IndepVarComp()
     ivc.add_output("power_in", units="kW", val=np.linspace(8.0, 12.0, NB_POINTS_TEST))
+    ivc.add_output("density", units="kg/m**3", val=np.linspace(1.11, 1.225, NB_POINTS_TEST))
 
     problem = run_system(
         PerformancesMaximum(aux_load_id="aux_load_1", number_of_points=NB_POINTS_TEST), ivc
@@ -94,6 +96,9 @@ def test_maximum():
     assert problem.get_val(
         "data:propulsion:he_power_train:aux_load:aux_load_1:power_max", units="kW"
     ) == pytest.approx(12.0, rel=1e-2)
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:cruise_air_density", units="kg/m**3"
+    ) == pytest.approx(1.11, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -221,6 +226,25 @@ def test_generator_cg_x():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+def test_sizing_drag():
+    input_list = [
+        "data:TLAR:v_cruise",
+        "data:propulsion:he_power_train:aux_load:aux_load_1:cruise_air_density",
+        "data:geometry:wing:area",
+        "data:propulsion:he_power_train:aux_load:aux_load_1:mass",
+    ]
+
+    ivc = get_indep_var_comp(input_list, __file__, XML_FILE)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(SizingDCAuxLoadDrag(aux_load_id="aux_load_1", low_speed_aero=False), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:cruise:CD0"
+    ) == pytest.approx(0.00030278, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_weight_per_fu():

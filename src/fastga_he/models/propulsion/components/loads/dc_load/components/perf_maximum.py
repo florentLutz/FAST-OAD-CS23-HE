@@ -32,15 +32,37 @@ class PerformancesMaximum(om.ExplicitComponent):
             units="W",
             desc="Power at the input side of the load",
         )
+        self.add_input(
+            "density",
+            val=np.full(number_of_points, np.nan),
+            units="kg/m**3",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
             units="W",
             val=10e3,
         )
+        self.add_output(
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density",
+            units="kg/m**3",
+            val=1.2,
+        )
+
+    def setup_partials(self):
+        aux_load_id = self.options["aux_load_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
             wrt="power_in",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density",
+            wrt="density",
             method="exact",
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
@@ -52,6 +74,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max"] = np.max(
             inputs["power_in"]
         )
+        outputs[
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density"
+        ] = np.min(inputs["density"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         aux_load_id = self.options["aux_load_id"]
@@ -60,3 +85,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
             "power_in",
         ] = np.where(inputs["power_in"] == np.max(inputs["power_in"]), 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density",
+            "density",
+        ] = np.where(inputs["density"] == np.min(inputs["density"]), 1.0, 0.0)

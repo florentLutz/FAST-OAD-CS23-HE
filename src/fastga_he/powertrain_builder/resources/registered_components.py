@@ -1074,7 +1074,7 @@ DC_AUX_LOAD = {
     CN_ID: "aux_load_id",
     CT: "aux_load",
     ATT: None,
-    PT: [],
+    PT: ["density"],
     SPT: [],
     PTS: [],
     IN: [("dc_voltage_in", None), (None, "dc_current_in")],

@@ -514,10 +514,10 @@
       </vertical_tail>
       <cooling>
         <cruise>
-          <CD0 is_input="True">0.02913<!--profile drag due to cooling in cruise conditions (0.008 + 0.01557)--></CD0>
+          <CD0 is_input="True">0.008<!--profile drag due to cooling in cruise conditions (0.008 + 0.01557)--></CD0>
         </cruise>
         <low_speed>
-          <CD0 is_input="True">0.02913<!--profile drag due to cooling in low speed conditions (0.008 + 0.01557)--></CD0>
+          <CD0 is_input="True">0.008<!--profile drag due to cooling in low speed conditions (0.008 + 0.01557)--></CD0>
         </low_speed>
       </cooling>
       <flaps>
