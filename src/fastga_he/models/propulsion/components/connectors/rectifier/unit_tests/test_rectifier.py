@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
@@ -1282,7 +1282,7 @@ def test_weight_per_fu():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:mass_per_fu", units="kg"
-    ) == pytest.approx(3.436e-05, rel=1e-3)
+    ) == pytest.approx(1.718e-05, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1290,9 +1290,9 @@ def test_weight_per_fu():
 def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
-        "data:propulsion:he_power_train:rectifier:rectifier_1:current_ac_caliber",
-        units="A",
-        val=150.0,
+        "data:propulsion:he_power_train:rectifier:rectifier_1:number_of_diodes",
+        units="unitless",
+        val=6.0,
     )
 
     problem = run_system(
@@ -1302,7 +1302,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost", units="USD"
-    ) == pytest.approx(2292.0, rel=1e-2)
+    ) == pytest.approx(3450.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1312,7 +1312,7 @@ def test_operational_cost():
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost",
         units="USD",
-        val=2292.0,
+        val=3450.0,
     )
 
     problem = run_system(
@@ -1322,6 +1322,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(152.8, rel=1e-2)
+    ) == pytest.approx(28.74, rel=1e-2)
 
     problem.check_partials(compact_print=True)

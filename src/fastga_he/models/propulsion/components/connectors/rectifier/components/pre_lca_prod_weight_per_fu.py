@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -36,10 +36,16 @@ class PreLCARectifierProdWeightPerFU(om.ExplicitComponent):
             desc="Number of aircraft required for a functional unit",
         )
         self.add_input(
+            name="data:TLAR:flight_hours_per_year",
+            val=283.2,
+            units="h",
+            desc="Expected number of hours flown per year",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan",
-            units="yr",
-            val=15.0,
-            desc="Expected lifetime of the rectifier, typically around 15 year",
+            units="h",
+            val=3.4e4,
+            desc="Expected lifetime of the rectifier, based on the lifespan of the IGBTs",
         )
         self.add_input(
             name="data:TLAR:aircraft_lifespan",
@@ -55,6 +61,9 @@ class PreLCARectifierProdWeightPerFU(om.ExplicitComponent):
             desc="Weight of the rectifier required for a functional unit",
         )
 
+    def setup_partials(self):
+        rectifier_id = self.options["rectifier_id"]
+
         self.declare_partials(
             of="*",
             wrt=[
@@ -63,11 +72,14 @@ class PreLCARectifierProdWeightPerFU(om.ExplicitComponent):
             ],
             method="exact",
         )
+        # I unfortunately have to put fd since there is no analytical expression for the
+        # derivative of ceil and openmdao does not like when a nil derivative is declared
         self.declare_partials(
             of="*",
             wrt=[
                 "data:TLAR:aircraft_lifespan",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan",
+                "data:TLAR:flight_hours_per_year",
             ],
             method="fd",
         )
@@ -75,29 +87,31 @@ class PreLCARectifierProdWeightPerFU(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
 
+        mass = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass"]
+        aircraft_per_fu = inputs["data:environmental_impact:aircraft_per_fu"]
+        aircraft_lifespan = inputs["data:TLAR:aircraft_lifespan"]
+        lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass_per_fu"] = (
-            inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass"]
-            * inputs["data:environmental_impact:aircraft_per_fu"]
-            * np.ceil(
-                inputs["data:TLAR:aircraft_lifespan"]
-                / inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
-            )
+            mass * aircraft_per_fu * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         rectifier_id = self.options["rectifier_id"]
 
+        mass = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass"]
+        aircraft_per_fu = inputs["data:environmental_impact:aircraft_per_fu"]
+        aircraft_lifespan = inputs["data:TLAR:aircraft_lifespan"]
+        lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass_per_fu",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass",
-        ] = inputs["data:environmental_impact:aircraft_per_fu"] * np.ceil(
-            inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
-        )
+        ] = aircraft_per_fu * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
+
         partials[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":mass"] * np.ceil(
-            inputs["data:TLAR:aircraft_lifespan"]
-            / inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
-        )
+        ] = mass * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)

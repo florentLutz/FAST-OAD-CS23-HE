@@ -1,17 +1,17 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
-import numpy as np
 import openmdao.api as om
 
 
 class LCCInverterCost(om.ExplicitComponent):
     """
-    Computation of the inverter purchase cost. Based on the retail price provided by
-    https://www.mcico.com/truebluepower/inverters?purchase_type=New+Outright%2CNew+Exchange and
-    several high power inverters from
-    https://emrax.com/wp-content/uploads/2020/03/recommended_controllers_for_emrax_motors_5.3.xlsx.
+    Computation of inverter purchase cost based on a 3-level NPC architecture from
+    :cite:`kremer:2022`. This is estimated based on 6 IGBTs per level, a 20% cost contribution
+    of the IGBTs to the total cost based on :cite:`burkart:2013`. The IGBT suggested pricing
+    (115 USD) is given by
+    https://www.mouser.fr/ProductDetail/Infineon-Technologies/FZ600R12KP4?qs=lxTgnyf4o0eNz5ooVj7tEA%3D%3D.
     """
 
     def initialize(self):
@@ -26,42 +26,30 @@ class LCCInverterCost(om.ExplicitComponent):
         inverter_id = self.options["inverter_id"]
 
         self.add_input(
-            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
-            units="kW",
-            val=np.nan,
-            desc="Max power at the output side of the inverter",
+            name="data:propulsion:he_power_train:inverter:" + inverter_id + ":number_of_switches",
+            val=6.0,
+            units="unitless",
+            desc="Number of switches in the inverter based on the architecture (e.g., "
+            "6 for a 3-level NPC inverter)",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             units="USD",
-            val=3500.0,
+            val=3450.0,
             desc="Unit purchase cost of the inverter",
         )
 
-        self.declare_partials(of="*", wrt="*", method="exact")
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", val=575.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"] = (
-            4666.0
+            115.0
             * inputs[
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating"
+                "data:propulsion:he_power_train:inverter:" + inverter_id + ":number_of_switches"
             ]
-            ** 0.0928
-        )
-
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
-        inverter_id = self.options["inverter_id"]
-
-        partials[
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
-            "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating",
-        ] = (
-            433.0048
-            * inputs[
-                "data:propulsion:he_power_train:inverter:" + inverter_id + ":ac_power_out_rating"
-            ]
-            ** -0.9072
+            / 0.2
         )
