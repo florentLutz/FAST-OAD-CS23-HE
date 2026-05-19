@@ -69,6 +69,9 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
         ]
 
+        # The operational cost is estimated by dividing the purchase cost by the IGBT lifetime
+        # expectancy. However, for annual flight hours below 2000 h, the component is unlikely to
+        # reach its end-of-life within the operational period of 15 years.
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id

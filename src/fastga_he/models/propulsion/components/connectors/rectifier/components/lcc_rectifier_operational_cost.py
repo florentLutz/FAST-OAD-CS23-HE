@@ -61,6 +61,9 @@ class LCCRectifierOperationalCost(om.ExplicitComponent):
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
         lifespan = inputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":lifespan"]
 
+        # The operational cost is estimated by dividing the purchase cost by the IGBT lifetime
+        # expectancy. However, for annual flight hours below 2000 h, the component is unlikely to
+        # reach its end-of-life within the operational period of 15 years.
         outputs[
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost"
         ] = purchase_cost * flight_hours_per_year / lifespan
