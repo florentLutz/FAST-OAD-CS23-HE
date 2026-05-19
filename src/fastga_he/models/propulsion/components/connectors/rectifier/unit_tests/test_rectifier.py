@@ -1302,7 +1302,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost", units="USD"
-    ) == pytest.approx(2700.0, rel=1e-2)
+    ) == pytest.approx(3450.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1312,7 +1312,7 @@ def test_operational_cost():
     ivc.add_output(
         "data:propulsion:he_power_train:rectifier:rectifier_1:purchase_cost",
         units="USD",
-        val=2700.0,
+        val=3450.0,
     )
 
     problem = run_system(
@@ -1322,6 +1322,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(60.7, rel=1e-2)
+    ) == pytest.approx(23.26, rel=1e-2)
 
     problem.check_partials(compact_print=True)

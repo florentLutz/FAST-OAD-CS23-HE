@@ -5,15 +5,14 @@
 import numpy as np
 import openmdao.api as om
 
-EXPECTED_LIFESPAN = 1.26e4  # Expected lifespan of the diode in hours, with a safety factor of 1.5
+EXPECTED_LIFESPAN = 4.2e4  # Expected lifespan of the diode in hours,
 
 
 class LCCRectifierOperationalCost(om.ExplicitComponent):
     """
     Computation of the annual operational cost of rectifier. The diodes are considered as the
-    throttle components in the system. Thw estimated rectifier life expectancy is based on the
-    lifespan of the IGBTs given by :cite:`sathik:2018` and a reduction factor of 0.3 based on the
-    result from :cite:`infineon:2021`.
+    throttle components in the system. The estimated rectifier life expectancy is based on the
+    lifespan of the IGBTs given by :cite:`sathik:2018` .
     """
 
     def initialize(self):
@@ -43,7 +42,7 @@ class LCCRectifierOperationalCost(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":operational_cost",
             units="USD/yr",
-            val=350.0,
+            val=23.26,
         )
 
     def setup_partials(self):

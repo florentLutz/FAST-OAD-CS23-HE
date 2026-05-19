@@ -9,8 +9,9 @@ class LCCRectifierCost(om.ExplicitComponent):
     """
     Computation of the rectifier purchase cost based on three-phase full bridge architecture.
      This is estimated based on two diodes per branch, a 20% cost contribution
-    of the main electronics to the total cost based on :cite:`burkart:2013`. The diode suggested
-    pricing (90 USD) is given by https://www.poweralia.com/d75-1400-12-8029.
+    of the main electronics to the total cost based on :cite:`burkart:2013`. The IGBT suggested pricing
+    (115 USD) is given by
+    https://www.mouser.fr/ProductDetail/Infineon-Technologies/FZ600R12KP4?qs=lxTgnyf4o0eNz5ooVj7tEA%3D%3D.
     """
 
     def initialize(self):
@@ -35,18 +36,18 @@ class LCCRectifierCost(om.ExplicitComponent):
         self.add_output(
             name="data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost",
             units="USD",
-            val=2700.0,
+            val=3450.0,
             desc="Unit purchase cost of the rectifier",
         )
 
     def setup_partials(self):
-        self.declare_partials(of="*", wrt="*", val=450.0)
+        self.declare_partials(of="*", wrt="*", val=575.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         rectifier_id = self.options["rectifier_id"]
 
         outputs["data:propulsion:he_power_train:rectifier:" + rectifier_id + ":purchase_cost"] = (
-            90.0
+            115.0
             * inputs[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":number_of_diodes"
             ]

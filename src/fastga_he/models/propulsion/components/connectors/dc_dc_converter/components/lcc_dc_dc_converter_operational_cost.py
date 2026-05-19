@@ -44,7 +44,7 @@ class LCCDCDCConverterOperationalCost(om.ExplicitComponent):
             + dc_dc_converter_id
             + ":operational_cost",
             units="USD/yr",
-            val=75.0,
+            val=31.02,
         )
 
     def setup_partials(self):

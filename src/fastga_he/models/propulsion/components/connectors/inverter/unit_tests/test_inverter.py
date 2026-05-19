@@ -1561,7 +1561,7 @@ def test_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
         name="data:propulsion:he_power_train:inverter:inverter_1:number_of_switches",
-        val=18.0,
+        val=6.0,
         units="unitless",
     )
 
@@ -1572,7 +1572,7 @@ def test_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:purchase_cost", units="USD"
-    ) == pytest.approx(10350.0, rel=1e-3)
+    ) == pytest.approx(3450.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1581,7 +1581,7 @@ def test_operational_cost():
     ivc = om.IndepVarComp()
     ivc.add_output(
         name="data:propulsion:he_power_train:inverter:inverter_1:purchase_cost",
-        val=10350.0,
+        val=3450.0,
         units="USD",
     )
 
@@ -1592,6 +1592,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(69.79, rel=1e-3)
+    ) == pytest.approx(23.26, rel=1e-3)
 
     problem.check_partials(compact_print=True)

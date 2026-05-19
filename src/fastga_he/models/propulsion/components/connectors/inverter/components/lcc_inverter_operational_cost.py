@@ -40,7 +40,7 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             units="USD/yr",
-            val=350.0,
+            val=23.26,
         )
 
     def setup_partials(self):

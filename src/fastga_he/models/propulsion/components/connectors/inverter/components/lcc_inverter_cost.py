@@ -27,16 +27,16 @@ class LCCInverterCost(om.ExplicitComponent):
 
         self.add_input(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":number_of_switches",
-            val=18.0,
+            val=6.0,
             units="unitless",
             desc="Number of switches in the inverter based on the architecture (e.g., "
-            "18 for a 3-level NPC inverter)",
+            "6 for a 3-level NPC inverter)",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
             units="USD",
-            val=10350.0,
+            val=3450.0,
             desc="Unit purchase cost of the inverter",
         )
 
