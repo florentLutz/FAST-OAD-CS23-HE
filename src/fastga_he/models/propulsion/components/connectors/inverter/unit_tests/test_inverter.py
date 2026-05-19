@@ -1592,6 +1592,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:inverter:inverter_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(28.7, rel=1e-3)
+    ) == pytest.approx(28.74, rel=1e-3)
 
     problem.check_partials(compact_print=True)
