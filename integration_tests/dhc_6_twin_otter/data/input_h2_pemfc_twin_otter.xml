@@ -1,8 +1,8 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">5.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
-      <luggage_mass_design units="kg" is_input="True">58.1<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
+      <NPAX_design is_input="True">6.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <luggage_mass_design units="kg" is_input="True">66.4<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">200.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">75.4<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">182.0<!--top-level requirement: cruise speed--></v_cruise>
@@ -188,8 +188,8 @@
         <PEMFC_stack>
           <pemfc_stack_1>
             <nominal_pressure units="atm" is_input="True">1.0<!--The nominal pressure at which the PEMFC stack operates.--></nominal_pressure>
-            <number_of_layers is_input="True">1600.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
-            <effective_area units="cm**2">2300.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
+            <number_of_layers is_input="True">1700.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
+            <effective_area units="cm**2">2000.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
           </pemfc_stack_1>
         </PEMFC_stack>
         <SM_PMSM>
@@ -477,15 +477,17 @@
         </DC_bus>
         <aux_load>
           <dc_aux_load_1>
-            <power_in_mission units="kW">120.65</power_in_mission>
-            <power_density units="kW/kg">0.261</power_density>
+            <power_in_mission units="kW">60.0</power_in_mission>
+            <power_density units="kW/kg">1.14</power_density>
+            <weight_to_drag_ratio units="unitless" is_input="True">5.0</weight_to_drag_ratio>
             <CG>
               <y_ratio>0.01</y_ratio>
             </CG>
           </dc_aux_load_1>
           <dc_aux_load_2>
-            <power_in_mission units="kW">120.65</power_in_mission>
-            <power_density units="kW/kg">0.261</power_density>
+            <power_in_mission units="kW">60.0</power_in_mission>
+            <power_density units="kW/kg">1.14</power_density>
+            <weight_to_drag_ratio units="unitless" is_input="True">5.0</weight_to_drag_ratio>
             <CG>
               <y_ratio>0.01</y_ratio>
             </CG>
@@ -556,7 +558,7 @@
     <weight>
       <aircraft>
         <max_payload units="kg" is_input="True">823.0<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">719.8<!--design payload weight--></payload>
+        <payload units="kg" is_input="True">823.0<!--design payload weight--></payload>
         <CG>
           <aft>
             <MAC_limit is_input="True">0.1<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
