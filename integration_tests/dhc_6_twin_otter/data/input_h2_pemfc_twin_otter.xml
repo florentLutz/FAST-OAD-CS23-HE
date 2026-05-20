@@ -478,7 +478,7 @@
         <aux_load>
           <dc_aux_load_1>
             <power_in_mission units="kW">60.0</power_in_mission>
-            <power_density units="kW/kg">1.14</power_density>
+            <power_density units="kW/kg">0.85</power_density>
             <weight_to_drag_ratio units="unitless" is_input="True">5.0</weight_to_drag_ratio>
             <CG>
               <y_ratio>0.01</y_ratio>
@@ -486,7 +486,7 @@
           </dc_aux_load_1>
           <dc_aux_load_2>
             <power_in_mission units="kW">60.0</power_in_mission>
-            <power_density units="kW/kg">1.14</power_density>
+            <power_density units="kW/kg">0.85</power_density>
             <weight_to_drag_ratio units="unitless" is_input="True">5.0</weight_to_drag_ratio>
             <CG>
               <y_ratio>0.01</y_ratio>
