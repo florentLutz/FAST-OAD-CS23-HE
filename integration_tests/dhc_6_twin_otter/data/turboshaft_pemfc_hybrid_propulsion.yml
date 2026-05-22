@@ -48,11 +48,19 @@ power_train_components:
       number_of_engines: 2
       number_of_tanks: 2
     position: in_the_wing  # "in_the_wing", "in_the_front", "in_the_back"
+
+  # Temporary approach of estimate Thermal Management System (TMS)
+  dc_aux_load_1:
+    id: fastga_he.pt_component.dc_load
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
+  dc_aux_load_2:
+    id: fastga_he.pt_component.dc_load
+    position: inside_the_wing # "inside_the_wing", "in_the_front", "in_the_back"
   dc_bus_1:
     id: fastga_he.pt_component.dc_bus
     options:
       number_of_inputs: 1
-      number_of_outputs: 2
+      number_of_outputs: 4
     position: inside_the_wing  # "inside_the_wing", "in_the_front", "in_the_back"
   dc_dc_converter_1:
     id: fastga_he.pt_component.dc_dc_converter
@@ -113,6 +121,12 @@ component_connections:
 
   - source: inverter_2
     target: [dc_bus_1, 2]
+
+  - source: dc_aux_load_1
+    target: [ dc_bus_1, 3 ]
+
+  - source: dc_aux_load_2
+    target: [ dc_bus_1, 4 ]
 
   - source: turboshaft_1
     target: [fuel_system_1, 1]

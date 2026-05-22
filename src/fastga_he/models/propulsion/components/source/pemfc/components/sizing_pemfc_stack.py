@@ -94,7 +94,7 @@ class SizingPEMFCStack(om.Group):
         )
         self.add_subsystem(
             name="pemfc_dimension",
-            subsys=SizingPEMFCStackDimensions(pemfc_stack_id=pemfc_stack_id),
+            subsys=SizingPEMFCStackDimensions(pemfc_stack_id=pemfc_stack_id, position=position),
             promotes=["*"],
         )
         self.add_subsystem(
