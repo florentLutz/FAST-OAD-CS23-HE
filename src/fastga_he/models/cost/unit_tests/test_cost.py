@@ -51,6 +51,8 @@ from ..constants import SERVICE_COST_CERTIFICATION
 
 XML_FILE = "tbm_900_inputs.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
+RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
+
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -1132,3 +1134,61 @@ def test_cost_pipistrel():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+def test_cost_dhc_6():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCC(
+                power_train_file_path=DATA_FOLDER_PATH / "dhc_6_assembly.yml",
+                delivery_method="train",
+                learning_curve=True,
+            )
+        ),
+        __file__,
+        "dhc_6_source.xml",
+    )
+
+    oad.RegisterSubmodel.active_models[SERVICE_COST_CERTIFICATION] = None
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCC(
+            power_train_file_path=DATA_FOLDER_PATH / "dhc_6_assembly.yml",
+            delivery_method="train",
+            learning_curve=True,
+        ),
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "dhc_6_cost.xml"
+
+    problem.write_outputs()
+
+def test_cost_dhc_6_h2():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCC(
+                power_train_file_path=DATA_FOLDER_PATH / "dhc_6_h2_assembly.yml",
+                delivery_method="train",
+                learning_curve=True,
+            )
+        ),
+        __file__,
+        "dhc_6_h2_source.xml",
+    )
+
+    oad.RegisterSubmodel.active_models[SERVICE_COST_CERTIFICATION] = None
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCC(
+            power_train_file_path=DATA_FOLDER_PATH / "dhc_6_h2_assembly.yml",
+            delivery_method="train",
+            learning_curve=True,
+        ),
+        ivc,
+    )
+
+    problem.output_file_path = RESULTS_FOLDER_PATH / "dhc_6_h2_cost.xml"
+
+    problem.write_outputs()
