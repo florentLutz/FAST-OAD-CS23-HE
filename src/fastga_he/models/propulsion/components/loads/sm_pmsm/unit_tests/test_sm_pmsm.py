@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import os.path as pth
 import numpy as np
@@ -1246,11 +1246,8 @@ def test_cost():
 
 
 def test_operational_cost():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:SM_PMSM:motor_1:purchase_cost",
-        24521.15,
-        units="USD",
+    ivc = get_indep_var_comp(
+        list_inputs(LCCSMPMSMOperationalCost(motor_id="motor_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -1258,6 +1255,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:SM_PMSM:motor_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(1634.74, rel=1e-2)
+    ) == pytest.approx(243.6, rel=1e-2)
 
     problem.check_partials(compact_print=True)

@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import numpy as np
 import pytest
@@ -797,14 +797,7 @@ def test_weight_per_fu():
 
 
 def test_cost():
-    ivc = get_indep_var_comp(
-        list_inputs(ConstraintsRPMEnsure(motor_id="motor_1")), __file__, XML_FILE
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:PMSM:motor_1:torque_rating",
-        150.0,
-        units="N*m",
-    )
+    ivc = get_indep_var_comp(list_inputs(LCCPMSMCost(motor_id="motor_1")), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(LCCPMSMCost(motor_id="motor_1"), ivc)
@@ -817,11 +810,8 @@ def test_cost():
 
 
 def test_operational_cost():
-    ivc = om.IndepVarComp()
-    ivc.add_output(
-        "data:propulsion:he_power_train:PMSM:motor_1:purchase_cost",
-        20815.61,
-        units="USD",
+    ivc = get_indep_var_comp(
+        list_inputs(LCCPMSMOperationalCost(motor_id="motor_1")), __file__, XML_FILE
     )
 
     # Run problem and check obtained value(s) is/(are) correct
@@ -829,6 +819,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(1387.7, rel=1e-2)
+    ) == pytest.approx(56.21, rel=1e-2)
 
     problem.check_partials(compact_print=True)

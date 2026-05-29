@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # ── 1. Input data ────────────────────────────────────────────────────────────
 
     b_points = {
-        "B₁":  {"t": 102_623, "R": 0.99},
+        "B₁": {"t": 102_623, "R": 0.99},
         "B₁₀": {"t": 140_757, "R": 0.90},
         "B₅₀": {"t": 210_348, "R": 0.50},
     }
@@ -37,8 +37,8 @@ if __name__ == "__main__":
 
     # Ordinary least squares
     slope, intercept = np.polyfit(x, y, 1)
-    beta = slope                          # Weibull shape parameter
-    eta  = np.exp(-intercept / beta)      # Weibull scale parameter (characteristic life)
+    beta = slope  # Weibull shape parameter
+    eta = np.exp(-intercept / beta)  # Weibull scale parameter (characteristic life)
 
     # R² of the linearised fit
     y_pred = slope * x + intercept
@@ -57,10 +57,10 @@ if __name__ == "__main__":
     # ── 3. Aviation lifespan targets ─────────────────────────────────────────────
 
     aviation_targets = {
-        "Commercial (10⁻⁷)":        1e-7,
-        "Military (10⁻⁸)":          1e-8,
+        "Commercial (10⁻⁷)": 1e-7,
+        "Military (10⁻⁸)": 1e-8,
         "Critical aviation (10⁻⁹)": 1e-9,
-        "Ultra-critical (10⁻¹⁰)":   1e-10,
+        "Ultra-critical (10⁻¹⁰)": 1e-10,
     }
 
     print("  Aviation lifespan targets")
@@ -72,20 +72,24 @@ if __name__ == "__main__":
     print("=" * 55)
 
     # Primary target
-    fp_primary  = 1e-9
-    R_primary   = 1 - fp_primary
-    t_primary   = eta * (-np.log(R_primary)) ** (1 / beta)
+    fp_primary = 1e-9
+    R_primary = 1 - fp_primary
+    t_primary = eta * (-np.log(R_primary)) ** (1 / beta)
 
     # ── 4. Weibull curve ─────────────────────────────────────────────────────────
 
     t_plot = np.linspace(1, 5e5, 2000)
-    R_plot = np.exp(-(t_plot / eta) ** beta)
+    R_plot = np.exp(-((t_plot / eta) ** beta))
 
     # ── 5. Plot ───────────────────────────────────────────────────────────────────
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    fig.suptitle("PMSM Weibull Reliability Analysis — Aviation Application",
-                 fontsize=13, fontweight="bold", y=1.01)
+    fig.suptitle(
+        "PMSM Weibull Reliability Analysis — Aviation Application",
+        fontsize=13,
+        fontweight="bold",
+        y=1.01,
+    )
 
     # ── 5a. Main reliability curve ───────────────────────────────────────────────
     ax = axes[0]
@@ -95,20 +99,36 @@ if __name__ == "__main__":
     # B-points
     for label, d in b_points.items():
         ax.plot(d["t"] / 1e5, d["R"], "o", color="#d63031", markersize=7, zorder=5)
-        ax.annotate(label, xy=(d["t"] / 1e5, d["R"]),
-                    xytext=(6, 4), textcoords="offset points",
-                    fontsize=9, color="#d63031")
+        ax.annotate(
+            label,
+            xy=(d["t"] / 1e5, d["R"]),
+            xytext=(6, 4),
+            textcoords="offset points",
+            fontsize=9,
+            color="#d63031",
+        )
         # Dashed drop lines
-        ax.plot([d["t"] / 1e5, d["t"] / 1e5], [0, d["R"]],
-                "--", color="#d63031", linewidth=0.7, alpha=0.5)
-        ax.plot([0, d["t"] / 1e5], [d["R"], d["R"]],
-                "--", color="#d63031", linewidth=0.7, alpha=0.5)
+        ax.plot(
+            [d["t"] / 1e5, d["t"] / 1e5],
+            [0, d["R"]],
+            "--",
+            color="#d63031",
+            linewidth=0.7,
+            alpha=0.5,
+        )
+        ax.plot(
+            [0, d["t"] / 1e5], [d["R"], d["R"]], "--", color="#d63031", linewidth=0.7, alpha=0.5
+        )
 
     # Aviation target marker (t_primary is very small → near origin)
-    ax.axvline(t_primary / 1e5, color="#27ae60", linewidth=1.5,
-               linestyle=":", label=f"10⁻⁹ target  t = {t_primary:,.0f} h")
-    ax.plot(t_primary / 1e5, R_primary, "^", color="#27ae60",
-            markersize=9, zorder=6)
+    ax.axvline(
+        t_primary / 1e5,
+        color="#27ae60",
+        linewidth=1.5,
+        linestyle=":",
+        label=f"10⁻⁹ target  t = {t_primary:,.0f} h",
+    )
+    ax.plot(t_primary / 1e5, R_primary, "^", color="#27ae60", markersize=9, zorder=6)
 
     ax.set_xlabel("t  /  h  (×10⁵)", fontsize=11)
     ax.set_ylabel("R(t)", fontsize=11)
@@ -119,24 +139,42 @@ if __name__ == "__main__":
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter("%.1f"))
 
     legend_handles = [
-        Line2D([0], [0], color="#1a5fa8", linewidth=2,   label="R(t) — Weibull fit"),
-        Line2D([0], [0], marker="o", color="w", markerfacecolor="#d63031",
-               markersize=7, label="B₁ / B₁₀ / B₅₀ points"),
-        Line2D([0], [0], color="#27ae60", linewidth=1.5, linestyle=":",
-               marker="^", markerfacecolor="#27ae60",
-               label=f"10⁻⁹ target  t ≈ {t_primary:,.0f} h"),
+        Line2D([0], [0], color="#1a5fa8", linewidth=2, label="R(t) — Weibull fit"),
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            markerfacecolor="#d63031",
+            markersize=7,
+            label="B₁ / B₁₀ / B₅₀ points",
+        ),
+        Line2D(
+            [0],
+            [0],
+            color="#27ae60",
+            linewidth=1.5,
+            linestyle=":",
+            marker="^",
+            markerfacecolor="#27ae60",
+            label=f"10⁻⁹ target  t ≈ {t_primary:,.0f} h",
+        ),
     ]
     ax.legend(handles=legend_handles, fontsize=9, loc="upper right")
 
     # Weibull parameters text box
-    param_text = (f"β  = {beta:.4f}\n"
-                  f"η  = {eta/1e5:.4f} × 10⁵ h\n"
-                  f"R² = {r_squared:.8f}")
-    ax.text(0.97, 0.55, param_text, transform=ax.transAxes,
-            fontsize=9, verticalalignment="top", horizontalalignment="right",
-            bbox=dict(boxstyle="round,pad=0.4", facecolor="lightyellow",
-                      edgecolor="gray", alpha=0.8),
-            fontfamily="monospace")
+    param_text = f"β  = {beta:.4f}\n" f"η  = {eta/1e5:.4f} × 10⁵ h\n" f"R² = {r_squared:.8f}"
+    ax.text(
+        0.97,
+        0.55,
+        param_text,
+        transform=ax.transAxes,
+        fontsize=9,
+        verticalalignment="top",
+        horizontalalignment="right",
+        bbox=dict(boxstyle="round,pad=0.4", facecolor="lightyellow", edgecolor="gray", alpha=0.8),
+        fontfamily="monospace",
+    )
 
     # ── 5b. Linearised Weibull (probability paper) ───────────────────────────────
     ax2 = axes[1]
@@ -144,20 +182,25 @@ if __name__ == "__main__":
     x_line = np.linspace(x.min() - 0.3, x.max() + 0.5, 100)
     y_line = slope * x_line + intercept
 
-    ax2.plot(x_line, y_line, color="#1a5fa8", linewidth=1.8,
-             label=f"Regression  β={beta:.3f}")
+    ax2.plot(x_line, y_line, color="#1a5fa8", linewidth=1.8, label=f"Regression  β={beta:.3f}")
     ax2.scatter(x, y, color="#d63031", s=60, zorder=5, label="B-points")
 
     for i, (label, d) in enumerate(b_points.items()):
-        ax2.annotate(label, xy=(x[i], y[i]),
-                     xytext=(6, 4), textcoords="offset points",
-                     fontsize=9, color="#d63031")
+        ax2.annotate(
+            label,
+            xy=(x[i], y[i]),
+            xytext=(6, 4),
+            textcoords="offset points",
+            fontsize=9,
+            color="#d63031",
+        )
 
     # Aviation target on linearised scale
     y_aviation = np.log(-np.log(R_primary))
     x_aviation = np.log(t_primary)
-    ax2.scatter([x_aviation], [y_aviation], color="#27ae60", s=80,
-                marker="^", zorder=6, label="10⁻⁹ target")
+    ax2.scatter(
+        [x_aviation], [y_aviation], color="#27ae60", s=80, marker="^", zorder=6, label="10⁻⁹ target"
+    )
     ax2.axvline(x_aviation, color="#27ae60", linewidth=1.2, linestyle=":", alpha=0.7)
     ax2.axhline(y_aviation, color="#27ae60", linewidth=1.2, linestyle=":", alpha=0.7)
 
@@ -169,11 +212,16 @@ if __name__ == "__main__":
 
     # Equation annotation
     eq_text = f"ln(−ln(R)) = {beta:.4f}·ln(t)  {intercept:+.4f}"
-    ax2.text(0.03, 0.97, eq_text, transform=ax2.transAxes,
-             fontsize=9, verticalalignment="top",
-             bbox=dict(boxstyle="round,pad=0.4", facecolor="lightyellow",
-                       edgecolor="gray", alpha=0.8),
-             fontfamily="monospace")
+    ax2.text(
+        0.03,
+        0.97,
+        eq_text,
+        transform=ax2.transAxes,
+        fontsize=9,
+        verticalalignment="top",
+        bbox=dict(boxstyle="round,pad=0.4", facecolor="lightyellow", edgecolor="gray", alpha=0.8),
+        fontfamily="monospace",
+    )
 
     plt.tight_layout()
     plt.show()
