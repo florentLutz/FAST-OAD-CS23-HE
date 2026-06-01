@@ -8,10 +8,10 @@ import openmdao.api as om
 
 class LCCPMSMOperationalCost(om.ExplicitComponent):
     """
-    Computation of the maintenance cost of the PMSM. As the bearing accounts most of the mechanical
+    Computation of the maintenance cost of the PMSM. As the bearing accounts for most of the mechanical
     faults of the rotor :cite:`orlowska:2022`, the PMSM operational cost is estimated based on
     the bearing's cost and life expectancy. The suggested bearing life expectancy is given by
-    Shigley's mechenical engineering design :cite:`shigley:2014`. The bearing types are provided
+    Shigley's mechanical engineering design :cite:`shigley:2014`. The bearing types are provided
     from :cite:`emrax:2018`. The off-the-shelf price of the bearing is referenced from
     https://qualitybearingsonline.co.uk/.
     """
@@ -59,7 +59,9 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost"] = (
-            flight_hours_per_year * 0.0311 * (np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
+            flight_hours_per_year
+            * 0.0311
+            * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -72,7 +74,7 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = 0.0311 * (np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
+        ] = 0.0311 * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
@@ -81,7 +83,7 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
             0.505
             * flight_hours_per_year
             * 0.0311
-            * (np.pi * rpm_rating / 60.0) ** 0.505
+            * (2.0 * np.pi * rpm_rating / 60.0) ** 0.505
             / (torque_rating**0.495)
         )
 
@@ -92,6 +94,6 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
             0.505
             * flight_hours_per_year
             * 0.0311
-            * (np.pi * torque_rating / 60.0) ** 0.505
+            * (2.0 * np.pi * torque_rating / 60.0) ** 0.505
             / (rpm_rating**0.495)
         )

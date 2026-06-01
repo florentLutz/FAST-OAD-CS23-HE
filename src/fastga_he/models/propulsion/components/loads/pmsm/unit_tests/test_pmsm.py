@@ -819,6 +819,6 @@ def test_operational_cost():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:PMSM:motor_1:operational_cost", units="USD/yr"
-    ) == pytest.approx(56.21, rel=1e-2)
+    ) == pytest.approx(79.78, rel=1e-2)
 
     problem.check_partials(compact_print=True)
