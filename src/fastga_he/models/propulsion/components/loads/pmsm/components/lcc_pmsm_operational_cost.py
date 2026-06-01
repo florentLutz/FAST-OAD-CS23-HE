@@ -41,6 +41,12 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
             val=np.nan,
             units="min**-1",
         )
+        self.add_input(
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy",
+            val=500.0,
+            units="h",
+            desc="Expected life expectancy of the bearing",
+        )
 
         self.add_output(
             name="data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
@@ -57,10 +63,14 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         torque_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
         rpm_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating"]
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        bearing_life_expectancy = inputs[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy"
+        ]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost"] = (
             flight_hours_per_year
-            * 0.0311
+            / bearing_life_expectancy
+            * 15.5
             * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
         )
 
@@ -70,11 +80,28 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         torque_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
         rpm_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating"]
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        bearing_life_expectancy = inputs[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy"
+        ]
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = 0.0311 * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
+        ] = (
+            15.5
+            / bearing_life_expectancy
+            * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
+        )
+
+        partials[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy",
+        ] = (
+            -flight_hours_per_year
+            * 15.5
+            / bearing_life_expectancy**2.0
+            * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
+        )
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
@@ -82,7 +109,8 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         ] = (
             0.505
             * flight_hours_per_year
-            * 0.0311
+            / bearing_life_expectancy
+            * 15.5
             * (2.0 * np.pi * rpm_rating / 60.0) ** 0.505
             / (torque_rating**0.495)
         )
@@ -93,7 +121,8 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
         ] = (
             0.505
             * flight_hours_per_year
-            * 0.0311
+            / bearing_life_expectancy
+            * 15.5
             * (2.0 * np.pi * torque_rating / 60.0) ** 0.505
             / (rpm_rating**0.495)
         )
