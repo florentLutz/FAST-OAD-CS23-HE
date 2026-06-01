@@ -11,6 +11,8 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from utils.filter_residuals import filter_residuals
+from fastga_he.gui.power_train_network_viewer import power_train_network_viewer
+
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
@@ -100,3 +102,13 @@ def test_sizing_twin_otter_pemfc_h2():
     residuals = filter_residuals(residuals)
 
     problem.write_outputs()
+
+def test_hybrid_dhc_6_powertrain_network():
+
+    pt_file_path = DATA_FOLDER_PATH / "pemfc_h2_propulsion.yml"
+    network_file_path = RESULTS_FOLDER_PATH / "dhc_6_h2.html"
+
+    power_train_network_viewer(
+        pt_file_path, network_file_path, animated_plot=False, orientation="LR", plot_scaling=1.3,
+        legend_position="BR", legend_scaling=1.3
+    )
