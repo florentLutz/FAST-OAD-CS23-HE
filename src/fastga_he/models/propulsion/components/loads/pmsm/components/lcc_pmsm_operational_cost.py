@@ -8,8 +8,12 @@ import openmdao.api as om
 
 class LCCPMSMOperationalCost(om.ExplicitComponent):
     """
-    Computation of the maintenance cost of the PMSM. For the default value of the average lifespan
-    of the motor, the value is taken from :cite:`thonemann:2024` for short term technologies.
+    Computation of the maintenance cost of the PMSM. As the bearing accounts most of the mechanical
+    faults of the rotor :cite:`orlowska:2022`, the PMSM operational cost is estimated based on
+    the bearing's cost and life expectancy. The suggested bearing life expectancy is given by
+    Shigley's mechenical engineering design :cite:`shigley:2014`. The bearing types are provided
+    from :cite:`emrax:2018`. The off-the-shelf price of the bearing is referenced from
+    https://qualitybearingsonline.co.uk/.
     """
 
     def initialize(self):
