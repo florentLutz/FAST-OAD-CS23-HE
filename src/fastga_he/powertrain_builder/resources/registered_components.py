@@ -1087,7 +1087,7 @@ DC_AUX_LOAD = {
     SMP: [
         {"delta_Cd": None},
     ],
-    ICON: "gears",
+    ICON: "dc_load",
     ICON_SIZE: 15,
     RSD: [],
     SETS_V: False,
