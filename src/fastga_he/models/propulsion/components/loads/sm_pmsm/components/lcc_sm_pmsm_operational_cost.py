@@ -35,7 +35,7 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
             desc="Expected number of hours flown per year",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":life_expectancy",
+            name="data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
             val=2000.0,
             units="h",
             desc="Expected lifespan of the PMSM motor, based on the bearing life expectancy",
@@ -57,12 +57,10 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost"
         ]
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
-        life_expectancy = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":life_expectancy"
-        ]
+        lifespan = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
 
         outputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost"] = (
-            purchase_cost * flight_hours_per_year / life_expectancy
+            purchase_cost * flight_hours_per_year / lifespan
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -72,21 +70,19 @@ class LCCSMPMSMOperationalCost(om.ExplicitComponent):
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost"
         ]
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
-        life_expectancy = inputs[
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":life_expectancy"
-        ]
+        lifespan = inputs["data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan"]
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = purchase_cost / life_expectancy
+        ] = purchase_cost / lifespan
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost",
-            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":life_expectancy",
-        ] = -purchase_cost * flight_hours_per_year / life_expectancy**2.0
+            "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":lifespan",
+        ] = -purchase_cost * flight_hours_per_year / lifespan**2.0
 
         partials[
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":operational_cost",
             "data:propulsion:he_power_train:SM_PMSM:" + motor_id + ":purchase_cost",
-        ] = flight_hours_per_year / life_expectancy
+        ] = flight_hours_per_year / lifespan
