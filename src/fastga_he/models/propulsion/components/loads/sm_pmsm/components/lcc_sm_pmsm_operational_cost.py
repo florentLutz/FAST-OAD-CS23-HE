@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class LCCSMPMSMOperationalCost(om.ExplicitComponent):
     """
-    Computation of the maintenance cost of the SM PMSM. As the bearing accounts most of the
+    Computation of the maintenance cost of the SM PMSM. As the bearing accounts for most of the
     mechanical faults of the rotor :cite:`orlowska:2022`, the PMSM operational cost is estimated
     based on the bearing's cost and life expectancy. The suggested bearing life expectancy is
     given by Shigley's mechanical engineering design :cite:`shigley:2014`. The bearing types are
