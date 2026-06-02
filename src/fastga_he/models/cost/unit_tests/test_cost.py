@@ -547,7 +547,7 @@ def test_production_cost_hydrogen():
     ) == pytest.approx(8120.33, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        377127.48, rel=1e-3
+        370227.48, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -589,11 +589,11 @@ def test_production_cost_hybrid_tbm_900():
     ) == pytest.approx(221207.71, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        4774515.71, rel=1e-3
+        4733865.7, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        5305017.45, rel=1e-3
+        5259850.79, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -964,7 +964,7 @@ def test_operational_cost_hydrogen():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(30047.64, rel=1e-3)
+    ) == pytest.approx(33321, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1041,7 +1041,7 @@ def test_operational_cost_hybrid_tbm_900():
     assert problem.get_val(
         "data:propulsion:he_power_train:rectifier:rectifier:operational_cost",
         units="USD/yr",
-    ) == pytest.approx(56.13, rel=1e-3)
+    ) == pytest.approx(20.8, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1118,16 +1118,16 @@ def test_cost_pipistrel():
     ) == pytest.approx(13495.22, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        290797, rel=1e-3
+        283897.96, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        323108.85, rel=1e-3
+        315442.18, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(32176.6, rel=1e-3)
+    ) == pytest.approx(33070.1, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

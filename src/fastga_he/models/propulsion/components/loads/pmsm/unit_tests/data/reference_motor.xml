@@ -35,6 +35,7 @@
             <he_power_train>
                 <PMSM>
                     <motor_1>
+                        <purchase_cost units="USD">8120.33</purchase_cost>
                         <mass units="kg">16.19</mass>
                         <from_LE units="m">0.15</from_LE>
                         <length units="m">0.088</length>
