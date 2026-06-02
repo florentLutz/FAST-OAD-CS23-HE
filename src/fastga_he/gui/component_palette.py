@@ -5,7 +5,7 @@
 """
 Component palette sidebar for the power-train network viewer.
 
-Provides a clickable icon palette (Bokeh server mode only) that lets the user
+Provides a clickable button palette (Bokeh server mode only) that lets the user
 select a component type and place instances on the main canvas by clicking.
 
 Typical usage
@@ -18,7 +18,7 @@ Typical usage
     ComponentPaletteLauncher.launch(port=5007)
 
     # --- embedded in an existing Bokeh document ---
-    palette_fig, state = ComponentPaletteBuilder.build()
+    palette_layout, state = ComponentPaletteBuilder.build()
 
     def make_doc(doc):
         from bokeh.layouts import row
@@ -26,14 +26,12 @@ Typical usage
         from fastga_he.gui.component_palette import PlacementHandler
 
         handler = PlacementHandler(state, main_plot)
-        state.tap_source.selected.on_change("indices", handler.on_palette_select)
         main_plot.on_event(Tap, handler.on_canvas_tap)
 
-        doc.add_root(row(palette_fig, main_plot))
+        doc.add_root(row(palette_layout, main_plot))
 
 """
 
-import base64
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -42,31 +40,21 @@ import bokeh.models as bkmodel
 import bokeh.plotting as bkplot
 from bokeh.events import Tap
 from bokeh.layouts import column, row
+from bokeh.models import TabPanel, Tabs  # noqa: F401 – used explicitly below
 from bokeh.server.server import Server
 from tornado.ioloop import IOLoop
 import webbrowser
 
-try:
-    from . import icons
-    from .power_train_network_viewer import (
-        BACKGROUND_COLOR_CODE,
-        ICONS_CONFIG,
-        _string_cleanup,
-        _url_to_base64,
-    )
-except ImportError:
-    # Fallback when the file is executed directly as a script
-    import sys
-    from pathlib import Path as _Path
+import sys
+from pathlib import Path as _Path
 
-    sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))  # src/
-    from fastga_he.gui import icons  # noqa: F401 (unused here but kept for consistency)
-    from fastga_he.gui.power_train_network_viewer import (
-        BACKGROUND_COLOR_CODE,
-        ICONS_CONFIG,
-        _string_cleanup,
-        _url_to_base64,
-    )
+sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
+from fastga_he.gui.power_train_network_viewer import (
+    BACKGROUND_COLOR_CODE,
+    ICONS_CONFIG,
+    _string_cleanup,
+    _url_to_base64,
+)
 
 _log = logging.getLogger(__name__)
 
@@ -74,10 +62,37 @@ _log = logging.getLogger(__name__)
 # Layout constants
 # ---------------------------------------------------------------------------
 
-PALETTE_WIDTH = 175
+PALETTE_WIDTH = 300
 ROW_HEIGHT = 52
-ICON_SIZE = 30
+ICON_SIZE = 50
 
+# Button appearance
+BTN_TYPE_DEFAULT = "light"  # unselected
+BTN_TYPE_SELECTED = "primary"  # selected (blue highlight)
+
+ICON_TYPE = {
+    "connector": [
+        "bus_bar",
+        "cable",
+        "switch",
+        "splitter",
+        "rectifier",
+        "dc_converter",
+        "inverter",
+        "gearbox",
+    ],
+    "load": ["e_motor", "dc_load"],
+    "source": [
+        "battery",
+        "generator",
+        "ice",
+        "turbine",
+        "fuel_cell",
+    ],
+    "propulsor": ["propeller"],
+    "tank": ["fuel_tank"],
+}
+# Dict of component_type -> list of component_keys (e.g. "source" -> ["battery", "generator", …])
 
 # ---------------------------------------------------------------------------
 # Shared mutable state between palette and placement handler
@@ -86,16 +101,14 @@ ICON_SIZE = 30
 
 @dataclass
 class PaletteState:
-    """Holds references to all Bokeh data-sources managed by the palette."""
+    """Holds references to all Bokeh widgets managed by the palette."""
 
-    # ColumnDataSource for the clickable tap target (one row per component)
-    tap_source: bkmodel.ColumnDataSource = field(default=None)
-    # ColumnDataSource that drives the highlight rectangle
-    highlight_source: bkmodel.ColumnDataSource = field(default=None)
+    # List of Button widgets, one per component (in ICONS_CONFIG order)
+    buttons: list = field(default_factory=list)
     # ColumnDataSource that accumulates icons placed on the main canvas
     placed_nodes_source: bkmodel.ColumnDataSource = field(default=None)
-    # ColumnDataSource for the status label (inside the palette figure)
-    status_source: bkmodel.ColumnDataSource = field(default=None)
+    # Div widget showing the currently selected component
+    status_div: bkmodel.Div = field(default=None)
     # Currently selected component key (e.g. "battery")
     selected_component: str = field(default=None)
     # Deduplication counters: component_key -> int
@@ -109,183 +122,127 @@ class PaletteState:
 
 class ComponentPaletteBuilder:
     """
-    Build the palette sidebar figure containing all available component icons.
+    Build the palette sidebar as a column of Bokeh ``Button`` widgets.
 
     This class is **pure** – it only constructs Bokeh objects and returns them;
-    it does not register any callbacks.  Callbacks are handled by
-    :class:`PlacementHandler`.
+    callbacks are wired by :class:`PlacementHandler`.
     """
 
     @staticmethod
     def build() -> tuple:
         """
-        Construct the palette figure and initialise a :class:`PaletteState`.
+        Construct the button palette and initialise a :class:`PaletteState`.
 
-        :return: ``(palette_figure, PaletteState)``
+        :return: ``(palette_column_layout, PaletteState)``
         """
         component_keys = list(ICONS_CONFIG.keys())
-        n = len(component_keys)
 
-        # Vertical centres for each row (top of figure = highest y)
-        ys = [(n - i - 0.5) * ROW_HEIGHT for i in range(n)]
+        # ------------------------------------------------------------------
+        # Title div
+        # ------------------------------------------------------------------
+        title_div = bkmodel.Div(
+            text="<b style='color:white;font-size:16pt'>Components</b>",
+            width=PALETTE_WIDTH,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
+        )
 
-        # Convert all icons to base64 so they work inside a Bokeh server
-        icon_urls = []
+        # ------------------------------------------------------------------
+        # One button per component (callbacks wired later by PlacementHandler)
+        # Buttons are kept in ICONS_CONFIG order for index-based selection.
+        # ------------------------------------------------------------------
+        buttons = []
+        btn_by_key: dict = {}
         for key in component_keys:
-            path = ICONS_CONFIG[key]["icon_path"]
-            file_url = "file://" + str(Path(path).resolve())
-            icon_urls.append(_url_to_base64(file_url))
+            # Add label with cleaned-up component name
+            label = _string_cleanup(key)
+            # Add icon (base64 so it renders inside the server)
+            icon_path = ICONS_CONFIG[key]["icon_path"]
+            file_url = "file://" + str(Path(icon_path).resolve())
+            b64_url = _url_to_base64(file_url)
 
-        # ------------------------------------------------------------------
-        # Data sources
-        # ------------------------------------------------------------------
+            svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 
+            120 120">
+              <image href="{b64_url}" width="120" height="120"/>
+            </svg>"""
 
-        palette_source = bkmodel.ColumnDataSource(
-            data=dict(
-                x=[ICON_SIZE] * n,
-                y=ys,
-                url=icon_urls,
-                w=[ICON_SIZE] * n,
-                h=[ICON_SIZE] * n,
+            btn = bkmodel.Button(
+                label=label,
+                icon=bkmodel.SVGIcon(svg=svg, size="2.75em"),
+                button_type=BTN_TYPE_DEFAULT,
+                width=PALETTE_WIDTH - 10,
+                height=ROW_HEIGHT - 6,
+                stylesheets=[
+                    """:host .bk-btn {
+                        font-size: 12pt;
+                        white-space: normal;
+                        padding-left: 6px;
+                        display: flex !important;
+                        flex-direction: row !important;
+                        align-items: center !important;
+                        justify-content: space-between !important;
+                    }
+                    :host .bk-btn .bk-btn-text {
+                        order: 0 !important;
+                        text-align: left;
+                    }
+                    :host .bk-btn .bk-icon {
+                        order: 1 !important;
+                        flex-shrink: 0;
+                    }
+                    """
+                ],
             )
+            buttons.append(btn)
+            btn_by_key[key] = btn
+
+        # ------------------------------------------------------------------
+        # Status div (updated by PlacementHandler on selection)
+        # ------------------------------------------------------------------
+        status_div = bkmodel.Div(
+            text="<i style='color:#aaa;font-size:14pt'>Select a component</i>",
+            width=PALETTE_WIDTH,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "14px"},
         )
 
-        # One invisible row-highlight rectangle; data is patched on selection
-        highlight_source = bkmodel.ColumnDataSource(
-            data=dict(x=[-9999.0], y=[-9999.0])  # off-screen until first selection
-        )
-
-        # Placed-nodes source used by the *main* canvas (populated on tap)
+        # ------------------------------------------------------------------
+        # Placed-nodes source used by the *main* canvas
+        # ------------------------------------------------------------------
         placed_nodes_source = bkmodel.ColumnDataSource(
             data=dict(x=[], y=[], url=[], w=[], h=[], name=[])
         )
 
-        # Status label at the bottom of the palette figure
-        status_source = bkmodel.ColumnDataSource(
-            data=dict(x=[PALETTE_WIDTH / 2], y=[6], text=["Select a component"])
-        )
-
-        # Tap-target source – wider invisble scatter that covers the full row
-        tap_source = bkmodel.ColumnDataSource(
-            data=dict(
-                x=[PALETTE_WIDTH / 2] * n,
-                y=ys,
-                component_key=component_keys,
-                label=[_string_cleanup(k) for k in component_keys],
-            )
-        )
-
-        # ------------------------------------------------------------------
-        # Figure
-        # ------------------------------------------------------------------
-
-        fig = bkplot.figure(
-            width=PALETTE_WIDTH,
-            height=n * ROW_HEIGHT + 24,
-            x_range=(0, PALETTE_WIDTH),
-            y_range=(0, n * ROW_HEIGHT),
-            toolbar_location=None,
-            background_fill_color=BACKGROUND_COLOR_CODE,
-            title="Components",
-        )
-        fig.xgrid.visible = False
-        fig.ygrid.visible = False
-        fig.xaxis.visible = False
-        fig.yaxis.visible = False
-        fig.title.text_color = "white"
-
-        # Highlight rect (behind selected row)
-        fig.rect(
-            x="x",
-            y="y",
-            width=PALETTE_WIDTH - 4,
-            height=ROW_HEIGHT - 4,
-            source=highlight_source,
-            fill_color="#FFD700",
-            fill_alpha=0.20,
-            line_color="#FFD700",
-            line_width=1,
-        )
-
-        # Component icons
-        fig.image_url(
-            url="url",
-            x="x",
-            y="y",
-            w="w",
-            h="h",
-            anchor="center",
-            source=palette_source,
-        )
-
-        # Component labels to the right of the icons
-        fig.add_layout(
-            bkmodel.LabelSet(
-                x="x",
-                y="y",
-                text="label",
-                x_offset=ICON_SIZE // 2 + 4,
-                source=tap_source,
-                text_color="white",
-                text_font_size="8pt",
-                text_baseline="middle",
-            )
-        )
-
-        # Horizontal dividers between rows
-        for i in range(1, n):
-            y_div = i * ROW_HEIGHT
-            divider_source = bkmodel.ColumnDataSource(
-                data=dict(x=[0, PALETTE_WIDTH], y=[y_div, y_div])
-            )
-            fig.line(
-                x="x",
-                y="y",
-                source=divider_source,
-                line_color="#808080",
-                line_width=0.5,
-                line_alpha=0.4,
-            )
-
-        # Invisible wide scatter used as tap target (covers the full row)
-        tap_glyph = fig.scatter(
-            x="x",
-            y="y",
-            size=PALETTE_WIDTH,
-            source=tap_source,
-            fill_alpha=0,
-            line_alpha=0,
-        )
-        fig.add_tools(
-            bkmodel.TapTool(renderers=[tap_glyph]),
-            bkmodel.HoverTool(
-                renderers=[tap_glyph],
-                tooltips=[("Component", "@label")],
-            ),
-        )
-
-        # Status label at the bottom
-        fig.add_layout(
-            bkmodel.LabelSet(
-                x="x",
-                y="y",
-                text="text",
-                source=status_source,
-                text_color="#FFD700",
-                text_font_size="7pt",
-                text_align="center",
-                text_baseline="bottom",
-            )
-        )
-
         state = PaletteState(
-            tap_source=tap_source,
-            highlight_source=highlight_source,
+            buttons=buttons,
             placed_nodes_source=placed_nodes_source,
-            status_source=status_source,
+            status_div=status_div,
         )
 
-        return fig, state
+        # ------------------------------------------------------------------
+        # Build one TabPanel per category defined in ICON_TYPE
+        # ------------------------------------------------------------------
+        tab_panels = []
+        for category, keys_in_cat in ICON_TYPE.items():
+            cat_buttons = [btn_by_key[k] for k in keys_in_cat if k in btn_by_key]
+            if not cat_buttons:
+                continue
+            tab_col = column(
+                *cat_buttons,
+                spacing=2,
+                styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
+            )
+            tab_panels.append(TabPanel(child=tab_col, title=category.capitalize()))
+
+        tabs = Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
+
+        palette_layout = column(
+            title_div,
+            tabs,
+            status_div,
+            spacing=2,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
+        )
+
+        return palette_layout, state
 
 
 # ---------------------------------------------------------------------------
@@ -295,12 +252,13 @@ class ComponentPaletteBuilder:
 
 class PlacementHandler:
     """
-    Wires palette selection events to canvas placement events.
+    Wires palette button events to canvas placement events.
 
-    Register the two callbacks after building the palette::
+    Instantiate **after** building the palette; the constructor automatically
+    wires all button ``on_click`` callbacks::
 
+        palette_layout, state = ComponentPaletteBuilder.build()
         handler = PlacementHandler(state, main_plot)
-        state.tap_source.selected.on_change("indices", handler.on_palette_select)
         main_plot.on_event(Tap, handler.on_canvas_tap)
         main_plot.image_url(
             url="url", x="x", y="y", w="w", h="h",
@@ -308,7 +266,7 @@ class PlacementHandler:
         )
     """
 
-    def __init__(self, state: PaletteState, main_plot, icon_size: int = 30):
+    def __init__(self, state: PaletteState, main_plot, icon_size: int = 50):
         """
         :param state: Shared :class:`PaletteState` instance
         :param main_plot: The Bokeh ``figure`` that acts as the canvas
@@ -317,44 +275,54 @@ class PlacementHandler:
         self.state = state
         self.main_plot = main_plot
         self.icon_size = icon_size
+        self._wire_buttons()
 
     # ------------------------------------------------------------------
-    # Palette selection callback
+    # Internal wiring
     # ------------------------------------------------------------------
 
-    def on_palette_select(self, attr, old, new):
-        """
-        Called when the user clicks a row in the palette.
-        Highlights the selected row and updates the status label.
-        """
-        if not new:
-            return
+    def _wire_buttons(self):
+        """Attach an on_click callback to every palette button."""
+        for idx, btn in enumerate(self.state.buttons):
+            btn.on_click(self._make_select_cb(idx))
 
-        idx = new[0]
+    def _make_select_cb(self, idx: int):
+        """Return a zero-argument closure that selects component at *idx*."""
+
+        def _cb():
+            self.on_palette_select(idx)
+
+        return _cb
+
+    # ------------------------------------------------------------------
+    # Palette selection
+    # ------------------------------------------------------------------
+
+    def on_palette_select(self, idx: int):
+        """
+        Select the component at position *idx* in :data:`ICONS_CONFIG`.
+
+        Updates button styling and the status label.
+        Can be called programmatically in tests without a running server.
+
+        :param idx: Zero-based index into ``list(ICONS_CONFIG.keys())``
+        """
         component_keys = list(ICONS_CONFIG.keys())
-        if idx >= len(component_keys):
+        if idx < 0 or idx >= len(component_keys):
             return
 
         self.state.selected_component = component_keys[idx]
 
-        # Move highlight rect to the selected row
-        n = len(component_keys)
-        y_center = (n - idx - 0.5) * ROW_HEIGHT
-        self.state.highlight_source.data = dict(
-            x=[PALETTE_WIDTH / 2],
-            y=[y_center],
-        )
+        # Highlight the selected button, reset all others
+        for j, btn in enumerate(self.state.buttons):
+            btn.button_type = BTN_TYPE_SELECTED if j == idx else BTN_TYPE_DEFAULT
 
         # Update status label
         label = _string_cleanup(self.state.selected_component)
-        self.state.status_source.data = dict(
-            x=[PALETTE_WIDTH / 2],
-            y=[6],
-            text=[f"Placing: {label}"],
-        )
+        self.state.status_div.text = f"<b style='color:#FFD700;font-size:14pt'>Placing: {label}</b>"
 
     # ------------------------------------------------------------------
-    # Canvas tap callback
+    # Canvas tap
     # ------------------------------------------------------------------
 
     def on_canvas_tap(self, event):
@@ -401,7 +369,7 @@ class ComponentPaletteLauncher:
     """
     Launch a self-contained Bokeh server that demonstrates the palette.
 
-    A blank canvas is placed next to the palette so you can click
+    A blank canvas is placed next to the button palette so you can click
     components and see them appear on the canvas.
     """
 
@@ -417,7 +385,7 @@ class ComponentPaletteLauncher:
         logging.getLogger("tornado").setLevel(logging.WARNING)
 
         def make_document(doc):
-            palette_fig, state = ComponentPaletteBuilder.build()
+            palette_layout, state = ComponentPaletteBuilder.build()
 
             # Blank canvas
             canvas = bkplot.figure(
@@ -447,9 +415,7 @@ class ComponentPaletteLauncher:
             )
 
             # Labels for placed nodes
-            placed_label_source = bkmodel.ColumnDataSource(
-                data=dict(x=[], y=[], text=[])
-            )
+            placed_label_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], text=[]))
             canvas.add_layout(
                 bkmodel.LabelSet(
                     x="x",
@@ -474,11 +440,11 @@ class ComponentPaletteLauncher:
 
             state.placed_nodes_source.on_change("data", _sync_labels)
 
+            # Wire buttons and canvas tap
             handler = PlacementHandler(state, canvas)
-            state.tap_source.selected.on_change("indices", handler.on_palette_select)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
-            doc.add_root(row(palette_fig, canvas))
+            doc.add_root(row(palette_layout, canvas))
             doc.title = "Component Palette Demo"
 
         def make_document_with_tracking(doc):

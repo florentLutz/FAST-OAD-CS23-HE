@@ -6,9 +6,9 @@
 Unit tests for the component_palette module.
 
 These tests cover:
-- palette figure construction (sizes, data sources)
-- palette state initialisation
-- PlacementHandler.on_palette_select  (highlight + status label)
+- palette layout construction (button count, labels, initial state)
+- PaletteState initialisation
+- PlacementHandler.on_palette_select  (button highlight + status div)
 - PlacementHandler.on_canvas_tap      (icon placement on canvas)
 - multiple placements & deduplication of node names
 - placing different component types alternately
@@ -18,13 +18,14 @@ These tests cover:
 import os
 import pytest
 
+import bokeh.models as bkmodel
 import bokeh.plotting as bkplot
-from bokeh.events import Tap
+
 
 from ..component_palette import (
+    BTN_TYPE_DEFAULT,
+    BTN_TYPE_SELECTED,
     ICONS_CONFIG,
-    PALETTE_WIDTH,
-    ROW_HEIGHT,
     ComponentPaletteBuilder,
     PaletteState,
     PlacementHandler,
@@ -61,81 +62,67 @@ def _make_tap_event(x: float = 100.0, y: float = 200.0):
 
 
 class TestComponentPaletteBuilder:
-    """Tests for the palette figure constructor."""
+    """Tests for the palette builder."""
 
     def test_build_returns_tuple(self):
-        """build() must return a 2-tuple (figure, PaletteState)."""
         result = ComponentPaletteBuilder.build()
-        assert isinstance(result, tuple)
-        assert len(result) == 2
-
-    def test_figure_type(self):
-        fig, _state = ComponentPaletteBuilder.build()
-        assert hasattr(fig, "renderers"), "Expected a Bokeh Figure object"
-
-    def test_figure_width(self):
-        fig, _state = ComponentPaletteBuilder.build()
-        assert fig.width == PALETTE_WIDTH
-
-    def test_figure_height_matches_component_count(self):
-        fig, _state = ComponentPaletteBuilder.build()
-        n = len(ICONS_CONFIG)
-        expected_height = n * ROW_HEIGHT + 24
-        assert fig.height == expected_height
+        assert isinstance(result, tuple) and len(result) == 2
 
     def test_state_type(self):
-        _fig, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteBuilder.build()
         assert isinstance(state, PaletteState)
 
-    def test_state_tap_source_row_count(self):
-        """tap_source must have one row per component in ICONS_CONFIG."""
-        _fig, state = ComponentPaletteBuilder.build()
-        n_rows = len(state.tap_source.data["component_key"])
-        assert n_rows == len(ICONS_CONFIG)
+    def test_button_count_matches_components(self):
+        """One button must be created for every entry in ICONS_CONFIG."""
+        _layout, state = ComponentPaletteBuilder.build()
+        assert len(state.buttons) == len(ICONS_CONFIG)
 
-    def test_state_tap_source_has_all_keys(self):
-        """All ICONS_CONFIG keys must be present in tap_source."""
-        _fig, state = ComponentPaletteBuilder.build()
-        assert set(state.tap_source.data["component_key"]) == set(ICONS_CONFIG.keys())
+    def test_buttons_are_bokeh_buttons(self):
+        _layout, state = ComponentPaletteBuilder.build()
+        for btn in state.buttons:
+            assert isinstance(btn, bkmodel.Button)
 
-    def test_state_placed_nodes_source_initially_empty(self):
-        """No nodes should be placed when the palette is first built."""
-        _fig, state = ComponentPaletteBuilder.build()
+    def test_button_labels_cleaned(self):
+        """Button labels must equal _string_cleanup of each ICONS_CONFIG key."""
+        _layout, state = ComponentPaletteBuilder.build()
+        keys = list(ICONS_CONFIG.keys())
+        for btn, key in zip(state.buttons, keys):
+            assert btn.label == _string_cleanup(key)
+
+    def test_buttons_initially_default_type(self):
+        """No button should appear selected before any interaction."""
+        _layout, state = ComponentPaletteBuilder.build()
+        for btn in state.buttons:
+            assert btn.button_type == BTN_TYPE_DEFAULT
+
+    def test_placed_nodes_source_initially_empty(self):
+        _layout, state = ComponentPaletteBuilder.build()
         assert state.placed_nodes_source.data["x"] == []
         assert state.placed_nodes_source.data["name"] == []
 
-    def test_state_selected_component_initially_none(self):
-        _fig, state = ComponentPaletteBuilder.build()
+    def test_selected_component_initially_none(self):
+        _layout, state = ComponentPaletteBuilder.build()
         assert state.selected_component is None
 
-    def test_state_placed_counter_initially_empty(self):
-        _fig, state = ComponentPaletteBuilder.build()
+    def test_placed_counter_initially_empty(self):
+        _layout, state = ComponentPaletteBuilder.build()
         assert state.placed_counter == {}
 
-    def test_highlight_source_off_screen_initially(self):
-        """The highlight rect should start off-screen (x < 0)."""
-        _fig, state = ComponentPaletteBuilder.build()
-        assert state.highlight_source.data["x"][0] < 0
+    def test_status_div_exists(self):
+        _layout, state = ComponentPaletteBuilder.build()
+        assert isinstance(state.status_div, bkmodel.Div)
 
-    def test_tap_source_labels_cleaned(self):
-        """Labels in tap_source must equal _string_cleanup of each key."""
-        _fig, state = ComponentPaletteBuilder.build()
-        keys = state.tap_source.data["component_key"]
-        labels = state.tap_source.data["label"]
-        for key, label in zip(keys, labels):
-            assert label == _string_cleanup(key)
+    def test_status_div_initial_text_not_empty(self):
+        _layout, state = ComponentPaletteBuilder.build()
+        assert len(state.status_div.text) > 0
 
-    def test_tap_source_icon_urls_are_base64(self):
-        """Icon URLs inside the palette tap source must be base64 data URIs."""
-        _fig, state = ComponentPaletteBuilder.build()
-        # The icon URLs are stored in the palette_source (image_url glyph),
-        # but the tap_source carries component_key; we validate via state.
-        # We just confirm that image_url renderers exist on the figure.
-        fig, _s = ComponentPaletteBuilder.build()
-        image_url_renderers = [
-            r for r in fig.renderers if hasattr(r, "glyph") and "ImageURL" in type(r.glyph).__name__
-        ]
-        assert len(image_url_renderers) > 0
+    def test_layout_contains_buttons(self):
+        """The returned layout column must contain all button widgets."""
+        layout, state = ComponentPaletteBuilder.build()
+        # Collect all widgets in the column children
+        children = list(layout.children)
+        for btn in state.buttons:
+            assert btn in children
 
 
 # ---------------------------------------------------------------------------
@@ -147,54 +134,60 @@ class TestPlacementHandlerPaletteSelect:
     """Tests for on_palette_select."""
 
     def setup_method(self):
-        _fig, self.state = ComponentPaletteBuilder.build()
+        _layout, self.state = ComponentPaletteBuilder.build()
         self.canvas = _make_canvas()
         self.handler = PlacementHandler(self.state, self.canvas)
 
     def test_select_first_component(self):
-        """Selecting index 0 should set selected_component to the first key."""
         first_key = list(ICONS_CONFIG.keys())[0]
-        self.handler.on_palette_select("indices", [], [0])
+        self.handler.on_palette_select(0)
         assert self.state.selected_component == first_key
 
     def test_select_last_component(self):
         last_key = list(ICONS_CONFIG.keys())[-1]
-        last_idx = len(ICONS_CONFIG) - 1
-        self.handler.on_palette_select("indices", [], [last_idx])
+        self.handler.on_palette_select(len(ICONS_CONFIG) - 1)
         assert self.state.selected_component == last_key
 
-    def test_highlight_moves_to_selected_row(self):
-        """Highlight rect x should equal PALETTE_WIDTH/2 after selection."""
-        self.handler.on_palette_select("indices", [], [0])
-        assert self.state.highlight_source.data["x"][0] == pytest.approx(PALETTE_WIDTH / 2)
+    def test_selected_button_type_changes_to_selected(self):
+        self.handler.on_palette_select(0)
+        assert self.state.buttons[0].button_type == BTN_TYPE_SELECTED
 
-    def test_highlight_y_matches_row(self):
-        """Highlight rect y must correspond to the selected row centre."""
-        n = len(ICONS_CONFIG)
-        idx = 2
-        expected_y = (n - idx - 0.5) * ROW_HEIGHT
-        self.handler.on_palette_select("indices", [], [idx])
-        assert self.state.highlight_source.data["y"][0] == pytest.approx(expected_y)
+    def test_other_buttons_remain_default(self):
+        self.handler.on_palette_select(0)
+        for btn in self.state.buttons[1:]:
+            assert btn.button_type == BTN_TYPE_DEFAULT
 
-    def test_status_label_updated(self):
-        """Status label must mention the selected component."""
+    def test_switching_selection_deselects_previous(self):
+        self.handler.on_palette_select(0)
+        self.handler.on_palette_select(2)
+        assert self.state.buttons[0].button_type == BTN_TYPE_DEFAULT
+        assert self.state.buttons[2].button_type == BTN_TYPE_SELECTED
+
+    def test_only_one_button_selected_at_a_time(self):
+        self.handler.on_palette_select(3)
+        selected = [b for b in self.state.buttons if b.button_type == BTN_TYPE_SELECTED]
+        assert len(selected) == 1
+
+    def test_status_div_updated_on_selection(self):
         key = list(ICONS_CONFIG.keys())[1]
-        idx = 1
-        self.handler.on_palette_select("indices", [], [idx])
-        status_text = self.state.status_source.data["text"][0]
-        assert _string_cleanup(key) in status_text
+        self.handler.on_palette_select(1)
+        assert _string_cleanup(key) in self.state.status_div.text
 
-    def test_empty_selection_does_not_crash(self):
-        """Calling on_palette_select with an empty list should be a no-op."""
-        self.handler.on_palette_select("indices", [], [])
+    def test_negative_index_does_not_crash(self):
+        self.handler.on_palette_select(-1)
         assert self.state.selected_component is None  # unchanged
 
     def test_out_of_range_index_does_not_crash(self):
-        """An index beyond the component list should not raise."""
-        out_of_range = len(ICONS_CONFIG) + 99
-        self.handler.on_palette_select("indices", [], [out_of_range])
-        # selected_component must remain unchanged (None)
-        assert self.state.selected_component is None
+        self.handler.on_palette_select(len(ICONS_CONFIG) + 99)
+        assert self.state.selected_component is None  # unchanged
+
+    def test_wire_buttons_attaches_callbacks(self):
+        """Clicking a button (simulated via _make_select_cb) must trigger selection."""
+        # Simulate clicking the first button by calling the handler's closure directly
+        cb = self.handler._make_select_cb(0)
+        cb()
+        assert self.state.selected_component == list(ICONS_CONFIG.keys())[0]
+        assert self.state.buttons[0].button_type == BTN_TYPE_SELECTED
 
 
 # ---------------------------------------------------------------------------
@@ -206,18 +199,17 @@ class TestPlacementHandlerCanvasTap:
     """Tests for on_canvas_tap."""
 
     def setup_method(self):
-        _fig, self.state = ComponentPaletteBuilder.build()
+        _layout, self.state = ComponentPaletteBuilder.build()
         self.canvas = _make_canvas()
         self.handler = PlacementHandler(self.state, self.canvas)
 
     def _select(self, idx: int = 0):
-        self.handler.on_palette_select("indices", [], [idx])
+        self.handler.on_palette_select(idx)
 
     # -- no selection guard --------------------------------------------------
 
     def test_tap_without_selection_places_nothing(self):
-        evt = _make_tap_event(50, 50)
-        self.handler.on_canvas_tap(evt)
+        self.handler.on_canvas_tap(_make_tap_event(50, 50))
         assert self.state.placed_nodes_source.data["x"] == []
 
     # -- single placement ----------------------------------------------------
@@ -261,7 +253,6 @@ class TestPlacementHandlerCanvasTap:
         assert len(self.state.placed_nodes_source.data["x"]) == 5
 
     def test_counter_increments_per_component(self):
-        """Each successive placement of the same component gets a higher suffix."""
         self._select(0)
         for i in range(1, 4):
             self.handler.on_canvas_tap(_make_tap_event())
@@ -269,36 +260,30 @@ class TestPlacementHandlerCanvasTap:
             assert name.endswith(f"_{i}")
 
     def test_different_components_have_independent_counters(self):
-        """Counters for different component types are independent."""
         keys = list(ICONS_CONFIG.keys())
-        self.handler.on_palette_select("indices", [], [0])
+        self.handler.on_palette_select(0)
         self.handler.on_canvas_tap(_make_tap_event())
         self.handler.on_canvas_tap(_make_tap_event())
 
-        self.handler.on_palette_select("indices", [], [1])
+        self.handler.on_palette_select(1)
         self.handler.on_canvas_tap(_make_tap_event())
 
         names = self.state.placed_nodes_source.data["name"]
-        # First component: two placements → _1, _2
         assert names[0] == f"{keys[0]}_1"
         assert names[1] == f"{keys[0]}_2"
-        # Second component: one placement → _1
         assert names[2] == f"{keys[1]}_1"
 
     def test_placed_icon_size_uses_handler_default(self):
         self._select(0)
         self.handler.on_canvas_tap(_make_tap_event())
-        w = self.state.placed_nodes_source.data["w"][0]
-        h = self.state.placed_nodes_source.data["h"][0]
-        assert w == self.handler.icon_size
-        assert h == self.handler.icon_size
+        assert self.state.placed_nodes_source.data["w"][0] == self.handler.icon_size
+        assert self.state.placed_nodes_source.data["h"][0] == self.handler.icon_size
 
     def test_custom_icon_size(self):
-        """PlacementHandler respects a custom icon_size."""
-        _fig2, state2 = ComponentPaletteBuilder.build()
+        _layout2, state2 = ComponentPaletteBuilder.build()
         canvas2 = _make_canvas()
         handler2 = PlacementHandler(state2, canvas2, icon_size=48)
-        handler2.on_palette_select("indices", [], [0])
+        handler2.on_palette_select(0)
         handler2.on_canvas_tap(_make_tap_event())
         assert state2.placed_nodes_source.data["w"][0] == 48
 
@@ -307,10 +292,10 @@ class TestPlacementHandlerCanvasTap:
     @pytest.mark.parametrize("idx", range(len(ICONS_CONFIG)))
     def test_each_component_can_be_placed(self, idx):
         """Every component type in ICONS_CONFIG must be placeable without error."""
-        _fig, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteBuilder.build()
         canvas = _make_canvas()
         handler = PlacementHandler(state, canvas)
-        handler.on_palette_select("indices", [], [idx])
+        handler.on_palette_select(idx)
         handler.on_canvas_tap(_make_tap_event())
         assert len(state.placed_nodes_source.data["x"]) == 1
 
