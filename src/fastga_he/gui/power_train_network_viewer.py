@@ -53,6 +53,11 @@ ICONS_CONFIG = {
         "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
         "target_color": MECHANICAL_POWER_COLOR_CODE,
     },
+    "dc_load": {
+        "icon_path": ICON_FOLDER_PATH / "DC_load.png",
+        "source_color": ELECTRICITY_CURRENT_COLOR_CODE,
+        "target_color": None,
+    },
     "generator": {
         "icon_path": ICON_FOLDER_PATH / "generator.png",
         "source_color": MECHANICAL_POWER_COLOR_CODE,
