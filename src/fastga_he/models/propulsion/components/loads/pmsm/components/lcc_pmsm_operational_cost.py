@@ -8,12 +8,10 @@ import openmdao.api as om
 
 class LCCPMSMOperationalCost(om.ExplicitComponent):
     """
-    Computation of the maintenance cost of the PMSM. As the bearing accounts for most of the mechanical
-    faults of the rotor :cite:`orlowska:2022`, the PMSM operational cost is estimated based on
-    the bearing's cost and life expectancy. The suggested bearing life expectancy is given by
-    Shigley's mechanical engineering design :cite:`shigley:2014`. The bearing types are provided
-    from :cite:`emrax:2018`. The off-the-shelf price of the bearing is referenced from
-    https://qualitybearingsonline.co.uk/.
+    Computation of the maintenance cost of the PMSM. As the bearing accounts for most of the
+    mechanical faults of the rotor :cite:`orlowska:2022`, the PMSM lifespan is estimated
+    based on the bearing life expectancy, given by Shigley's mechanical engineering design
+    :cite:`shigley:2014`.
     """
 
     def initialize(self):
@@ -31,21 +29,16 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
             desc="Expected number of hours flown per year",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
+            units="USD",
             val=np.nan,
-            units="kN*m",
-            desc="Max continuous torque of the motor",
+            desc="Unit purchase cost of the PMS motor",
         )
         self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
-            val=np.nan,
-            units="min**-1",
-        )
-        self.add_input(
-            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy",
-            val=500.0,
+            name="data:propulsion:he_power_train:PMSM:" + motor_id + ":life_expectancy",
+            val=2000.0,
             units="h",
-            desc="Expected life expectancy of the bearing",
+            desc="Expected lifespan of the PMSM motor, based on the bearing life expectancy",
         )
 
         self.add_output(
@@ -60,69 +53,36 @@ class LCCPMSMOperationalCost(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         motor_id = self.options["motor_id"]
 
-        torque_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
-        rpm_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating"]
+        purchase_cost = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost"]
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
-        bearing_life_expectancy = inputs[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy"
+        life_expectancy = inputs[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":life_expectancy"
         ]
 
         outputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost"] = (
-            flight_hours_per_year
-            / bearing_life_expectancy
-            * 15.5
-            * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
+            purchase_cost * flight_hours_per_year / life_expectancy
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         motor_id = self.options["motor_id"]
 
-        torque_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating"]
-        rpm_rating = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating"]
+        purchase_cost = inputs["data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost"]
         flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
-        bearing_life_expectancy = inputs[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy"
+        life_expectancy = inputs[
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":life_expectancy"
         ]
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
             "data:TLAR:flight_hours_per_year",
-        ] = (
-            15.5
-            / bearing_life_expectancy
-            * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
-        )
+        ] = purchase_cost / life_expectancy
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":bearing_life_expectancy",
-        ] = (
-            -flight_hours_per_year
-            * 15.5
-            / bearing_life_expectancy**2.0
-            * (2.0 * np.pi * torque_rating * rpm_rating / 60.0) ** 0.505
-        )
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":life_expectancy",
+        ] = -purchase_cost * flight_hours_per_year / life_expectancy**2.0
 
         partials[
             "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":torque_rating",
-        ] = (
-            0.505
-            * flight_hours_per_year
-            / bearing_life_expectancy
-            * 15.5
-            * (2.0 * np.pi * rpm_rating / 60.0) ** 0.505
-            / (torque_rating**0.495)
-        )
-
-        partials[
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":operational_cost",
-            "data:propulsion:he_power_train:PMSM:" + motor_id + ":rpm_rating",
-        ] = (
-            0.505
-            * flight_hours_per_year
-            / bearing_life_expectancy
-            * 15.5
-            * (2.0 * np.pi * torque_rating / 60.0) ** 0.505
-            / (rpm_rating**0.495)
-        )
+            "data:propulsion:he_power_train:PMSM:" + motor_id + ":purchase_cost",
+        ] = flight_hours_per_year / life_expectancy
