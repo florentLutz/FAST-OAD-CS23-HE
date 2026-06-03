@@ -169,6 +169,8 @@ class ComponentPaletteBuilder:
             file_url = "file://" + str(Path(icon_path).resolve())
             b64_url = _url_to_base64(file_url)
 
+            # SVG conversion is a bit hacky but it allows us to control the icon size and avoid
+            # blurry rendering that happens when resizing raster images in Bokeh
             svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 
             120 120">
               <image href="{b64_url}" width="120" height="120"/>
@@ -219,20 +221,43 @@ class ComponentPaletteBuilder:
             button_type=BTN_TYPE_DEFAULT,
             width=PALETTE_WIDTH - 10,
             height=ROW_HEIGHT - 6,
+            stylesheets=[
+                """
+                :host button {
+                    font-size: 1.4em;
+                }
+            """
+            ],
         )
 
         save_button = bkmodel.Button(
             label="Save",
+            icon=bkmodel.TablerIcon(icon_name="device-floppy"),
             button_type="success",
             width=PALETTE_WIDTH - 10,
             height=ROW_HEIGHT - 6,
+            stylesheets=[
+                """
+                :host button {
+                    font-size: 1.4em;
+                }
+            """
+            ],
         )
 
         end_session_button = bkmodel.Button(
             label="End Session",
+            icon=bkmodel.TablerIcon(icon_name="power"),
             button_type="warning",
             width=PALETTE_WIDTH - 10,
             height=ROW_HEIGHT - 6,
+            stylesheets=[
+                """
+                :host button {
+                    font-size: 1.4em;
+                }
+            """
+            ],
         )
         end_session_button.js_on_click(bkmodel.CustomJS(code="window.close();"))
 
