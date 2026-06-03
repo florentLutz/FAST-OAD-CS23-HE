@@ -35,12 +35,13 @@ Typical usage
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+import json
+from datetime import datetime
 
 import bokeh.models as bkmodel
 import bokeh.plotting as bkplot
 from bokeh.events import Tap
 from bokeh.layouts import column, row
-from bokeh.models import TabPanel, Tabs  # noqa: F401 – used explicitly below
 from bokeh.server.server import Server
 from tornado.ioloop import IOLoop
 import webbrowser
@@ -56,7 +57,7 @@ from fastga_he.gui.power_train_network_viewer import (
     _url_to_base64,
 )
 
-_log = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Layout constants
@@ -113,6 +114,14 @@ class PaletteState:
     selected_component: str = field(default=None)
     # Deduplication counters: component_key -> int
     placed_counter: dict = field(default_factory=dict)
+    # Delete button
+    delete_button: bkmodel.Button = field(default=None)
+    # Whether delete mode is active (click on canvas removes nearest icon)
+    save_button: bkmodel.Button = field(default=None)
+    # Save the current canvas state into a JSON file
+    end_session_button: bkmodel.Button = field(default=None)
+    # button to end the current session (stop the server)
+    delete_mode: bool = field(default=False)
 
 
 # ---------------------------------------------------------------------------
@@ -204,6 +213,29 @@ class ComponentPaletteBuilder:
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "14px"},
         )
 
+        delete_button = bkmodel.Button(
+            label="Delete",
+            icon=bkmodel.TablerIcon(icon_name="trash"),
+            button_type=BTN_TYPE_DEFAULT,
+            width=PALETTE_WIDTH - 10,
+            height=ROW_HEIGHT - 6,
+        )
+
+        save_button = bkmodel.Button(
+            label="Save",
+            button_type="success",
+            width=PALETTE_WIDTH - 10,
+            height=ROW_HEIGHT - 6,
+        )
+
+        end_session_button = bkmodel.Button(
+            label="End Session",
+            button_type="warning",
+            width=PALETTE_WIDTH - 10,
+            height=ROW_HEIGHT - 6,
+        )
+        end_session_button.js_on_click(bkmodel.CustomJS(code="window.close();"))
+
         # ------------------------------------------------------------------
         # Placed-nodes source used by the *main* canvas
         # ------------------------------------------------------------------
@@ -215,6 +247,9 @@ class ComponentPaletteBuilder:
             buttons=buttons,
             placed_nodes_source=placed_nodes_source,
             status_div=status_div,
+            delete_button=delete_button,
+            save_button=save_button,
+            end_session_button=end_session_button,
         )
 
         # ------------------------------------------------------------------
@@ -230,14 +265,17 @@ class ComponentPaletteBuilder:
                 spacing=2,
                 styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
             )
-            tab_panels.append(TabPanel(child=tab_col, title=category.capitalize()))
+            tab_panels.append(bkmodel.TabPanel(child=tab_col, title=category.capitalize()))
 
-        tabs = Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
+        tabs = bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
 
         palette_layout = column(
             title_div,
             tabs,
             status_div,
+            delete_button,
+            save_button,
+            end_session_button,
             spacing=2,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
@@ -283,8 +321,12 @@ class PlacementHandler:
 
     def _wire_buttons(self):
         """Attach an on_click callback to every palette button."""
+        self.state.save_button.on_click(self._save_canvas_state)
+        self.state.end_session_button.on_click(self._end_session)
         for idx, btn in enumerate(self.state.buttons):
             btn.on_click(self._make_select_cb(idx))
+        if self.state.delete_button is not None:
+            self.state.delete_button.on_click(self._toggle_delete_mode)
 
     def _make_select_cb(self, idx: int):
         """Return a zero-argument closure that selects component at *idx*."""
@@ -293,6 +335,54 @@ class PlacementHandler:
             self.on_palette_select(idx)
 
         return _cb
+
+    # ------------------------------------------------------------------
+    # Delete mode toggle
+    # ------------------------------------------------------------------
+
+    def _toggle_delete_mode(self):
+        """Toggle delete mode on/off."""
+        self.state.delete_mode = not self.state.delete_mode
+        if self.state.delete_mode:
+            # Enter delete mode: deselect any component
+            self.state.selected_component = None
+            for btn in self.state.buttons:
+                btn.button_type = BTN_TYPE_DEFAULT
+            self.state.status_div.text = "<b style='color:#FF4444;font-size:14pt'>Delete mode: click an icon to remove it</b>"
+            self.state.delete_button.button_type = "danger"
+        else:
+            # Exit delete mode
+            self.state.status_div.text = (
+                "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
+            )
+            self.state.delete_button.button_type = BTN_TYPE_DEFAULT
+
+    # ------------------------------------------------------------------
+    # Delete mode toggle
+    # ------------------------------------------------------------------
+
+    def _save_canvas_state(self):
+        """Save the current canvas state (placed nodes) into a JSON file."""
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"canvas_state_{timestamp}.json"
+        data_to_save = self.state.placed_nodes_source.data
+        with open(filename, "w") as f:
+            json.dump(data_to_save, f, indent=2)
+        _LOGGER.info("Canvas state saved to %s", filename)
+        # Reset button state after a short delay
+        IOLoop.current().call_later(
+            1.0, lambda: setattr(self.state.save_button, "button_type", "success")
+        )
+
+    # ------------------------------------------------------------------
+    # End session
+    # ------------------------------------------------------------------
+
+    def _end_session(self):
+        """End the current session by stopping the server."""
+        _LOGGER.info("Ending session and stopping server")
+        IOLoop.current().stop()
 
     # ------------------------------------------------------------------
     # Palette selection
@@ -313,6 +403,12 @@ class PlacementHandler:
 
         self.state.selected_component = component_keys[idx]
 
+        # Exit delete mode if active
+        if self.state.delete_mode:
+            self.state.delete_mode = False
+            if self.state.delete_button is not None:
+                self.state.delete_button.button_type = BTN_TYPE_DEFAULT
+
         # Highlight the selected button, reset all others
         for j, btn in enumerate(self.state.buttons):
             btn.button_type = BTN_TYPE_SELECTED if j == idx else BTN_TYPE_DEFAULT
@@ -328,13 +424,38 @@ class PlacementHandler:
     def on_canvas_tap(self, event):
         """
         Called when the user taps the main canvas.
-        Places the currently selected component icon at the tapped position.
+        In normal mode: places the currently selected component icon at the tapped position.
+        In delete mode: removes the nearest placed icon within snap distance.
         """
+        x, y = event.x, event.y
+
+        if self.state.delete_mode:
+            current = self.state.placed_nodes_source.data
+            xs = list(current.get("x", []))
+            ys = list(current.get("y", []))
+            if not xs:
+                return
+            # Find nearest icon
+            snap = self.icon_size
+            best_idx = None
+            best_dist = float("inf")
+            for i, (ix, iy) in enumerate(zip(xs, ys)):
+                dist = ((x - ix) ** 2 + (y - iy) ** 2) ** 0.5
+                if dist < snap and dist < best_dist:
+                    best_dist = dist
+                    best_idx = i
+            if best_idx is not None:
+                new_data = {k: list(v) for k, v in current.items()}
+                for col in new_data:
+                    new_data[col].pop(best_idx)
+                self.state.placed_nodes_source.data = new_data
+                _LOGGER.info("Deleted node at index %d", best_idx)
+            return
+
         if self.state.selected_component is None:
             return
 
         comp_key = self.state.selected_component
-        x, y = event.x, event.y
 
         # Unique node name (e.g. "battery_1", "battery_2", …)
         count = self.state.placed_counter.get(comp_key, 0) + 1
@@ -357,7 +478,7 @@ class PlacementHandler:
             "name": list(current["name"]) + [node_name],
         }
 
-        _log.debug("Placed %s at (%.1f, %.1f)", node_name, x, y)
+        _LOGGER.info("Placed %s at (%.1f, %.1f)", node_name, x, y)
 
 
 # ---------------------------------------------------------------------------
