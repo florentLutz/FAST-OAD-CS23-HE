@@ -18,7 +18,7 @@ Typical usage
     ComponentPaletteLauncher.launch(port=5007)
 
     # --- embedded in an existing Bokeh document ---
-    palette_layout, state = ComponentPaletteBuilder.build()
+    palette_layout, table_panel, state = ComponentPaletteBuilder.build()
 
     def make_doc(doc):
         from bokeh.layouts import row
@@ -32,6 +32,8 @@ Typical usage
 
 """
 
+import sys
+from pathlib import Path
 import logging
 from dataclasses import dataclass, field
 import json
@@ -45,11 +47,12 @@ from bokeh.server.server import Server
 from tornado.ioloop import IOLoop
 import webbrowser
 
-import sys
-from pathlib import Path
-from fastga_he.gui.constants import POSSIBLE_POSITIONS, ICON_TYPE, POSSIBLE_COMPONENT_TYPES
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from fastga_he.gui.constants import (
+    POSSIBLE_POSITIONS,
+    ICON_TYPE,
+    POSSIBLE_COMPONENT_TYPES,
+    POSSIBLE_OPTIONS,
+)
 from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
     ICONS_CONFIG,
@@ -58,28 +61,35 @@ from fastga_he.gui.power_train_network_viewer import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-# ---------------------------------------------------------------------------
+# ============================================================================
 # Layout constants
-# ---------------------------------------------------------------------------
+# ============================================================================
 
 PALETTE_WIDTH = 300
 ROW_HEIGHT = 52
-ICON_SIZE = 50
+ICON_SIZE = 45
 
 # Button appearance
-BUTTON_DEFAULT_COLOR_TYPE = "light"  # unselected
-BUTTON_SELECTED_COLOR_TYPE = "primary"  # selected (blue highlight)
+BUTTON_DEFAULT_COLOR_TYPE = "light"  # unselected state
+BUTTON_SELECTED_COLOR_TYPE = "primary"  # selected state (blue highlight)
 
 
-# ---------------------------------------------------------------------------
-# Shared mutable state between palette and placement handler
-# ---------------------------------------------------------------------------
+# ============================================================================
+# Shared mutable state
+# ============================================================================
 
 
 @dataclass
 class PaletteState:
-    """Holds references to all Bokeh widgets managed by the palette."""
+    """
+    Holds references to all Bokeh widgets managed by the palette.
+
+    Passed by reference between :class:`ComponentPaletteBuilder`,
+    :class:`PlacementHandler`, and :class:`ComponentPaletteLauncher` so that
+    all parties share the same widget instances.
+    """
 
     buttons: list = field(default_factory=list)
     placed_nodes_source: bkmodel.ColumnDataSource = field(default=None)
@@ -102,14 +112,14 @@ class PaletteState:
     options_source: bkmodel.ColumnDataSource = field(default=None)
     apply_button: bkmodel.Button = field(default=None)
     # Index of the currently selected canvas node (None = nothing selected)
-    selected_node_idx: int = field(default=None)
+    selected_node_index: int = field(default=None)
     # The whole config panel column – toggled visible/invisible
     table_panel: object = field(default=None)
 
 
-# ---------------------------------------------------------------------------
+# ============================================================================
 # Palette builder
-# ---------------------------------------------------------------------------
+# ============================================================================
 
 
 class ComponentPaletteBuilder:
@@ -129,37 +139,30 @@ class ComponentPaletteBuilder:
         """
         component_keys = list(ICONS_CONFIG.keys())
 
-        # ------------------------------------------------------------------
-        # Title div
-        # ------------------------------------------------------------------
+        # Title div for the palette sidebar
         title_div = bkmodel.Div(
             text="<b style='color:white;font-size:16pt'>Components</b>",
             width=PALETTE_WIDTH,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
         )
 
-        # ------------------------------------------------------------------
-        # One button per component (callbacks wired later by PlacementHandler)
+        # One button per component – callbacks wired later by PlacementHandler.
         # Buttons are kept in ICONS_CONFIG order for index-based selection.
-        # ------------------------------------------------------------------
         buttons = []
-        btn_by_key: dict = {}
+        button_by_key: dict = {}
         for key in component_keys:
-            # Add label with cleaned-up component name
             label = _string_cleanup(key)
-            # Add icon (base64 so it renders inside the server)
+
+            # Base64-encode the icon so it renders correctly inside the server
             icon_path = ICONS_CONFIG[key]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
             b64_url = _url_to_base64(file_url)
 
-            # SVG conversion is a bit hacky but it allows us to control the icon size and avoid
-            # blurry rendering that happens when resizing raster images in Bokeh
-            svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 
-            120 120">
-              <image href="{b64_url}" width="120" height="120"/>
-            </svg>"""
+            # Wrap image in an SVG to control size and avoid blurry raster scaling in Bokeh
+            svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+                    <image href="{b64_url}" width="120" height="120"/></svg>"""
 
-            btn = bkmodel.Button(
+            button = bkmodel.Button(
                 label=label,
                 icon=bkmodel.SVGIcon(svg=svg, size="2.75em"),
                 button_type=BUTTON_DEFAULT_COLOR_TYPE,
@@ -186,17 +189,18 @@ class ComponentPaletteBuilder:
                     """
                 ],
             )
-            buttons.append(btn)
-            btn_by_key[key] = btn
+            buttons.append(button)
+            button_by_key[key] = button
 
-        # ------------------------------------------------------------------
-        # Status div (updated by PlacementHandler on selection)
-        # ------------------------------------------------------------------
+        # Status div – updated by PlacementHandler when a component is selected
         status_div = bkmodel.Div(
             text="<i style='color:#aaa;font-size:14pt'>Select a component</i>",
             width=PALETTE_WIDTH,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "14px"},
         )
+
+        # Shared stylesheet for action buttons (Delete, Save, End Session)
+        _action_stylesheet = [":host button { font-size: 1.4em; }"]
 
         delete_button = bkmodel.Button(
             label="Delete",
@@ -204,13 +208,7 @@ class ComponentPaletteBuilder:
             button_type=BUTTON_DEFAULT_COLOR_TYPE,
             width=PALETTE_WIDTH - 10,
             height=ROW_HEIGHT - 6,
-            stylesheets=[
-                """
-                :host button {
-                    font-size: 1.4em;
-                }
-            """
-            ],
+            stylesheets=_action_stylesheet,
         )
 
         save_button = bkmodel.Button(
@@ -219,13 +217,7 @@ class ComponentPaletteBuilder:
             button_type="success",
             width=PALETTE_WIDTH - 10,
             height=ROW_HEIGHT - 6,
-            stylesheets=[
-                """
-                :host button {
-                    font-size: 1.4em;
-                }
-            """
-            ],
+            stylesheets=_action_stylesheet,
         )
 
         end_session_button = bkmodel.Button(
@@ -234,42 +226,39 @@ class ComponentPaletteBuilder:
             button_type="warning",
             width=PALETTE_WIDTH - 10,
             height=ROW_HEIGHT - 6,
-            stylesheets=[
-                """
-                :host button {
-                    font-size: 1.4em;
-                }
-            """
-            ],
+            stylesheets=_action_stylesheet,
         )
         end_session_button.js_on_click(bkmodel.CustomJS(code="window.close();"))
 
-        # ------------------------------------------------------------------
-        # Placed-nodes source used by the *main* canvas
-        # ------------------------------------------------------------------
+        # ColumnDataSource for placed nodes – consumed by the main canvas image_url renderer
         placed_nodes_source = bkmodel.ColumnDataSource(
             data=dict(
-                x=[], y=[], url=[], w=[], h=[], name=[], node_type=[], icon_type=[], position=[]
+                x=[],
+                y=[],
+                url=[],
+                w=[],
+                h=[],
+                name=[],
+                node_type=[],
+                icon_type=[],
+                position=[],
+                options=[],  # JSON-encoded dict of option_name → value
             )
         )
 
-        # ------------------------------------------------------------------
-        # Hover source – mirrors placed_nodes_source positions for scatter
-        # ------------------------------------------------------------------
+        # Hover source – mirrors placed_nodes_source positions for the scatter hover tool
         hover_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], name=[], node_type=[]))
 
-        # ------------------------------------------------------------------
-        # Options table source (for editing component options in the config panel)
-        # ------------------------------------------------------------------
+        # Options table source for the component configurator panel
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
         option_column = bkmodel.TableColumn(field="options", title="Options")
         value_column = bkmodel.TableColumn(
-            field="value", title="Value", editor=bkmodel.StringEditor()
+            field="value",
+            title="Value",
+            editor=bkmodel.StringEditor(),
         )
 
-        # ------------------------------------------------------------------
-        # Config inputs – TextInput for Component ID, Select for Component Type
-        # ------------------------------------------------------------------
+        # Configurator panel inputs
         name_input = bkmodel.TextInput(
             title="Component ID:",
             value="",
@@ -277,17 +266,8 @@ class ComponentPaletteBuilder:
             styles={"color": "white", "font-size": "18px"},
         )
 
-        # All possible node_type strings (used as Select options)
-        _all_types: list = []
-        for _v in POSSIBLE_COMPONENT_TYPES.values():
-            if isinstance(_v, list):
-                _all_types.extend(_v)
-            else:
-                _all_types.append(_v)
-        _all_types = sorted(set(_all_types))
-
-        # Select widget for Component Type – options filtered to valid types
-        # for the selected node when a node is selected.
+        # Select widget for Component Type – options are filtered to valid types
+        # for the selected node whenever a canvas node is clicked
         type_select = bkmodel.Select(
             title="Component Type:",
             value="",
@@ -296,8 +276,7 @@ class ComponentPaletteBuilder:
             styles={"color": "white", "font-size": "18px"},
         )
 
-        # Select widget for Position – options come from POSSIBLE_POSITIONS keyed
-        # by the component type (node_type) of the selected node.
+        # Select widget for Position – options come from POSSIBLE_POSITIONS keyed by node_type
         position_select = bkmodel.Select(
             title="Position:",
             value="",
@@ -307,14 +286,12 @@ class ComponentPaletteBuilder:
         )
 
         options_table = bkmodel.DataTable(
-            columns=[
-                option_column,
-                value_column,
-            ],
+            columns=[option_column, value_column],
             source=options_table_source,
             width=380,
             height=200,
-            styles={"color": "white", "font-size": "14px"},
+            editable=True,
+            styles={"color": "black", "font-size": "18px"},
         )
 
         apply_button = bkmodel.Button(
@@ -323,9 +300,10 @@ class ComponentPaletteBuilder:
             button_type="primary",
             width=380,
             height=ROW_HEIGHT - 6,
-            stylesheets=[":host button { font-size: 1.2em; }"],
+            stylesheets=_action_stylesheet,
         )
 
+        # Section heading for the configurator panel
         table_title_div = bkmodel.Div(
             text="<b style='color:white;font-size:18pt'>Component Configurator</b>",
             width=380,
@@ -333,13 +311,13 @@ class ComponentPaletteBuilder:
         )
 
         component_id_type_div = bkmodel.Div(
-            text="<b style='color:white;font-size:16pt'>Component ID & Type</b>",
+            text="<b style='color:white;font-size:16pt'>Component ID &amp; Type</b>",
             width=380,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
         )
 
         component_option_title_div = bkmodel.Div(
-            text="<b style='color:white;font-size:16pt'>Position & Options</b>",
+            text="<b style='color:white;font-size:16pt'>Position &amp; Options</b>",
             width=380,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
         )
@@ -350,6 +328,7 @@ class ComponentPaletteBuilder:
             styles={"background": BACKGROUND_COLOR_CODE},
         )
 
+        # Config panel column – hidden until a canvas node is selected
         table_panel = column(
             table_title_div,
             component_id_type_div,
@@ -361,7 +340,7 @@ class ComponentPaletteBuilder:
             options_table,
             apply_button,
             spacing=4,
-            visible=False,  # hidden until a canvas node is selected
+            visible=False,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
 
@@ -382,20 +361,20 @@ class ComponentPaletteBuilder:
             table_panel=table_panel,
         )
 
-        # ------------------------------------------------------------------
         # Build one TabPanel per category defined in ICON_TYPE
-        # ------------------------------------------------------------------
         tab_panels = []
-        for category, keys_in_cat in ICON_TYPE.items():
-            cat_buttons = [btn_by_key[k] for k in keys_in_cat if k in btn_by_key]
-            if not cat_buttons:
+        for category, keys_in_category in ICON_TYPE.items():
+            category_buttons = [
+                button_by_key[key] for key in keys_in_category if key in button_by_key
+            ]
+            if not category_buttons:
                 continue
-            tab_col = column(
-                *cat_buttons,
+            tab_column = column(
+                *category_buttons,
                 spacing=2,
                 styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
             )
-            tab_panels.append(bkmodel.TabPanel(child=tab_col, title=category.capitalize()))
+            tab_panels.append(bkmodel.TabPanel(child=tab_column, title=category.capitalize()))
 
         tabs = bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
 
@@ -413,9 +392,9 @@ class ComponentPaletteBuilder:
         return palette_layout, table_panel, state
 
 
-# ---------------------------------------------------------------------------
+# ============================================================================
 # Placement handler
-# ---------------------------------------------------------------------------
+# ============================================================================
 
 
 class PlacementHandler:
@@ -425,7 +404,7 @@ class PlacementHandler:
     Instantiate **after** building the palette; the constructor automatically
     wires all button ``on_click`` callbacks::
 
-        palette_layout, state = ComponentPaletteBuilder.build()
+        palette_layout, table_panel, state = ComponentPaletteBuilder.build()
         handler = PlacementHandler(state, main_plot)
         main_plot.on_event(Tap, handler.on_canvas_tap)
         main_plot.image_url(
@@ -436,102 +415,112 @@ class PlacementHandler:
 
     def __init__(self, state: PaletteState, main_plot, icon_size: int = 50):
         """
-        :param state: Shared :class:`PaletteState` instance
-        :param main_plot: The Bokeh ``figure`` that acts as the canvas
-        :param icon_size: Pixel size of placed icons (width = height)
+        :param state: Shared :class:`PaletteState` instance.
+        :param main_plot: The Bokeh ``figure`` that acts as the placement canvas.
+        :param icon_size: Pixel size (width = height) used for placed icons.
         """
         self.state = state
         self.main_plot = main_plot
         self.icon_size = icon_size
         self._wire_buttons()
 
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     # Internal wiring
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
 
     def _wire_buttons(self):
-        """Attach an on_click callback to every palette button."""
+        """Attach ``on_click`` callbacks to every palette and action button."""
         self.state.save_button.on_click(self._save_canvas_state)
         self.state.end_session_button.on_click(self._end_session)
-        for idx, btn in enumerate(self.state.buttons):
-            btn.on_click(self._make_select_cb(idx))
+        for index, button in enumerate(self.state.buttons):
+            button.on_click(self._make_select_callback(index))
         if self.state.delete_button is not None:
             self.state.delete_button.on_click(self._toggle_delete_mode)
 
-    def _make_select_cb(self, idx: int):
-        """Return a zero-argument closure that selects component at *idx*."""
+    def _make_select_callback(self, idx: int):
+        """
+        Return a zero-argument closure that selects the component at *idx*.
 
-        def _cb():
+        :param idx: Zero-based index into ``list(ICONS_CONFIG.keys())``.
+
+        :return: Callback function for a palette button.
+        """
+
+        def _callback():
             self.on_palette_select(idx)
 
-        return _cb
+        return _callback
 
-    # ------------------------------------------------------------------
-    # Delete mode toggle
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    # Delete mode
+    # -----------------------------------------------------------------------
 
     def _toggle_delete_mode(self):
-        """Toggle delete mode on/off."""
+        """Toggle delete mode on / off, updating button styling and status text."""
         self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
-            # Enter delete mode: deselect any component
+            # Enter delete mode: deselect any active component
             self.state.selected_component = None
             for btn in self.state.buttons:
                 btn.button_type = BUTTON_DEFAULT_COLOR_TYPE
             self.state.status_div.text = "<b style='color:#FF4444;font-size:14pt'>Delete mode: click an icon to remove it</b>"
             self.state.delete_button.button_type = "danger"
         else:
-            # Exit delete mode
+            # Exit delete mode: restore default status text
             self.state.status_div.text = (
                 "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
             )
             self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
-    # ------------------------------------------------------------------
-    # Delete mode toggle
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    # Save canvas state
+    # -----------------------------------------------------------------------
 
     def _save_canvas_state(self):
-        """Save the current canvas state (placed nodes) into a JSON file."""
+        """
+        Serialise the current placed-nodes data to a timestamped JSON file.
 
+        The file is written to the current working directory and the button
+        type is reset to ``"success"`` after a 1-second delay.
+        """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"canvas_state_{timestamp}.json"
         data_to_save = self.state.placed_nodes_source.data
         with open(filename, "w") as f:
             json.dump(data_to_save, f, indent=2)
         _LOGGER.info("Canvas state saved to %s", filename)
-        # Reset button state after a short delay
         IOLoop.current().call_later(
             1.0, lambda: setattr(self.state.save_button, "button_type", "success")
         )
 
-    # ------------------------------------------------------------------
-    # End session toggle
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    # End session
+    # -----------------------------------------------------------------------
 
     def _end_session(self):
-        """End the current session by stopping the server."""
+        """Stop the Bokeh IO loop, terminating the server session."""
         _LOGGER.info("Ending session and stopping server")
         IOLoop.current().stop()
 
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     # Palette selection
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
 
     def on_palette_select(self, idx: int):
         """
         Select the component at position *idx* in :data:`ICONS_CONFIG`.
 
-        Updates button styling and the status label.
-        Can be called programmatically in tests without a running server.
+        A second click on the same button deselects it.  Updates button
+        styling and the status label accordingly.  Can be called
+        programmatically in tests without a running server.
 
-        :param idx: Zero-based index into ``list(ICONS_CONFIG.keys())``
+        :param idx: Zero-based index into ``list(ICONS_CONFIG.keys())``.
         """
         component_keys = list(ICONS_CONFIG.keys())
         if idx < 0 or idx >= len(component_keys):
             return
 
-        # Second click on the same button → unselect
+        # Second click on the same button → deselect
         if self.state.selected_component == component_keys[idx]:
             self.state.selected_component = None
             self.state.buttons[idx].button_type = BUTTON_DEFAULT_COLOR_TYPE
@@ -542,37 +531,48 @@ class PlacementHandler:
 
         self.state.selected_component = component_keys[idx]
 
-        # Exit delete mode if active
+        # Exit delete mode if it was active
         if self.state.delete_mode:
             self.state.delete_mode = False
             if self.state.delete_button is not None:
                 self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
-        # Highlight the selected button, reset all others
+        # Highlight selected button, reset all others
         for j, btn in enumerate(self.state.buttons):
             btn.button_type = BUTTON_SELECTED_COLOR_TYPE if j == idx else BUTTON_DEFAULT_COLOR_TYPE
 
-        # Update status label
         label = _string_cleanup(self.state.selected_component)
         self.state.status_div.text = f"<b style='color:#FFD700;font-size:14pt'>Placing: {label}</b>"
 
+    # -----------------------------------------------------------------------
+    # Config panel helpers
+    # -----------------------------------------------------------------------
+
     def _populate_node_table(self, idx: int):
-        """Fill name_input, type_select and position_select with the values for node *idx*."""
+        """
+        Fill the config panel widgets with the stored values of node *idx*.
+
+        Populates ``name_input``, ``type_select``, ``position_select``, and
+        ``options_table`` from ``placed_nodes_source``.
+
+        :param idx: Zero-based index into ``placed_nodes_source`` data arrays.
+        """
         pdata = self.state.placed_nodes_source.data
         om_name = list(pdata.get("name", []))[idx]
         node_type = list(pdata.get("node_type", []))[idx]
         comp_key = list(pdata.get("icon_type", []))[idx]
         position = list(pdata.get("position", []))[idx] if pdata.get("position") else ""
+        saved_opts_json = list(pdata.get("options", []))[idx] if pdata.get("options") else "{}"
 
         self.state.name_input.value = om_name
 
-        # Update type_select options to valid choices for this comp_key
+        # Populate type_select with valid choices for this component key
         possible = POSSIBLE_COMPONENT_TYPES.get(comp_key, comp_key)
         choices = possible if isinstance(possible, list) else [possible]
         self.state.type_select.options = choices
         self.state.type_select.value = node_type if node_type in choices else choices[0]
 
-        # Update position_select options from POSSIBLE_POSITIONS keyed by node_type
+        # Populate position_select with valid positions for this node_type
         pos_choices = POSSIBLE_POSITIONS.get(node_type, [])
         self.state.position_select.options = pos_choices
         if pos_choices:
@@ -582,27 +582,100 @@ class PlacementHandler:
         else:
             self.state.position_select.value = ""
 
+        # Restore saved option values; fall back to defaults from POSSIBLE_OPTIONS
+        saved_opts: dict = {}
+        try:
+            saved_opts = json.loads(saved_opts_json) if saved_opts_json else {}
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+        self._refresh_options_table(node_type, saved_opts)
+
+    @staticmethod
+    def _option_val_to_str(v) -> str:
+        """
+        Convert an option value to its display string.
+
+        :param v: Raw option value (``True``, ``False``, or a scalar).
+
+        :return: Display string (``True`` → ``"on"``, ``False`` → ``"off"``).
+        """
+        if v is True:
+            return "on"
+        if v is False:
+            return "off"
+        return str(v)
+
+    @staticmethod
+    def _str_to_option_val(s: str):
+        """
+        Parse a display string back to a Python value.
+
+        :param s: Display string from the options table.
+
+        :return: ``True`` for ``"on"``, ``False`` for ``"off"``, otherwise tries
+                 ``int`` then ``float`` before returning the raw string.
+        """
+        if s == "on":
+            return True
+        if s == "off":
+            return False
+        try:
+            return int(s)
+        except (ValueError, TypeError):
+            pass
+        try:
+            return float(s)
+        except (ValueError, TypeError):
+            pass
+        return s
+
+    def _refresh_options_table(self, node_type: str, overrides: dict = None):
+        """
+        Rebuild the options DataTable for *node_type*, applying any *overrides*.
+
+        :param node_type: Component type string used as key into ``POSSIBLE_OPTIONS``.
+        :param overrides: Previously saved option values that take precedence over defaults.
+        """
+        if overrides is None:
+            overrides = {}
+        opts_def = POSSIBLE_OPTIONS.get(node_type, {})
+        opt_names = list(opts_def.keys())
+        opt_values = []
+        for k, v_list in opts_def.items():
+            if k in overrides:
+                opt_values.append(self._option_val_to_str(overrides[k]))
+            else:
+                default = v_list[0] if v_list else ""
+                opt_values.append(self._option_val_to_str(default))
+        self.state.options_source.data = dict(options=opt_names, value=opt_values)
+
     def _clear_node_table(self):
-        """Clear inputs and hide the config panel."""
+        """Reset all config panel inputs and hide the panel."""
         self.state.name_input.value = ""
         self.state.type_select.options = []
         self.state.type_select.value = ""
         self.state.position_select.options = []
         self.state.position_select.value = ""
+        self.state.options_source.data = dict(options=[], value=[])
         if self.state.table_panel is not None:
             self.state.table_panel.visible = False
 
-    # ------------------------------------------------------------------
-    # Canvas tap
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    # Canvas tap handler
+    # -----------------------------------------------------------------------
 
     def on_canvas_tap(self, event):
         """
-        Called when the user taps the main canvas.
+        Handle a tap event on the main canvas.
 
-        * Delete mode  → remove nearest icon.
-        * Component selected → place a new icon.
-        * Neither  → select/deselect existing node for editing.
+        Behaviour depends on the current interaction mode:
+
+        * **Delete mode** – remove the nearest placed icon within snap distance.
+        * **Component selected** – place a new icon at the tap coordinates.
+        * **Neither** – select or deselect the nearest existing node for editing.
+
+        :param event: Bokeh ``Tap`` event carrying ``x`` and ``y`` coordinates.
         """
         x, y = event.x, event.y
 
@@ -612,7 +685,8 @@ class PlacementHandler:
             ys = list(current.get("y", []))
             if not xs:
                 return
-            # Find nearest icon
+
+            # Find the nearest icon within snap distance
             snap = self.icon_size
             best_idx = None
             best_dist = float("inf")
@@ -621,13 +695,14 @@ class PlacementHandler:
                 if dist < snap and dist < best_dist:
                     best_dist = dist
                     best_idx = i
+
             if best_idx is not None:
                 new_data = {k: list(v) for k, v in current.items()}
                 for col in new_data:
                     new_data[col].pop(best_idx)
                 self.state.placed_nodes_source.data = new_data
 
-                # Sync hover_source
+                # Keep hover_source in sync
                 if self.state.hover_source is not None:
                     hdata = {k: list(v) for k, v in self.state.hover_source.data.items()}
                     for col in hdata:
@@ -635,26 +710,27 @@ class PlacementHandler:
                             hdata[col].pop(best_idx)
                     self.state.hover_source.data = hdata
 
-                # If the deleted node was selected, clear the config panel
-                if self.state.selected_node_idx == best_idx:
-                    self.state.selected_node_idx = None
+                # Update selected index after deletion
+                if self.state.selected_node_index == best_idx:
+                    self.state.selected_node_index = None
                     self._clear_node_table()
                 elif (
-                    self.state.selected_node_idx is not None
-                    and self.state.selected_node_idx > best_idx
+                    self.state.selected_node_index is not None
+                    and self.state.selected_node_index > best_idx
                 ):
-                    self.state.selected_node_idx -= 1
+                    self.state.selected_node_index -= 1
 
                 _LOGGER.info("Deleted node at index %d", best_idx)
             return
 
         if self.state.selected_component is None:
-            # --- Node selection / deselection mode ---
+            # Node selection / deselection mode
             current = self.state.placed_nodes_source.data
             xs = list(current.get("x", []))
             ys = list(current.get("y", []))
             if not xs:
                 return
+
             snap = self.icon_size
             best_idx = None
             best_dist = float("inf")
@@ -663,46 +739,54 @@ class PlacementHandler:
                 if dist < snap and dist < best_dist:
                     best_dist = dist
                     best_idx = i
-            if best_idx is None:
-                # Clicked on empty space → deselect
-                self.state.selected_node_idx = None
+
+            if best_idx is None or self.state.selected_node_index == best_idx:
+                # Tapped on empty space / Second tap on same node → deselect current node
+                self.state.selected_node_index = None
                 self._clear_node_table()
                 return
-            if self.state.selected_node_idx == best_idx:
-                # Second click on same node → deselect
-                self.state.selected_node_idx = None
-                self._clear_node_table()
+
             else:
-                # Select this node
-                self.state.selected_node_idx = best_idx
+                # Select this node and show the configurator panel
+                self.state.selected_node_index = best_idx
                 self._populate_node_table(best_idx)
                 if self.state.table_panel is not None:
                     self.state.table_panel.visible = True
             return
 
-        # Deselect any previously selected node when placing a new component
-        if self.state.selected_node_idx is not None:
-            self.state.selected_node_idx = None
+        # Deselect any previously selected node before placing a new component
+        if self.state.selected_node_index is not None:
+            self.state.selected_node_index = None
             self._clear_node_table()
 
         comp_key = self.state.selected_component
 
-        # Unique node name (e.g. "battery_1", "battery_2", …)
+        # Generate a unique node name (e.g. "battery_1", "battery_2", …)
         count = self.state.placed_counter.get(comp_key, 0) + 1
         self.state.placed_counter[comp_key] = count
         node_name = f"{comp_key}_{count}"
 
-        # Icon URL (base64 so it renders inside the server)
+        # Base64-encode the icon for reliable rendering inside the server
         icon_path = ICONS_CONFIG[comp_key]["icon_path"]
         file_url = "file://" + str(Path(icon_path).resolve())
         b64_url = _url_to_base64(file_url)
 
-        # Determine default node_type and position from POSSIBLE_TYPES / POSSIBLE_POSITIONS
-        possible = POSSIBLE_COMPONENT_TYPES.get(comp_key, comp_key)
-        default_type = possible[0] if isinstance(possible, list) else possible
-        pos_choices = POSSIBLE_POSITIONS.get(default_type, [])
-        default_position = pos_choices[0] if pos_choices else ""
+        # Resolve default node_type and position from lookup tables
+        possible_type = POSSIBLE_COMPONENT_TYPES.get(comp_key, comp_key)
+        default_type = possible_type[0] if isinstance(possible_type, list) else possible_type
+        posiition_choices = POSSIBLE_POSITIONS.get(default_type, [])
+        default_position = posiition_choices[0] if posiition_choices else ""
 
+        # Build default options JSON from POSSIBLE_OPTIONS
+        opts_def = POSSIBLE_OPTIONS.get(default_type, {})
+        default_opts = {
+            k: (True if v_list[0] is True else (False if v_list[0] is False else v_list[0]))
+            for k, v_list in opts_def.items()
+            if v_list
+        }
+        default_opts_json = json.dumps(default_opts)
+
+        # Append new node to the placed-nodes source
         size = self.icon_size
         current = self.state.placed_nodes_source.data
         self.state.placed_nodes_source.data = {
@@ -715,9 +799,10 @@ class PlacementHandler:
             "icon_type": list(current.get("icon_type", [])) + [comp_key],
             "node_type": list(current.get("node_type", [])) + [default_type],
             "position": list(current.get("position", [])) + [default_position],
+            "options": list(current.get("options", [])) + [default_opts_json],
         }
 
-        # Sync hover_source (position + name for scatter hover)
+        # Keep hover_source in sync (position + metadata for the scatter hover tool)
         if self.state.hover_source is not None:
             hdata = self.state.hover_source.data
             self.state.hover_source.data = {
@@ -737,9 +822,9 @@ class PlacementHandler:
         )
 
 
-# ---------------------------------------------------------------------------
-# Standalone launcher (demo / development helper)
-# ---------------------------------------------------------------------------
+# ============================================================================
+# Standalone launcher
+# ============================================================================
 
 
 class ComponentPaletteLauncher:
@@ -755,21 +840,22 @@ class ComponentPaletteLauncher:
         """
         Start the palette demo server and open it in the default browser.
 
-        :param port: TCP port for the Bokeh server
-        :param address: Server address
+        :param port: TCP port for the Bokeh server.
+        :param address: Server bind address.
         """
         logging.getLogger("bokeh").setLevel(logging.WARNING)
         logging.getLogger("tornado").setLevel(logging.WARNING)
 
         def make_document(doc):
+            """Build the Bokeh document with palette, canvas, and config panel."""
             palette_layout, table_panel, state = ComponentPaletteBuilder.build()
 
-            # Blank canvas
+            # Blank canvas sized to accommodate all component rows
             canvas = bkplot.figure(
                 width=800,
-                height=len(ICONS_CONFIG) * ROW_HEIGHT + 24,
+                height=800,
                 x_range=(0, 800),
-                y_range=(0, len(ICONS_CONFIG) * ROW_HEIGHT),
+                y_range=(0, 800),
                 toolbar_location="above",
                 background_fill_color=BACKGROUND_COLOR_CODE,
                 title="Powertrain Builder – click to place components",
@@ -780,7 +866,7 @@ class ComponentPaletteLauncher:
             canvas.yaxis.visible = False
             canvas.title.text_color = BACKGROUND_COLOR_CODE
 
-            # Render placed nodes on the canvas
+            # Render placed node icons on the canvas
             canvas.image_url(
                 url="url",
                 x="x",
@@ -791,11 +877,11 @@ class ComponentPaletteLauncher:
                 source=state.placed_nodes_source,
             )
 
-            # Scatter glyph for hover interaction (partially transparent circle)
+            # Transparent scatter glyph for hover interaction
             scatter_glyph = canvas.scatter(
                 x="x",
                 y="y",
-                size=55,
+                size=ICON_SIZE + 10,
                 source=state.hover_source,
                 fill_alpha=0,
                 line_alpha=0,
@@ -808,7 +894,7 @@ class ComponentPaletteLauncher:
             )
             canvas.add_tools(hover_tool)
 
-            # Labels for placed nodes
+            # Label set for placed node names
             placed_label_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], text=[]))
             canvas.add_layout(
                 bkmodel.LabelSet(
@@ -824,7 +910,7 @@ class ComponentPaletteLauncher:
                 )
             )
 
-            # Keep labels in sync with placed nodes
+            # Keep labels in sync with the placed-nodes source
             def _sync_labels(attr, old, new_data):
                 placed_label_source.data = dict(
                     x=list(new_data.get("x", [])),
@@ -834,22 +920,40 @@ class ComponentPaletteLauncher:
 
             state.placed_nodes_source.on_change("data", _sync_labels)
 
-            # type_select → refresh position_select options when component type changes
+            # Refresh position_select and options table when component type changes
             def _on_type_select_change(attr, old, new):
                 pos_choices = POSSIBLE_POSITIONS.get(new, [])
                 state.position_select.options = pos_choices
                 state.position_select.value = pos_choices[0] if pos_choices else ""
+                idx = state.selected_node_index
+                saved_opts = {}
+                if idx is not None:
+                    saved_opts_json = list(state.placed_nodes_source.data.get("options", []))
+                    if idx < len(saved_opts_json):
+                        try:
+                            saved_opts = json.loads(saved_opts_json[idx]) or {}
+                        except (json.JSONDecodeError, TypeError):
+                            pass
+                handler._refresh_options_table(new, saved_opts)
 
             state.type_select.on_change("value", _on_type_select_change)
 
-            # Apply button – write name_input / type_select / position_select values back to placed_nodes_source
+            # Write config panel values back to placed_nodes_source on Apply
             def _apply_node_config():
-                idx = state.selected_node_idx
+                idx = state.selected_node_index
                 if idx is None:
                     return
                 new_om_name = state.name_input.value
                 new_node_type = state.type_select.value
                 new_position = state.position_select.value
+
+                # Collect and encode options as JSON
+                opt_names = list(state.options_source.data.get("options", []))
+                opt_vals = list(state.options_source.data.get("value", []))
+                opts_dict = {
+                    k: PlacementHandler._str_to_option_val(v) for k, v in zip(opt_names, opt_vals)
+                }
+                opts_json = json.dumps(opts_dict)
 
                 pdata = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
                 if idx < len(pdata.get("name", [])):
@@ -858,6 +962,10 @@ class ComponentPaletteLauncher:
                     pdata["node_type"][idx] = new_node_type
                 if idx < len(pdata.get("position", [])):
                     pdata["position"][idx] = new_position
+                if "options" not in pdata:
+                    pdata["options"] = ["{}"] * len(pdata.get("name", []))
+                if idx < len(pdata["options"]):
+                    pdata["options"][idx] = opts_json
                 state.placed_nodes_source.data = pdata
 
                 hdata = {k: list(v) for k, v in state.hover_source.data.items()}
@@ -868,16 +976,17 @@ class ComponentPaletteLauncher:
                 state.hover_source.data = hdata
 
                 _LOGGER.info(
-                    "Applied: node[%d] name=%s type=%s position=%s",
+                    "Applied: node[%d] name=%s type=%s position=%s options=%s",
                     idx,
                     new_om_name,
                     new_node_type,
                     new_position,
+                    opts_json,
                 )
 
             state.apply_button.on_click(_apply_node_config)
 
-            # Wire buttons and canvas tap
+            # Wire palette buttons and canvas tap
             handler = PlacementHandler(state, canvas)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
@@ -885,6 +994,7 @@ class ComponentPaletteLauncher:
             doc.title = "Component Palette Demo"
 
         def make_document_with_tracking(doc):
+            """Wrap ``make_document`` to stop the IO loop when the session ends."""
             make_document(doc)
 
             def on_destroy(session_context):
@@ -904,9 +1014,9 @@ class ComponentPaletteLauncher:
         server.io_loop.start()
 
 
-# ---------------------------------------------------------------------------
+# ============================================================================
 # Script entry-point
-# ---------------------------------------------------------------------------
+# ============================================================================
 
 if __name__ == "__main__":
     ComponentPaletteLauncher.launch()

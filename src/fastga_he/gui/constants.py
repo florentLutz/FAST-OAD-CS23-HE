@@ -75,3 +75,36 @@ POSSIBLE_COMPONENT_TYPES = {
     "fuel_tank": ["fuel_tank", "gaseous_hydrogen_tank"],
     "fuel_system": ["fuel_system", "H2_fuel_system"],
 }
+
+# number_of_points_reserve
+POSSIBLE_OPTIONS = {
+    "DC_bus": {"number_of_inputs": [1], "number_of_outputs": [1]},
+    "DC_cable_harness": {},
+    "DC_SSPC": {"closed": [True, False], "at_bus_output": [True, False]},
+    "DC_splitter": {"splitter_mode": ["percent_split", "power_share"]},
+    "rectifier": {},
+    "DC_DC_converter": {},
+    "inverter": {},
+    "speed_reducer": {},
+    "planetary_gear": {"gear_mode": ["percent_split", "power_share"]},
+    "gearbox": {},
+    "PMSM": {},
+    "SM_PMSM": {},
+    "aux_load": {},
+    "battery_pack": {"direct_bus_connection": [False, True]},
+    "generator": {},
+    "turbo_generator": {},
+    "ICE": {},
+    "high_rpm_ICE": {},
+    "turboshaft": {"adjust_sfc": [True, False]},
+    "PEMFC_stack": {
+        "model_fidelity": ["empirical", "analytical"],
+        "direct_bus_connection": [False, True],
+        "compressor_connection": [False, True],
+    },
+    "propeller": {},
+    "fuel_tank": {},
+    "gaseous_hydrogen_tank": {},
+    "fuel_system": {"number_of_tanks": [1], "number_of_engines": [1]},
+    "H2_fuel_system": {"number_of_tanks": [1], "number_of_power_sources": [1]},
+}
