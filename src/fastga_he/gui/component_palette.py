@@ -33,6 +33,7 @@ Typical usage
 """
 
 import sys
+import math
 from pathlib import Path
 import logging
 from dataclasses import dataclass, field
@@ -52,9 +53,12 @@ from fastga_he.gui.constants import (
     ICON_TYPE,
     POSSIBLE_COMPONENT_TYPES,
     POSSIBLE_OPTIONS,
+    DEFAULT_SOURCE_COUNT,
+    DEFAULT_TARGET_NUMBER,
 )
 from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
+    DEFAULT_COLOR,
     ICONS_CONFIG,
     _string_cleanup,
     _url_to_base64,
@@ -71,9 +75,74 @@ PALETTE_WIDTH = 300
 ROW_HEIGHT = 52
 ICON_SIZE = 45
 
+# Port appearance
+PORT_RADIUS = 8  # radius of each port ball in data-units (≈ pixels)
+NODE_RADIUS = ICON_SIZE / 2  # half icon size = orbit base
+
 # Button appearance
 BUTTON_DEFAULT_COLOR_TYPE = "light"  # unselected state
 BUTTON_SELECTED_COLOR_TYPE = "primary"  # selected state (blue highlight)
+
+
+# ============================================================================
+# Port placement
+# ============================================================================
+
+
+def compute_ports(
+    cx: float,
+    cy: float,
+    node_radius: float = NODE_RADIUS,
+    port_radius: float = PORT_RADIUS,
+    n_outputs: int = 0,
+    n_inputs: int = 0,
+    spread: float = 120.0,
+    gap: float = 20.0,
+) -> dict:
+    """
+    Place port balls evenly around a circular node.
+
+    Output ports fan around the top half (centred at −90°);
+    input ports fan around the bottom half (centred at +90°).
+
+    :param cx: Node centre x in canvas coordinates.
+    :param cy: Node centre y in canvas coordinates.
+    :param node_radius: Radius of the node circle (data-units / pixels).
+    :param port_radius: Radius of each port ball (data-units / pixels).
+    :param n_outputs: Number of output (source) ports.
+    :param n_inputs: Number of input (target) ports.
+    :param spread: Angular fan for each half in degrees (default 120).
+    :param gap: Clearance between node edge and port centre (pixels).
+
+    :return: ``{"outputs": [Port, …], "inputs": [Port, …]}`` where each Port
+             is a dict with keys ``index``, ``kind``, ``angle_deg``, ``x``, ``y``.
+    """
+    orbit = node_radius + port_radius + gap
+
+    def _angle(index: int, total: int, centre: float) -> float:
+        if total == 1:
+            return centre
+        start = centre - spread / 2
+        step = spread / (total - 1)
+        return start + index * step
+
+    def _xy(angle_deg: float):
+        a = math.radians(angle_deg)
+        return cx + orbit * math.cos(a), cy + orbit * math.sin(a)
+
+    outputs = []
+    for i in range(n_outputs):
+        d = _angle(i, n_outputs, -90.0)
+        px, py = _xy(d)
+        outputs.append({"index": i, "kind": "output", "angle_deg": d, "x": px, "y": py})
+
+    inputs = []
+    for i in range(n_inputs):
+        d = _angle(i, n_inputs, 90.0)
+        px, py = _xy(d)
+        inputs.append({"index": i, "kind": "input", "angle_deg": d, "x": px, "y": py})
+
+    return {"outputs": outputs, "inputs": inputs}
 
 
 # ============================================================================
@@ -115,6 +184,15 @@ class PaletteState:
     selected_node_index: int = field(default=None)
     # The whole config panel column – toggled visible/invisible
     table_panel: object = field(default=None)
+    # Source / Target port data sources for each component, keyed by node index in
+    # placed_nodes_source
+    source_port_source: bkmodel.ColumnDataSource = field(default=None)
+    target_port_source: bkmodel.ColumnDataSource = field(default=None)
+    # Spinners for editable port counts (only visible for components whose default count == 3)
+    source_count_spinner: bkmodel.Spinner = field(default=None)
+    target_count_spinner: bkmodel.Spinner = field(default=None)
+    # Column section wrapping the spinners – toggled visible when ports are editable
+    port_count_section: object = field(default=None)
 
 
 # ============================================================================
@@ -243,11 +321,22 @@ class ComponentPaletteBuilder:
                 icon_type=[],
                 position=[],
                 options=[],  # JSON-encoded dict of option_name → value
+                n_sources=[],  # current source-port count for this node
+                n_targets=[],  # current target-port count for this node
             )
         )
 
         # Hover source – mirrors placed_nodes_source positions for the scatter hover tool
         hover_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], name=[], node_type=[]))
+
+        # Port data sources – one row per port ball on the canvas
+        # Columns: x, y (centre), color (hex), label (str port index), node_index (owner)
+        source_port_source = bkmodel.ColumnDataSource(
+            data=dict(x=[], y=[], color=[], label=[], node_index=[])
+        )
+        target_port_source = bkmodel.ColumnDataSource(
+            data=dict(x=[], y=[], color=[], label=[], node_index=[])
+        )
 
         # Options table source for the component configurator panel
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
@@ -285,7 +374,7 @@ class ComponentPaletteBuilder:
             styles={"color": "white", "font-size": "18px"},
         )
 
-        options_table = bkmodel.DataTable(
+        options_list = bkmodel.DataTable(
             columns=[option_column, value_column],
             source=options_table_source,
             width=380,
@@ -328,15 +417,55 @@ class ComponentPaletteBuilder:
             styles={"background": BACKGROUND_COLOR_CODE},
         )
 
+        options_table = column(
+            options_table_title,
+            options_list,
+            visible=False,
+            styles={"background": BACKGROUND_COLOR_CODE},
+        )
+
+        # Port count spinners – only visible for components whose default count equals 3
+        port_count_title_div = bkmodel.Div(
+            text="<b style='color:white;font-size:16pt'>Port Counts</b>",
+            width=380,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
+        )
+        source_count_spinner = bkmodel.Spinner(
+            title="Source Ports:",
+            value=1,
+            low=1,
+            high=20,
+            step=1,
+            width=180,
+            visible=False,
+            styles={"color": "white", "font-size": "14px"},
+        )
+        target_count_spinner = bkmodel.Spinner(
+            title="Target Ports:",
+            value=1,
+            low=1,
+            high=20,
+            step=1,
+            width=180,
+            visible=False,
+            styles={"color": "white", "font-size": "14px"},
+        )
+        port_count_section = column(
+            port_count_title_div,
+            row(source_count_spinner, target_count_spinner),
+            visible=False,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "4px"},
+        )
+
         # Config panel column – hidden until a canvas node is selected
         table_panel = column(
             table_title_div,
             component_id_type_div,
             name_input,
             type_select,
+            port_count_section,
             component_option_title_div,
             position_select,
-            options_table_title,
             options_table,
             apply_button,
             spacing=4,
@@ -352,6 +481,11 @@ class ComponentPaletteBuilder:
             save_button=save_button,
             end_session_button=end_session_button,
             hover_source=hover_source,
+            source_port_source=source_port_source,
+            target_port_source=target_port_source,
+            source_count_spinner=source_count_spinner,
+            target_count_spinner=target_count_spinner,
+            port_count_section=port_count_section,
             options_table=options_table,
             options_source=options_table_source,
             name_input=name_input,
@@ -564,6 +698,11 @@ class PlacementHandler:
         position = list(pdata.get("position", []))[idx] if pdata.get("position") else ""
         saved_opts_json = list(pdata.get("options", []))[idx] if pdata.get("options") else "{}"
 
+        if saved_opts_json != "{}":
+            self.state.options_table.visible = True
+        else:
+            self.state.options_table.visible = False
+
         self.state.name_input.value = om_name
 
         # Populate type_select with valid choices for this component key
@@ -590,6 +729,30 @@ class PlacementHandler:
             pass
 
         self._refresh_options_table(node_type, saved_opts)
+
+        # Show / update port-count spinners for editable components (default count == 3)
+        n_src_default = DEFAULT_SOURCE_COUNT.get(node_type, 0)
+        n_tgt_default = DEFAULT_TARGET_NUMBER.get(node_type, 0)
+        src_editable = n_src_default == 3
+        tgt_editable = n_tgt_default == 3
+
+        current_n_src = (
+            list(pdata.get("n_sources", []))[idx] if pdata.get("n_sources") else n_src_default
+        )
+        current_n_tgt = (
+            list(pdata.get("n_targets", []))[idx] if pdata.get("n_targets") else n_tgt_default
+        )
+
+        if self.state.source_count_spinner is not None:
+            self.state.source_count_spinner.visible = src_editable
+            if src_editable:
+                self.state.source_count_spinner.value = int(current_n_src)
+        if self.state.target_count_spinner is not None:
+            self.state.target_count_spinner.visible = tgt_editable
+            if tgt_editable:
+                self.state.target_count_spinner.value = int(current_n_tgt)
+        if self.state.port_count_section is not None:
+            self.state.port_count_section.visible = src_editable or tgt_editable
 
     @staticmethod
     def _option_val_to_str(v) -> str:
@@ -658,8 +821,99 @@ class PlacementHandler:
         self.state.position_select.options = []
         self.state.position_select.value = ""
         self.state.options_source.data = dict(options=[], value=[])
+        if self.state.port_count_section is not None:
+            self.state.port_count_section.visible = False
+            if self.state.source_count_spinner is not None:
+                self.state.source_count_spinner.visible = False
+            if self.state.target_count_spinner is not None:
+                self.state.target_count_spinner.visible = False
         if self.state.table_panel is not None:
             self.state.table_panel.visible = False
+
+    # -----------------------------------------------------------------------
+    # Port management
+    # -----------------------------------------------------------------------
+
+    def _rebuild_all_ports(self):
+        """
+        Recompute every port ball position from the current placed-nodes data
+        and push the result into ``source_port_source`` / ``target_port_source``.
+
+        Called whenever nodes are added, moved, deleted, or their port counts
+        are changed via the spinner widgets.
+        """
+        if self.state.source_port_source is None or self.state.target_port_source is None:
+            return
+
+        pdata = self.state.placed_nodes_source.data
+        xs = list(pdata.get("x", []))
+        ys = list(pdata.get("y", []))
+        icon_types = list(pdata.get("icon_type", []))
+        node_types = list(pdata.get("node_type", []))
+        n_sources_list = list(pdata.get("n_sources", []))
+        n_targets_list = list(pdata.get("n_targets", []))
+
+        src_x, src_y, src_color, src_label, src_node_idx = [], [], [], [], []
+        tgt_x, tgt_y, tgt_color, tgt_label, tgt_node_idx = [], [], [], [], []
+
+        for i, (cx, cy, icon_type, node_type) in enumerate(zip(xs, ys, icon_types, node_types)):
+            n_src = (
+                int(n_sources_list[i])
+                if i < len(n_sources_list)
+                else DEFAULT_SOURCE_COUNT.get(node_type, 0)
+            )
+            n_tgt = (
+                int(n_targets_list[i])
+                if i < len(n_targets_list)
+                else DEFAULT_TARGET_NUMBER.get(node_type, 0)
+            )
+
+            cfg = ICONS_CONFIG.get(icon_type, {})
+            raw_src_color = cfg.get("source_color") or DEFAULT_COLOR
+            raw_tgt_color = cfg.get("target_color") or DEFAULT_COLOR
+
+            ports = compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_src, n_tgt)
+
+            for p in ports["outputs"]:
+                src_x.append(p["x"])
+                src_y.append(p["y"])
+                src_color.append(raw_src_color)
+                src_label.append(str(p["index"] + 1))
+                src_node_idx.append(i)
+
+            for p in ports["inputs"]:
+                tgt_x.append(p["x"])
+                tgt_y.append(p["y"])
+                tgt_color.append(raw_tgt_color)
+                tgt_label.append(str(p["index"] + 1))
+                tgt_node_idx.append(i)
+
+        self.state.source_port_source.data = dict(
+            x=src_x, y=src_y, color=src_color, label=src_label, node_index=src_node_idx
+        )
+        self.state.target_port_source.data = dict(
+            x=tgt_x, y=tgt_y, color=tgt_color, label=tgt_label, node_index=tgt_node_idx
+        )
+
+    def _best_possible_node(self, x: float, y: float):
+        """Return the best possible node index for the tap action."""
+        current = self.state.placed_nodes_source.data
+        xs = list(current.get("x", []))
+        ys = list(current.get("y", []))
+        if not xs:
+            return None, None, current
+
+        # Find the nearest icon within snap distance
+        snap = self.icon_size
+        best_idx = None
+        best_dist = float("inf")
+        for i, (ix, iy) in enumerate(zip(xs, ys)):
+            dist = ((x - ix) ** 2 + (y - iy) ** 2) ** 0.5
+            if dist < snap and dist < best_dist:
+                best_dist = dist
+                best_idx = i
+
+        return best_idx, best_dist, current
 
     # -----------------------------------------------------------------------
     # Canvas tap handler
@@ -680,21 +934,7 @@ class PlacementHandler:
         x, y = event.x, event.y
 
         if self.state.delete_mode:
-            current = self.state.placed_nodes_source.data
-            xs = list(current.get("x", []))
-            ys = list(current.get("y", []))
-            if not xs:
-                return
-
-            # Find the nearest icon within snap distance
-            snap = self.icon_size
-            best_idx = None
-            best_dist = float("inf")
-            for i, (ix, iy) in enumerate(zip(xs, ys)):
-                dist = ((x - ix) ** 2 + (y - iy) ** 2) ** 0.5
-                if dist < snap and dist < best_dist:
-                    best_dist = dist
-                    best_idx = i
+            best_idx, best_dist, current = self._best_possible_node(x, y)
 
             if best_idx is not None:
                 new_data = {k: list(v) for k, v in current.items()}
@@ -710,6 +950,9 @@ class PlacementHandler:
                             hdata[col].pop(best_idx)
                     self.state.hover_source.data = hdata
 
+                # Rebuild port balls after deletion
+                self._rebuild_all_ports()
+
                 # Update selected index after deletion
                 if self.state.selected_node_index == best_idx:
                     self.state.selected_node_index = None
@@ -724,23 +967,12 @@ class PlacementHandler:
             return
 
         if self.state.selected_component is None:
-            # Node selection / deselection mode
-            current = self.state.placed_nodes_source.data
-            xs = list(current.get("x", []))
-            ys = list(current.get("y", []))
-            if not xs:
+            best_idx, best_dist, current = self._best_possible_node(x, y)
+
+            if best_idx is None and best_dist is None:
                 return
 
-            snap = self.icon_size
-            best_idx = None
-            best_dist = float("inf")
-            for i, (ix, iy) in enumerate(zip(xs, ys)):
-                dist = ((x - ix) ** 2 + (y - iy) ** 2) ** 0.5
-                if dist < snap and dist < best_dist:
-                    best_dist = dist
-                    best_idx = i
-
-            if best_idx is None or self.state.selected_node_index == best_idx:
+            elif best_idx is None or self.state.selected_node_index == best_idx:
                 # Tapped on empty space / Second tap on same node → deselect current node
                 self.state.selected_node_index = None
                 self._clear_node_table()
@@ -774,8 +1006,8 @@ class PlacementHandler:
         # Resolve default node_type and position from lookup tables
         possible_type = POSSIBLE_COMPONENT_TYPES.get(comp_key, comp_key)
         default_type = possible_type[0] if isinstance(possible_type, list) else possible_type
-        posiition_choices = POSSIBLE_POSITIONS.get(default_type, [])
-        default_position = posiition_choices[0] if posiition_choices else ""
+        position_choices = POSSIBLE_POSITIONS.get(default_type, [])
+        default_position = position_choices[0] if position_choices else ""
 
         # Build default options JSON from POSSIBLE_OPTIONS
         opts_def = POSSIBLE_OPTIONS.get(default_type, {})
@@ -785,6 +1017,10 @@ class PlacementHandler:
             if v_list
         }
         default_opts_json = json.dumps(default_opts)
+
+        # Default port counts from constants
+        default_n_src = DEFAULT_SOURCE_COUNT.get(default_type, 0)
+        default_n_tgt = DEFAULT_TARGET_NUMBER.get(default_type, 0)
 
         # Append new node to the placed-nodes source
         size = self.icon_size
@@ -800,6 +1036,8 @@ class PlacementHandler:
             "node_type": list(current.get("node_type", [])) + [default_type],
             "position": list(current.get("position", [])) + [default_position],
             "options": list(current.get("options", [])) + [default_opts_json],
+            "n_sources": list(current.get("n_sources", [])) + [default_n_src],
+            "n_targets": list(current.get("n_targets", [])) + [default_n_tgt],
         }
 
         # Keep hover_source in sync (position + metadata for the scatter hover tool)
@@ -811,6 +1049,9 @@ class PlacementHandler:
                 "name": list(hdata["name"]) + [node_name],
                 "node_type": list(hdata.get("node_type", [])) + [default_type],
             }
+
+        # Rebuild port balls for the new node
+        self._rebuild_all_ports()
 
         _LOGGER.info(
             "Placed %s (node_type=%s, position=%s) at (%.1f, %.1f)",
@@ -853,9 +1094,9 @@ class ComponentPaletteLauncher:
             # Blank canvas sized to accommodate all component rows
             canvas = bkplot.figure(
                 width=800,
-                height=800,
+                height=950,
                 x_range=(0, 800),
-                y_range=(0, 800),
+                y_range=(0, 950),
                 toolbar_location="above",
                 background_fill_color=BACKGROUND_COLOR_CODE,
                 title="Powertrain Builder – click to place components",
@@ -887,6 +1128,54 @@ class ComponentPaletteLauncher:
                 line_alpha=0,
                 hover_fill_alpha=0.1,
                 hover_line_alpha=0.3,
+            )
+
+            # Source port balls (button half of each node)
+            canvas.scatter(
+                x="x",
+                y="y",
+                size=PORT_RADIUS * 2,
+                marker="circle",
+                fill_color=BACKGROUND_COLOR_CODE,
+                line_color="color",
+                line_width=2.0,
+                fill_alpha=0.9,
+                source=state.source_port_source,
+            )
+            canvas.text(
+                x="x",
+                y="y",
+                text="label",
+                source=state.source_port_source,
+                text_align="center",
+                text_baseline="middle",
+                text_font_size="9px",
+                text_font_style="bold",
+                text_color="color",
+            )
+
+            # Target port balls (top half of each node)
+            canvas.scatter(
+                x="x",
+                y="y",
+                size=PORT_RADIUS * 2,
+                marker="circle",
+                fill_color="color",
+                line_color="white",
+                line_width=2.0,
+                fill_alpha=0.9,
+                source=state.target_port_source,
+            )
+            canvas.text(
+                x="x",
+                y="y",
+                text="label",
+                source=state.target_port_source,
+                text_align="center",
+                text_baseline="middle",
+                text_font_size="9px",
+                text_font_style="bold",
+                text_color="white",
             )
             hover_tool = bkmodel.HoverTool(
                 renderers=[scatter_glyph],
@@ -936,6 +1225,10 @@ class ComponentPaletteLauncher:
                             pass
                 handler._refresh_options_table(new, saved_opts)
 
+                # Update options table visibility based on whether the new type has any options
+                opts_def = POSSIBLE_OPTIONS.get(new, {})
+                state.options_table.visible = bool(opts_def)
+
             state.type_select.on_change("value", _on_type_select_change)
 
             # Write config panel values back to placed_nodes_source on Apply
@@ -960,12 +1253,26 @@ class ComponentPaletteLauncher:
                     pdata["name"][idx] = new_om_name
                 if idx < len(pdata.get("node_type", [])):
                     pdata["node_type"][idx] = new_node_type
+                    # If the node_type changed, we may need to reset port counts to defaults for the new type
+                    if not state.source_count_spinner.visible:
+                        pdata["n_sources"][idx] = int(DEFAULT_SOURCE_COUNT[new_node_type])
+                        pdata["n_targets"][idx] = int(DEFAULT_TARGET_NUMBER[new_node_type])
                 if idx < len(pdata.get("position", [])):
                     pdata["position"][idx] = new_position
                 if "options" not in pdata:
                     pdata["options"] = ["{}"] * len(pdata.get("name", []))
                 if idx < len(pdata["options"]):
                     pdata["options"][idx] = opts_json
+                # Update port counts if the spinners are visible (i.e. editable for this component)
+                if state.source_count_spinner is not None and state.source_count_spinner.visible:
+                    new_n_src = int(state.source_count_spinner.value)
+                    if "n_sources" in pdata and idx < len(pdata["n_sources"]):
+                        pdata["n_sources"][idx] = new_n_src
+
+                if state.target_count_spinner is not None and state.target_count_spinner.visible:
+                    new_n_tgt = int(state.target_count_spinner.value)
+                    if "n_targets" in pdata and idx < len(pdata["n_targets"]):
+                        pdata["n_targets"][idx] = new_n_tgt
                 state.placed_nodes_source.data = pdata
 
                 hdata = {k: list(v) for k, v in state.hover_source.data.items()}
@@ -974,6 +1281,8 @@ class ComponentPaletteLauncher:
                 if idx < len(hdata.get("node_type", [])):
                     hdata["node_type"][idx] = new_node_type
                 state.hover_source.data = hdata
+
+                handler._rebuild_all_ports()
 
                 _LOGGER.info(
                     "Applied: node[%d] name=%s type=%s position=%s options=%s",
