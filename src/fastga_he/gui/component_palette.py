@@ -89,8 +89,6 @@ NODE_SELECT_COLOR = "#FFD700"  # gold color for selected node overlay (semi-tran
 # ============================================================================
 # Port placement
 # ============================================================================
-
-
 def compute_ports(
     cx: float,
     cy: float,
@@ -197,6 +195,12 @@ class PaletteState:
     port_count_section: object = field(default=None)
     # Select node alpha change
     selected_node_overlay_source: bkmodel.ColumnDataSource = field(default=None)
+    # Edge line connection source
+    edge_source: bkmodel.ColumnDataSource = field(default=None)
+    pending_port: dict = field(default=None)
+    pending_port_source: bkmodel.ColumnDataSource = field(default=None)
+    connections_source: bkmodel.ColumnDataSource = field(default=None)
+    connections_table_widget: bkmodel.DataTable = field(default=None)
 
 
 # ============================================================================
@@ -481,6 +485,26 @@ class ComponentPaletteBuilder:
             visible=False,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "4px"},
         )
+        connections_source = bkmodel.ColumnDataSource(
+            data=dict(my_port=[], connected_to=[], edge_idx=[])
+        )
+        connections_table_widget = bkmodel.DataTable(
+            columns=[
+                bkmodel.TableColumn(field="my_port", title="My Port"),
+                bkmodel.TableColumn(field="connected_to", title="Connected To"),
+            ],
+            source=connections_source,
+            width=380,
+            height=130,
+            editable=False,
+            selectable=True,
+            styles={"color": "black", "font-size": "14px"},
+        )
+        connections_title_div = bkmodel.Div(
+            text="<b style='color:white;font-size:16pt'>Connections</b>",
+            width=380,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
+        )
 
         # Config panel column – hidden until a canvas node is selected
         table_panel = column(
@@ -492,11 +516,28 @@ class ComponentPaletteBuilder:
             component_option_title_div,
             position_select,
             options_table,
+            connections_title_div,
+            connections_table_widget,
             apply_button,
             spacing=4,
             visible=False,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
+
+        edge_source = bkmodel.ColumnDataSource(
+            data=dict(
+                xs=[],
+                ys=[],
+                color=[],
+                node_a_idx=[],
+                a_label=[],
+                a_kind=[],
+                node_b_idx=[],
+                b_label=[],
+                b_kind=[],
+            )
+        )
+        pending_port_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], color=[]))
 
         state = PaletteState(
             buttons=buttons,
@@ -519,6 +560,10 @@ class ComponentPaletteBuilder:
             apply_button=apply_button,
             table_panel=table_panel,
             selected_node_overlay_source=selected_node_overlay_source,
+            edge_source=edge_source,
+            pending_port_source=pending_port_source,
+            connections_source=connections_source,
+            connections_table_widget=connections_table_widget,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -585,6 +630,204 @@ class PlacementHandler:
         self._wire_buttons()
 
     # -----------------------------------------------------------------------
+    # Edge connection methods
+    # -----------------------------------------------------------------------
+    def _find_nearest_port(self, x: float, y: float) -> dict | None:
+        """Return metadata for the nearest port ball within snap distance, or None."""
+        snap = PORT_RADIUS * 2.5
+        best, best_dist = None, snap
+        for kind, src in [
+            ("source", self.state.source_port_source),
+            ("target", self.state.target_port_source),
+        ]:
+            if src is None:
+                continue
+            data = src.data
+            for i, (px, py) in enumerate(zip(list(data.get("x", [])), list(data.get("y", [])))):
+                dist = ((x - px) ** 2 + (y - py) ** 2) ** 0.5
+                if dist < best_dist:
+                    best_dist = dist
+                    best = {
+                        "kind": kind,
+                        "x": px,
+                        "y": py,
+                        "color": list(data["color"])[i],
+                        "label": list(data["label"])[i],
+                        "node_index": list(data["node_index"])[i],
+                    }
+        return best
+
+    def _cancel_pending_connection(self):
+        """Clear the pending port selection and its highlight ring."""
+        self.state.pending_port = None
+        if self.state.pending_port_source is not None:
+            self.state.pending_port_source.data = dict(x=[], y=[], color=[])
+
+    def _handle_port_tap(self, port: dict):
+        """First click stores port; second click on same kind+color draws an edge."""
+        pending = self.state.pending_port
+        if pending is None:
+            self.state.pending_port = port
+            if self.state.pending_port_source is not None:
+                self.state.pending_port_source.data = dict(
+                    x=[port["x"]], y=[port["y"]], color=[port["color"]]
+                )
+            return
+        # Same port tapped again → cancel
+        if (
+            port["kind"] == pending["kind"]
+            and port["node_index"] == pending["node_index"]
+            and port["label"] == pending["label"]
+        ):
+            self._cancel_pending_connection()
+            return
+        # connects source↔target of the same energy type (color)
+        if port["kind"] != pending["kind"] and port["color"] == pending["color"]:
+            self._add_edge(pending, port)
+        self._cancel_pending_connection()
+
+    def _point_to_segment_dist(
+        self, px: float, py: float, x1: float, y1: float, x2: float, y2: float
+    ) -> float:
+        """Distance minimale du point (px, py) au segment (x1,y1)→(x2,y2)."""
+        dx, dy = x2 - x1, y2 - y1
+        if dx == 0 and dy == 0:
+            return ((px - x1) ** 2 + (py - y1) ** 2) ** 0.5
+        t = max(0.0, min(1.0, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)))
+        return ((px - (x1 + t * dx)) ** 2 + (py - (y1 + t * dy)) ** 2) ** 0.5
+
+    def _find_nearest_edge(self, x: float, y: float, snap: float = 12.0) -> int | None:
+        """Retourne l'index de l'arête la plus proche dans le rayon *snap*, ou None."""
+        if self.state.edge_source is None:
+            return None
+        edata = self.state.edge_source.data
+        best_idx, best_dist = None, snap
+        for i, (xs, ys) in enumerate(zip(edata.get("xs", []), edata.get("ys", []))):
+            if len(xs) < 2:
+                continue
+            dist = self._point_to_segment_dist(x, y, xs[0], ys[0], xs[1], ys[1])
+            if dist < best_dist:
+                best_dist = dist
+                best_idx = i
+        return best_idx
+
+    def _add_edge(self, port_a: dict, port_b: dict):
+        """Append a new edge row to edge_source."""
+        if self.state.edge_source is None:
+            return
+        edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+
+        for i in range(len(edata.get("node_a_idx", []))):
+            port_a_used = (
+                edata["node_a_idx"][i] == port_a["node_index"]
+                and edata["a_label"][i] == port_a["label"]
+                and edata["a_kind"][i] == port_a["kind"]
+            ) or (
+                edata["node_b_idx"][i] == port_a["node_index"]
+                and edata["b_label"][i] == port_a["label"]
+                and edata["b_kind"][i] == port_a["kind"]
+            )
+            port_b_used = (
+                edata["node_a_idx"][i] == port_b["node_index"]
+                and edata["a_label"][i] == port_b["label"]
+                and edata["a_kind"][i] == port_b["kind"]
+            ) or (
+                edata["node_b_idx"][i] == port_b["node_index"]
+                and edata["b_label"][i] == port_b["label"]
+                and edata["b_kind"][i] == port_b["kind"]
+            )
+
+            if port_a_used or port_b_used:
+                _LOGGER.info("Port already connected; edge rejected.")
+                return
+
+        # Check reverse connection: port_a's node → port_b's node already exists in reverse
+        loop_connection = any(
+            (
+                edata["node_a_idx"][i] == port_b["node_index"]
+                and edata["node_b_idx"][i] == port_a["node_index"]
+            )
+            or (
+                edata["node_a_idx"][i] == port_a["node_index"]
+                and edata["node_b_idx"][i] == port_b["node_index"]
+            )
+            for i in range(len(edata.get("node_a_idx", [])))
+        )
+        if loop_connection:
+            _LOGGER.info("Loop connection detected; edge rejected.")
+            return
+
+        edata["xs"].append([port_a["x"], port_b["x"]])
+        edata["ys"].append([port_a["y"], port_b["y"]])
+        edata["color"].append(port_a["color"])
+        edata["node_a_idx"].append(port_a["node_index"])
+        edata["a_label"].append(port_a["label"])
+        edata["a_kind"].append(port_a["kind"])
+        edata["node_b_idx"].append(port_b["node_index"])
+        edata["b_label"].append(port_b["label"])
+        edata["b_kind"].append(port_b["kind"])
+        self.state.edge_source.data = edata
+
+        if self.state.selected_node_index is not None:
+            if (
+                port_a["node_index"] == self.state.selected_node_index
+                or port_b["node_index"] == self.state.selected_node_index
+            ):
+                self._refresh_connections_table(self.state.selected_node_index)
+
+        _LOGGER.info(
+            "Edge: %s port %s (node %d) ↔ %s port %s (node %d)",
+            port_a["kind"],
+            port_a["label"],
+            port_a["node_index"],
+            port_b["kind"],
+            port_b["label"],
+            port_b["node_index"],
+        )
+
+    def _rebuild_edges(self):
+        """
+        Recompute xs/ys in edge_source from stored port-identity columns.
+
+        Called at the end of _rebuild_all_ports so edges track port positions
+        after port-count spinner changes.  Edges whose ports no longer exist
+        (e.g. port count reduced) are silently dropped.
+        """
+        if self.state.edge_source is None:
+            return
+        edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        if not edata.get("node_a_idx"):
+            return
+        # Build (kind, node_index, label) → (x, y) from current port sources
+        pos: dict = {}
+        for kind, src in [
+            ("source", self.state.source_port_source),
+            ("target", self.state.target_port_source),
+        ]:
+            if src is None:
+                continue
+            d = src.data
+            for i, (px, py) in enumerate(zip(list(d.get("x", [])), list(d.get("y", [])))):
+                key = (kind, list(d["node_index"])[i], list(d["label"])[i])
+                pos[key] = (px, py)
+
+        new_xs, new_ys, valid = [], [], []
+        for i in range(len(edata["node_a_idx"])):
+            ka = (edata["a_kind"][i], edata["node_a_idx"][i], edata["a_label"][i])
+            kb = (edata["b_kind"][i], edata["node_b_idx"][i], edata["b_label"][i])
+            if ka in pos and kb in pos:
+                ax, ay = pos[ka]
+                bx, by = pos[kb]
+                new_xs.append([ax, bx])
+                new_ys.append([ay, by])
+                valid.append(i)
+
+        new_edata = {k: [edata[k][j] for j in valid] for k in edata}
+        new_edata["xs"] = new_xs
+        new_edata["ys"] = new_ys
+        self.state.edge_source.data = new_edata
+
+    # -----------------------------------------------------------------------
     # Internal wiring
     # -----------------------------------------------------------------------
 
@@ -617,13 +860,17 @@ class PlacementHandler:
 
     def _toggle_delete_mode(self):
         """Toggle delete mode on / off, updating button styling and status text."""
+        self._cancel_pending_connection()
         self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
             # Enter delete mode: deselect any active component
             self.state.selected_component = None
             for btn in self.state.buttons:
                 btn.button_type = BUTTON_DEFAULT_COLOR_TYPE
-            self.state.status_div.text = "<b style='color:#FF4444;font-size:14pt'>Delete mode: click an icon to remove it</b>"
+            self.state.status_div.text = (
+                "<b style='color:#FF4444;font-size:14pt'>Delete mode: "
+                "click an icon / a connection to remove it</b>"
+            )
             self.state.delete_button.button_type = "danger"
         else:
             # Exit delete mode: restore default status text
@@ -645,9 +892,23 @@ class PlacementHandler:
         """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"canvas_state_{timestamp}.json"
-        data_to_save = self.state.placed_nodes_source.data
+
+        # Bokeh ColumnDataSource stores numpy arrays; convert to plain lists for JSON
+        nodes_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
+        edges_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
+        target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
+
+        canvas_state = {
+            "components": nodes_data,
+            "connections": edges_data,
+            "source_ports": source_data,
+            "target_ports": target_data,
+        }
+
         with open(filename, "w") as f:
-            json.dump(data_to_save, f, indent=2)
+            json.dump(canvas_state, f, indent=2)
+
         _LOGGER.info("Canvas state saved to %s", filename)
         IOLoop.current().call_later(
             1.0, lambda: setattr(self.state.save_button, "button_type", "success")
@@ -689,6 +950,7 @@ class PlacementHandler:
             )
             return
 
+        self._cancel_pending_connection()
         self.state.selected_component = component_keys[idx]
 
         # Exit delete mode if it was active
@@ -866,7 +1128,50 @@ class PlacementHandler:
 
         if self.state.selected_node_overlay_source is not None:
             self.state.selected_node_overlay_source.data = dict(x=[], y=[])
+
+        if self.state.connections_source is not None:
+            self.state.connections_source.data = dict(my_port=[], connected_to=[], edge_idx=[])
+
         self._rebuild_all_ports()
+
+    def _refresh_connections_table(self, node_idx: int):
+        """Populate the Connections DataTable with edges of node *node_idx*."""
+        if self.state.connections_source is None or self.state.edge_source is None:
+            return
+        edata = self.state.edge_source.data
+        names = list(self.state.placed_nodes_source.data.get("name", []))
+        my_ports, connected_to, edge_indices = [], [], []
+        for i in range(len(edata.get("node_a_idx", []))):
+            na, nb = edata["node_a_idx"][i], edata["node_b_idx"][i]
+            if na == node_idx:
+                other = names[nb] if nb < len(names) else f"node_{nb}"
+                my_ports.append(f"{edata['a_kind'][i]}:{edata['a_label'][i]}")
+                connected_to.append(f"{other} ({edata['b_kind'][i]}:{edata['b_label'][i]})")
+                edge_indices.append(i)
+            elif nb == node_idx:
+                other = names[na] if na < len(names) else f"node_{na}"
+                my_ports.append(f"{edata['b_kind'][i]}:{edata['b_label'][i]}")
+                connected_to.append(f"{other} ({edata['a_kind'][i]}:{edata['a_label'][i]})")
+                edge_indices.append(i)
+        self.state.connections_source.data = dict(
+            my_port=my_ports, connected_to=connected_to, edge_idx=edge_indices
+        )
+
+    def _delete_selected_connection(self):
+        """Delete the edge(s) selected in the Connections DataTable."""
+        if self.state.connections_source is None or self.state.edge_source is None:
+            return
+        selected = list(self.state.connections_source.selected.indices)
+        if not selected:
+            return
+        edge_idx_col = list(self.state.connections_source.data.get("edge_idx", []))
+        to_delete = {edge_idx_col[i] for i in selected if i < len(edge_idx_col)}
+        edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        keep = [i for i in range(len(edata.get("xs", []))) if i not in to_delete]
+        self.state.edge_source.data = {k: [edata[k][j] for j in keep] for k in edata}
+        _LOGGER.info("Deleted connection(s) at edge indices %s", sorted(to_delete))
+        if self.state.selected_node_index is not None:
+            self._refresh_connections_table(self.state.selected_node_index)
 
     # -----------------------------------------------------------------------
     # Port management
@@ -988,6 +1293,10 @@ class PlacementHandler:
             fill_alpha=tgt_fill_alpha,
             line_alpha=tgt_line_alpha,
         )
+        self._rebuild_edges()
+
+        if self.state.selected_node_index is not None:
+            self._refresh_connections_table(self.state.selected_node_index)
 
     def _best_possible_node(self, x: float, y: float):
         """Return the best possible node index for the tap action."""
@@ -1027,6 +1336,13 @@ class PlacementHandler:
         """
         x, y = event.x, event.y
 
+        # ── Port connection (highest priority, only in idle mode) ─────────────
+        if not self.state.delete_mode and self.state.selected_component is None:
+            nearest_port = self._find_nearest_port(x, y)
+            if nearest_port is not None:
+                self._handle_port_tap(nearest_port)
+                return
+
         if self.state.delete_mode:
             best_idx, best_dist, current = self._best_possible_node(x, y)
 
@@ -1044,6 +1360,26 @@ class PlacementHandler:
                             hdata[col].pop(best_idx)
                     self.state.hover_source.data = hdata
 
+                # Prune edges that referenced the deleted node; shift remaining indices
+                if self.state.edge_source is not None:
+                    edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                    keep = [
+                        i
+                        for i, (na, nb) in enumerate(
+                            zip(edata.get("node_a_idx", []), edata.get("node_b_idx", []))
+                        )
+                        if na != best_idx and nb != best_idx
+                    ]
+                    new_edata = {}
+                    for k, vals in edata.items():
+                        kept = [vals[i] for i in keep]
+                        if k == "node_a_idx":
+                            kept = [v - 1 if v > best_idx else v for v in kept]
+                        elif k == "node_b_idx":
+                            kept = [v - 1 if v > best_idx else v for v in kept]
+                        new_edata[k] = kept
+                    self.state.edge_source.data = new_edata
+
                 # Rebuild port balls after deletion
                 self._rebuild_all_ports()
 
@@ -1058,10 +1394,27 @@ class PlacementHandler:
                     self.state.selected_node_index -= 1
 
                 _LOGGER.info("Deleted node at index %d", best_idx)
+
+            else:
+                # No nearest node – attempt to delete an edge if within snap distance
+                edge_idx = self._find_nearest_edge(x, y)
+                if edge_idx is not None and self.state.edge_source is not None:
+                    edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                    for k in edata:
+                        edata[k].pop(edge_idx)
+                    self.state.edge_source.data = edata
+                    _LOGGER.info("Delete edge at index %d", edge_idx)
+
+                if self.state.selected_node_index is not None:
+                    self._refresh_connections_table(self.state.selected_node_index)
+
             return
 
         if self.state.selected_component is None:
             best_idx, best_dist, current = self._best_possible_node(x, y)
+
+            # Cancel any pending port if tapping a node or empty space
+            self._cancel_pending_connection()
 
             if best_idx is None and best_dist is None:
                 return
@@ -1178,6 +1531,10 @@ class ComponentPaletteLauncher:
         :param port: TCP port for the Bokeh server.
         :param address: Server bind address.
         """
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        )
         logging.getLogger("bokeh").setLevel(logging.WARNING)
         logging.getLogger("tornado").setLevel(logging.WARNING)
 
@@ -1201,6 +1558,15 @@ class ComponentPaletteLauncher:
             canvas.yaxis.visible = False
             canvas.title.text_color = BACKGROUND_COLOR_CODE
 
+            # Edge lines
+            canvas.multi_line(
+                xs="xs",
+                ys="ys",
+                line_color="color",
+                line_width=4,
+                line_alpha=0.85,
+                source=state.edge_source,
+            )
             canvas.scatter(
                 x="x",
                 y="y",
@@ -1221,6 +1587,18 @@ class ComponentPaletteLauncher:
                 h="h",
                 anchor="center",
                 source=state.placed_nodes_source,
+            )
+            # Pending port highlight ring
+            canvas.scatter(
+                x="x",
+                y="y",
+                size=PORT_RADIUS * 2 + 12,
+                source=state.pending_port_source,
+                fill_color="color",
+                fill_alpha=0.35,
+                line_color="white",
+                line_width=2,
+                line_dash="dashed",
             )
 
             # Transparent scatter glyph for hover interaction
