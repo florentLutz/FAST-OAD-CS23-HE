@@ -1166,7 +1166,7 @@ class ComponentPaletteLauncher:
             )
 
             # Source port balls (button half of each node)
-            source_glyph = canvas.scatter(
+            canvas.scatter(
                 x="x",
                 y="y",
                 size=PORT_RADIUS * 2,
@@ -1176,6 +1176,18 @@ class ComponentPaletteLauncher:
                 line_width=2.0,
                 fill_alpha=0.9,
                 source=state.source_port_source,
+            )
+            source_glyph = canvas.scatter(
+                x="x",
+                y="y",
+                size=PORT_RADIUS * 2 + 5,
+                source=state.source_port_source,
+                fill_color="color",
+                line_color="color",
+                fill_alpha=0,
+                line_alpha=0,
+                hover_fill_alpha=0.3,
+                hover_line_alpha=0.5,
             )
             canvas.text(
                 x="x",
@@ -1190,7 +1202,7 @@ class ComponentPaletteLauncher:
             )
 
             # Target port balls (top half of each node)
-            target_glyph = canvas.scatter(
+            canvas.scatter(
                 x="x",
                 y="y",
                 size=PORT_RADIUS * 2,
@@ -1200,6 +1212,18 @@ class ComponentPaletteLauncher:
                 line_width=2.0,
                 fill_alpha=0.9,
                 source=state.target_port_source,
+            )
+            target_glyph = canvas.scatter(
+                x="x",
+                y="y",
+                size=PORT_RADIUS * 2 + 5,
+                source=state.target_port_source,
+                fill_color="color",
+                line_color="color",
+                fill_alpha=0,
+                line_alpha=0,
+                hover_fill_alpha=0.3,
+                hover_line_alpha=0.5,
             )
             canvas.text(
                 x="x",
