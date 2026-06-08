@@ -332,10 +332,10 @@ class ComponentPaletteBuilder:
         # Port data sources – one row per port ball on the canvas
         # Columns: x, y (centre), color (hex), label (str port index), node_index (owner)
         source_port_source = bkmodel.ColumnDataSource(
-            data=dict(x=[], y=[], color=[], label=[], node_index=[])
+            data=dict(x=[], y=[], color=[], label=[], node_index=[], node_name=[], node_type=[])
         )
         target_port_source = bkmodel.ColumnDataSource(
-            data=dict(x=[], y=[], color=[], label=[], node_index=[])
+            data=dict(x=[], y=[], color=[], label=[], node_index=[], node_name=[], node_type=[])
         )
 
         # Options table source for the component configurator panel
@@ -850,13 +850,32 @@ class PlacementHandler:
         ys = list(pdata.get("y", []))
         icon_types = list(pdata.get("icon_type", []))
         node_types = list(pdata.get("node_type", []))
+        node_names = list(pdata.get("name", []))
         n_sources_list = list(pdata.get("n_sources", []))
         n_targets_list = list(pdata.get("n_targets", []))
 
-        src_x, src_y, src_color, src_label, src_node_idx = [], [], [], [], []
-        tgt_x, tgt_y, tgt_color, tgt_label, tgt_node_idx = [], [], [], [], []
+        src_x, src_y, src_color, src_label, src_node_idx, src_node_name, src_node_type = (
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        )
+        tgt_x, tgt_y, tgt_color, tgt_label, tgt_node_idx, tgt_node_name, tgt_node_type = (
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        )
 
-        for i, (cx, cy, icon_type, node_type) in enumerate(zip(xs, ys, icon_types, node_types)):
+        for i, (cx, cy, icon_type, node_type, node_name) in enumerate(
+            zip(xs, ys, icon_types, node_types, node_names)
+        ):
             n_src = (
                 int(n_sources_list[i])
                 if i < len(n_sources_list)
@@ -880,6 +899,8 @@ class PlacementHandler:
                 src_color.append(raw_src_color)
                 src_label.append(str(p["index"] + 1))
                 src_node_idx.append(i)
+                src_node_name.append([node_name])
+                src_node_type.append([node_type])
 
             for p in ports["inputs"]:
                 tgt_x.append(p["x"])
@@ -887,12 +908,26 @@ class PlacementHandler:
                 tgt_color.append(raw_tgt_color)
                 tgt_label.append(str(p["index"] + 1))
                 tgt_node_idx.append(i)
+                tgt_node_name.append([node_name])
+                tgt_node_type.append([node_type])
 
         self.state.source_port_source.data = dict(
-            x=src_x, y=src_y, color=src_color, label=src_label, node_index=src_node_idx
+            x=src_x,
+            y=src_y,
+            color=src_color,
+            label=src_label,
+            node_index=src_node_idx,
+            node_name=src_node_name,
+            node_type=src_node_type,
         )
         self.state.target_port_source.data = dict(
-            x=tgt_x, y=tgt_y, color=tgt_color, label=tgt_label, node_index=tgt_node_idx
+            x=tgt_x,
+            y=tgt_y,
+            color=tgt_color,
+            label=tgt_label,
+            node_index=tgt_node_idx,
+            node_name=tgt_node_name,
+            node_type=tgt_node_type,
         )
 
     def _best_possible_node(self, x: float, y: float):
@@ -1131,7 +1166,7 @@ class ComponentPaletteLauncher:
             )
 
             # Source port balls (button half of each node)
-            canvas.scatter(
+            source_glyph = canvas.scatter(
                 x="x",
                 y="y",
                 size=PORT_RADIUS * 2,
@@ -1155,7 +1190,7 @@ class ComponentPaletteLauncher:
             )
 
             # Target port balls (top half of each node)
-            canvas.scatter(
+            target_glyph = canvas.scatter(
                 x="x",
                 y="y",
                 size=PORT_RADIUS * 2,
@@ -1177,11 +1212,29 @@ class ComponentPaletteLauncher:
                 text_font_style="bold",
                 text_color="white",
             )
-            hover_tool = bkmodel.HoverTool(
+            hover_tool_component = bkmodel.HoverTool(
                 renderers=[scatter_glyph],
                 tooltips=[("Component id", "@name"), ("Component type", "@node_type")],
             )
-            canvas.add_tools(hover_tool)
+            hover_tool_source = bkmodel.HoverTool(
+                renderers=[source_glyph],
+                tooltips=[
+                    ("Port type", "Source"),
+                    ("Port number", "@label"),
+                    ("Component id", "@node_name"),
+                    ("Component type", "@node_type"),
+                ],
+            )
+            hover_tool_target = bkmodel.HoverTool(
+                renderers=[target_glyph],
+                tooltips=[
+                    ("Port type", "Target"),
+                    ("Port number", "@label"),
+                    ("Component id", "@node_name"),
+                    ("Component type", "@node_type"),
+                ],
+            )
+            canvas.add_tools(hover_tool_component, hover_tool_source, hover_tool_target)
 
             # Label set for placed node names
             placed_label_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], text=[]))
@@ -1321,11 +1374,3 @@ class ComponentPaletteLauncher:
 
         IOLoop.current().call_later(0.1, lambda: webbrowser.open(f"http://{address}:{port}/"))
         server.io_loop.start()
-
-
-# ============================================================================
-# Script entry-point
-# ============================================================================
-
-if __name__ == "__main__":
-    ComponentPaletteLauncher.launch()

@@ -23,12 +23,13 @@ import bokeh.plotting as bkplot
 
 
 from ..component_palette import (
-    BTN_TYPE_DEFAULT,
-    BTN_TYPE_SELECTED,
+    BUTTON_DEFAULT_COLOR_TYPE,
+    BUTTON_SELECTED_COLOR_TYPE,
     ICONS_CONFIG,
     ComponentPaletteBuilder,
     PaletteState,
     PlacementHandler,
+    ComponentPaletteLauncher,
 )
 from ..power_train_network_viewer import _string_cleanup
 
@@ -93,7 +94,7 @@ class TestComponentPaletteBuilder:
         """No button should appear selected before any interaction."""
         _layout, state = ComponentPaletteBuilder.build()
         for btn in state.buttons:
-            assert btn.button_type == BTN_TYPE_DEFAULT
+            assert btn.button_type == BUTTON_DEFAULT_COLOR_TYPE
 
     def test_placed_nodes_source_initially_empty(self):
         _layout, state = ComponentPaletteBuilder.build()
@@ -150,22 +151,22 @@ class TestPlacementHandlerPaletteSelect:
 
     def test_selected_button_type_changes_to_selected(self):
         self.handler.on_palette_select(0)
-        assert self.state.buttons[0].button_type == BTN_TYPE_SELECTED
+        assert self.state.buttons[0].button_type == BUTTON_SELECTED_COLOR_TYPE
 
     def test_other_buttons_remain_default(self):
         self.handler.on_palette_select(0)
         for btn in self.state.buttons[1:]:
-            assert btn.button_type == BTN_TYPE_DEFAULT
+            assert btn.button_type == BUTTON_DEFAULT_COLOR_TYPE
 
     def test_switching_selection_deselects_previous(self):
         self.handler.on_palette_select(0)
         self.handler.on_palette_select(2)
-        assert self.state.buttons[0].button_type == BTN_TYPE_DEFAULT
-        assert self.state.buttons[2].button_type == BTN_TYPE_SELECTED
+        assert self.state.buttons[0].button_type == BUTTON_DEFAULT_COLOR_TYPE
+        assert self.state.buttons[2].button_type == BUTTON_SELECTED_COLOR_TYPE
 
     def test_only_one_button_selected_at_a_time(self):
         self.handler.on_palette_select(3)
-        selected = [b for b in self.state.buttons if b.button_type == BTN_TYPE_SELECTED]
+        selected = [b for b in self.state.buttons if b.button_type == BUTTON_SELECTED_COLOR_TYPE]
         assert len(selected) == 1
 
     def test_status_div_updated_on_selection(self):
@@ -187,7 +188,7 @@ class TestPlacementHandlerPaletteSelect:
         cb = self.handler._make_select_cb(0)
         cb()
         assert self.state.selected_component == list(ICONS_CONFIG.keys())[0]
-        assert self.state.buttons[0].button_type == BTN_TYPE_SELECTED
+        assert self.state.buttons[0].button_type == BUTTON_SELECTED_COLOR_TYPE
 
 
 # ---------------------------------------------------------------------------
@@ -307,7 +308,10 @@ class TestPlacementHandlerCanvasTap:
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped in CI – requires an interactive IOLoop.")
 def test_component_palette_launcher_import():
-    """Ensure the launcher class is importable and callable without errors."""
-    from ..component_palette import ComponentPaletteLauncher  # noqa: F401
-
     assert callable(ComponentPaletteLauncher.launch)
+
+
+def test_palette_launcher_functionality():
+    """Test that the launcher can be called without errors and returns expected types."""
+
+    ComponentPaletteLauncher.launch()
