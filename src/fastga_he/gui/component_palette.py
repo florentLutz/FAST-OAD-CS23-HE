@@ -83,6 +83,8 @@ NODE_RADIUS = ICON_SIZE / 2  # half icon size = orbit base
 BUTTON_DEFAULT_COLOR_TYPE = "light"  # unselected state
 BUTTON_SELECTED_COLOR_TYPE = "primary"  # selected state (blue highlight)
 
+NODE_SELECT_COLOR = "#FFD700"  # gold color for selected node overlay (semi-transparent)
+
 
 # ============================================================================
 # Port placement
@@ -193,6 +195,8 @@ class PaletteState:
     target_count_spinner: bkmodel.Spinner = field(default=None)
     # Column section wrapping the spinners – toggled visible when ports are editable
     port_count_section: object = field(default=None)
+    # Select node alpha change
+    selected_node_overlay_source: bkmodel.ColumnDataSource = field(default=None)
 
 
 # ============================================================================
@@ -332,11 +336,32 @@ class ComponentPaletteBuilder:
         # Port data sources – one row per port ball on the canvas
         # Columns: x, y (centre), color (hex), label (str port index), node_index (owner)
         source_port_source = bkmodel.ColumnDataSource(
-            data=dict(x=[], y=[], color=[], label=[], node_index=[], node_name=[], node_type=[])
+            data=dict(
+                x=[],
+                y=[],
+                color=[],
+                label=[],
+                node_index=[],
+                node_name=[],
+                node_type=[],
+                fill_alpha=[],
+                line_alpha=[],
+            )
         )
         target_port_source = bkmodel.ColumnDataSource(
-            data=dict(x=[], y=[], color=[], label=[], node_index=[], node_name=[], node_type=[])
+            data=dict(
+                x=[],
+                y=[],
+                color=[],
+                label=[],
+                node_index=[],
+                node_name=[],
+                node_type=[],
+                fill_alpha=[],
+                line_alpha=[],
+            )
         )
+        selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
 
         # Options table source for the component configurator panel
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
@@ -493,6 +518,7 @@ class ComponentPaletteBuilder:
             position_select=position_select,
             apply_button=apply_button,
             table_panel=table_panel,
+            selected_node_overlay_source=selected_node_overlay_source,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -754,6 +780,14 @@ class PlacementHandler:
         if self.state.port_count_section is not None:
             self.state.port_count_section.visible = src_editable or tgt_editable
 
+        if self.state.selected_node_overlay_source is not None:
+            pdata = self.state.placed_nodes_source.data
+            self.state.selected_node_overlay_source.data = dict(
+                x=[list(pdata["x"])[idx]],
+                y=[list(pdata["y"])[idx]],
+            )
+        self._rebuild_all_ports()
+
     @staticmethod
     def _option_val_to_str(v) -> str:
         """
@@ -830,6 +864,10 @@ class PlacementHandler:
         if self.state.table_panel is not None:
             self.state.table_panel.visible = False
 
+        if self.state.selected_node_overlay_source is not None:
+            self.state.selected_node_overlay_source.data = dict(x=[], y=[])
+        self._rebuild_all_ports()
+
     # -----------------------------------------------------------------------
     # Port management
     # -----------------------------------------------------------------------
@@ -844,6 +882,9 @@ class PlacementHandler:
         """
         if self.state.source_port_source is None or self.state.target_port_source is None:
             return
+
+        _SEL_FILL, _SEL_LINE = 0.3, 0.5
+        _DIM_FILL, _DIM_LINE = 0.0, 0.0
 
         pdata = self.state.placed_nodes_source.data
         xs = list(pdata.get("x", []))
@@ -863,6 +904,8 @@ class PlacementHandler:
             [],
             [],
         )
+        src_fill_alpha, src_line_alpha = [], []
+
         tgt_x, tgt_y, tgt_color, tgt_label, tgt_node_idx, tgt_node_name, tgt_node_type = (
             [],
             [],
@@ -872,6 +915,10 @@ class PlacementHandler:
             [],
             [],
         )
+        tgt_fill_alpha, tgt_line_alpha = [], []
+
+        has_sel = self.state.selected_node_index is not None
+        selected_idx = self.state.selected_node_index
 
         for i, (cx, cy, icon_type, node_type, node_name) in enumerate(
             zip(xs, ys, icon_types, node_types, node_names)
@@ -893,6 +940,10 @@ class PlacementHandler:
 
             ports = compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_src, n_tgt)
 
+            is_sel = has_sel and i == selected_idx
+            f_a = _SEL_FILL if is_sel else _DIM_FILL
+            l_a = _SEL_LINE if is_sel else _DIM_LINE
+
             for p in ports["outputs"]:
                 src_x.append(p["x"])
                 src_y.append(p["y"])
@@ -901,6 +952,8 @@ class PlacementHandler:
                 src_node_idx.append(i)
                 src_node_name.append([node_name])
                 src_node_type.append([node_type])
+                src_fill_alpha.append(f_a)
+                src_line_alpha.append(l_a)
 
             for p in ports["inputs"]:
                 tgt_x.append(p["x"])
@@ -910,6 +963,8 @@ class PlacementHandler:
                 tgt_node_idx.append(i)
                 tgt_node_name.append([node_name])
                 tgt_node_type.append([node_type])
+                tgt_fill_alpha.append(f_a)
+                tgt_line_alpha.append(l_a)
 
         self.state.source_port_source.data = dict(
             x=src_x,
@@ -919,6 +974,8 @@ class PlacementHandler:
             node_index=src_node_idx,
             node_name=src_node_name,
             node_type=src_node_type,
+            fill_alpha=src_fill_alpha,
+            line_alpha=src_line_alpha,
         )
         self.state.target_port_source.data = dict(
             x=tgt_x,
@@ -928,6 +985,8 @@ class PlacementHandler:
             node_index=tgt_node_idx,
             node_name=tgt_node_name,
             node_type=tgt_node_type,
+            fill_alpha=tgt_fill_alpha,
+            line_alpha=tgt_line_alpha,
         )
 
     def _best_possible_node(self, x: float, y: float):
@@ -1142,6 +1201,17 @@ class ComponentPaletteLauncher:
             canvas.yaxis.visible = False
             canvas.title.text_color = BACKGROUND_COLOR_CODE
 
+            canvas.scatter(
+                x="x",
+                y="y",
+                size=ICON_SIZE + 14,
+                source=state.selected_node_overlay_source,
+                fill_color=NODE_SELECT_COLOR,
+                fill_alpha=0.3,
+                line_color=NODE_SELECT_COLOR,
+                line_alpha=0.7,
+                line_width=3,
+            )
             # Render placed node icons on the canvas
             canvas.image_url(
                 url="url",
@@ -1184,8 +1254,8 @@ class ComponentPaletteLauncher:
                 source=state.source_port_source,
                 fill_color="color",
                 line_color="color",
-                fill_alpha=0,
-                line_alpha=0,
+                fill_alpha="fill_alpha",
+                line_alpha="line_alpha",
                 hover_fill_alpha=0.3,
                 hover_line_alpha=0.5,
             )
@@ -1220,8 +1290,8 @@ class ComponentPaletteLauncher:
                 source=state.target_port_source,
                 fill_color="color",
                 line_color="color",
-                fill_alpha=0,
-                line_alpha=0,
+                fill_alpha="fill_alpha",
+                line_alpha="line_alpha",
                 hover_fill_alpha=0.3,
                 hover_line_alpha=0.5,
             )
@@ -1332,8 +1402,8 @@ class ComponentPaletteLauncher:
                     pdata["node_type"][idx] = new_node_type
                     # If the node_type changed, we may need to reset port counts to defaults for the new type
                     if not state.source_count_spinner.visible:
-                        pdata["n_sources"][idx] = int(DEFAULT_SOURCE_COUNT[new_node_type])
-                        pdata["n_targets"][idx] = int(DEFAULT_TARGET_NUMBER[new_node_type])
+                        pdata["n_sources"][idx] = int(DEFAULT_SOURCE_COUNT.get(new_node_type, 0))
+                        pdata["n_targets"][idx] = int(DEFAULT_TARGET_NUMBER.get(new_node_type, 0))
                 if idx < len(pdata.get("position", [])):
                     pdata["position"][idx] = new_position
                 if "options" not in pdata:
