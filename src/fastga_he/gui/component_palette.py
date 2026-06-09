@@ -352,6 +352,7 @@ class ComponentPaletteBuilder:
                 node_type=[],
                 fill_alpha=[],
                 line_alpha=[],
+                connected=[],
             )
         )
         target_port_source = bkmodel.ColumnDataSource(
@@ -365,6 +366,7 @@ class ComponentPaletteBuilder:
                 node_type=[],
                 fill_alpha=[],
                 line_alpha=[],
+                connected=[],
             )
         )
         selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
@@ -680,6 +682,7 @@ class PlacementHandler:
         # connects source↔target of the same energy type (color)
         if port["kind"] != pending["kind"] and port["color"] == pending["color"]:
             self._add_edge(pending, port)
+            self._rebuild_all_ports()
         self._cancel_pending_connection()
 
     def _point_to_segment_dist(
@@ -769,6 +772,31 @@ class PlacementHandler:
                 port_a["node_index"] == self.state.selected_node_index
                 or port_b["node_index"] == self.state.selected_node_index
             ):
+                src_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
+                tgt_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
+
+                def _mark_connected(data, port):
+                    data["connected"] = [
+                        "True"
+                        if (
+                            data["node_index"][i] == port["node_index"]
+                            and data["label"][i] == port["label"]
+                        )
+                        else data["connected"][i]  # preserve existing "True"
+                        for i in range(len(data["node_index"]))
+                    ]
+
+                if port_a["kind"] == "source":
+                    _mark_connected(src_data, port_a)
+                    _mark_connected(tgt_data, port_b)
+                else:
+                    _mark_connected(tgt_data, port_a)
+                    _mark_connected(src_data, port_b)
+
+                # Full reassignment so Bokeh detects the change
+                self.state.source_port_source.data = src_data
+                self.state.target_port_source.data = tgt_data
+
                 self._refresh_connections_table(self.state.selected_node_index)
 
         _LOGGER.info(
@@ -1165,6 +1193,29 @@ class PlacementHandler:
 
         self._rebuild_all_ports()
 
+    def _refresh_connections_table(self, node_idx: int):
+        """Populate the Connections DataTable with edges of node *node_idx*."""
+        if self.state.connections_source is None or self.state.edge_source is None:
+            return
+        edata = self.state.edge_source.data
+        names = list(self.state.placed_nodes_source.data.get("name", []))
+        my_ports, connected_to, edge_indices = [], [], []
+        for i in range(len(edata.get("node_a_idx", []))):
+            na, nb = edata["node_a_idx"][i], edata["node_b_idx"][i]
+            if na == node_idx:
+                other = names[nb] if nb < len(names) else f"node_{nb}"
+                my_ports.append(f"{edata['a_kind'][i]}:{edata['a_label'][i]}")
+                connected_to.append(f"{other} ({edata['b_kind'][i]}:{edata['b_label'][i]})")
+                edge_indices.append(i)
+            elif nb == node_idx:
+                other = names[na] if na < len(names) else f"node_{na}"
+                my_ports.append(f"{edata['b_kind'][i]}:{edata['b_label'][i]}")
+                connected_to.append(f"{other} ({edata['a_kind'][i]}:{edata['a_label'][i]})")
+                edge_indices.append(i)
+        self.state.connections_source.data = dict(
+            my_port=my_ports, connected_to=connected_to, edge_idx=edge_indices
+        )
+
     def _delete_selected_connection(self):
         """Delete the edge(s) selected in the Connections DataTable."""
         if self.state.connections_source is None or self.state.edge_source is None:
@@ -1230,6 +1281,18 @@ class PlacementHandler:
         )
         tgt_fill_alpha, tgt_line_alpha = [], []
 
+        # Build a set of connected (kind, node_index, label) tuples from edge_source
+        connected_ports: set = set()
+        if self.state.edge_source is not None:
+            edata = self.state.edge_source.data
+            for i in range(len(edata.get("node_a_idx", []))):
+                connected_ports.add(
+                    (edata["a_kind"][i], edata["node_a_idx"][i], edata["a_label"][i])
+                )
+                connected_ports.add(
+                    (edata["b_kind"][i], edata["node_b_idx"][i], edata["b_label"][i])
+                )
+
         has_sel = self.state.selected_node_index is not None
         selected_idx = self.state.selected_node_index
 
@@ -1289,6 +1352,11 @@ class PlacementHandler:
             node_type=src_node_type,
             fill_alpha=src_fill_alpha,
             line_alpha=src_line_alpha,
+            kind=["source"] * len(src_x),
+            connected=[
+                "True" if ("source", src_node_idx[i], src_label[i]) in connected_ports else "False"
+                for i in range(len(src_x))
+            ],
         )
         self.state.target_port_source.data = dict(
             x=tgt_x,
@@ -1300,6 +1368,11 @@ class PlacementHandler:
             node_type=tgt_node_type,
             fill_alpha=tgt_fill_alpha,
             line_alpha=tgt_line_alpha,
+            kind=["target"] * len(tgt_x),
+            connected=[
+                "True" if ("target", tgt_node_idx[i], tgt_label[i]) in connected_ports else "False"
+                for i in range(len(tgt_x))
+            ],
         )
         self._rebuild_edges()
 
