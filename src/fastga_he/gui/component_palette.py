@@ -203,6 +203,12 @@ class PaletteState:
     pending_port_source: bkmodel.ColumnDataSource = field(default=None)
     connections_source: bkmodel.ColumnDataSource = field(default=None)
     connections_table_widget: bkmodel.DataTable = field(default=None)
+    # Dynamic column of connection rows – children rebuilt by _refresh_connections_table_new
+    connections_rows_column: object = field(default=None)
+    # Temporary (dashed) preview edges shown before Apply is clicked
+    temp_edge_source: bkmodel.ColumnDataSource = field(default=None)
+    # Pending port-pair connections waiting for Apply: list of (port_a_dict, port_b_dict)
+    pending_connections: list = field(default_factory=list)
 
 
 # ============================================================================
@@ -485,17 +491,14 @@ class ComponentPaletteBuilder:
         connections_source = bkmodel.ColumnDataSource(
             data=dict(my_port=[], connected_to=[], edge_idx=[])
         )
-        connections_table_widget = bkmodel.DataTable(
-            columns=[
-                bkmodel.TableColumn(field="my_port", title="My Port"),
-                bkmodel.TableColumn(field="connected_to", title="Connected To"),
-            ],
-            source=connections_source,
-            width=380,
-            height=130,
-            editable=False,
-            selectable=True,
-            styles={"color": "black", "font-size": "14px"},
+        # Dynamic column that will hold one row per connection (label + select)
+        connections_rows_column = column(
+            [],
+            styles={"background": BACKGROUND_COLOR_CODE},
+        )
+        connections_table_widget = column(
+            connections_rows_column,
+            styles={"background": BACKGROUND_COLOR_CODE},
         )
         connections_title_div = bkmodel.Div(
             text="<b style='color:white;font-size:16pt'>Connections</b>",
@@ -535,6 +538,7 @@ class ComponentPaletteBuilder:
             )
         )
         pending_port_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], color=[]))
+        temp_edge_source = bkmodel.ColumnDataSource(data=dict(xs=[], ys=[], color=[]))
 
         state = PaletteState(
             buttons=buttons,
@@ -562,6 +566,9 @@ class ComponentPaletteBuilder:
             pending_port_source=pending_port_source,
             connections_source=connections_source,
             connections_table_widget=connections_table_widget,
+            connections_rows_column=connections_rows_column,
+            temp_edge_source=temp_edge_source,
+            pending_connections=[],
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -808,6 +815,42 @@ class PlacementHandler:
             port_b["label"],
             port_b["node_index"],
         )
+
+    def _add_edge_temp(self, port_a: dict, port_b: dict):
+        """
+        Draw a dashed preview line between two ports in ``temp_edge_source``.
+
+        The line is **not** registered in ``edge_source``; it is replaced by a
+        permanent edge only when :meth:`_apply_node_config` is called.
+
+        :param port_a: Port metadata dict (keys: kind, x, y, color, label, node_index).
+        :param port_b: Port metadata dict (same keys).
+        """
+        if self.state.temp_edge_source is None:
+            return
+        tdata = {k: list(v) for k, v in self.state.temp_edge_source.data.items()}
+        tdata["xs"].append([port_a["x"], port_b["x"]])
+        tdata["ys"].append([port_a["y"], port_b["y"]])
+        tdata["color"].append(port_a["color"])
+        self.state.temp_edge_source.data = tdata
+        _LOGGER.debug(
+            "Temp edge: %s:%s → %s:%s",
+            port_a["kind"],
+            port_a["label"],
+            port_b["kind"],
+            port_b["label"],
+        )
+
+    def _clear_temp_edges(self):
+        """Wipe all dashed preview edges and the pending-connection list."""
+        self.state.pending_connections.clear()
+        if self.state.temp_edge_source is not None:
+            self.state.temp_edge_source.data = dict(xs=[], ys=[], color=[])
+
+    def _clear_temp_edge_visuals(self):
+        """Clear only the canvas dashed lines, leave pending_connections intact."""
+        if self.state.temp_edge_source is not None:
+            self.state.temp_edge_source.data = dict(xs=[], ys=[], color=[])
 
     def _rebuild_edges(self):
         """
@@ -1191,30 +1234,325 @@ class PlacementHandler:
         if self.state.connections_source is not None:
             self.state.connections_source.data = dict(my_port=[], connected_to=[], edge_idx=[])
 
+        if self.state.connections_rows_column is not None:
+            self.state.connections_rows_column.children = []
+
         self._rebuild_all_ports()
 
     def _refresh_connections_table(self, node_idx: int):
-        """Populate the Connections DataTable with edges of node *node_idx*."""
-        if self.state.connections_source is None or self.state.edge_source is None:
+        """
+        Populate the Connections panel for node *node_idx* using dynamic rows.
+
+        For every source port of the selected node a row is created with:
+          - a disabled TextInput showing the port label (e.g. ``"source:1"``)
+          - a Select whose choices are all currently-unconnected target ports;
+            if the port is already connected the current peer is prepended so
+            the existing selection is preserved.
+
+        For every target port of the selected node a symmetric row is created
+        showing which source port it is connected to (or the available
+        unconnected source ports as choices).
+
+        Selecting a new value in any Select immediately draws (or re-draws)
+        the corresponding edge.
+        """
+        if self.state.connections_rows_column is None:
             return
-        edata = self.state.edge_source.data
-        names = list(self.state.placed_nodes_source.data.get("name", []))
-        my_ports, connected_to, edge_indices = [], [], []
-        for i in range(len(edata.get("node_a_idx", []))):
-            na, nb = edata["node_a_idx"][i], edata["node_b_idx"][i]
-            if na == node_idx:
-                other = names[nb] if nb < len(names) else f"node_{nb}"
-                my_ports.append(f"{edata['a_kind'][i]}:{edata['a_label'][i]}")
-                connected_to.append(f"{other} ({edata['b_kind'][i]}:{edata['b_label'][i]})")
-                edge_indices.append(i)
-            elif nb == node_idx:
-                other = names[na] if na < len(names) else f"node_{na}"
-                my_ports.append(f"{edata['b_kind'][i]}:{edata['b_label'][i]}")
-                connected_to.append(f"{other} ({edata['a_kind'][i]}:{edata['a_label'][i]})")
-                edge_indices.append(i)
-        self.state.connections_source.data = dict(
-            my_port=my_ports, connected_to=connected_to, edge_idx=edge_indices
-        )
+
+        source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
+        target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
+        node_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
+        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+
+        # ------------------------------------------------------------------ #
+        # Build lookup: (kind, port_label) → (peer_node_idx, peer_label)      #
+        # for every edge that touches node_idx.                                #
+        # ------------------------------------------------------------------ #
+        connected_src: dict[str, tuple[int, str]] = {}  # src_label → (peer_node, tgt_label)
+        connected_tgt: dict[str, tuple[int, str]] = {}  # tgt_label → (peer_node, src_label)
+
+        for i in range(len(edge_data.get("node_a_idx", []))):
+            na, nb = edge_data["node_a_idx"][i], edge_data["node_b_idx"][i]
+            al, bl = edge_data["a_label"][i], edge_data["b_label"][i]
+            ak, bk = edge_data["a_kind"][i], edge_data["b_kind"][i]
+
+            if na == node_idx and ak == "source":
+                connected_src[al] = (nb, bl)
+            elif nb == node_idx and bk == "source":
+                connected_src[bl] = (na, al)
+            if na == node_idx and ak == "target":
+                connected_tgt[al] = (nb, bl)
+            elif nb == node_idx and bk == "target":
+                connected_tgt[bl] = (na, al)
+
+        # ------------------------------------------------------------------ #
+        # Helper: build a display string for a peer port                      #
+        # ------------------------------------------------------------------ #
+        def _peer_str(peer_node_idx: int, peer_label: str, peer_kind: str) -> str:
+            name = (
+                node_data["name"][peer_node_idx]
+                if peer_node_idx < len(node_data.get("name", []))
+                else f"node_{peer_node_idx}"
+            )
+            return f"{name} ({peer_kind}:{peer_label})"
+
+        # ------------------------------------------------------------------ #
+        # Helper: given a new Select value string find its (node_idx, label)  #
+        # ------------------------------------------------------------------ #
+        def _parse_choice(choice_str: str, candidates: list[tuple]) -> tuple | None:
+            """Return (node_idx, label, kind) matching the display string, or None."""
+            for node_i, lbl, kind, disp in candidates:
+                if disp == choice_str:
+                    return node_i, lbl, kind
+            return None
+
+        # ------------------------------------------------------------------ #
+        # Collect all unconnected target ports (for source-port selects)      #
+        # ------------------------------------------------------------------ #
+        free_targets: list[tuple[int, str, str, str]] = []  # (node_i, label, kind, display)
+        for j in range(len(target_data.get("node_index", []))):
+            if target_data["connected"][j] == "False" and target_data["node_index"][j] != node_idx:
+                free_targets.append(
+                    (
+                        target_data["node_index"][j],
+                        target_data["label"][j],
+                        "target",
+                        _peer_str(target_data["node_index"][j], target_data["label"][j], "target"),
+                    )
+                )
+
+        # Collect all unconnected source ports (for target-port selects)
+        free_sources: list[tuple[int, str, str, str]] = []
+        for j in range(len(source_data.get("node_index", []))):
+            if source_data["connected"][j] == "False" and source_data["node_index"][j] != node_idx:
+                free_sources.append(
+                    (
+                        source_data["node_index"][j],
+                        source_data["label"][j],
+                        "source",
+                        _peer_str(source_data["node_index"][j], source_data["label"][j], "source"),
+                    )
+                )
+
+        _EMPTY = ""  # sentinel shown when port has no connection and no free peers
+
+        new_rows = []
+
+        # ------------------------------------------------------------------ #
+        # Source-port rows                                                     #
+        # ------------------------------------------------------------------ #
+        for i in range(len(source_data.get("node_index", []))):
+            if source_data["node_index"][i] != node_idx:
+                continue
+
+            src_label = source_data["label"][i]
+            is_connected = source_data["connected"][i] == "True"
+
+            label_input = bkmodel.TextInput(
+                value=f"source:{src_label}",
+                width=180,
+                disabled=True,
+                styles={"color": "white", "font-size": "14px"},
+            )
+
+            candidates = list(free_targets)
+            current_str = _EMPTY
+            if is_connected and src_label in connected_src:
+                peer_node_i, peer_lbl = connected_src[src_label]
+                current_str = _peer_str(peer_node_i, peer_lbl, "target")
+                candidates = [
+                    c for c in candidates if not (c[0] == peer_node_i and c[1] == peer_lbl)
+                ] + [(peer_node_i, peer_lbl, "target", _peer_str(peer_node_i, peer_lbl, "target"))]
+
+            choices = [_EMPTY] + [c[3] for c in candidates if c[3] != current_str]
+            if current_str and current_str not in choices:
+                choices = [current_str] + choices
+
+            value_select = bkmodel.Select(
+                value=current_str if current_str else _EMPTY,
+                options=choices,
+                width=180,
+                styles={"color": "white", "font-size": "12px"},
+            )
+
+            def _make_src_callback(
+                _src_label=src_label,
+                _src_node_idx=node_idx,
+                _src_color=source_data["color"][i],
+                _src_x=source_data["x"][i],
+                _src_y=source_data["y"][i],
+                _candidates=candidates,
+            ):
+                def _on_change(attr, old, new_val):
+                    # 1. Remove any pending connection for this source port
+                    self.state.pending_connections = [
+                        (pa, pb)
+                        for pa, pb in self.state.pending_connections
+                        if not (
+                            pa["kind"] == "source"
+                            and pa["node_index"] == _src_node_idx
+                            and pa["label"] == _src_label
+                        )
+                    ]
+                    # Redraw all temp edges from remaining pending list
+                    self._clear_temp_edge_visuals()
+                    for pa, pb in list(self.state.pending_connections):
+                        self._add_edge_temp(pa, pb)
+
+                    if new_val == _EMPTY:
+                        return
+
+                    parsed = _parse_choice(new_val, _candidates)
+                    if parsed is None:
+                        return
+                    tgt_node_i, tgt_lbl, tgt_kind, _ = parsed
+
+                    # Fetch live target port position
+                    tgt_data = self.state.target_port_source.data
+                    tgt_x, tgt_y, tgt_color = None, None, None
+                    for j in range(len(tgt_data.get("node_index", []))):
+                        if (
+                            tgt_data["node_index"][j] == tgt_node_i
+                            and tgt_data["label"][j] == tgt_lbl
+                        ):
+                            tgt_x = tgt_data["x"][j]
+                            tgt_y = tgt_data["y"][j]
+                            tgt_color = tgt_data["color"][j]
+                            break
+                    if tgt_x is None:
+                        return
+
+                    port_a = {
+                        "kind": "source",
+                        "node_index": _src_node_idx,
+                        "label": _src_label,
+                        "x": _src_x,
+                        "y": _src_y,
+                        "color": _src_color,
+                    }
+                    port_b = {
+                        "kind": "target",
+                        "node_index": tgt_node_i,
+                        "label": tgt_lbl,
+                        "x": tgt_x,
+                        "y": tgt_y,
+                        "color": tgt_color,
+                    }
+                    self.state.pending_connections.append((port_a, port_b))
+                    self._add_edge_temp(port_a, port_b)
+
+                return _on_change
+
+            value_select.on_change("value", _make_src_callback())
+            new_rows.append(row(label_input, value_select, spacing=4))
+
+        # ------------------------------------------------------------------ #
+        # Target-port rows                                                     #
+        # ------------------------------------------------------------------ #
+        for i in range(len(target_data.get("node_index", []))):
+            if target_data["node_index"][i] != node_idx:
+                continue
+
+            tgt_label = target_data["label"][i]
+            is_connected = target_data["connected"][i] == "True"
+
+            label_input = bkmodel.TextInput(
+                value=f"target:{tgt_label}",
+                width=180,
+                disabled=True,
+                styles={"color": "white", "font-size": "14px"},
+            )
+
+            candidates = list(free_sources)
+            current_str = _EMPTY
+            if is_connected and tgt_label in connected_tgt:
+                peer_node_i, peer_lbl = connected_tgt[tgt_label]
+                current_str = _peer_str(peer_node_i, peer_lbl, "source")
+                candidates = [
+                    c for c in candidates if not (c[0] == peer_node_i and c[1] == peer_lbl)
+                ] + [(peer_node_i, peer_lbl, "source", _peer_str(peer_node_i, peer_lbl, "source"))]
+
+            choices = [_EMPTY] + [c[3] for c in candidates if c[3] != current_str]
+            if current_str and current_str not in choices:
+                choices = [current_str] + choices
+
+            value_select = bkmodel.Select(
+                value=current_str if current_str else _EMPTY,
+                options=choices,
+                width=180,
+                styles={"color": "white", "font-size": "12px"},
+            )
+
+            def _make_tgt_callback(
+                _tgt_label=tgt_label,
+                _tgt_node_idx=node_idx,
+                _tgt_color=target_data["color"][i],
+                _tgt_x=target_data["x"][i],
+                _tgt_y=target_data["y"][i],
+                _candidates=candidates,
+            ):
+                def _on_change(attr, old, new_val):
+                    # 1. Remove any pending connection for this target port
+                    self.state.pending_connections = [
+                        (pa, pb)
+                        for pa, pb in self.state.pending_connections
+                        if not (
+                            pb["kind"] == "target"
+                            and pb["node_index"] == _tgt_node_idx
+                            and pb["label"] == _tgt_label
+                        )
+                    ]
+                    self._clear_temp_edge_visuals()
+                    for pa, pb in list(self.state.pending_connections):
+                        self._add_edge_temp(pa, pb)
+
+                    if new_val == _EMPTY:
+                        return
+
+                    parsed = _parse_choice(new_val, _candidates)
+                    if parsed is None:
+                        return
+                    src_node_i, src_lbl, src_kind, _ = parsed
+
+                    src_data = self.state.source_port_source.data
+                    src_x, src_y, src_color = None, None, None
+                    for j in range(len(src_data.get("node_index", []))):
+                        if (
+                            src_data["node_index"][j] == src_node_i
+                            and src_data["label"][j] == src_lbl
+                        ):
+                            src_x = src_data["x"][j]
+                            src_y = src_data["y"][j]
+                            src_color = src_data["color"][j]
+                            break
+                    if src_x is None:
+                        return
+
+                    port_a = {
+                        "kind": "source",
+                        "node_index": src_node_i,
+                        "label": src_lbl,
+                        "x": src_x,
+                        "y": src_y,
+                        "color": src_color,
+                    }
+                    port_b = {
+                        "kind": "target",
+                        "node_index": _tgt_node_idx,
+                        "label": _tgt_label,
+                        "x": _tgt_x,
+                        "y": _tgt_y,
+                        "color": _tgt_color,
+                    }
+                    self.state.pending_connections.append((port_a, port_b))
+                    self._add_edge_temp(port_a, port_b)
+
+                return _on_change
+
+            value_select.on_change("value", _make_tgt_callback())
+            new_rows.append(row(label_input, value_select, spacing=4))
+
+        self.state.connections_rows_column.children = new_rows
 
     def _delete_selected_connection(self):
         """Delete the edge(s) selected in the Connections DataTable."""
@@ -1648,6 +1986,16 @@ class ComponentPaletteLauncher:
                 line_alpha=0.85,
                 source=state.edge_source,
             )
+            # Dashed preview edges – shown while connections are pending Apply
+            canvas.multi_line(
+                xs="xs",
+                ys="ys",
+                line_color="color",
+                line_width=3,
+                line_alpha=0.65,
+                line_dash="dashed",
+                source=state.temp_edge_source,
+            )
             canvas.scatter(
                 x="x",
                 y="y",
@@ -1888,6 +2236,11 @@ class ComponentPaletteLauncher:
                     hdata["node_type"][idx] = new_node_type
                 state.hover_source.data = hdata
 
+                handler._rebuild_all_ports()
+
+                for port_a, port_b in list(state.pending_connections):
+                    handler._add_edge(port_a, port_b)
+                handler._clear_temp_edges()  # removes dashed lines + clears list
                 handler._rebuild_all_ports()
 
                 _LOGGER.info(
