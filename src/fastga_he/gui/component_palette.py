@@ -176,8 +176,10 @@ class PaletteState:
     type_select: bkmodel.Select = field(default=None)
     # Select widget for Position (shown in config panel)
     position_select: bkmodel.Select = field(default=None)
-    # DataTable for editing component options (shown in config panel)
-    options_table: bkmodel.DataTable = field(default=None)
+    # Column widget holding per-option rows (TextInput label + Select value)
+    options_table: object = field(default=None)
+    # Dynamic column of option rows – children rebuilt by _refresh_options_table
+    options_rows_column: object = field(default=None)
     options_source: bkmodel.ColumnDataSource = field(default=None)
     apply_button: bkmodel.Button = field(default=None)
     # Index of the currently selected canvas node (None = nothing selected)
@@ -367,13 +369,13 @@ class ComponentPaletteBuilder:
         )
         selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
 
-        # Options table source for the component configurator panel
+        # Options source – still used to track option names/values as plain lists
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
-        option_column = bkmodel.TableColumn(field="options", title="Options")
-        value_column = bkmodel.TableColumn(
-            field="value",
-            title="Value",
-            editor=bkmodel.StringEditor(),
+
+        # Dynamic column that will hold one row per option (TextInput label + Select value)
+        options_rows_column = column(
+            [],
+            styles={"background": BACKGROUND_COLOR_CODE},
         )
 
         # Configurator panel inputs
@@ -403,14 +405,7 @@ class ComponentPaletteBuilder:
             styles={"color": "white", "font-size": "18px"},
         )
 
-        options_list = bkmodel.DataTable(
-            columns=[option_column, value_column],
-            source=options_table_source,
-            width=380,
-            height=200,
-            editable=True,
-            styles={"color": "black", "font-size": "18px"},
-        )
+        options_list = options_rows_column
 
         apply_button = bkmodel.Button(
             label="Apply",
@@ -553,6 +548,7 @@ class ComponentPaletteBuilder:
             target_count_spinner=target_count_spinner,
             port_count_section=port_count_section,
             options_table=options_table,
+            options_rows_column=options_rows_column,
             options_source=options_table_source,
             name_input=name_input,
             type_select=type_select,
@@ -1090,23 +1086,58 @@ class PlacementHandler:
         return s
 
     def _refresh_options_table(self, node_type: str, overrides: dict = None):
-        """
-        Rebuild the options DataTable for *node_type*, applying any *overrides*.
-
-        :param node_type: Component type string used as key into ``POSSIBLE_OPTIONS``.
-        :param overrides: Previously saved option values that take precedence over defaults.
-        """
         if overrides is None:
             overrides = {}
         opts_def = POSSIBLE_OPTIONS.get(node_type, {})
         opt_names = list(opts_def.keys())
         opt_values = []
+        new_rows = []
+        value_selects = []  # keep references for the sync callback
+
         for k, v_list in opts_def.items():
-            if k in overrides:
-                opt_values.append(self._option_val_to_str(overrides[k]))
-            else:
-                default = v_list[0] if v_list else ""
-                opt_values.append(self._option_val_to_str(default))
+            current = overrides[k] if k in overrides else (v_list[0] if v_list else "")
+            current_str = self._option_val_to_str(current)
+
+            label_input = bkmodel.TextInput(
+                value=k,
+                width=180,
+                disabled=True,
+                styles={"color": "white", "font-size": "14px"},
+            )
+
+            choices = [self._option_val_to_str(c) for c in v_list] if v_list else [current_str]
+            if current_str not in choices:
+                choices = [current_str] + choices
+
+            value_select = bkmodel.Select(
+                value=current_str,
+                options=choices,
+                width=180,
+                styles={"color": "white", "font-size": "14px"},
+            )
+
+            new_rows.append(row(label_input, value_select, spacing=4))
+            opt_values.append(current_str)
+            value_selects.append(value_select)
+
+        # Sync every Select change back to options_source so _apply_node_config reads
+        # the current user-chosen values and not the stale initial ones.
+        def _make_sync_callback(selects, names):
+            def _on_change(attr, old, new):
+                self.state.options_source.data = dict(
+                    options=names,
+                    value=[s.value for s in selects],
+                )
+
+            return _on_change
+
+        sync_cb = _make_sync_callback(value_selects, opt_names)
+        for vs in value_selects:
+            vs.on_change("value", sync_cb)
+
+        if self.state.options_rows_column is not None:
+            self.state.options_rows_column.children = new_rows
+
         self.state.options_source.data = dict(options=opt_names, value=opt_values)
 
     def _clear_node_table(self):
@@ -1133,29 +1164,6 @@ class PlacementHandler:
             self.state.connections_source.data = dict(my_port=[], connected_to=[], edge_idx=[])
 
         self._rebuild_all_ports()
-
-    def _refresh_connections_table(self, node_idx: int):
-        """Populate the Connections DataTable with edges of node *node_idx*."""
-        if self.state.connections_source is None or self.state.edge_source is None:
-            return
-        edata = self.state.edge_source.data
-        names = list(self.state.placed_nodes_source.data.get("name", []))
-        my_ports, connected_to, edge_indices = [], [], []
-        for i in range(len(edata.get("node_a_idx", []))):
-            na, nb = edata["node_a_idx"][i], edata["node_b_idx"][i]
-            if na == node_idx:
-                other = names[nb] if nb < len(names) else f"node_{nb}"
-                my_ports.append(f"{edata['a_kind'][i]}:{edata['a_label'][i]}")
-                connected_to.append(f"{other} ({edata['b_kind'][i]}:{edata['b_label'][i]})")
-                edge_indices.append(i)
-            elif nb == node_idx:
-                other = names[na] if na < len(names) else f"node_{na}"
-                my_ports.append(f"{edata['b_kind'][i]}:{edata['b_label'][i]}")
-                connected_to.append(f"{other} ({edata['a_kind'][i]}:{edata['a_label'][i]})")
-                edge_indices.append(i)
-        self.state.connections_source.data = dict(
-            my_port=my_ports, connected_to=connected_to, edge_idx=edge_indices
-        )
 
     def _delete_selected_connection(self):
         """Delete the edge(s) selected in the Connections DataTable."""
