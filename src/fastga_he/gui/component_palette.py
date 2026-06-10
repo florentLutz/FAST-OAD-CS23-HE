@@ -2343,23 +2343,28 @@ class ComponentPaletteLauncher:
                 # edges and keeps connections_source in sync with edge_source.
                 handler._refresh_connections_table(idx)
 
-                state.apply_button.on_click(_apply_node_config)
-
-                connections_json = json.dumps(
-                    [
-                        {
-                            "my_port": pa["kind"] + ":" + pa["label"],
-                            "connected_to_node": state.placed_nodes_source.data["name"][
-                                pb["node_index"]
-                            ]
-                            if pb["node_index"]
-                            < len(list(state.placed_nodes_source.data.get("name", [])))
-                            else f"node_{pb['node_index']}",
-                            "connected_to_port": pb["kind"] + ":" + pb["label"],
-                        }
-                        for pa, pb in list(state.pending_connections)
-                    ]
-                )
+                _cs = state.connections_source.data if state.connections_source is not None else {}
+                _ed = state.edge_source.data if state.edge_source is not None else {}
+                _names = list(state.placed_nodes_source.data.get("name", []))
+                _conn_entries = []
+                for _i in range(len(_ed.get("node_a_idx", []))):
+                    _na = _ed["node_a_idx"][_i]
+                    _nb = _ed["node_b_idx"][_i]
+                    if _na == idx or _nb == idx:
+                        _peer = _nb if _na == idx else _na
+                        _peer_name = _names[_peer] if _peer < len(_names) else f"node_{_peer}"
+                        _my_kind = _ed["a_kind"][_i] if _na == idx else _ed["b_kind"][_i]
+                        _my_lbl = _ed["a_label"][_i] if _na == idx else _ed["b_label"][_i]
+                        _pr_kind = _ed["b_kind"][_i] if _na == idx else _ed["a_kind"][_i]
+                        _pr_lbl = _ed["b_label"][_i] if _na == idx else _ed["a_label"][_i]
+                        _conn_entries.append(
+                            {
+                                "my_port": f"{_my_kind}:{_my_lbl}",
+                                "connected_to_node": _peer_name,
+                                "connected_to_port": f"{_pr_kind}:{_pr_lbl}",
+                            }
+                        )
+                connections_json = json.dumps(_conn_entries)
                 _LOGGER.info(
                     "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
                     idx,
@@ -2369,6 +2374,8 @@ class ComponentPaletteLauncher:
                     opts_json,
                     connections_json,
                 )
+
+            state.apply_button.on_click(_apply_node_config)
 
             # Wire palette buttons and canvas tap
             handler = PlacementHandler(state, canvas)
