@@ -833,7 +833,7 @@ class PlacementHandler:
         tdata["ys"].append([port_a["y"], port_b["y"]])
         tdata["color"].append(port_a["color"])
         self.state.temp_edge_source.data = tdata
-        _LOGGER.debug(
+        _LOGGER.info(
             "Temp edge: %s:%s → %s:%s",
             port_a["kind"],
             port_a["label"],
@@ -844,8 +844,7 @@ class PlacementHandler:
     def _clear_temp_edges(self):
         """Wipe all dashed preview edges and the pending-connection list."""
         self.state.pending_connections.clear()
-        if self.state.temp_edge_source is not None:
-            self.state.temp_edge_source.data = dict(xs=[], ys=[], color=[])
+        self._clear_temp_edge_visuals()
 
     def _clear_temp_edge_visuals(self):
         """Clear only the canvas dashed lines, leave pending_connections intact."""
@@ -1116,6 +1115,7 @@ class PlacementHandler:
                 y=[list(pdata["y"])[idx]],
             )
         self._rebuild_all_ports()
+        self._refresh_connections_table(idx)
 
     @staticmethod
     def _option_val_to_str(v) -> str:
@@ -1256,7 +1256,12 @@ class PlacementHandler:
         Selecting a new value in any Select immediately draws (or re-draws)
         the corresponding edge.
         """
-        if self.state.connections_rows_column is None:
+        if (
+            self.state.connections_rows_column is None
+            or self.state.edge_source is None
+            or self.state.source_port_source is None
+            or self.state.target_port_source is None
+        ):
             return
 
         source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
@@ -1311,7 +1316,12 @@ class PlacementHandler:
         # ------------------------------------------------------------------ #
         free_targets: list[tuple[int, str, str, str]] = []  # (node_i, label, kind, display)
         for j in range(len(target_data.get("node_index", []))):
-            if target_data["connected"][j] == "False" and target_data["node_index"][j] != node_idx:
+            if (
+                target_data["connected"][j] == "False"
+                and target_data["node_index"][j] != node_idx
+                and target_data["color"][j]
+                == ICONS_CONFIG[node_data["icon_type"][node_idx]]["target_color"]
+            ):
                 free_targets.append(
                     (
                         target_data["node_index"][j],
@@ -1324,7 +1334,12 @@ class PlacementHandler:
         # Collect all unconnected source ports (for target-port selects)
         free_sources: list[tuple[int, str, str, str]] = []
         for j in range(len(source_data.get("node_index", []))):
-            if source_data["connected"][j] == "False" and source_data["node_index"][j] != node_idx:
+            if (
+                source_data["connected"][j] == "False"
+                and source_data["node_index"][j] != node_idx
+                and source_data["color"][j]
+                == ICONS_CONFIG[node_data["icon_type"][node_idx]]["source_color"]
+            ):
                 free_sources.append(
                     (
                         source_data["node_index"][j],
@@ -1405,7 +1420,7 @@ class PlacementHandler:
                     parsed = _parse_choice(new_val, _candidates)
                     if parsed is None:
                         return
-                    tgt_node_i, tgt_lbl, tgt_kind, _ = parsed
+                    tgt_node_i, tgt_lbl, tgt_kind = parsed
 
                     # Fetch live target port position
                     tgt_data = self.state.target_port_source.data
@@ -1422,12 +1437,23 @@ class PlacementHandler:
                     if tgt_x is None:
                         return
 
+                    live_src_x, live_src_y = _src_x, _src_y  # fallback
+                    src_data_live = self.state.source_port_source.data
+                    for j in range(len(src_data_live.get("node_index", []))):
+                        if (
+                            src_data_live["node_index"][j] == _src_node_idx
+                            and src_data_live["label"][j] == _src_label
+                        ):
+                            live_src_x = src_data_live["x"][j]
+                            live_src_y = src_data_live["y"][j]
+                            break
+
                     port_a = {
                         "kind": "source",
                         "node_index": _src_node_idx,
                         "label": _src_label,
-                        "x": _src_x,
-                        "y": _src_y,
+                        "x": live_src_x,
+                        "y": live_src_y,
                         "color": _src_color,
                     }
                     port_b = {
@@ -1443,7 +1469,17 @@ class PlacementHandler:
 
                 return _on_change
 
-            value_select.on_change("value", _make_src_callback())
+            value_select.on_change(
+                "value",
+                _make_src_callback(
+                    _src_label=src_label,
+                    _src_node_idx=node_idx,
+                    _src_color=source_data["color"][i],
+                    _src_x=source_data["x"][i],
+                    _src_y=source_data["y"][i],
+                    _candidates=candidates,
+                ),
+            )
             new_rows.append(row(label_input, value_select, spacing=4))
 
         # ------------------------------------------------------------------ #
@@ -1512,7 +1548,7 @@ class PlacementHandler:
                     parsed = _parse_choice(new_val, _candidates)
                     if parsed is None:
                         return
-                    src_node_i, src_lbl, src_kind, _ = parsed
+                    src_node_i, src_lbl, src_kind = parsed
 
                     src_data = self.state.source_port_source.data
                     src_x, src_y, src_color = None, None, None
@@ -1528,6 +1564,17 @@ class PlacementHandler:
                     if src_x is None:
                         return
 
+                    live_tgt_x, live_tgt_y = _tgt_x, _tgt_y  # fallback
+                    tgt_data_live = self.state.target_port_source.data
+                    for j in range(len(tgt_data_live.get("node_index", []))):
+                        if (
+                            tgt_data_live["node_index"][j] == _tgt_node_idx
+                            and tgt_data_live["label"][j] == _tgt_label
+                        ):
+                            live_tgt_x = tgt_data_live["x"][j]
+                            live_tgt_y = tgt_data_live["y"][j]
+                            break
+
                     port_a = {
                         "kind": "source",
                         "node_index": src_node_i,
@@ -1540,8 +1587,8 @@ class PlacementHandler:
                         "kind": "target",
                         "node_index": _tgt_node_idx,
                         "label": _tgt_label,
-                        "x": _tgt_x,
-                        "y": _tgt_y,
+                        "x": live_tgt_x,
+                        "y": live_tgt_y,
                         "color": _tgt_color,
                     }
                     self.state.pending_connections.append((port_a, port_b))
@@ -1549,10 +1596,62 @@ class PlacementHandler:
 
                 return _on_change
 
-            value_select.on_change("value", _make_tgt_callback())
+            value_select.on_change(
+                "value",
+                _make_tgt_callback(
+                    _tgt_label=tgt_label,
+                    _tgt_node_idx=node_idx,
+                    _tgt_color=target_data["color"][i],
+                    _tgt_x=target_data["x"][i],
+                    _tgt_y=target_data["y"][i],
+                    _candidates=candidates,
+                ),
+            )
             new_rows.append(row(label_input, value_select, spacing=4))
 
         self.state.connections_rows_column.children = new_rows
+
+        # ------------------------------------------------------------------ #
+        # Keep connections_source in sync so _delete_selected_connection can  #
+        # resolve the correct edge_idx for any selected row.                  #
+        # ------------------------------------------------------------------ #
+        if self.state.connections_source is not None:
+            cs_my_port: list = []
+            cs_connected_to: list = []
+            cs_edge_idx: list = []
+
+            for i in range(len(edge_data.get("node_a_idx", []))):
+                na = edge_data["node_a_idx"][i]
+                nb = edge_data["node_b_idx"][i]
+                al = edge_data["a_label"][i]
+                bl = edge_data["b_label"][i]
+                ak = edge_data["a_kind"][i]
+                bk = edge_data["b_kind"][i]
+
+                if na == node_idx:
+                    peer_name = (
+                        node_data["name"][nb]
+                        if nb < len(node_data.get("name", []))
+                        else f"node_{nb}"
+                    )
+                    cs_my_port.append(f"{ak}:{al}")
+                    cs_connected_to.append(f"{peer_name} ({bk}:{bl})")
+                    cs_edge_idx.append(i)
+                elif nb == node_idx:
+                    peer_name = (
+                        node_data["name"][na]
+                        if na < len(node_data.get("name", []))
+                        else f"node_{na}"
+                    )
+                    cs_my_port.append(f"{bk}:{bl}")
+                    cs_connected_to.append(f"{peer_name} ({ak}:{al})")
+                    cs_edge_idx.append(i)
+
+            self.state.connections_source.data = dict(
+                my_port=cs_my_port,
+                connected_to=cs_connected_to,
+                edge_idx=cs_edge_idx,
+            )
 
     def _delete_selected_connection(self):
         """Delete the edge(s) selected in the Connections DataTable."""
@@ -2236,23 +2335,40 @@ class ComponentPaletteLauncher:
                     hdata["node_type"][idx] = new_node_type
                 state.hover_source.data = hdata
 
-                handler._rebuild_all_ports()
-
                 for port_a, port_b in list(state.pending_connections):
                     handler._add_edge(port_a, port_b)
                 handler._clear_temp_edges()  # removes dashed lines + clears list
                 handler._rebuild_all_ports()
+                # Refresh the connections panel so it reflects the newly committed
+                # edges and keeps connections_source in sync with edge_source.
+                handler._refresh_connections_table(idx)
 
+                state.apply_button.on_click(_apply_node_config)
+
+                connections_json = json.dumps(
+                    [
+                        {
+                            "my_port": pa["kind"] + ":" + pa["label"],
+                            "connected_to_node": state.placed_nodes_source.data["name"][
+                                pb["node_index"]
+                            ]
+                            if pb["node_index"]
+                            < len(list(state.placed_nodes_source.data.get("name", [])))
+                            else f"node_{pb['node_index']}",
+                            "connected_to_port": pb["kind"] + ":" + pb["label"],
+                        }
+                        for pa, pb in list(state.pending_connections)
+                    ]
+                )
                 _LOGGER.info(
-                    "Applied: node[%d] name=%s type=%s position=%s options=%s",
+                    "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
                     idx,
                     new_om_name,
                     new_node_type,
                     new_position,
                     opts_json,
+                    connections_json,
                 )
-
-            state.apply_button.on_click(_apply_node_config)
 
             # Wire palette buttons and canvas tap
             handler = PlacementHandler(state, canvas)

@@ -311,6 +311,7 @@ def test_component_palette_launcher_import():
     assert callable(ComponentPaletteLauncher.launch)
 
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped in CI – requires an interactive IOLoop.")
 def test_palette_launcher_functionality():
     """Test that the launcher can be called without errors and returns expected types."""
 
