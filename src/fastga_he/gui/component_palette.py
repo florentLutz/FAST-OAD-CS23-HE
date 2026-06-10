@@ -209,6 +209,8 @@ class PaletteState:
     temp_edge_source: bkmodel.ColumnDataSource = field(default=None)
     # Pending port-pair connections waiting for Apply: list of (port_a_dict, port_b_dict)
     pending_connections: list = field(default_factory=list)
+    # Select widget for Symmetry component (shown in config panel)
+    symmetry_select: bkmodel.Select = field(default=None)
 
 
 # ============================================================================
@@ -339,6 +341,8 @@ class ComponentPaletteBuilder:
                 options=[],  # JSON-encoded dict of option_name → value
                 n_sources=[],  # current source-port count for this node
                 n_targets=[],  # current target-port count for this node
+                symmetry_name=[], # name of the symmetry node
+                symmetry_node_index=[]
             )
         )
 
@@ -505,6 +509,17 @@ class ComponentPaletteBuilder:
             width=380,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
         )
+        symmetry_title_div = bkmodel.Div(
+            text="<b style='color:white;font-size:16pt'>Symmetry & Distributed Load</b>",
+            width=380,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
+        )
+        symmetry_select = bkmodel.Select(
+            value="",
+            options=[],
+            width=380,
+            styles={"color": "white", "font-size": "18px"},
+        )
 
         # Config panel column – hidden until a canvas node is selected
         table_panel = column(
@@ -518,6 +533,8 @@ class ComponentPaletteBuilder:
             options_table,
             connections_title_div,
             connections_table_widget,
+            symmetry_title_div,
+            symmetry_select,
             apply_button,
             spacing=4,
             visible=False,
@@ -569,6 +586,7 @@ class ComponentPaletteBuilder:
             connections_rows_column=connections_rows_column,
             temp_edge_source=temp_edge_source,
             pending_connections=[],
+            symmetry_select=symmetry_select,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -1116,6 +1134,7 @@ class PlacementHandler:
             )
         self._rebuild_all_ports()
         self._refresh_connections_table(idx)
+        self._refresh_symmetry_select(idx, comp_key)
 
     @staticmethod
     def _option_val_to_str(v) -> str:
@@ -1211,6 +1230,42 @@ class PlacementHandler:
 
         self.state.options_source.data = dict(options=opt_names, value=opt_values)
 
+    def _refresh_symmetry_select(self, current_node_idx: int, icon_type: str):
+        """
+        Populate ``symmetry_select`` with the names of all placed nodes that
+        share *icon_type* with the currently selected node, excluding the node
+        itself.  Prepend an empty sentinel so the user can clear the selection.
+
+        Also restores the previously saved symmetry value for *current_node_idx*
+        when it exists in ``placed_nodes_source``.
+
+        :param current_node_idx: Index of the node being edited.
+        :param icon_type: The ``icon_type`` key of the selected node.
+        """
+        if self.state.symmetry_select is None:
+            return
+
+        pdata = self.state.placed_nodes_source.data
+        names = list(pdata.get("name", []))
+        icon_types = list(pdata.get("icon_type", []))
+        saved_symmetry = list(pdata.get("symmetry_name", []))
+
+        peers = [
+            names[i]
+            for i in range(len(names))
+            if i != current_node_idx and icon_types[i] == icon_type
+        ]
+        choices = [""] + peers
+        self.state.symmetry_select.options = choices
+
+        # Restore previously saved symmetry name (if any)
+        current_sym = (
+            saved_symmetry[current_node_idx]
+            if current_node_idx < len(saved_symmetry)
+            else ""
+        )
+        self.state.symmetry_select.value = current_sym if current_sym in choices else ""
+
     def _clear_node_table(self):
         """Reset all config panel inputs and hide the panel."""
         self.state.name_input.value = ""
@@ -1236,6 +1291,10 @@ class PlacementHandler:
 
         if self.state.connections_rows_column is not None:
             self.state.connections_rows_column.children = []
+
+        if self.state.symmetry_select is not None:
+            self.state.symmetry_select.options = [""]
+            self.state.symmetry_select.value = ""
 
         self._rebuild_all_ports()
 
@@ -2282,6 +2341,13 @@ class ComponentPaletteLauncher:
                 opts_def = POSSIBLE_OPTIONS.get(new, {})
                 state.options_table.visible = bool(opts_def)
 
+                # Refresh symmetry_select: peer candidates depend on icon_type, not node_type,
+                # so look up the icon_type of the currently selected node.
+                if idx is not None:
+                    icon_types = list(state.placed_nodes_source.data.get("icon_type", []))
+                    icon_type = icon_types[idx] if idx < len(icon_types) else ""
+                    handler._refresh_symmetry_select(idx, icon_type)
+
             state.type_select.on_change("value", _on_type_select_change)
 
             # Write config panel values back to placed_nodes_source on Apply
@@ -2334,6 +2400,52 @@ class ComponentPaletteLauncher:
                 if idx < len(hdata.get("node_type", [])):
                     hdata["node_type"][idx] = new_node_type
                 state.hover_source.data = hdata
+
+                # ── Symmetry: persist selected symmetry peer ─────────────────
+                new_sym_name = state.symmetry_select.value if state.symmetry_select is not None else ""
+                pdata2 = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
+                names_list = pdata2.get("name", [])
+
+                # Find the node index of the chosen symmetry peer (or -1 if none)
+                sym_peer_idx = -1
+                if new_sym_name:
+                    for _j, _n in enumerate(names_list):
+                        if _n == new_sym_name:
+                            sym_peer_idx = _j
+                            break
+
+                # Write this node's symmetry columns
+                if "symmetry_name" not in pdata2:
+                    pdata2["symmetry_name"] = [""] * len(names_list)
+                if "symmetry_node_index" not in pdata2:
+                    pdata2["symmetry_node_index"] = [-1] * len(names_list)
+                if idx < len(pdata2["symmetry_name"]):
+                    pdata2["symmetry_name"][idx] = new_sym_name
+                if idx < len(pdata2["symmetry_node_index"]):
+                    pdata2["symmetry_node_index"][idx] = sym_peer_idx
+
+                # Sync back: if the peer exists, point it to this node so that
+                # when the peer is selected its symmetry_select default is correct.
+                current_node_name = names_list[idx] if idx < len(names_list) else ""
+                if sym_peer_idx >= 0:
+                    if sym_peer_idx < len(pdata2["symmetry_name"]):
+                        pdata2["symmetry_name"][sym_peer_idx] = current_node_name
+                    if sym_peer_idx < len(pdata2["symmetry_node_index"]):
+                        pdata2["symmetry_node_index"][sym_peer_idx] = idx
+                # If symmetry was cleared, also clear the old peer's back-reference
+                elif not new_sym_name:
+                    for _j in range(len(names_list)):
+                        if (
+                            _j != idx
+                            and _j < len(pdata2["symmetry_name"])
+                            and pdata2["symmetry_name"][_j] == current_node_name
+                        ):
+                            pdata2["symmetry_name"][_j] = ""
+                            if _j < len(pdata2["symmetry_node_index"]):
+                                pdata2["symmetry_node_index"][_j] = -1
+
+                state.placed_nodes_source.data = pdata2
+                # ─────────────────────────────────────────────────────────────
 
                 for port_a, port_b in list(state.pending_connections):
                     handler._add_edge(port_a, port_b)
