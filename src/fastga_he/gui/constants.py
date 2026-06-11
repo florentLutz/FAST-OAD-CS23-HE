@@ -164,3 +164,11 @@ DEFAULT_TARGET_NUMBER = {
     "fuel_system": 3,
     "H2_fuel_system": 3,
 }
+
+# Dict of component_type -> list of options that can have multiple instances (e.g. "fuel_system"
+# -> [source, target])
+MULTI_PORT_OPTIONS = {
+    "DC_bus": ["number_of_inputs", "number_of_outputs"],
+    "fuel_system": ["number_of_tanks", "number_of_engines"],
+    "H2_fuel_system": ["number_of_tanks", "number_of_power_sources"],
+}

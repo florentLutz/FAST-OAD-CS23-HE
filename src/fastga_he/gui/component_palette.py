@@ -56,6 +56,7 @@ from fastga_he.gui.constants import (
     DEFAULT_SOURCE_COUNT,
     DEFAULT_TARGET_NUMBER,
 )
+from fastga_he.gui.powertrain_config_writer import PowerTrainYAML
 from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
     DEFAULT_COLOR,
@@ -341,8 +342,8 @@ class ComponentPaletteBuilder:
                 options=[],  # JSON-encoded dict of option_name → value
                 n_sources=[],  # current source-port count for this node
                 n_targets=[],  # current target-port count for this node
-                symmetry_name=[], # name of the symmetry node
-                symmetry_node_index=[]
+                symmetry_name=[],  # name of the symmetry node
+                symmetry_node_index=[],
             )
         )
 
@@ -969,15 +970,20 @@ class PlacementHandler:
 
     def _save_canvas_state(self):
         """
-        Serialise the current placed-nodes data to a timestamped JSON file.
+        Serialise the current placed-nodes data to a timestamped JSON backup file
+        and a YAML powertrain configuration file.
 
-        The file is written to the current working directory and the button
-        type is reset to ``"success"`` after a 1-second delay.
+        Both files are written to the current working directory and share the same
+        timestamp suffix.  The JSON file is kept as a full-fidelity backup of the
+        canvas state, while the YAML file is the powertrain config consumed by
+        FAST-OAD_CS23-HE.  The save button is reset to ``"success"`` after a
+        1-second delay.
         """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"canvas_state_{timestamp}.json"
 
-        # Bokeh ColumnDataSource stores numpy arrays; convert to plain lists for JSON
+        # ── JSON backup (full canvas state) ──────────────────────────────────
+        json_filename = f"canvas_state_{timestamp}.json"
+
         nodes_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
         edges_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
         source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
@@ -990,10 +996,31 @@ class PlacementHandler:
             "target_ports": target_data,
         }
 
-        with open(filename, "w") as f:
+        with open(json_filename, "w") as f:
             json.dump(canvas_state, f, indent=2)
 
-        _LOGGER.info("Canvas state saved to %s", filename)
+        _LOGGER.info("Canvas state (JSON backup) saved to %s", json_filename)
+
+        # ── YAML powertrain configuration ─────────────────────────────────────
+        yaml_filename = f"powertrain_config_{timestamp}.yml"
+
+        try:
+            pt_yaml = PowerTrainYAML(self.state)
+            pt_yaml.set_title(f"powertrain_config_{timestamp}")
+
+            n_nodes = len(nodes_data.get("name", []))
+            for node_index in range(n_nodes):
+                pt_yaml.add_component(node_index)
+
+            pt_yaml.add_connection()
+
+            pt_yaml.write(yaml_filename)
+            _LOGGER.info("Powertrain YAML config saved to %s", yaml_filename)
+        except Exception:
+            _LOGGER.exception(
+                "Failed to write YAML config; JSON backup at %s is still valid.", json_filename
+            )
+
         IOLoop.current().call_later(
             1.0, lambda: setattr(self.state.save_button, "button_type", "success")
         )
@@ -1260,9 +1287,7 @@ class PlacementHandler:
 
         # Restore previously saved symmetry name (if any)
         current_sym = (
-            saved_symmetry[current_node_idx]
-            if current_node_idx < len(saved_symmetry)
-            else ""
+            saved_symmetry[current_node_idx] if current_node_idx < len(saved_symmetry) else ""
         )
         self.state.symmetry_select.value = current_sym if current_sym in choices else ""
 
@@ -2402,7 +2427,9 @@ class ComponentPaletteLauncher:
                 state.hover_source.data = hdata
 
                 # ── Symmetry: persist selected symmetry peer ─────────────────
-                new_sym_name = state.symmetry_select.value if state.symmetry_select is not None else ""
+                new_sym_name = (
+                    state.symmetry_select.value if state.symmetry_select is not None else ""
+                )
                 pdata2 = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
                 names_list = pdata2.get("name", [])
 
