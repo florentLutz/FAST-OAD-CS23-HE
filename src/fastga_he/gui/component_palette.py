@@ -689,6 +689,7 @@ class PlacementHandler:
 
     def _handle_port_tap(self, port: dict):
         """First click stores port; second click on same kind+color draws an edge."""
+        self._clear_temp_edges()
         pending = self.state.pending_port
         if pending is None:
             self.state.pending_port = port
@@ -948,8 +949,11 @@ class PlacementHandler:
         self._cancel_pending_connection()
         self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
-            # Enter delete mode: deselect any active component
+            # Enter delete mode: deselect any active component and clear config panel
             self.state.selected_component = None
+            self.state.selected_node_index = None  # ← clear selection
+            self._clear_temp_edges()  # ← discard any pending connections
+            self._clear_node_table()  # ← hides panel + full reset
             for btn in self.state.buttons:
                 btn.button_type = BUTTON_DEFAULT_COLOR_TYPE
             self.state.status_div.text = (
@@ -1354,8 +1358,8 @@ class PlacementHandler:
         edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
 
         # ------------------------------------------------------------------ #
-        # Build lookup: (kind, port_label) → (peer_node_idx, peer_label)      #
-        # for every edge that touches node_idx.                                #
+        # Build lookup: (kind, port_label) → (peer_node_idx, peer_label)     #
+        # for every edge that touches node_idx.                              #
         # ------------------------------------------------------------------ #
         connected_src: dict[str, tuple[int, str]] = {}  # src_label → (peer_node, tgt_label)
         connected_tgt: dict[str, tuple[int, str]] = {}  # tgt_label → (peer_node, src_label)
@@ -1375,7 +1379,7 @@ class PlacementHandler:
                 connected_tgt[bl] = (na, al)
 
         # ------------------------------------------------------------------ #
-        # Helper: build a display string for a peer port                      #
+        # Helper: build a display string for a peer port                     #
         # ------------------------------------------------------------------ #
         def _peer_str(peer_node_idx: int, peer_label: str, peer_kind: str) -> str:
             name = (
@@ -1386,7 +1390,7 @@ class PlacementHandler:
             return f"{name} ({peer_kind}:{peer_label})"
 
         # ------------------------------------------------------------------ #
-        # Helper: given a new Select value string find its (node_idx, label)  #
+        # Helper: given a new Select value string find its (node_idx, label) #
         # ------------------------------------------------------------------ #
         def _parse_choice(choice_str: str, candidates: list[tuple]) -> tuple | None:
             """Return (node_idx, label, kind) matching the display string, or None."""
@@ -1396,15 +1400,17 @@ class PlacementHandler:
             return None
 
         # ------------------------------------------------------------------ #
-        # Collect all unconnected target ports (for source-port selects)      #
+        # Collect all unconnected target ports (for source-port selects)     #
         # ------------------------------------------------------------------ #
         free_targets: list[tuple[int, str, str, str]] = []  # (node_i, label, kind, display)
+        _selected_source_color = ICONS_CONFIG.get(node_data["icon_type"][node_idx], {}).get(
+            "source_color", ""
+        )
         for j in range(len(target_data.get("node_index", []))):
             if (
                 target_data["connected"][j] == "False"
                 and target_data["node_index"][j] != node_idx
-                and target_data["color"][j]
-                == ICONS_CONFIG[node_data["icon_type"][node_idx]]["target_color"]
+                and target_data["color"][j] == _selected_source_color
             ):
                 free_targets.append(
                     (
@@ -1416,13 +1422,15 @@ class PlacementHandler:
                 )
 
         # Collect all unconnected source ports (for target-port selects)
+        _selected_target_color = ICONS_CONFIG.get(node_data["icon_type"][node_idx], {}).get(
+            "target_color", ""
+        )
         free_sources: list[tuple[int, str, str, str]] = []
         for j in range(len(source_data.get("node_index", []))):
             if (
                 source_data["connected"][j] == "False"
                 and source_data["node_index"][j] != node_idx
-                and source_data["color"][j]
-                == ICONS_CONFIG[node_data["icon_type"][node_idx]]["source_color"]
+                and source_data["color"][j] == _selected_target_color
             ):
                 free_sources.append(
                     (
@@ -1438,7 +1446,7 @@ class PlacementHandler:
         new_rows = []
 
         # ------------------------------------------------------------------ #
-        # Source-port rows                                                     #
+        # Source-port rows                                                   #
         # ------------------------------------------------------------------ #
         for i in range(len(source_data.get("node_index", []))):
             if source_data["node_index"][i] != node_idx:
@@ -1499,6 +1507,30 @@ class PlacementHandler:
                         self._add_edge_temp(pa, pb)
 
                     if new_val == _EMPTY:
+                        # Delete the committed edge for this source port, if any
+                        if self.state.edge_source is not None:
+                            edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                            keep = [
+                                i
+                                for i in range(len(edata.get("node_a_idx", [])))
+                                if not (
+                                    (
+                                        edata["node_a_idx"][i] == _src_node_idx
+                                        and edata["a_label"][i] == _src_label
+                                        and edata["a_kind"][i] == "source"
+                                    )
+                                    or (
+                                        edata["node_b_idx"][i] == _src_node_idx
+                                        and edata["b_label"][i] == _src_label
+                                        and edata["b_kind"][i] == "source"
+                                    )
+                                )
+                            ]
+                            self.state.edge_source.data = {
+                                k: [edata[k][j] for j in keep] for k in edata
+                            }
+                            self._rebuild_all_ports()
+                            self._refresh_connections_table(_src_node_idx)
                         return
 
                     parsed = _parse_choice(new_val, _candidates)
@@ -1627,6 +1659,30 @@ class PlacementHandler:
                         self._add_edge_temp(pa, pb)
 
                     if new_val == _EMPTY:
+                        # Delete the committed edge for this target port, if any
+                        if self.state.edge_source is not None:
+                            edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                            keep = [
+                                i
+                                for i in range(len(edata.get("node_a_idx", [])))
+                                if not (
+                                    (
+                                        edata["node_a_idx"][i] == _tgt_node_idx
+                                        and edata["a_label"][i] == _tgt_label
+                                        and edata["a_kind"][i] == "target"
+                                    )
+                                    or (
+                                        edata["node_b_idx"][i] == _tgt_node_idx
+                                        and edata["b_label"][i] == _tgt_label
+                                        and edata["b_kind"][i] == "target"
+                                    )
+                                )
+                            ]
+                            self.state.edge_source.data = {
+                                k: [edata[k][j] for j in keep] for k in edata
+                            }
+                            self._rebuild_all_ports()
+                            self._refresh_connections_table(_tgt_node_idx)
                         return
 
                     parsed = _parse_choice(new_val, _candidates)
@@ -2024,11 +2080,13 @@ class PlacementHandler:
             elif best_idx is None or self.state.selected_node_index == best_idx:
                 # Tapped on empty space / Second tap on same node → deselect current node
                 self.state.selected_node_index = None
+                self._clear_temp_edges()
                 self._clear_node_table()
                 return
 
             else:
                 # Select this node and show the configurator panel
+                self._clear_temp_edges()
                 self.state.selected_node_index = best_idx
                 self._populate_node_table(best_idx)
                 if self.state.table_panel is not None:
@@ -2038,6 +2096,7 @@ class PlacementHandler:
         # Deselect any previously selected node before placing a new component
         if self.state.selected_node_index is not None:
             self.state.selected_node_index = None
+            self._clear_temp_edges()
             self._clear_node_table()
 
         comp_key = self.state.selected_component
