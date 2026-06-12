@@ -30,31 +30,6 @@ POSSIBLE_POSITIONS = {
     "H2_fuel_system": ["in_the_front", "in_the_middle", "in_the_rear"],
 }
 
-ICON_TYPE = {
-    "connector": [
-        "bus_bar",
-        "cable",
-        "switch",
-        "splitter",
-        "rectifier",
-        "dc_converter",
-        "inverter",
-        "gearbox",
-        "fuel_system",
-    ],
-    "load": ["e_motor", "dc_load"],
-    "source": [
-        "battery",
-        "generator",
-        "ice",
-        "turbine",
-        "fuel_cell",
-    ],
-    "propulsor": ["propeller"],
-    "tank": ["fuel_tank"],
-}
-# Dict of component_type -> list of component_keys (e.g. "source" -> ["battery", "generator", …])
-
 POSSIBLE_COMPONENT_TYPES = {
     "bus_bar": "DC_bus",
     "cable": "DC_cable_harness",

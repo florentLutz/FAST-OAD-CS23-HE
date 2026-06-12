@@ -50,7 +50,6 @@ import webbrowser
 
 from fastga_he.gui.constants import (
     POSSIBLE_POSITIONS,
-    ICON_TYPE,
     POSSIBLE_COMPONENT_TYPES,
     POSSIBLE_OPTIONS,
     DEFAULT_SOURCE_COUNT,
@@ -64,6 +63,7 @@ from fastga_he.gui.power_train_network_viewer import (
     _string_cleanup,
     _url_to_base64,
 )
+from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 _LOGGER = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -235,6 +235,28 @@ class ComponentPaletteBuilder:
         :return: ``(palette_column_layout, table_layout, BuilderState)``
         """
         component_icon_keys = list(ICONS_CONFIG.keys())
+        category_keys = {}
+        for component in KNOWN_COMPONENTS:
+            icon = component["icon_for_network_graph"]
+            component_type_class = component["components_type_class"]
+            if isinstance(component_type_class, list):
+                # check if any of the types in the list are already in category_keys
+                for type in component_type_class:
+                    if type == "propulsive_load":
+                        continue
+                    elif type not in category_keys:
+                        category_keys[type] = [icon]
+                    elif icon not in category_keys[type]:
+                        category_keys[type].append(icon)
+            elif component_type_class == "propulsive_load":
+                if "load" not in category_keys:
+                    category_keys["load"] = [icon]
+                else:
+                    category_keys["load"].append(icon)
+            elif component_type_class not in category_keys:
+                category_keys[component_type_class] = [icon]
+            elif icon not in component_type_class:
+                category_keys[component_type_class].append(icon)
 
         # Title div for the palette sidebar
         title_div = bkmodel.Div(
@@ -593,7 +615,7 @@ class ComponentPaletteBuilder:
         # Build one TabPanel per category defined in ICON_TYPE
         tab_panels = []
         # Create tab panels by grouping buttons according to their category in ICON_TYPE
-        for category, keys_in_category in ICON_TYPE.items():
+        for category, keys_in_category in category_keys.items():
             # extract buttons for this category, preserving the order in component_icon_keys
             category_buttons = [
                 button_by_key[key] for key in keys_in_category if key in button_by_key
