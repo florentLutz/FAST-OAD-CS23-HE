@@ -12,10 +12,10 @@ Typical usage
 -------------
 ::
 
-    from fastga_he.gui.component_palette import ComponentPaletteBuilder, ComponentPaletteLauncher
+    from fastga_he.gui.component_palette import ComponentPaletteBuilder, PowertrainBuilderLauncher
 
     # --- standalone demo ---
-    ComponentPaletteLauncher.launch(port=5007)
+    PowertrainBuilderLauncher.launch(port=5007)
 
     # --- embedded in an existing Bokeh document ---
     palette_layout, table_panel, state = ComponentPaletteBuilder.build()
@@ -54,9 +54,9 @@ from fastga_he.gui.constants import (
     POSSIBLE_COMPONENT_TYPES,
     POSSIBLE_OPTIONS,
     DEFAULT_SOURCE_COUNT,
-    DEFAULT_TARGET_NUMBER,
+    DEFAULT_TARGET_COUNT,
 )
-from fastga_he.gui.powertrain_config_writer import PowerTrainYAML
+from fastga_he.gui.power_train_network_writer import PowerTrainYAML
 from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
     DEFAULT_COLOR,
@@ -152,12 +152,12 @@ def compute_ports(
 
 
 @dataclass
-class PaletteState:
+class BuilderState:
     """
-    Holds references to all Bokeh widgets managed by the palette.
+    Holds references to all Bokeh widgets of the powertrain builder.
 
     Passed by reference between :class:`ComponentPaletteBuilder`,
-    :class:`PlacementHandler`, and :class:`ComponentPaletteLauncher` so that
+    :class:`PlacementHandler`, and :class:`PowertrainBuilderLauncher` so that
     all parties share the same widget instances.
     """
 
@@ -230,11 +230,11 @@ class ComponentPaletteBuilder:
     @staticmethod
     def build() -> tuple:
         """
-        Construct the button palette and initialise a :class:`PaletteState`.
+        Construct the button palette and initialise a :class:`BuilderState`.
 
-        :return: ``(palette_column_layout, table_layout, PaletteState)``
+        :return: ``(palette_column_layout, table_layout, BuilderState)``
         """
-        component_keys = list(ICONS_CONFIG.keys())
+        component_icon_keys = list(ICONS_CONFIG.keys())
 
         # Title div for the palette sidebar
         title_div = bkmodel.Div(
@@ -243,11 +243,11 @@ class ComponentPaletteBuilder:
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
         )
 
-        # One button per component – callbacks wired later by PlacementHandler.
+        # One button per icon – callbacks wired later by PlacementHandler.
         # Buttons are kept in ICONS_CONFIG order for index-based selection.
         buttons = []
         button_by_key: dict = {}
-        for key in component_keys:
+        for key in component_icon_keys:
             label = _string_cleanup(key)
 
             # Base64-encode the icon so it renders correctly inside the server
@@ -558,7 +558,7 @@ class ComponentPaletteBuilder:
         pending_port_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], color=[]))
         temp_edge_source = bkmodel.ColumnDataSource(data=dict(xs=[], ys=[], color=[]))
 
-        state = PaletteState(
+        state = BuilderState(
             buttons=buttons,
             placed_nodes_source=placed_nodes_source,
             status_div=status_div,
@@ -592,7 +592,9 @@ class ComponentPaletteBuilder:
 
         # Build one TabPanel per category defined in ICON_TYPE
         tab_panels = []
+        # Create tab panels by grouping buttons according to their category in ICON_TYPE
         for category, keys_in_category in ICON_TYPE.items():
+            # extract buttons for this category, preserving the order in component_icon_keys
             category_buttons = [
                 button_by_key[key] for key in keys_in_category if key in button_by_key
             ]
@@ -603,6 +605,7 @@ class ComponentPaletteBuilder:
                 spacing=2,
                 styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
             )
+            # Add the tab panel for this category, with the title capitalised
             tab_panels.append(bkmodel.TabPanel(child=tab_column, title=category.capitalize()))
 
         tabs = bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
@@ -642,9 +645,9 @@ class PlacementHandler:
         )
     """
 
-    def __init__(self, state: PaletteState, main_plot, icon_size: int = 50):
+    def __init__(self, state: BuilderState, main_plot, icon_size: int = 50):
         """
-        :param state: Shared :class:`PaletteState` instance.
+        :param state: Shared :class:`BuilderState` instance.
         :param main_plot: The Bokeh ``figure`` that acts as the placement canvas.
         :param icon_size: Pixel size (width = height) used for placed icons.
         """
@@ -657,24 +660,39 @@ class PlacementHandler:
     # Edge connection methods
     # -----------------------------------------------------------------------
     def _find_nearest_port(self, x: float, y: float) -> dict | None:
-        """Return metadata for the nearest port ball within snap distance, or None."""
+        """
+        Return metadata for the nearest port ball within snap distance, or ``None``.
+
+        Searches both ``source_port_source`` and ``target_port_source`` for the port
+        whose centre is closest to ``(x, y)``. The snap radius is ``PORT_RADIUS * 2.5``
+        data-units, giving a comfortable click target around each port ball.
+
+        :param x: Tap x coordinate in canvas data-units.
+        :param y: Tap y coordinate in canvas data-units.
+
+        :return: A dict with keys ``kind``, ``x``, ``y``, ``color``, ``label``,
+            and ``node_index`` for the nearest port, or ``None`` if no port is
+            within snap distance.
+        """
         snap = PORT_RADIUS * 2.5
-        best, best_dist = None, snap
-        for kind, src in [
+        best, best_distance = None, snap
+        for kind, port_source in [
             ("source", self.state.source_port_source),
             ("target", self.state.target_port_source),
         ]:
-            if src is None:
+            if port_source is None:
                 continue
-            data = src.data
-            for i, (px, py) in enumerate(zip(list(data.get("x", [])), list(data.get("y", [])))):
-                dist = ((x - px) ** 2 + (y - py) ** 2) ** 0.5
-                if dist < best_dist:
-                    best_dist = dist
+            data = port_source.data
+            for i, (port_x, port_y) in enumerate(
+                zip(list(data.get("x", [])), list(data.get("y", [])))
+            ):
+                distance = ((x - port_x) ** 2 + (y - port_y) ** 2) ** 0.5
+                if distance < best_distance:
+                    best_distance = distance
                     best = {
                         "kind": kind,
-                        "x": px,
-                        "y": py,
+                        "x": port_x,
+                        "y": port_y,
                         "color": list(data["color"])[i],
                         "label": list(data["label"])[i],
                         "node_index": list(data["node_index"])[i],
@@ -682,13 +700,33 @@ class PlacementHandler:
         return best
 
     def _cancel_pending_connection(self):
-        """Clear the pending port selection and its highlight ring."""
+        """
+        Cancel any port selection that is waiting for a second click.
+
+        Clears ``state.pending_port`` and removes the highlight ring rendered
+        through ``pending_port_source``, returning the canvas to its idle state.
+        """
         self.state.pending_port = None
         if self.state.pending_port_source is not None:
             self.state.pending_port_source.data = dict(x=[], y=[], color=[])
 
     def _handle_port_tap(self, port: dict):
-        """First click stores port; second click on same kind+color draws an edge."""
+        """
+        Manage the two-click port-connection workflow.
+
+        On the **first click** the port is stored as the pending endpoint and
+        a highlight ring is drawn around it. On the **second click**:
+
+        * If the same port is tapped again, the selection is cancelled.
+        * If a port of the **opposite kind** (source ↔ target) with the **same
+          energy colour** is tapped, a permanent edge is drawn and both ports
+          are marked connected.
+        * Any other combination is silently ignored and the pending selection
+          is cleared.
+
+        :param port: Port metadata dict with keys ``kind``, ``x``, ``y``,
+            ``color``, ``label``, and ``node_index``.
+        """
         self._clear_temp_edges()
         pending = self.state.pending_port
         if pending is None:
@@ -712,55 +750,115 @@ class PlacementHandler:
             self._rebuild_all_ports()
         self._cancel_pending_connection()
 
-    def _point_to_segment_dist(
+    def _cursor_to_segment_distance(
         self, px: float, py: float, x1: float, y1: float, x2: float, y2: float
     ) -> float:
-        """Distance minimale du point (px, py) au segment (x1,y1)→(x2,y2)."""
-        dx, dy = x2 - x1, y2 - y1
-        if dx == 0 and dy == 0:
+        """
+        Return the minimum Euclidean distance from cursor point ``(px, py)`` to the
+        line segment from ``(x1, y1)`` to ``(x2, y2)``.
+
+        Used by :meth:`_find_nearest_edge` to decide whether a tap falls close
+        enough to an existing edge to delete it.
+
+        :param px: X coordinate of the cursor point.
+        :param py: Y coordinate of the cursor point.
+        :param x1: X coordinate of the segment start.
+        :param y1: Y coordinate of the segment start.
+        :param x2: X coordinate of the segment end.
+        :param y2: Y coordinate of the segment end.
+
+        :return: Shortest distance (in data-units / pixels) from the point to
+            the segment.
+        """
+        distance_x, distance_y = x2 - x1, y2 - y1
+        if distance_x == 0 and distance_y == 0:
             return ((px - x1) ** 2 + (py - y1) ** 2) ** 0.5
-        t = max(0.0, min(1.0, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)))
-        return ((px - (x1 + t * dx)) ** 2 + (py - (y1 + t * dy)) ** 2) ** 0.5
+
+        # Projection parameter for the cursor point onto the line defined by the segment,
+        # clamped to [0, 1] to stay within the segment.
+        projection_parameter = max(
+            0.0,
+            min(
+                1.0,
+                ((px - x1) * distance_x + (py - y1) * distance_y) / (distance_x**2 + distance_y**2),
+            ),
+        )
+        return (
+            (px - (x1 + projection_parameter * distance_x)) ** 2
+            + (py - (y1 + projection_parameter * distance_y)) ** 2
+        ) ** 0.5
 
     def _find_nearest_edge(self, x: float, y: float, snap: float = 12.0) -> int | None:
-        """Retourne l'index de l'arête la plus proche dans le rayon *snap*, ou None."""
+        """
+        Return the index of the edge closest to ``(x, y)`` within *snap* pixels,
+        or ``None`` if no edge is close enough.
+
+        Iterates over every two-point polyline stored in ``edge_source`` and
+        calls :meth:`_cursor_to_segment_distance` for each. Used in delete mode to
+        let the user click near a connection line to remove it.
+
+        :param x: Tap x coordinate in canvas data-units.
+        :param y: Tap y coordinate in canvas data-units.
+        :param snap: Maximum allowed distance (data-units) for a hit.
+
+        :return: Zero-based row index into ``edge_source``, or ``None``.
+        """
+        # No edges → no hit
         if self.state.edge_source is None:
             return None
-        edata = self.state.edge_source.data
-        best_idx, best_dist = None, snap
-        for i, (xs, ys) in enumerate(zip(edata.get("xs", []), edata.get("ys", []))):
+
+        edge_data = self.state.edge_source.data
+        best_index, best_distance = None, snap
+        for i, (xs, ys) in enumerate(zip(edge_data.get("xs", []), edge_data.get("ys", []))):
             if len(xs) < 2:
                 continue
-            dist = self._point_to_segment_dist(x, y, xs[0], ys[0], xs[1], ys[1])
-            if dist < best_dist:
-                best_dist = dist
-                best_idx = i
-        return best_idx
+            distance = self._cursor_to_segment_distance(x, y, xs[0], ys[0], xs[1], ys[1])
+            if distance < best_distance:
+                best_distance = distance
+                best_index = i
+        return best_index
 
     def _add_edge(self, port_a: dict, port_b: dict):
-        """Append a new edge row to edge_source."""
+        """
+        Append a permanent edge between two ports to ``edge_source``.
+
+        Before adding, the method guards against two invalid cases:
+
+        * **Already-occupied port** – either port is already the endpoint of an
+          existing edge.
+        * **Loop connection** – the two nodes are already connected in either
+          direction.
+
+        If either check fails the edge is rejected and a warning is logged.
+        Otherwise the edge row is appended and port ``connected`` flags are
+        updated in-place so the Connections panel stays accurate.
+
+        :param port_a: Source-side port metadata dict (keys: ``kind``, ``x``,
+            ``y``, ``color``, ``label``, ``node_index``).
+        :param port_b: Target-side port metadata dict (same keys).
+        """
         if self.state.edge_source is None:
             return
-        edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
 
-        for i in range(len(edata.get("node_a_idx", []))):
+        for i in range(len(edge_data.get("node_a_idx", []))):
             port_a_used = (
-                edata["node_a_idx"][i] == port_a["node_index"]
-                and edata["a_label"][i] == port_a["label"]
-                and edata["a_kind"][i] == port_a["kind"]
+                edge_data["node_a_idx"][i] == port_a["node_index"]
+                and edge_data["a_label"][i] == port_a["label"]
+                and edge_data["a_kind"][i] == port_a["kind"]
             ) or (
-                edata["node_b_idx"][i] == port_a["node_index"]
-                and edata["b_label"][i] == port_a["label"]
-                and edata["b_kind"][i] == port_a["kind"]
+                edge_data["node_b_idx"][i] == port_a["node_index"]
+                and edge_data["b_label"][i] == port_a["label"]
+                and edge_data["b_kind"][i] == port_a["kind"]
             )
             port_b_used = (
-                edata["node_a_idx"][i] == port_b["node_index"]
-                and edata["a_label"][i] == port_b["label"]
-                and edata["a_kind"][i] == port_b["kind"]
+                edge_data["node_a_idx"][i] == port_b["node_index"]
+                and edge_data["a_label"][i] == port_b["label"]
+                and edge_data["a_kind"][i] == port_b["kind"]
             ) or (
-                edata["node_b_idx"][i] == port_b["node_index"]
-                and edata["b_label"][i] == port_b["label"]
-                and edata["b_kind"][i] == port_b["kind"]
+                edge_data["node_b_idx"][i] == port_b["node_index"]
+                and edge_data["b_label"][i] == port_b["label"]
+                and edge_data["b_kind"][i] == port_b["kind"]
             )
 
             if port_a_used or port_b_used:
@@ -770,29 +868,29 @@ class PlacementHandler:
         # Check reverse connection: port_a's node → port_b's node already exists in reverse
         loop_connection = any(
             (
-                edata["node_a_idx"][i] == port_b["node_index"]
-                and edata["node_b_idx"][i] == port_a["node_index"]
+                edge_data["node_a_idx"][i] == port_b["node_index"]
+                and edge_data["node_b_idx"][i] == port_a["node_index"]
             )
             or (
-                edata["node_a_idx"][i] == port_a["node_index"]
-                and edata["node_b_idx"][i] == port_b["node_index"]
+                edge_data["node_a_idx"][i] == port_a["node_index"]
+                and edge_data["node_b_idx"][i] == port_b["node_index"]
             )
-            for i in range(len(edata.get("node_a_idx", [])))
+            for i in range(len(edge_data.get("node_a_idx", [])))
         )
         if loop_connection:
             _LOGGER.info("Loop connection detected; edge rejected.")
             return
 
-        edata["xs"].append([port_a["x"], port_b["x"]])
-        edata["ys"].append([port_a["y"], port_b["y"]])
-        edata["color"].append(port_a["color"])
-        edata["node_a_idx"].append(port_a["node_index"])
-        edata["a_label"].append(port_a["label"])
-        edata["a_kind"].append(port_a["kind"])
-        edata["node_b_idx"].append(port_b["node_index"])
-        edata["b_label"].append(port_b["label"])
-        edata["b_kind"].append(port_b["kind"])
-        self.state.edge_source.data = edata
+        edge_data["xs"].append([port_a["x"], port_b["x"]])
+        edge_data["ys"].append([port_a["y"], port_b["y"]])
+        edge_data["color"].append(port_a["color"])
+        edge_data["node_a_idx"].append(port_a["node_index"])
+        edge_data["a_label"].append(port_a["label"])
+        edge_data["a_kind"].append(port_a["kind"])
+        edge_data["node_b_idx"].append(port_b["node_index"])
+        edge_data["b_label"].append(port_b["label"])
+        edge_data["b_kind"].append(port_b["kind"])
+        self.state.edge_source.data = edge_data
 
         if self.state.selected_node_index is not None:
             if (
@@ -841,7 +939,7 @@ class PlacementHandler:
         Draw a dashed preview line between two ports in ``temp_edge_source``.
 
         The line is **not** registered in ``edge_source``; it is replaced by a
-        permanent edge only when :meth:`_apply_node_config` is called.
+        permanent edge only when :meth:`apply_node_configurations` is called.
 
         :param port_a: Port metadata dict (keys: kind, x, y, color, label, node_index).
         :param port_b: Port metadata dict (same keys).
@@ -881,8 +979,8 @@ class PlacementHandler:
         """
         if self.state.edge_source is None:
             return
-        edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
-        if not edata.get("node_a_idx"):
+        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        if not edge_data.get("node_a_idx"):
             return
         # Build (kind, node_index, label) → (x, y) from current port sources
         pos: dict = {}
@@ -898,9 +996,9 @@ class PlacementHandler:
                 pos[key] = (px, py)
 
         new_xs, new_ys, valid = [], [], []
-        for i in range(len(edata["node_a_idx"])):
-            ka = (edata["a_kind"][i], edata["node_a_idx"][i], edata["a_label"][i])
-            kb = (edata["b_kind"][i], edata["node_b_idx"][i], edata["b_label"][i])
+        for i in range(len(edge_data["node_a_idx"])):
+            ka = (edge_data["a_kind"][i], edge_data["node_a_idx"][i], edge_data["a_label"][i])
+            kb = (edge_data["b_kind"][i], edge_data["node_b_idx"][i], edge_data["b_label"][i])
             if ka in pos and kb in pos:
                 ax, ay = pos[ka]
                 bx, by = pos[kb]
@@ -908,17 +1006,27 @@ class PlacementHandler:
                 new_ys.append([ay, by])
                 valid.append(i)
 
-        new_edata = {k: [edata[k][j] for j in valid] for k in edata}
-        new_edata["xs"] = new_xs
-        new_edata["ys"] = new_ys
-        self.state.edge_source.data = new_edata
+        new_edge_data = {k: [edge_data[k][j] for j in valid] for k in edge_data}
+        new_edge_data["xs"] = new_xs
+        new_edge_data["ys"] = new_ys
+        self.state.edge_source.data = new_edge_data
 
     # -----------------------------------------------------------------------
     # Internal wiring
     # -----------------------------------------------------------------------
 
     def _wire_buttons(self):
-        """Attach ``on_click`` callbacks to every palette and action button."""
+        """
+        Attach ``on_click`` callbacks to every palette and action button.
+
+        Called once from :meth:`__init__`. Connects:
+
+        * Each component palette button → :meth:`on_palette_select` (via
+          :meth:`_make_select_callback`).
+        * The Save button → :meth:`_save_canvas_state`.
+        * The End Session button → :meth:`_end_session`.
+        * The Delete button → :meth:`_toggle_delete_mode`.
+        """
         self.state.save_button.on_click(self._save_canvas_state)
         self.state.end_session_button.on_click(self._end_session)
         for index, button in enumerate(self.state.buttons):
@@ -934,18 +1042,27 @@ class PlacementHandler:
 
         :return: Callback function for a palette button.
         """
-
-        def _callback():
-            self.on_palette_select(idx)
-
-        return _callback
+        return lambda: self.on_palette_select(idx)
 
     # -----------------------------------------------------------------------
     # Delete mode
     # -----------------------------------------------------------------------
 
     def _toggle_delete_mode(self):
-        """Toggle delete mode on / off, updating button styling and status text."""
+        """
+        Toggle delete mode on / off, updating button styling and status text.
+
+        When entering delete mode:
+
+        * Any active component selection and pending port connection are cleared.
+        * The config panel is hidden and all palette buttons are reset to their
+          default (unselected) style.
+        * The Delete button turns red (``"danger"``) as a visual indicator.
+        * The status label prompts the user to click a node or edge to remove it.
+
+        When leaving delete mode the status label and Delete button style are
+        both restored to their defaults.
+        """
         self._cancel_pending_connection()
         self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
@@ -1034,7 +1151,12 @@ class PlacementHandler:
     # -----------------------------------------------------------------------
 
     def _end_session(self):
-        """Stop the Bokeh IO loop, terminating the server session."""
+        """
+        Stop the Bokeh IO loop, terminating the server session.
+
+        Bound to the End Session button. After this call the browser tab will
+        lose its WebSocket connection and the Python process will exit.
+        """
         _LOGGER.info("Ending session and stopping server")
         IOLoop.current().stop()
 
@@ -1052,12 +1174,12 @@ class PlacementHandler:
 
         :param idx: Zero-based index into ``list(ICONS_CONFIG.keys())``.
         """
-        component_keys = list(ICONS_CONFIG.keys())
-        if idx < 0 or idx >= len(component_keys):
+        component_icon_keys = list(ICONS_CONFIG.keys())
+        if idx < 0 or idx >= len(component_icon_keys):
             return
 
         # Second click on the same button → deselect
-        if self.state.selected_component == component_keys[idx]:
+        if self.state.selected_component == component_icon_keys[idx]:
             self.state.selected_component = None
             self.state.buttons[idx].button_type = BUTTON_DEFAULT_COLOR_TYPE
             self.state.status_div.text = (
@@ -1066,7 +1188,7 @@ class PlacementHandler:
             return
 
         self._cancel_pending_connection()
-        self.state.selected_component = component_keys[idx]
+        self.state.selected_component = component_icon_keys[idx]
 
         # Exit delete mode if it was active
         if self.state.delete_mode:
@@ -1135,7 +1257,7 @@ class PlacementHandler:
 
         # Show / update port-count spinners for editable components (default count == 3)
         n_src_default = DEFAULT_SOURCE_COUNT.get(node_type, 0)
-        n_tgt_default = DEFAULT_TARGET_NUMBER.get(node_type, 0)
+        n_tgt_default = DEFAULT_TARGET_COUNT.get(node_type, 0)
         src_editable = n_src_default == 3
         tgt_editable = n_tgt_default == 3
 
@@ -1207,6 +1329,19 @@ class PlacementHandler:
         return s
 
     def _refresh_options_table(self, node_type: str, overrides: dict = None):
+        """
+        Rebuild the Options section of the config panel for a given node type.
+
+        Reads the allowed option names and their possible values from
+        ``POSSIBLE_OPTIONS[node_type]``, creates one row per option (a disabled
+        ``TextInput`` label + a ``Select`` widget for the value), and wires a
+        shared ``on_change`` callback so that ``options_source`` is always in
+        sync with the user's current selection.
+
+        :param node_type: The component type key used to look up ``POSSIBLE_OPTIONS``.
+        :param overrides: Optional mapping of ``{option_name: current_value}`` used
+            to pre-populate widgets with previously saved values instead of defaults.
+        """
         if overrides is None:
             overrides = {}
         opts_def = POSSIBLE_OPTIONS.get(node_type, {})
@@ -1241,7 +1376,7 @@ class PlacementHandler:
             opt_values.append(current_str)
             value_selects.append(value_select)
 
-        # Sync every Select change back to options_source so _apply_node_config reads
+        # Sync every Select change back to options_source so apply_node_configurations reads
         # the current user-chosen values and not the stale initial ones.
         def _make_sync_callback(selects, names):
             def _on_change(attr, old, new):
@@ -1296,7 +1431,15 @@ class PlacementHandler:
         self.state.symmetry_select.value = current_sym if current_sym in choices else ""
 
     def _clear_node_table(self):
-        """Reset all config panel inputs and hide the panel."""
+        """
+        Reset all node configuration panel inputs to their empty defaults and hide the panel.
+
+        Clears ``name_input``, ``type_select``, ``position_select``,
+        ``options_source``, ``connections_source``, and ``symmetry_select``;
+        hides the port-count spinner section; removes the selected-node overlay;
+        empties the dynamic connection rows; and calls :meth:`_rebuild_all_ports`
+        so port ball alphas are reset (no node highlighted).
+        """
         self.state.name_input.value = ""
         self.state.type_select.options = []
         self.state.type_select.value = ""
@@ -1509,25 +1652,25 @@ class PlacementHandler:
                     if new_val == _EMPTY:
                         # Delete the committed edge for this source port, if any
                         if self.state.edge_source is not None:
-                            edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                            edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
                             keep = [
                                 i
-                                for i in range(len(edata.get("node_a_idx", [])))
+                                for i in range(len(edge_data.get("node_a_idx", [])))
                                 if not (
                                     (
-                                        edata["node_a_idx"][i] == _src_node_idx
-                                        and edata["a_label"][i] == _src_label
-                                        and edata["a_kind"][i] == "source"
+                                        edge_data["node_a_idx"][i] == _src_node_idx
+                                        and edge_data["a_label"][i] == _src_label
+                                        and edge_data["a_kind"][i] == "source"
                                     )
                                     or (
-                                        edata["node_b_idx"][i] == _src_node_idx
-                                        and edata["b_label"][i] == _src_label
-                                        and edata["b_kind"][i] == "source"
+                                        edge_data["node_b_idx"][i] == _src_node_idx
+                                        and edge_data["b_label"][i] == _src_label
+                                        and edge_data["b_kind"][i] == "source"
                                     )
                                 )
                             ]
                             self.state.edge_source.data = {
-                                k: [edata[k][j] for j in keep] for k in edata
+                                k: [edge_data[k][j] for j in keep] for k in edge_data
                             }
                             self._rebuild_all_ports()
                             self._refresh_connections_table(_src_node_idx)
@@ -1661,25 +1804,25 @@ class PlacementHandler:
                     if new_val == _EMPTY:
                         # Delete the committed edge for this target port, if any
                         if self.state.edge_source is not None:
-                            edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                            edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
                             keep = [
                                 i
-                                for i in range(len(edata.get("node_a_idx", [])))
+                                for i in range(len(edge_data.get("node_a_idx", [])))
                                 if not (
                                     (
-                                        edata["node_a_idx"][i] == _tgt_node_idx
-                                        and edata["a_label"][i] == _tgt_label
-                                        and edata["a_kind"][i] == "target"
+                                        edge_data["node_a_idx"][i] == _tgt_node_idx
+                                        and edge_data["a_label"][i] == _tgt_label
+                                        and edge_data["a_kind"][i] == "target"
                                     )
                                     or (
-                                        edata["node_b_idx"][i] == _tgt_node_idx
-                                        and edata["b_label"][i] == _tgt_label
-                                        and edata["b_kind"][i] == "target"
+                                        edge_data["node_b_idx"][i] == _tgt_node_idx
+                                        and edge_data["b_label"][i] == _tgt_label
+                                        and edge_data["b_kind"][i] == "target"
                                     )
                                 )
                             ]
                             self.state.edge_source.data = {
-                                k: [edata[k][j] for j in keep] for k in edata
+                                k: [edge_data[k][j] for j in keep] for k in edge_data
                             }
                             self._rebuild_all_ports()
                             self._refresh_connections_table(_tgt_node_idx)
@@ -1794,7 +1937,14 @@ class PlacementHandler:
             )
 
     def _delete_selected_connection(self):
-        """Delete the edge(s) selected in the Connections DataTable."""
+        """
+        Delete the edge(s) currently selected in the Connections DataTable.
+
+        Reads the highlighted row indices from ``connections_source.selected``,
+        resolves them to actual edge indices via the ``edge_idx`` column, removes
+        those rows from ``edge_source``, and refreshes the Connections panel so
+        the table reflects the updated state.
+        """
         if self.state.connections_source is None or self.state.edge_source is None:
             return
         selected = list(self.state.connections_source.selected.indices)
@@ -1802,9 +1952,9 @@ class PlacementHandler:
             return
         edge_idx_col = list(self.state.connections_source.data.get("edge_idx", []))
         to_delete = {edge_idx_col[i] for i in selected if i < len(edge_idx_col)}
-        edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
-        keep = [i for i in range(len(edata.get("xs", []))) if i not in to_delete]
-        self.state.edge_source.data = {k: [edata[k][j] for j in keep] for k in edata}
+        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
+        self.state.edge_source.data = {k: [edge_data[k][j] for j in keep] for k in edge_data}
         _LOGGER.info("Deleted connection(s) at edge indices %s", sorted(to_delete))
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
@@ -1861,13 +2011,13 @@ class PlacementHandler:
         # Build a set of connected (kind, node_index, label) tuples from edge_source
         connected_ports: set = set()
         if self.state.edge_source is not None:
-            edata = self.state.edge_source.data
-            for i in range(len(edata.get("node_a_idx", []))):
+            edge_data = self.state.edge_source.data
+            for i in range(len(edge_data.get("node_a_idx", []))):
                 connected_ports.add(
-                    (edata["a_kind"][i], edata["node_a_idx"][i], edata["a_label"][i])
+                    (edge_data["a_kind"][i], edge_data["node_a_idx"][i], edge_data["a_label"][i])
                 )
                 connected_ports.add(
-                    (edata["b_kind"][i], edata["node_b_idx"][i], edata["b_label"][i])
+                    (edge_data["b_kind"][i], edge_data["node_b_idx"][i], edge_data["b_label"][i])
                 )
 
         has_sel = self.state.selected_node_index is not None
@@ -1884,7 +2034,7 @@ class PlacementHandler:
             n_tgt = (
                 int(n_targets_list[i])
                 if i < len(n_targets_list)
-                else DEFAULT_TARGET_NUMBER.get(node_type, 0)
+                else DEFAULT_TARGET_COUNT.get(node_type, 0)
             )
 
             cfg = ICONS_CONFIG.get(icon_type, {})
@@ -1957,7 +2107,21 @@ class PlacementHandler:
             self._refresh_connections_table(self.state.selected_node_index)
 
     def _best_possible_node(self, x: float, y: float):
-        """Return the best possible node index for the tap action."""
+        """
+        Find the nearest placed node to canvas coordinates ``(x, y)``.
+
+        Searches all nodes in ``placed_nodes_source`` and returns the one
+        closest to the tap point, provided it falls within ``icon_size`` pixels.
+
+        :param x: Tap x coordinate in canvas data-units.
+        :param y: Tap y coordinate in canvas data-units.
+
+        :return: ``(best_idx, best_dist, current_data)`` where ``best_idx`` is the
+            zero-based index of the closest node (``None`` if nothing is within snap
+            distance), ``best_dist`` is the Euclidean distance to that node
+            (``None`` if the source is empty), and ``current_data`` is the raw
+            ``placed_nodes_source.data`` dict.
+        """
         current = self.state.placed_nodes_source.data
         xs = list(current.get("x", []))
         ys = list(current.get("y", []))
@@ -2020,23 +2184,23 @@ class PlacementHandler:
 
                 # Prune edges that referenced the deleted node; shift remaining indices
                 if self.state.edge_source is not None:
-                    edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                    edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
                     keep = [
                         i
                         for i, (na, nb) in enumerate(
-                            zip(edata.get("node_a_idx", []), edata.get("node_b_idx", []))
+                            zip(edge_data.get("node_a_idx", []), edge_data.get("node_b_idx", []))
                         )
                         if na != best_idx and nb != best_idx
                     ]
-                    new_edata = {}
-                    for k, vals in edata.items():
+                    new_edge_data = {}
+                    for k, vals in edge_data.items():
                         kept = [vals[i] for i in keep]
                         if k == "node_a_idx":
                             kept = [v - 1 if v > best_idx else v for v in kept]
                         elif k == "node_b_idx":
                             kept = [v - 1 if v > best_idx else v for v in kept]
-                        new_edata[k] = kept
-                    self.state.edge_source.data = new_edata
+                        new_edge_data[k] = kept
+                    self.state.edge_source.data = new_edge_data
 
                 # Rebuild port balls after deletion
                 self._rebuild_all_ports()
@@ -2057,10 +2221,10 @@ class PlacementHandler:
                 # No nearest node – attempt to delete an edge if within snap distance
                 edge_idx = self._find_nearest_edge(x, y)
                 if edge_idx is not None and self.state.edge_source is not None:
-                    edata = {k: list(v) for k, v in self.state.edge_source.data.items()}
-                    for k in edata:
-                        edata[k].pop(edge_idx)
-                    self.state.edge_source.data = edata
+                    edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                    for k in edge_data:
+                        edge_data[k].pop(edge_idx)
+                    self.state.edge_source.data = edge_data
                     _LOGGER.info("Delete edge at index %d", edge_idx)
 
                 if self.state.selected_node_index is not None:
@@ -2128,7 +2292,7 @@ class PlacementHandler:
 
         # Default port counts from constants
         default_n_src = DEFAULT_SOURCE_COUNT.get(default_type, 0)
-        default_n_tgt = DEFAULT_TARGET_NUMBER.get(default_type, 0)
+        default_n_tgt = DEFAULT_TARGET_COUNT.get(default_type, 0)
 
         # Append new node to the placed-nodes source
         size = self.icon_size
@@ -2176,12 +2340,12 @@ class PlacementHandler:
 # ============================================================================
 
 
-class ComponentPaletteLauncher:
+class PowertrainBuilderLauncher:
     """
-    Launch a self-contained Bokeh server that demonstrates the palette.
+    Launch a self-contained Bokeh server that demonstrates the powertrain builder.
 
-    A blank canvas is placed next to the button palette so you can click
-    components and see them appear on the canvas.
+    A blank canvas is placed at the center next to the component button palette on the left and
+    the component configuration panel on the right.
     """
 
     @staticmethod
@@ -2200,7 +2364,7 @@ class ComponentPaletteLauncher:
         logging.getLogger("tornado").setLevel(logging.WARNING)
 
         def make_document(doc):
-            """Build the Bokeh document with palette, canvas, and config panel."""
+            """Build the Bokeh document with palette, canvas, and configration panel."""
             palette_layout, table_panel, state = ComponentPaletteBuilder.build()
 
             # Blank canvas sized to accommodate all component rows
@@ -2238,6 +2402,7 @@ class ComponentPaletteLauncher:
                 line_dash="dashed",
                 source=state.temp_edge_source,
             )
+            # Select indicator ring around selected nodes
             canvas.scatter(
                 x="x",
                 y="y",
@@ -2355,10 +2520,12 @@ class ComponentPaletteLauncher:
                 text_font_style="bold",
                 text_color="white",
             )
+            # node hover tooltips
             hover_tool_component = bkmodel.HoverTool(
                 renderers=[scatter_glyph],
                 tooltips=[("Component id", "@name"), ("Component type", "@node_type")],
             )
+            # port hover tooltips – show different port type in tooltip and relevant metadata
             hover_tool_source = bkmodel.HoverTool(
                 renderers=[source_glyph],
                 tooltips=[
@@ -2435,7 +2602,7 @@ class ComponentPaletteLauncher:
             state.type_select.on_change("value", _on_type_select_change)
 
             # Write config panel values back to placed_nodes_source on Apply
-            def _apply_node_config():
+            def apply_node_configurations():
                 idx = state.selected_node_index
                 if idx is None:
                     return
@@ -2459,7 +2626,7 @@ class ComponentPaletteLauncher:
                     # If the node_type changed, we may need to reset port counts to defaults for the new type
                     if not state.source_count_spinner.visible:
                         pdata["n_sources"][idx] = int(DEFAULT_SOURCE_COUNT.get(new_node_type, 0))
-                        pdata["n_targets"][idx] = int(DEFAULT_TARGET_NUMBER.get(new_node_type, 0))
+                        pdata["n_targets"][idx] = int(DEFAULT_TARGET_COUNT.get(new_node_type, 0))
                 if idx < len(pdata.get("position", [])):
                     pdata["position"][idx] = new_position
                 if "options" not in pdata:
@@ -2573,14 +2740,14 @@ class ComponentPaletteLauncher:
                     connections_json,
                 )
 
-            state.apply_button.on_click(_apply_node_config)
+            state.apply_button.on_click(apply_node_configurations)
 
             # Wire palette buttons and canvas tap
             handler = PlacementHandler(state, canvas)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
             doc.add_root(row(palette_layout, canvas, table_panel))
-            doc.title = "Component Palette Demo"
+            doc.title = "Powertrain Builder"
 
         def make_document_with_tracking(doc):
             """Wrap ``make_document`` to stop the IO loop when the session ends."""

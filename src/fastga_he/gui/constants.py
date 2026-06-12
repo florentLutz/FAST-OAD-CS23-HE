@@ -137,7 +137,7 @@ DEFAULT_SOURCE_COUNT = {
     "H2_fuel_system": 3,
 }
 
-DEFAULT_TARGET_NUMBER = {
+DEFAULT_TARGET_COUNT = {
     "DC_bus": 3,
     "DC_cable_harness": 1,
     "DC_SSPC": 1,

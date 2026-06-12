@@ -22,14 +22,14 @@ import bokeh.models as bkmodel
 import bokeh.plotting as bkplot
 
 
-from ..component_palette import (
+from ..power_train_network_builder import (
     BUTTON_DEFAULT_COLOR_TYPE,
     BUTTON_SELECTED_COLOR_TYPE,
     ICONS_CONFIG,
     ComponentPaletteBuilder,
-    PaletteState,
+    BuilderState,
     PlacementHandler,
-    ComponentPaletteLauncher,
+    PowertrainBuilderLauncher,
 )
 from ..power_train_network_viewer import _string_cleanup
 
@@ -71,7 +71,7 @@ class TestComponentPaletteBuilder:
 
     def test_state_type(self):
         _layout, state = ComponentPaletteBuilder.build()
-        assert isinstance(state, PaletteState)
+        assert isinstance(state, BuilderState)
 
     def test_button_count_matches_components(self):
         """One button must be created for every entry in ICONS_CONFIG."""
@@ -308,11 +308,11 @@ class TestPlacementHandlerCanvasTap:
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped in CI – requires an interactive IOLoop.")
 def test_component_palette_launcher_import():
-    assert callable(ComponentPaletteLauncher.launch)
+    assert callable(PowertrainBuilderLauncher.launch)
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped in CI – requires an interactive IOLoop.")
-def test_palette_launcher_functionality():
+def test_powertrain_builder_launcher_functionality():
     """Test that the launcher can be called without errors and returns expected types."""
 
-    ComponentPaletteLauncher.launch()
+    PowertrainBuilderLauncher.launch()
