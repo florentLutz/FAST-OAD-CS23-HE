@@ -34,6 +34,8 @@ Typical usage
 
 import sys
 import math
+import ast
+import importlib
 from pathlib import Path
 import logging
 from dataclasses import dataclass, field
@@ -49,7 +51,6 @@ from tornado.ioloop import IOLoop
 import webbrowser
 
 from fastga_he.gui.constants import (
-    POSSIBLE_POSITIONS,
     POSSIBLE_OPTIONS,
 )
 from fastga_he.gui.power_train_network_writer import PowerTrainYAML
@@ -64,6 +65,7 @@ from fastga_he.powertrain_builder.resources.registered_components import KNOWN_C
 
 _LOGGER = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+COMPONENTS_PATH = Path(__file__).resolve().parents[2] / "fastga_he/models/propulsion/components"
 
 # ============================================================================
 # Layout constants
@@ -213,6 +215,7 @@ class BuilderState:
     default_source_count: dict = field(default_factory=dict)
     default_target_count: dict = field(default_factory=dict)
     component_type_to_icon: dict = field(default_factory=dict)
+    possible_position: dict = field(default_factory=dict)  # component_type -> list of positions
 
 
 # ============================================================================
@@ -297,6 +300,97 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
             default_target_count[component_type] = 1
 
     return default_source_count, default_target_count
+
+
+# ============================================================================
+# Get Possible Positions
+# ============================================================================
+
+
+def _get_possible_position(constants_path: Path) -> list | None:
+    """
+    Parse constants.py with ast and extract the POSSIBLE_POSITION value
+    without importing the module.
+    """
+    if not constants_path.exists():
+        return None
+
+    source = constants_path.read_text()
+    tree = ast.parse(source)
+
+    for node in ast.walk(tree):
+        # Look for: POSSIBLE_POSITION = [...]  or  POSSIBLE_POSITION = (...)
+        if isinstance(node, ast.Assign) and any(
+            isinstance(t, ast.Name) and t.id == "POSSIBLE_POSITION" for t in node.targets
+        ):
+            # Safely evaluate the assigned value (handles lists, tuples, strings, enums)
+            try:
+                return ast.literal_eval(node.value)
+            except ValueError:
+                # Value contains non-literals (e.g. enum references) — fall back to importlib
+                return None
+
+    return None
+
+
+def _get_possible_position_via_import(
+    constants_path: Path, components_path: Path, base_package: str
+) -> list | None:
+    """
+    Fallback: dynamically import constants.py and read POSSIBLE_POSITION directly.
+    Used when ast.literal_eval fails (e.g. enum values).
+    """
+    try:
+        # Build dotted module path from file path
+        relative = constants_path.with_suffix("").relative_to(components_path.parent.parent.parent)
+        module_path = ".".join(relative.parts)
+        module = importlib.import_module(module_path)
+        return getattr(module, "POSSIBLE_POSITION", None)
+    except Exception as e:
+        print(f"  Warning: could not import {constants_path}: {e}")
+        return None
+
+
+def _get_performance_component_names(
+    components_path: str | Path,
+    base_package: str = "fastga_he.models.propulsion.components",
+) -> dict:
+    components_path = Path(components_path)
+    results = {}
+
+    # Build a reverse map: OM_components_name -> components_type
+    om_name_to_type = {
+        component["OM_components_name"]: component["components_type"]
+        for component in KNOWN_COMPONENTS
+    }
+
+    for init_file in sorted(components_path.rglob("__init__.py")):
+        source = init_file.read_text()
+        tree = ast.parse(source)
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    if alias.name.startswith("Performances"):
+                        stripped_name = alias.name.removeprefix("Performances")
+                        component_type = om_name_to_type.get(stripped_name)
+                        if component_type is None:
+                            continue  # no matching component, skip
+
+                        constants_file = init_file.parent / "constants.py"
+                        possible_positions = _get_possible_position(constants_file)
+                        if possible_positions is None and constants_file.exists():
+                            possible_positions = _get_possible_position_via_import(
+                                constants_file, components_path, base_package
+                            )
+
+                        results[component_type] = possible_positions or []
+
+    # Fill in any known components not found during the scan
+    for component in KNOWN_COMPONENTS:
+        results.setdefault(component["components_type"], [])
+
+    return results
 
 
 # ============================================================================
@@ -669,6 +763,8 @@ class ComponentPaletteBuilder:
 
         component_type_to_icon = _map_possible_component_types_to_ions()
 
+        possible_position = _get_performance_component_names(COMPONENTS_PATH)
+
         state = BuilderState(
             buttons=buttons,
             placed_nodes_source=placed_nodes_source,
@@ -702,6 +798,7 @@ class ComponentPaletteBuilder:
             default_source_count=default_source_count,
             default_target_count=default_target_count,
             component_type_to_icon=component_type_to_icon,
+            possible_position=possible_position,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -1350,7 +1447,7 @@ class PlacementHandler:
         self.state.type_select.value = node_type if node_type in choices else choices[0]
 
         # Populate position_select with valid positions for this node_type
-        pos_choices = POSSIBLE_POSITIONS.get(node_type, [])
+        pos_choices = self.state.possible_position.get(node_type, [])
         self.state.position_select.options = pos_choices
         if pos_choices:
             self.state.position_select.value = (
@@ -2390,7 +2487,7 @@ class PlacementHandler:
 
         # Resolve default node_type and position from lookup tables
         default_type = self.state.component_type_to_icon.get(comp_key, comp_key)[0]
-        position_choices = POSSIBLE_POSITIONS.get(default_type, [])
+        position_choices = self.state.possible_position.get(default_type, [])
         default_position = position_choices[0] if position_choices else ""
 
         # Build default options JSON from POSSIBLE_OPTIONS
@@ -2686,7 +2783,7 @@ class PowertrainBuilderLauncher:
 
             # Refresh position_select and options table when component type changes
             def _on_type_select_change(attr, old, new):
-                pos_choices = POSSIBLE_POSITIONS.get(new, [])
+                pos_choices = state.possible_position.get(new, [])
                 state.position_select.options = pos_choices
                 state.position_select.value = pos_choices[0] if pos_choices else ""
                 idx = state.selected_node_index
