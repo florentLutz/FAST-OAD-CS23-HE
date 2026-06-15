@@ -11,3 +11,4 @@ SERVICE_BATTERY_LIFESPAN = "service.propulsion.battery.lifespan"
 SERVICE_BATTERY_MASS_PER_FU = "service.propulsion.battery.mass_per_fu"
 
 POSSIBLE_POSITION = ["inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"]
+POSSIBLE_OPTION = {"direct_bus_connection": [False, True]}
