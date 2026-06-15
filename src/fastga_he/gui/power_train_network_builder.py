@@ -35,7 +35,6 @@ Typical usage
 import sys
 import math
 import ast
-import importlib
 from pathlib import Path
 import logging
 from dataclasses import dataclass, field
@@ -50,9 +49,6 @@ from bokeh.server.server import Server
 from tornado.ioloop import IOLoop
 import webbrowser
 
-from fastga_he.gui.constants import (
-    POSSIBLE_OPTIONS,
-)
 from fastga_he.gui.power_train_network_writer import PowerTrainYAML
 from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
@@ -216,6 +212,8 @@ class BuilderState:
     default_target_count: dict = field(default_factory=dict)
     component_type_to_icon: dict = field(default_factory=dict)
     possible_position: dict = field(default_factory=dict)  # component_type -> list of positions
+    possible_options: dict = field(default_factory=dict)
+    # component_type -> option name -> list of option values
 
 
 # ============================================================================
@@ -223,7 +221,7 @@ class BuilderState:
 # ============================================================================
 
 
-def _map_possible_component_types_to_ions() -> dict:
+def _map_possible_component_types_to_icons() -> dict:
     """
     Build a dict mapping each component_type to its icon key.
 
@@ -307,56 +305,174 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
 # ============================================================================
 
 
-def _get_possible_position(constants_path: Path) -> list | None:
+def _read_constant_from_ast(constants_path: Path, variable_name: str):
     """
-    Parse constants.py with ast and extract the POSSIBLE_POSITION value
-    without importing the module.
+    Extract a single module-level assignment from a ``constants.py`` file using
+    the AST, **without importing the module**.
+
+    This avoids triggering FAST-OAD submodel registration side-effects that
+    would raise *"Name … is already used"* errors when the same submodel string
+    is declared across multiple components.
+
+    The function distinguishes three outcomes:
+
+    * ``(value, True)``  — variable found **and** its value is a plain Python
+      literal (list, dict, bool, str, int, float …) that could be evaluated
+      safely by :func:`ast.literal_eval`.
+    * ``(None, True)``   — variable found but its value contains non-literal
+      nodes (e.g. enum references).  The caller *may* attempt an importlib
+      fallback, but only if the relevant module is already cached in
+      ``sys.modules`` (i.e. has been imported earlier in the same process
+      without side-effects).
+    * ``(None, False)``  — variable not present in the file at all; no fallback
+      is needed.
+
+    :param constants_path: Path to the ``constants.py`` file to parse.
+    :param variable_name: Module-level name to look for (e.g.
+        ``"POSSIBLE_POSITION"`` or ``"POSSIBLE_OPTION"``).
+
+    :return: ``(value_or_none, found_flag)``
     """
     if not constants_path.exists():
-        return None
+        return None, False
 
-    source = constants_path.read_text()
-    tree = ast.parse(source)
+    try:
+        source = constants_path.read_text(encoding="utf-8")
+        tree = ast.parse(source)
+    except (OSError, SyntaxError):
+        return None, False
 
     for node in ast.walk(tree):
-        # Look for: POSSIBLE_POSITION = [...]  or  POSSIBLE_POSITION = (...)
         if isinstance(node, ast.Assign) and any(
-            isinstance(t, ast.Name) and t.id == "POSSIBLE_POSITION" for t in node.targets
+            isinstance(t, ast.Name) and t.id == variable_name for t in node.targets
         ):
-            # Safely evaluate the assigned value (handles lists, tuples, strings, enums)
             try:
-                return ast.literal_eval(node.value)
-            except ValueError:
-                # Value contains non-literals (e.g. enum references) — fall back to importlib
-                return None
+                return ast.literal_eval(node.value), True
+            except (ValueError, TypeError):
+                # Non-literal value (e.g. contains an enum reference)
+                return None, True
 
-    return None
+    return None, False
+
+
+def _read_constant_via_cached_import(
+    constants_path: Path, components_path: Path, variable_name: str
+):
+    """
+    Read *variable_name* from a ``constants.py`` that is **already cached** in
+    ``sys.modules``.
+
+    This is a last-resort fallback used only when :func:`_read_constant_from_ast`
+    reports that the variable exists but cannot be evaluated statically (e.g.
+    because it references an enum).  Importing a module that is already in
+    ``sys.modules`` is free of side-effects — no registration code runs again —
+    so it is safe even for FAST-OAD components whose module-level code would
+    otherwise cause *"Name … is already used"* errors.
+
+    If the module is **not** already cached this function returns ``None``
+    silently rather than triggering a fresh import.
+
+    :param constants_path: Path to the ``constants.py`` file (used to derive
+        the dotted module path).
+    :param components_path: Root of the components tree; used to compute the
+        relative dotted path.
+    :param variable_name: Attribute name to retrieve from the module.
+
+    :return: The attribute value, or ``None`` if the module is not cached or
+        the attribute is absent.
+    """
+    try:
+        relative = constants_path.with_suffix("").relative_to(components_path.parent.parent.parent)
+        module_path = ".".join(relative.parts)
+    except ValueError:
+        return None
+
+    # Only use a cached module — never trigger a fresh import here.
+    module = sys.modules.get(module_path)
+    if module is None:
+        return None
+
+    return getattr(module, variable_name, None)
+
+
+def _get_possible_position(constants_path: Path) -> list | None:
+    """
+    Return the ``POSSIBLE_POSITION`` list from *constants_path* using a pure
+    AST parse.  Returns ``None`` when the variable is absent or non-literal.
+    """
+    value, _ = _read_constant_from_ast(constants_path, "POSSIBLE_POSITION")
+    return value
 
 
 def _get_possible_position_via_import(
     constants_path: Path, components_path: Path, base_package: str
 ) -> list | None:
     """
-    Fallback: dynamically import constants.py and read POSSIBLE_POSITION directly.
-    Used when ast.literal_eval fails (e.g. enum values).
+    Cached-module fallback for ``POSSIBLE_POSITION``.
+
+    Only reads from ``sys.modules``; never triggers a fresh import.
     """
-    try:
-        # Build dotted module path from file path
-        relative = constants_path.with_suffix("").relative_to(components_path.parent.parent.parent)
-        module_path = ".".join(relative.parts)
-        module = importlib.import_module(module_path)
-        return getattr(module, "POSSIBLE_POSITION", None)
-    except Exception as e:
-        print(f"  Warning: could not import {constants_path}: {e}")
-        return None
+    return _read_constant_via_cached_import(constants_path, components_path, "POSSIBLE_POSITION")
+
+
+def _get_possible_option(constants_path: Path) -> dict | None:
+    """
+    Return the ``POSSIBLE_OPTION`` dict from *constants_path* using a pure
+    AST parse.  Returns ``None`` when the variable is absent or non-literal.
+
+    :param constants_path: Path to the component's ``constants.py`` file.
+
+    :return: The ``POSSIBLE_OPTION`` dict (e.g. ``{"adjust_sfc": [True, False]}``)
+             or ``None``.
+    """
+    value, _ = _read_constant_from_ast(constants_path, "POSSIBLE_OPTION")
+    return value
+
+
+def _get_possible_option_via_import(
+    constants_path: Path, components_path: Path, base_package: str
+) -> dict | None:
+    """
+    Cached-module fallback for ``POSSIBLE_OPTION``.
+
+    Only reads from ``sys.modules``; never triggers a fresh import.
+
+    :param constants_path: Path to the component's ``constants.py`` file.
+    :param components_path: Root path of the components tree.
+    :param base_package: Unused; kept for API symmetry with the position variant.
+
+    :return: The ``POSSIBLE_OPTION`` dict, or ``None``.
+    """
+    return _read_constant_via_cached_import(constants_path, components_path, "POSSIBLE_OPTION")
 
 
 def _get_performance_component_names(
     components_path: str | Path,
     base_package: str = "fastga_he.models.propulsion.components",
-) -> dict:
+) -> tuple[dict, dict]:
+    """
+    Scan the components tree and return per-component-type possible positions
+    **and** possible options, both read from each component's ``constants.py``.
+
+    Both values are extracted via a pure AST parse so that no module is
+    imported and no FAST-OAD submodel registration side-effects are triggered.
+    The importlib fallback is invoked only when the variable is confirmed to
+    exist in the file but its value contains non-literal nodes (e.g. enum
+    references), **and** only when the module is already present in
+    ``sys.modules`` — so it is always side-effect-free.
+
+    :param components_path: Root path of the components tree.
+    :param base_package: Dotted package name used as the import root when
+        the cached-module fallback is needed.
+
+    :return: ``(possible_position, possible_options)`` where
+
+        * ``possible_position`` maps ``component_type -> list[str]``
+        * ``possible_options``  maps ``component_type -> {option_name: list[values]}``
+    """
     components_path = Path(components_path)
-    results = {}
+    position_results = {}
+    option_results = {}
 
     # Build a reverse map: OM_components_name -> components_type
     om_name_to_type = {
@@ -378,19 +494,35 @@ def _get_performance_component_names(
                             continue  # no matching component, skip
 
                         constants_file = init_file.parent / "constants.py"
-                        possible_positions = _get_possible_position(constants_file)
-                        if possible_positions is None and constants_file.exists():
-                            possible_positions = _get_possible_position_via_import(
-                                constants_file, components_path, base_package
-                            )
 
-                        results[component_type] = possible_positions or []
+                        # ── POSSIBLE_POSITION ──────────────────────────────
+                        pos_value, pos_found = _read_constant_from_ast(
+                            constants_file, "POSSIBLE_POSITION"
+                        )
+                        if pos_value is None and pos_found:
+                            # Variable exists but is non-literal — try cached module only
+                            pos_value = _read_constant_via_cached_import(
+                                constants_file, components_path, "POSSIBLE_POSITION"
+                            )
+                        position_results[component_type] = pos_value or []
+
+                        # ── POSSIBLE_OPTION ────────────────────────────────
+                        opt_value, opt_found = _read_constant_from_ast(
+                            constants_file, "POSSIBLE_OPTION"
+                        )
+                        if opt_value is None and opt_found:
+                            # Variable exists but is non-literal — try cached module only
+                            opt_value = _read_constant_via_cached_import(
+                                constants_file, components_path, "POSSIBLE_OPTION"
+                            )
+                        option_results[component_type] = opt_value or {}
 
     # Fill in any known components not found during the scan
     for component in KNOWN_COMPONENTS:
-        results.setdefault(component["components_type"], [])
+        position_results.setdefault(component["components_type"], [])
+        option_results.setdefault(component["components_type"], {})
 
-    return results
+    return position_results, option_results
 
 
 # ============================================================================
@@ -761,9 +893,9 @@ class ComponentPaletteBuilder:
 
         default_source_count, default_target_count = _build_port_count_defaults()
 
-        component_type_to_icon = _map_possible_component_types_to_ions()
+        component_type_to_icon = _map_possible_component_types_to_icons()
 
-        possible_position = _get_performance_component_names(COMPONENTS_PATH)
+        possible_position, possible_options = _get_performance_component_names(COMPONENTS_PATH)
 
         state = BuilderState(
             buttons=buttons,
@@ -799,6 +931,7 @@ class ComponentPaletteBuilder:
             default_target_count=default_target_count,
             component_type_to_icon=component_type_to_icon,
             possible_position=possible_position,
+            possible_options=possible_options,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -1456,7 +1589,7 @@ class PlacementHandler:
         else:
             self.state.position_select.value = ""
 
-        # Restore saved option values; fall back to defaults from POSSIBLE_OPTIONS
+        # Restore saved option values; fall back to defaults from state.possible_options
         saved_opts: dict = {}
         try:
             saved_opts = json.loads(saved_opts_json) if saved_opts_json else {}
@@ -1509,9 +1642,9 @@ class PlacementHandler:
         :return: Display string (``True`` → ``"on"``, ``False`` → ``"off"``).
         """
         if v is True:
-            return "on"
+            return "True"
         if v is False:
-            return "off"
+            return "False"
         return str(v)
 
     @staticmethod
@@ -1524,9 +1657,9 @@ class PlacementHandler:
         :return: ``True`` for ``"on"``, ``False`` for ``"off"``, otherwise tries
                  ``int`` then ``float`` before returning the raw string.
         """
-        if s == "on":
+        if s == "True":
             return True
-        if s == "off":
+        if s == "False":
             return False
         try:
             return int(s)
@@ -1543,18 +1676,18 @@ class PlacementHandler:
         Rebuild the Options section of the config panel for a given node type.
 
         Reads the allowed option names and their possible values from
-        ``POSSIBLE_OPTIONS[node_type]``, creates one row per option (a disabled
+        ``state.possible_options[node_type]``, creates one row per option (a disabled
         ``TextInput`` label + a ``Select`` widget for the value), and wires a
         shared ``on_change`` callback so that ``options_source`` is always in
         sync with the user's current selection.
 
-        :param node_type: The component type key used to look up ``POSSIBLE_OPTIONS``.
+        :param node_type: The component type key used to look up ``state.possible_options``.
         :param overrides: Optional mapping of ``{option_name: current_value}`` used
             to pre-populate widgets with previously saved values instead of defaults.
         """
         if overrides is None:
             overrides = {}
-        opts_def = POSSIBLE_OPTIONS.get(node_type, {})
+        opts_def = self.state.possible_options.get(node_type, {})
         opt_names = list(opts_def.keys())
         opt_values = []
         new_rows = []
@@ -2490,8 +2623,8 @@ class PlacementHandler:
         position_choices = self.state.possible_position.get(default_type, [])
         default_position = position_choices[0] if position_choices else ""
 
-        # Build default options JSON from POSSIBLE_OPTIONS
-        opts_def = POSSIBLE_OPTIONS.get(default_type, {})
+        # Build default options JSON from possible_options
+        opts_def = self.state.possible_options.get(default_type, {})
         default_opts = {
             k: (True if v_list[0] is True else (False if v_list[0] is False else v_list[0]))
             for k, v_list in opts_def.items()
@@ -2798,7 +2931,7 @@ class PowertrainBuilderLauncher:
                 handler._refresh_options_table(new, saved_opts)
 
                 # Update options table visibility based on whether the new type has any options
-                opts_def = POSSIBLE_OPTIONS.get(new, {})
+                opts_def = state.possible_options.get(new, {})
                 state.options_table.visible = bool(opts_def)
 
                 # Refresh symmetry_select: peer candidates depend on icon_type, not node_type,

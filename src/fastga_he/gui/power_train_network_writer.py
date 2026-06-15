@@ -8,8 +8,6 @@ import logging
 from io import StringIO
 from ruamel.yaml import YAML
 
-
-from .constants import MULTI_PORT_OPTIONS
 from ..powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 
@@ -28,6 +26,8 @@ class PowerTrainYAML:
         self.edge_data = {k: list(v) for k, v in state.edge_source.data.items()}
         self.source_data = {k: list(v) for k, v in state.source_port_source.data.items()}
         self.target_data = {k: list(v) for k, v in state.target_port_source.data.items()}
+        self.possible_options = state.possible_options
+        self.default_source_count = state.default_source_count
 
     def set_title(self, title):
         self.data["title"] = title
@@ -42,17 +42,51 @@ class PowerTrainYAML:
             (comp for comp in KNOWN_COMPONENTS if comp["components_type"] == component_type), None
         )["id"]
 
-        # Parse the options JSON string for this node into a dict
+        # Parse the options JSON string for this node into a dict.
+        # This already contains every option the user configured in the GUI,
+        # including boolean toggles (e.g. adjust_sfc) stored as booleans.
         raw_opts = self.node_data["options"][node_index]
         try:
             options_dict = json.loads(raw_opts) if raw_opts else {}
         except (json.JSONDecodeError, TypeError):
             options_dict = {}
 
-        # Add multi-port options if the component type is in MULTI_PORT_OPTIONS
-        if component_type in MULTI_PORT_OPTIONS:
-            options_dict[MULTI_PORT_OPTIONS[component_type][0]] = source_count
-            options_dict[MULTI_PORT_OPTIONS[component_type][1]] = target_count
+        # Merge in per-component-type option defaults for any key not already
+        # present in the saved JSON (covers options that were never touched in
+        # the GUI and therefore never written to placed_nodes_source["options"]).
+        comp_opts_def = self.possible_options.get(component_type, {})
+        for opt_name, opt_values in comp_opts_def.items():
+            if opt_name not in options_dict and opt_values:
+                options_dict[opt_name] = opt_values[0]
+
+        # Add multi-port options for variable-port components (default count == 3).
+        # Each such component has exactly two "number_of_" attributes in KNOWN_COMPONENTS:
+        # one for the source side and one for the target side, in that order.
+        # We assign source_count to the source-side attribute and target_count to the
+        # target-side attribute, mirroring the convention in _build_port_count_defaults.
+        # Source-side keywords: inputs, tanks.
+        # Target-side keywords: outputs, engines, power_sources.
+        if self.default_source_count.get(component_type, 0) == 3:
+            component_attributes = (
+                next(
+                    (
+                        comp
+                        for comp in KNOWN_COMPONENTS
+                        if comp["components_type"] == component_type
+                    ),
+                    {},
+                ).get("attributes")
+                or []
+            )
+            _SOURCE_KEYWORDS = ("_inputs", "_tanks")
+            _TARGET_KEYWORDS = ("_outputs", "_engines", "_power_sources")
+            for attr in component_attributes:
+                if "number_of_" not in attr:
+                    continue
+                if any(keyword in attr for keyword in _SOURCE_KEYWORDS):
+                    options_dict[attr] = source_count
+                elif any(keyword in attr for keyword in _TARGET_KEYWORDS):
+                    options_dict[attr] = target_count
 
         if not options_dict:
             if not symetry:
@@ -83,29 +117,26 @@ class PowerTrainYAML:
                 }
 
     def add_connection(self):
-        if "False" in self.source_data["connected"] or "False" in self.target_data["connected"]:
-            _LOGGER.warning("Skipping connection because at least one port is not connected.")
-            return  # Skip if any port is not connected
+        # Warn (but do not abort) when any port is still unconnected so the
+        # user knows the saved YAML may be incomplete.  The "connected" column
+        # stores the string "True"/"False", so we normalise with str().
+        unconnected_src = any(str(v) == "False" for v in self.source_data.get("connected", []))
+        unconnected_tgt = any(str(v) == "False" for v in self.target_data.get("connected", []))
+        if unconnected_src or unconnected_tgt:
+            _LOGGER.warning("At least one port is not connected; the saved YAML may be incomplete.")
 
         for connection in range(len(self.edge_data["node_a_idx"])):
             start_port_name = self.node_data["name"][self.edge_data["node_a_idx"][connection]]
             end_port_name = self.node_data["name"][self.edge_data["node_b_idx"][connection]]
-            start_port_component_type = self.node_data["node_type"][
-                self.edge_data["node_a_idx"][connection]
-            ]
-            end_port_component_type = self.node_data["node_type"][
-                self.edge_data["node_b_idx"][connection]
-            ]
 
             if self.edge_data["a_kind"][connection] == "source":
                 source = start_port_name
                 source_count = self.node_data["n_sources"][self.edge_data["node_a_idx"][connection]]
                 target = end_port_name
                 target_count = self.node_data["n_targets"][self.edge_data["node_b_idx"][connection]]
-                if source_count > 1 or start_port_component_type in MULTI_PORT_OPTIONS:
+                if source_count > 1:
                     source = f"[{source}, {int(self.edge_data['a_label'][connection])}]"
-
-                if target_count > 1 or end_port_component_type in MULTI_PORT_OPTIONS:
+                if target_count > 1:
                     target = f"[{target}, {int(self.edge_data['b_label'][connection])}]"
 
             else:
@@ -113,10 +144,9 @@ class PowerTrainYAML:
                 source_count = self.node_data["n_sources"][self.edge_data["node_b_idx"][connection]]
                 target = start_port_name
                 target_count = self.node_data["n_targets"][self.edge_data["node_a_idx"][connection]]
-                if source_count > 1 or end_port_component_type in MULTI_PORT_OPTIONS:
+                if source_count > 1:
                     source = f"[{source}, {int(self.edge_data['b_label'][connection])}]"
-
-                if target_count > 1 or start_port_component_type in MULTI_PORT_OPTIONS:
+                if target_count > 1:
                     target = f"[{target}, {int(self.edge_data['a_label'][connection])}]"
 
             self.data["component_connections"].append({"source": source, "target": target})
