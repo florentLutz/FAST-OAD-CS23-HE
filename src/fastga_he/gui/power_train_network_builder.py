@@ -50,10 +50,7 @@ import webbrowser
 
 from fastga_he.gui.constants import (
     POSSIBLE_POSITIONS,
-    POSSIBLE_COMPONENT_TYPES,
     POSSIBLE_OPTIONS,
-    DEFAULT_SOURCE_COUNT,
-    DEFAULT_TARGET_COUNT,
 )
 from fastga_he.gui.power_train_network_writer import PowerTrainYAML
 from fastga_he.gui.power_train_network_viewer import (
@@ -212,6 +209,94 @@ class BuilderState:
     pending_connections: list = field(default_factory=list)
     # Select widget for Symmetry component (shown in config panel)
     symmetry_select: bkmodel.Select = field(default=None)
+    # Per-component-type default port counts, built once during ComponentPaletteBuilder.build()
+    default_source_count: dict = field(default_factory=dict)
+    default_target_count: dict = field(default_factory=dict)
+    component_type_to_icon: dict = field(default_factory=dict)
+
+
+# ============================================================================
+# Possible component types mapper
+# ============================================================================
+
+
+def _map_possible_component_types_to_ions() -> dict:
+    """
+    Build a dict mapping each component_type to its icon key.
+
+    :return: ``{component_type: icon_key}``
+    """
+    type_to_icon = {}
+    for component in KNOWN_COMPONENTS:
+        component_type = component["components_type"]
+        icon_key = component["icon_for_network_graph"]
+        if icon_key not in type_to_icon.keys():
+            type_to_icon[icon_key] = [component_type]
+        else:
+            type_to_icon[icon_key].append(component_type)
+
+    return type_to_icon
+
+
+# ============================================================================
+# Port-count defaults builder
+# ============================================================================
+
+
+def _build_port_count_defaults() -> tuple[dict, dict]:
+    """
+    Derive default source/target port counts for every known component type.
+
+    Iterates over :data:`KNOWN_COMPONENTS` and applies the same rules that
+    were previously encoded as static imports from ``constants``:
+
+    * If any attribute name contains ``"number_of_"`` → 3 sources, 3 targets
+      (variable-count component).
+    * If any attribute name contains ``"_mode"`` → 2 sources, 1 target.
+    * ``"gearbox"`` → 1 source, 2 targets.
+    * ``"propeller"`` or ``"aux_load"`` → 1 source, 0 targets.
+    * ``"fuel_tank"`` or ``"gaseous_hydrogen_tank"`` → 0 sources, 1 target.
+    * Everything else → 1 source, 1 target.
+
+    :return: ``(default_source_count, default_target_count)`` – both are dicts
+             keyed by ``components_type`` string.
+    """
+    default_source_count: dict = {}
+    default_target_count: dict = {}
+
+    for component in KNOWN_COMPONENTS:
+        component_type = component["components_type"]
+        attribute = component["attributes"]
+
+        if component_type == "gearbox":
+            default_source_count[component_type] = 1
+            default_target_count[component_type] = 2
+        elif component_type in ("propeller", "aux_load"):
+            default_source_count[component_type] = 1
+            default_target_count[component_type] = 0
+        elif component_type in ("fuel_tank", "gaseous_hydrogen_tank", "battery_pack"):
+            default_source_count[component_type] = 0
+            default_target_count[component_type] = 1
+        elif isinstance(attribute, list):
+            # Set up default counts for components with attributes, then check for special cases
+            default_source_count[component_type] = 1
+            default_target_count[component_type] = 1
+
+            for attr in attribute:
+                if "number_of_" in attr:
+                    default_source_count[component_type] = 3
+                    default_target_count[component_type] = 3
+                    break
+                elif "_mode" in attr:
+                    default_source_count[component_type] = 2
+                    default_target_count[component_type] = 1
+                    break
+
+        else:
+            default_source_count[component_type] = 1
+            default_target_count[component_type] = 1
+
+    return default_source_count, default_target_count
 
 
 # ============================================================================
@@ -580,6 +665,10 @@ class ComponentPaletteBuilder:
         pending_port_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], color=[]))
         temp_edge_source = bkmodel.ColumnDataSource(data=dict(xs=[], ys=[], color=[]))
 
+        default_source_count, default_target_count = _build_port_count_defaults()
+
+        component_type_to_icon = _map_possible_component_types_to_ions()
+
         state = BuilderState(
             buttons=buttons,
             placed_nodes_source=placed_nodes_source,
@@ -610,6 +699,9 @@ class ComponentPaletteBuilder:
             temp_edge_source=temp_edge_source,
             pending_connections=[],
             symmetry_select=symmetry_select,
+            default_source_count=default_source_count,
+            default_target_count=default_target_count,
+            component_type_to_icon=component_type_to_icon,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -1253,8 +1345,7 @@ class PlacementHandler:
         self.state.name_input.value = om_name
 
         # Populate type_select with valid choices for this component key
-        possible = POSSIBLE_COMPONENT_TYPES.get(comp_key, comp_key)
-        choices = possible if isinstance(possible, list) else [possible]
+        choices = self.state.component_type_to_icon.get(comp_key, comp_key)
         self.state.type_select.options = choices
         self.state.type_select.value = node_type if node_type in choices else choices[0]
 
@@ -1278,8 +1369,8 @@ class PlacementHandler:
         self._refresh_options_table(node_type, saved_opts)
 
         # Show / update port-count spinners for editable components (default count == 3)
-        n_src_default = DEFAULT_SOURCE_COUNT.get(node_type, 0)
-        n_tgt_default = DEFAULT_TARGET_COUNT.get(node_type, 0)
+        n_src_default = self.state.default_source_count.get(node_type, 0)
+        n_tgt_default = self.state.default_target_count.get(node_type, 0)
         src_editable = n_src_default == 3
         tgt_editable = n_tgt_default == 3
 
@@ -2051,12 +2142,12 @@ class PlacementHandler:
             n_src = (
                 int(n_sources_list[i])
                 if i < len(n_sources_list)
-                else DEFAULT_SOURCE_COUNT.get(node_type, 0)
+                else self.state.default_source_count.get(node_type, 0)
             )
             n_tgt = (
                 int(n_targets_list[i])
                 if i < len(n_targets_list)
-                else DEFAULT_TARGET_COUNT.get(node_type, 0)
+                else self.state.default_target_count.get(node_type, 0)
             )
 
             cfg = ICONS_CONFIG.get(icon_type, {})
@@ -2298,8 +2389,7 @@ class PlacementHandler:
         b64_url = _url_to_base64(file_url)
 
         # Resolve default node_type and position from lookup tables
-        possible_type = POSSIBLE_COMPONENT_TYPES.get(comp_key, comp_key)
-        default_type = possible_type[0] if isinstance(possible_type, list) else possible_type
+        default_type = self.state.component_type_to_icon.get(comp_key, comp_key)[0]
         position_choices = POSSIBLE_POSITIONS.get(default_type, [])
         default_position = position_choices[0] if position_choices else ""
 
@@ -2313,8 +2403,8 @@ class PlacementHandler:
         default_opts_json = json.dumps(default_opts)
 
         # Default port counts from constants
-        default_n_src = DEFAULT_SOURCE_COUNT.get(default_type, 0)
-        default_n_tgt = DEFAULT_TARGET_COUNT.get(default_type, 0)
+        default_n_src = self.state.default_source_count.get(default_type, 0)
+        default_n_tgt = self.state.default_target_count.get(default_type, 0)
 
         # Append new node to the placed-nodes source
         size = self.icon_size
@@ -2647,8 +2737,12 @@ class PowertrainBuilderLauncher:
                     pdata["node_type"][idx] = new_node_type
                     # If the node_type changed, we may need to reset port counts to defaults for the new type
                     if not state.source_count_spinner.visible:
-                        pdata["n_sources"][idx] = int(DEFAULT_SOURCE_COUNT.get(new_node_type, 0))
-                        pdata["n_targets"][idx] = int(DEFAULT_TARGET_COUNT.get(new_node_type, 0))
+                        pdata["n_sources"][idx] = int(
+                            state.default_source_count.get(new_node_type, 0)
+                        )
+                        pdata["n_targets"][idx] = int(
+                            state.default_target_count.get(new_node_type, 0)
+                        )
                 if idx < len(pdata.get("position", [])):
                     pdata["position"][idx] = new_position
                 if "options" not in pdata:
