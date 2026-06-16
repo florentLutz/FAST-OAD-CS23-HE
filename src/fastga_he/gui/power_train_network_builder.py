@@ -218,6 +218,13 @@ class BuilderState:
     # Hidden TextInput widgets used to relay file paths chosen via browser prompt() back to Python
     json_path_input: bkmodel.TextInput = field(default=None)
     yaml_path_input: bkmodel.TextInput = field(default=None)
+    # Hidden TextInput used to relay the JSON path chosen in the Load Design dialog
+    load_path_input: bkmodel.TextInput = field(default=None)
+    # Startup overlay buttons shown on the canvas before the first action
+    new_design_button: bkmodel.Button = field(default=None)
+    load_design_button: bkmodel.Button = field(default=None)
+    # The whole startup overlay column – hidden (not just its buttons) on dismiss
+    startup_overlay: object = field(default=None)
 
 
 # ============================================================================
@@ -668,6 +675,76 @@ class ComponentPaletteConfigurationTableBuilder:
         # They are invisible (width=0, height=0) and live only to trigger on_change callbacks.
         json_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
         yaml_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
+        # Hidden input used by the Load Design dialog to send the chosen JSON path to Python
+        load_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
+
+        # ── Startup overlay buttons ───────────────────────────────────────────
+        # Displayed centered on the canvas when the app first launches.
+        # Both buttons disappear once either is clicked.
+        _startup_btn_css = [
+            """:host button {
+                font-size: 1.6em;
+                padding: 18px 40px;
+                border-radius: 10px;
+                font-weight: bold;
+                letter-spacing: 0.04em;
+            }"""
+        ]
+        new_design_button = bkmodel.Button(
+            label="New Design",
+            icon=bkmodel.TablerIcon(icon_name="file-plus"),
+            button_type="primary",
+            width=220,
+            height=70,
+            stylesheets=_startup_btn_css,
+        )
+        load_design_button = bkmodel.Button(
+            label="Load Design",
+            icon=bkmodel.TablerIcon(icon_name="folder-open"),
+            button_type="light",
+            width=220,
+            height=70,
+            stylesheets=_startup_btn_css,
+        )
+
+        # Load Design: open native OS file-open dialog then relay chosen filename to Python
+        load_design_button.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(load_input=load_path_input),
+                code="""
+(async () => {
+    let fileName = null;
+
+    if (typeof window.showOpenFilePicker === 'function') {
+        // ── Native OS "Open" dialog (Chrome / Edge / Opera) ─────────────────
+        try {
+            const [fileHandle] = await window.showOpenFilePicker({
+                types: [{
+                    description: 'JSON canvas state backup',
+                    accept: { 'application/json': ['.json'] },
+                }],
+                multiple: false,
+            });
+            fileName = fileHandle.name;
+        } catch (e) {
+            if (e.name !== 'AbortError') { throw e; }
+            return;  // User cancelled – do nothing
+        }
+    } else {
+        // ── Fallback: window.prompt() ────────────────────────────────────────
+        const raw = window.prompt('Load JSON canvas state – enter the file name or full path:');
+        if (raw === null || raw.trim() === '') { return; }
+        fileName = raw.trim();
+    }
+
+    if (fileName) {
+        load_input.value = fileName;
+    }
+})();
+""",
+            )
+        )
+        yaml_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
 
         # ── CustomJS for Save button: native OS "Save As" dialogs ───────────────
         # Uses the File System Access API (window.showSaveFilePicker) available in
@@ -1036,6 +1113,9 @@ class ComponentPaletteConfigurationTableBuilder:
             possible_options=possible_options,
             json_path_input=json_path_input,
             yaml_path_input=yaml_path_input,
+            load_path_input=load_path_input,
+            new_design_button=new_design_button,
+            load_design_button=load_design_button,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -1067,6 +1147,7 @@ class ComponentPaletteConfigurationTableBuilder:
             end_session_button,
             json_path_input,
             yaml_path_input,
+            load_path_input,
             spacing=2,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
@@ -1486,6 +1567,14 @@ class PlacementHandler:
         # both values atomically, avoiding any two-widget propagation race.
         if self.state.yaml_path_input is not None:
             self.state.yaml_path_input.on_change("value", self._on_yaml_path_chosen)
+
+        # Load Design: the CustomJS writes the chosen filename into load_path_input
+        if self.state.load_path_input is not None:
+            self.state.load_path_input.on_change("value", self._on_load_path_chosen)
+
+        # New Design: wipe canvas and dismiss overlay immediately
+        if self.state.new_design_button is not None:
+            self.state.new_design_button.on_click(self._on_new_design)
         for index, button in enumerate(self.state.buttons):
             button.on_click(self._make_select_callback(index))
         if self.state.delete_button is not None:
@@ -1557,6 +1646,176 @@ class PlacementHandler:
         if self.state.save_button is not None:
             self.state.save_button.button_type = "warning"
 
+    # -----------------------------------------------------------------------
+    # Startup overlay
+    # -----------------------------------------------------------------------
+
+    def _dismiss_startup_overlay(self):
+        """
+        Hide the startup overlay panel (and both its buttons).
+
+        Called as soon as the user makes a choice so the canvas is unobstructed.
+        """
+        if self.state.startup_overlay is not None:
+            self.state.startup_overlay.visible = False
+        if self.state.new_design_button is not None:
+            self.state.new_design_button.visible = False
+        if self.state.load_design_button is not None:
+            self.state.load_design_button.visible = False
+
+    def _on_new_design(self):
+        """
+        Start with a blank canvas.
+
+        Hides the startup overlay and resets every data source to empty so the
+        user begins with a completely fresh powertrain design.
+        """
+        self._dismiss_startup_overlay()
+
+        # Reset all canvas data sources
+        self.state.placed_nodes_source.data = {
+            "x": [], "y": [], "url": [], "w": [], "h": [],
+            "name": [], "node_type": [], "icon_type": [], "position": [],
+            "options": [], "n_sources": [], "n_targets": [],
+            "symmetry_name": [], "symmetry_node_index": [],
+        }
+        self.state.hover_source.data = dict(x=[], y=[], name=[], node_type=[])
+        self.state.edge_source.data = dict(
+            xs=[], ys=[], color=[],
+            node_a_idx=[], a_label=[], a_kind=[],
+            node_b_idx=[], b_label=[], b_kind=[],
+        )
+        self.state.source_port_source.data = dict(
+            x=[], y=[], color=[], label=[], node_index=[],
+            node_name=[], node_type=[], fill_alpha=[], line_alpha=[], connected=[],
+        )
+        self.state.target_port_source.data = dict(
+            x=[], y=[], color=[], label=[], node_index=[],
+            node_name=[], node_type=[], fill_alpha=[], line_alpha=[], connected=[],
+        )
+        self._clear_temp_edges()
+        self.state.placed_counter.clear()
+        self.state.selected_node_index = None
+        self.state.selected_component = None
+        self.state.delete_mode = False
+        self._clear_node_table()
+
+        # Fresh design has nothing unsaved yet
+        if self.state.save_button is not None:
+            self.state.save_button.button_type = "success"
+
+        _LOGGER.info("New Design started – canvas cleared.")
+
+    # -----------------------------------------------------------------------
+    # Load canvas state
+    # -----------------------------------------------------------------------
+
+    def _on_load_path_chosen(self, attr, old, new):
+        """
+        Triggered when the hidden ``load_path_input`` value changes.
+
+        The Load Design button's ``CustomJS`` writes the filename chosen in the
+        OS file-open dialog (or ``window.prompt`` fallback) into ``load_path_input``.
+        This callback reads that name, restores the canvas, and resets the input.
+
+        :param attr: Bokeh attribute name (always ``"value"``).
+        :param old: Previous value (ignored).
+        :param new: Chosen JSON file name or path.
+        """
+        if not new:
+            return
+        # Reset before loading so reloading the same file works (Bokeh only fires
+        # on_change when the value actually changes: _EMPTY → path → _EMPTY → path).
+        if self.state.load_path_input is not None:
+            self.state.load_path_input.value = _EMPTY
+        self._dismiss_startup_overlay()
+        self._load_canvas_state(json_path=new)
+
+    def _load_canvas_state(self, json_path: str):
+        """
+        Restore the canvas from a JSON canvas-state backup file.
+
+        Clears the current canvas entirely, then replays every node, edge, and
+        port that was serialised by :meth:`_save_canvas_state`.  After loading,
+        all port balls are rebuilt and the Save button is set green to reflect
+        that the loaded state is already "saved".
+
+        :param json_path: Path to the JSON file written by a previous save.
+        """
+        json_file = Path(json_path)
+        if not json_file.exists():
+            _LOGGER.error("Load failed – file not found: %s", json_file)
+            return
+
+        try:
+            with open(json_file) as f:
+                canvas_state = json.load(f)
+        except Exception:
+            _LOGGER.exception("Load failed – could not parse JSON from %s", json_file)
+            return
+
+        # ── Wipe current canvas state ─────────────────────────────────────────
+        self.state.selected_node_index = None
+        self.state.selected_component = None
+        self.state.delete_mode = False
+        self.state.pending_connections.clear()
+        self.state.placed_counter.clear()
+        self._clear_node_table()
+        self._clear_temp_edges()
+
+        # ── Restore data sources ──────────────────────────────────────────────
+        nodes_data = canvas_state.get("components", {})
+        edges_data = canvas_state.get("connections", {})
+        source_data = canvas_state.get("source_ports", {})
+        target_data = canvas_state.get("target_ports", {})
+
+        # Ensure every expected column exists (forward-compatibility)
+        _node_defaults = {
+            "x": [], "y": [], "url": [], "w": [], "h": [],
+            "name": [], "node_type": [], "icon_type": [], "position": [],
+            "options": [], "n_sources": [], "n_targets": [],
+            "symmetry_name": [], "symmetry_node_index": [],
+        }
+        for col, default in _node_defaults.items():
+            nodes_data.setdefault(col, default)
+
+        self.state.placed_nodes_source.data = {k: list(v) for k, v in nodes_data.items()}
+        self.state.edge_source.data = {k: list(v) for k, v in edges_data.items()}
+        self.state.source_port_source.data = {k: list(v) for k, v in source_data.items()}
+        self.state.target_port_source.data = {k: list(v) for k, v in target_data.items()}
+
+        # Rebuild hover_source from restored nodes
+        self.state.hover_source.data = {
+            "x": list(nodes_data.get("x", [])),
+            "y": list(nodes_data.get("y", [])),
+            "name": list(nodes_data.get("name", [])),
+            "node_type": list(nodes_data.get("node_type", [])),
+        }
+
+        # Rebuild placed_counter so future placements continue from the right index
+        for name in nodes_data.get("name", []):
+            # names are like "battery_1"; extract the icon key prefix
+            parts = name.rsplit("_", 1)
+            if len(parts) == 2 and parts[1].isdigit():
+                key = parts[0]
+                self.state.placed_counter[key] = max(
+                    self.state.placed_counter.get(key, 0), int(parts[1])
+                )
+
+        self._rebuild_all_ports()
+        self._rebuild_edges()
+
+        # Mark as saved (the loaded file is the current saved state)
+        if self.state.save_button is not None:
+            self.state.save_button.button_type = "success"
+
+        _LOGGER.info(
+            "Canvas loaded from %s (%d nodes, %d edges)",
+            json_file,
+            len(nodes_data.get("name", [])),
+            len(edges_data.get("xs", [])),
+        )
+
     def _on_yaml_path_chosen(self, attr, old, new):
         """
         Triggered when the hidden ``yaml_path_input`` value changes.
@@ -1578,26 +1837,30 @@ class PlacementHandler:
         :param old: Previous bundle string (ignored).
         :param new: JSON bundle ``{"yaml": "...", "json": "...", "ts": "..."}``.
         """
+        # Ignore the reset write (empty string) that this callback makes at the end
         if not new:
             return
 
         try:
             bundle = json.loads(new)
-            yaml_path = bundle.get("yaml", _EMPTY)
-            json_path = bundle.get("json", _EMPTY)
-        except (json.JSONDecodeError, AttributeError):
+        except (json.JSONDecodeError, ValueError):
             _LOGGER.error("Could not decode save-dialog bundle: %r", new)
             return
 
-        # At least one file must have a name, otherwise there is nothing to do
+        yaml_path = bundle.get("yaml") or _EMPTY
+        json_path = bundle.get("json") or _EMPTY
+
+        # At least one file must have a non-empty name, otherwise nothing to write
         if not yaml_path and not json_path:
             return
 
-        self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
-
-        # Reset the hidden input so it can be reused for the next save
+        # Reset the hidden input *before* the save so that if the user immediately
+        # saves again with identical filenames, Bokeh sees a value change (_EMPTY →
+        # new bundle) and fires on_change correctly.
         if self.state.yaml_path_input is not None:
             self.state.yaml_path_input.value = _EMPTY
+
+        self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
 
     def _save_canvas_state(self, yaml_path: str = "", json_path: str = ""):
         """
@@ -2865,6 +3128,8 @@ class PlacementHandler:
             "options": list(current.get("options", [])) + [default_opts_json],
             "n_sources": list(current.get("n_sources", [])) + [default_n_src],
             "n_targets": list(current.get("n_targets", [])) + [default_n_tgt],
+            "symmetry_name": list(current.get("symmetry_name", [])) + [_EMPTY],
+            "symmetry_node_index": list(current.get("symmetry_node_index", [])) + [-1],
         }
 
         # Keep hover_source in sync (position + metadata for the scatter hover tool)
@@ -3323,7 +3588,52 @@ class PowertrainBuilderLauncher:
             handler = PlacementHandler(state, canvas)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
+            # ── Startup overlay – centered on the canvas ──────────────────────
+            # A column of two large buttons sits on top of the canvas.  Both are
+            # hidden by their own on_click / load callbacks once the user chooses.
+            startup_overlay = column(
+                bkmodel.Div(
+                    text=(
+                        "<div style='"
+                        "color:white;"
+                        "font-size:22pt;"
+                        "font-weight:bold;"
+                        "text-align:center;"
+                        "padding:24px 0 18px 0;"
+                        "letter-spacing:0.04em;"
+                        "'>Powertrain Builder</div>"
+                        "<div style='"
+                        "color:#aaa;"
+                        "font-size:12pt;"
+                        "text-align:center;"
+                        "padding-bottom:28px;"
+                        "'>Start a new design or restore a previous session</div>"
+                    ),
+                    width=500,
+                ),
+                row(
+                    state.new_design_button,
+                    bkmodel.Div(text="", width=30),  # spacer
+                    state.load_design_button,
+                    styles={"justify-content": "center"},
+                ),
+                styles={
+                    "background": "rgba(30,30,40,0.97)",
+                    "border": "2px solid #444",
+                    "border-radius": "16px",
+                    "padding": "10px 40px 30px 40px",
+                    "position": "absolute",
+                    # Centre over the canvas (canvas width=800px, overlay width≈500px)
+                    "left": f"{PALETTE_WIDTH + 150}px",
+                    "top": "340px",
+                    "z-index": "100",
+                    "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
+                },
+            )
+
             doc.add_root(row(palette_layout, canvas, table_panel))
+            state.startup_overlay = startup_overlay
+            doc.add_root(startup_overlay)
             doc.title = "Powertrain Builder"
 
         def make_document_with_tracking(doc):
