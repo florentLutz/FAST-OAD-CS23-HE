@@ -215,6 +215,9 @@ class BuilderState:
     possible_position: dict = field(default_factory=dict)  # component_type -> list of positions
     possible_options: dict = field(default_factory=dict)
     # component_type -> option name -> list of option values
+    # Hidden TextInput widgets used to relay file paths chosen via browser prompt() back to Python
+    json_path_input: bkmodel.TextInput = field(default=None)
+    yaml_path_input: bkmodel.TextInput = field(default=None)
 
 
 # ============================================================================
@@ -661,6 +664,104 @@ class ComponentPaletteConfigurationTableBuilder:
         )
         end_session_button.js_on_click(bkmodel.CustomJS(code="window.close();"))
 
+        # ── Hidden TextInput widgets – carry file paths from browser prompt() to Python ──
+        # They are invisible (width=0, height=0) and live only to trigger on_change callbacks.
+        json_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
+        yaml_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
+
+        # ── CustomJS for Save button: native OS "Save As" dialogs ───────────────
+        # Uses the File System Access API (window.showSaveFilePicker) available in
+        # Chromium-based browsers (Chrome, Edge, Opera).  Each call opens the real
+        # Windows/macOS/Linux "Save As" dialog.
+        #
+        # Order: YAML first (the primary deliverable), then JSON (the backup).
+        # Cancelling either dialog cancels only that file – the other is still saved.
+        # Both filenames are bundled as a JSON string into yaml_path_input so that
+        # the single on_change callback receives both values atomically.
+        #
+        # Fallback: window.prompt() for Firefox / unsupported browsers.
+        save_button.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(
+                    yaml_input=yaml_path_input,
+                    save_btn=save_button,
+                ),
+                code="""
+(async () => {
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const ts = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_` +
+               `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+    let yamlName = null;
+    let jsonName = null;
+
+    if (typeof window.showSaveFilePicker === 'function') {
+        // ── YAML dialog first (primary file) ────────────────────────────────
+        try {
+            const yamlHandle = await window.showSaveFilePicker({
+                suggestedName: `powertrain_config_${ts}.yml`,
+                types: [{
+                    description: 'YAML powertrain configuration',
+                    accept: { 'text/yaml': ['.yml', '.yaml'] },
+                }],
+            });
+            yamlName = yamlHandle.name;
+        } catch (e) {
+            if (e.name !== 'AbortError') { throw e; }
+            // Cancelled – yamlName stays null, skip YAML but still ask for JSON
+        }
+
+        // ── JSON dialog second (backup file) ────────────────────────────────
+        try {
+            const jsonHandle = await window.showSaveFilePicker({
+                suggestedName: `canvas_state_${ts}.json`,
+                types: [{
+                    description: 'JSON canvas state backup',
+                    accept: { 'application/json': ['.json'] },
+                }],
+            });
+            jsonName = jsonHandle.name;
+        } catch (e) {
+            if (e.name !== 'AbortError') { throw e; }
+            // Cancelled – jsonName stays null, skip JSON
+        }
+
+    } else {
+        // ── Fallback: window.prompt() ────────────────────────────────────────
+        const rawYaml = window.prompt(
+            'YAML powertrain config – enter a file name (Cancel to skip):',
+            `powertrain_config_${ts}.yml`
+        );
+        if (rawYaml !== null && rawYaml.trim() !== '') {
+            yamlName = rawYaml.trim();
+        }
+
+        const rawJson = window.prompt(
+            'JSON backup file – enter a file name (Cancel to skip):',
+            `canvas_state_${ts}.json`
+        );
+        if (rawJson !== null && rawJson.trim() !== '') {
+            jsonName = rawJson.trim();
+        }
+    }
+
+    // If the user cancelled both dialogs, do nothing
+    if (yamlName === null && jsonName === null) { return; }
+
+    // Bundle both names (null → empty string) into yaml_path_input.
+    // The on_change callback in Python reads this single value atomically.
+    save_btn.button_type = 'warning';
+    yaml_input.value = JSON.stringify({
+        yaml: yamlName || '',
+        json: jsonName || '',
+        ts:   ts
+    });
+})();
+""",
+            )
+        )
+
         # ColumnDataSource for placed nodes – consumed by the main canvas image_url renderer
         placed_nodes_source = bkmodel.ColumnDataSource(
             data=dict(
@@ -933,6 +1034,8 @@ class ComponentPaletteConfigurationTableBuilder:
             component_type_to_icon=component_type_to_icon,
             possible_position=possible_position,
             possible_options=possible_options,
+            json_path_input=json_path_input,
+            yaml_path_input=yaml_path_input,
         )
 
         # Build one TabPanel per category defined in ICON_TYPE
@@ -962,6 +1065,8 @@ class ComponentPaletteConfigurationTableBuilder:
             delete_button,
             save_button,
             end_session_button,
+            json_path_input,
+            yaml_path_input,
             spacing=2,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
@@ -1269,6 +1374,7 @@ class PlacementHandler:
 
                 self._refresh_connections_table(self.state.selected_node_index)
 
+        self._mark_unsaved()
         _LOGGER.info(
             "Edge: %s port %s (node %d) ↔ %s port %s (node %d)",
             port_a["kind"],
@@ -1372,8 +1478,14 @@ class PlacementHandler:
         * The End Session button → :meth:`_end_session`.
         * The Delete button → :meth:`_toggle_delete_mode`.
         """
-        self.state.save_button.on_click(self._save_canvas_state)
         self.state.end_session_button.on_click(self._end_session)
+
+        # The Save button fires a CustomJS that opens two OS "Save As" dialogs
+        # (YAML first, then JSON) and bundles both chosen filenames as a JSON
+        # string into yaml_path_input.  This single on_change callback receives
+        # both values atomically, avoiding any two-widget propagation race.
+        if self.state.yaml_path_input is not None:
+            self.state.yaml_path_input.on_change("value", self._on_yaml_path_chosen)
         for index, button in enumerate(self.state.buttons):
             button.on_click(self._make_select_callback(index))
         if self.state.delete_button is not None:
@@ -1434,62 +1546,116 @@ class PlacementHandler:
     # Save canvas state
     # -----------------------------------------------------------------------
 
-    def _save_canvas_state(self):
+    def _mark_unsaved(self):
         """
-        Serialise the current placed-nodes data to a timestamped JSON backup file
-        and a YAML powertrain configuration file.
+        Turn the Save button yellow (``"warning"``) to signal unsaved changes.
 
-        Both files are written to the current working directory and share the same
-        timestamp suffix.  The JSON file is kept as a full-fidelity backup of the
-        canvas state, while the YAML file is the powertrain config consumed by
-        FAST-OAD_CS23-HE.  The save button is reset to ``"success"`` after a
-        1-second delay.
+        Called by every method that mutates the canvas (place node, delete node,
+        add edge, delete edge, apply configuration).  The button returns to green
+        (``"success"``) only after a successful save via :meth:`_save_canvas_state`.
         """
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        if self.state.save_button is not None:
+            self.state.save_button.button_type = "warning"
 
-        # ── JSON backup (full canvas state) ──────────────────────────────────
-        json_filename = f"canvas_state_{timestamp}.json"
+    def _on_yaml_path_chosen(self, attr, old, new):
+        """
+        Triggered when the hidden ``yaml_path_input`` value changes.
 
+        The save button's ``CustomJS`` bundles both chosen filenames (either may
+        be an empty string if the user cancelled that dialog) as a JSON string
+        and writes it into ``yaml_path_input``.  This single ``on_change``
+        callback therefore receives both values atomically, with no race condition.
+
+        Either file is optional – an empty name means that file is skipped.
+        If the user cancelled both dialogs the bundle is never written and this
+        callback never fires.
+
+        The Save button is set to green (``"success"``) immediately after a
+        successful write, then reset to ``"warning"`` only when the next canvas
+        mutation occurs.
+
+        :param attr: Bokeh attribute name (always ``"value"``).
+        :param old: Previous bundle string (ignored).
+        :param new: JSON bundle ``{"yaml": "...", "json": "...", "ts": "..."}``.
+        """
+        if not new:
+            return
+
+        try:
+            bundle = json.loads(new)
+            yaml_path = bundle.get("yaml", _EMPTY)
+            json_path = bundle.get("json", _EMPTY)
+        except (json.JSONDecodeError, AttributeError):
+            _LOGGER.error("Could not decode save-dialog bundle: %r", new)
+            return
+
+        # At least one file must have a name, otherwise there is nothing to do
+        if not yaml_path and not json_path:
+            return
+
+        self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
+
+        # Reset the hidden input so it can be reused for the next save
+        if self.state.yaml_path_input is not None:
+            self.state.yaml_path_input.value = _EMPTY
+
+    def _save_canvas_state(self, yaml_path: str = "", json_path: str = ""):
+        """
+        Serialise the current canvas to the file paths chosen by the user.
+
+        Both parameters are optional – an empty string means that file is
+        skipped entirely.  The YAML file is the primary powertrain configuration
+        consumed by FAST-OAD_CS23-HE; the JSON file is a full-fidelity canvas
+        backup used to restore the session later.
+
+        The Save button is set to green (``"success"``) synchronously at the end
+        of this method, so it cannot be overwritten by a `call_later` race.
+
+        :param yaml_path: File name (or full path) for the YAML config, or ``""``
+            to skip writing YAML.
+        :param json_path: File name (or full path) for the JSON backup, or ``""``
+            to skip writing JSON.
+        """
         nodes_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
         edges_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
         source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
         target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
 
-        canvas_state = {
-            "components": nodes_data,
-            "connections": edges_data,
-            "source_ports": source_data,
-            "target_ports": target_data,
-        }
+        # ── YAML powertrain configuration (primary) ───────────────────────────
+        if yaml_path:
+            yaml_file = Path(yaml_path)
+            yaml_file.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                pt_yaml = PowerTrainYAML(self.state)
+                pt_yaml.set_title(yaml_file.stem)
 
-        with open(json_filename, "w") as f:
-            json.dump(canvas_state, f, indent=2)
+                n_nodes = len(nodes_data.get("name", []))
+                for node_index in range(n_nodes):
+                    pt_yaml.add_component(node_index)
 
-        _LOGGER.info("Canvas state (JSON backup) saved to %s", json_filename)
+                pt_yaml.add_connection()
+                pt_yaml.write(str(yaml_file))
+                _LOGGER.info("Powertrain YAML config saved to %s", yaml_file)
+            except Exception:
+                _LOGGER.exception("Failed to write YAML config to %s.", yaml_file)
 
-        # ── YAML powertrain configuration ─────────────────────────────────────
-        yaml_filename = f"powertrain_config_{timestamp}.yml"
+        # ── JSON backup (full canvas state) ───────────────────────────────────
+        if json_path:
+            json_file = Path(json_path)
+            json_file.parent.mkdir(parents=True, exist_ok=True)
+            canvas_state = {
+                "components": nodes_data,
+                "connections": edges_data,
+                "source_ports": source_data,
+                "target_ports": target_data,
+            }
+            with open(json_file, "w") as f:
+                json.dump(canvas_state, f, indent=2)
+            _LOGGER.info("Canvas state (JSON backup) saved to %s", json_file)
 
-        try:
-            pt_yaml = PowerTrainYAML(self.state)
-            pt_yaml.set_title(f"powertrain_config_{timestamp}")
-
-            n_nodes = len(nodes_data.get("name", []))
-            for node_index in range(n_nodes):
-                pt_yaml.add_component(node_index)
-
-            pt_yaml.add_connection()
-
-            pt_yaml.write(yaml_filename)
-            _LOGGER.info("Powertrain YAML config saved to %s", yaml_filename)
-        except Exception:
-            _LOGGER.exception(
-                "Failed to write YAML config; JSON backup at %s is still valid.", json_filename
-            )
-
-        IOLoop.current().call_later(
-            1.0, lambda: setattr(self.state.save_button, "button_type", "success")
-        )
+        # Turn the Save button green immediately (synchronous, no call_later race)
+        if self.state.save_button is not None:
+            self.state.save_button.button_type = "success"
 
     # -----------------------------------------------------------------------
     # End session
@@ -2323,6 +2489,7 @@ class PlacementHandler:
         # Rebuild edge_source.data without the deleted edges
         keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
         self.state.edge_source.data = {k: [edge_data[k][j] for j in keep] for k in edge_data}
+        self._mark_unsaved()
         _LOGGER.info("Deleted connection(s) at edge indices %s", sorted(to_delete))
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
@@ -2603,6 +2770,7 @@ class PlacementHandler:
                     self.state.selected_node_index -= 1
 
                 _LOGGER.info("Deleted node at index %d", best_idx)
+                self._mark_unsaved()
 
             else:
                 # No nearest node – attempt to delete an edge if within snap distance
@@ -2612,6 +2780,7 @@ class PlacementHandler:
                     for k in edge_data:
                         edge_data[k].pop(edge_idx)
                     self.state.edge_source.data = edge_data
+                    self._mark_unsaved()
                     _LOGGER.info("Delete edge at index %d", edge_idx)
 
                 if self.state.selected_node_index is not None:
@@ -2710,6 +2879,7 @@ class PlacementHandler:
 
         # Rebuild port balls for the new node
         self._rebuild_all_ports()
+        self._mark_unsaved()
 
         _LOGGER.info(
             "Placed %s (node_type=%s, position=%s) at (%.1f, %.1f)",
@@ -3145,6 +3315,7 @@ class PowertrainBuilderLauncher:
                     opts_json,
                     connections_json,
                 )
+                handler._mark_unsaved()
 
             state.apply_button.on_click(apply_node_configurations)
 
