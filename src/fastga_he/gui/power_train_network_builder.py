@@ -80,6 +80,7 @@ BUTTON_DEFAULT_COLOR_TYPE = "light"  # unselected state
 BUTTON_SELECTED_COLOR_TYPE = "primary"  # selected state (blue highlight)
 
 NODE_SELECT_COLOR = "#FFD700"  # gold color for selected node overlay (semi-transparent)
+_EMPTY = ""
 
 
 # ============================================================================
@@ -727,7 +728,7 @@ class ComponentPaletteBuilder:
         # Configurator panel inputs
         name_input = bkmodel.TextInput(
             title="Component ID:",
-            value="",
+            value=_EMPTY,
             width=380,
             styles={"color": "white", "font-size": "18px"},
         )
@@ -736,7 +737,7 @@ class ComponentPaletteBuilder:
         # for the selected node whenever a canvas node is clicked
         type_select = bkmodel.Select(
             title="Component Type:",
-            value="",
+            value=_EMPTY,
             options=[],
             width=380,
             styles={"color": "white", "font-size": "18px"},
@@ -745,7 +746,7 @@ class ComponentPaletteBuilder:
         # Select widget for Position – options come from POSSIBLE_POSITIONS keyed by node_type
         position_select = bkmodel.Select(
             title="Position:",
-            value="",
+            value=_EMPTY,
             options=[],
             width=380,
             styles={"color": "white", "font-size": "18px"},
@@ -1564,7 +1565,7 @@ class PlacementHandler:
         om_name = list(pdata.get("name", []))[idx]
         node_type = list(pdata.get("node_type", []))[idx]
         comp_key = list(pdata.get("icon_type", []))[idx]
-        position = list(pdata.get("position", []))[idx] if pdata.get("position") else ""
+        position = list(pdata.get("position", []))[idx] if pdata.get("position") else _EMPTY
         saved_opts_json = list(pdata.get("options", []))[idx] if pdata.get("options") else "{}"
 
         if saved_opts_json != "{}":
@@ -1633,43 +1634,42 @@ class PlacementHandler:
         self._refresh_symmetry_select(idx, comp_key)
 
     @staticmethod
-    def _option_val_to_str(v) -> str:
+    def _option_values_to_strings(value) -> str:
         """
         Convert an option value to its display string.
 
-        :param v: Raw option value (``True``, ``False``, or a scalar).
+        :param value: Raw option value (``True``, ``False``, or specific string).
 
-        :return: Display string (``True`` → ``"on"``, ``False`` → ``"off"``).
+        :return: Display string
         """
-        if v is True:
+        if value is True:
             return "True"
-        if v is False:
+        if value is False:
             return "False"
-        return str(v)
+        return str(value)
 
     @staticmethod
-    def _str_to_option_val(s: str):
+    def _strings_to_option_values(string: str):
         """
         Parse a display string back to a Python value.
 
-        :param s: Display string from the options table.
+        :param string: Display string from the options table.
 
-        :return: ``True`` for ``"on"``, ``False`` for ``"off"``, otherwise tries
-                 ``int`` then ``float`` before returning the raw string.
+        :return: Boolean or string value corresponding to the display string.
         """
-        if s == "True":
+        if string == "True":
             return True
-        if s == "False":
+        if string == "False":
             return False
         try:
-            return int(s)
+            return int(string)
         except (ValueError, TypeError):
             pass
         try:
-            return float(s)
+            return float(string)
         except (ValueError, TypeError):
             pass
-        return s
+        return string
 
     def _refresh_options_table(self, node_type: str, overrides: dict = None):
         """
@@ -1687,36 +1687,44 @@ class PlacementHandler:
         """
         if overrides is None:
             overrides = {}
-        opts_def = self.state.possible_options.get(node_type, {})
-        opt_names = list(opts_def.keys())
+        options_definition = self.state.possible_options.get(node_type, {})
+        option_names = list(options_definition.keys())
         opt_values = []
         new_rows = []
         value_selects = []  # keep references for the sync callback
 
-        for k, v_list in opts_def.items():
-            current = overrides[k] if k in overrides else (v_list[0] if v_list else "")
-            current_str = self._option_val_to_str(current)
+        for option_name, value_list in options_definition.items():
+            current = (
+                overrides[option_name]
+                if option_name in overrides
+                else (value_list[0] if value_list else _EMPTY)
+            )
+            current_string = self._option_values_to_strings(current)
 
             label_input = bkmodel.TextInput(
-                value=k,
+                value=option_name,
                 width=180,
                 disabled=True,
                 styles={"color": "white", "font-size": "14px"},
             )
 
-            choices = [self._option_val_to_str(c) for c in v_list] if v_list else [current_str]
-            if current_str not in choices:
-                choices = [current_str] + choices
+            choices = (
+                [self._option_values_to_strings(choice) for choice in value_list]
+                if (value_list)
+                else [current_string]
+            )
+            if current_string not in choices:
+                choices = [current_string] + choices
 
             value_select = bkmodel.Select(
-                value=current_str,
+                value=current_string,
                 options=choices,
                 width=180,
                 styles={"color": "white", "font-size": "14px"},
             )
 
             new_rows.append(row(label_input, value_select, spacing=4))
-            opt_values.append(current_str)
+            opt_values.append(current_string)
             value_selects.append(value_select)
 
         # Sync every Select change back to options_source so apply_node_configurations reads
@@ -1725,53 +1733,59 @@ class PlacementHandler:
             def _on_change(attr, old, new):
                 self.state.options_source.data = dict(
                     options=names,
-                    value=[s.value for s in selects],
+                    value=[selected.value for selected in selects],
                 )
 
             return _on_change
 
-        sync_cb = _make_sync_callback(value_selects, opt_names)
-        for vs in value_selects:
-            vs.on_change("value", sync_cb)
+        sync_callback = _make_sync_callback(value_selects, option_names)
+        for value_selected in value_selects:
+            value_selected.on_change("value", sync_callback)
 
         if self.state.options_rows_column is not None:
             self.state.options_rows_column.children = new_rows
 
-        self.state.options_source.data = dict(options=opt_names, value=opt_values)
+        self.state.options_source.data = dict(options=option_names, value=opt_values)
 
-    def _refresh_symmetry_select(self, current_node_idx: int, icon_type: str):
+    def _refresh_symmetry_select(self, current_node_index: int, icon_type: str):
         """
         Populate ``symmetry_select`` with the names of all placed nodes that
         share *icon_type* with the currently selected node, excluding the node
         itself.  Prepend an empty sentinel so the user can clear the selection.
 
-        Also restores the previously saved symmetry value for *current_node_idx*
+        Also restores the previously saved symmetry value for *current_node_index*
         when it exists in ``placed_nodes_source``.
 
-        :param current_node_idx: Index of the node being edited.
+        :param current_node_index: Index of the node being edited.
         :param icon_type: The ``icon_type`` key of the selected node.
         """
         if self.state.symmetry_select is None:
             return
 
-        pdata = self.state.placed_nodes_source.data
-        names = list(pdata.get("name", []))
-        icon_types = list(pdata.get("icon_type", []))
-        saved_symmetry = list(pdata.get("symmetry_name", []))
+        placed_nodes_data = self.state.placed_nodes_source.data
+        names = list(placed_nodes_data.get("name", []))
+        icon_types = list(placed_nodes_data.get("icon_type", []))
+        saved_symmetry = list(placed_nodes_data.get("symmetry_name", []))
 
+        # Build a list of all nodes that share the same icon_type, excluding the current node
         peers = [
             names[i]
             for i in range(len(names))
-            if i != current_node_idx and icon_types[i] == icon_type
+            if i != current_node_index and icon_types[i] == icon_type
         ]
-        choices = [""] + peers
+        # Prepend an empty string to allow clearing the selection
+        choices = [_EMPTY] + peers
         self.state.symmetry_select.options = choices
 
         # Restore previously saved symmetry name (if any)
-        current_sym = (
-            saved_symmetry[current_node_idx] if current_node_idx < len(saved_symmetry) else ""
+        current_symmetry_component = (
+            saved_symmetry[current_node_index]
+            if current_node_index < len(saved_symmetry)
+            else _EMPTY
         )
-        self.state.symmetry_select.value = current_sym if current_sym in choices else ""
+        self.state.symmetry_select.value = (
+            current_symmetry_component if (current_symmetry_component in choices) else _EMPTY
+        )
 
     def _clear_node_table(self):
         """
@@ -1783,11 +1797,11 @@ class PlacementHandler:
         empties the dynamic connection rows; and calls :meth:`_rebuild_all_ports`
         so port ball alphas are reset (no node highlighted).
         """
-        self.state.name_input.value = ""
+        self.state.name_input.value = _EMPTY
         self.state.type_select.options = []
-        self.state.type_select.value = ""
+        self.state.type_select.value = _EMPTY
         self.state.position_select.options = []
-        self.state.position_select.value = ""
+        self.state.position_select.value = _EMPTY
         self.state.options_source.data = dict(options=[], value=[])
         if self.state.port_count_section is not None:
             self.state.port_count_section.visible = False
@@ -1808,8 +1822,8 @@ class PlacementHandler:
             self.state.connections_rows_column.children = []
 
         if self.state.symmetry_select is not None:
-            self.state.symmetry_select.options = [""]
-            self.state.symmetry_select.value = ""
+            self.state.symmetry_select.options = [_EMPTY]
+            self.state.symmetry_select.value = _EMPTY
 
         self._rebuild_all_ports()
 
@@ -1838,17 +1852,21 @@ class PlacementHandler:
         ):
             return
 
-        source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
-        target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
-        node_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
-        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        source_data = {
+            key: list(value) for key, value in self.state.source_port_source.data.items()
+        }
+        target_data = {
+            key: list(value) for key, value in self.state.target_port_source.data.items()
+        }
+        node_data = {key: list(value) for key, value in self.state.placed_nodes_source.data.items()}
+        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
 
         # ------------------------------------------------------------------ #
         # Build lookup: (kind, port_label) → (peer_node_idx, peer_label)     #
         # for every edge that touches node_idx.                              #
         # ------------------------------------------------------------------ #
-        connected_src: dict[str, tuple[int, str]] = {}  # src_label → (peer_node, tgt_label)
-        connected_tgt: dict[str, tuple[int, str]] = {}  # tgt_label → (peer_node, src_label)
+        connected_source: dict[str, tuple[int, str]] = {}  # src_label → (peer_node, tgt_label)
+        connected_target: dict[str, tuple[int, str]] = {}  # tgt_label → (peer_node, src_label)
 
         for i in range(len(edge_data.get("node_a_idx", []))):
             na, nb = edge_data["node_a_idx"][i], edge_data["node_b_idx"][i]
@@ -1856,33 +1874,33 @@ class PlacementHandler:
             ak, bk = edge_data["a_kind"][i], edge_data["b_kind"][i]
 
             if na == node_idx and ak == "source":
-                connected_src[al] = (nb, bl)
+                connected_source[al] = (nb, bl)
             elif nb == node_idx and bk == "source":
-                connected_src[bl] = (na, al)
+                connected_source[bl] = (na, al)
             if na == node_idx and ak == "target":
-                connected_tgt[al] = (nb, bl)
+                connected_target[al] = (nb, bl)
             elif nb == node_idx and bk == "target":
-                connected_tgt[bl] = (na, al)
+                connected_target[bl] = (na, al)
 
         # ------------------------------------------------------------------ #
         # Helper: build a display string for a peer port                     #
         # ------------------------------------------------------------------ #
-        def _peer_str(peer_node_idx: int, peer_label: str, peer_kind: str) -> str:
+        def _peer_string(peer_node_index: int, peer_label: str, peer_kind: str) -> str:
             name = (
-                node_data["name"][peer_node_idx]
-                if peer_node_idx < len(node_data.get("name", []))
-                else f"node_{peer_node_idx}"
+                node_data["name"][peer_node_index]
+                if peer_node_index < len(node_data.get("name", []))
+                else f"node_{peer_node_index}"
             )
             return f"{name} ({peer_kind}:{peer_label})"
 
         # ------------------------------------------------------------------ #
         # Helper: given a new Select value string find its (node_idx, label) #
         # ------------------------------------------------------------------ #
-        def _parse_choice(choice_str: str, candidates: list[tuple]) -> tuple | None:
+        def _parse_choice(choice_string: str, candidates: list[tuple]) -> tuple | None:
             """Return (node_idx, label, kind) matching the display string, or None."""
-            for node_i, lbl, kind, disp in candidates:
-                if disp == choice_str:
-                    return node_i, lbl, kind
+            for node_index, label, kind, display_string in candidates:
+                if display_string == choice_string:
+                    return node_index, label, kind
             return None
 
         # ------------------------------------------------------------------ #
@@ -1903,7 +1921,9 @@ class PlacementHandler:
                         target_data["node_index"][j],
                         target_data["label"][j],
                         "target",
-                        _peer_str(target_data["node_index"][j], target_data["label"][j], "target"),
+                        _peer_string(
+                            target_data["node_index"][j], target_data["label"][j], "target"
+                        ),
                     )
                 )
 
@@ -1923,12 +1943,11 @@ class PlacementHandler:
                         source_data["node_index"][j],
                         source_data["label"][j],
                         "source",
-                        _peer_str(source_data["node_index"][j], source_data["label"][j], "source"),
+                        _peer_string(
+                            source_data["node_index"][j], source_data["label"][j], "source"
+                        ),
                     )
                 )
-
-        _EMPTY = ""  # sentinel shown when port has no connection and no free peers
-
         new_rows = []
 
         # ------------------------------------------------------------------ #
@@ -1950,12 +1969,14 @@ class PlacementHandler:
 
             candidates = list(free_targets)
             current_str = _EMPTY
-            if is_connected and src_label in connected_src:
-                peer_node_i, peer_lbl = connected_src[src_label]
-                current_str = _peer_str(peer_node_i, peer_lbl, "target")
+            if is_connected and src_label in connected_source:
+                peer_node_i, peer_lbl = connected_source[src_label]
+                current_str = _peer_string(peer_node_i, peer_lbl, "target")
                 candidates = [
                     c for c in candidates if not (c[0] == peer_node_i and c[1] == peer_lbl)
-                ] + [(peer_node_i, peer_lbl, "target", _peer_str(peer_node_i, peer_lbl, "target"))]
+                ] + [
+                    (peer_node_i, peer_lbl, "target", _peer_string(peer_node_i, peer_lbl, "target"))
+                ]
 
             choices = [_EMPTY] + [c[3] for c in candidates if c[3] != current_str]
             if current_str and current_str not in choices:
@@ -2103,12 +2124,14 @@ class PlacementHandler:
 
             candidates = list(free_sources)
             current_str = _EMPTY
-            if is_connected and tgt_label in connected_tgt:
-                peer_node_i, peer_lbl = connected_tgt[tgt_label]
-                current_str = _peer_str(peer_node_i, peer_lbl, "source")
+            if is_connected and tgt_label in connected_target:
+                peer_node_i, peer_lbl = connected_target[tgt_label]
+                current_str = _peer_string(peer_node_i, peer_lbl, "source")
                 candidates = [
                     c for c in candidates if not (c[0] == peer_node_i and c[1] == peer_lbl)
-                ] + [(peer_node_i, peer_lbl, "source", _peer_str(peer_node_i, peer_lbl, "source"))]
+                ] + [
+                    (peer_node_i, peer_lbl, "source", _peer_string(peer_node_i, peer_lbl, "source"))
+                ]
 
             choices = [_EMPTY] + [c[3] for c in candidates if c[3] != current_str]
             if current_str and current_str not in choices:
@@ -2293,9 +2316,11 @@ class PlacementHandler:
         selected = list(self.state.connections_source.selected.indices)
         if not selected:
             return
-        edge_idx_col = list(self.state.connections_source.data.get("edge_idx", []))
-        to_delete = {edge_idx_col[i] for i in selected if i < len(edge_idx_col)}
-        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        edge_index_list = list(self.state.connections_source.data.get("edge_idx", []))
+        # Build a set of edge indices to delete, filtering out any that are out of bounds
+        to_delete = {edge_index_list[i] for i in selected if i < len(edge_index_list)}
+        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
+        # Rebuild edge_source.data without the deleted edges
         keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
         self.state.edge_source.data = {k: [edge_data[k][j] for j in keep] for k in edge_data}
         _LOGGER.info("Deleted connection(s) at edge indices %s", sorted(to_delete))
@@ -2317,19 +2342,26 @@ class PlacementHandler:
         if self.state.source_port_source is None or self.state.target_port_source is None:
             return
 
-        _SEL_FILL, _SEL_LINE = 0.3, 0.5
-        _DIM_FILL, _DIM_LINE = 0.0, 0.0
+        _selected_fill_alpha, _selected_line_alpha = 0.3, 0.5
 
-        pdata = self.state.placed_nodes_source.data
-        xs = list(pdata.get("x", []))
-        ys = list(pdata.get("y", []))
-        icon_types = list(pdata.get("icon_type", []))
-        node_types = list(pdata.get("node_type", []))
-        node_names = list(pdata.get("name", []))
-        n_sources_list = list(pdata.get("n_sources", []))
-        n_targets_list = list(pdata.get("n_targets", []))
+        placed_nodes_data = self.state.placed_nodes_source.data
+        xs = list(placed_nodes_data.get("x", []))
+        ys = list(placed_nodes_data.get("y", []))
+        icon_types = list(placed_nodes_data.get("icon_type", []))
+        node_types = list(placed_nodes_data.get("node_type", []))
+        node_names = list(placed_nodes_data.get("name", []))
+        n_sources_list = list(placed_nodes_data.get("n_sources", []))
+        n_targets_list = list(placed_nodes_data.get("n_targets", []))
 
-        src_x, src_y, src_color, src_label, src_node_idx, src_node_name, src_node_type = (
+        (
+            source_x,
+            source_y,
+            source_color,
+            source_label,
+            source_node_index,
+            source_node_name,
+            source_node_type,
+        ) = (
             [],
             [],
             [],
@@ -2338,9 +2370,17 @@ class PlacementHandler:
             [],
             [],
         )
-        src_fill_alpha, src_line_alpha = [], []
+        source_fill_alpha, source_line_alpha = [], []
 
-        tgt_x, tgt_y, tgt_color, tgt_label, tgt_node_idx, tgt_node_name, tgt_node_type = (
+        (
+            target_x,
+            target_y,
+            target_color,
+            target_label,
+            target_node_idx,
+            target_node_name,
+            target_node_type,
+        ) = (
             [],
             [],
             [],
@@ -2349,7 +2389,7 @@ class PlacementHandler:
             [],
             [],
         )
-        tgt_fill_alpha, tgt_line_alpha = [], []
+        target_fill_alpha, target_line_alpha = [], []
 
         # Build a set of connected (kind, node_index, label) tuples from edge_source
         connected_ports: set = set()
@@ -2363,8 +2403,8 @@ class PlacementHandler:
                     (edge_data["b_kind"][i], edge_data["node_b_idx"][i], edge_data["b_label"][i])
                 )
 
-        has_sel = self.state.selected_node_index is not None
-        selected_idx = self.state.selected_node_index
+        has_selected_node = self.state.selected_node_index is not None
+        selected_node_index = self.state.selected_node_index
 
         for i, (cx, cy, icon_type, node_type, node_name) in enumerate(
             zip(xs, ys, icon_types, node_types, node_names)
@@ -2386,62 +2426,66 @@ class PlacementHandler:
 
             ports = compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_src, n_tgt)
 
-            is_sel = has_sel and i == selected_idx
-            f_a = _SEL_FILL if is_sel else _DIM_FILL
-            l_a = _SEL_LINE if is_sel else _DIM_LINE
+            is_selected = has_selected_node and i == selected_node_index
+            fill_alpha = _selected_fill_alpha if is_selected else 0.0
+            line_alpha = _selected_line_alpha if is_selected else 0.0
 
-            for p in ports["outputs"]:
-                src_x.append(p["x"])
-                src_y.append(p["y"])
-                src_color.append(raw_src_color)
-                src_label.append(str(p["index"] + 1))
-                src_node_idx.append(i)
-                src_node_name.append([node_name])
-                src_node_type.append([node_type])
-                src_fill_alpha.append(f_a)
-                src_line_alpha.append(l_a)
+            for port in ports["outputs"]:
+                source_x.append(port["x"])
+                source_y.append(port["y"])
+                source_color.append(raw_src_color)
+                source_label.append(str(port["index"] + 1))
+                source_node_index.append(i)
+                source_node_name.append([node_name])
+                source_node_type.append([node_type])
+                source_fill_alpha.append(fill_alpha)
+                source_line_alpha.append(line_alpha)
 
-            for p in ports["inputs"]:
-                tgt_x.append(p["x"])
-                tgt_y.append(p["y"])
-                tgt_color.append(raw_tgt_color)
-                tgt_label.append(str(p["index"] + 1))
-                tgt_node_idx.append(i)
-                tgt_node_name.append([node_name])
-                tgt_node_type.append([node_type])
-                tgt_fill_alpha.append(f_a)
-                tgt_line_alpha.append(l_a)
+            for port in ports["inputs"]:
+                target_x.append(port["x"])
+                target_y.append(port["y"])
+                target_color.append(raw_tgt_color)
+                target_label.append(str(port["index"] + 1))
+                target_node_idx.append(i)
+                target_node_name.append([node_name])
+                target_node_type.append([node_type])
+                target_fill_alpha.append(fill_alpha)
+                target_line_alpha.append(line_alpha)
 
         self.state.source_port_source.data = dict(
-            x=src_x,
-            y=src_y,
-            color=src_color,
-            label=src_label,
-            node_index=src_node_idx,
-            node_name=src_node_name,
-            node_type=src_node_type,
-            fill_alpha=src_fill_alpha,
-            line_alpha=src_line_alpha,
-            kind=["source"] * len(src_x),
+            x=source_x,
+            y=source_y,
+            color=source_color,
+            label=source_label,
+            node_index=source_node_index,
+            node_name=source_node_name,
+            node_type=source_node_type,
+            fill_alpha=source_fill_alpha,
+            line_alpha=source_line_alpha,
+            kind=["source"] * len(source_x),
             connected=[
-                "True" if ("source", src_node_idx[i], src_label[i]) in connected_ports else "False"
-                for i in range(len(src_x))
+                "True"
+                if ("source", source_node_index[i], source_label[i]) in connected_ports
+                else "False"
+                for i in range(len(source_x))
             ],
         )
         self.state.target_port_source.data = dict(
-            x=tgt_x,
-            y=tgt_y,
-            color=tgt_color,
-            label=tgt_label,
-            node_index=tgt_node_idx,
-            node_name=tgt_node_name,
-            node_type=tgt_node_type,
-            fill_alpha=tgt_fill_alpha,
-            line_alpha=tgt_line_alpha,
-            kind=["target"] * len(tgt_x),
+            x=target_x,
+            y=target_y,
+            color=target_color,
+            label=target_label,
+            node_index=target_node_idx,
+            node_name=target_node_name,
+            node_type=target_node_type,
+            fill_alpha=target_fill_alpha,
+            line_alpha=target_line_alpha,
+            kind=["target"] * len(target_x),
             connected=[
-                "True" if ("target", tgt_node_idx[i], tgt_label[i]) in connected_ports else "False"
-                for i in range(len(tgt_x))
+                "True"
+                if ("target", target_node_idx[i], target_label[i]) in connected_ports
+                else "False"
+                for i in range(len(target_x))
             ],
         )
         self._rebuild_edges()
@@ -2621,7 +2665,7 @@ class PlacementHandler:
         # Resolve default node_type and position from lookup tables
         default_type = self.state.component_type_to_icon.get(comp_key, comp_key)[0]
         position_choices = self.state.possible_position.get(default_type, [])
-        default_position = position_choices[0] if position_choices else ""
+        default_position = position_choices[0] if position_choices else _EMPTY
 
         # Build default options JSON from possible_options
         opts_def = self.state.possible_options.get(default_type, {})
@@ -2918,7 +2962,7 @@ class PowertrainBuilderLauncher:
             def _on_type_select_change(attr, old, new):
                 pos_choices = state.possible_position.get(new, [])
                 state.position_select.options = pos_choices
-                state.position_select.value = pos_choices[0] if pos_choices else ""
+                state.position_select.value = pos_choices[0] if pos_choices else _EMPTY
                 idx = state.selected_node_index
                 saved_opts = {}
                 if idx is not None:
@@ -2938,69 +2982,73 @@ class PowertrainBuilderLauncher:
                 # so look up the icon_type of the currently selected node.
                 if idx is not None:
                     icon_types = list(state.placed_nodes_source.data.get("icon_type", []))
-                    icon_type = icon_types[idx] if idx < len(icon_types) else ""
+                    icon_type = icon_types[idx] if idx < len(icon_types) else _EMPTY
                     handler._refresh_symmetry_select(idx, icon_type)
 
             state.type_select.on_change("value", _on_type_select_change)
 
             # Write config panel values back to placed_nodes_source on Apply
             def apply_node_configurations():
-                idx = state.selected_node_index
-                if idx is None:
+                selected_node_index = state.selected_node_index
+                if selected_node_index is None:
                     return
                 new_om_name = state.name_input.value
                 new_node_type = state.type_select.value
                 new_position = state.position_select.value
 
                 # Collect and encode options as JSON
-                opt_names = list(state.options_source.data.get("options", []))
-                opt_vals = list(state.options_source.data.get("value", []))
-                opts_dict = {
-                    k: PlacementHandler._str_to_option_val(v) for k, v in zip(opt_names, opt_vals)
+                option_names = list(state.options_source.data.get("options", []))
+                option_values = list(state.options_source.data.get("value", []))
+                options_dict = {
+                    name: PlacementHandler._strings_to_option_values(value)
+                    for name, value in zip(option_names, option_values)
                 }
-                opts_json = json.dumps(opts_dict)
+                opts_json = json.dumps(options_dict)
 
-                pdata = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
-                if idx < len(pdata.get("name", [])):
-                    pdata["name"][idx] = new_om_name
-                if idx < len(pdata.get("node_type", [])):
-                    pdata["node_type"][idx] = new_node_type
+                pdata = {
+                    property: list(value)
+                    for property, value in state.placed_nodes_source.data.items()
+                }
+                if selected_node_index < len(pdata.get("name", [])):
+                    pdata["name"][selected_node_index] = new_om_name
+                if selected_node_index < len(pdata.get("node_type", [])):
+                    pdata["node_type"][selected_node_index] = new_node_type
                     # If the node_type changed, we may need to reset port counts to defaults for the new type
                     if not state.source_count_spinner.visible:
-                        pdata["n_sources"][idx] = int(
+                        pdata["n_sources"][selected_node_index] = int(
                             state.default_source_count.get(new_node_type, 0)
                         )
-                        pdata["n_targets"][idx] = int(
+                        pdata["n_targets"][selected_node_index] = int(
                             state.default_target_count.get(new_node_type, 0)
                         )
-                if idx < len(pdata.get("position", [])):
-                    pdata["position"][idx] = new_position
+                if selected_node_index < len(pdata.get("position", [])):
+                    pdata["position"][selected_node_index] = new_position
                 if "options" not in pdata:
                     pdata["options"] = ["{}"] * len(pdata.get("name", []))
-                if idx < len(pdata["options"]):
-                    pdata["options"][idx] = opts_json
+                if selected_node_index < len(pdata["options"]):
+                    pdata["options"][selected_node_index] = opts_json
                 # Update port counts if the spinners are visible (i.e. editable for this component)
                 if state.source_count_spinner is not None and state.source_count_spinner.visible:
                     new_n_src = int(state.source_count_spinner.value)
-                    if "n_sources" in pdata and idx < len(pdata["n_sources"]):
-                        pdata["n_sources"][idx] = new_n_src
+                    if "n_sources" in pdata and selected_node_index < len(pdata["n_sources"]):
+                        pdata["n_sources"][selected_node_index] = new_n_src
 
                 if state.target_count_spinner is not None and state.target_count_spinner.visible:
                     new_n_tgt = int(state.target_count_spinner.value)
-                    if "n_targets" in pdata and idx < len(pdata["n_targets"]):
-                        pdata["n_targets"][idx] = new_n_tgt
+                    if "n_targets" in pdata and selected_node_index < len(pdata["n_targets"]):
+                        pdata["n_targets"][selected_node_index] = new_n_tgt
                 state.placed_nodes_source.data = pdata
 
                 hdata = {k: list(v) for k, v in state.hover_source.data.items()}
-                if idx < len(hdata.get("name", [])):
-                    hdata["name"][idx] = new_om_name
-                if idx < len(hdata.get("node_type", [])):
-                    hdata["node_type"][idx] = new_node_type
+                if selected_node_index < len(hdata.get("name", [])):
+                    hdata["name"][selected_node_index] = new_om_name
+                if selected_node_index < len(hdata.get("node_type", [])):
+                    hdata["node_type"][selected_node_index] = new_node_type
                 state.hover_source.data = hdata
 
                 # ── Symmetry: persist selected symmetry peer ─────────────────
                 new_sym_name = (
-                    state.symmetry_select.value if state.symmetry_select is not None else ""
+                    state.symmetry_select.value if state.symmetry_select is not None else _EMPTY
                 )
                 pdata2 = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
                 names_list = pdata2.get("name", [])
@@ -3015,31 +3063,35 @@ class PowertrainBuilderLauncher:
 
                 # Write this node's symmetry columns
                 if "symmetry_name" not in pdata2:
-                    pdata2["symmetry_name"] = [""] * len(names_list)
+                    pdata2["symmetry_name"] = [_EMPTY] * len(names_list)
                 if "symmetry_node_index" not in pdata2:
                     pdata2["symmetry_node_index"] = [-1] * len(names_list)
-                if idx < len(pdata2["symmetry_name"]):
-                    pdata2["symmetry_name"][idx] = new_sym_name
-                if idx < len(pdata2["symmetry_node_index"]):
-                    pdata2["symmetry_node_index"][idx] = sym_peer_idx
+                if selected_node_index < len(pdata2["symmetry_name"]):
+                    pdata2["symmetry_name"][selected_node_index] = new_sym_name
+                if selected_node_index < len(pdata2["symmetry_node_index"]):
+                    pdata2["symmetry_node_index"][selected_node_index] = sym_peer_idx
 
                 # Sync back: if the peer exists, point it to this node so that
                 # when the peer is selected its symmetry_select default is correct.
-                current_node_name = names_list[idx] if idx < len(names_list) else ""
+                current_node_name = (
+                    names_list[selected_node_index]
+                    if selected_node_index < len(names_list)
+                    else _EMPTY
+                )
                 if sym_peer_idx >= 0:
                     if sym_peer_idx < len(pdata2["symmetry_name"]):
                         pdata2["symmetry_name"][sym_peer_idx] = current_node_name
                     if sym_peer_idx < len(pdata2["symmetry_node_index"]):
-                        pdata2["symmetry_node_index"][sym_peer_idx] = idx
+                        pdata2["symmetry_node_index"][sym_peer_idx] = selected_node_index
                 # If symmetry was cleared, also clear the old peer's back-reference
                 elif not new_sym_name:
                     for _j in range(len(names_list)):
                         if (
-                            _j != idx
+                            _j != selected_node_index
                             and _j < len(pdata2["symmetry_name"])
                             and pdata2["symmetry_name"][_j] == current_node_name
                         ):
-                            pdata2["symmetry_name"][_j] = ""
+                            pdata2["symmetry_name"][_j] = _EMPTY
                             if _j < len(pdata2["symmetry_node_index"]):
                                 pdata2["symmetry_node_index"][_j] = -1
 
@@ -3052,7 +3104,7 @@ class PowertrainBuilderLauncher:
                 handler._rebuild_all_ports()
                 # Refresh the connections panel so it reflects the newly committed
                 # edges and keeps connections_source in sync with edge_source.
-                handler._refresh_connections_table(idx)
+                handler._refresh_connections_table(selected_node_index)
 
                 _cs = state.connections_source.data if state.connections_source is not None else {}
                 _ed = state.edge_source.data if state.edge_source is not None else {}
@@ -3061,13 +3113,21 @@ class PowertrainBuilderLauncher:
                 for _i in range(len(_ed.get("node_a_idx", []))):
                     _na = _ed["node_a_idx"][_i]
                     _nb = _ed["node_b_idx"][_i]
-                    if _na == idx or _nb == idx:
-                        _peer = _nb if _na == idx else _na
+                    if _na == selected_node_index or _nb == selected_node_index:
+                        _peer = _nb if _na == selected_node_index else _na
                         _peer_name = _names[_peer] if _peer < len(_names) else f"node_{_peer}"
-                        _my_kind = _ed["a_kind"][_i] if _na == idx else _ed["b_kind"][_i]
-                        _my_lbl = _ed["a_label"][_i] if _na == idx else _ed["b_label"][_i]
-                        _pr_kind = _ed["b_kind"][_i] if _na == idx else _ed["a_kind"][_i]
-                        _pr_lbl = _ed["b_label"][_i] if _na == idx else _ed["a_label"][_i]
+                        _my_kind = (
+                            _ed["a_kind"][_i] if _na == selected_node_index else _ed["b_kind"][_i]
+                        )
+                        _my_lbl = (
+                            _ed["a_label"][_i] if _na == selected_node_index else _ed["b_label"][_i]
+                        )
+                        _pr_kind = (
+                            _ed["b_kind"][_i] if _na == selected_node_index else _ed["a_kind"][_i]
+                        )
+                        _pr_lbl = (
+                            _ed["b_label"][_i] if _na == selected_node_index else _ed["a_label"][_i]
+                        )
                         _conn_entries.append(
                             {
                                 "my_port": f"{_my_kind}:{_my_lbl}",
@@ -3078,7 +3138,7 @@ class PowertrainBuilderLauncher:
                 connections_json = json.dumps(_conn_entries)
                 _LOGGER.info(
                     "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
-                    idx,
+                    selected_node_index,
                     new_om_name,
                     new_node_type,
                     new_position,
