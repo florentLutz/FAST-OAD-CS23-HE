@@ -37,7 +37,12 @@ class PowerTrainYAML:
         component_type = self.node_data["node_type"][node_index]
         source_count = self.node_data["n_sources"][node_index]
         target_count = self.node_data["n_targets"][node_index]
-        symetry = self.node_data["symmetry_name"][node_index]
+        symmetry_node_index = self.node_data["symmetry_node_index"][node_index]
+        symetry = (
+            self.node_data["symmetry_name"][node_index]
+            if symmetry_node_index < node_index
+            else None
+        )
         component_id = next(
             (comp for comp in KNOWN_COMPONENTS if comp["components_type"] == component_type), None
         )["id"]

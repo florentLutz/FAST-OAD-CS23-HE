@@ -26,7 +26,7 @@ from ..power_train_network_builder import (
     BUTTON_DEFAULT_COLOR_TYPE,
     BUTTON_SELECTED_COLOR_TYPE,
     ICONS_CONFIG,
-    ComponentPaletteBuilder,
+    ComponentPaletteConfigurationTableBuilder,
     BuilderState,
     PlacementHandler,
     PowertrainBuilderLauncher,
@@ -66,60 +66,60 @@ class TestComponentPaletteBuilder:
     """Tests for the palette builder."""
 
     def test_build_returns_tuple(self):
-        result = ComponentPaletteBuilder.build()
+        result = ComponentPaletteConfigurationTableBuilder.build()
         assert isinstance(result, tuple) and len(result) == 2
 
     def test_state_type(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert isinstance(state, BuilderState)
 
     def test_button_count_matches_components(self):
         """One button must be created for every entry in ICONS_CONFIG."""
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert len(state.buttons) == len(ICONS_CONFIG)
 
     def test_buttons_are_bokeh_buttons(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         for btn in state.buttons:
             assert isinstance(btn, bkmodel.Button)
 
     def test_button_labels_cleaned(self):
         """Button labels must equal _string_cleanup of each ICONS_CONFIG key."""
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         keys = list(ICONS_CONFIG.keys())
         for btn, key in zip(state.buttons, keys):
             assert btn.label == _string_cleanup(key)
 
     def test_buttons_initially_default_type(self):
         """No button should appear selected before any interaction."""
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         for btn in state.buttons:
             assert btn.button_type == BUTTON_DEFAULT_COLOR_TYPE
 
     def test_placed_nodes_source_initially_empty(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert state.placed_nodes_source.data["x"] == []
         assert state.placed_nodes_source.data["name"] == []
 
     def test_selected_component_initially_none(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert state.selected_component is None
 
     def test_placed_counter_initially_empty(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert state.placed_counter == {}
 
     def test_status_div_exists(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert isinstance(state.status_div, bkmodel.Div)
 
     def test_status_div_initial_text_not_empty(self):
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         assert len(state.status_div.text) > 0
 
     def test_layout_contains_buttons(self):
         """The returned layout column must contain all button widgets."""
-        layout, state = ComponentPaletteBuilder.build()
+        layout, state = ComponentPaletteConfigurationTableBuilder.build()
         # Collect all widgets in the column children
         children = list(layout.children)
         for btn in state.buttons:
@@ -135,7 +135,7 @@ class TestPlacementHandlerPaletteSelect:
     """Tests for on_palette_select."""
 
     def setup_method(self):
-        _layout, self.state = ComponentPaletteBuilder.build()
+        _layout, self.state = ComponentPaletteConfigurationTableBuilder.build()
         self.canvas = _make_canvas()
         self.handler = PlacementHandler(self.state, self.canvas)
 
@@ -200,7 +200,7 @@ class TestPlacementHandlerCanvasTap:
     """Tests for on_canvas_tap."""
 
     def setup_method(self):
-        _layout, self.state = ComponentPaletteBuilder.build()
+        _layout, self.state = ComponentPaletteConfigurationTableBuilder.build()
         self.canvas = _make_canvas()
         self.handler = PlacementHandler(self.state, self.canvas)
 
@@ -281,7 +281,7 @@ class TestPlacementHandlerCanvasTap:
         assert self.state.placed_nodes_source.data["h"][0] == self.handler.icon_size
 
     def test_custom_icon_size(self):
-        _layout2, state2 = ComponentPaletteBuilder.build()
+        _layout2, state2 = ComponentPaletteConfigurationTableBuilder.build()
         canvas2 = _make_canvas()
         handler2 = PlacementHandler(state2, canvas2, icon_size=48)
         handler2.on_palette_select(0)
@@ -293,7 +293,7 @@ class TestPlacementHandlerCanvasTap:
     @pytest.mark.parametrize("idx", range(len(ICONS_CONFIG)))
     def test_each_component_can_be_placed(self, idx):
         """Every component type in ICONS_CONFIG must be placeable without error."""
-        _layout, state = ComponentPaletteBuilder.build()
+        _layout, state = ComponentPaletteConfigurationTableBuilder.build()
         canvas = _make_canvas()
         handler = PlacementHandler(state, canvas)
         handler.on_palette_select(idx)

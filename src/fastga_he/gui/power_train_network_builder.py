@@ -531,7 +531,7 @@ def _get_performance_component_names(
 # ============================================================================
 
 
-class ComponentPaletteBuilder:
+class ComponentPaletteConfigurationTableBuilder:
     """
     Build the palette sidebar as a column of Bokeh ``Button`` widgets.
 
@@ -1566,9 +1566,9 @@ class PlacementHandler:
         node_type = list(pdata.get("node_type", []))[idx]
         comp_key = list(pdata.get("icon_type", []))[idx]
         position = list(pdata.get("position", []))[idx] if pdata.get("position") else _EMPTY
-        saved_opts_json = list(pdata.get("options", []))[idx] if pdata.get("options") else "{}"
+        saved_options_json = list(pdata.get("options", []))[idx] if pdata.get("options") else "{}"
 
-        if saved_opts_json != "{}":
+        if saved_options_json != "{}":
             self.state.options_table.visible = True
         else:
             self.state.options_table.visible = False
@@ -1591,13 +1591,13 @@ class PlacementHandler:
             self.state.position_select.value = ""
 
         # Restore saved option values; fall back to defaults from state.possible_options
-        saved_opts: dict = {}
+        saved_options: dict = {}
         try:
-            saved_opts = json.loads(saved_opts_json) if saved_opts_json else {}
+            saved_options = json.loads(saved_options_json) if saved_options_json else {}
         except (json.JSONDecodeError, TypeError):
             pass
 
-        self._refresh_options_table(node_type, saved_opts)
+        self._refresh_options_table(node_type, saved_options)
 
         # Show / update port-count spinners for editable components (default count == 3)
         n_src_default = self.state.default_source_count.get(node_type, 0)
@@ -2751,7 +2751,7 @@ class PowertrainBuilderLauncher:
 
         def make_document(doc):
             """Build the Bokeh document with palette, canvas, and configration panel."""
-            palette_layout, table_panel, state = ComponentPaletteBuilder.build()
+            palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
 
             # Blank canvas sized to accommodate all component rows
             canvas = bkplot.figure(
@@ -2964,15 +2964,15 @@ class PowertrainBuilderLauncher:
                 state.position_select.options = pos_choices
                 state.position_select.value = pos_choices[0] if pos_choices else _EMPTY
                 idx = state.selected_node_index
-                saved_opts = {}
+                saved_options = {}
                 if idx is not None:
-                    saved_opts_json = list(state.placed_nodes_source.data.get("options", []))
-                    if idx < len(saved_opts_json):
+                    saved_options_json = list(state.placed_nodes_source.data.get("options", []))
+                    if idx < len(saved_options_json):
                         try:
-                            saved_opts = json.loads(saved_opts_json[idx]) or {}
+                            saved_options = json.loads(saved_options_json[idx]) or {}
                         except (json.JSONDecodeError, TypeError):
                             pass
-                handler._refresh_options_table(new, saved_opts)
+                handler._refresh_options_table(new, saved_options)
 
                 # Update options table visibility based on whether the new type has any options
                 opts_def = state.possible_options.get(new, {})
