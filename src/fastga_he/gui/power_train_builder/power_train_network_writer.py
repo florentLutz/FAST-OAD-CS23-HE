@@ -8,7 +8,7 @@ import logging
 from io import StringIO
 from ruamel.yaml import YAML
 
-from ..powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
+from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -159,7 +159,8 @@ class PowerTrainYAML:
     def set_watcher_file_path(self, path):
         self.data["watcher_file_path"] = path
 
-    def write(self, filepath):
+    def _build_output(self) -> str:
+        """Serialise and format the YAML content, returning it as a string."""
         yaml = YAML()
         yaml.default_flow_style = False
         yaml.indent(mapping=2, sequence=4, offset=2)
@@ -188,5 +189,13 @@ class PowerTrainYAML:
         # Add blank line between each component under power_train_components (2-space indented keys)
         output = re.sub(r"\n(\s{2}\w)", r"\n\n\1", output)
 
+        return output
+
+    def write(self, filepath):
+        """Write the formatted YAML content to a file on disk."""
         with open(filepath, "w", encoding="utf-8") as f:
-            f.write(output)
+            f.write(self._build_output())
+
+    def write_to_stream(self, stream) -> None:
+        """Write the formatted YAML content to an open file-like object (e.g. io.StringIO)."""
+        stream.write(self._build_output())
