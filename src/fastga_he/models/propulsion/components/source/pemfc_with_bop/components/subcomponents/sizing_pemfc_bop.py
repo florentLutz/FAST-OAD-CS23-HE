@@ -10,7 +10,7 @@ from .coolant_tank import SizingCoolantTank
 from .diffuser import SizingDiffuser
 from .heat_exchanger import SizingHeatExchanger
 from .humidifier import SizingHumidifier
-from .scoop_inlet import SizingScoopInlet
+from .inlet import SizingInlet
 from .nozzle import SizingNozzle
 from .pipe import SizingPipe
 from .pump import SizingPumpWeight
@@ -140,7 +140,7 @@ class SizingPEMFCBOP(om.Group):
         )
         self.add_subsystem(
             "air_inlet",
-            SizingScoopInlet(
+            SizingInlet(
                 air_inlet_id=air_inlet_id,
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
             ),

@@ -1222,7 +1222,7 @@ def test_bop_sizing():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:bop_mass",
         units="kg",
-    ) == pytest.approx(98.0, rel=1e-2)
+    ) == pytest.approx(88.3, rel=1e-2)
 
     problem.output_file_path = RESULTS_FOLDER_PATH / "test_bop_sizing_outputs.xml"
 

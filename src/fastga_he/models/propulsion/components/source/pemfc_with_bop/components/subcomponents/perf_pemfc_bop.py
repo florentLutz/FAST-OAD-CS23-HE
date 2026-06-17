@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 from .compressor import PerformancesCompressor
-from .scoop_inlet import PerformancesScoopInlet
+from .inlet import PerformancesInlet
 from .heat_exchanger import PerformancesHeatExchanger
 from .humidifier import PerformancesHumidifier
 from .pipe import PerformancesPipe
@@ -133,7 +133,7 @@ class PerformancesPEMFCBOP(om.Group):
         )
         self.add_subsystem(
             "air_inlet",
-            PerformancesScoopInlet(
+            PerformancesInlet(
                 pemfc_stack_bop_id=pemfc_stack_bop_id,
                 air_inlet_id=air_inlet_id,
                 number_of_points=number_of_points,
