@@ -30,7 +30,6 @@ from tornado.ioloop import IOLoop
 from fastga_he.gui.power_train_network_viewer import BACKGROUND_COLOR_CODE
 
 from .power_train_builder_state import (
-    BuilderState,
     ICON_SIZE,
     NODE_SELECT_COLOR,
     PALETTE_WIDTH,
@@ -495,6 +494,11 @@ class PowertrainBuilderLauncher:
             doc.add_root(row(palette_layout, canvas, table_panel))
             state.startup_overlay = startup_overlay
             doc.add_root(startup_overlay)
+            # Save-options overlay (watcher path dialog) – floats above the canvas.
+            # state.save_overlay was created and wired in ComponentPaletteConfigurationTableBuilder;
+            # it is already visible=False and will be shown by the Save button's CustomJS.
+            if state.save_overlay is not None:
+                doc.add_root(state.save_overlay)
             doc.title = "Powertrain Builder"
 
         def make_document_with_tracking(doc):

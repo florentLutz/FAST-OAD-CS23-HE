@@ -171,17 +171,17 @@ class BuilderState:
     component_type_to_icon: dict = field(default_factory=dict)
     possible_position: dict = field(default_factory=dict)  # component_type -> list of positions
     possible_options: dict = field(default_factory=dict)
-    # component_type -> option name -> list of option values
-    # Hidden TextInput widgets used to relay file paths chosen via browser prompt() back to Python
-    json_path_input: bkmodel.TextInput = field(default=None)
-    yaml_path_input: bkmodel.TextInput = field(default=None)
-    # Hidden TextInput used to relay the JSON path chosen in the Load Design dialog
-    load_path_input: bkmodel.TextInput = field(default=None)
-    # Hidden TextInput used to push serialised YAML/JSON content from Python to the browser
-    # for writing via the FileSystem Access API (showSaveFilePicker / createWritable).
-    save_content_output: bkmodel.TextInput = field(default=None)
+    # Watcher file path: visible TextInput in the save overlay where the user types or
+    # browses to a watcher file path; its value is read by Python at save time.
+    watcher_path_input: bkmodel.TextInput = field(default=None)
+    # The save-options overlay column – shown by the Save button before the file dialogs open.
+    save_overlay: object = field(default=None)
     # Startup overlay buttons shown on the canvas before the first action
     new_design_button: bkmodel.Button = field(default=None)
     load_design_button: bkmodel.Button = field(default=None)
     # The whole startup overlay column – hidden (not just its buttons) on dismiss
     startup_overlay: object = field(default=None)
+    # Toggle triggers: JS flips '0'/'1' to fire Python on_change callbacks.
+    browse_load_trigger: bkmodel.TextInput = field(default=None)
+    browse_save_trigger: bkmodel.TextInput = field(default=None)
+    browse_watcher_trigger: bkmodel.TextInput = field(default=None)

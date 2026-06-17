@@ -50,177 +50,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 COMPONENTS_PATH = Path(__file__).resolve().parents[3] / "fastga_he/models/propulsion/components"
 
 # ── Load dialog ───────────────────────────────────────────────────────────────
-# When showOpenFilePicker is available (Chrome/Edge/Opera) the file's full text
-# content is read in JS and written into load_path_input so Python never needs
-# an OS path.  The prompt() fallback still sends a raw filesystem path (the
-# server must be on the same machine, as before).
+# Toggles browse_load_trigger to signal Python to open a tkinter open-file dialog.
 _JS_LOAD_DIALOG = """
-(async () => {
-    if (typeof window.showOpenFilePicker === 'function') {
-        // ── Native OS "Open" dialog (Chrome / Edge / Opera) ─────────────────
-        try {
-            const [fileHandle] = await window.showOpenFilePicker({
-                types: [{
-                    description: 'JSON canvas state backup',
-                    accept: { 'application/json': ['.json'] },
-                }],
-                multiple: false,
-            });
-            // Read the actual file content – no OS path needed
-            const file = await fileHandle.getFile();
-            const content = await file.text();
-            load_input.value = content;
-        } catch (e) {
-            if (e.name !== 'AbortError') { throw e; }
-            // User cancelled – do nothing
-        }
-    } else {
-        // ── Fallback: window.prompt() ────────────────────────────────────────
-        const raw = window.prompt('Load JSON canvas state – enter the full file path:');
-        if (raw === null || raw.trim() === '') { return; }
-        load_input.value = raw.trim();
-    }
-})();
+browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';
 """
 
-# ── Save click dialog ─────────────────────────────────────────────────────────
-# Fired by the Save button click.  Opens the OS file-picker dialogs to let the
-# user choose filenames/locations, then signals Python by writing a bundle into
-# yaml_path_input.  Python serialises the canvas and pushes the content strings
-# back through save_content_output (see _JS_WRITE_CONTENT below).
-# The prompt() fallback sends bare filenames for Python to write server-side.
+# ── Save click: show watcher-path overlay ─────────────────────────────────────
 _JS_SAVE_CLICK = """
-(async () => {
-    const now = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    const ts = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_` +
-               `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-
-    let yamlName = null;
-    let jsonName = null;
-    let useBrowserWrite = false;
-
-    if (typeof window.showSaveFilePicker === 'function') {
-        useBrowserWrite = true;
-
-        // ── YAML dialog first (primary file) ────────────────────────────────
-        try {
-            const yamlHandle = await window.showSaveFilePicker({
-                suggestedName: `powertrain_config_${ts}.yml`,
-                types: [{
-                    description: 'YAML powertrain configuration',
-                    accept: { 'text/yaml': ['.yml', '.yaml'] },
-                }],
-            });
-            // Store handle on window so _JS_WRITE_CONTENT can access it
-            window._ptb_yaml_handle = yamlHandle;
-            yamlName = yamlHandle.name;
-        } catch (e) {
-            if (e.name !== 'AbortError') { throw e; }
-            window._ptb_yaml_handle = null;
-        }
-
-        // ── JSON dialog second (backup file) ────────────────────────────────
-        try {
-            const jsonHandle = await window.showSaveFilePicker({
-                suggestedName: `canvas_state_${ts}.json`,
-                types: [{
-                    description: 'JSON canvas state backup',
-                    accept: { 'application/json': ['.json'] },
-                }],
-            });
-            window._ptb_json_handle = jsonHandle;
-            jsonName = jsonHandle.name;
-        } catch (e) {
-            if (e.name !== 'AbortError') { throw e; }
-            window._ptb_json_handle = null;
-        }
-
-    } else {
-        // ── Fallback: window.prompt() ────────────────────────────────────────
-        const rawYaml = window.prompt(
-            'YAML powertrain config – enter a file name (Cancel to skip):',
-            `powertrain_config_${ts}.yml`
-        );
-        if (rawYaml !== null && rawYaml.trim() !== '') {
-            yamlName = rawYaml.trim();
-        }
-
-        const rawJson = window.prompt(
-            'JSON backup file – enter a file name (Cancel to skip):',
-            `canvas_state_${ts}.json`
-        );
-        if (rawJson !== null && rawJson.trim() !== '') {
-            jsonName = rawJson.trim();
-        }
-    }
-
-    // Both dialogs cancelled → do nothing
-    if (yamlName === null && jsonName === null) { return; }
-
-    // Signal Python: send chosen names + flag so it knows which save path to use
-    save_btn.button_type = 'warning';
-    yaml_input.value = JSON.stringify({
-        yaml:             yamlName  || '',
-        json:             jsonName  || '',
-        ts:               ts,
-        use_browser_write: useBrowserWrite,
-    });
-})();
-"""
-
-# ── Write content callback ────────────────────────────────────────────────────
-# Fired by an on_change on save_content_output when Python pushes the serialised
-# YAML/JSON strings back to the browser.  Uses the FileSystemFileHandle objects
-# stored by _JS_SAVE_CLICK to write directly, or falls back to blob downloads.
-_JS_WRITE_CONTENT = """
-(async () => {
-    if (!cb_obj.value || cb_obj.value === '') { return; }
-
-    let bundle;
-    try {
-        bundle = JSON.parse(cb_obj.value);
-    } catch (e) {
-        console.error('PTB: could not parse save bundle', e);
-        return;
-    }
-
-    if (typeof window.showSaveFilePicker === 'function') {
-        // Write via the stored FileSystemFileHandle objects
-        if (bundle.yaml && window._ptb_yaml_handle) {
-            try {
-                const writable = await window._ptb_yaml_handle.createWritable();
-                await writable.write(bundle.yaml);
-                await writable.close();
-                window._ptb_yaml_handle = null;
-            } catch (e) { console.error('PTB: YAML write failed', e); }
-        }
-        if (bundle.json && window._ptb_json_handle) {
-            try {
-                const writable = await window._ptb_json_handle.createWritable();
-                await writable.write(bundle.json);
-                await writable.close();
-                window._ptb_json_handle = null;
-            } catch (e) { console.error('PTB: JSON write failed', e); }
-        }
-    } else {
-        // Fallback: trigger browser blob downloads
-        ['yaml', 'json'].forEach(type => {
-            if (!bundle[type]) { return; }
-            const mime = type === 'yaml' ? 'text/yaml' : 'application/json';
-            const blob = new Blob([bundle[type]], { type: mime });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = type === 'yaml'
-                ? `powertrain_config_${bundle.ts}.yml`
-                : `canvas_state_${bundle.ts}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-        });
-    }
-})();
+save_overlay_widget.visible = true;
 """
 
 
@@ -350,18 +187,18 @@ class ComponentPaletteConfigurationTableBuilder:
         end_session_button.js_on_click(bkmodel.CustomJS(code="window.close();"))
 
         # ── Hidden TextInput relay widgets ────────────────────────────────────
-        # load_path_input  : JS → Python  (file content or fallback path)
-        # yaml_path_input  : JS → Python  (save-dialog signal bundle)
-        # save_content_output : Python → JS  (serialised YAML+JSON content)
-        # json_path_input  : retained for BuilderState compat (unused in new flow)
-        json_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
-        yaml_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
-        load_path_input = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
-        save_content_output = bkmodel.TextInput(value=_EMPTY, width=0, height=0, visible=False)
+        # Three toggle triggers: JS flips '0'/'1' to fire Python on_change callbacks.
+        # browse_load_trigger    → _on_browse_load    (opens tkinter open-file dialog)
+        # browse_save_trigger    → _on_browse_save    (opens tkinter save-file dialogs)
+        # browse_watcher_trigger → _on_browse_watcher (opens tkinter save-file dialog for CSV)
 
-        # ── Wire load dialog to both Load Design buttons (tmp + overlay) ──────
+        browse_load_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        browse_watcher_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+
+        # ── Wire Load Design buttons → signal Python to open tkinter dialog ───
         _load_js = bkmodel.CustomJS(
-            args=dict(load_input=load_path_input),
+            args=dict(browse_load_trigger=browse_load_trigger),
             code=_JS_LOAD_DIALOG,
         )
 
@@ -375,24 +212,113 @@ class ComponentPaletteConfigurationTableBuilder:
         )
         load_design_button_tmp.js_on_click(_load_js)
 
-        # ── Wire Save button: click → open OS dialogs → signal Python ─────────
+        # ── Watcher-path overlay widgets ──────────────────────────────────────
+        # Built here (palette) so they can be wired to JS args; registered in
+        # BuilderState so the launcher can add the overlay to the document and
+        # the handler can read watcher_path_input.value at save time.
+        watcher_path_input = bkmodel.TextInput(
+            title="Watcher file path (optional):",
+            value=_EMPTY,
+            width=340,
+            placeholder="Leave blank to skip",
+            styles={"color": "white", "font-size": "14px"},
+            # visible=False
+        )
+        _browse_watcher_btn = bkmodel.Button(
+            label="...",
+            button_type="light",
+            width=40,
+            height=31,
+        )
+        _browse_watcher_btn.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(browse_trigger=browse_watcher_trigger),
+                code="browse_trigger.value = browse_trigger.value === '1' ? '0' : '1';",
+            )
+        )
+        _continue_save_btn = bkmodel.Button(
+            label="Continue to Save",
+            icon=bkmodel.TablerIcon(icon_name="device-floppy"),
+            button_type="primary",
+            width=200,
+            height=40,
+        )
+        _cancel_watcher_btn = bkmodel.Button(
+            label="Cancel",
+            button_type="light",
+            width=100,
+            height=40,
+        )
+
+        # The overlay column – hidden until the Save button is clicked
+        save_overlay = column(
+            bkmodel.Div(
+                text=(
+                    "<div style='"
+                    "color:white;font-size:22pt;font-weight:bold;"
+                    "text-align:center;padding:24px 0 18px 0;letter-spacing:0.04em;"
+                    "'>Save Design</div>"
+                    "<div style='"
+                    "color:#aaa;font-size:12pt;"
+                    "text-align:center;padding-bottom:28px;"
+                    "'>Optionally specify a watcher file path, then click "
+                    "<b>Continue</b> to choose output locations.</div>"
+                ),
+                width=500,
+            ),
+            row(
+                watcher_path_input,
+                bkmodel.Spacer(width=6),
+                _browse_watcher_btn,
+                styles={"align-items": "flex-end"},
+            ),
+            bkmodel.Spacer(height=14),
+            row(
+                _cancel_watcher_btn,
+                bkmodel.Div(text="", width=30),
+                _continue_save_btn,
+                styles={"justify-content": "center"},
+            ),
+            visible=False,
+            styles={
+                "background": "rgba(30,30,40,0.97)",
+                "border": "2px solid #444",
+                "border-radius": "16px",
+                "padding": "10px 40px 30px 40px",
+                "position": "absolute",
+                "left": f"{PALETTE_WIDTH + 150}px",
+                "top": "340px",
+                "z-index": "100",
+                "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
+            },
+        )
+
+        # ── Wire Save button: click → show watcher overlay ────────────────────
         save_button.js_on_click(
             bkmodel.CustomJS(
-                args=dict(yaml_input=yaml_path_input, save_btn=save_button),
+                args=dict(save_overlay_widget=save_overlay),
                 code=_JS_SAVE_CLICK,
             )
         )
 
-        # ── Wire save_content_output: Python push → JS writes files ──────────
-        # on_change fires when Python sets save_content_output.value with the
-        # serialised canvas strings; _JS_WRITE_CONTENT uses the stored handles
-        # (or blob downloads) to complete the write.
-        save_content_output.js_on_change(
-            "value",
+        # ── Wire Cancel button: hide overlay without saving ───────────────────
+        _cancel_watcher_btn.js_on_click(
             bkmodel.CustomJS(
-                args=dict(save_output=save_content_output),
-                code=_JS_WRITE_CONTENT,
-            ),
+                args=dict(save_overlay_widget=save_overlay),
+                code="save_overlay_widget.visible = false;",
+            )
+        )
+
+        # ── Wire Continue button → signal Python to open tkinter save dialogs ─
+        _continue_save_btn.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(
+                    save_overlay_widget=save_overlay,
+                    browse_save_trigger=browse_save_trigger,
+                ),
+                code="save_overlay_widget.visible = false; "
+                "browse_save_trigger.value = browse_save_trigger.value === '1' ? '0' : '1';",
+            )
         )
 
         # ── Startup overlay buttons ───────────────────────────────────────────
@@ -656,10 +582,11 @@ class ComponentPaletteConfigurationTableBuilder:
             component_type_to_icon=component_type_to_icon,
             possible_position=possible_position,
             possible_options=possible_options,
-            json_path_input=json_path_input,
-            yaml_path_input=yaml_path_input,
-            load_path_input=load_path_input,
-            save_content_output=save_content_output,
+            browse_load_trigger=browse_load_trigger,
+            browse_save_trigger=browse_save_trigger,
+            browse_watcher_trigger=browse_watcher_trigger,
+            watcher_path_input=watcher_path_input,
+            save_overlay=save_overlay,
             new_design_button=new_design_button,
             load_design_button=load_design_button,
         )
@@ -688,10 +615,9 @@ class ComponentPaletteConfigurationTableBuilder:
             delete_button,
             save_button,
             end_session_button,
-            json_path_input,
-            yaml_path_input,
-            load_path_input,
-            save_content_output,  # must be in the DOM for js_on_change to fire
+            browse_load_trigger,
+            browse_save_trigger,
+            browse_watcher_trigger,
             spacing=2,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )

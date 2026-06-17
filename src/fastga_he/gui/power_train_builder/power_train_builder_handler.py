@@ -20,14 +20,19 @@ Typical usage::
 import json
 import logging
 from pathlib import Path
-
+from tkinter import filedialog
+import tkinter as tk
 import bokeh.models as bkmodel
 from bokeh.layouts import row
 from tornado.ioloop import IOLoop
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _string_cleanup, _url_to_base64
+from fastga_he.gui.power_train_network_viewer import (
+    ICONS_CONFIG,
+    _string_cleanup,
+    _url_to_base64,
+    DEFAULT_COLOR,
+)
 from .power_train_network_writer import PowerTrainYAML
-
 from .power_train_builder_state import (
     BuilderState,
     BUTTON_DEFAULT_COLOR_TYPE,
@@ -79,31 +84,14 @@ class PlacementHandler:
         Called once from :meth:`__init__`. Connects:
 
         * Each component palette button → :meth:`on_palette_select`.
-        * The Save button → :meth:`_on_yaml_path_chosen` (via hidden TextInput).
         * The End Session button → :meth:`_end_session`.
         * The Delete button → :meth:`_toggle_delete_mode`.
         * The New Design button → :meth:`_on_new_design`.
-        * The Load Design hidden input → :meth:`_on_load_path_chosen`.
-        * The Save Content output input → :meth:`_on_save_content_requested` (JS-driven save).
+        * The browse_load_trigger → :meth:`_on_browse_load` (tkinter open-file dialog).
+        * The browse_save_trigger → :meth:`_on_browse_save` (tkinter save-file dialogs).
+        * The browse_watcher_trigger → :meth:`_on_browse_watcher` (tkinter CSV path dialog).
         """
         self.state.end_session_button.on_click(self._end_session)
-
-        # The Save button fires a CustomJS that opens two OS "Save As" dialogs
-        # (YAML first, then JSON) and bundles both chosen filenames as a JSON
-        # string into yaml_path_input.  This single on_change callback receives
-        # both values atomically, avoiding any two-widget propagation race.
-        if self.state.yaml_path_input is not None:
-            self.state.yaml_path_input.on_change("value", self._on_yaml_path_chosen)
-
-        # Load Design: the CustomJS writes the chosen file's *content* into
-        # load_path_input (for showOpenFilePicker) or a raw path (prompt fallback).
-        if self.state.load_path_input is not None:
-            self.state.load_path_input.on_change("value", self._on_load_path_chosen)
-
-        # Save content output: JS writes serialised canvas content here so Python
-        # can push YAML/JSON strings back for the browser to write via createWritable().
-        if self.state.save_content_output is not None:
-            self.state.save_content_output.on_change("value", self._on_save_content_requested)
 
         # New Design: wipe canvas and dismiss overlay immediately
         if self.state.new_design_button is not None:
@@ -114,6 +102,15 @@ class PlacementHandler:
 
         if self.state.delete_button is not None:
             self.state.delete_button.on_click(self._toggle_delete_mode)
+
+        if self.state.browse_load_trigger is not None:
+            self.state.browse_load_trigger.on_change("value", self._on_browse_load)
+
+        if self.state.browse_save_trigger is not None:
+            self.state.browse_save_trigger.on_change("value", self._on_browse_save)
+
+        if self.state.browse_watcher_trigger is not None:
+            self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
 
     def _make_select_callback(self, idx: int):
         """
@@ -301,126 +298,6 @@ class PlacementHandler:
         if self.state.save_button is not None:
             self.state.save_button.button_type = "warning"
 
-    def _on_yaml_path_chosen(self, attr, old, new):
-        """
-        Triggered when the hidden ``yaml_path_input`` value changes.
-
-        The Save button's ``CustomJS`` bundles both chosen filenames (either
-        may be an empty string if the user cancelled that dialog) as a JSON
-        string and writes it into ``yaml_path_input``.  This single callback
-        receives both values atomically, with no race condition.
-
-        When ``showSaveFilePicker`` is available the JS side uses
-        ``createWritable()`` to write directly, so Python only needs to supply
-        the serialised content via ``save_content_output``.  When the prompt()
-        fallback is active the old path-based save is used instead.
-
-        :param attr: Bokeh attribute name (always ``"value"``).
-        :param old: Previous bundle string (ignored).
-        :param new: JSON bundle ``{"yaml": "...", "json": "...", "ts": "...",
-                    "use_browser_write": true|false}``.
-        """
-        if not new:
-            return
-
-        try:
-            bundle = json.loads(new)
-        except (json.JSONDecodeError, ValueError):
-            _LOGGER.error("Could not decode save-dialog bundle: %r", new)
-            return
-
-        # Reset before saving so a re-save with identical names fires on_change again
-        if self.state.yaml_path_input is not None:
-            self.state.yaml_path_input.value = _EMPTY
-
-        use_browser_write = bundle.get("use_browser_write", False)
-
-        if use_browser_write:
-            # showSaveFilePicker path: JS holds the file handles and will call
-            # createWritable() once Python pushes the content strings.
-            ts = bundle.get("ts", "")
-            self._push_content_for_browser_save(ts)
-        else:
-            # prompt() fallback: JS only has bare filenames; Python writes the files.
-            yaml_path = bundle.get("yaml") or _EMPTY
-            json_path = bundle.get("json") or _EMPTY
-            if yaml_path or json_path:
-                self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
-
-    def _push_content_for_browser_save(self, ts: str = ""):
-        """
-        Serialise the canvas state and push both YAML and JSON strings to the
-        browser via the hidden ``save_content_output`` TextInput.
-
-        The paired ``CustomJS`` on_change handler in the browser receives the
-        bundle and writes each file using the ``FileSystemFileHandle``
-        ``createWritable()`` API (or falls back to a blob download).
-
-        :param ts: Timestamp string generated by the browser JS (used as the
-            suggested filename suffix in the download fallback).
-        """
-        nodes_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
-        edges_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
-        source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
-        target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
-
-        # ── Build YAML content string ─────────────────────────────────────────
-        yaml_content = ""
-        try:
-            import io
-
-            pt_yaml = PowerTrainYAML(self.state)
-            pt_yaml.set_title(f"powertrain_config_{ts}")
-            for node_index in range(len(nodes_data.get("name", []))):
-                pt_yaml.add_component(node_index)
-            pt_yaml.add_connection()
-            buf = io.StringIO()
-            pt_yaml.write_to_stream(buf)
-            yaml_content = buf.getvalue()
-        except Exception:
-            _LOGGER.exception("Failed to serialise YAML content for browser save.")
-
-        # ── Build JSON content string ─────────────────────────────────────────
-        canvas_state = {
-            "components": nodes_data,
-            "connections": edges_data,
-            "source_ports": source_data,
-            "target_ports": target_data,
-        }
-        json_content = json.dumps(canvas_state, indent=2)
-
-        # ── Push bundle to the browser ────────────────────────────────────────
-        bundle = json.dumps(
-            {
-                "yaml": yaml_content,
-                "json": json_content,
-                "ts": ts,
-            }
-        )
-
-        if self.state.save_content_output is not None:
-            self.state.save_content_output.value = bundle
-            _LOGGER.info("Canvas content pushed to browser for save (ts=%s).", ts)
-
-        if self.state.save_button is not None:
-            self.state.save_button.button_type = "success"
-
-    def _on_save_content_requested(self, attr, old, new):
-        """
-        Triggered when ``save_content_output`` changes.
-
-        This callback exists only to reset the widget value so that a second
-        save with the same timestamp will fire ``on_change`` again.  The
-        actual file-write happens in the browser-side ``CustomJS``.
-
-        :param attr: Bokeh attribute name (always ``"value"``).
-        :param old: Previous content bundle (ignored).
-        :param new: JSON content bundle written by :meth:`_push_content_for_browser_save`.
-        """
-        # Reset so the next save triggers on_change even if content is identical.
-        if new and self.state.save_content_output is not None:
-            self.state.save_content_output.value = _EMPTY
-
     def _save_canvas_state(self, yaml_path: str = "", json_path: str = ""):
         """
         Serialise the current canvas to the file paths chosen by the user.
@@ -447,6 +324,14 @@ class PlacementHandler:
                 for node_index in range(len(nodes_data.get("name", []))):
                     pt_yaml.add_component(node_index)
                 pt_yaml.add_connection()
+                # Apply watcher file path when the user supplied one in the overlay.
+                watcher_path = (
+                    self.state.watcher_path_input.value.strip()
+                    if self.state.watcher_path_input is not None
+                    else ""
+                )
+                if watcher_path:
+                    pt_yaml.set_watcher_file_path(watcher_path)
                 pt_yaml.write(str(yaml_file))
                 _LOGGER.info("Powertrain YAML config saved to %s", yaml_file)
             except Exception:
@@ -467,56 +352,6 @@ class PlacementHandler:
 
         if self.state.save_button is not None:
             self.state.save_button.button_type = "success"
-
-    def _on_load_path_chosen(self, attr, old, new):
-        """
-        Triggered when the hidden ``load_path_input`` value changes.
-
-        When ``showOpenFilePicker`` is available, the browser JS reads the file
-        content and writes the raw JSON string into ``load_path_input``.
-        When the ``prompt()`` fallback is active, a plain filesystem path is
-        written instead.
-
-        The two cases are disambiguated by inspecting the first character of
-        the value: a ``{`` signals JSON content; anything else is treated as a
-        filesystem path.
-
-        :param attr: Bokeh attribute name (always ``"value"``).
-        :param old: Previous value (ignored).
-        :param new: Either raw JSON canvas-state content or a filesystem path.
-        """
-        if not new:
-            return
-        if self.state.load_path_input is not None:
-            self.state.load_path_input.value = _EMPTY
-        self._dismiss_startup_overlay()
-
-        stripped = new.strip()
-        if stripped.startswith("{"):
-            # showOpenFilePicker path: the browser sent us the file content directly.
-            self._load_canvas_state_from_content(stripped)
-        else:
-            # prompt() fallback: treat as a filesystem path.
-            self._load_canvas_state(json_path=stripped)
-
-    def _load_canvas_state_from_content(self, json_content: str):
-        """
-        Restore the canvas from a JSON string read by the browser.
-
-        This is the primary load path when ``showOpenFilePicker`` is available.
-        No filesystem access is needed on the Python side.
-
-        :param json_content: Raw JSON string of a canvas-state backup produced
-            by :meth:`_save_canvas_state` or :meth:`_push_content_for_browser_save`.
-        """
-        try:
-            canvas_state = json.loads(json_content)
-        except Exception:
-            _LOGGER.exception("Load failed – could not parse JSON content received from browser.")
-            return
-
-        _LOGGER.info("Loading canvas state from browser-supplied content.")
-        self._restore_canvas_from_dict(canvas_state)
 
     def _load_canvas_state(self, json_path: str):
         """
@@ -617,6 +452,84 @@ class PlacementHandler:
             len(nodes_data.get("name", [])),
             len(edges_data.get("xs", [])),
         )
+
+    @staticmethod
+    def _open_tkinter_dialog(func, **kwargs):
+        """
+        Run a tkinter file dialog on the calling thread and return the result.
+
+        :param func: The ``filedialog`` function to call
+            (e.g. ``filedialog.asksaveasfilename``).
+        :param kwargs: Keyword arguments forwarded to *func*.
+        :return: The chosen path string, or ``""`` if the user cancelled.
+        """
+
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        try:
+            result = func(parent=root, **kwargs)
+        finally:
+            root.destroy()
+        return result or ""
+
+    def _on_browse_load(self, attr, old, new):
+        """
+        Open a native OS open-file dialog (tkinter) for loading a JSON canvas
+        backup, then restore the canvas from the chosen file.
+
+        Triggered by the hidden ``browse_load_trigger`` TextInput toggling.
+        """
+        path = self._open_tkinter_dialog(
+            filedialog.askopenfilename,
+            title="Load canvas state",
+            filetypes=[("JSON canvas backup", "*.json"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        self._dismiss_startup_overlay()
+        self._load_canvas_state(json_path=path)
+
+    def _on_browse_save(self, attr, old, new):
+        """
+        Open native OS save-file dialogs (tkinter) for the YAML config and JSON
+        backup, then write both files.  The watcher file path is read from
+        ``state.watcher_path_input`` which the user filled in the overlay.
+
+        Triggered by the hidden ``browse_save_trigger`` TextInput toggling.
+        """
+
+        yaml_path = self._open_tkinter_dialog(
+            filedialog.asksaveasfilename,
+            title="Save YAML powertrain config",
+            defaultextension=".yml",
+            filetypes=[("YAML files", "*.yml *.yaml"), ("All files", "*.*")],
+        )
+        json_path = self._open_tkinter_dialog(
+            filedialog.asksaveasfilename,
+            title="Save JSON canvas backup",
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+        )
+        if yaml_path or json_path:
+            self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
+
+    def _on_browse_watcher(self, attr, old, new):
+        """
+        Open a native OS save-file dialog (tkinter) to choose the watcher CSV
+        path and write it back into ``state.watcher_path_input``.
+
+        Triggered by the hidden ``browse_watcher_trigger`` TextInput toggling.
+        """
+        path = self._open_tkinter_dialog(
+            filedialog.asksaveasfilename,
+            title="Choose watcher CSV file",
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+        )
+        if path and self.state.watcher_path_input is not None:
+            self.state.watcher_path_input.value = path
+            _LOGGER.info("Watcher CSV path set to: %s", path)
 
     # -----------------------------------------------------------------------
     # End session
@@ -963,8 +876,6 @@ class PlacementHandler:
         node_names = list(placed_nodes_data.get("name", []))
         n_sources_list = list(placed_nodes_data.get("n_sources", []))
         n_targets_list = list(placed_nodes_data.get("n_targets", []))
-
-        from fastga_he.gui.power_train_network_viewer import DEFAULT_COLOR, ICONS_CONFIG
 
         source_x, source_y, source_color, source_label = [], [], [], []
         source_node_index, source_node_name, source_node_type = [], [], []
@@ -1359,7 +1270,6 @@ class PlacementHandler:
         node_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
         edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
 
-        from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
         # Build lookup: port label → (peer_node_idx, peer_label) for every edge
         # that touches node_idx.
@@ -1912,8 +1822,6 @@ class PlacementHandler:
         count = self.state.placed_counter.get(comp_key, 0) + 1
         self.state.placed_counter[comp_key] = count
         node_name = f"{comp_key}_{count}"
-
-        from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
         icon_path = ICONS_CONFIG[comp_key]["icon_path"]
         file_url = "file://" + str(Path(icon_path).resolve())

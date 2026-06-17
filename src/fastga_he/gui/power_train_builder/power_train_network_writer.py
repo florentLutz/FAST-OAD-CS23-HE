@@ -173,6 +173,14 @@ class PowerTrainYAML:
         # Remove quotes around [component_name, N] patterns
         output = re.sub(r"'(\[[^\]]+\])'", r"\1", output)
 
+        # Fix watcher_file_path: ruamel.yaml may emit the value on the next line
+        # as a block scalar. Collapse it back to a single inline assignment.
+        output = re.sub(
+            r"(watcher_file_path:)\s*\n\s+(\S[^\n]*)",
+            r"\1 \2",
+            output,
+        )
+
         # Add a blank line before each top-level key (except the first one)
         top_level_keys = [
             "title",

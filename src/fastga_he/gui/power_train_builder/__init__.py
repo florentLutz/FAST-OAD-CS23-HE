@@ -2,4 +2,4 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-from .power_train_builder_launcher import PowertrainBuilderLauncher
+from .power_train_builder_launcher import PowertrainBuilderLauncher as PowertrainBuilderLauncher
