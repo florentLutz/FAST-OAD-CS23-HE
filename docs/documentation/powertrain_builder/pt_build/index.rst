@@ -24,7 +24,7 @@ To launch the builder, add the following code snippet to your Python script:
 
     PowertrainBuilderLauncher.launch()
 
-Once load from existed design the builder should look like this:
+Once loaded from existed design the builder should look like this:
 
 .. image:: ../../../img/start_up_page.svg
     :width: 800
