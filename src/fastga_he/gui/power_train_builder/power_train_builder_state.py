@@ -185,3 +185,15 @@ class BuilderState:
     browse_load_trigger: bkmodel.TextInput = field(default=None)
     browse_save_trigger: bkmodel.TextInput = field(default=None)
     browse_watcher_trigger: bkmodel.TextInput = field(default=None)
+    # "Unsaved changes" confirmation overlay – shown by End Session when save_button is yellow.
+    unsaved_exit_overlay: object = field(default=None)
+    # Toggle trigger used by the overlay's "Save & Exit" button to open the save flow.
+    end_session_save_trigger: bkmodel.TextInput = field(default=None)
+    # Toggle trigger fired by JS when it is safe to actually stop the server.
+    # Using a trigger (instead of on_click) means Python only runs _end_session
+    # when JS has already decided it is appropriate – the Python on_click callback
+    # on end_session_button is never registered, avoiding unconditional firing.
+    end_session_trigger: bkmodel.TextInput = field(default=None)
+    # Trigger flipped by Python to make the browser call window.close().
+    # Uses js_on_change so the JS callback runs when the server pushes the value.
+    close_window_trigger: bkmodel.TextInput = field(default=None)

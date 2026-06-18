@@ -13,6 +13,7 @@ from ..power_train_builder import PowertrainBuilderLauncher
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
+
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Skipped in CI – requires an interactive IOLoop.")
 def test_power_train_builder_launcher_functionality():
     """Test that the launcher can be called without errors and returns expected types."""

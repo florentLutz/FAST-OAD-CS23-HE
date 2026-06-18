@@ -91,7 +91,10 @@ class PlacementHandler:
         * The browse_save_trigger → :meth:`_on_browse_save` (tkinter save-file dialogs).
         * The browse_watcher_trigger → :meth:`_on_browse_watcher` (tkinter CSV path dialog).
         """
-        self.state.end_session_button.on_click(self._end_session)
+        # End Session is handled entirely via JS + end_session_trigger to avoid the
+        # Python on_click firing unconditionally (before JS can gate on save state).
+        if self.state.end_session_trigger is not None:
+            self.state.end_session_trigger.on_change("value", self._on_end_session_trigger)
 
         # New Design: wipe canvas and dismiss overlay immediately
         if self.state.new_design_button is not None:
@@ -111,6 +114,11 @@ class PlacementHandler:
 
         if self.state.browse_watcher_trigger is not None:
             self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
+
+        if self.state.end_session_save_trigger is not None:
+            self.state.end_session_save_trigger.on_change(
+                "value", self._on_end_session_save_trigger
+            )
 
     def _make_select_callback(self, idx: int):
         """
@@ -490,29 +498,9 @@ class PlacementHandler:
         self._dismiss_startup_overlay()
         self._load_canvas_state(json_path=path)
 
-    def _on_browse_save(self, attr, old, new):
-        """
-        Open native OS save-file dialogs (tkinter) for the YAML config and JSON
-        backup, then write both files.  The watcher file path is read from
-        ``state.watcher_path_input`` which the user filled in the overlay.
-
-        Triggered by the hidden ``browse_save_trigger`` TextInput toggling.
-        """
-
-        yaml_path = self._open_tkinter_dialog(
-            filedialog.asksaveasfilename,
-            title="Save YAML powertrain config",
-            defaultextension=".yml",
-            filetypes=[("YAML files", "*.yml *.yaml"), ("All files", "*.*")],
-        )
-        json_path = self._open_tkinter_dialog(
-            filedialog.asksaveasfilename,
-            title="Save JSON canvas backup",
-            defaultextension=".json",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
-        )
-        if yaml_path or json_path:
-            self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
+    # -----------------------------------------------------------------------
+    # Save / load (continued)
+    # -----------------------------------------------------------------------
 
     def _on_browse_watcher(self, attr, old, new):
         """
@@ -539,15 +527,86 @@ class PlacementHandler:
         """
         Stop the Bokeh IO loop, terminating the server session.
 
-        Bound to the End Session button.  After this call the browser tab will
-        lose its WebSocket connection and the Python process will exit.
+        Never called directly from a button ``on_click``; always invoked via
+        :meth:`_on_end_session_trigger` so that the JS gate (which checks the
+        save-button colour) has already run before Python acts.
         """
         _LOGGER.info("Ending session and stopping server")
         IOLoop.current().stop()
 
-    # -----------------------------------------------------------------------
-    # Edge connection methods
-    # -----------------------------------------------------------------------
+    def _on_end_session_trigger(self, attr, old, new):
+        """
+        Fire :meth:`_end_session` in response to the ``end_session_trigger``
+        TextInput toggle.
+
+        JS flips this trigger in exactly two situations:
+
+        * The End Session button is clicked **and** the design is already saved
+          (save button is green).
+        * The **End Anyway** button in the unsaved-exit overlay is clicked.
+
+        By routing through a trigger rather than ``on_click`` we guarantee that
+        Python's stop call only runs when JS has already decided it is safe to
+        do so.
+        """
+        self._end_session()
+
+    def _on_end_session_save_trigger(self, attr, old, new):
+        """
+        Triggered by the ``end_session_save_trigger`` TextInput when the user
+        clicks **Save & Exit** in the unsaved-exit overlay.
+
+        The JS side has already opened the watcher-path overlay for the user
+        to fill in; once they click **Continue to Save** the
+        ``browse_save_trigger`` fires ``_on_browse_save``.  We simply set an
+        internal flag here so that ``_on_browse_save`` knows it should call
+        ``_end_session`` after saving.
+        """
+        _LOGGER.info("Save & Exit requested – will end session after save completes.")
+        self._pending_exit_after_save = True
+
+    def _on_browse_save(self, attr, old, new):
+        """
+        Open native OS save-file dialogs (tkinter) for the YAML config and JSON
+        backup, then write both files.  The watcher file path is read from
+        ``state.watcher_path_input`` which the user filled in the overlay.
+
+        If ``_pending_exit_after_save`` is ``True`` (set by
+        ``_on_end_session_save_trigger``), the session is ended automatically
+        after a successful save.
+
+        Triggered by the hidden ``browse_save_trigger`` TextInput toggling.
+        """
+
+        yaml_path = self._open_tkinter_dialog(
+            filedialog.asksaveasfilename,
+            title="Save YAML powertrain config",
+            defaultextension=".yml",
+            filetypes=[("YAML files", "*.yml *.yaml"), ("All files", "*.*")],
+        )
+        json_path = self._open_tkinter_dialog(
+            filedialog.asksaveasfilename,
+            title="Save JSON canvas backup",
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+        )
+        if yaml_path or json_path:
+            self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
+
+        if getattr(self, "_pending_exit_after_save", False):
+            self._pending_exit_after_save = False
+            _LOGGER.info("Save & Exit: save complete – signalling browser then ending session.")
+            # Flip close_window_trigger BEFORE stopping the IOLoop so Bokeh can
+            # push the value change to the browser (which fires window.close() via
+            # js_on_change).  _end_session() calls IOLoop.stop(), after which no
+            # further document updates can be delivered to the client.
+            if self.state.close_window_trigger is not None:
+                self.state.close_window_trigger.value = (
+                    "0" if self.state.close_window_trigger.value == "1" else "1"
+                )
+            # Defer the actual IOLoop stop by one tick so Bokeh has time to flush
+            # the trigger update to the WebSocket before the server shuts down.
+            IOLoop.current().call_later(0.3, self._end_session)
 
     def _find_nearest_port(self, x: float, y: float) -> dict | None:
         """
@@ -1269,7 +1328,6 @@ class PlacementHandler:
         target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
         node_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
         edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
-
 
         # Build lookup: port label → (peer_node_idx, peer_label) for every edge
         # that touches node_idx.

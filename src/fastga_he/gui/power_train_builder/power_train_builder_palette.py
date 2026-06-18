@@ -60,6 +60,17 @@ _JS_SAVE_CLICK = """
 save_overlay_widget.visible = true;
 """
 
+# ── End Session click: show unsaved-exit overlay if save_button is yellow,
+#    otherwise flip end_session_trigger so Python stops the server cleanly. ──
+_JS_END_SESSION_CLICK = """
+if (save_button_widget.button_type === 'warning') {
+    unsaved_exit_overlay_widget.visible = true;
+} else {
+    end_session_trigger.value = end_session_trigger.value === '1' ? '0' : '1';
+    window.close();
+}
+"""
+
 
 class ComponentPaletteConfigurationTableBuilder:
     """
@@ -184,7 +195,8 @@ class ComponentPaletteConfigurationTableBuilder:
             height=ROW_HEIGHT - 6,
             stylesheets=_action_stylesheet,
         )
-        end_session_button.js_on_click(bkmodel.CustomJS(code="window.close();"))
+        # js_on_click for End Session is wired later, after unsaved_exit_overlay is built,
+        # so that it can reference both save_button and unsaved_exit_overlay_widget.
 
         # ── Hidden TextInput relay widgets ────────────────────────────────────
         # Three toggle triggers: JS flips '0'/'1' to fire Python on_change callbacks.
@@ -195,6 +207,13 @@ class ComponentPaletteConfigurationTableBuilder:
         browse_load_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_watcher_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        end_session_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        # Flipped by Python after a Save & Exit save completes; JS responds with window.close().
+        close_window_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        close_window_trigger.js_on_change(
+            "value",
+            bkmodel.CustomJS(code="window.close();"),
+        )
 
         # ── Wire Load Design buttons → signal Python to open tkinter dialog ───
         _load_js = bkmodel.CustomJS(
@@ -318,6 +337,124 @@ class ComponentPaletteConfigurationTableBuilder:
                 ),
                 code="save_overlay_widget.visible = false; "
                 "browse_save_trigger.value = browse_save_trigger.value === '1' ? '0' : '1';",
+            )
+        )
+
+        # ── Unsaved-exit overlay ──────────────────────────────────────────────
+        # Shown when the user clicks End Session while save_button is yellow.
+        # Hidden trigger used by "Save & Exit" to open the watcher-path overlay,
+        # then chain straight into the save flow and end the session on completion.
+        end_session_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+
+        _end_anyway_btn = bkmodel.Button(
+            label="End Anyway",
+            icon=bkmodel.TablerIcon(icon_name="power"),
+            button_type="danger",
+            width=200,
+            height=40,
+        )
+        _save_and_exit_btn = bkmodel.Button(
+            label="Save & Exit",
+            icon=bkmodel.TablerIcon(icon_name="device-floppy"),
+            button_type="primary",
+            width=200,
+            height=40,
+        )
+        _cancel_exit_btn = bkmodel.Button(
+            label="Cancel",
+            button_type="light",
+            width=100,
+            height=40,
+        )
+
+        unsaved_exit_overlay = column(
+            bkmodel.Div(
+                text=(
+                    "<div style='"
+                    "color:white;font-size:22pt;font-weight:bold;"
+                    "text-align:center;padding:24px 0 18px 0;letter-spacing:0.04em;"
+                    "'>Unsaved Changes</div>"
+                    "<div style='"
+                    "color:#aaa;font-size:12pt;"
+                    "text-align:center;padding-bottom:28px;"
+                    "'>End session without saving changes?</div>"
+                ),
+                width=500,
+            ),
+            row(
+                _cancel_exit_btn,
+                bkmodel.Div(text="", width=20),
+                _end_anyway_btn,
+                bkmodel.Div(text="", width=20),
+                _save_and_exit_btn,
+                styles={"justify-content": "center"},
+            ),
+            end_session_save_trigger,
+            visible=False,
+            styles={
+                "background": "rgba(30,30,40,0.97)",
+                "border": "2px solid #444",
+                "border-radius": "16px",
+                "padding": "10px 40px 30px 40px",
+                "position": "absolute",
+                "left": f"{PALETTE_WIDTH + 100}px",
+                "top": "340px",
+                "z-index": "100",
+                "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
+            },
+        )
+
+        # Cancel: just hide the overlay
+        _cancel_exit_btn.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(unsaved_exit_overlay_widget=unsaved_exit_overlay),
+                code="unsaved_exit_overlay_widget.visible = false;",
+            )
+        )
+
+        # End Anyway: hide the overlay, flip end_session_trigger so Python stops the server,
+        # then close the browser tab.
+        _end_anyway_btn.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(
+                    unsaved_exit_overlay_widget=unsaved_exit_overlay,
+                    end_session_trigger=end_session_trigger,
+                ),
+                code=(
+                    "unsaved_exit_overlay_widget.visible = false; "
+                    "end_session_trigger.value = end_session_trigger.value === '1' ? '0' : '1'; "
+                    "window.close();"
+                ),
+            )
+        )
+
+        # Save & Exit: open the watcher-path / save overlay, then Python handler
+        # ends the session after the files are written (via end_session_save_trigger).
+        _save_and_exit_btn.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(
+                    unsaved_exit_overlay_widget=unsaved_exit_overlay,
+                    save_overlay_widget=save_overlay,
+                    end_session_save_trigger=end_session_save_trigger,
+                ),
+                code=(
+                    "unsaved_exit_overlay_widget.visible = false; "
+                    "save_overlay_widget.visible = true; "
+                    "end_session_save_trigger.value = "
+                    "    end_session_save_trigger.value === '1' ? '0' : '1';"
+                ),
+            )
+        )
+
+        # ── Wire End Session button: check for unsaved state before closing ───
+        end_session_button.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(
+                    save_button_widget=save_button,
+                    unsaved_exit_overlay_widget=unsaved_exit_overlay,
+                    end_session_trigger=end_session_trigger,
+                ),
+                code=_JS_END_SESSION_CLICK,
             )
         )
 
@@ -589,6 +726,10 @@ class ComponentPaletteConfigurationTableBuilder:
             save_overlay=save_overlay,
             new_design_button=new_design_button,
             load_design_button=load_design_button,
+            unsaved_exit_overlay=unsaved_exit_overlay,
+            end_session_save_trigger=end_session_save_trigger,
+            end_session_trigger=end_session_trigger,
+            close_window_trigger=close_window_trigger,
         )
 
         # ── Build tabbed palette sidebar ──────────────────────────────────────
@@ -618,6 +759,9 @@ class ComponentPaletteConfigurationTableBuilder:
             browse_load_trigger,
             browse_save_trigger,
             browse_watcher_trigger,
+            end_session_save_trigger,
+            end_session_trigger,
+            close_window_trigger,
             spacing=2,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )

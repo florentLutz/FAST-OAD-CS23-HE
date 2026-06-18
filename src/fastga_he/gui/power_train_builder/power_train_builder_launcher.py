@@ -499,6 +499,10 @@ class PowertrainBuilderLauncher:
             # it is already visible=False and will be shown by the Save button's CustomJS.
             if state.save_overlay is not None:
                 doc.add_root(state.save_overlay)
+            # Unsaved-exit overlay – floats above the canvas, shown when the user
+            # clicks End Session with unsaved changes (save button is yellow).
+            if state.unsaved_exit_overlay is not None:
+                doc.add_root(state.unsaved_exit_overlay)
             doc.title = "Powertrain Builder"
 
         def make_document_with_tracking(doc):
