@@ -11,8 +11,8 @@ in YAML format, which can be use in later aircraft sizing or optimization.
    :maxdepth: 1
 
     Component node placement <node_placement>
-    Component connections <component_connections>
     Node properties configuration <node_properties>
+    Component connections <component_connections>
     Save & reload design <save_load>
     End Session <end_session>
 
