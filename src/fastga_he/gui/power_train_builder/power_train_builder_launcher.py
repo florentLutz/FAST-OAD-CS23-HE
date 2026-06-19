@@ -27,7 +27,14 @@ from bokeh.layouts import column, row
 from bokeh.server.server import Server
 from tornado.ioloop import IOLoop
 
-from fastga_he.gui.power_train_network_viewer import BACKGROUND_COLOR_CODE
+from fastga_he.gui.power_train_network_viewer import (
+    BACKGROUND_COLOR_CODE,
+    COLOR_ICON_CONFIG,
+    ELECTRICITY_CURRENT_COLOR_CODE,
+    FUEL_FLOW_COLOR_CODE,
+    MECHANICAL_POWER_COLOR_CODE,
+    _url_to_base64,
+)
 
 from .power_train_builder_state import (
     ICON_SIZE,
@@ -40,6 +47,73 @@ from .power_train_builder_palette import ComponentPaletteConfigurationTableBuild
 from .power_train_builder_handler import PlacementHandler
 
 _LOGGER = logging.getLogger(__name__)
+
+# ── Canvas legend ─────────────────────────────────────────────────────────────
+# Mirrors the viewer's LegendBuilder._add_legend layout:
+#   [icon PNG]  [colored label text]
+# Each row: icon anchored at (x_icon, y), label left-aligned at x_label
+# and drawn in the edge color of that connection type.
+#
+# All coordinates are in canvas data space (x_range 0–800, y_range 0–950).
+_LEGEND_ENTRIES = [
+    ("fuel", "Fuel Flow", FUEL_FLOW_COLOR_CODE),
+    ("mechanical", "Mechanical Power", MECHANICAL_POWER_COLOR_CODE),
+    ("electricity", "Electrical Current", ELECTRICITY_CURRENT_COLOR_CODE),
+]
+
+_LEGEND_X_ICON = 680  # center-x of the PNG icon
+_LEGEND_X_LABEL = 691  # left edge of the text label (icon_center + ~11)
+_LEGEND_Y_TOP = 940  # y of the first (topmost) row
+_LEGEND_ROW_STEP = 22  # vertical spacing between rows
+_LEGEND_ICON_W = 9  # icon width  in data units (matches viewer)
+_LEGEND_ICON_H = 12  # icon height in data units (matches viewer)
+
+
+def _add_canvas_legend(canvas) -> None:
+    """
+    Draw a static three-entry connection-type legend in the upper-right corner
+    of the builder canvas, mirroring the layout of the network viewer's
+    :meth:`LegendBuilder._add_legend`.
+
+    Each row contains:
+
+    * A small colour PNG icon (fuel / mechanical / electricity) on the **left**,
+      loaded via :func:`_url_to_base64` exactly as the viewer does.
+    * A text label to the **right** of the icon, drawn in the edge color of
+      that connection type.
+
+    :param canvas: The Bokeh ``Figure`` to annotate.
+    """
+    for i, (icon_key, description, edge_color) in enumerate(_LEGEND_ENTRIES):
+        y = _LEGEND_Y_TOP - i * _LEGEND_ROW_STEP
+
+        # ── PNG icon (left) ───────────────────────────────────────────────────
+        icon_path = COLOR_ICON_CONFIG[icon_key]
+        icon_url = _url_to_base64("file://" + str(icon_path.resolve()))
+        canvas.image_url(
+            url=[icon_url],
+            x=[_LEGEND_X_ICON],
+            y=[y],
+            w=_LEGEND_ICON_W,
+            h=_LEGEND_ICON_H,
+            anchor="center",
+        )
+
+        # ── Colored text label (right) ────────────────────────────────────────
+        canvas.add_layout(
+            bkmodel.LabelSet(
+                x="x",
+                y="y",
+                text="text",
+                source=bkmodel.ColumnDataSource(
+                    data=dict(x=[_LEGEND_X_LABEL], y=[y], text=[description])
+                ),
+                text_align="left",
+                text_baseline="middle",
+                text_color=edge_color,
+                text_font_size="9pt",
+            )
+        )
 
 
 class PowertrainBuilderLauncher:
@@ -84,6 +158,9 @@ class PowertrainBuilderLauncher:
             canvas.xaxis.visible = False
             canvas.yaxis.visible = False
             canvas.title.text_color = BACKGROUND_COLOR_CODE
+
+            # ── Static connection-type legend (upper-right corner) ────────────
+            _add_canvas_legend(canvas)
 
             # ── Permanent edge lines ──────────────────────────────────────────
             canvas.multi_line(
