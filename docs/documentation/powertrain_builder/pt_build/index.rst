@@ -3,7 +3,7 @@
 ===============
 PT file Builder
 ===============
-The ``power_train_builder`` graphical user interface provides a convenient way to create and edit powertrain
+The powertrain builder graphical user interface provides a convenient way to create and edit powertrain
 configurations for the FAST-GA-HE framework. Once the powertrain configuration is created, it can be saved as a PT file
 in YAML format, which can be use in later aircraft sizing or optimization.
 
