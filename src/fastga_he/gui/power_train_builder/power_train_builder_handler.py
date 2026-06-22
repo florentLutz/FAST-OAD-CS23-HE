@@ -117,6 +117,7 @@ class PlacementHandler:
         if self.state.browse_save_trigger is not None:
             self.state.browse_save_trigger.on_change("value", self._on_browse_save)
 
+        # Open a native OS file dialog to choose the watcher CSV path
         if self.state.browse_watcher_trigger is not None:
             self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
 
@@ -271,11 +272,11 @@ class PlacementHandler:
 
         :param component_index: Zero-based index into ``list(ICONS_CONFIG.keys())``.
         """
-        component_icon_keys = list(ICONS_CONFIG.keys())
-        if component_index < 0 or component_index >= len(component_icon_keys):
+        icon_keys = list(ICONS_CONFIG.keys())
+        if component_index < 0 or component_index >= len(icon_keys):
             return
 
-        if self.state.selected_component == component_icon_keys[component_index]:
+        if self.state.selected_component == icon_keys[component_index]:
             self.state.selected_component = None
             self.state.buttons[component_index].button_type = BUTTON_DEFAULT_COLOR_TYPE
             self.state.status_div.text = (
@@ -284,7 +285,7 @@ class PlacementHandler:
             return
 
         self._cancel_pending_connection()
-        self.state.selected_component = component_icon_keys[component_index]
+        self.state.selected_component = icon_keys[component_index]
 
         if self.state.delete_mode:
             self.state.delete_mode = False
@@ -446,10 +447,16 @@ class PlacementHandler:
             nodes_data.setdefault(col, default)
 
         # Fill the data sources with the loaded data
-        self.state.placed_nodes_source.data = {k: list(v) for k, v in nodes_data.items()}
-        self.state.edge_source.data = {k: list(v) for k, v in edges_data.items()}
-        self.state.source_port_source.data = {k: list(v) for k, v in source_data.items()}
-        self.state.target_port_source.data = {k: list(v) for k, v in target_data.items()}
+        self.state.placed_nodes_source.data = {
+            key: list(value) for key, value in nodes_data.items()
+        }
+        self.state.edge_source.data = {key: list(value) for key, value in edges_data.items()}
+        self.state.source_port_source.data = {
+            key: list(value) for key, value in source_data.items()
+        }
+        self.state.target_port_source.data = {
+            key: list(value) for key, value in target_data.items()
+        }
 
         self.state.hover_source.data = {
             "x": list(nodes_data.get("x", [])),
@@ -480,6 +487,23 @@ class PlacementHandler:
             len(edges_data.get("xs", [])),
         )
 
+    def _on_browse_load(self, attr, old, new):
+        """
+        Open a native OS open-file dialog (tkinter) for loading a JSON canvas
+        backup, then restore the canvas from the chosen file.
+
+        Triggered by the hidden ``browse_load_trigger`` TextInput toggling.
+        """
+        path = self._open_tkinter_dialog(
+            filedialog.askopenfilename,
+            title="Load canvas state",
+            filetypes=[("JSON canvas backup", "*.json"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        self._dismiss_startup_overlay()
+        self._load_canvas_state(json_path=path)
+
     @staticmethod
     def _open_tkinter_dialog(func, **kwargs):
         """
@@ -499,23 +523,6 @@ class PlacementHandler:
         finally:
             root.destroy()
         return result or ""
-
-    def _on_browse_load(self, attr, old, new):
-        """
-        Open a native OS open-file dialog (tkinter) for loading a JSON canvas
-        backup, then restore the canvas from the chosen file.
-
-        Triggered by the hidden ``browse_load_trigger`` TextInput toggling.
-        """
-        path = self._open_tkinter_dialog(
-            filedialog.askopenfilename,
-            title="Load canvas state",
-            filetypes=[("JSON canvas backup", "*.json"), ("All files", "*.*")],
-        )
-        if not path:
-            return
-        self._dismiss_startup_overlay()
-        self._load_canvas_state(json_path=path)
 
     # -----------------------------------------------------------------------
     # Save / load (continued)
@@ -638,7 +645,7 @@ class PlacementHandler:
             and ``node_index`` for the nearest port, or ``None``.
         """
         snap = PORT_RADIUS * 2.5
-        best, best_distance = None, snap
+        nearest_port, nearest_port_distance = None, snap
         for kind, port_source in [
             ("source", self.state.source_port_source),
             ("target", self.state.target_port_source),
@@ -650,9 +657,9 @@ class PlacementHandler:
                 zip(list(data.get("x", [])), list(data.get("y", [])))
             ):
                 distance = ((x - port_x) ** 2 + (y - port_y) ** 2) ** 0.5
-                if distance < best_distance:
-                    best_distance = distance
-                    best = {
+                if distance < nearest_port_distance:
+                    nearest_port_distance = distance
+                    nearest_port = {
                         "kind": kind,
                         "x": port_x,
                         "y": port_y,
@@ -660,7 +667,7 @@ class PlacementHandler:
                         "label": list(data["label"])[i],
                         "node_index": list(data["node_index"])[i],
                     }
-        return best
+        return nearest_port
 
     def _cancel_pending_connection(self):
         """Cancel any port selection waiting for a second click."""
@@ -765,7 +772,7 @@ class PlacementHandler:
         """
         if self.state.edge_source is None:
             return
-        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
 
         for i in range(len(edge_data.get("starting_node_index", []))):
             starting_port_already_used = (
@@ -820,8 +827,12 @@ class PlacementHandler:
             starting_port["node_index"] == self.state.selected_node_index
             or ending_port["node_index"] == self.state.selected_node_index
         ):
-            src_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
-            tgt_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
+            source_data = {
+                key: list(value) for key, value in self.state.source_port_source.data.items()
+            }
+            target_data = {
+                key: list(value) for key, value in self.state.target_port_source.data.items()
+            }
 
             def _mark_connected(data, port):
                 data["connected"] = [
@@ -835,14 +846,14 @@ class PlacementHandler:
                 ]
 
             if starting_port["kind"] == "source":
-                _mark_connected(src_data, starting_port)
-                _mark_connected(tgt_data, ending_port)
+                _mark_connected(source_data, starting_port)
+                _mark_connected(target_data, ending_port)
             else:
-                _mark_connected(tgt_data, starting_port)
-                _mark_connected(src_data, ending_port)
+                _mark_connected(target_data, starting_port)
+                _mark_connected(source_data, ending_port)
 
-            self.state.source_port_source.data = src_data
-            self.state.target_port_source.data = tgt_data
+            self.state.source_port_source.data = source_data
+            self.state.target_port_source.data = target_data
             self._refresh_connections_table(self.state.selected_node_index)
 
         self._mark_unsaved()
@@ -865,11 +876,13 @@ class PlacementHandler:
         """
         if self.state.temp_edge_source is None:
             return
-        tdata = {k: list(v) for k, v in self.state.temp_edge_source.data.items()}
-        tdata["xs"].append([starting_port["x"], ending_port["x"]])
-        tdata["ys"].append([starting_port["y"], ending_port["y"]])
-        tdata["color"].append(starting_port["color"])
-        self.state.temp_edge_source.data = tdata
+        temp_edge_data = {
+            key: list(value) for key, value in self.state.temp_edge_source.data.items()
+        }
+        temp_edge_data["xs"].append([starting_port["x"], ending_port["x"]])
+        temp_edge_data["ys"].append([starting_port["y"], ending_port["y"]])
+        temp_edge_data["color"].append(starting_port["color"])
+        self.state.temp_edge_source.data = temp_edge_data
         _LOGGER.info(
             "Temp edge: %s:%s → %s:%s",
             starting_port["kind"],
@@ -898,21 +911,23 @@ class PlacementHandler:
         """
         if self.state.edge_source is None:
             return
-        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
         if not edge_data.get("starting_node_index"):
             return
 
-        pos: dict = {}
-        for kind, src in [
+        position: dict = {}
+        for kind, data_source in [
             ("source", self.state.source_port_source),
             ("target", self.state.target_port_source),
         ]:
-            if src is None:
+            if data_source is None:
                 continue
-            d = src.data
-            for i, (px, py) in enumerate(zip(list(d.get("x", [])), list(d.get("y", [])))):
-                key = (kind, list(d["node_index"])[i], list(d["label"])[i])
-                pos[key] = (px, py)
+            dataset = data_source.data
+            for i, (px, py) in enumerate(
+                zip(list(dataset.get("x", [])), list(dataset.get("y", [])))
+            ):
+                key = (kind, list(dataset["node_index"])[i], list(dataset["label"])[i])
+                position[key] = (px, py)
 
         new_xs, new_ys, valid = [], [], []
         for i in range(len(edge_data["starting_node_index"])):
@@ -926,9 +941,9 @@ class PlacementHandler:
                 edge_data["ending_node_index"][i],
                 edge_data["ending_port_label"][i],
             )
-            if starting_port_key in pos and ending_port_key in pos:
-                starting_x, starting_y = pos[starting_port_key]
-                ending_x, ending_y = pos[ending_port_key]
+            if starting_port_key in position and ending_port_key in position:
+                starting_x, starting_y = position[starting_port_key]
+                ending_x, ending_y = position[ending_port_key]
                 new_xs.append([starting_x, ending_x])
                 new_ys.append([starting_y, ending_y])
                 valid.append(i)
@@ -997,22 +1012,22 @@ class PlacementHandler:
         for i, (cx, cy, icon_type, node_type, node_name) in enumerate(
             zip(xs, ys, icon_types, node_types, node_names)
         ):
-            n_src = (
+            n_source = (
                 int(n_sources_list[i])
                 if i < len(n_sources_list)
                 else self.state.default_source_count.get(node_type, 0)
             )
-            n_tgt = (
+            n_target = (
                 int(n_targets_list[i])
                 if i < len(n_targets_list)
                 else self.state.default_target_count.get(node_type, 0)
             )
 
             cfg = ICONS_CONFIG.get(icon_type, {})
-            raw_src_color = cfg.get("source_color") or DEFAULT_COLOR
-            raw_tgt_color = cfg.get("target_color") or DEFAULT_COLOR
+            raw_source_color = cfg.get("source_color") or DEFAULT_COLOR
+            raw_target_color = cfg.get("target_color") or DEFAULT_COLOR
 
-            ports = compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_src, n_tgt)
+            ports = compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_source, n_target)
             is_selected = has_selected_node and i == selected_node_index
             fill_alpha = selected_node_fill_alpha if is_selected else 0.0
             line_alpha = selected_node_line_alpha if is_selected else 0.0
@@ -1020,7 +1035,7 @@ class PlacementHandler:
             for port in ports["outputs"]:
                 source_x.append(port["x"])
                 source_y.append(port["y"])
-                source_color.append(raw_src_color)
+                source_color.append(raw_source_color)
                 source_label.append(str(port["index"] + 1))
                 source_node_index.append(i)
                 source_node_name.append([node_name])
@@ -1031,7 +1046,7 @@ class PlacementHandler:
             for port in ports["inputs"]:
                 target_x.append(port["x"])
                 target_y.append(port["y"])
-                target_color.append(raw_tgt_color)
+                target_color.append(raw_target_color)
                 target_label.append(str(port["index"] + 1))
                 target_node_index.append(i)
                 target_node_name.append([node_name])
@@ -1087,49 +1102,58 @@ class PlacementHandler:
         :param x: Tap x coordinate in canvas data-units.
         :param y: Tap y coordinate in canvas data-units.
 
-        :return: ``(best_idx, best_dist, current_data)`` where ``best_idx`` is the
+        :return: ``(best_index, shortest_distance, nodes_data)`` where ``best_index`` is the
             zero-based index of the closest node (``None`` if nothing is within snap
-            distance), ``best_dist`` is the Euclidean distance, and ``current_data``
+            distance), ``shortest_distance`` is the Euclidean distance, and ``nodes_data``
             is the raw ``placed_nodes_source.data`` dict.
         """
-        current = self.state.placed_nodes_source.data
-        xs = list(current.get("x", []))
-        ys = list(current.get("y", []))
+        nodes_data = self.state.placed_nodes_source.data
+        xs = list(nodes_data.get("x", []))
+        ys = list(nodes_data.get("y", []))
         if not xs:
-            return None, None, current
+            return None, None, nodes_data
 
         snap = self.icon_size
-        best_idx = None
-        best_dist = float("inf")
+        best_index = None
+        shortest_distance = float("inf")
         for node_position_index, (node_x, node_y) in enumerate(zip(xs, ys)):
             distance_to_tap = ((x - node_x) ** 2 + (y - node_y) ** 2) ** 0.5
-            if distance_to_tap < snap and distance_to_tap < best_dist:
-                best_dist = distance_to_tap
-                best_idx = node_position_index
+            # Only consider nodes within snap distance and track the closest one
+            if distance_to_tap < snap and distance_to_tap < shortest_distance:
+                shortest_distance = distance_to_tap
+                best_index = node_position_index
 
-        return best_idx, best_dist, current
+        return best_index, shortest_distance, nodes_data
 
     # -----------------------------------------------------------------------
     # Config panel helpers
     # -----------------------------------------------------------------------
 
-    def _populate_node_table(self, idx: int):
+    def _populate_node_table(self, index: int):
         """
-        Fill the config panel widgets with the stored values of node *idx*.
+        Fill the config panel widgets with the stored values of node *index*.
 
-        :param idx: Zero-based index into ``placed_nodes_source`` data arrays.
+        :param index: Zero-based index into ``placed_nodes_source`` data arrays.
         """
-        pdata = self.state.placed_nodes_source.data
-        om_name = list(pdata.get("name", []))[idx]
-        node_type = list(pdata.get("node_type", []))[idx]
-        comp_key = list(pdata.get("icon_type", []))[idx]
-        position = list(pdata.get("position", []))[idx] if pdata.get("position") else _EMPTY
-        saved_options_json = list(pdata.get("options", []))[idx] if pdata.get("options") else "{}"
+        placed_node_data = self.state.placed_nodes_source.data
+        node_name = list(placed_node_data.get("name", []))[index]
+        node_type = list(placed_node_data.get("node_type", []))[index]
+        icon_key = list(placed_node_data.get("icon_type", []))[index]
+        position = (
+            list(placed_node_data.get("position", []))[index]
+            if placed_node_data.get("position")
+            else _EMPTY
+        )
+        saved_options_json = (
+            list(placed_node_data.get("options", []))[index]
+            if placed_node_data.get("options")
+            else "{}"
+        )
 
         self.state.options_table.visible = saved_options_json != "{}"
-        self.state.name_input.value = om_name
+        self.state.name_input.value = node_name
 
-        choices = self.state.component_type_to_icon.get(comp_key, comp_key)
+        choices = self.state.component_type_to_icon.get(icon_key, icon_key)
         self.state.type_select.options = choices
         self.state.type_select.value = node_type if node_type in choices else choices[0]
 
@@ -1156,13 +1180,13 @@ class PlacementHandler:
         target_ports_are_editable = default_target_port_count == 3
 
         current_source_port_count = (
-            list(pdata.get("n_sources", []))[idx]
-            if pdata.get("n_sources")
+            list(placed_node_data.get("n_sources", []))[index]
+            if placed_node_data.get("n_sources")
             else default_source_port_count
         )
         current_target_port_count = (
-            list(pdata.get("n_targets", []))[idx]
-            if pdata.get("n_targets")
+            list(placed_node_data.get("n_targets", []))[index]
+            if placed_node_data.get("n_targets")
             else default_target_port_count
         )
 
@@ -1180,14 +1204,13 @@ class PlacementHandler:
             )
 
         if self.state.selected_node_overlay_source is not None:
-            pdata = self.state.placed_nodes_source.data
             self.state.selected_node_overlay_source.data = dict(
-                x=[list(pdata["x"])[idx]],
-                y=[list(pdata["y"])[idx]],
+                x=[list(placed_node_data["x"])[index]],
+                y=[list(placed_node_data["y"])[index]],
             )
         self._rebuild_all_ports()
-        self._refresh_connections_table(idx)
-        self._refresh_symmetry_select(idx, comp_key)
+        self._refresh_connections_table(index)
+        self._refresh_symmetry_select(index, icon_key)
 
     @staticmethod
     def _option_values_to_strings(value) -> str:
@@ -1236,12 +1259,12 @@ class PlacementHandler:
         value_selects = []
 
         for option_name, value_list in options_definition.items():
-            current = (
+            current_values = (
                 overrides[option_name]
                 if option_name in overrides
                 else (value_list[0] if value_list else _EMPTY)
             )
-            current_string = self._option_values_to_strings(current)
+            current_stringing = self._option_values_to_strings(current_values)
 
             label_input = bkmodel.TextInput(
                 value=option_name,
@@ -1252,19 +1275,19 @@ class PlacementHandler:
             choices = (
                 [self._option_values_to_strings(choice) for choice in value_list]
                 if value_list
-                else [current_string]
+                else [current_stringing]
             )
-            if current_string not in choices:
-                choices = [current_string] + choices
+            if current_stringing not in choices:
+                choices = [current_stringing] + choices
 
             value_select = bkmodel.Select(
-                value=current_string,
+                value=current_stringing,
                 options=choices,
                 width=180,
                 styles={"color": "white", "font-size": "14px"},
             )
             new_rows.append(row(label_input, value_select, spacing=4))
-            opt_values.append(current_string)
+            opt_values.append(current_stringing)
             value_selects.append(value_select)
 
         def _make_sync_callback(selects, names):
@@ -1300,12 +1323,12 @@ class PlacementHandler:
         icon_types = list(placed_nodes_data.get("icon_type", []))
         saved_symmetry = list(placed_nodes_data.get("symmetry_name", []))
 
-        peers = [
+        symmetry_candidates = [
             names[i]
             for i in range(len(names))
             if i != current_node_index and icon_types[i] == icon_type
         ]
-        choices = [_EMPTY] + peers
+        choices = [_EMPTY] + symmetry_candidates
         self.state.symmetry_select.options = choices
 
         current_symmetry_component = (
@@ -1347,16 +1370,16 @@ class PlacementHandler:
             self.state.symmetry_select.value = _EMPTY
         self._rebuild_all_ports()
 
-    def _refresh_connections_table(self, node_idx: int):
+    def _refresh_connections_table(self, node_index: int):
         """
-        Populate the Connections panel for node *node_idx* using dynamic rows.
+        Populate the Connections panel for node *node_index* using dynamic rows.
 
         For every source port of the selected node a row is created with a
         disabled label and a Select showing compatible unconnected target ports.
         A symmetric row is created for every target port.  Selecting a new
         value immediately draws (or removes) the corresponding preview edge.
 
-        :param node_idx: Zero-based index of the node to show connections for.
+        :param node_index: Zero-based index of the node to show connections for.
         """
         if (
             self.state.connections_rows_column is None
@@ -1366,13 +1389,17 @@ class PlacementHandler:
         ):
             return
 
-        source_data = {k: list(v) for k, v in self.state.source_port_source.data.items()}
-        target_data = {k: list(v) for k, v in self.state.target_port_source.data.items()}
-        node_data = {k: list(v) for k, v in self.state.placed_nodes_source.data.items()}
-        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        source_data = {
+            key: list(value) for key, value in self.state.source_port_source.data.items()
+        }
+        target_data = {
+            key: list(value) for key, value in self.state.target_port_source.data.items()
+        }
+        node_data = {key: list(value) for key, value in self.state.placed_nodes_source.data.items()}
+        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
 
-        # Build lookup: port label → (peer_node_idx, peer_label) for every edge
-        # that touches node_idx.
+        # Build lookup: port label → (far_node_index, far_label) for every edge
+        # that touches node_index.
         connected_source: dict[str, tuple[int, str]] = {}
         connected_target: dict[str, tuple[int, str]] = {}
 
@@ -1384,34 +1411,34 @@ class PlacementHandler:
             starting_port_kind_value = edge_data["starting_port_kind"][i]
             ending_port_kind_value = edge_data["ending_port_kind"][i]
 
-            if starting_node_position == node_idx and starting_port_kind_value == "source":
+            if starting_node_position == node_index and starting_port_kind_value == "source":
                 connected_source[starting_port_label_value] = (
                     ending_node_position,
                     ending_port_label_value,
                 )
-            elif ending_node_position == node_idx and ending_port_kind_value == "source":
+            elif ending_node_position == node_index and ending_port_kind_value == "source":
                 connected_source[ending_port_label_value] = (
                     starting_node_position,
                     starting_port_label_value,
                 )
-            if starting_node_position == node_idx and starting_port_kind_value == "target":
+            if starting_node_position == node_index and starting_port_kind_value == "target":
                 connected_target[starting_port_label_value] = (
                     ending_node_position,
                     ending_port_label_value,
                 )
-            elif ending_node_position == node_idx and ending_port_kind_value == "target":
+            elif ending_node_position == node_index and ending_port_kind_value == "target":
                 connected_target[ending_port_label_value] = (
                     starting_node_position,
                     starting_port_label_value,
                 )
 
-        def _peer_string(peer_node_index: int, peer_label: str, peer_kind: str) -> str:
+        def _far_string(far_node_index: int, far_label: str, far_kind: str) -> str:
             name = (
-                node_data["name"][peer_node_index]
-                if peer_node_index < len(node_data.get("name", []))
-                else f"node_{peer_node_index}"
+                node_data["name"][far_node_index]
+                if far_node_index < len(node_data.get("name", []))
+                else f"node_{far_node_index}"
             )
-            return f"{name} ({peer_kind}:{peer_label})"
+            return f"{name} ({far_kind}:{far_label})"
 
         def _parse_choice(choice_string: str, candidates: list[tuple]) -> tuple | None:
             for node_index, label, kind, display_string in candidates:
@@ -1419,35 +1446,35 @@ class PlacementHandler:
                     return node_index, label, kind
             return None
 
-        _selected_source_color = ICONS_CONFIG.get(node_data["icon_type"][node_idx], {}).get(
+        selected_source_color = ICONS_CONFIG.get(node_data["icon_type"][node_index], {}).get(
             "source_color", ""
         )
         free_targets: list[tuple[int, str, str, str]] = []
         for j in range(len(target_data.get("node_index", []))):
             if (
                 target_data["connected"][j] == "False"
-                and target_data["node_index"][j] != node_idx
-                and target_data["color"][j] == _selected_source_color
+                and target_data["node_index"][j] != node_index
+                and target_data["color"][j] == selected_source_color
             ):
                 free_targets.append(
                     (
                         target_data["node_index"][j],
                         target_data["label"][j],
                         "target",
-                        _peer_string(
+                        _far_string(
                             target_data["node_index"][j], target_data["label"][j], "target"
                         ),
                     )
                 )
 
-        _selected_target_color = ICONS_CONFIG.get(node_data["icon_type"][node_idx], {}).get(
+        _selected_target_color = ICONS_CONFIG.get(node_data["icon_type"][node_index], {}).get(
             "target_color", ""
         )
         free_sources: list[tuple[int, str, str, str]] = []
         for j in range(len(source_data.get("node_index", []))):
             if (
                 source_data["connected"][j] == "False"
-                and source_data["node_index"][j] != node_idx
+                and source_data["node_index"][j] != node_index
                 and source_data["color"][j] == _selected_target_color
             ):
                 free_sources.append(
@@ -1455,7 +1482,7 @@ class PlacementHandler:
                         source_data["node_index"][j],
                         source_data["label"][j],
                         "source",
-                        _peer_string(
+                        _far_string(
                             source_data["node_index"][j], source_data["label"][j], "source"
                         ),
                     )
@@ -1465,132 +1492,141 @@ class PlacementHandler:
 
         # ── Source-port rows ──────────────────────────────────────────────────
         for i in range(len(source_data.get("node_index", []))):
-            if source_data["node_index"][i] != node_idx:
+            if source_data["node_index"][i] != node_index:
                 continue
 
-            src_label = source_data["label"][i]
+            source_label = source_data["label"][i]
             is_connected = source_data["connected"][i] == "True"
 
             label_input = bkmodel.TextInput(
-                value=f"source:{src_label}",
+                value=f"source:{source_label}",
                 width=180,
                 disabled=True,
                 styles={"color": "white", "font-size": "14px"},
             )
 
             candidates = list(free_targets)
-            current_str = _EMPTY
-            if is_connected and src_label in connected_source:
-                peer_node_i, peer_lbl = connected_source[src_label]
-                current_str = _peer_string(peer_node_i, peer_lbl, "target")
+            current_string = _EMPTY
+            if is_connected and source_label in connected_source:
+                far_node_i, far_label = connected_source[source_label]
+                current_string = _far_string(far_node_i, far_label, "target")
                 candidates = [
-                    c for c in candidates if not (c[0] == peer_node_i and c[1] == peer_lbl)
+                    candidate
+                    for candidate in candidates
+                    if not (candidate[0] == far_node_i and candidate[1] == far_label)
                 ] + [
-                    (peer_node_i, peer_lbl, "target", _peer_string(peer_node_i, peer_lbl, "target"))
+                    (far_node_i, far_label, "target", _far_string(far_node_i, far_label, "target"))
                 ]
 
-            choices = [_EMPTY] + [c[3] for c in candidates if c[3] != current_str]
-            if current_str and current_str not in choices:
-                choices = [current_str] + choices
+            choices = [_EMPTY] + [
+                candidate[3] for candidate in candidates if candidate[3] != current_string
+            ]
+            if current_string and current_string not in choices:
+                choices = [current_string] + choices
 
             value_select = bkmodel.Select(
-                value=current_str if current_str else _EMPTY,
+                value=current_string if current_string else _EMPTY,
                 options=choices,
                 width=180,
                 styles={"color": "white", "font-size": "12px"},
             )
 
-            def _make_src_callback(
-                _src_label=src_label,
-                _src_node_idx=node_idx,
-                _src_color=source_data["color"][i],
-                _src_x=source_data["x"][i],
-                _src_y=source_data["y"][i],
+            def _make_source_callback(
+                _source_label=source_label,
+                _source_node_idx=node_index,
+                _source_color=source_data["color"][i],
+                _source_x=source_data["x"][i],
+                _source_y=source_data["y"][i],
                 _candidates=candidates,
             ):
-                def _on_change(attr, old, new_val):
+                def _on_change(attr, old, new_value):
                     self.state.pending_connections = [
-                        (pa, pb)
-                        for pa, pb in self.state.pending_connections
+                        (starting_port, ending_port)
+                        for starting_port, ending_port in self.state.pending_connections
                         if not (
-                            pa["kind"] == "source"
-                            and pa["node_index"] == _src_node_idx
-                            and pa["label"] == _src_label
+                            starting_port["kind"] == "source"
+                            and starting_port["node_index"] == _source_node_idx
+                            and starting_port["label"] == _source_label
                         )
                     ]
                     self._clear_temp_edge_visuals()
-                    for pa, pb in list(self.state.pending_connections):
-                        self._add_edge_temp(pa, pb)
+                    for starting_port, ending_port in list(self.state.pending_connections):
+                        self._add_edge_temp(starting_port, ending_port)
 
-                    if new_val == _EMPTY:
+                    if new_value == _EMPTY:
                         if self.state.edge_source is not None:
-                            ed = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                            edge_data = {
+                                key: list(value)
+                                for key, value in self.state.edge_source.data.items()
+                            }
                             keep = [
                                 i
-                                for i in range(len(ed.get("starting_node_index", [])))
+                                for i in range(len(edge_data.get("starting_node_index", [])))
                                 if not (
                                     (
-                                        ed["starting_node_index"][i] == _src_node_idx
-                                        and ed["starting_port_label"][i] == _src_label
-                                        and ed["starting_port_kind"][i] == "source"
+                                        edge_data["starting_node_index"][i] == _source_node_idx
+                                        and edge_data["starting_port_label"][i] == _source_label
+                                        and edge_data["starting_port_kind"][i] == "source"
                                     )
                                     or (
-                                        ed["ending_node_index"][i] == _src_node_idx
-                                        and ed["ending_port_label"][i] == _src_label
-                                        and ed["ending_port_kind"][i] == "source"
+                                        edge_data["ending_node_index"][i] == _source_node_idx
+                                        and edge_data["ending_port_label"][i] == _source_label
+                                        and edge_data["ending_port_kind"][i] == "source"
                                     )
                                 )
                             ]
-                            self.state.edge_source.data = {k: [ed[k][j] for j in keep] for k in ed}
+                            self.state.edge_source.data = {
+                                k: [edge_data[k][j] for j in keep] for k in edge_data
+                            }
                             self._rebuild_all_ports()
-                            self._refresh_connections_table(_src_node_idx)
+                            self._refresh_connections_table(_source_node_idx)
                         return
 
-                    parsed = _parse_choice(new_val, _candidates)
+                    parsed = _parse_choice(new_value, _candidates)
                     if parsed is None:
                         return
-                    tgt_node_i, tgt_lbl, _ = parsed
+                    target_node_i, target_label, _ = parsed
 
-                    tgt_data = self.state.target_port_source.data
-                    tgt_x, tgt_y, tgt_color = None, None, None
-                    for j in range(len(tgt_data.get("node_index", []))):
+                    target_data = self.state.target_port_source.data
+                    target_x, target_y, target_color = None, None, None
+                    for j in range(len(target_data.get("node_index", []))):
                         if (
-                            tgt_data["node_index"][j] == tgt_node_i
-                            and tgt_data["label"][j] == tgt_lbl
+                            target_data["node_index"][j] == target_node_i
+                            and target_data["label"][j] == target_label
                         ):
-                            tgt_x = tgt_data["x"][j]
-                            tgt_y = tgt_data["y"][j]
-                            tgt_color = tgt_data["color"][j]
+                            target_x = target_data["x"][j]
+                            target_y = target_data["y"][j]
+                            target_color = target_data["color"][j]
                             break
-                    if tgt_x is None:
+                    if target_x is None:
                         return
 
-                    live_src_x, live_src_y = _src_x, _src_y
-                    src_data_live = self.state.source_port_source.data
-                    for j in range(len(src_data_live.get("node_index", []))):
+                    live_source_x, live_source_y = _source_x, _source_y
+                    source_data_live = self.state.source_port_source.data
+                    for j in range(len(source_data_live.get("node_index", []))):
                         if (
-                            src_data_live["node_index"][j] == _src_node_idx
-                            and src_data_live["label"][j] == _src_label
+                            source_data_live["node_index"][j] == _source_node_idx
+                            and source_data_live["label"][j] == _source_label
                         ):
-                            live_src_x = src_data_live["x"][j]
-                            live_src_y = src_data_live["y"][j]
+                            live_source_x = source_data_live["x"][j]
+                            live_source_y = source_data_live["y"][j]
                             break
 
                     starting_port = {
                         "kind": "source",
-                        "node_index": _src_node_idx,
-                        "label": _src_label,
-                        "x": live_src_x,
-                        "y": live_src_y,
-                        "color": _src_color,
+                        "node_index": _source_node_idx,
+                        "label": _source_label,
+                        "x": live_source_x,
+                        "y": live_source_y,
+                        "color": _source_color,
                     }
                     ending_port = {
                         "kind": "target",
-                        "node_index": tgt_node_i,
-                        "label": tgt_lbl,
-                        "x": tgt_x,
-                        "y": tgt_y,
-                        "color": tgt_color,
+                        "node_index": target_node_i,
+                        "label": target_label,
+                        "x": target_x,
+                        "y": target_y,
+                        "color": target_color,
                     }
                     self.state.pending_connections.append((starting_port, ending_port))
                     self._add_edge_temp(starting_port, ending_port)
@@ -1599,12 +1635,12 @@ class PlacementHandler:
 
             value_select.on_change(
                 "value",
-                _make_src_callback(
-                    _src_label=src_label,
-                    _src_node_idx=node_idx,
-                    _src_color=source_data["color"][i],
-                    _src_x=source_data["x"][i],
-                    _src_y=source_data["y"][i],
+                _make_source_callback(
+                    _source_label=source_label,
+                    _source_node_idx=node_index,
+                    _source_color=source_data["color"][i],
+                    _source_x=source_data["x"][i],
+                    _source_y=source_data["y"][i],
                     _candidates=candidates,
                 ),
             )
@@ -1612,132 +1648,141 @@ class PlacementHandler:
 
         # ── Target-port rows ──────────────────────────────────────────────────
         for i in range(len(target_data.get("node_index", []))):
-            if target_data["node_index"][i] != node_idx:
+            if target_data["node_index"][i] != node_index:
                 continue
 
-            tgt_label = target_data["label"][i]
+            target_label = target_data["label"][i]
             is_connected = target_data["connected"][i] == "True"
 
             label_input = bkmodel.TextInput(
-                value=f"target:{tgt_label}",
+                value=f"target:{target_label}",
                 width=180,
                 disabled=True,
                 styles={"color": "white", "font-size": "14px"},
             )
 
             candidates = list(free_sources)
-            current_str = _EMPTY
-            if is_connected and tgt_label in connected_target:
-                peer_node_i, peer_lbl = connected_target[tgt_label]
-                current_str = _peer_string(peer_node_i, peer_lbl, "source")
+            current_string = _EMPTY
+            if is_connected and target_label in connected_target:
+                far_node_i, far_label = connected_target[target_label]
+                current_string = _far_string(far_node_i, far_label, "source")
                 candidates = [
-                    c for c in candidates if not (c[0] == peer_node_i and c[1] == peer_lbl)
+                    candidate
+                    for candidate in candidates
+                    if not (candidate[0] == far_node_i and candidate[1] == far_label)
                 ] + [
-                    (peer_node_i, peer_lbl, "source", _peer_string(peer_node_i, peer_lbl, "source"))
+                    (far_node_i, far_label, "source", _far_string(far_node_i, far_label, "source"))
                 ]
 
-            choices = [_EMPTY] + [c[3] for c in candidates if c[3] != current_str]
-            if current_str and current_str not in choices:
-                choices = [current_str] + choices
+            choices = [_EMPTY] + [
+                candidate[3] for candidate in candidates if candidate[3] != current_string
+            ]
+            if current_string and current_string not in choices:
+                choices = [current_string] + choices
 
             value_select = bkmodel.Select(
-                value=current_str if current_str else _EMPTY,
+                value=current_string if current_string else _EMPTY,
                 options=choices,
                 width=180,
                 styles={"color": "white", "font-size": "12px"},
             )
 
-            def _make_tgt_callback(
-                _tgt_label=tgt_label,
-                _tgt_node_idx=node_idx,
-                _tgt_color=target_data["color"][i],
-                _tgt_x=target_data["x"][i],
-                _tgt_y=target_data["y"][i],
+            def _make_target_callback(
+                _target_label=target_label,
+                _target_node_idx=node_index,
+                _target_color=target_data["color"][i],
+                _target_x=target_data["x"][i],
+                _target_y=target_data["y"][i],
                 _candidates=candidates,
             ):
-                def _on_change(attr, old, new_val):
+                def _on_change(attr, old, new_value):
                     self.state.pending_connections = [
-                        (pa, pb)
-                        for pa, pb in self.state.pending_connections
+                        (starting_port, ending_port)
+                        for starting_port, ending_port in self.state.pending_connections
                         if not (
-                            pb["kind"] == "target"
-                            and pb["node_index"] == _tgt_node_idx
-                            and pb["label"] == _tgt_label
+                            ending_port["kind"] == "target"
+                            and ending_port["node_index"] == _target_node_idx
+                            and ending_port["label"] == _target_label
                         )
                     ]
                     self._clear_temp_edge_visuals()
-                    for pa, pb in list(self.state.pending_connections):
-                        self._add_edge_temp(pa, pb)
+                    for starting_port, ending_port in list(self.state.pending_connections):
+                        self._add_edge_temp(starting_port, ending_port)
 
-                    if new_val == _EMPTY:
+                    if new_value == _EMPTY:
                         if self.state.edge_source is not None:
-                            ed = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                            edge_data = {
+                                key: list(value)
+                                for key, value in self.state.edge_source.data.items()
+                            }
                             keep = [
                                 i
-                                for i in range(len(ed.get("starting_node_index", [])))
+                                for i in range(len(edge_data.get("starting_node_index", [])))
                                 if not (
                                     (
-                                        ed["starting_node_index"][i] == _tgt_node_idx
-                                        and ed["starting_port_label"][i] == _tgt_label
-                                        and ed["starting_port_kind"][i] == "target"
+                                        edge_data["starting_node_index"][i] == _target_node_idx
+                                        and edge_data["starting_port_label"][i] == _target_label
+                                        and edge_data["starting_port_kind"][i] == "target"
                                     )
                                     or (
-                                        ed["ending_node_index"][i] == _tgt_node_idx
-                                        and ed["ending_port_label"][i] == _tgt_label
-                                        and ed["ending_port_kind"][i] == "target"
+                                        edge_data["ending_node_index"][i] == _target_node_idx
+                                        and edge_data["ending_port_label"][i] == _target_label
+                                        and edge_data["ending_port_kind"][i] == "target"
                                     )
                                 )
                             ]
-                            self.state.edge_source.data = {k: [ed[k][j] for j in keep] for k in ed}
+                            self.state.edge_source.data = {
+                                k: [edge_data[k][j] for j in keep] for k in edge_data
+                            }
                             self._rebuild_all_ports()
-                            self._refresh_connections_table(_tgt_node_idx)
+                            self._refresh_connections_table(_target_node_idx)
                         return
 
-                    parsed = _parse_choice(new_val, _candidates)
+                    parsed = _parse_choice(new_value, _candidates)
                     if parsed is None:
                         return
-                    src_node_i, src_lbl, _ = parsed
+                    source_node_i, source_label, _ = parsed
 
-                    src_data = self.state.source_port_source.data
-                    src_x, src_y, src_color = None, None, None
-                    for j in range(len(src_data.get("node_index", []))):
+                    source_data = self.state.source_port_source.data
+                    source_x, source_y, source_color = None, None, None
+                    for j in range(len(source_data.get("node_index", []))):
                         if (
-                            src_data["node_index"][j] == src_node_i
-                            and src_data["label"][j] == src_lbl
+                            source_data["node_index"][j] == source_node_i
+                            and source_data["label"][j] == source_label
                         ):
-                            src_x = src_data["x"][j]
-                            src_y = src_data["y"][j]
-                            src_color = src_data["color"][j]
+                            source_x = source_data["x"][j]
+                            source_y = source_data["y"][j]
+                            source_color = source_data["color"][j]
                             break
-                    if src_x is None:
+                    if source_x is None:
                         return
 
-                    live_tgt_x, live_tgt_y = _tgt_x, _tgt_y
-                    tgt_data_live = self.state.target_port_source.data
-                    for j in range(len(tgt_data_live.get("node_index", []))):
+                    live_target_x, live_target_y = _target_x, _target_y
+                    target_data_live = self.state.target_port_source.data
+                    for j in range(len(target_data_live.get("node_index", []))):
                         if (
-                            tgt_data_live["node_index"][j] == _tgt_node_idx
-                            and tgt_data_live["label"][j] == _tgt_label
+                            target_data_live["node_index"][j] == _target_node_idx
+                            and target_data_live["label"][j] == _target_label
                         ):
-                            live_tgt_x = tgt_data_live["x"][j]
-                            live_tgt_y = tgt_data_live["y"][j]
+                            live_target_x = target_data_live["x"][j]
+                            live_target_y = target_data_live["y"][j]
                             break
 
                     starting_port = {
                         "kind": "source",
-                        "node_index": src_node_i,
-                        "label": src_lbl,
-                        "x": src_x,
-                        "y": src_y,
-                        "color": src_color,
+                        "node_index": source_node_i,
+                        "label": source_label,
+                        "x": source_x,
+                        "y": source_y,
+                        "color": source_color,
                     }
                     ending_port = {
                         "kind": "target",
-                        "node_index": _tgt_node_idx,
-                        "label": _tgt_label,
-                        "x": live_tgt_x,
-                        "y": live_tgt_y,
-                        "color": _tgt_color,
+                        "node_index": _target_node_idx,
+                        "label": _target_label,
+                        "x": live_target_x,
+                        "y": live_target_y,
+                        "color": _target_color,
                     }
                     self.state.pending_connections.append((starting_port, ending_port))
                     self._add_edge_temp(starting_port, ending_port)
@@ -1746,12 +1791,12 @@ class PlacementHandler:
 
             value_select.on_change(
                 "value",
-                _make_tgt_callback(
-                    _tgt_label=tgt_label,
-                    _tgt_node_idx=node_idx,
-                    _tgt_color=target_data["color"][i],
-                    _tgt_x=target_data["x"][i],
-                    _tgt_y=target_data["y"][i],
+                _make_target_callback(
+                    _target_label=target_label,
+                    _target_node_idx=node_index,
+                    _target_color=target_data["color"][i],
+                    _target_x=target_data["x"][i],
+                    _target_y=target_data["y"][i],
                     _candidates=candidates,
                 ),
             )
@@ -1761,7 +1806,7 @@ class PlacementHandler:
 
         # Keep connections_source in sync
         if self.state.connections_source is not None:
-            cs_my_port, cs_connected_to, cs_edge_idx = [], [], []
+            my_port, connected_to, edge_index = [], [], []
             for i in range(len(edge_data.get("starting_node_index", []))):
                 starting_node_position = edge_data["starting_node_index"][i]
                 ending_node_position = edge_data["ending_node_index"][i]
@@ -1770,33 +1815,33 @@ class PlacementHandler:
                 starting_port_kind_value = edge_data["starting_port_kind"][i]
                 ending_port_kind_value = edge_data["ending_port_kind"][i]
 
-                if starting_node_position == node_idx:
-                    peer_name = (
+                if starting_node_position == node_index:
+                    far_name = (
                         node_data["name"][ending_node_position]
                         if ending_node_position < len(node_data.get("name", []))
                         else f"node_{ending_node_position}"
                     )
-                    cs_my_port.append(f"{starting_port_kind_value}:{starting_port_label_value}")
-                    cs_connected_to.append(
-                        f"{peer_name} ({ending_port_kind_value}:{ending_port_label_value})"
+                    my_port.append(f"{starting_port_kind_value}:{starting_port_label_value}")
+                    connected_to.append(
+                        f"{far_name} ({ending_port_kind_value}:{ending_port_label_value})"
                     )
-                    cs_edge_idx.append(i)
-                elif ending_node_position == node_idx:
-                    peer_name = (
+                    edge_index.append(i)
+                elif ending_node_position == node_index:
+                    far_name = (
                         node_data["name"][starting_node_position]
                         if starting_node_position < len(node_data.get("name", []))
                         else f"node_{starting_node_position}"
                     )
-                    cs_my_port.append(f"{ending_port_kind_value}:{ending_port_label_value}")
-                    cs_connected_to.append(
-                        f"{peer_name} ({starting_port_kind_value}:{starting_port_label_value})"
+                    my_port.append(f"{ending_port_kind_value}:{ending_port_label_value}")
+                    connected_to.append(
+                        f"{far_name} ({starting_port_kind_value}:{starting_port_label_value})"
                     )
-                    cs_edge_idx.append(i)
+                    edge_index.append(i)
 
             self.state.connections_source.data = dict(
-                my_port=cs_my_port,
-                connected_to=cs_connected_to,
-                edge_idx=cs_edge_idx,
+                my_port=my_port,
+                connected_to=connected_to,
+                edge_idx=edge_index,
             )
 
     def _delete_selected_connection(self):
@@ -1814,7 +1859,7 @@ class PlacementHandler:
             return
         edge_index_list = list(self.state.connections_source.data.get("edge_idx", []))
         to_delete = {edge_index_list[i] for i in selected if i < len(edge_index_list)}
-        edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
         keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
         self.state.edge_source.data = {k: [edge_data[k][j] for j in keep] for k in edge_data}
         self._mark_unsaved()
@@ -1848,21 +1893,21 @@ class PlacementHandler:
                 return
 
         if self.state.delete_mode:
-            best_node_index, best_node_distance, current = self._best_possible_node(x, y)
+            best_node_index, best_node_distance, nodes_data = self._best_possible_node(x, y)
 
             if best_node_index is not None:
-                new_data = {key: list(values) for key, values in current.items()}
-                for col in new_data:
-                    new_data[col].pop(best_node_index)
+                new_data = {key: list(values) for key, values in nodes_data.items()}
+                for column in new_data:
+                    new_data[column].pop(best_node_index)
                 self.state.placed_nodes_source.data = new_data
 
                 if self.state.hover_source is not None:
                     hover_data = {
                         key: list(values) for key, values in self.state.hover_source.data.items()
                     }
-                    for col in hover_data:
-                        if best_node_index < len(hover_data[col]):
-                            hover_data[col].pop(best_node_index)
+                    for column in hover_data:
+                        if best_node_index < len(hover_data[column]):
+                            hover_data[column].pop(best_node_index)
                     self.state.hover_source.data = hover_data
 
                 if self.state.edge_source is not None:
@@ -1871,13 +1916,14 @@ class PlacementHandler:
                     }
                     keep_indices = [
                         i
-                        for i, (node_a_index, node_b_index) in enumerate(
+                        for i, (starting_node_index, ending_node_index) in enumerate(
                             zip(
                                 edge_data.get("starting_node_index", []),
                                 edge_data.get("ending_node_index", []),
                             )
                         )
-                        if node_a_index != best_node_index and node_b_index != best_node_index
+                        if starting_node_index != best_node_index
+                        and ending_node_index != best_node_index
                     ]
                     new_edge_data = {}
                     for column_key, column_values in edge_data.items():
@@ -1906,7 +1952,9 @@ class PlacementHandler:
             else:
                 edge_idx = self._find_nearest_edge(x, y)
                 if edge_idx is not None and self.state.edge_source is not None:
-                    edge_data = {k: list(v) for k, v in self.state.edge_source.data.items()}
+                    edge_data = {
+                        key: list(value) for key, value in self.state.edge_source.data.items()
+                    }
                     for k in edge_data:
                         edge_data[k].pop(edge_idx)
                     self.state.edge_source.data = edge_data
@@ -1919,7 +1967,7 @@ class PlacementHandler:
             return
 
         if self.state.selected_component is None:
-            best_node_index, best_node_distance, current = self._best_possible_node(x, y)
+            best_node_index, best_node_distance, nodes_data = self._best_possible_node(x, y)
             self._cancel_pending_connection()
 
             if best_node_index is None and best_node_distance is None:
@@ -1943,18 +1991,16 @@ class PlacementHandler:
             self._clear_temp_edges()
             self._clear_node_table()
 
-        component_icon_key = self.state.selected_component
-        placement_count = self.state.placed_counter.get(component_icon_key, 0) + 1
-        self.state.placed_counter[component_icon_key] = placement_count
-        node_name = f"{component_icon_key}_{placement_count}"
+        icon_key = self.state.selected_component
+        placement_count = self.state.placed_counter.get(icon_key, 0) + 1
+        self.state.placed_counter[icon_key] = placement_count
+        node_name = f"{icon_key}_{placement_count}"
 
-        icon_path = ICONS_CONFIG[component_icon_key]["icon_path"]
+        icon_path = ICONS_CONFIG[icon_key]["icon_path"]
         file_url = "file://" + str(Path(icon_path).resolve())
         base64_url = _url_to_base64(file_url)
 
-        default_component_type = self.state.component_type_to_icon.get(
-            component_icon_key, component_icon_key
-        )[0]
+        default_component_type = self.state.component_type_to_icon.get(icon_key, icon_key)[0]
         position_choices = self.state.possible_position.get(default_component_type, [])
         default_position = position_choices[0] if position_choices else _EMPTY
 
@@ -1974,22 +2020,22 @@ class PlacementHandler:
         default_target_port_count = self.state.default_target_count.get(default_component_type, 0)
 
         icon_pixel_size = self.icon_size
-        current = self.state.placed_nodes_source.data
+        nodes_data = self.state.placed_nodes_source.data
         self.state.placed_nodes_source.data = {
-            "x": list(current["x"]) + [x],
-            "y": list(current["y"]) + [y],
-            "url": list(current["url"]) + [base64_url],
-            "w": list(current["w"]) + [icon_pixel_size],
-            "h": list(current["h"]) + [icon_pixel_size],
-            "name": list(current["name"]) + [node_name],
-            "icon_type": list(current.get("icon_type", [])) + [component_icon_key],
-            "node_type": list(current.get("node_type", [])) + [default_component_type],
-            "position": list(current.get("position", [])) + [default_position],
-            "options": list(current.get("options", [])) + [default_options_json],
-            "n_sources": list(current.get("n_sources", [])) + [default_source_port_count],
-            "n_targets": list(current.get("n_targets", [])) + [default_target_port_count],
-            "symmetry_name": list(current.get("symmetry_name", [])) + [_EMPTY],
-            "symmetry_node_index": list(current.get("symmetry_node_index", [])) + [-1],
+            "x": list(nodes_data["x"]) + [x],
+            "y": list(nodes_data["y"]) + [y],
+            "url": list(nodes_data["url"]) + [base64_url],
+            "w": list(nodes_data["w"]) + [icon_pixel_size],
+            "h": list(nodes_data["h"]) + [icon_pixel_size],
+            "name": list(nodes_data["name"]) + [node_name],
+            "icon_type": list(nodes_data.get("icon_type", [])) + [icon_key],
+            "node_type": list(nodes_data.get("node_type", [])) + [default_component_type],
+            "position": list(nodes_data.get("position", [])) + [default_position],
+            "options": list(nodes_data.get("options", [])) + [default_options_json],
+            "n_sources": list(nodes_data.get("n_sources", [])) + [default_source_port_count],
+            "n_targets": list(nodes_data.get("n_targets", [])) + [default_target_port_count],
+            "symmetry_name": list(nodes_data.get("symmetry_name", [])) + [_EMPTY],
+            "symmetry_node_index": list(nodes_data.get("symmetry_node_index", [])) + [-1],
         }
 
         if self.state.hover_source is not None:
