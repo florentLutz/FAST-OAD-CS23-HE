@@ -5,9 +5,9 @@
 """
 Standalone Bokeh server launcher for the powertrain builder.
 
-:class:`PowertrainBuilderLauncher` builds the full Bokeh document (canvas,
-palette, configurator panel, startup overlay) and starts a local server,
-opening the application in the default browser.
+:class:`PowertrainBuilderLauncher` builds the full Bokeh document — canvas,
+palette, configurator panel, and startup overlay — and starts a local Bokeh
+server, opening the application in the default browser.
 
 Typical usage::
 
@@ -75,25 +75,22 @@ def _add_canvas_legend(canvas) -> None:
     of the builder canvas, mirroring the layout of the network viewer's
     :meth:`LegendBuilder._add_legend`.
 
-    Each row contains:
-
-    * A small colour PNG icon (fuel / mechanical / electricity) on the **left**,
-      loaded via :func:`_url_to_base64` exactly as the viewer does.
-    * A text label to the **right** of the icon, drawn in the edge color of
-      that connection type.
+    Each row contains a small colour PNG icon (fuel, mechanical, or
+    electricity) on the left — loaded via :func:`_url_to_base64` — and a
+    text label drawn in the edge colour of that connection type on the right.
 
     :param canvas: The Bokeh ``Figure`` to annotate.
     """
-    for i, (icon_key, description, edge_color) in enumerate(_LEGEND_ENTRIES):
-        y = _LEGEND_Y_TOP - i * _LEGEND_ROW_STEP
+    for entry_index, (icon_key, description, edge_color) in enumerate(_LEGEND_ENTRIES):
+        entry_y = _LEGEND_Y_TOP - entry_index * _LEGEND_ROW_STEP
 
         # ── PNG icon (left) ───────────────────────────────────────────────────
-        icon_path = COLOR_ICON_CONFIG[icon_key]
-        icon_url = _url_to_base64("file://" + str(icon_path.resolve()))
+        icon_file_path = COLOR_ICON_CONFIG[icon_key]
+        icon_base64_url = _url_to_base64("file://" + str(icon_file_path.resolve()))
         canvas.image_url(
-            url=[icon_url],
+            url=[icon_base64_url],
             x=[_LEGEND_X_ICON],
-            y=[y],
+            y=[entry_y],
             w=_LEGEND_ICON_W,
             h=_LEGEND_ICON_H,
             anchor="center",
@@ -106,7 +103,7 @@ def _add_canvas_legend(canvas) -> None:
                 y="y",
                 text="text",
                 source=bkmodel.ColumnDataSource(
-                    data=dict(x=[_LEGEND_X_LABEL], y=[y], text=[description])
+                    data=dict(x=[_LEGEND_X_LABEL], y=[entry_y], text=[description])
                 ),
                 text_align="left",
                 text_baseline="middle",
@@ -121,13 +118,17 @@ class PowertrainBuilderLauncher:
     Launch a self-contained Bokeh server running the powertrain builder.
 
     A blank canvas is placed in the centre, flanked by the component palette
-    on the left and the configurator panel on the right.
+    on the left and the component configurator panel on the right. The server
+    stops automatically when the browser session ends.
     """
 
     @staticmethod
     def launch(port: int = 5007, address: str = "localhost"):
         """
         Start the Bokeh server and open it in the default browser.
+
+        Configures logging, builds the Bokeh document, starts the server on
+        the given port, and blocks the calling thread until the session ends.
 
         :param port: TCP port for the Bokeh server (default 5007).
         :param address: Server bind address (default ``"localhost"``).
@@ -140,7 +141,7 @@ class PowertrainBuilderLauncher:
         logging.getLogger("tornado").setLevel(logging.WARNING)
 
         def make_document(doc):
-            """Build the Bokeh document with palette, canvas, and configurator panel."""
+            """Build the complete Bokeh document: palette, canvas, and configurator panel."""
             palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
 
             # ── Canvas ────────────────────────────────────────────────────────
@@ -361,174 +362,248 @@ class PowertrainBuilderLauncher:
                 state.position_select.options = pos_choices
                 state.position_select.value = pos_choices[0] if pos_choices else _EMPTY
 
-                idx = state.selected_node_index
+                current_selected_node_index_for_type = state.selected_node_index
                 saved_options = {}
-                if idx is not None:
-                    saved_options_json = list(state.placed_nodes_source.data.get("options", []))
-                    if idx < len(saved_options_json):
+                if current_selected_node_index_for_type is not None:
+                    saved_options_json_list = list(
+                        state.placed_nodes_source.data.get("options", [])
+                    )
+                    if current_selected_node_index_for_type < len(saved_options_json_list):
                         try:
-                            saved_options = json.loads(saved_options_json[idx]) or {}
+                            saved_options = (
+                                json.loads(
+                                    saved_options_json_list[current_selected_node_index_for_type]
+                                )
+                                or {}
+                            )
                         except (json.JSONDecodeError, TypeError):
                             pass
                 handler._refresh_options_table(new, saved_options)
                 state.options_table.visible = bool(state.possible_options.get(new, {}))
 
-                if idx is not None:
-                    icon_types = list(state.placed_nodes_source.data.get("icon_type", []))
-                    icon_type = icon_types[idx] if idx < len(icon_types) else _EMPTY
-                    handler._refresh_symmetry_select(idx, icon_type)
+                if current_selected_node_index_for_type is not None:
+                    icon_type_list = list(state.placed_nodes_source.data.get("icon_type", []))
+                    icon_type = (
+                        icon_type_list[current_selected_node_index_for_type]
+                        if current_selected_node_index_for_type < len(icon_type_list)
+                        else _EMPTY
+                    )
+                    handler._refresh_symmetry_select(
+                        current_selected_node_index_for_type, icon_type
+                    )
 
             state.type_select.on_change("value", _on_type_select_change)
 
             # ── Apply button: commit config panel edits to placed_nodes_source ─
             def apply_node_configurations():
-                selected_node_index = state.selected_node_index
-                if selected_node_index is None:
+                current_selected_node_index = state.selected_node_index
+                if current_selected_node_index is None:
                     return
 
-                new_om_name = state.name_input.value
+                # Get node properties from the configurator panel
+                new_node_name_id = state.name_input.value
                 new_node_type = state.type_select.value
                 new_position = state.position_select.value
 
                 option_names = list(state.options_source.data.get("options", []))
                 option_values = list(state.options_source.data.get("value", []))
-                options_dict = {
-                    name: PlacementHandler._strings_to_option_values(value)
-                    for name, value in zip(option_names, option_values)
+                option_values_dict = {
+                    option_name: PlacementHandler._strings_to_option_values(option_value)
+                    for option_name, option_value in zip(option_names, option_values)
                 }
-                opts_json = json.dumps(options_dict)
+                # convert the options dict to a JSON string for storage in the ColumnDataSource
+                options_json_string = json.dumps(option_values_dict)
 
-                pdata = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
+                placed_nodes_data = {
+                    key: list(values) for key, values in state.placed_nodes_source.data.items()
+                }
 
-                if selected_node_index < len(pdata.get("name", [])):
-                    pdata["name"][selected_node_index] = new_om_name
-                if selected_node_index < len(pdata.get("node_type", [])):
-                    pdata["node_type"][selected_node_index] = new_node_type
-                    # Reset port counts to defaults when the type changes and spinners are hidden
+                # Check first if the current_selected_node_index is within bounds for each property
+                # before updating, to avoid IndexErrors.
+                if current_selected_node_index < len(placed_nodes_data.get("name", [])):
+                    placed_nodes_data["name"][current_selected_node_index] = new_node_name_id
+                if current_selected_node_index < len(placed_nodes_data.get("node_type", [])):
+                    placed_nodes_data["node_type"][current_selected_node_index] = new_node_type
+                    # Reset port counts to defaults when the type changes and spinners are hidden.
                     if not state.source_count_spinner.visible:
-                        pdata["n_sources"][selected_node_index] = int(
+                        placed_nodes_data["n_sources"][current_selected_node_index] = int(
                             state.default_source_count.get(new_node_type, 0)
                         )
-                        pdata["n_targets"][selected_node_index] = int(
+                        placed_nodes_data["n_targets"][current_selected_node_index] = int(
                             state.default_target_count.get(new_node_type, 0)
                         )
-                if selected_node_index < len(pdata.get("position", [])):
-                    pdata["position"][selected_node_index] = new_position
-                if "options" not in pdata:
-                    pdata["options"] = ["{}"] * len(pdata.get("name", []))
-                if selected_node_index < len(pdata["options"]):
-                    pdata["options"][selected_node_index] = opts_json
+                if current_selected_node_index < len(placed_nodes_data.get("position", [])):
+                    placed_nodes_data["position"][current_selected_node_index] = new_position
+                # Place empty dict if there is no options entry for this node yet
+                if "options" not in placed_nodes_data:
+                    placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
+                # Update options JSON string for this node
+                if current_selected_node_index < len(placed_nodes_data["options"]):
+                    placed_nodes_data["options"][current_selected_node_index] = options_json_string
 
+                # These two spinners shows only if the node type supports multiple ports
                 if state.source_count_spinner is not None and state.source_count_spinner.visible:
-                    new_n_src = int(state.source_count_spinner.value)
-                    if "n_sources" in pdata and selected_node_index < len(pdata["n_sources"]):
-                        pdata["n_sources"][selected_node_index] = new_n_src
+                    new_source_port_count = int(state.source_count_spinner.value)
+                    if "n_sources" in placed_nodes_data and current_selected_node_index < len(
+                        placed_nodes_data["n_sources"]
+                    ):
+                        placed_nodes_data["n_sources"][current_selected_node_index] = (
+                            new_source_port_count
+                        )
                 if state.target_count_spinner is not None and state.target_count_spinner.visible:
-                    new_n_tgt = int(state.target_count_spinner.value)
-                    if "n_targets" in pdata and selected_node_index < len(pdata["n_targets"]):
-                        pdata["n_targets"][selected_node_index] = new_n_tgt
-
-                state.placed_nodes_source.data = pdata
+                    new_target_port_count = int(state.target_count_spinner.value)
+                    if "n_targets" in placed_nodes_data and current_selected_node_index < len(
+                        placed_nodes_data["n_targets"]
+                    ):
+                        placed_nodes_data["n_targets"][current_selected_node_index] = (
+                            new_target_port_count
+                        )
 
                 # Update hover_source name and type
-                hdata = {k: list(v) for k, v in state.hover_source.data.items()}
-                if selected_node_index < len(hdata.get("name", [])):
-                    hdata["name"][selected_node_index] = new_om_name
-                if selected_node_index < len(hdata.get("node_type", [])):
-                    hdata["node_type"][selected_node_index] = new_node_type
-                state.hover_source.data = hdata
+                hover_data = {key: list(values) for key, values in state.hover_source.data.items()}
+                if current_selected_node_index < len(hover_data.get("name", [])):
+                    hover_data["name"][current_selected_node_index] = new_node_name_id
+                if current_selected_node_index < len(hover_data.get("node_type", [])):
+                    hover_data["node_type"][current_selected_node_index] = new_node_type
+                state.hover_source.data = hover_data
 
                 # ── Persist symmetry selection ────────────────────────────────
-                new_sym_name = (
+                _NO_SYMMETRY_PEER = -1
+                all_node_names = placed_nodes_data.get("name", [])
+                node_count = len(all_node_names)
+
+                # Guard: current index must be valid before we touch names.
+                if current_selected_node_index >= node_count:
+                    return
+
+                current_node_name = all_node_names[current_selected_node_index]
+                new_symmetry_name = (
                     state.symmetry_select.value if state.symmetry_select is not None else _EMPTY
                 )
-                pdata2 = {k: list(v) for k, v in state.placed_nodes_source.data.items()}
-                names_list = pdata2.get("name", [])
 
-                sym_peer_idx = -1
-                if new_sym_name:
-                    for _j, _n in enumerate(names_list):
-                        if _n == new_sym_name:
-                            sym_peer_idx = _j
+                # Ensure symmetry columns exist and are fully sized (handles newly added nodes).
+                symmetry_names = list(placed_nodes_data.get("symmetry_name", []))
+                symmetry_indices = list(placed_nodes_data.get("symmetry_node_index", []))
+                if len(symmetry_names) < node_count:
+                    symmetry_names += [_EMPTY] * (node_count - len(symmetry_names))
+                if len(symmetry_indices) < node_count:
+                    symmetry_indices += [_NO_SYMMETRY_PEER] * (node_count - len(symmetry_indices))
+
+                # Resolve the newly chosen peer index.
+                new_peer_index = _NO_SYMMETRY_PEER
+                if new_symmetry_name and new_symmetry_name != _EMPTY:
+                    for node_position, node_name in enumerate(all_node_names):
+                        if node_name == new_symmetry_name:
+                            new_peer_index = node_position
                             break
 
-                pdata2.setdefault("symmetry_name", [_EMPTY] * len(names_list))
-                pdata2.setdefault("symmetry_node_index", [-1] * len(names_list))
+                # ── Clear stale references on both sides before writing ────────
+                #
+                # Two nodes may be displaced by this Apply:
+                #   (a) current node's *old* peer  — it pointed back at current_node;
+                #       now current_node is leaving, so clear it.
+                #   (b) new peer's *old* partner   — new_peer previously pointed at
+                #       some other node D; D still points at new_peer, so clear D too.
+                #
+                # We handle both by scanning the full table and wiping every node
+                # whose symmetry_name matches current_node_name OR new_symmetry_name,
+                # excluding the two nodes that will get fresh values written below.
 
-                if selected_node_index < len(pdata2["symmetry_name"]):
-                    pdata2["symmetry_name"][selected_node_index] = new_sym_name
-                if selected_node_index < len(pdata2["symmetry_node_index"]):
-                    pdata2["symmetry_node_index"][selected_node_index] = sym_peer_idx
+                nodes_getting_fresh_write = {current_selected_node_index}
+                if new_peer_index != _NO_SYMMETRY_PEER:
+                    nodes_getting_fresh_write.add(new_peer_index)
 
-                current_node_name = (
-                    names_list[selected_node_index]
-                    if selected_node_index < len(names_list)
-                    else _EMPTY
-                )
-                if sym_peer_idx >= 0:
-                    if sym_peer_idx < len(pdata2["symmetry_name"]):
-                        pdata2["symmetry_name"][sym_peer_idx] = current_node_name
-                    if sym_peer_idx < len(pdata2["symmetry_node_index"]):
-                        pdata2["symmetry_node_index"][sym_peer_idx] = selected_node_index
-                elif not new_sym_name:
-                    # Clear the old peer's back-reference if symmetry was removed
-                    for _j in range(len(names_list)):
-                        if (
-                            _j != selected_node_index
-                            and _j < len(pdata2["symmetry_name"])
-                            and pdata2["symmetry_name"][_j] == current_node_name
-                        ):
-                            pdata2["symmetry_name"][_j] = _EMPTY
-                            if _j < len(pdata2["symmetry_node_index"]):
-                                pdata2["symmetry_node_index"][_j] = -1
+                for position in range(node_count):
+                    if position in nodes_getting_fresh_write:
+                        continue
+                    sym_name = symmetry_names[position]
+                    if sym_name == current_node_name or (
+                        new_symmetry_name
+                        and new_symmetry_name != _EMPTY
+                        and sym_name == new_symmetry_name
+                    ):
+                        symmetry_names[position] = _EMPTY
+                        symmetry_indices[position] = _NO_SYMMETRY_PEER
 
-                state.placed_nodes_source.data = pdata2
+                # Write the current node's new symmetry entry.
+                symmetry_names[current_selected_node_index] = new_symmetry_name
+                symmetry_indices[current_selected_node_index] = new_peer_index
+
+                # Write the new peer's back-reference (if a peer was chosen).
+                if new_peer_index != _NO_SYMMETRY_PEER:
+                    symmetry_names[new_peer_index] = current_node_name
+                    symmetry_indices[new_peer_index] = current_selected_node_index
+
+                placed_nodes_data["symmetry_name"] = symmetry_names
+                placed_nodes_data["symmetry_node_index"] = symmetry_indices
+
+                # Update the placed_nodes_source with the modified data
+                state.placed_nodes_source.data = placed_nodes_data
 
                 # ── Commit pending connections ─────────────────────────────────
-                for port_a, port_b in list(state.pending_connections):
-                    handler._add_edge(port_a, port_b)
+                for starting_port, ending_port in list(state.pending_connections):
+                    handler._add_edge(starting_port, ending_port)
                 handler._clear_temp_edges()
                 handler._rebuild_all_ports()
-                handler._refresh_connections_table(selected_node_index)
+                handler._refresh_connections_table(current_selected_node_index)
 
                 # Log applied state
-                _ed = state.edge_source.data if state.edge_source is not None else {}
-                _names = list(state.placed_nodes_source.data.get("name", []))
-                _conn_entries = []
-                for _i in range(len(_ed.get("node_a_idx", []))):
-                    _na = _ed["node_a_idx"][_i]
-                    _nb = _ed["node_b_idx"][_i]
-                    if _na == selected_node_index or _nb == selected_node_index:
-                        _peer = _nb if _na == selected_node_index else _na
-                        _peer_name = _names[_peer] if _peer < len(_names) else f"node_{_peer}"
-                        _my_kind = (
-                            _ed["a_kind"][_i] if _na == selected_node_index else _ed["b_kind"][_i]
+                edge_data_snapshot = state.edge_source.data if state.edge_source is not None else {}
+                all_placed_names = list(state.placed_nodes_source.data.get("name", []))
+                connection_log_entries = []
+                for edge_index in range(len(edge_data_snapshot.get("starting_node_index", []))):
+                    starting_node_index = edge_data_snapshot["starting_node_index"][edge_index]
+                    ending_node_index = edge_data_snapshot["ending_node_index"][edge_index]
+                    if (
+                        starting_node_index == current_selected_node_index
+                        or ending_node_index == current_selected_node_index
+                    ):
+                        connected_node_index = (
+                            ending_node_index
+                            if starting_node_index == current_selected_node_index
+                            else starting_node_index
                         )
-                        _my_lbl = (
-                            _ed["a_label"][_i] if _na == selected_node_index else _ed["b_label"][_i]
+                        connected_node_name = (
+                            all_placed_names[connected_node_index]
+                            if connected_node_index < len(all_placed_names)
+                            else f"node_{connected_node_index}"
                         )
-                        _pr_kind = (
-                            _ed["b_kind"][_i] if _na == selected_node_index else _ed["a_kind"][_i]
+                        my_port_kind = (
+                            edge_data_snapshot["starting_port_kind"][edge_index]
+                            if starting_node_index == current_selected_node_index
+                            else edge_data_snapshot["ending_port_kind"][edge_index]
                         )
-                        _pr_lbl = (
-                            _ed["b_label"][_i] if _na == selected_node_index else _ed["a_label"][_i]
+                        my_port_label = (
+                            edge_data_snapshot["starting_port_label"][edge_index]
+                            if starting_node_index == current_selected_node_index
+                            else edge_data_snapshot["ending_port_label"][edge_index]
                         )
-                        _conn_entries.append(
+                        connected_port_kind = (
+                            edge_data_snapshot["ending_port_kind"][edge_index]
+                            if starting_node_index == current_selected_node_index
+                            else edge_data_snapshot["starting_port_kind"][edge_index]
+                        )
+                        connected_port_label = (
+                            edge_data_snapshot["ending_port_label"][edge_index]
+                            if starting_node_index == current_selected_node_index
+                            else edge_data_snapshot["starting_port_label"][edge_index]
+                        )
+                        connection_log_entries.append(
                             {
-                                "my_port": f"{_my_kind}:{_my_lbl}",
-                                "connected_to_node": _peer_name,
-                                "connected_to_port": f"{_pr_kind}:{_pr_lbl}",
+                                "my_port": f"{my_port_kind}:{my_port_label}",
+                                "connected_to_node": connected_node_name,
+                                "connected_to_port": f"{connected_port_kind}:{connected_port_label}",
                             }
                         )
 
                 _LOGGER.info(
                     "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
-                    selected_node_index,
-                    new_om_name,
+                    current_selected_node_index,
+                    new_node_name_id,
                     new_node_type,
                     new_position,
-                    opts_json,
-                    json.dumps(_conn_entries),
+                    options_json_string,
+                    json.dumps(connection_log_entries),
                 )
                 handler._mark_unsaved()
 
@@ -583,7 +658,7 @@ class PowertrainBuilderLauncher:
             doc.title = "Powertrain Builder"
 
         def make_document_with_tracking(doc):
-            """Wrap ``make_document`` to stop the IO loop when the session ends."""
+            """Wrap :func:`make_document` and register a session-destroyed hook that stops the IO loop."""
             make_document(doc)
 
             def on_destroy(session_context):

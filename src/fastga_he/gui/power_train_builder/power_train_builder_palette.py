@@ -5,10 +5,10 @@
 """
 Palette sidebar and component-configurator panel builder.
 
-:class:`ComponentPaletteConfigurationTableBuilder` is a pure factory — it
+:class:`ComponentPaletteConfigurationTableBuilder` is a pure factory that
 constructs every Bokeh widget and data source needed by the builder UI and
-packages them into a :class:`BuilderState`.  No callbacks are wired here;
-that responsibility belongs to :class:`PlacementHandler`.
+packages them into a :class:`BuilderState`. No event callbacks are wired
+here; that responsibility belongs to :class:`PlacementHandler`.
 
 Typical usage::
 
@@ -76,39 +76,47 @@ class ComponentPaletteConfigurationTableBuilder:
     """
     Build the palette sidebar and component-configurator panel as Bokeh widgets.
 
-    This class is **pure** – it only constructs Bokeh objects and returns them;
-    all callbacks are wired by :class:`PlacementHandler`.
+    This class is **pure**: it only constructs Bokeh objects and returns them.
+    All event callbacks are wired by :class:`PlacementHandler`.
     """
 
     @staticmethod
     def build() -> tuple:
         """
-        Construct the button palette, configurator panel, and shared state.
+        Construct the button palette, configurator panel, and shared builder state.
 
-        :return: ``(palette_column_layout, table_panel, BuilderState)``
+        :return: A three-element tuple
+            ``(palette_column_layout, table_panel, BuilderState)`` where
+
+            * ``palette_column_layout`` is the left-side Bokeh column widget
+              containing the tabbed component buttons and action buttons.
+            * ``table_panel`` is the right-side Bokeh column widget for the
+              component configurator.
+            * :class:`BuilderState` holds references to every shared widget
+              and data source.
         """
         # ── Categorise icons into tab groups ──────────────────────────────────
         component_icon_keys = list(ICONS_CONFIG.keys())
-        category_keys: dict = {}
+        category_to_icon_keys: dict = {}
         for component in KNOWN_COMPONENTS:
-            icon = component["icon_for_network_graph"]
+            icon_key = component["icon_for_network_graph"]
             component_type_class = component["components_type_class"]
             if isinstance(component_type_class, list):
                 for type_class in component_type_class:
                     if type_class == "propulsive_load":
                         continue
-                    elif type_class not in category_keys:
-                        category_keys[type_class] = [icon]
-                    elif icon not in category_keys[type_class]:
-                        category_keys[type_class].append(icon)
+                    elif type_class not in category_to_icon_keys:
+                        category_to_icon_keys[type_class] = [icon_key]
+                    elif icon_key not in category_to_icon_keys[type_class]:
+                        category_to_icon_keys[type_class].append(icon_key)
             elif component_type_class == "propulsive_load":
-                category_keys.setdefault("load", [])
-                if icon not in category_keys["load"]:
-                    category_keys["load"].append(icon)
-            elif component_type_class not in category_keys:
-                category_keys[component_type_class] = [icon]
-            elif icon not in category_keys[component_type_class]:
-                category_keys[component_type_class].append(icon)
+                category_to_icon_keys.setdefault("load", [])
+                if icon_key not in category_to_icon_keys["load"]:
+                    category_to_icon_keys["load"].append(icon_key)
+            elif component_type_class not in category_to_icon_keys:
+                category_to_icon_keys[component_type_class] = [icon_key]
+            elif icon_key not in category_to_icon_keys[component_type_class]:
+                category_to_icon_keys[component_type_class].append(icon_key)
 
         # ── Shared stylesheet for action buttons (Delete, Save, End Session) ──
         _action_stylesheet = [":host button { font-size: 1.4em; }"]
@@ -142,16 +150,16 @@ class ComponentPaletteConfigurationTableBuilder:
         ]
 
         buttons = []
-        button_by_key: dict = {}
-        for key in component_icon_keys:
-            label = _string_cleanup(key)
-            icon_path = ICONS_CONFIG[key]["icon_path"]
+        button_by_icon_key: dict = {}
+        for icon_key in component_icon_keys:
+            label = _string_cleanup(icon_key)
+            icon_path = ICONS_CONFIG[icon_key]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
-            b64_url = _url_to_base64(file_url)
+            base64_url = _url_to_base64(file_url)
             svg = (
                 f'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"'
                 f' viewBox="0 0 120 120">'
-                f'<image href="{b64_url}" width="120" height="120"/></svg>'
+                f'<image href="{base64_url}" width="120" height="120"/></svg>'
             )
             button = bkmodel.Button(
                 label=label,
@@ -162,7 +170,7 @@ class ComponentPaletteConfigurationTableBuilder:
                 stylesheets=_btn_stylesheet,
             )
             buttons.append(button)
-            button_by_key[key] = button
+            button_by_icon_key[icon_key] = button
 
         status_div = bkmodel.Div(
             text="<i style='color:#aaa;font-size:14pt'>Select a component</i>",
@@ -544,12 +552,12 @@ class ComponentPaletteConfigurationTableBuilder:
                 xs=[],
                 ys=[],
                 color=[],
-                node_a_idx=[],
-                a_label=[],
-                a_kind=[],
-                node_b_idx=[],
-                b_label=[],
-                b_kind=[],
+                starting_node_index=[],
+                starting_port_label=[],
+                starting_port_kind=[],
+                ending_node_index=[],
+                ending_port_label=[],
+                ending_port_kind=[],
             )
         )
         pending_port_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], color=[]))
@@ -679,9 +687,11 @@ class ComponentPaletteConfigurationTableBuilder:
         )
 
         # ── Metadata lookup tables ────────────────────────────────────────────
-        default_source_count, default_target_count = _build_port_count_defaults()
-        component_type_to_icon = _map_possible_component_types_to_icons()
-        possible_position, possible_options = _get_performance_component_names(COMPONENTS_PATH)
+        default_source_port_count, default_target_port_count = _build_port_count_defaults()
+        component_type_to_icon_map = _map_possible_component_types_to_icons()
+        possible_position_map, possible_options_map = _get_performance_component_names(
+            COMPONENTS_PATH
+        )
 
         # ── Assemble BuilderState ─────────────────────────────────────────────
         state = BuilderState(
@@ -714,11 +724,11 @@ class ComponentPaletteConfigurationTableBuilder:
             temp_edge_source=temp_edge_source,
             pending_connections=[],
             symmetry_select=symmetry_select,
-            default_source_count=default_source_count,
-            default_target_count=default_target_count,
-            component_type_to_icon=component_type_to_icon,
-            possible_position=possible_position,
-            possible_options=possible_options,
+            default_source_count=default_source_port_count,
+            default_target_count=default_target_port_count,
+            component_type_to_icon=component_type_to_icon_map,
+            possible_position=possible_position_map,
+            possible_options=possible_options_map,
             browse_load_trigger=browse_load_trigger,
             browse_save_trigger=browse_save_trigger,
             browse_watcher_trigger=browse_watcher_trigger,
@@ -734,9 +744,11 @@ class ComponentPaletteConfigurationTableBuilder:
 
         # ── Build tabbed palette sidebar ──────────────────────────────────────
         tab_panels = []
-        for category, keys_in_category in category_keys.items():
+        for category, keys_in_category in category_to_icon_keys.items():
             category_buttons = [
-                button_by_key[key] for key in keys_in_category if key in button_by_key
+                button_by_icon_key[icon_key]
+                for icon_key in keys_in_category
+                if icon_key in button_by_icon_key
             ]
             if not category_buttons:
                 continue
