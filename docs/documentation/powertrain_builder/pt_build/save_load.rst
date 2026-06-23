@@ -10,11 +10,11 @@ the standard file dialog window.
 
 Saving design
 =============
-To save a design, click on the white "Save Design" button, which trigger the path selection window for the PT watcher
-csv file. This path, added at the end of the PT file, can either hand typed or selected from the standard file dialog
-window using the ``...`` button. To leave the path empty, simply click on the "Continue to save" button. To cancel
-the saving process, simply cancel the file dialog window. The save action can be performed at any time during the design
-process, and the user can continue editing the design after saving.
+To save a design, click on the ``Save`` button, which trigger the path selection window for the PT watcher
+csv file. The csv file path, added at the end of the PT file, can either be hand-typed or selected from the standard
+file dialog window using the ``...`` button. To leave the path empty, click on the ``Continue to save`` button.
+To cancel the saving process, click on the ``cancel`` to exit the file dialog window. The save action can be performed
+at any time during the design process, and new edits can be resumed afterwards.
 
 .. image:: ../../../img/common_save.gif
     :width: 600px
