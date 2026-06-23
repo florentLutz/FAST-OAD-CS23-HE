@@ -6,8 +6,8 @@
 Standalone Bokeh server launcher for the powertrain builder.
 
 :class:`PowertrainBuilderLauncher` builds the full Bokeh document — canvas,
-palette, configurator panel, and startup overlay — and starts a local Bokeh
-server, opening the application in the default browser.
+palette, configurator panel, undo / redo toolbar, and startup overlay — and
+starts a local Bokeh server, opening the application in the default browser.
 
 Typical usage::
 
@@ -60,6 +60,8 @@ _LEGEND_ENTRIES = [
     ("mechanical", "Mechanical Power", MECHANICAL_POWER_COLOR_CODE),
     ("electricity", "Electrical Current", ELECTRICITY_CURRENT_COLOR_CODE),
 ]
+
+_NO_SYMMETRY_PEER = -1
 
 _LEGEND_X_ICON = 680  # center-x of the PNG icon
 _LEGEND_X_LABEL = 691  # left edge of the text label (icon_center + ~11)
@@ -118,8 +120,9 @@ class PowertrainBuilderLauncher:
     Launch a self-contained Bokeh server running the powertrain builder.
 
     A blank canvas is placed in the centre, flanked by the component palette
-    on the left and the component configurator panel on the right. The server
-    stops automatically when the browser session ends.
+    on the left and the component configurator panel on the right.  An
+    Undo / Redo toolbar row sits above the canvas.  The server stops
+    automatically when the browser session ends.
     """
 
     @staticmethod
@@ -143,6 +146,32 @@ class PowertrainBuilderLauncher:
         def make_document(doc):
             """Build the complete Bokeh document: palette, canvas, and configurator panel."""
             palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+
+            # ── Undo / Redo buttons ───────────────────────────────────────────
+            # Created here (before PlacementHandler) so they exist on the state
+            # when _wire_buttons() runs and can be wired immediately.
+            _undo_redo_stylesheet = [":host button { font-size: 1.25em; min-width: 90px; }"]
+
+            undo_button = bkmodel.Button(
+                label="Undo",
+                icon=bkmodel.TablerIcon(icon_name="arrow-back-up"),
+                button_type="default",
+                width=100,
+                height=36,
+                stylesheets=_undo_redo_stylesheet,
+            )
+            redo_button = bkmodel.Button(
+                label="Redo",
+                icon=bkmodel.TablerIcon(icon_name="arrow-forward-up"),
+                button_type="default",
+                width=100,
+                height=36,
+                stylesheets=_undo_redo_stylesheet,
+            )
+
+            # Store on state so PlacementHandler._wire_buttons() can reach them.
+            state.undo_button = undo_button
+            state.redo_button = redo_button
 
             # ── Canvas ────────────────────────────────────────────────────────
             canvas = bkplot.figure(
@@ -400,6 +429,10 @@ class PowertrainBuilderLauncher:
                 if current_selected_node_index is None:
                     return
 
+                # Push undo snapshot *before* any mutation so the user can
+                # revert the entire Apply operation with a single Undo click.
+                handler._push_undo()
+
                 # Get node properties from the configurator panel
                 new_node_name_id = state.name_input.value
                 new_node_type = state.type_select.value
@@ -468,7 +501,7 @@ class PowertrainBuilderLauncher:
                 state.hover_source.data = hover_data
 
                 # ── Persist symmetry selection ────────────────────────────────
-                _NO_SYMMETRY_PEER = -1
+
                 all_node_names = placed_nodes_data.get("name", [])
                 node_count = len(all_node_names)
 
@@ -643,9 +676,28 @@ class PowertrainBuilderLauncher:
                 },
             )
 
+            # ── Undo / Redo toolbar row (above the canvas) ────────────────────
+            # Floated in the upper-left of the canvas area via absolute positioning
+            # so it does not shift the canvas itself.  z-index keeps it above the
+            # Bokeh toolbar but below the startup / save overlays (z-index 100).
+            undo_redo_overlay = row(
+                undo_button,
+                bkmodel.Spacer(width=4),
+                redo_button,
+                styles={
+                    "position": "absolute",
+                    "left": f"{PALETTE_WIDTH + 38}px",  # increase this to move right
+                    "top": "30px",  # increase this to move down
+                    "z-index": "50",
+                    "padding": "4px 8px",
+                    "box-shadow": "0 2px 8px rgba(0,0,0,0.1)",
+                },
+            )
             doc.add_root(row(palette_layout, canvas, table_panel))
             state.startup_overlay = startup_overlay
             doc.add_root(startup_overlay)
+            doc.add_root(undo_redo_overlay)
+
             # Save-options overlay (watcher path dialog) – floats above the canvas.
             # state.save_overlay was created and wired in ComponentPaletteConfigurationTableBuilder;
             # it is already visible=False and will be shown by the Save button's CustomJS.

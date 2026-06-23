@@ -203,20 +203,42 @@ class ComponentPaletteConfigurationTableBuilder:
             height=ROW_HEIGHT - 6,
             stylesheets=_action_stylesheet,
         )
-        # js_on_click for End Session is wired later, after unsaved_exit_overlay is built,
-        # so that it can reference both save_button and unsaved_exit_overlay_widget.
+        # The End Session button's js_on_click is wired further below, after both
+        # ``unsaved_exit_overlay`` and ``end_session_trigger`` have been constructed.
+        # The CustomJS callback needs to reference all three objects (``save_button``,
+        # ``unsaved_exit_overlay_widget``, and ``end_session_trigger``) as args, so the
+        # wiring must be deferred until all of them exist.
 
         # ── Hidden TextInput relay widgets ────────────────────────────────────
-        # Three toggle triggers: JS flips '0'/'1' to fire Python on_change callbacks.
-        # browse_load_trigger    → _on_browse_load    (opens tkinter open-file dialog)
-        # browse_save_trigger    → _on_browse_save    (opens tkinter save-file dialogs)
-        # browse_watcher_trigger → _on_browse_watcher (opens tkinter save-file dialog for CSV)
+        # Bokeh's CustomJS cannot call Python directly, so each action that needs
+        # server-side logic (file dialogs, session shutdown) is routed through a
+        # hidden TextInput whose value is toggled between '0' and '1' by JS.
+        # Python registers an on_change("value", …) callback on each trigger;
+        # the toggle guarantees the callback fires even when the value was already
+        # '0' or '1' from a previous click.
+        #
+        # Trigger routing:
+        #   browse_load_trigger    → IOMixin._on_browse_load
+        #                            Opens a tkinter open-file dialog; restores the
+        #                            canvas from the chosen JSON backup.
+        #   browse_save_trigger    → IOMixin._on_browse_save
+        #                            Opens two tkinter save-file dialogs (YAML config
+        #                            and JSON backup); writes both files.
+        #   browse_watcher_trigger → IOMixin._on_browse_watcher
+        #                            Opens a tkinter save-file dialog to choose the
+        #                            watcher CSV path; writes it into watcher_path_input.
+        #   end_session_trigger    → IOMixin._on_end_session_trigger
+        #                            Stops the Bokeh IOLoop, terminating the server.
+        #                            Flipped by JS only when it is safe to do so (design
+        #                            already saved, or "End Anyway" confirmed).
+        #   close_window_trigger   → js_on_change CustomJS (window.close())
+        #                            Flipped by Python after a Save & Exit save completes
+        #                            so the browser tab closes before the IOLoop stops.
 
         browse_load_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_watcher_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         end_session_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
-        # Flipped by Python after a Save & Exit save completes; JS responds with window.close().
         close_window_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger.js_on_change(
             "value",

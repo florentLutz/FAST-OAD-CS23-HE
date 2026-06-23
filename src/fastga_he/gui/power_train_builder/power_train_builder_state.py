@@ -216,3 +216,10 @@ class BuilderState:
     # Trigger flipped by Python to make the browser call window.close().
     # Uses js_on_change so the JS callback runs when the server pushes the value.
     close_window_trigger: bkmodel.TextInput = field(default=None)
+
+    # ── Undo / redo ───────────────────────────────────────────────────────────
+    # UndoStack instance (set by PlacementHandler.__init__).
+    undo_stack: object = field(default=None)
+    # Bokeh Button widgets for Undo and Redo, placed above the canvas.
+    undo_button: bkmodel.Button = field(default=None)
+    redo_button: bkmodel.Button = field(default=None)
