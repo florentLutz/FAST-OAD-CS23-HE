@@ -471,7 +471,7 @@ class ConfigPanelMixin:
                 self._make_port_callback(
                     _own_kind="source",
                     _own_label=source_label,
-                    _own_node_idx=node_index,
+                    _own_node_index=node_index,
                     _own_color=source_data["color"][i],
                     _own_x=source_data["x"][i],
                     _own_y=source_data["y"][i],
@@ -531,7 +531,7 @@ class ConfigPanelMixin:
                 self._make_port_callback(
                     _own_kind="target",
                     _own_label=target_label,
-                    _own_node_idx=node_index,
+                    _own_node_index=node_index,
                     _own_color=target_data["color"][i],
                     _own_x=target_data["x"][i],
                     _own_y=target_data["y"][i],
@@ -617,7 +617,7 @@ class ConfigPanelMixin:
         self,
         _own_kind: str,
         _own_label: str,
-        _own_node_idx: int,
+        _own_node_index: int,
         _own_color: str,
         _own_x: float,
         _own_y: float,
@@ -641,7 +641,7 @@ class ConfigPanelMixin:
 
         :param _own_kind: ``"source"`` or ``"target"``.
         :param _own_label: Port label of the own port (e.g. ``"1"``).
-        :param _own_node_idx: Node index of the own port.
+        :param _own_node_index: Node index of the own port.
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x of the own port at callback-build time.
         :param _own_y: Snapshot y of the own port at callback-build time.
@@ -652,7 +652,7 @@ class ConfigPanelMixin:
             self._on_port_select_change,
             _own_kind=_own_kind,
             _own_label=_own_label,
-            _own_node_idx=_own_node_idx,
+            _own_node_index=_own_node_index,
             _own_color=_own_color,
             _own_x=_own_x,
             _own_y=_own_y,
@@ -667,7 +667,7 @@ class ConfigPanelMixin:
         *,
         _own_kind: str,
         _own_label: str,
-        _own_node_idx: int,
+        _own_node_index: int,
         _own_color: str,
         _own_x: float,
         _own_y: float,
@@ -691,7 +691,7 @@ class ConfigPanelMixin:
         :param new_value: Newly selected display string, or ``_EMPTY``.
         :param _own_kind: ``"source"`` or ``"target"`` — which end is "ours".
         :param _own_label: Port label of the own port.
-        :param _own_node_idx: Node index of the own port.
+        :param _own_node_index: Node index of the own port.
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x coordinate captured when the row was built.
         :param _own_y: Snapshot y coordinate captured when the row was built.
@@ -717,7 +717,7 @@ class ConfigPanelMixin:
                 for sp, ep in self.state.pending_connections
                 if not (
                     sp["kind"] == "source"
-                    and sp["node_index"] == _own_node_idx
+                    and sp["node_index"] == _own_node_index
                     and sp["label"] == _own_label
                 )
             ]
@@ -727,7 +727,7 @@ class ConfigPanelMixin:
                 for sp, ep in self.state.pending_connections
                 if not (
                     ep["kind"] == "target"
-                    and ep["node_index"] == _own_node_idx
+                    and ep["node_index"] == _own_node_index
                     and ep["label"] == _own_label
                 )
             ]
@@ -746,12 +746,12 @@ class ConfigPanelMixin:
                     for i in range(len(edge_data.get("starting_node_index", [])))
                     if not (
                         (
-                            edge_data["starting_node_index"][i] == _own_node_idx
+                            edge_data["starting_node_index"][i] == _own_node_index
                             and edge_data["starting_port_label"][i] == _own_label
                             and edge_data["starting_port_kind"][i] == _own_kind
                         )
                         or (
-                            edge_data["ending_node_index"][i] == _own_node_idx
+                            edge_data["ending_node_index"][i] == _own_node_index
                             and edge_data["ending_port_label"][i] == _own_label
                             and edge_data["ending_port_kind"][i] == _own_kind
                         )
@@ -761,7 +761,8 @@ class ConfigPanelMixin:
                     k: [edge_data[k][j] for j in keep] for k in edge_data
                 }
                 self._rebuild_all_ports()
-                self._refresh_connections_table(_own_node_idx)
+                self._refresh_connections_table(_own_node_index)
+                self._mark_unsaved()
             return
 
         # Resolve the chosen far-end port from the candidates list.
@@ -786,7 +787,7 @@ class ConfigPanelMixin:
         live_own_x, live_own_y = _own_x, _own_y
         own_data = _own_port_source.data
         for j in range(len(own_data.get("node_index", []))):
-            if own_data["node_index"][j] == _own_node_idx and own_data["label"][j] == _own_label:
+            if own_data["node_index"][j] == _own_node_index and own_data["label"][j] == _own_label:
                 live_own_x = own_data["x"][j]
                 live_own_y = own_data["y"][j]
                 break
@@ -795,7 +796,7 @@ class ConfigPanelMixin:
         if _own_kind == "source":
             starting_port = {
                 "kind": "source",
-                "node_index": _own_node_idx,
+                "node_index": _own_node_index,
                 "label": _own_label,
                 "x": live_own_x,
                 "y": live_own_y,
@@ -820,7 +821,7 @@ class ConfigPanelMixin:
             }
             ending_port = {
                 "kind": "target",
-                "node_index": _own_node_idx,
+                "node_index": _own_node_index,
                 "label": _own_label,
                 "x": live_own_x,
                 "y": live_own_y,

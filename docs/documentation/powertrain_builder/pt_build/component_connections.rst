@@ -33,17 +33,8 @@ node or selecting another component.
     :width: 600px
     :align: center
 
-Delete connection
-=================
-Similar to delete the component node on canvas, by clicking the delete button on the left panel, the delete button will
-turn red and the delete mode will be activated. In this mode, Any connection can be deleted on the canvas by clicking
-on it.
-
-.. image:: ../../../img/delete_edge_canvas.gif
-    :width: 600px
-    :align: center
-
-
+Delete connection by drop down menu
+===================================
 Another way to delete the connection is to select the empty value in the drop down menu of the right node properties
 panel and apply the changes.
 

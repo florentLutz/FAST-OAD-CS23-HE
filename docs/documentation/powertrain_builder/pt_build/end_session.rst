@@ -3,7 +3,7 @@
 ===========
 End session
 ===========
-To end a session, click on the "End Session" button located in the button of the left panel. If the changes are saved,
+To end a session, click on the ``End Session`` button located in the button of the left panel. If the changes are saved,
 (save button in green color), the session will be ended and the window will be closed.
 
 .. image:: ../../../img/end_session.svg

@@ -32,13 +32,3 @@ placement mode, click the component button again or click on the delete button t
 
 To switch between different component, simply navigate through the component type class tabs and click on the desired
 component button. The placement mode will remain active until the user clicks the highlighted component button again.
-
-Delete component
-================
-By clicking the delete button on the left panel, the delete button will turn red and the delete mode will be activated.
-In this mode, the user can delete any component on the canvas by clicking on it. To exit the delete mode, simply click
-the delete button again.
-
-.. image:: ../../../img/component_delete_mode.gif
-    :width: 600px
-    :align: center
