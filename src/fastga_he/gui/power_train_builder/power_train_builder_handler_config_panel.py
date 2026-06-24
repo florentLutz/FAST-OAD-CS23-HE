@@ -147,7 +147,7 @@ class ConfigPanelMixin:
         if self.state.selected_node_overlay_source is not None:
             self.state.selected_node_overlay_source.data = dict(x=[], y=[])
         if self.state.connections_source is not None:
-            self.state.connections_source.data = dict(my_port=[], connected_to=[], edge_idx=[])
+            self.state.connections_source.data = dict(my_port=[], connected_to=[], edge_index=[])
         if self.state.connections_rows_column is not None:
             self.state.connections_rows_column.children = []
         if self.state.symmetry_select is not None:
@@ -158,32 +158,6 @@ class ConfigPanelMixin:
     # -----------------------------------------------------------------------
     # Options table
     # -----------------------------------------------------------------------
-
-    @staticmethod
-    def _option_values_to_strings(value) -> str:
-        """Convert an option value (bool, int, float, or str) to its display string."""
-        if value is True:
-            return "True"
-        if value is False:
-            return "False"
-        return str(value)
-
-    @staticmethod
-    def _strings_to_option_values(string: str):
-        """Parse a display string back to a typed Python value (bool, int, float, or str)."""
-        if string == "True":
-            return True
-        if string == "False":
-            return False
-        try:
-            return int(string)
-        except (ValueError, TypeError):
-            pass
-        try:
-            return float(string)
-        except (ValueError, TypeError):
-            pass
-        return string
 
     def _refresh_options_table(self, node_type: str, overrides: dict = None):
         """
@@ -211,7 +185,7 @@ class ConfigPanelMixin:
                 if option_name in overrides
                 else (value_list[0] if value_list else _EMPTY)
             )
-            current_stringing = self._option_values_to_strings(current_values)
+            current_stringing = _option_values_to_strings(current_values)
 
             label_input = bkmodel.TextInput(
                 value=option_name,
@@ -220,7 +194,7 @@ class ConfigPanelMixin:
                 styles={"color": "white", "font-size": "14px"},
             )
             choices = (
-                [self._option_values_to_strings(choice) for choice in value_list]
+                [_option_values_to_strings(choice) for choice in value_list]
                 if value_list
                 else [current_stringing]
             )
@@ -579,7 +553,7 @@ class ConfigPanelMixin:
             self.state.connections_source.data = dict(
                 my_port=my_port,
                 connected_to=connected_to,
-                edge_idx=edge_index,
+                edge_index=edge_index,
             )
 
     @staticmethod
@@ -605,8 +579,8 @@ class ConfigPanelMixin:
         Reverse-lookup a display string in a candidates list.
 
         :param choice_string: The string currently selected in the dropdown.
-        :param candidates: List of ``(node_idx, label, kind, display_str)`` tuples.
-        :return: ``(node_idx, label, kind)`` for the matching entry, or ``None``.
+        :param candidates: List of ``(node_index, label, kind, display_str)`` tuples.
+        :return: ``(node_index, label, kind)`` for the matching entry, or ``None``.
         """
         for node_index, label, kind, display_string in candidates:
             if display_string == choice_string:
@@ -645,7 +619,7 @@ class ConfigPanelMixin:
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x of the own port at callback-build time.
         :param _own_y: Snapshot y of the own port at callback-build time.
-        :param _candidates: Pre-built list of ``(node_idx, label, kind,
+        :param _candidates: Pre-built list of ``(node_index, label, kind,
             display_str)`` tuples for the far end.
         """
         return functools.partial(
@@ -695,7 +669,7 @@ class ConfigPanelMixin:
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x coordinate captured when the row was built.
         :param _own_y: Snapshot y coordinate captured when the row was built.
-        :param _candidates: Candidate ``(node_idx, label, kind, display_str)``
+        :param _candidates: Candidate ``(node_index, label, kind, display_str)``
             tuples for the far end, built when the row was rendered.
         """
         _own_port_source = (
@@ -850,7 +824,7 @@ class ConfigPanelMixin:
             return
         # Update undo stack
         self._push_undo()
-        edge_index_list = list(self.state.connections_source.data.get("edge_idx", []))
+        edge_index_list = list(self.state.connections_source.data.get("edge_index", []))
         to_delete = {edge_index_list[i] for i in selected if i < len(edge_index_list)}
         edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
         keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
@@ -859,3 +833,29 @@ class ConfigPanelMixin:
         _LOGGER.info("Deleted connection(s) at edge indices %s", sorted(to_delete))
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
+
+
+def _option_values_to_strings(value) -> str:
+    """Convert an option value (bool, int, float, or str) to its display string."""
+    if value is True:
+        return "True"
+    if value is False:
+        return "False"
+    return str(value)
+
+
+def _strings_to_option_values(string: str):
+    """Parse a display string back to a typed Python value (bool, int, float, or str)."""
+    if string == "True":
+        return True
+    if string == "False":
+        return False
+    try:
+        return int(string)
+    except (ValueError, TypeError):
+        pass
+    try:
+        return float(string)
+    except (ValueError, TypeError):
+        pass
+    return string

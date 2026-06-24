@@ -164,6 +164,21 @@ class PlacementMixin:
             )
             self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
+    def _exit_delete_mode(self):
+        """
+        Exit delete mode unconditionally, restoring button styling and status text.
+
+        Safe to call even when delete mode is already inactive (no-op in that case).
+        Unlike :meth:`_toggle_delete_mode`, this never flips delete mode *on* and
+        has no side-effects beyond resetting the relevant UI elements.
+        """
+        if not self.state.delete_mode:
+            return
+        self.state.delete_mode = False
+        self.state.status_div.text = "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
+        if self.state.delete_button is not None:
+            self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+
     # -----------------------------------------------------------------------
     # Palette selection
     # -----------------------------------------------------------------------
@@ -193,10 +208,7 @@ class PlacementMixin:
         self._cancel_pending_connection()
         self.state.selected_component = icon_keys[component_index]
 
-        if self.state.delete_mode:
-            self.state.delete_mode = False
-            if self.state.delete_button is not None:
-                self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+        self._exit_delete_mode()
 
         for button_position, palette_button in enumerate(self.state.buttons):
             palette_button.button_type = (

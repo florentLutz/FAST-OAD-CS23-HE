@@ -45,6 +45,7 @@ from .power_train_builder_state import (
 )
 from .power_train_builder_palette import ComponentPaletteConfigurationTableBuilder
 from .power_train_builder_handler import PlacementHandler
+from .power_train_builder_handler_config_panel import _strings_to_option_values
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -441,7 +442,7 @@ class PowertrainBuilderLauncher:
                 option_names = list(state.options_source.data.get("options", []))
                 option_values = list(state.options_source.data.get("value", []))
                 option_values_dict = {
-                    option_name: PlacementHandler._strings_to_option_values(option_value)
+                    option_name: _strings_to_option_values(option_value)
                     for option_name, option_value in zip(option_names, option_values)
                 }
                 # convert the options dict to a JSON string for storage in the ColumnDataSource

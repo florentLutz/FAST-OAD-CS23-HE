@@ -242,8 +242,8 @@ class PlacementHandler(PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin)
                 self._mark_unsaved()
 
             else:
-                edge_idx = self._find_nearest_edge(x, y)
-                if edge_idx is not None and self.state.edge_source is not None:
+                edge_index = self._find_nearest_edge(x, y)
+                if edge_index is not None and self.state.edge_source is not None:
                     # Capture state before deleting the edge.
                     self._push_undo()
 
@@ -251,10 +251,10 @@ class PlacementHandler(PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin)
                         key: list(value) for key, value in self.state.edge_source.data.items()
                     }
                     for k in edge_data:
-                        edge_data[k].pop(edge_idx)
+                        edge_data[k].pop(edge_index)
                     self.state.edge_source.data = edge_data
                     self._mark_unsaved()
-                    _LOGGER.info("Deleted edge at index %d", edge_idx)
+                    _LOGGER.info("Deleted edge at index %d", edge_index)
 
                 if self.state.selected_node_index is not None:
                     self._refresh_connections_table(self.state.selected_node_index)

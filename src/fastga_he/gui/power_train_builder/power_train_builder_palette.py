@@ -567,7 +567,7 @@ class ComponentPaletteConfigurationTableBuilder:
         selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
         connections_source = bkmodel.ColumnDataSource(
-            data=dict(my_port=[], connected_to=[], edge_idx=[])
+            data=dict(my_port=[], connected_to=[], edge_index=[])
         )
         edge_source = bkmodel.ColumnDataSource(
             data=dict(

@@ -309,7 +309,7 @@ class IOMixin:
         """
         self.state.selected_node_index = None
         self.state.selected_component = None
-        self.state.delete_mode = False
+        self._exit_delete_mode()
         self.state.pending_connections.clear()
         self._clear_node_table()
         self._clear_temp_edges()
@@ -367,6 +367,7 @@ class IOMixin:
         if snapshot is None:
             return
 
+        self._exit_delete_mode()
         self._restore_from_snapshot(snapshot)
         self._mark_unsaved()
         _LOGGER.info(
@@ -394,6 +395,7 @@ class IOMixin:
         if snapshot is None:
             return
 
+        self._exit_delete_mode()
         self._restore_from_snapshot(snapshot)
         self._mark_unsaved()
         _LOGGER.info(
