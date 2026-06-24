@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Powertrain Builder — Object Structure</title>
+<style>
+  :root {
+    --bg:#ffffff; --bg2:#f7f6f3; --bg3:#f1efe8;
+    --text:#2c2c2a; --text2:#5f5e5a; --text3:#888780;
+    --border:rgba(0,0,0,0.12); --border2:rgba(0,0,0,0.22);
+    --shadow:0 1px 4px rgba(0,0,0,0.07); --radius:10px;
+    --font:system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"SFMono-Regular","Cascadia Code",Consolas,"Liberation Mono",monospace;
+    --purple-fill:#eeedfe; --purple-border:#534ab7; --purple-text:#3c3489;
+    --teal-fill:#e1f5ee;   --teal-border:#0f6e56;   --teal-text:#085041;
+    --coral-fill:#faece7;  --coral-border:#993c1d;  --coral-text:#712b13;
+    --gray-fill:#f1efe8;   --gray-border:#5f5e5a;   --gray-text:#2c2c2a;
+    --amber-fill:#faeeda;  --amber-border:#854f0b;  --amber-text:#633806;
+  }
+  @media (prefers-color-scheme:dark) {
+    :root {
+      --bg:#1e1e1c; --bg2:#272724; --bg3:#2c2c2a;
+      --text:#e8e6dc; --text2:#b4b2a9; --text3:#5f5e5a;
+      --border:rgba(255,255,255,0.1); --border2:rgba(255,255,255,0.2);
+      --shadow:0 1px 4px rgba(0,0,0,0.35);
+      --purple-fill:#26215c; --purple-border:#7f77dd; --purple-text:#cecbf6;
+      --teal-fill:#04342c;   --teal-border:#1d9e75;   --teal-text:#9fe1cb;
+      --coral-fill:#4a1b0c;  --coral-border:#d85a30;  --coral-text:#f5c4b3;
+      --gray-fill:#2c2c2a;   --gray-border:#888780;   --gray-text:#d3d1c7;
+      --amber-fill:#412402;  --amber-border:#ba7517;  --amber-text:#fac775;
+    }
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);padding:32px 24px 48px;max-width:1100px;margin:0 auto;}
+  .breadcrumb{font-size:12px;color:var(--text3);margin-bottom:10px;letter-spacing:0.02em;}
+  .breadcrumb span{margin:0 6px;}
+  .page-header{margin-bottom:24px;padding-bottom:18px;border-bottom:0.5px solid var(--border);}
+  .page-header h1{font-size:22px;font-weight:500;color:var(--text);margin-bottom:4px;}
+  .page-header p{font-size:14px;color:var(--text2);line-height:1.6;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+  .legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+  .diagram-wrap{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:20px 16px 12px;margin-bottom:16px;}
+  .hint{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;}
+  .desc-panel{border:0.5px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;height:270px;overflow:hidden;}
+  .step-nav{display:flex;flex-wrap:wrap;gap:3px;padding:6px 8px 0;background:var(--bg2);border-bottom:0.5px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;flex-shrink:0;}
+  .step-tab{display:flex;align-items:center;gap:5px;padding:5px 10px 6px;font-size:11px;font-weight:500;border-radius:6px 6px 0 0;border:0.5px solid transparent;border-bottom:none;cursor:pointer;color:var(--text3);background:transparent;transition:color .13s,background .13s;user-select:none;white-space:nowrap;}
+  .step-tab:hover{color:var(--text2);background:var(--bg3);}
+  .step-tab.active{color:var(--text);background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);margin-bottom:-0.5px;z-index:1;}
+  .step-pip{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .desc-content{flex:1;overflow:hidden;padding:18px 24px 16px;background:var(--bg);display:flex;flex-direction:column;gap:10px;}
+  .desc-top{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+  .desc-title{font-size:15px;font-weight:500;color:var(--text);}
+  .desc-file{font-family:var(--mono);font-size:11px;color:var(--text3);}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0;}
+  .tag{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;letter-spacing:0.01em;}
+  .tag.purple{background:var(--purple-fill);color:var(--purple-text);}
+  .tag.teal{background:var(--teal-fill);color:var(--teal-text);}
+  .tag.coral{background:var(--coral-fill);color:var(--coral-text);}
+  .tag.gray{background:var(--gray-fill);color:var(--gray-text);}
+  .tag.amber{background:var(--amber-fill);color:var(--amber-text);}
+  .desc-body{font-size:13px;color:var(--text2);line-height:1.65;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;}
+  .desc-body code{font-family:var(--mono);font-size:11.5px;background:var(--bg3);padding:1px 5px;border-radius:4px;color:var(--text);}
+  .desc-nav{display:flex;justify-content:space-between;align-items:center;padding:9px 22px 11px;border-top:0.5px solid var(--border);background:var(--bg2);border-radius:0 0 var(--radius) var(--radius);flex-shrink:0;}
+  .nav-btn{font-size:12px;color:var(--text3);background:none;border:0.5px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;transition:color .12s,border-color .12s,background .12s;}
+  .nav-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg3);}
+  .nav-btn:disabled{opacity:0.3;cursor:default;}
+  .nav-counter{font-size:11px;color:var(--text3);}
+  .read-more{font-size:11px;color:var(--purple-border);cursor:pointer;text-decoration:none;align-self:flex-start;flex-shrink:0;}
+  .read-more:hover{text-decoration:underline;}
+  .expand-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:100;align-items:center;justify-content:center;padding:32px;}
+  .expand-overlay.open{display:flex;}
+  .expand-box{background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius);padding:24px 28px 22px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow);position:relative;}
+  .expand-close{position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);line-height:1;padding:2px 4px;border-radius:4px;transition:color .12s,background .12s;}
+  .expand-close:hover{color:var(--text);background:var(--bg3);}
+  .expand-title{font-size:16px;font-weight:500;color:var(--text);margin-bottom:4px;padding-right:28px;}
+  .expand-file{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:10px;}
+  .expand-body{font-size:13px;color:var(--text2);line-height:1.75;}
+  .expand-body code{font-family:var(--mono);font-size:11.5px;background:var(--bg3);padding:1px 5px;border-radius:4px;color:var(--text);}
+  .pt-node{cursor:pointer;}
+  .pt-node rect{transition:filter .13s;}
+  .pt-node:hover rect{filter:brightness(0.92);}
+  .pt-node.active rect{stroke-width:1.5 !important;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Object structure map</h1>
+  <p>Component hierarchy and responsibilities for the interactive Powertrain Builder. Click any block in the diagram or use the tabs below to inspect each module.</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple-fill);border:1px solid var(--purple-border)"></div>Entry point</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal-fill);border:1px solid var(--teal-border)"></div>Builders &amp; state</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--coral-fill);border:1px solid var(--coral-border)"></div>Mixins</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gray-fill);border:1px solid var(--gray-border)"></div>Data / utilities</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber-fill);border:1px solid var(--amber-border)"></div>Serialisers &amp; helpers</div>
+</div>
+
+<div class="diagram-wrap">
+  <svg id="structure-svg" width="100%" viewBox="0 0 1020 560" role="img">
+    <title>Powertrain Builder object structure</title>
+    <desc>Hierarchy: PowertrainBuilderLauncher at top branches to PaletteBuilder, BuilderState, and PlacementHandler; data sources in the middle row; six nodes at the bottom including mixins, UndoStack, PowerTrainYAML and MetadataHelpers.</desc>
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- ROW 1: Launcher -->
+    <g class="pt-node" id="n-launcher" onclick="activate('launcher')">
+      <rect x="360" y="20" width="300" height="46" rx="8" fill="var(--purple-fill)" stroke="var(--purple-border)" stroke-width="0.75"/>
+      <text x="510" y="43" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="var(--purple-text)" font-family="system-ui,-apple-system,sans-serif">PowertrainBuilderLauncher</text>
+    </g>
+
+    <!-- Row 1→2 connectors -->
+    <line x1="425" y1="66" x2="200" y2="124" stroke="#888780" stroke-width="1.6" fill="none"/>
+    <line x1="510" y1="66" x2="510" y2="124" stroke="#888780" stroke-width="1.6" fill="none"/>
+    <line x1="595" y1="66" x2="820" y2="124" stroke="#888780" stroke-width="1.6" fill="none"/>
+
+    <!-- ROW 2 -->
+    <g class="pt-node" id="n-handler" onclick="activate('handler')">
+      <rect x="60" y="124" width="280" height="58" rx="8" fill="var(--teal-fill)" stroke="var(--teal-border)" stroke-width="0.75"/>
+      <text x="200" y="145" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="var(--teal-text)" font-family="system-ui,-apple-system,sans-serif">PlacementHandler</text>
+      <text x="200" y="165" text-anchor="middle" dominant-baseline="central" font-size="11" fill="var(--teal-border)" font-family="system-ui,-apple-system,sans-serif">composed of 4 mixins</text>
+    </g>
+
+    <g class="pt-node" id="n-state" onclick="activate('state')">
+      <rect x="370" y="124" width="280" height="58" rx="8" fill="var(--teal-fill)" stroke="var(--teal-border)" stroke-width="0.75"/>
+      <text x="510" y="145" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="var(--teal-text)" font-family="system-ui,-apple-system,sans-serif">BuilderState</text>
+      <text x="510" y="165" text-anchor="middle" dominant-baseline="central" font-size="11" fill="var(--teal-border)" font-family="system-ui,-apple-system,sans-serif">shared dataclass reference</text>
+    </g>
+
+    <g class="pt-node" id="n-palette" onclick="activate('palette')">
+      <rect x="680" y="124" width="280" height="58" rx="8" fill="var(--teal-fill)" stroke="var(--teal-border)" stroke-width="0.75"/>
+      <text x="820" y="145" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="var(--teal-text)" font-family="system-ui,-apple-system,sans-serif">PaletteBuilder</text>
+      <text x="820" y="165" text-anchor="middle" dominant-baseline="central" font-size="11" fill="var(--teal-border)" font-family="system-ui,-apple-system,sans-serif">creates widgets + data sources</text>
+    </g>
+
+    <!-- Row 2→3 connectors -->
+    <path d="M200 182 L200 214 L390 214 L390 248" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+    <line x1="510" y1="182" x2="510" y2="248" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+    <line x1="820" y1="182" x2="630" y2="248" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+
+    <!-- ROW 3: Data sources -->
+    <g class="pt-node" id="n-datasources" onclick="activate('datasources')">
+      <rect x="250" y="248" width="520" height="72" rx="8" fill="var(--gray-fill)" stroke="var(--gray-border)" stroke-width="0.75"/>
+      <text x="510" y="270" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="var(--gray-text)" font-family="system-ui,-apple-system,sans-serif">BuilderState data sources</text>
+      <text x="510" y="290" text-anchor="middle" dominant-baseline="central" font-size="11" fill="var(--gray-border)" font-family="system-ui,-apple-system,sans-serif">placed_nodes_source · edge_source · port sources</text>
+      <text x="510" y="308" text-anchor="middle" dominant-baseline="central" font-size="11" fill="var(--gray-border)" font-family="system-ui,-apple-system,sans-serif">undo_stack · undo_button · redo_button</text>
+    </g>
+
+    <!-- Row 3→4 connectors (6 nodes below) -->
+    <line x1="350" y1="320" x2="90"  y2="370" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+    <line x1="420" y1="320" x2="270" y2="370" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+    <line x1="490" y1="320" x2="450" y2="370" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+    <line x1="530" y1="320" x2="620" y2="370" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  marker-start="url(#arr)" fill="none"/>
+    <line x1="600" y1="320" x2="790" y2="370" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  fill="none"/>
+    <line x1="670" y1="320" x2="940" y2="370" stroke="#888780" stroke-width="1.6" marker-end="url(#arr)"  fill="none"/>
+
+    <!-- ROW 4: Six nodes -->
+    <g class="pt-node" id="n-mixins" onclick="activate('mixins')">
+      <rect x="10" y="370" width="160" height="58" rx="8" fill="var(--coral-fill)" stroke="var(--coral-border)" stroke-width="0.75"/>
+      <text x="90" y="391" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--coral-text)" font-family="system-ui,-apple-system,sans-serif">PlacementMixin · IOMixin</text>
+      <text x="90" y="411" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--coral-border)" font-family="system-ui,-apple-system,sans-serif">node · save/load · undo</text>
+    </g>
+
+    <g class="pt-node" id="n-undostack" onclick="activate('undostack')">
+      <rect x="182" y="370" width="176" height="58" rx="8" fill="var(--gray-fill)" stroke="var(--gray-border)" stroke-width="0.75"/>
+      <text x="270" y="391" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--gray-text)" font-family="system-ui,-apple-system,sans-serif">UndoStack</text>
+      <text x="270" y="411" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--gray-border)" font-family="system-ui,-apple-system,sans-serif">history.py</text>
+    </g>
+
+    <g class="pt-node" id="n-portmixin" onclick="activate('portmixin')">
+      <rect x="370" y="370" width="176" height="58" rx="8" fill="var(--coral-fill)" stroke="var(--coral-border)" stroke-width="0.75"/>
+      <text x="458" y="391" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--coral-text)" font-family="system-ui,-apple-system,sans-serif">PortEdgeMixin</text>
+      <text x="458" y="411" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--coral-border)" font-family="system-ui,-apple-system,sans-serif">ports · edges</text>
+    </g>
+
+    <g class="pt-node" id="n-configmixin" onclick="activate('configmixin')">
+      <rect x="558" y="370" width="176" height="58" rx="8" fill="var(--coral-fill)" stroke="var(--coral-border)" stroke-width="0.75"/>
+      <text x="646" y="391" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--coral-text)" font-family="system-ui,-apple-system,sans-serif">ConfigPanelMixin</text>
+      <text x="646" y="411" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--coral-border)" font-family="system-ui,-apple-system,sans-serif">position · options · connections</text>
+    </g>
+
+    <g class="pt-node" id="n-yamlwriter" onclick="activate('yamlwriter')">
+      <rect x="746" y="370" width="176" height="58" rx="8" fill="var(--amber-fill)" stroke="var(--amber-border)" stroke-width="0.75"/>
+      <text x="834" y="391" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--amber-text)" font-family="system-ui,-apple-system,sans-serif">PowerTrainYAML</text>
+      <text x="834" y="411" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--amber-border)" font-family="system-ui,-apple-system,sans-serif">network_writer.py</text>
+    </g>
+
+    <g class="pt-node" id="n-metadata" onclick="activate('metadata')">
+      <rect x="934" y="370" width="76" height="58" rx="8" fill="var(--amber-fill)" stroke="var(--amber-border)" stroke-width="0.75"/>
+      <text x="972" y="391" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--amber-text)" font-family="system-ui,-apple-system,sans-serif">Metadata</text>
+      <text x="972" y="411" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--amber-border)" font-family="system-ui,-apple-system,sans-serif">helpers</text>
+    </g>
+
+    <!-- PaletteBuilder also references Metadata (scanning components) -->
+    <line x1="942" y1="182" x2="972" y2="368" stroke="#888780" stroke-width="1.6" stroke-dasharray="4 3" marker-start="url(#arr)"/>
+    <text x="978" y="280" font-size="9" fill="var(--text3)" font-family="system-ui,-apple-system,sans-serif" text-anchor="start">scans components</text>
+
+  </svg>
+  <p class="hint">Click any block to inspect — or use the tabs below</p>
+</div>
+
+<!-- Description panel -->
+<div class="desc-panel">
+  <div class="step-nav" id="step-nav"></div>
+  <div class="desc-content" id="desc-content">
+    <div class="desc-top">
+      <div class="desc-title" id="dp-title"></div>
+      <div class="desc-file"  id="dp-file"></div>
+    </div>
+    <div class="tags" id="dp-tags"></div>
+    <div class="desc-body"  id="dp-body"></div>
+    <a class="read-more" id="read-more" onclick="openExpand()">Read full description ↗</a>
+  </div>
+  <div class="desc-nav">
+    <button class="nav-btn" id="btn-prev" onclick="navStep(-1)">← Prev</button>
+    <span class="nav-counter" id="nav-counter"></span>
+    <button class="nav-btn" id="btn-next" onclick="navStep(1)">Next →</button>
+  </div>
+</div>
+
+<!-- Expand overlay -->
+<div class="expand-overlay" id="expand-overlay" onclick="closeExpand(event)">
+  <div class="expand-box">
+    <button class="expand-close" onclick="closeExpand(null)" aria-label="Close">✕</button>
+    <div class="expand-title" id="ex-title"></div>
+    <div class="expand-file"  id="ex-file"></div>
+    <div class="tags"         id="ex-tags"></div>
+    <div class="expand-body"  id="ex-body"></div>
+  </div>
+</div>
+
+<script>
+const nodes = [
+  { key:'launcher', color:'purple',
+    title:'PowertrainBuilderLauncher', file:'power_train_builder_launcher.py',
+    tags:['Entry point','Bokeh server'],
+    body:`Starts the Bokeh server and builds the entire document. Calls <code>PaletteBuilder.build()</code> to get the palette layout, table panel, and state. Creates the canvas <code>Figure</code>, wires <code>PlacementHandler</code>, registers the <code>apply_node_configurations</code> callback, and adds all overlay roots. Creates <code>undo_button</code> and <code>redo_button</code> and stores them on <code>state</code> before the handler is constructed so <code>_wire_buttons()</code> can reach them.`
+  },
+  { key:'palette', color:'teal',
+    title:'ComponentPaletteConfigurationTableBuilder', file:'power_train_builder_palette.py',
+    tags:['Factory','Pure builder'],
+    body:`A pure factory — no callbacks wired here. Creates every Bokeh widget (palette buttons, action buttons, configurator inputs, overlays, hidden trigger TextInputs) and every <code>ColumnDataSource</code>. Packages them all into a <code>BuilderState</code> and returns <code>(palette_layout, table_panel, state)</code>. JS CustomJS callbacks for save/load/end-session overlays are wired here. Also calls <code>MetadataHelpers</code> to scan component <code>constants.py</code> files and populate <code>possible_position</code> and <code>possible_options</code> on state.`
+  },
+  { key:'state', color:'teal',
+    title:'BuilderState', file:'power_train_builder_state.py',
+    tags:['Dataclass','Shared reference'],
+    body:`A <code>@dataclass</code> holding references to every Bokeh widget and data source. Passed by reference to <code>PlacementHandler</code> and the launcher's callbacks so all parties share the same live objects. Key fields: the four mutable canvas sources (<code>placed_nodes_source</code>, <code>edge_source</code>, <code>source_port_source</code>, <code>target_port_source</code>), <code>undo_stack</code> (set by <code>PlacementHandler.__init__</code>), <code>undo_button</code> / <code>redo_button</code> (set by the launcher), and <code>possible_position</code> / <code>possible_options</code> (populated by MetadataHelpers at startup).`
+  },
+  { key:'handler', color:'teal',
+    title:'PlacementHandler', file:'power_train_builder_handler.py',
+    tags:['Composite class','MRO via mixins'],
+    body:`Inherits from all four mixins via Python multiple inheritance: <code>PlacementMixin</code>, <code>IOMixin</code>, <code>PortEdgeMixin</code>, <code>ConfigPanelMixin</code>. The constructor creates the <code>UndoStack</code>, attaches it to <code>state.undo_stack</code>, calls <code>_wire_buttons()</code> to register all <code>on_click</code> and <code>on_change</code> callbacks, and calls <code>_refresh_undo_redo_buttons()</code>. The main canvas entry point is <code>on_canvas_tap(event)</code> wired to Bokeh's <code>Tap</code> event.`
+  },
+  { key:'datasources', color:'gray',
+    title:'BuilderState data sources', file:'power_train_builder_state.py',
+    tags:['ColumnDataSource','Bokeh reactive'],
+    body:`The four <code>ColumnDataSource</code> objects are the single source of truth for all canvas content. Reassigning <code>source.data</code> triggers Bokeh to push a WebSocket diff to the browser. <code>placed_nodes_source</code> holds node positions, icons, types, options, port counts. <code>edge_source</code> holds all permanent connections. <code>source_port_source</code> and <code>target_port_source</code> hold computed port ball positions. All four are snapshotted together by <code>make_snapshot()</code> for undo.`
+  },
+  { key:'mixins', color:'coral',
+    title:'PlacementMixin + IOMixin', file:'handler_overlay.py · handler_io.py',
+    tags:['Mixin','No direct instantiation'],
+    body:`<code>PlacementMixin</code> handles the startup overlay choices, palette button selection, and delete-mode toggling. Its <code>_on_new_design()</code> clears all data sources and the undo stack. <code>IOMixin</code> handles save (YAML via <code>PowerTrainYAML</code> + JSON backup via tkinter dialogs), load (<code>_restore_canvas_from_dict</code>), end-session JS-gate triggering, and the full undo/redo system: <code>_push_undo()</code>, <code>_on_undo()</code>, <code>_on_redo()</code>, <code>_restore_from_snapshot()</code>, <code>_refresh_undo_redo_buttons()</code>.`
+  },
+  { key:'undostack', color:'gray',
+    title:'UndoStack + make_snapshot()', file:'power_train_builder_history.py',
+    tags:['Pure Python','No Bokeh dependency'],
+    body:`<code>UndoStack</code> holds two bounded <code>deque</code>s: <code>_undo</code> and <code>_redo</code>. <code>push(snapshot)</code> appends to undo and clears redo. <code>push_redo(snapshot)</code> saves the current state before restoring an undo. <code>undo()</code> and <code>redo()</code> pop from their stacks. <code>can_undo</code> / <code>can_redo</code> are <code>@property</code> descriptors. <code>make_snapshot(state)</code> deep-copies all four data dicts plus <code>placed_counter</code> into a plain Python dict — no Bokeh objects stored.`
+  },
+  { key:'portmixin', color:'coral',
+    title:'PortEdgeMixin', file:'handler_ports.py',
+    tags:['Mixin','No direct instantiation'],
+    body:`Handles all port geometry: hit-testing nearest port or edge, the two-click canvas connection workflow (<code>_handle_port_tap()</code> pushes undo before committing a permanent edge), <code>_add_edge()</code>, <code>_rebuild_all_ports()</code> (recomputes port ball positions via <code>compute_ports()</code> in state.py), and <code>_rebuild_edges()</code>. Also provides <code>_best_possible_node()</code> and <code>_find_nearest_edge()</code> hit-testing helpers used by the delete branch.`
+  },
+  { key:'configmixin', color:'coral',
+    title:'ConfigPanelMixin', file:'handler_config_panel.py',
+    tags:['Mixin','No direct instantiation'],
+    body:`Populates and refreshes the right-hand configurator panel when a node is selected. <code>_populate_node_table(index)</code> fills name/type/position inputs, options table, port-count spinners, connections table, and symmetry select. <code>_refresh_connections_table()</code> builds dynamic Select rows for each port and wires <code>_on_port_select_change()</code> callbacks that draw preview edges or disconnect permanent ones. <code>_delete_selected_connection()</code> removes edges selected in the DataTable. All mutating paths call <code>_push_undo()</code> first.`
+  },
+  { key:'yamlwriter', color:'amber',
+    title:'PowerTrainYAML', file:'power_train_network_writer.py',
+    tags:['Serialiser','YAML + ruamel'],
+    body:`Assembles and writes the YAML powertrain configuration consumed by FAST-OAD_CS23-HE. Constructed by <code>IOMixin._save_canvas_state()</code> with a snapshot of the live <code>BuilderState</code>. <code>add_component(node_index)</code> emits one component entry (id, options, position, symmetry). <code>add_connection()</code> iterates edges and emits source→target pairs, appending port-index suffixes for multi-port components. <code>write(file_path)</code> post-processes ruamel output to add blank lines between sections and strip quotes from port-index patterns.`
+  },
+  { key:'metadata', color:'amber',
+    title:'Metadata helpers', file:'power_train_builder_metadata.py',
+    tags:['AST scan','No import side-effects'],
+    body:`Three helper groups called once during <code>PaletteBuilder.build()</code>. <code>_map_possible_component_types_to_icons()</code> builds the icon→component_type reverse map. <code>_build_port_count_defaults()</code> derives default source/target port counts from <code>KNOWN_COMPONENTS</code> rules. <code>_get_performance_component_names()</code> walks the components tree, extracts <code>POSSIBLE_POSITION</code> and <code>POSSIBLE_OPTION</code> from each <code>constants.py</code> via pure AST parsing — no fresh imports, no FAST-OAD submodel registration side-effects.`
+  }
+];
+
+const pipColors = {
+  purple:'var(--purple-border)', teal:'var(--teal-border)',
+  coral:'var(--coral-border)', gray:'var(--gray-border)', amber:'var(--amber-border)'
+};
+const tabLabels = {
+  launcher:'Launcher', palette:'Palette', state:'State', handler:'Handler',
+  datasources:'Data sources', mixins:'Overlay·IO', undostack:'UndoStack',
+  portmixin:'PortEdge', configmixin:'ConfigPanel', yamlwriter:'YAML writer', metadata:'Metadata'
+};
+
+const nav = document.getElementById('step-nav');
+nodes.forEach((n, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'step-tab'; btn.id = 'tab-' + n.key; btn.title = n.title;
+  btn.innerHTML = `<span class="step-pip" style="background:${pipColors[n.color]}"></span>${tabLabels[n.key]}`;
+  btn.onclick = () => setActive(i);
+  nav.appendChild(btn);
+});
+
+let current = 0;
+function setActive(idx) {
+  current = idx;
+  const n = nodes[idx];
+  document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + n.key).classList.add('active');
+  document.querySelectorAll('.pt-node').forEach(el => { el.style.opacity='0.38'; el.classList.remove('active'); });
+  const svgEl = document.getElementById('n-' + n.key);
+  if (svgEl) { svgEl.style.opacity='1'; svgEl.classList.add('active'); }
+  document.getElementById('dp-title').textContent = n.title;
+  document.getElementById('dp-file').textContent  = n.file;
+  document.getElementById('dp-tags').innerHTML = n.tags.map(t => `<span class="tag ${n.color}">${t}</span>`).join('');
+  document.getElementById('dp-body').innerHTML = n.body;
+  document.getElementById('nav-counter').textContent = `${idx + 1} / ${nodes.length}`;
+  document.getElementById('btn-prev').disabled = idx === 0;
+  document.getElementById('btn-next').disabled = idx === nodes.length - 1;
+}
+function activate(key) { const idx = nodes.findIndex(n => n.key === key); if (idx !== -1) setActive(idx); }
+function navStep(dir) { const next = current + dir; if (next >= 0 && next < nodes.length) setActive(next); }
+function openExpand() {
+  const n = nodes[current];
+  document.getElementById('ex-title').textContent = n.title;
+  document.getElementById('ex-file').textContent  = n.file;
+  document.getElementById('ex-tags').innerHTML = n.tags.map(t => `<span class="tag ${n.color}">${t}</span>`).join('');
+  document.getElementById('ex-body').innerHTML = n.body;
+  document.getElementById('expand-overlay').classList.add('open');
+}
+function closeExpand(e) {
+  if (e === null || e.target === document.getElementById('expand-overlay'))
+    document.getElementById('expand-overlay').classList.remove('open');
+}
+setActive(0);
+</script>
+</body>
+</html>

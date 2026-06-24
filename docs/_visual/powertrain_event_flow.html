@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Powertrain Builder — Runtime Event Flow</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f6f3;
+    --bg3: #f1efe8;
+    --text: #2c2c2a;
+    --text2: #5f5e5a;
+    --text3: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --shadow: 0 1px 4px rgba(0,0,0,0.07);
+    --radius: 10px;
+    --font: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SFMono-Regular","Cascadia Code",Consolas,"Liberation Mono",monospace;
+    --purple-fill:#eeedfe; --purple-border:#534ab7; --purple-text:#3c3489;
+    --teal-fill:#e1f5ee;   --teal-border:#0f6e56;   --teal-text:#085041;
+    --coral-fill:#faece7;  --coral-border:#993c1d;  --coral-text:#712b13;
+    --gray-fill:#f1efe8;   --gray-border:#5f5e5a;   --gray-text:#2c2c2a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#1e1e1c; --bg2:#272724; --bg3:#2c2c2a;
+      --text:#e8e6dc; --text2:#b4b2a9; --text3:#5f5e5a;
+      --border:rgba(255,255,255,0.1); --border2:rgba(255,255,255,0.2);
+      --shadow:0 1px 4px rgba(0,0,0,0.35);
+      --purple-fill:#26215c; --purple-border:#7f77dd; --purple-text:#cecbf6;
+      --teal-fill:#04342c;   --teal-border:#1d9e75;   --teal-text:#9fe1cb;
+      --coral-fill:#4a1b0c;  --coral-border:#d85a30;  --coral-text:#f5c4b3;
+      --gray-fill:#2c2c2a;   --gray-border:#888780;   --gray-text:#d3d1c7;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .page-header { margin-bottom:24px; padding-bottom:18px; border-bottom:0.5px solid var(--border); }
+  .page-header h1 { font-size:22px; font-weight:500; color:var(--text); margin-bottom:4px; }
+  .page-header p  { font-size:14px; color:var(--text2); line-height:1.6; }
+
+  .legend { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
+  .legend-dot  { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+
+  /* ── Main two-column layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    align-items: stretch;   /* both columns same height */
+  }
+
+  /* ── Left: diagram ── */
+  .diagram-wrap {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 12px 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  .hint { font-size:11px; color:var(--text3); text-align:center; margin-top:8px; }
+
+  /* ── Right: description panel, same height as diagram ── */
+  .desc-panel {
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;        /* clip inner content, not the panel */
+  }
+
+  /* Step nav tabs along the top of the right panel */
+  .step-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--bg2);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 6px 8px 0;
+    gap: 3px;
+  }
+  .step-tab {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px 6px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 6px 6px 0 0;
+    border: 0.5px solid transparent;
+    border-bottom: none;
+    cursor: pointer;
+    color: var(--text3);
+    background: transparent;
+    transition: color 0.13s, background 0.13s;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .step-tab:hover { color: var(--text2); background: var(--bg3); }
+  .step-tab.active {
+    color: var(--text);
+    background: var(--bg);
+    border-color: var(--border);
+    border-bottom-color: var(--bg);  /* merges with content area */
+    margin-bottom: -0.5px;
+    z-index: 1;
+  }
+  .step-pip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Scrollable content area */
+  .desc-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 22px 20px;
+    background: var(--bg);
+  }
+
+  .desc-title {
+    font-size: 15px; font-weight: 500;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+  .tag {
+    font-size:11px; padding:3px 9px; border-radius:4px;
+    font-weight:500; letter-spacing:0.01em;
+  }
+  .tag.purple { background:var(--purple-fill); color:var(--purple-text); }
+  .tag.teal   { background:var(--teal-fill);   color:var(--teal-text); }
+  .tag.coral  { background:var(--coral-fill);  color:var(--coral-text); }
+  .tag.gray   { background:var(--gray-fill);   color:var(--gray-text); }
+
+  .desc-body {
+    font-size: 13px; color: var(--text2);
+    line-height: 1.75;
+  }
+  .desc-body code {
+    font-family: var(--mono); font-size: 11.5px;
+    background: var(--bg3); padding: 1px 5px;
+    border-radius: 4px; color: var(--text);
+  }
+
+  /* nav prev/next at bottom */
+  .desc-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 22px 12px;
+    border-top: 0.5px solid var(--border);
+    background: var(--bg2);
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .nav-btn {
+    font-size: 12px; color: var(--text3);
+    background: none; border: 0.5px solid var(--border);
+    border-radius: 6px; padding: 4px 12px;
+    cursor: pointer; transition: color 0.12s, border-color 0.12s, background 0.12s;
+  }
+  .nav-btn:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-counter { font-size: 11px; color: var(--text3); }
+
+  /* SVG node interaction */
+  .fl-node { cursor: pointer; }
+  .fl-node rect { transition: filter 0.13s; }
+  .fl-node:hover rect { filter: brightness(0.92); }
+  .fl-node.active rect { stroke-width: 1.5 !important; }
+</style>
+</head>
+<body>
+
+
+<div class="page-header">
+  <h1>Runtime event flow</h1>
+  <p>What happens from the moment a user clicks the canvas to when Bokeh pushes the diff to the browser. Click any block in the diagram or a tab above to read the implementation details.</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gray-fill);border:1px solid var(--gray-border)"></div> Browser / Bokeh layer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple-fill);border:1px solid var(--purple-border)"></div> Central dispatcher</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--coral-fill);border:1px solid var(--coral-border)"></div> Action branches</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal-fill);border:1px solid var(--teal-border)"></div> State mutation</div>
+</div>
+
+<div class="layout">
+
+  <!-- ── Left: flowchart ── -->
+  <div class="diagram-wrap">
+    <svg id="flow-svg" width="100%" viewBox="0 0 280 760" role="img">
+      <title>Powertrain Builder runtime event flow</title>
+      <desc>Sequential flow from user action in browser through on_canvas_tap, three action branches, undo snapshot, source mutation, port rebuild, Bokeh WebSocket push, and undo/redo path back to mutation.</desc>
+      <defs>
+        <marker id="fa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- 1: User action -->
+      <g class="fl-node" id="f-useraction" onclick="activate('useraction')">
+        <rect x="30" y="14" width="220" height="40" rx="7" fill="var(--gray-fill)" stroke="var(--gray-border)" stroke-width="0.75"/>
+        <text x="140" y="34" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--gray-text)" font-family="system-ui,-apple-system,sans-serif">User action in browser</text>
+      </g>
+      <line x1="140" y1="54" x2="140" y2="78" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+
+      <!-- 2: Dispatcher -->
+      <g class="fl-node" id="f-tap" onclick="activate('tap')">
+        <rect x="20" y="78" width="240" height="52" rx="7" fill="var(--purple-fill)" stroke="var(--purple-border)" stroke-width="0.75"/>
+        <text x="140" y="98" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--purple-text)" font-family="system-ui,-apple-system,sans-serif">on_canvas_tap(event)</text>
+        <text x="140" y="116" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--purple-border)" font-family="system-ui,-apple-system,sans-serif">PlacementHandler · dispatches by mode</text>
+      </g>
+
+      <!-- Branch lines -->
+      <line x1="70"  y1="130" x2="50"  y2="176" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+      <line x1="140" y1="130" x2="140" y2="176" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+      <line x1="210" y1="130" x2="230" y2="176" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+
+      <!-- 3a: Delete -->
+      <g class="fl-node" id="f-delete" onclick="activate('delete')">
+        <rect x="14" y="176" width="86" height="48" rx="7" fill="var(--coral-fill)" stroke="var(--coral-border)" stroke-width="0.75"/>
+        <text x="57" y="195" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--coral-text)" font-family="system-ui,-apple-system,sans-serif">delete mode</text>
+        <text x="57" y="213" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--coral-border)" font-family="system-ui,-apple-system,sans-serif">node or edge</text>
+      </g>
+
+      <!-- 3b: Port tap -->
+      <g class="fl-node" id="f-porttap" onclick="activate('porttap')">
+        <rect x="108" y="176" width="64" height="48" rx="7" fill="var(--coral-fill)" stroke="var(--coral-border)" stroke-width="0.75"/>
+        <text x="140" y="193" text-anchor="middle" dominant-baseline="central" font-size="10" font-weight="500" fill="var(--coral-text)" font-family="system-ui,-apple-system,sans-serif">port tap</text>
+        <text x="140" y="211" text-anchor="middle" dominant-baseline="central" font-size="9" fill="var(--coral-border)" font-family="system-ui,-apple-system,sans-serif">2-click edge</text>
+      </g>
+
+      <!-- 3c: Place -->
+      <g class="fl-node" id="f-place" onclick="activate('place')">
+        <rect x="180" y="176" width="86" height="48" rx="7" fill="var(--coral-fill)" stroke="var(--coral-border)" stroke-width="0.75"/>
+        <text x="223" y="195" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="var(--coral-text)" font-family="system-ui,-apple-system,sans-serif">place icon</text>
+        <text x="223" y="213" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--coral-border)" font-family="system-ui,-apple-system,sans-serif">append to source</text>
+      </g>
+
+      <!-- Converge → push undo -->
+      <line x1="57"  y1="224" x2="100" y2="258" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+      <line x1="140" y1="224" x2="140" y2="258" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+      <line x1="223" y1="224" x2="180" y2="258" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+
+      <!-- 4: Push undo -->
+      <g class="fl-node" id="f-pushundo" onclick="activate('pushundo')">
+        <rect x="26" y="258" width="228" height="52" rx="7" fill="var(--teal-fill)" stroke="var(--teal-border)" stroke-width="0.75"/>
+        <text x="140" y="278" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--teal-text)" font-family="system-ui,-apple-system,sans-serif">IOMixin._push_undo()</text>
+        <text x="140" y="296" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--teal-border)" font-family="system-ui,-apple-system,sans-serif">make_snapshot() → UndoStack.push()</text>
+      </g>
+      <line x1="140" y1="310" x2="140" y2="334" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+
+      <!-- 5: Mutate -->
+      <g class="fl-node" id="f-mutate" onclick="activate('mutate')">
+        <rect x="20" y="334" width="240" height="64" rx="7" fill="var(--gray-fill)" stroke="var(--gray-border)" stroke-width="0.75"/>
+        <text x="140" y="354" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--gray-text)" font-family="system-ui,-apple-system,sans-serif">BuilderState sources mutated</text>
+        <text x="140" y="372" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--gray-border)" font-family="system-ui,-apple-system,sans-serif">placed_nodes_source · edge_source · ports</text>
+        <text x="140" y="388" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--gray-border)" font-family="system-ui,-apple-system,sans-serif">.data dict reassigned → Bokeh diffs</text>
+      </g>
+      <line x1="140" y1="398" x2="140" y2="422" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+
+      <!-- 6: Rebuild ports -->
+      <g class="fl-node" id="f-rebuild" onclick="activate('rebuild')">
+        <rect x="26" y="422" width="228" height="52" rx="7" fill="var(--teal-fill)" stroke="var(--teal-border)" stroke-width="0.75"/>
+        <text x="140" y="442" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--teal-text)" font-family="system-ui,-apple-system,sans-serif">_rebuild_all_ports()</text>
+        <text x="140" y="460" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--teal-border)" font-family="system-ui,-apple-system,sans-serif">recompute geometry → _rebuild_edges()</text>
+      </g>
+      <line x1="140" y1="474" x2="140" y2="498" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)"/>
+
+      <!-- 7: Bokeh push -->
+      <g class="fl-node" id="f-bokeh" onclick="activate('bokeh')">
+        <rect x="40" y="498" width="200" height="40" rx="7" fill="var(--gray-fill)" stroke="var(--gray-border)" stroke-width="0.75"/>
+        <text x="140" y="518" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--gray-text)" font-family="system-ui,-apple-system,sans-serif">Bokeh pushes diff to browser</text>
+      </g>
+
+      <!-- Undo/redo loop left rail -->
+      <path d="M40 518 L18 518 L18 634 L56 634" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)" fill="none"/>
+      <text x="11" y="576" font-size="10" fill="var(--text3)" font-family="system-ui,-apple-system,sans-serif" text-anchor="middle">undo</text>
+      <text x="11" y="589" font-size="10" fill="var(--text3)" font-family="system-ui,-apple-system,sans-serif" text-anchor="middle">/ redo</text>
+
+      <!-- 8: Undo/redo -->
+      <g class="fl-node" id="f-undoredo" onclick="activate('undoredo')">
+        <rect x="56" y="608" width="190" height="52" rx="7" fill="var(--purple-fill)" stroke="var(--purple-border)" stroke-width="0.75"/>
+        <text x="151" y="628" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="var(--purple-text)" font-family="system-ui,-apple-system,sans-serif">_on_undo() / _on_redo()</text>
+        <text x="151" y="646" text-anchor="middle" dominant-baseline="central" font-size="10" fill="var(--purple-border)" font-family="system-ui,-apple-system,sans-serif">IOMixin · pop snapshot → restore</text>
+      </g>
+
+      <!-- Return right rail → mutate -->
+      <path d="M246 634 L264 634 L264 366 L262 366" stroke="#888780" stroke-width="0.6" marker-end="url(#fa)" fill="none"/>
+      <text x="271" y="502" font-size="10" fill="var(--text3)" font-family="system-ui,-apple-system,sans-serif" text-anchor="start">restores</text>
+      <text x="271" y="514" font-size="10" fill="var(--text3)" font-family="system-ui,-apple-system,sans-serif" text-anchor="start">sources</text>
+
+    </svg>
+    <p class="hint">Click any block to read details →</p>
+  </div>
+
+  <!-- ── Right: description panel ── -->
+  <div class="desc-panel">
+
+    <!-- Tab strip -->
+    <div class="step-nav" id="step-nav"></div>
+
+    <!-- Scrollable body -->
+    <div class="desc-content" id="desc-content">
+      <div class="desc-title" id="dp-title"></div>
+      <div class="tags" id="dp-tags"></div>
+      <div class="desc-body" id="dp-body"></div>
+    </div>
+
+    <!-- Prev / Next footer -->
+    <div class="desc-nav">
+      <button class="nav-btn" id="btn-prev" onclick="navStep(-1)">← Prev</button>
+      <span class="nav-counter" id="nav-counter"></span>
+      <button class="nav-btn" id="btn-next" onclick="navStep(1)">Next →</button>
+    </div>
+
+  </div>
+
+</div><!-- end .layout -->
+
+<script>
+const steps = [
+  {
+    key: 'useraction', label: '1', color: 'gray',
+    title: 'User action in browser',
+    tags: ['Bokeh Tap event', 'Button on_click'],
+    body: `Any click on the canvas fires a Bokeh <code>Tap</code> event carrying <code>event.x</code> and <code>event.y</code> in canvas data-units. Button clicks fire synchronous <code>on_click</code> Python callbacks on the server. Both are handled entirely in Python — no JavaScript roundtrip except for the hidden trigger <code>TextInput</code> toggles used for the save/load/end-session flows.`
+  },
+  {
+    key: 'tap', label: '2', color: 'purple',
+    title: 'on_canvas_tap(event)',
+    tags: ['PlacementHandler', 'Dispatcher'],
+    body: `The central dispatcher. Reads <code>state.delete_mode</code> and <code>state.selected_component</code> to decide which branch to take. Priority order: (1) if not in delete mode and no component selected, check for a nearby port first — port taps have highest priority. (2) If delete mode, find the nearest node or edge and remove it. (3) If a component is selected, place a new icon. (4) Otherwise, select/deselect the nearest node. In branches 1, 2, and 3 that mutate the canvas, <code>_push_undo()</code> is called before the mutation.`
+  },
+  {
+    key: 'delete', label: '3a', color: 'coral',
+    title: 'Delete mode branch',
+    tags: ['PortEdgeMixin._best_possible_node', 'PortEdgeMixin._find_nearest_edge'],
+    body: `Calls <code>_best_possible_node(x, y)</code> to find the nearest node within snap distance (<code>icon_size</code> pixels). If found: pushes undo, removes the node's row from <code>placed_nodes_source.data</code>, removes all edges touching that node from <code>edge_source.data</code>, re-indexes surviving edge node indices, calls <code>_rebuild_all_ports()</code>. If no node found, tries <code>_find_nearest_edge(x, y)</code> with a 12 px snap tolerance and removes that single edge row.`
+  },
+  {
+    key: 'porttap', label: '3b', color: 'coral',
+    title: '_handle_port_tap()',
+    tags: ['PortEdgeMixin', 'Two-click workflow'],
+    body: `First tap: stores the port as <code>state.pending_port</code> and highlights it with <code>pending_port_source</code>. Second tap on a compatible port (opposite kind, same energy colour): calls <code>_push_undo()</code> then <code>_add_edge(pending, port)</code>. Same port tapped twice cancels the selection. Incompatible port (wrong kind or colour) is silently ignored. The undo push happens only on the second tap, right before the permanent edge is written to <code>edge_source</code>.`
+  },
+  {
+    key: 'place', label: '3c', color: 'coral',
+    title: 'Place icon branch',
+    tags: ['on_canvas_tap', 'placed_nodes_source'],
+    body: `Pushes undo, then appends one new row to every column of <code>placed_nodes_source.data</code>: coordinates, base64 icon URL, node name (<code>icon_key_N</code>), <code>node_type</code>, <code>position</code>, <code>options</code> JSON, default port counts, empty symmetry fields. Also appends to <code>hover_source</code>. Increments <code>state.placed_counter[icon_key]</code> so the next placement gets a unique suffix. Finally calls <code>_rebuild_all_ports()</code> and <code>_mark_unsaved()</code>.`
+  },
+  {
+    key: 'pushundo', label: '4', color: 'teal',
+    title: 'IOMixin._push_undo()',
+    tags: ['IOMixin', 'make_snapshot()', 'UndoStack.push()'],
+    body: `Calls <code>make_snapshot(self.state)</code> which <code>copy.deepcopy</code>s all four data source dicts plus <code>placed_counter</code> into a plain Python dict — no Bokeh objects stored. Calls <code>self.state.undo_stack.push(snapshot)</code> which appends to <code>_undo</code> deque and clears <code>_redo</code> deque (a new mutation invalidates the redo history). Finally calls <code>_refresh_undo_redo_buttons()</code> to update the enabled/dimmed visual state.`
+  },
+  {
+    key: 'mutate', label: '5', color: 'gray',
+    title: 'BuilderState sources mutated',
+    tags: ['ColumnDataSource', 'Bokeh reactive'],
+    body: `Each mutation rebuilds the affected dict locally then reassigns <code>source.data = new_dict</code>. Reassigning <code>.data</code> (not mutating in place) is required for Bokeh to detect the change and schedule a WebSocket push to the browser. The browser's Bokeh client receives a patch and re-renders only the changed glyphs — icons, edges, port balls — without a full page reload. The <code>_sync_labels</code> callback on <code>placed_nodes_source</code> keeps the node-name label overlay in sync automatically.`
+  },
+  {
+    key: 'rebuild', label: '6', color: 'teal',
+    title: '_rebuild_all_ports()',
+    tags: ['PortEdgeMixin', 'compute_ports()'],
+    body: `Iterates all placed nodes and calls <code>compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_source, n_target)</code> for each to compute port ball positions geometrically (evenly fanned around the node circle). Writes the full <code>source_port_source.data</code> and <code>target_port_source.data</code> dicts from scratch, including the <code>connected</code> column derived from existing edges. Calls <code>_rebuild_edges()</code> at the end to update the <code>xs/ys</code> columns so edge lines follow moved nodes.`
+  },
+  {
+    key: 'bokeh', label: '7', color: 'gray',
+    title: 'Bokeh pushes diff to browser',
+    tags: ['WebSocket', 'ColumnDataSource patch'],
+    body: `After all Python callbacks return, Bokeh's Tornado IOLoop flushes pending document changes over the WebSocket connection. Only changed data source columns are sent as a binary patch — not the full document. The browser-side Bokeh JS client applies the patch to its local model and triggers a re-render of any glyphs bound to the changed sources. This is why reassigning <code>source.data</code> rather than mutating in-place is critical.`
+  },
+  {
+    key: 'undoredo', label: '8', color: 'purple',
+    title: '_on_undo() / _on_redo()',
+    tags: ['IOMixin', 'UndoStack', '_restore_from_snapshot()'],
+    body: `<strong>Undo:</strong> captures current state via <code>make_snapshot()</code> → <code>push_redo(current)</code>, then pops from <code>_undo</code> deque → calls <code>_restore_from_snapshot(snapshot)</code>. <strong>Redo:</strong> captures current state → <code>push_undo_only(current)</code> (bypasses the <code>_redo.clear()</code> that normal <code>push()</code> would trigger), then pops from <code>_redo</code> deque → calls <code>_restore_from_snapshot(snapshot)</code>. Both finish with <code>_mark_unsaved()</code> which calls <code>_refresh_undo_redo_buttons()</code>.`
+  }
+];
+
+// Build color vars for pip dots
+const pipColors = {
+  gray:   'var(--gray-border)',
+  purple: 'var(--purple-border)',
+  coral:  'var(--coral-border)',
+  teal:   'var(--teal-border)'
+};
+
+// Render tab strip
+const nav = document.getElementById('step-nav');
+steps.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'step-tab';
+  btn.id = 'tab-' + s.key;
+  btn.innerHTML = `<span class="step-pip" style="background:${pipColors[s.color]}"></span>${s.label}`;
+  btn.title = s.title;
+  btn.onclick = () => setActive(i);
+  nav.appendChild(btn);
+});
+
+let current = 0;
+
+function setActive(idx) {
+  current = idx;
+  const s = steps[idx];
+
+  // Update tabs
+  document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + s.key).classList.add('active');
+
+  // Update SVG
+  document.querySelectorAll('.fl-node').forEach(n => {
+    n.style.opacity = '0.38';
+    n.classList.remove('active');
+  });
+  const svgEl = document.getElementById('f-' + s.key);
+  if (svgEl) { svgEl.style.opacity = '1'; svgEl.classList.add('active'); }
+
+  // Update description
+  document.getElementById('dp-title').textContent = s.title;
+  document.getElementById('dp-tags').innerHTML = s.tags.map(t =>
+    `<span class="tag ${s.color}">${t}</span>`).join('');
+  document.getElementById('dp-body').innerHTML = s.body;
+
+  // Scroll content area to top
+  document.getElementById('desc-content').scrollTop = 0;
+
+  // Update nav counter + buttons
+  document.getElementById('nav-counter').textContent = `${idx + 1} / ${steps.length}`;
+  document.getElementById('btn-prev').disabled = idx === 0;
+  document.getElementById('btn-next').disabled = idx === steps.length - 1;
+}
+
+// Clicking SVG node maps to step index
+function activate(key) {
+  const idx = steps.findIndex(s => s.key === key);
+  if (idx !== -1) setActive(idx);
+}
+
+function navStep(dir) {
+  const next = current + dir;
+  if (next >= 0 && next < steps.length) setActive(next);
+}
+
+// Start on step 1
+setActive(0);
+</script>
+</body>
+</html>

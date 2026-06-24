@@ -5,7 +5,7 @@
 """
 Startup-overlay, new-design, delete-mode, and palette-selection logic.
 
-Mixin class :class:`OverlayMixin` is not meant to be instantiated directly;
+Mixin class :class:`PlacementMixin` is not meant to be instantiated directly;
 it is composed into :class:`PlacementHandler` via multiple inheritance.
 """
 
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from .power_train_builder_state import BuilderState
 
 
-class OverlayMixin:
+class PlacementMixin:
     """
     Handles the startup overlay choices, palette button selection, and delete-mode toggling.
 

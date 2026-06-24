@@ -37,7 +37,7 @@ from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base6
 
 from .power_train_builder_state import BuilderState, _EMPTY
 from .power_train_builder_history import UndoStack
-from .power_train_builder_handler_overlay import OverlayMixin
+from .power_train_builder_handler_placement import PlacementMixin
 from .power_train_builder_handler_io import IOMixin
 from .power_train_builder_handler_ports import PortEdgeMixin
 from .power_train_builder_handler_config_panel import ConfigPanelMixin
@@ -45,7 +45,7 @@ from .power_train_builder_handler_config_panel import ConfigPanelMixin
 _LOGGER = logging.getLogger(__name__)
 
 
-class PlacementHandler(OverlayMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin):
+class PlacementHandler(PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin):
     """
     Wires palette button events to canvas placement and interaction events.
 
