@@ -19,7 +19,6 @@ Typical usage::
     palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
 """
 
-import sys
 from pathlib import Path
 
 import bokeh.models as bkmodel
