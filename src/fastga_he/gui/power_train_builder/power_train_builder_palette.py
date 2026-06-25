@@ -46,8 +46,7 @@ from .power_train_builder_metadata import (
     _get_performance_component_names,
 )
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-COMPONENTS_PATH = Path(__file__).resolve().parents[3] / "fastga_he/models/propulsion/components"
+COMPONENTS_PATH = Path(__file__).resolve().parents[2] / "models" / "propulsion" / "components"
 
 # ── Load dialog ───────────────────────────────────────────────────────────────
 # Toggles browse_load_trigger to signal Python to open a tkinter open-file dialog.
