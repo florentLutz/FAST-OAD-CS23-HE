@@ -102,16 +102,20 @@ def test_sizing_twin_otter_pemfc_h2():
 
     problem.write_outputs()
 
-def test_hybrid_dhc_6_powertrain_network():
 
+def test_hybrid_dhc_6_powertrain_network():
     pt_file_path = DATA_FOLDER_PATH / "turboshaft_pemfc_hybrid_propulsion.yml"
     network_file_path = RESULTS_FOLDER_PATH / "dhc_6_h2.html"
 
     power_train_network_viewer(
-        pt_file_path, network_file_path, animated_plot=False, orientation="LR", plot_scaling=1.3,
-        legend_position="BR", legend_scaling=1.3
+        pt_file_path,
+        network_file_path,
+        animated_plot=False,
+        orientation="LR",
+        plot_scaling=1.3,
+        legend_position="BR",
+        legend_scaling=1.3,
     )
-
 
 
 def test_sizing_twin_otter_pemfc_h2_inside():

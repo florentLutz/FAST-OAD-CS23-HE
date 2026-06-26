@@ -1135,6 +1135,7 @@ def test_cost_pipistrel():
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
+
 def test_cost_dhc_6():
     ivc = get_indep_var_comp(
         list_inputs(
@@ -1163,6 +1164,7 @@ def test_cost_dhc_6():
     problem.output_file_path = RESULTS_FOLDER_PATH / "dhc_6_cost.xml"
 
     problem.write_outputs()
+
 
 def test_cost_dhc_6_h2():
     ivc = get_indep_var_comp(

@@ -5,8 +5,6 @@
 import numpy as np
 import openmdao.api as om
 
-MINOR_LOSS_FACTOR = 0.375
-
 
 class PerformancesCoolantPressureDrop(om.ExplicitComponent):
     """
@@ -93,14 +91,6 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
             units="kg/m**3",
             val=np.nan,
         )
-        self.add_input(
-            name="data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:transport_velocity",
-            units="m/s",
-            val=1.5,
-            desc="Pipe flow velocity",
-        )
 
         self.add_output(
             name="data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -147,11 +137,6 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
         rho_coolant = inputs["mean_coolant_density"]
         rho_coolant_inlet = inputs["coolant_inlet_density"]
         rho_coolant_outlet = inputs["coolant_outlet_density"]
-        flow_velocity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:transport_velocity"
-        ]
 
         outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -166,7 +151,7 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
             * coolant_flow_length
             / (rho_coolant * fin_hydraulic_diameter)
             + (1.0 + sigma**2.0 + k_exit) / rho_coolant_outlet
-        ) + rho_coolant * flow_velocity**2.0 * MINOR_LOSS_FACTOR
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
@@ -200,11 +185,6 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
         rho_coolant = inputs["mean_coolant_density"]
         rho_coolant_inlet = inputs["coolant_inlet_density"]
         rho_coolant_outlet = inputs["coolant_outlet_density"]
-        flow_velocity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:transport_velocity"
-        ]
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -322,7 +302,7 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
             * coolant_fanning_factor
             * coolant_flow_length
             / (rho_coolant**2.0 * fin_hydraulic_diameter)
-        ) + flow_velocity**2.0 * MINOR_LOSS_FACTOR
+        )
 
         partials[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -351,14 +331,3 @@ class PerformancesCoolantPressureDrop(om.ExplicitComponent):
             * (1.0 + sigma**2.0 + k_exit)
             / rho_coolant_outlet**2.0
         )
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + heat_exchanger_id
-            + ":coolant_pressure_drop",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":coolant:transport_velocity",
-        ] = 2.0 * rho_coolant * flow_velocity * MINOR_LOSS_FACTOR

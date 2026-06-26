@@ -227,6 +227,7 @@ def test_generator_cg_x():
 
         problem.check_partials(compact_print=True)
 
+
 def test_sizing_drag():
     input_list = [
         "data:TLAR:v_cruise",

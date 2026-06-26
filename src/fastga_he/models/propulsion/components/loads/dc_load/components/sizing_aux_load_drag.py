@@ -84,8 +84,11 @@ class SizingDCAuxLoadDrag(om.ExplicitComponent):
 
         outputs[
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":" + ls_tag + ":CD0"
-        ] = (aux_load_mass / weight_to_drag_ratio) / (0.5 * air_density * v_cruise**2 *
-                                                      wing_area)*9.81
+        ] = (
+            (aux_load_mass / weight_to_drag_ratio)
+            / (0.5 * air_density * v_cruise**2 * wing_area)
+            * 9.81
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         aux_load_id = self.options["aux_load_id"]
@@ -108,7 +111,7 @@ class SizingDCAuxLoadDrag(om.ExplicitComponent):
             -2
             * (aux_load_mass / weight_to_drag_ratio)
             / (0.5 * air_density * v_cruise**3 * wing_area)
-        )*9.81
+        ) * 9.81
 
         partials[
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":" + ls_tag + ":CD0",
@@ -117,7 +120,7 @@ class SizingDCAuxLoadDrag(om.ExplicitComponent):
             -1
             * (aux_load_mass / weight_to_drag_ratio)
             / (0.5 * air_density**2 * v_cruise**2 * wing_area)
-        )*9.81
+        ) * 9.81
 
         partials[
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":" + ls_tag + ":CD0",
@@ -126,12 +129,12 @@ class SizingDCAuxLoadDrag(om.ExplicitComponent):
             -1
             * (aux_load_mass / weight_to_drag_ratio)
             / (0.5 * air_density * v_cruise**2 * wing_area**2)
-        )*9.81
+        ) * 9.81
 
         partials[
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":" + ls_tag + ":CD0",
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":mass",
-        ] = 1 / weight_to_drag_ratio / (0.5 * air_density * v_cruise**2 * wing_area)*9.81
+        ] = 1 / weight_to_drag_ratio / (0.5 * air_density * v_cruise**2 * wing_area) * 9.81
 
         partials[
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":" + ls_tag + ":CD0",
@@ -140,4 +143,4 @@ class SizingDCAuxLoadDrag(om.ExplicitComponent):
             -1
             * (aux_load_mass / weight_to_drag_ratio**2)
             / (0.5 * air_density * v_cruise**2 * wing_area)
-        )*9.81
+        ) * 9.81

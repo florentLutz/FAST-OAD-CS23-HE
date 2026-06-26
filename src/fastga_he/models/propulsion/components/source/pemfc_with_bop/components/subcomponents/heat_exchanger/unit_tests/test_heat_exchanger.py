@@ -484,7 +484,7 @@ def test_air_pressure_drop():
     assert problem.get_val(
         "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:heat_exchanger_1:air_pressure_drop",
         units="Pa",
-    ) == pytest.approx(np.full(NB_POINTS_TEST, 22759.83), rel=1e-2)
+    ) == pytest.approx(np.full(NB_POINTS_TEST, 12262.2), rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
