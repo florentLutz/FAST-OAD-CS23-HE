@@ -751,32 +751,30 @@ class AerostructuralLoadHE(om.ExplicitComponent):
             y_current = y_point_mass + (i - nb_point_side) * interval_len
             if (y_current >= 0.0) and (y_current <= semi_span):
                 y_added.append(y_current)
+                new_chord = np.interp(y_current, y_vector, chord_vector)
+                new_mass = np.interp(y_current, y_vector, point_mass_array)
                 y_vector, idx = AerostructuralLoadHE.insert_in_sorted_array(y_vector, y_current)
                 index = int(float(idx[0]))
-                chord_vector = np.insert(
-                    chord_vector, index, np.interp(y_current, y_vector, chord_vector)
-                )
-                point_mass_array = np.insert(
-                    point_mass_array, index, np.interp(y_current, y_vector, point_mass_array)
-                )
+                chord_vector = np.insert(chord_vector, index, new_chord)
+                point_mass_array = np.insert(point_mass_array, index, new_mass)
                 fake_point_mass_array = np.insert(fake_point_mass_array, index, 0.0)
 
         y_min = min(y_added) - 1e-3
+        chord_y_min = np.interp(y_min, y_vector, chord_vector)
+        mass_y_min = np.interp(y_min, y_vector, point_mass_array)
         y_vector, idx = AerostructuralLoadHE.insert_in_sorted_array(y_vector, y_min)
         index = int(float(idx[0]))
-        chord_vector = np.insert(chord_vector, index, np.interp(y_min, y_vector, chord_vector))
-        point_mass_array = np.insert(
-            point_mass_array, index, np.interp(y_min, y_vector, point_mass_array)
-        )
+        chord_vector = np.insert(chord_vector, index, chord_y_min)
+        point_mass_array = np.insert(point_mass_array, index, mass_y_min)
         fake_point_mass_array = np.insert(fake_point_mass_array, index, 0.0)
 
         y_max = max(y_added) + 1e-3
+        chord_y_max = np.interp(y_max, y_vector, chord_vector)
+        mass_y_max = np.interp(y_max, y_vector, point_mass_array)
         y_vector, idx = AerostructuralLoadHE.insert_in_sorted_array(y_vector, y_max)
         index = int(float(idx[0]))
-        chord_vector = np.insert(chord_vector, index, np.interp(y_max, y_vector, chord_vector))
-        point_mass_array = np.insert(
-            point_mass_array, index, np.interp(y_max, y_vector, point_mass_array)
-        )
+        chord_vector = np.insert(chord_vector, index, chord_y_max)
+        point_mass_array = np.insert(point_mass_array, index, mass_y_max)
         fake_point_mass_array = np.insert(fake_point_mass_array, index, 0.0)
 
         # STEP 5/XX - WE NOW HAVE THE RIGHT WE JUST NEED TO SCALE IT PROPERLY WHICH IS THE POINT
