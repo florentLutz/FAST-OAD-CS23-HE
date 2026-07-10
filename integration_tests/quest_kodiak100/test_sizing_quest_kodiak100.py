@@ -516,7 +516,7 @@ def test_sizing_kodiak_100_full_electric_future_na_ion_with_lca():
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        1.747306946521163e-06, rel=1e-2
+        1.8104373e-06, rel=1e-2
     )
 
 

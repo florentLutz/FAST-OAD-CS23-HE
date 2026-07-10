@@ -26,9 +26,9 @@ def test_compare_impacts_three_designs_bar_chart_normalised():
             RESULTS_FOLDER_PATH / "oad_process_outputs_elec_na_ion_with_lca.xml",
         ],
         names_aircraft=[
-            "2025 w/ Li-Ion",
-            "2040 w/ Li-S",
-            "2040 w/ Sodium-Ion",
+            "Current w/ Li-Ion",
+            "Future w/ Li-S",
+            "Future w/ Sodium-Ion",
         ],
         impact_filter_list=[
             "acidification",
@@ -55,14 +55,14 @@ def test_compare_impacts_three_designs_bar_chart_normalised():
         margin=dict(l=5, r=5, t=60, b=5),
         title_font=dict(size=20),
         legend_font=dict(size=20),
-        legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.02),
+        # legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.02),
         width=1800,
-        height=800,
+        height=600,
     )
     fig.update_xaxes(
         title_font=dict(size=15),
     )
-    fig.update_yaxes(title_font=dict(size=15), range=[0, 1.25e-6])
+    fig.update_yaxes(title_font=dict(size=15), range=[0, 1.0e-6])
     fig["layout"]["yaxis"]["title"]["font"]["size"] = 20
     fig["layout"]["yaxis"]["tickfont"]["size"] = 20
     fig["layout"]["xaxis"]["title"]["font"]["size"] = 20

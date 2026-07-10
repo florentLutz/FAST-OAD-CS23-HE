@@ -854,18 +854,17 @@ def test_time_sensitivity_post_processing():
     # For what we will call the optimal trajectory, we'll look for the immediate biggest gain.
     # If no gains can be reached with immediate neighbours, we expand to the neighbours' neighbours.
     bed_history = [395]
-    lifespan_history = [150.]
+    lifespan_history = [150.0]
 
     # First step is a necessary improvement of the BED to allow feasibility
     current_bed = 500
-    current_lifespan = 150.
+    current_lifespan = 150.0
 
     interp = LinearNDInterpolator(list(zip(lifespans, beds)), single_scores)
 
     failsafe = 0
 
-    while not (current_bed == 1300 and current_lifespan == 12000.) and failsafe < 100:
-
+    while not (current_bed == 1300 and current_lifespan == 12000.0) and failsafe < 100:
         # We look for next point
         next_point = []
         neighbours = _find_neighbour(current_lifespan, current_bed)
@@ -873,11 +872,10 @@ def test_time_sensitivity_post_processing():
         current_score = interp(current_lifespan, current_bed)
 
         while not next_point:
-
             # If any of the neighbour is the final point we exit as this will always be the final
             # point
-            if (12000., 1300) in neighbours:
-                next_point = (12000., 1300)
+            if (12000.0, 1300) in neighbours:
+                next_point = (12000.0, 1300)
                 break
 
             # First check if there is an improvement in the current score, we check for
@@ -893,7 +891,7 @@ def test_time_sensitivity_post_processing():
                 next_point = neighbours[index_best_neighbour]
                 break  # This line might be redundant since the line above exits the while
 
-            else: # No immediate neighbour with significant gain so we update the list of neighbour with neighbours' neighbour
+            else:  # No immediate neighbour with significant gain so we update the list of neighbour with neighbours' neighbour
                 new_neighbours = []
                 for neighbour in neighbours:
                     neighbours_neighbours = _find_neighbour(neighbour[0], neighbour[1])
@@ -919,10 +917,9 @@ def test_time_sensitivity_post_processing():
     fig.add_trace(heatmap)
 
     for index, _ in enumerate(lifespan_history):
-
         scatter_opt_traj = go.Scatter(
-            x=lifespan_history[:index+1],
-            y=bed_history[:index+1],
+            x=lifespan_history[: index + 1],
+            y=bed_history[: index + 1],
             line=dict(color="black", width=3),
             marker=dict(color="black", size=10, symbol="diamond"),
             mode="lines+markers",
@@ -946,6 +943,7 @@ def test_time_sensitivity_post_processing():
 
         # fig.show()
         fig.write_image(pth.join(pth.join(RESULTS_TIME_SENSITIVITY, "images"), str(index) + ".png"))
+
 
 def test_time_sensitivity_post_processing_other_strategy():
     """
@@ -1118,7 +1116,7 @@ def test_time_sensitivity_post_processing_other_strategy():
     # For what we will call the optimal trajectory, we'll look for the immediate biggest gain.
     # If no gains can be reached with immediate neighbours, we expand to the neighbours' neighbours.
     bed_history = [395, 500]
-    lifespan_history = [150., 150]
+    lifespan_history = [150.0, 150]
 
     rounded_years = 2025 + 5 * (
         1.823088191771652e-05
@@ -1134,7 +1132,9 @@ def test_time_sensitivity_post_processing_other_strategy():
         suitable_bed = beds[suitable_design]
         suitable_lifespan = lifespans[suitable_design]
 
-        coherent_design = np.where(suitable_bed >= bed_history[-1]) and np.where(suitable_lifespan >= lifespan_history[-1])
+        coherent_design = np.where(suitable_bed >= bed_history[-1]) and np.where(
+            suitable_lifespan >= lifespan_history[-1]
+        )
 
         best_design = np.argmin(np.array(single_scores)[suitable_design][coherent_design])
         bed_history.append(suitable_bed[coherent_design][best_design])
@@ -1148,10 +1148,9 @@ def test_time_sensitivity_post_processing_other_strategy():
     fig.add_trace(heatmap)
 
     for index, _ in enumerate(lifespan_history):
-
         scatter_opt_traj = go.Scatter(
-            x=lifespan_history[:index+1],
-            y=bed_history[:index+1],
+            x=lifespan_history[: index + 1],
+            y=bed_history[: index + 1],
             line=dict(color="black", width=3),
             marker=dict(color="black", size=10, symbol="diamond"),
             mode="lines+markers",
@@ -1174,6 +1173,8 @@ def test_time_sensitivity_post_processing_other_strategy():
         fig.update_yaxes(title_font=dict(size=15), range=[345, 1350])
 
         # fig.show()
-        fig.write_image(pth.join(pth.join(RESULTS_TIME_SENSITIVITY, "images_v2"), str(index) + ".png"))
+        fig.write_image(
+            pth.join(pth.join(RESULTS_TIME_SENSITIVITY, "images_v2"), str(index) + ".png")
+        )
 
     fig.show()

@@ -5,7 +5,7 @@ module_folders:
 
 # Input and output files
 input_file: ../results/oad_process_inputs_he_with_lca_future.xml
-output_file: ../results/oad_process_outputs_he_with_lca.xml
+output_file: ../results/oad_process_outputs_he_with_lca_future.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')

@@ -299,6 +299,9 @@ def test_weight_comparison():
     fig = mass_breakdown_bar_plot(retrofit_aircraft, name="Conservative hybrid design", fig=fig)
     fig = mass_breakdown_bar_plot(new_wing_aircraft, name="Hybrid design from scratch", fig=fig)
     fig.update_layout(font=dict(size=20))
+    fig.data[0].x = ["MTOM/TOM", "OME", "Fuel - Mission", "Payload"]
+    fig.data[2].x = ["MTOM/TOM", "OME", "Fuel - Mission", "Payload"]
+    fig.data[4].x = ["MTOM/TOM", "OME", "Fuel - Mission", "Payload"]
     fig.show()
 
 
