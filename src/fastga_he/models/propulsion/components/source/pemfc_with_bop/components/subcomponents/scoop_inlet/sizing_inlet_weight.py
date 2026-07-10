@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingInletWeight(om.ExplicitComponent):
     """
-    Computation of the inlet weight.
+    Computation of the flush_inlet weight.
     """
 
     def initialize(self):
@@ -21,7 +21,7 @@ class SizingInletWeight(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 

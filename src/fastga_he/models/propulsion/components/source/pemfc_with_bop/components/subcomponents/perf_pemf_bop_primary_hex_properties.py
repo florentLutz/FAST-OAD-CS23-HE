@@ -112,7 +112,7 @@ class PerformancesPrimaryHeatExchangerThermalBalance(om.Group):
 
 class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
     """
-    Compute the specific heat capacity of the air at the primary heat exchanger inlet and outlet.
+    Compute the specific heat capacity of the air at the primary heat exchanger flush_inlet and outlet.
     """
 
     def initialize(self):
@@ -577,7 +577,7 @@ class _CoolantIntermediateTemperate(om.ExplicitComponent):
 
 class _CoolantTemperature(om.ExplicitComponent):
     """
-    The computation of the coolant temperature at the primary heat exchanger's inlet and outlet.
+    The computation of the coolant temperature at the primary heat exchanger's flush_inlet and outlet.
     """
 
     def initialize(self):
@@ -652,7 +652,7 @@ class _CoolantTemperature(om.ExplicitComponent):
 
 class _AirFlowRate(om.ExplicitComponent):
     """
-    Compute the air mass flow rate at the supplement heat exchanger inlet.
+    Compute the air mass flow rate at the supplement heat exchanger flush_inlet.
     """
 
     def initialize(self):

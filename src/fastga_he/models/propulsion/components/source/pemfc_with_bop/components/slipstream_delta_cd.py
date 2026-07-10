@@ -7,7 +7,7 @@ import numpy as np
 
 
 # class SlipstreamPEMFCStackBOPDeltaCd(om.ExplicitComponent):
-#     """The drag created by the flush inlet and the exhaust of the PEMFC stack."""
+#     """The drag created by the flush flush_inlet and the exhaust of the PEMFC stack."""
 #
 #     def initialize(self):
 #         self.options.declare(
@@ -94,7 +94,7 @@ import numpy as np
 
 
 class SlipstreamPEMFCStackBOPDeltaCd(om.Group):
-    """The drag created by the flush inlet and the exhaust of the PEMFC stack."""
+    """The drag created by the flush flush_inlet and the exhaust of the PEMFC stack."""
 
     def initialize(self):
         self.options.declare(
@@ -129,7 +129,7 @@ class SlipstreamPEMFCStackBOPDeltaCd(om.Group):
 
 
 class _MeanBOPDrag(om.ExplicitComponent):
-    """The mean drag created by the flush inlet and the exhaust of the PEMFC stack."""
+    """The mean drag created by the flush flush_inlet and the exhaust of the PEMFC stack."""
 
     def initialize(self):
         self.options.declare(
@@ -204,7 +204,7 @@ class _MeanBOPDrag(om.ExplicitComponent):
 
 
 class _DeltaCd(om.ExplicitComponent):
-    """The drag created by the flush inlet and the exhaust of the PEMFC stack."""
+    """The drag created by the flush flush_inlet and the exhaust of the PEMFC stack."""
 
     def initialize(self):
         self.options.declare(

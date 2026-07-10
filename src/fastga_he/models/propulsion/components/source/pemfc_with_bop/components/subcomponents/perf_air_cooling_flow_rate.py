@@ -32,7 +32,7 @@ class PerformancesAirCoolingFlowRate(om.Group):
         self.options.declare(
             name="connected_inlet_id",
             default=None,
-            desc="Identifier of the inlet connected to the air cooling flow rate",
+            desc="Identifier of the flush_inlet connected to the air cooling flow rate",
             allow_none=False,
         )
         self.options.declare(
@@ -489,7 +489,7 @@ class PerformancesAirMassFlowFactor(om.ExplicitComponent):
         self.options.declare(
             name="connected_inlet_id",
             default=None,
-            desc="Identifier of the inlet connected to the air cooling flow rate",
+            desc="Identifier of the flush_inlet connected to the air cooling flow rate",
             allow_none=False,
         )
 

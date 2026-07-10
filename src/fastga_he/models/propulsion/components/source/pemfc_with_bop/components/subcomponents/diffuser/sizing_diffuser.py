@@ -44,7 +44,7 @@ class SizingDiffuser(om.Group):
         self.options.declare(
             name="connected_air_inlet_id",
             default=None,
-            desc="Identifier of the connected air inlet",
+            desc="Identifier of the connected air flush_inlet",
             allow_none=False,
         )
 

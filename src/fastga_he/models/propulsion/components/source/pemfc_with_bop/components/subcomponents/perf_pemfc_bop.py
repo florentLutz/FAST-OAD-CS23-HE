@@ -6,7 +6,7 @@ import openmdao.api as om
 import numpy as np
 
 from .compressor import PerformancesCompressor
-from .inlet import PerformancesInlet
+from .flush_inlet import PerformancesInlet
 from .heat_exchanger import PerformancesHeatExchanger
 from .humidifier import PerformancesHumidifier
 from .pipe import PerformancesPipe
@@ -58,7 +58,7 @@ class PerformancesPEMFCBOP(om.Group):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
         self.options.declare(

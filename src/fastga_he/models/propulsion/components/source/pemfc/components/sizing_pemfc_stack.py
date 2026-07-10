@@ -55,7 +55,7 @@ class SizingPEMFCStack(om.Group):
             default=False,
             types=bool,
             desc="The PEMFC stack operation pressure have to adjust based on compressor "
-            "connection for the oxygen/air inlet",
+            "connection for the oxygen/air flush_inlet",
         )
 
     def setup(self):

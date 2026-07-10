@@ -10,7 +10,7 @@ from .coolant_tank import SizingCoolantTank
 from .diffuser import SizingDiffuser
 from .heat_exchanger import SizingHeatExchanger
 from .humidifier import SizingHumidifier
-from .inlet import SizingInlet
+from .flush_inlet import SizingInlet
 from .nozzle import SizingNozzle
 from .pipe import SizingPipe
 from .pump import SizingPumpWeight
@@ -50,7 +50,7 @@ class SizingPEMFCBOP(om.Group):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
         self.options.declare(

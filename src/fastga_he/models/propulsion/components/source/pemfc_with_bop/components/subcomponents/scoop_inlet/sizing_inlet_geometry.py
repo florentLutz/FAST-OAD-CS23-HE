@@ -21,7 +21,7 @@ class SizingInletGeometry(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -46,7 +46,7 @@ class SizingInletGeometry(om.ExplicitComponent):
             + ":throat_aspect_ratio",
             val=4.0,
             units="unitless",
-            desc="Aspect ratio of the inlet cross-section, defined as the ratio of the throat "
+            desc="Aspect ratio of the flush_inlet cross-section, defined as the ratio of the throat "
             "height to the throat width",
         )
 

@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesMachFactor(om.ExplicitComponent):
+class PerformancesInletDesignAirFlow(om.ExplicitComponent):
     """
-    Computation of the effectiveness of the air compressibility to the inlet drag coefficient.
+    Computation of the design air flow of the flush_inlet.
     """
 
     def initialize(self):
@@ -21,66 +21,69 @@ class PerformancesMachFactor(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
+        )
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
+        number_of_points = self.options["number_of_points"]
 
         self.add_input(
+            "total_air_mass_flow",
+            val=np.nan,
+            units="kg/s",
+            shape=number_of_points,
+        )
+
+        self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_mach",
-            val=np.nan,
-            units="unitless",
-        )
-
-        self.add_output(
-            "mach_factor",
-            val=1.1,
-            units="unitless",
+            + ":design_air_mass_flow",
+            val=2.1,
+            units="kg/s",
         )
 
     def setup_partials(self):
-        self.declare_partials("*", "*", method="exact")
+        number_of_points = self.options["number_of_points"]
+
+        self.declare_partials(
+            "*",
+            "*",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        design_mach = inputs[
+        outputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_mach"
-        ]
-
-        outputs["mach_factor"] = np.where(
-            design_mach >= 0.55, 16.5 * design_mach**2.0 - 19.75 * design_mach + 6.96, 1.0
-        )
+            + ":design_air_mass_flow"
+        ] = np.max(inputs["total_air_mass_flow"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        design_mach = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":design_mach"
-        ]
+        design_air_mass_flow = np.max(inputs["total_air_mass_flow"])
 
         partials[
-            "mach_factor",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_mach",
-        ] = np.where(design_mach >= 0.55, 33.0 * design_mach - 19.75, 0.0)
+            + ":design_air_mass_flow",
+            "total_air_mass_flow",
+        ] = np.where(design_air_mass_flow == inputs["total_air_mass_flow"], 1.0, 0.0)

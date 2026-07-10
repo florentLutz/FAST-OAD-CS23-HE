@@ -17,7 +17,7 @@ from ...perf_ambient_pressure import PerformancesPEMFCStackBOPAmbientPressure
 
 class PerformancesScoopInlet(om.Group):
     """
-    Air inlet Performances group.
+    Air flush_inlet Performances group.
     """
 
     def initialize(self):
@@ -30,7 +30,7 @@ class PerformancesScoopInlet(om.Group):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
         self.options.declare(

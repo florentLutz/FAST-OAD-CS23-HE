@@ -11,7 +11,7 @@ MAX_PEMFC_SPECIFIC_POWER = 2.06  # [kW/kg]
 
 class SizingPEMFCStackBOPSpecificPower(om.ExplicitComponent):
     """
-    Computation of the maximum specific power provide of the PEMFC system excluding the inlet
+    Computation of the maximum specific power provide of the PEMFC system excluding the flush_inlet
     compressor. Applied in weight calculation.The data and the regression model of this
     calculation can be found in the methodology folder.
     Source: https://www.h3dynamics.com/_files/ugd/3029f7_5111f6ea97244ed09b72a916a8997773.pdf

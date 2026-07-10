@@ -11,7 +11,7 @@ from .sizing_inlet_weight import SizingInletWeight
 
 class SizingInlet(om.Group):
     """
-    Air inlet sizing computations.
+    Air flush_inlet sizing computations.
     """
 
     def initialize(self):
@@ -24,7 +24,7 @@ class SizingInlet(om.Group):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 

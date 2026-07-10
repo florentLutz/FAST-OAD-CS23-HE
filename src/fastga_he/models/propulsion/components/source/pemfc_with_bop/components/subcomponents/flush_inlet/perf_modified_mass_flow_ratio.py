@@ -6,9 +6,10 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesInletDesignAirFlow(om.ExplicitComponent):
+class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
     """
-    Computation of the design air flow of the inlet.
+    Computation of the flush_inlet modified mass flow rate ratio, which is part of the air mass flow rate
+    ratio calculation.
     """
 
     def initialize(self):
@@ -21,69 +22,68 @@ class PerformancesInletDesignAirFlow(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
-        )
-        self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
-        number_of_points = self.options["number_of_points"]
 
         self.add_input(
-            "total_air_mass_flow",
-            val=np.nan,
-            units="kg/s",
-            shape=number_of_points,
-        )
-
-        self.add_output(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_air_mass_flow",
-            val=2.1,
-            units="kg/s",
+            + ":throat_height_layer_thickness_ratio",
+            val=np.nan,
+            units="unitless",
+        )
+
+        self.add_output(
+            "modified_mass_flow_ratio",
+            val=0.6,
+            units="unitless",
         )
 
     def setup_partials(self):
-        number_of_points = self.options["number_of_points"]
-
-        self.declare_partials(
-            "*",
-            "*",
-            method="exact",
-            rows=np.zeros(number_of_points),
-            cols=np.arange(number_of_points),
-        )
+        self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":design_air_mass_flow"
-        ] = np.max(inputs["total_air_mass_flow"])
+        outputs["modified_mass_flow_ratio"] = (
+            0.1651
+            * inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + air_inlet_id
+                + ":throat_height_layer_thickness_ratio"
+            ]
+            ** -0.4068
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        design_air_mass_flow = np.max(inputs["total_air_mass_flow"])
-
         partials[
+            "modified_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_air_mass_flow",
-            "total_air_mass_flow",
-        ] = np.where(design_air_mass_flow == inputs["total_air_mass_flow"], 1.0, 0.0)
+            + ":throat_height_layer_thickness_ratio",
+        ] = (
+            -0.06716268
+            * inputs[
+                "data:propulsion:he_power_train:PEMFC_stack_bop:"
+                + pemfc_stack_bop_id
+                + ":"
+                + air_inlet_id
+                + ":throat_height_layer_thickness_ratio"
+            ]
+            ** -1.4068
+        )

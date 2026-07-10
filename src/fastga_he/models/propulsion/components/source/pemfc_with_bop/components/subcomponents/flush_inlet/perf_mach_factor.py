@@ -6,10 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
+class PerformancesMachFactor(om.ExplicitComponent):
     """
-    Computation of the inlet modified mass flow rate ratio, which is part of the air mass flow rate
-    ratio calculation.
+    Computation of the effectiveness of the air compressibility to the flush_inlet drag coefficient.
     """
 
     def initialize(self):
@@ -22,7 +21,7 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -35,14 +34,14 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
+            + ":design_mach",
             val=np.nan,
             units="unitless",
         )
 
         self.add_output(
-            "modified_mass_flow_ratio",
-            val=0.6,
+            "mach_factor",
+            val=1.1,
             units="unitless",
         )
 
@@ -53,37 +52,35 @@ class PerformancesModifiedMassFlowRatio(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        outputs["modified_mass_flow_ratio"] = (
-            0.1651
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + air_inlet_id
-                + ":throat_height_layer_thickness_ratio"
-            ]
-            ** -0.4068
+        design_mach = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":design_mach"
+        ]
+
+        outputs["mach_factor"] = np.where(
+            design_mach >= 0.55, 16.5 * design_mach**2.0 - 19.75 * design_mach + 6.96, 1.0
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        partials[
-            "modified_mass_flow_ratio",
+        design_mach = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-        ] = (
-            -0.06716268
-            * inputs[
-                "data:propulsion:he_power_train:PEMFC_stack_bop:"
-                + pemfc_stack_bop_id
-                + ":"
-                + air_inlet_id
-                + ":throat_height_layer_thickness_ratio"
-            ]
-            ** -1.4068
-        )
+            + ":design_mach"
+        ]
+
+        partials[
+            "mach_factor",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":design_mach",
+        ] = np.where(design_mach >= 0.55, 33.0 * design_mach - 19.75, 0.0)

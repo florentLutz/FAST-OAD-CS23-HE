@@ -151,7 +151,7 @@ class SizingHeatExchangerFlowLength(om.Group):
 
 class _CoolantFlowLength(om.ExplicitComponent):
     """
-    Computation of the air flow length, which is derived by the fraction between the inlet area
+    Computation of the air flow length, which is derived by the fraction between the flush_inlet area
     and the no flow length.
     """
 

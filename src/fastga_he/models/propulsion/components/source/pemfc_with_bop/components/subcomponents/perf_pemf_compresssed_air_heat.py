@@ -58,7 +58,7 @@ class PerformancesCompressedAirHeat(om.Group):
 
 class _PrimaryHeatExchangerAirProperties(om.ExplicitComponent):
     """
-    Compute the specific heat capacity of the air at the primary heat exchanger inlet and outlet.
+    Compute the specific heat capacity of the air at the primary heat exchanger flush_inlet and outlet.
     """
 
     def initialize(self):

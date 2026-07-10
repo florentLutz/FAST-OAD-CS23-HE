@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesInletEfficiency(om.ExplicitComponent):
     """
-    Computation of the inlet efficiency of pressure recovery.
+    Computation of the flush_inlet efficiency of pressure recovery.
     """
 
     def initialize(self):
@@ -24,7 +24,7 @@ class PerformancesInletEfficiency(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 

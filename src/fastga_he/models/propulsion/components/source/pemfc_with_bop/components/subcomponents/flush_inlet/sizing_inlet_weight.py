@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitComponent):
+class SizingInletWeight(om.ExplicitComponent):
     """
-    Computation of the throat height layer thickness ratio.
+    Computation of the flush_inlet weight.
     """
 
     def initialize(self):
@@ -21,7 +21,7 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -30,36 +30,31 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
             + air_inlet_id
-            + ":design_air_density",
-            units="kg/m**3",
+            + ":ramp_length",
             val=np.nan,
-        )
-        self.add_input(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
-            + air_inlet_id
-            + ":design_true_airspeed",
-            units="m/s",
-            val=np.nan,
+            units="ft",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness",
+            + ":inlet_capture_area",
             val=np.nan,
-            units="m",
+            units="ft**2",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_air_mass_flow",
+            + ":max_ambient_dynamic_pressure",
             val=np.nan,
-            units="kg/s",
+            units="psi",
         )
 
         self.add_output(
@@ -67,9 +62,9 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-            val=0.021,
-            units="unitless",
+            + ":mass",
+            val=10.0,
+            units="lb",
         )
 
     def setup_partials(self):
@@ -79,29 +74,26 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        density = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
-            + air_inlet_id
-            + ":design_air_density"
-        ]
-        velocity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
-            + air_inlet_id
-            + ":design_true_airspeed"
-        ]
-        max_thickness = inputs[
+        ramp_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness"
+            + ":ramp_length"
         ]
-        design_mass_flow_rate = inputs[
+        inlet_capture_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_air_mass_flow"
+            + ":inlet_capture_area"
+        ]
+        max_ambient_dynamic_pressure = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":max_ambient_dynamic_pressure"
         ]
 
         outputs[
@@ -109,36 +101,38 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio"
-        ] = 0.831 * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
+            + ":mass"
+        ] = (
+            0.32 * ramp_length * inlet_capture_area**0.65 * max_ambient_dynamic_pressure**0.6
+            + 1.735
+            * (ramp_length * np.sqrt(inlet_capture_area) * max_ambient_dynamic_pressure * 1.3)
+            ** 0.7331
+        )
 
-    def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        density = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
-            + air_inlet_id
-            + ":design_air_density"
-        ]
-        velocity = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
-            + air_inlet_id
-            + ":design_true_airspeed"
-        ]
-        max_thickness = inputs[
+        ramp_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness"
+            + ":ramp_length"
         ]
-        design_mass_flow_rate = inputs[
+        inlet_capture_area = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":design_air_mass_flow"
+            + ":inlet_capture_area"
+        ]
+        max_ambient_dynamic_pressure = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":max_ambient_dynamic_pressure"
         ]
 
         partials[
@@ -146,18 +140,21 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness",
+            + ":ramp_length",
         ] = (
-            2.0
-            * 0.831
-            * 0.415
-            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
-            / max_thickness
+            0.32 * inlet_capture_area**0.65 * max_ambient_dynamic_pressure**0.6
+            + 1.735
+            * 0.7331
+            * (ramp_length * np.sqrt(inlet_capture_area) * max_ambient_dynamic_pressure * 1.3)
+            ** -0.2669
+            * np.sqrt(inlet_capture_area)
+            * max_ambient_dynamic_pressure
+            * 1.3
         )
 
         partials[
@@ -165,15 +162,27 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
+            + ":mass",
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
             + air_inlet_id
-            + ":design_air_density",
+            + ":inlet_capture_area",
         ] = (
-            0.831
-            * 0.415
-            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
-            / density
+            0.32
+            * ramp_length
+            * 0.65
+            * inlet_capture_area**-0.35
+            * max_ambient_dynamic_pressure**0.6
+            + 1.735
+            * 0.7331
+            * (ramp_length * np.sqrt(inlet_capture_area) * max_ambient_dynamic_pressure * 1.3)
+            ** -0.2669
+            * ramp_length
+            * 0.5
+            / np.sqrt(inlet_capture_area)
+            * max_ambient_dynamic_pressure
+            * 1.3
         )
 
         partials[
@@ -181,31 +190,15 @@ class PerformancesThroatHeightMomentumBoundaryLayerThicknessRatio(om.ExplicitCom
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:pemfc_stack_bop_1:"
-            + air_inlet_id
-            + ":design_true_airspeed",
-        ] = (
-            0.831
-            * 0.415
-            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
-            / velocity
-        )
-
-        partials[
+            + ":mass",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":design_air_mass_flow",
+            + ":max_ambient_dynamic_pressure",
         ] = (
-            -0.831
-            * 0.415
-            * (design_mass_flow_rate / (density * velocity * max_thickness**2.0)) ** -0.415
-            / design_mass_flow_rate
+            0.192 * ramp_length * inlet_capture_area**0.65 * max_ambient_dynamic_pressure**-0.4
+            + 1.2719285
+            * (ramp_length * np.sqrt(inlet_capture_area) * 1.3) ** 0.7331
+            * max_ambient_dynamic_pressure**-0.2669
         )

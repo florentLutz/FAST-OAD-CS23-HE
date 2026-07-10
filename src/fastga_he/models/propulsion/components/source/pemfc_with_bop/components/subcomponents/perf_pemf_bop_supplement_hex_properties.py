@@ -38,7 +38,7 @@ class PerformancesSupplementHeatExchangerThermalBalance(om.Group):
         self.options.declare(
             name="connected_air_inlet_id",
             default=None,
-            desc="Identifier of the connected air inlet",
+            desc="Identifier of the connected air flush_inlet",
             allow_none=False,
         )
 
@@ -131,7 +131,7 @@ class PerformancesSupplementHeatExchangerThermalBalance(om.Group):
 
 class _SupplementHeatExchangerAirProperties(om.ExplicitComponent):
     """
-    Compute the specific heat capacity of the air at the supplement heat exchanger inlet and outlet.
+    Compute the specific heat capacity of the air at the supplement heat exchanger flush_inlet and outlet.
     """
 
     def initialize(self):
@@ -240,7 +240,7 @@ class _MeanAirTemperature(om.ExplicitComponent):
 
 class _DesignAirMassFlow(om.ExplicitComponent):
     """
-    Compute the design air mass flow rate at the supplement heat exchanger inlet.
+    Compute the design air mass flow rate at the supplement heat exchanger flush_inlet.
     """
 
     def initialize(self):
@@ -253,7 +253,7 @@ class _DesignAirMassFlow(om.ExplicitComponent):
         self.options.declare(
             name="connected_air_inlet_id",
             default=None,
-            desc="Identifier of the connected air inlet",
+            desc="Identifier of the connected air flush_inlet",
             allow_none=False,
         )
 
@@ -679,7 +679,7 @@ class _TMSAirOutletTemperate(om.ExplicitComponent):
 
 class _CoolantTemperature(om.ExplicitComponent):
     """
-    The computation of the coolant temperature at the supplement heat exchanger's inlet and outlet.
+    The computation of the coolant temperature at the supplement heat exchanger's flush_inlet and outlet.
     """
 
     def initialize(self):
@@ -754,7 +754,7 @@ class _CoolantTemperature(om.ExplicitComponent):
 
 class _AirFlowRate(om.ExplicitComponent):
     """
-    Compute the air mass flow rate at the supplement heat exchanger inlet.
+    Compute the air mass flow rate at the supplement heat exchanger flush_inlet.
     """
 
     def initialize(self):

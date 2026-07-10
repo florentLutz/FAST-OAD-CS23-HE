@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesThroatAirSpeed(om.ExplicitComponent):
     """
-    Computation of the inlet throat airspeed.
+    Computation of the flush_inlet throat airspeed.
     """
 
     def initialize(self):

@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
     """
-    Computes the turbulent boundary layer thickness and the momentum thickness at the inlet.
+    Computes the turbulent boundary layer thickness and the momentum thickness at the flush_inlet.
     """
 
     def initialize(self):
@@ -21,7 +21,7 @@ class PerformancesMaxBoundaryLayerThickness(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
         self.options.declare(

@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponent):
+class PerformancesAirMassFlowRatio(om.ExplicitComponent):
     """
-    Computation of the fraction between the boundary layer thickness and the inlet highlight height.
+    Computation of the flush_inlet air mass flow ratio.
     """
 
     def initialize(self):
@@ -21,7 +21,7 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -30,11 +30,16 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input(
+            "modified_mass_flow_ratio",
+            val=np.nan,
+            units="unitless",
+        )
+        self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_boundary_layer_thickness",
+            + ":throat_height",
             val=np.nan,
             units="m",
         )
@@ -49,12 +54,8 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio",
-            val=0.19,
+            "air_mass_flow_ratio",
+            val=0.56,
             units="unitless",
         )
 
@@ -65,6 +66,14 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
+        modified_mass_flow_ratio = inputs["modified_mass_flow_ratio"]
+        throat_height = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
+        ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -72,26 +81,23 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
             + air_inlet_id
             + ":lip_ramp_floor_distance"
         ]
-        max_boundary_layer_thickness = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness"
-        ]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio"
-        ] = max_boundary_layer_thickness / lip_ramp_floor_distance
+        outputs["air_mass_flow_ratio"] = (
+            modified_mass_flow_ratio * throat_height / lip_ramp_floor_distance
+        )
 
-    def compute_partials(self, inputs, partials, discrete_inputs=None):
+    def compute_partials(self, inputs, partials, discrete_inputs=None, discrete_outputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
+        modified_mass_flow_ratio = inputs["modified_mass_flow_ratio"]
+        throat_height = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":throat_height"
+        ]
         lip_ramp_floor_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -99,36 +105,25 @@ class PerformancesBoundaryLayerThicknessHighlightHeightRatio(om.ExplicitComponen
             + air_inlet_id
             + ":lip_ramp_floor_distance"
         ]
-        max_boundary_layer_thickness = inputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness"
-        ]
+
+        partials["air_mass_flow_ratio", "modified_mass_flow_ratio"] = (
+            throat_height / lip_ramp_floor_distance
+        )
 
         partials[
+            "air_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio",
+            + ":throat_height",
+        ] = modified_mass_flow_ratio / lip_ramp_floor_distance
+
+        partials[
+            "air_mass_flow_ratio",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
             + ":lip_ramp_floor_distance",
-        ] = -max_boundary_layer_thickness / lip_ramp_floor_distance**2.0
-
-        partials[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":layer_thickness_highlight_height_ratio",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":max_boundary_layer_thickness",
-        ] = 1.0 / lip_ramp_floor_distance
+        ] = -modified_mass_flow_ratio * throat_height / lip_ramp_floor_distance**2.0

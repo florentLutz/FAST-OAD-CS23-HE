@@ -408,7 +408,7 @@
         </efficiency>
         <pressure_loss>
           <combustion_chamber is_input="True">0.95<!--combustion chamber pressure loss--></combustion_chamber>
-          <inlet is_input="True">0.8<!--inlet total pressure loss--></inlet>
+          <inlet is_input="True">0.8<!--flush_inlet total pressure loss--></inlet>
         </pressure_loss>
       </turboprop>
       <he_power_train>

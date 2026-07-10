@@ -19,7 +19,7 @@ from ..fluid_characteristics import FluidSpecificHeatCapacity
 
 class PerformancesCompressor(om.Group):
     """
-    Air inlet Performances group.
+    Air flush_inlet Performances group.
     """
 
     def initialize(self):

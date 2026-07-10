@@ -46,7 +46,7 @@ class PerformancesPEMFCStack(om.Group):
             default=False,
             types=bool,
             desc="The PEMFC stack operation pressure have to adjust based on compressor "
-            "connection for the oxygen/air inlet",
+            "connection for the oxygen/air flush_inlet",
         )
         self.options.declare(
             name="model_fidelity",

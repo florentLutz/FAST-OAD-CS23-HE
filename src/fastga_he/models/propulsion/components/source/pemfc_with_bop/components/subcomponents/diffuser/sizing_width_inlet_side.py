@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class SizingInletSideInnerWidth(om.ExplicitComponent):
     """
-    Computation of the inner width of the inlet side.
+    Computation of the inner width of the flush_inlet side.
     """
 
     def initialize(self):
@@ -27,7 +27,7 @@ class SizingInletSideInnerWidth(om.ExplicitComponent):
         self.options.declare(
             name="connected_air_inlet_id",
             default=None,
-            desc="Identifier of the connected air inlet",
+            desc="Identifier of the connected air flush_inlet",
             allow_none=False,
         )
 

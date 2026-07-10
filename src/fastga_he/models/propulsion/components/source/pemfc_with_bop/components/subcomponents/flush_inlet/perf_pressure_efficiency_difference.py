@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesPressureEfficiencyDifference(om.ExplicitComponent):
     """
-    Computation of the inlet pressure efficiency difference due to flow condition.
+    Computation of the flush_inlet pressure efficiency difference due to flow condition.
     """
 
     def initialize(self):

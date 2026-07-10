@@ -12,7 +12,7 @@ from fastga_he.models.propulsion.components.source.pemfc_with_bop.components.sub
 
 class PerformancesAirInletAirMassFlow(om.ExplicitComponent):
     """
-    Compute the total air mass flow rate at the air inlet.
+    Compute the total air mass flow rate at the air flush_inlet.
     """
 
     def initialize(self):

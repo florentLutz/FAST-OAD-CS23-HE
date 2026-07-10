@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesMomentumFlowCorrectionFactor(om.Group):
     """
-    Computation of the momentum flow correction factor of a flush inlet. This is part of the inlet
+    Computation of the momentum flow correction factor of a flush flush_inlet. This is part of the flush_inlet
     ram drag computation.
     """
 
@@ -22,7 +22,7 @@ class PerformancesMomentumFlowCorrectionFactor(om.Group):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -81,7 +81,7 @@ class PerformancesMomentumFlowCorrectionFactor(om.Group):
 
 class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
     """
-    Computation of the momentum flow correction factor of a flush inlet. This is part of the inlet
+    Computation of the momentum flow correction factor of a flush flush_inlet. This is part of the flush_inlet
     ram drag computation.
     """
 
@@ -95,7 +95,7 @@ class _MomentumFlowCorrectionFactor(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 

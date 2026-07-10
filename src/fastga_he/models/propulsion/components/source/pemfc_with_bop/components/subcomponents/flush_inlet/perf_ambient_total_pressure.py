@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class PerformancesThroatTemperature(om.ExplicitComponent):
+class PerformancesAmbientTotalPressure(om.ExplicitComponent):
     """
-    Computation of the ambient throat temperature.
+    Computation of the ambient total pressure.
     """
 
     def initialize(self):
@@ -24,7 +24,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -34,12 +34,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
         air_inlet_id = self.options["air_inlet_id"]
 
         self.add_input("mach", val=np.nan, shape=number_of_points)
-        self.add_input(
-            "exterior_temperature",
-            val=np.nan,
-            units="K",
-            shape=number_of_points,
-        )
+        self.add_input("ambient_pressure", units="Pa", val=np.full(number_of_points, np.nan))
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
@@ -51,9 +46,9 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
         )
 
         self.add_output(
-            "throat_total_temperature",
-            val=295.0,
-            units="K",
+            "ambient_total_pressure",
+            val=11e4,
+            units="Pa",
             shape=number_of_points,
         )
 
@@ -64,7 +59,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt=["mach", "exterior_temperature"],
+            wrt=["mach", "ambient_pressure"],
             method="exact",
             rows=np.arange(number_of_points),
             cols=np.arange(number_of_points),
@@ -85,7 +80,7 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        exterior_temperature = inputs["exterior_temperature"]
+        static_pressure = inputs["ambient_pressure"]
         mach = inputs["mach"]
         gamma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -95,15 +90,15 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             + ":specific_heat_ratio"
         ]
 
-        outputs["throat_total_temperature"] = exterior_temperature * (
-            1.0 + (gamma - 1.0) * 0.5 * mach**2.0
-        )
+        outputs["ambient_total_pressure"] = static_pressure * (
+            1.0 + 0.5 * (gamma - 1.0) * mach**2.0
+        ) ** (gamma / (gamma - 1.0))
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        exterior_temperature = inputs["exterior_temperature"]
+        static_pressure = inputs["ambient_pressure"]
         mach = inputs["mach"]
         gamma = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
@@ -113,17 +108,31 @@ class PerformancesThroatTemperature(om.ExplicitComponent):
             + ":specific_heat_ratio"
         ]
 
-        partials["throat_total_temperature", "exterior_temperature"] = (
-            1.0 + (gamma - 1.0) * 0.5 * mach**2.0
+        partials["ambient_total_pressure", "ambient_pressure"] = (
+            1.0 + 0.5 * (gamma - 1.0) * mach**2.0
+        ) ** (gamma / (gamma - 1.0))
+
+        partials["ambient_total_pressure", "mach"] = (
+            static_pressure
+            * gamma
+            * mach
+            * (((gamma - 1.0) * mach**2.0) * 0.5 + 1.0) ** (gamma / (gamma - 1.0) - 1.0)
         )
 
-        partials["throat_total_temperature", "mach"] = exterior_temperature * (gamma - 1.0) * mach
-
         partials[
-            "throat_total_temperature",
+            "ambient_total_pressure",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
             + ":specific_heat_ratio",
-        ] = exterior_temperature * 0.5 * mach**2.0
+        ] = (
+            static_pressure
+            * ((mach**2.0 * (gamma - 1.0)) * 0.5 + 1.0) ** (gamma / (gamma - 1.0))
+            * (
+                np.log((mach**2.0 * (gamma - 1.0)) * 0.5 + 1.0)
+                * (1.0 / (gamma - 1.0) - gamma / (gamma - 1.0) ** 2.0)
+                + (mach**2.0 * gamma)
+                / (2.0 * ((mach**2.0 * (gamma - 1.0)) / 2.0 + 1.0) * (gamma - 1.0))
+            )
+        )

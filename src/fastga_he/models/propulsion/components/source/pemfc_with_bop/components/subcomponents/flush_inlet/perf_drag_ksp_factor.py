@@ -8,7 +8,7 @@ import openmdao.api as om
 
 class PerformancesDragKspFactor(om.ExplicitComponent):
     """
-    Computation of the Ksp factor in the inlet drag coefficient.
+    Computation of the Ksp factor in the flush_inlet drag coefficient.
     """
 
     def initialize(self):
@@ -21,7 +21,7 @@ class PerformancesDragKspFactor(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 

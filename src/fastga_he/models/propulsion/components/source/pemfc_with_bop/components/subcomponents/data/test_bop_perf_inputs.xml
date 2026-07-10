@@ -27,7 +27,7 @@
               <max_boundary_layer_thickness units="m" is_input="False">0.01634781987616747</max_boundary_layer_thickness>
               <max_momentum_boundary_layer_thickness units="m" is_input="False">0.0016347819876167471</max_momentum_boundary_layer_thickness>
               <max_ram_pressure_efficiency units="unitless" is_input="False">0.9859088241383683</max_ram_pressure_efficiency>
-              <ramp_angle units="rad" is_input="True">0.12217304763960307<!--Ramp angle of the inlet, defined as the angle between the inlet walls and the horizontal plane--></ramp_angle>
+              <ramp_angle units="rad" is_input="True">0.12217304763960307<!--Ramp angle of the flush_inlet, defined as the angle between the flush_inlet walls and the horizontal plane--></ramp_angle>
               <ramp_floor_inlet_plane_distance units="m" is_input="True">0.09604260217156961</ramp_floor_inlet_plane_distance>
               <ramp_length units="ft" is_input="True">3.28084</ramp_length>
               <specific_heat_ratio units="unitless" is_input="True">1.4</specific_heat_ratio>

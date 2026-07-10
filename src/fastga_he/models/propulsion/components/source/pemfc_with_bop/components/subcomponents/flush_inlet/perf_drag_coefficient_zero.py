@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class SizingThroatHeight(om.ExplicitComponent):
+class PerformancesCDZeroInletMassFlow(om.ExplicitComponent):
     """
-    Computation of the throat height.
+    Computation of the flush_inlet drag coefficient with zero flush_inlet mass flow rate.
     """
 
     def initialize(self):
@@ -21,7 +21,7 @@ class SizingThroatHeight(om.ExplicitComponent):
         self.options.declare(
             name="air_inlet_id",
             default=None,
-            desc="Identifier of the air inlet",
+            desc="Identifier of the air flush_inlet",
             allow_none=False,
         )
 
@@ -34,28 +34,33 @@ class SizingThroatHeight(om.ExplicitComponent):
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
+            + ":lip_length",
             val=np.nan,
-            units="unitless",
+            units="m",
         )
         self.add_input(
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness",
+            + ":ramp_floor_inlet_plane_distance",
+            val=np.nan,
+            units="m",
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance",
             val=np.nan,
             units="m",
         )
 
         self.add_output(
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":throat_height",
-            val=0.08,
-            units="m",
+            "cd_zero_inlet_mass_flow",
+            val=0.16,
+            units="unitless",
         )
 
     def setup_partials(self):
@@ -65,70 +70,95 @@ class SizingThroatHeight(om.ExplicitComponent):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        layer_thickness_ratio = inputs[
+        lip_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio"
+            + ":lip_length"
         ]
-        max_momentum_boundary_layer_thickness = inputs[
+        ramp_floor_inlet_plane_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness"
+            + ":ramp_floor_inlet_plane_distance"
+        ]
+        lip_ramp_floor_distance = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance"
         ]
 
-        outputs[
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":throat_height"
-        ] = max_momentum_boundary_layer_thickness / layer_thickness_ratio
+        outputs["cd_zero_inlet_mass_flow"] = (
+            0.1362
+            * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -0.2202
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         pemfc_stack_bop_id = self.options["pemfc_stack_bop_id"]
         air_inlet_id = self.options["air_inlet_id"]
 
-        layer_thickness_ratio = inputs[
+        lip_length = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height_layer_thickness_ratio"
+            + ":lip_length"
         ]
-        max_momentum_boundary_layer_thickness = inputs[
+        ramp_floor_inlet_plane_distance = inputs[
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness"
+            + ":ramp_floor_inlet_plane_distance"
+        ]
+        lip_ramp_floor_distance = inputs[
+            "data:propulsion:he_power_train:PEMFC_stack_bop:"
+            + pemfc_stack_bop_id
+            + ":"
+            + air_inlet_id
+            + ":lip_ramp_floor_distance"
         ]
 
         partials[
+            "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height",
-            "data:propulsion:he_power_train:PEMFC_stack_bop:"
-            + pemfc_stack_bop_id
-            + ":"
-            + air_inlet_id
-            + ":throat_height_layer_thickness_ratio",
-        ] = -max_momentum_boundary_layer_thickness / layer_thickness_ratio**2.0
+            + ":lip_length",
+        ] = (
+            0.02999124
+            * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
+            * (ramp_floor_inlet_plane_distance - lip_ramp_floor_distance)
+            / lip_length**2.0
+        )
 
         partials[
+            "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":throat_height",
+            + ":ramp_floor_inlet_plane_distance",
+        ] = (
+            -0.02999124
+            * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
+            / lip_length
+        )
+
+        partials[
+            "cd_zero_inlet_mass_flow",
             "data:propulsion:he_power_train:PEMFC_stack_bop:"
             + pemfc_stack_bop_id
             + ":"
             + air_inlet_id
-            + ":max_momentum_boundary_layer_thickness",
-        ] = 1.0 / layer_thickness_ratio
+            + ":lip_ramp_floor_distance",
+        ] = (
+            0.02999124
+            * ((ramp_floor_inlet_plane_distance - lip_ramp_floor_distance) / lip_length) ** -1.2202
+            / lip_length
+        )
