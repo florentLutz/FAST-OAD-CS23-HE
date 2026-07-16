@@ -5,8 +5,8 @@ module_folders:
 
 
 # Input and output files
-input_file: ../results/oad_process_inputs_pemfc_h2_gas.xml
-output_file: ../results/oad_process_outputs_pemfc_h2_gas.xml
+input_file: ../results/oad_process_inputs_pemfc_h2_gas_retrofit.xml
+output_file: ../results/oad_process_outputs_pemfc_h2_gas_retrofit.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
