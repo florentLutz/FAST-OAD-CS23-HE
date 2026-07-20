@@ -1,0 +1,121 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    gearbox:
+        amount: ANCHOR_COMPONENT_MASS
+        unit: kilogram
+
+        production:
+            tfe:
+                name: 'market for tetrafluoroethylene'
+                loc: 'GLO'
+                amount: 20.97 * 1e-3
+
+            acrylonitrile:
+                name: 'market for acrylonitrile'
+                loc: 'GLO'
+                amount: 65.25 * 1e-3
+
+            carbon_black:
+                name: 'market for carbon black'
+                loc: 'GLO'
+                amount: 5.93 * 1e-3
+
+            thermoforming:
+                name: 'market for thermoforming of plastic sheets'
+                loc: 'GLO'
+                amount: 73.09 * 1e-3
+
+            chromium_steel:
+                name: ''
+                loc: ''
+                amount: 641.92 * 1e-3
+
+            chromium_coating:
+                name: 'market for hard chromium coat, electroplating, steel substrate, 0.14 mm thickness'
+                loc: 'GLO'
+                amount: 3674.71 * 1e-4
+
+            steel_drawing:
+                name: 'market for deep drawing, steel, 650 kN press, single stroke'
+                loc: 'GLO'
+                amount: 561.43 * 1e-3
+
+            sulfuric_acid:
+                name: 'market for sulfuric acid'
+                loc: 'RoW'
+                amount: 7.1 * 1e-3
+
+            titanium_dioxide:
+                name: 'market for titanium dioxide'
+                loc: 'RoW'
+                amount: 1.96 * 1e-3
+
+            extrusion:
+                name: 'market for extrusion, plastic film'
+                loc: 'GLO'
+                amount: 18.43 * 1e-3
+
+            platinium:
+                name: 'market for platinum'
+                loc: 'GLO'
+                amount: 6.0 * 1e-4 * 1e-3  # 0.6 mg in kg
+
+            water:
+                name: 'market for water, deionised'
+                loc: 'RoW'
+                amount: 14.52 * 1e-3
+
+            propanol:
+                name: 'market for 1-propanol'
+                loc: 'GLO'
+                amount: 14.33 * 1e-3
+
+            polyethylene:
+                name: 'market for polyethylene, low density, granulate'
+                loc: 'GLO'
+                amount: 1.43 * 1e-3
+
+            methanol:
+                name: 'market for methanol'
+                loc: 'RoW'
+                amount: 1.59 * 1e-3
+
+            silicone:
+                name: 'market for silicone product'
+                loc: 'RoW'
+                amount: 76.06 * 1e-3
+
+            aluminium:
+                name: 'market for aluminium, primary, ingot'
+                loc: 'RoW'
+                amount: 118.65 * 1e-3
+
+            nylon:
+                name: 'market for nylon 6-6'
+                loc: 'RoW'
+                amount: 8.31 * 1e-3
+
+            copper:
+                name: 'market for copper, cathode'
+                loc: 'GLO'
+                amount: 30.64 * 1e-3
+
+            nickel:
+                name: 'market for nickel, class 1'
+                loc: 'GLO'
+                amount: 0.052 * 1e-3
+
+            gold:
+                name: 'market for gold'
+                loc: 'GLO'
+                amount: 0.05 * 1e-3
+
+            moulding:
+                name: 'market for injection moulding'
+                loc: 'GLO'
+                amount: 118.5 * 1e-3
+
+        # Based on the LCI conducted in :cite:`evon:2026`
