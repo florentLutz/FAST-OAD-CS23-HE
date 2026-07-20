@@ -95,7 +95,7 @@ def test_retrofit_twin_otter_pemfc_h2():
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
-
+    print(residuals)
     problem.write_outputs()
 
 

@@ -5,6 +5,8 @@
 import openmdao.api as om
 
 from .perf_power_in import PerformancesPowerIn
+from .perf_heat_power_ratio import PerformancesHeatPowerRatio
+from .perf_power_density import PerformancesPowerDensity
 from .perf_current_in import PerformancesCurrentIn
 from .perf_maximum import PerformancesMaximum
 
@@ -27,7 +29,7 @@ class PerformancesDCAuxLoad(om.Group):
 
         self.add_subsystem(
             "power_in_mission",
-            PerformancesPowerIn(aux_load_id=aux_load_id, number_of_points=number_of_points),
+            PerformancesPowerIn(number_of_points=number_of_points),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -38,5 +40,15 @@ class PerformancesDCAuxLoad(om.Group):
         self.add_subsystem(
             "maximum",
             PerformancesMaximum(aux_load_id=aux_load_id, number_of_points=number_of_points),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "heat_power_ratio",
+            PerformancesHeatPowerRatio(aux_load_id=aux_load_id),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "power_density",
+            PerformancesPowerDensity(aux_load_id=aux_load_id),
             promotes=["*"],
         )

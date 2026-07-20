@@ -64,6 +64,7 @@ model:
         wing_area:
             id: fastga.loop.wing_area
 
+
 submodels:
     service.weight.mass.payload: null
     service.weight.mass.propulsion.installed_engine: fastga.submodel.weight.mass.propulsion.installed_engine.raymer

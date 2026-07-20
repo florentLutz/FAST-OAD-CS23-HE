@@ -37,6 +37,12 @@ class PerformancesMaximum(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             units="kg/m**3",
         )
+        self.add_input(
+            name="waste_heat",
+            val=np.full(number_of_points, np.nan),
+            units="kW",
+            desc="Heat from PEMFC to dissipate",
+        )
 
         self.add_output(
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":power_max",
@@ -47,6 +53,11 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density",
             units="kg/m**3",
             val=1.2,
+        )
+        self.add_output(
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":waste_heat_max",
+            units="kW",
+            val=10.0,
         )
 
     def setup_partials(self):
@@ -67,6 +78,13 @@ class PerformancesMaximum(om.ExplicitComponent):
             rows=np.zeros(number_of_points),
             cols=np.arange(number_of_points),
         )
+        self.declare_partials(
+            of="data:propulsion:he_power_train:aux_load:" + aux_load_id + ":waste_heat_max",
+            wrt="waste_heat",
+            method="exact",
+            rows=np.zeros(number_of_points),
+            cols=np.arange(number_of_points),
+        )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         aux_load_id = self.options["aux_load_id"]
@@ -77,6 +95,9 @@ class PerformancesMaximum(om.ExplicitComponent):
         outputs[
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density"
         ] = np.min(inputs["density"])
+        outputs["data:propulsion:he_power_train:aux_load:" + aux_load_id + ":waste_heat_max"] = (
+            np.max(inputs["waste_heat"])
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         aux_load_id = self.options["aux_load_id"]
@@ -90,3 +111,8 @@ class PerformancesMaximum(om.ExplicitComponent):
             "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":cruise_air_density",
             "density",
         ] = np.where(inputs["density"] == np.min(inputs["density"]), 1.0, 0.0)
+
+        partials[
+            "data:propulsion:he_power_train:aux_load:" + aux_load_id + ":waste_heat_max",
+            "waste_heat",
+        ] = np.where(inputs["waste_heat"] == np.max(inputs["waste_heat"]), 1.0, 0.0)
