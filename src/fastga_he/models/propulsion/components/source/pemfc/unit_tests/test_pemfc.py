@@ -41,6 +41,10 @@ from ..components.perf_pemfc_polarization_curve import (
 )
 from ..components.perf_pemfc_stack import PerformancesPEMFCStack
 
+from ..components.perf_inflight_h2o_emissions import PerformancesPEMFCStackInFlightH2OEmissions
+from ..components.perf_inflight_emissions_sum import PerformancesPEMFCStackInFlightEmissionsSum
+from ..components.perf_inflight_emissions import PerformancesPEMFCStackInFlightEmissions
+
 from ..components.cstr_ensure import (
     ConstraintsPEMFCStackEffectiveAreaEnsure,
     ConstraintsPEMFCStackPowerEnsure,
@@ -810,6 +814,122 @@ def test_performances_pemfc_layer_voltage_analytical():
 
     problem.check_partials(compact_print=True)
 
+
+def test_in_flight_h2o_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackInFlightH2OEmissions(
+            number_of_points=NB_POINTS_TEST, pemfc_stack_id="pemfc_stack_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("H2O_emissions", units="kg") == pytest.approx(
+        np.array([46.08, 49.5, 53.1, 56.97, 61.29, 65.97, 71.01, 75.96, 81.9, 87.48]),
+        rel=1e-2,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_emissions_sum():
+    ivc = om.IndepVarComp()
+    ivc.add_output("CO2_emissions", units="kg", val=np.zeros(NB_POINTS_TEST))
+    ivc.add_output("CO_emissions", units="g", val=np.zeros(NB_POINTS_TEST))
+    ivc.add_output("NOx_emissions", units="g", val=np.zeros(NB_POINTS_TEST))
+    ivc.add_output("SOx_emissions", units="g", val=np.zeros(NB_POINTS_TEST))
+    ivc.add_output(
+        "H2O_emissions",
+        units="kg",
+        val=np.array([46.08, 49.5, 53.1, 56.97, 61.29, 65.97, 71.01, 75.96, 81.9, 87.48]),
+    )
+    ivc.add_output("HC_emissions", units="g", val=np.zeros(NB_POINTS_TEST))
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackInFlightEmissionsSum(
+            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:CO2",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:CO",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:NOx",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:SOx",
+        units="g",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:H2O",
+        units="kg",
+    ) == pytest.approx(649.26, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:HC",
+        units="g",
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_in_flight_emissions():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "fuel_consumed_t",
+        val=np.array([5.12, 5.5, 5.9, 6.33, 6.81, 7.33, 7.89, 8.44, 9.1, 9.72]),
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PerformancesPEMFCStackInFlightEmissions(
+            pemfc_stack_id="pemfc_stack_1", number_of_points=NB_POINTS_TEST
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:CO2",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:CO",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:NOx",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:SOx",
+        units="g",
+    ) == pytest.approx(0.0, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:H2O",
+        units="kg",
+    ) == pytest.approx(649.26, rel=1e-2)
+    assert problem.get_val(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:HC",
+        units="g",
+    ) == pytest.approx(0.0, rel=1e-2)
+
+    problem.check_partials(compact_print=True)
 
 def test_performances_pemfc_stack_empirical():
     # Research independent input value in .xml file
