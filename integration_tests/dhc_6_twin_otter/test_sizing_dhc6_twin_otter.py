@@ -98,6 +98,37 @@ def test_retrofit_twin_otter_pemfc_h2():
     print(residuals)
     problem.write_outputs()
 
+def test_retrofit_twin_otter_pemfc_h2_hybrid():
+    """Test the overall aircraft design process with wing positioning."""
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_h2_pemfc_twin_otter_retrofit_hybrid.xml"
+    process_file_name = "retrofit_pemfc_h2_twin_otter_hybrid.yml"
+
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    # Create inputs
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    n2_path = RESULTS_FOLDER_PATH / "n2_dhc6_twin_otter_h2_hybrid_retrofit.html"
+
+    problem.model_options["*propeller_*"] = {"mass_as_input": True}
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    om.n2(problem, show_browser=False, outfile=n2_path)
+
+    problem.run_model()
+
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    residuals = filter_residuals(residuals)
+    print(residuals)
+    problem.write_outputs()
 
 def test_sizing_twin_otter_pemfc_h2():
     """Test the overall aircraft design process with wing positioning."""
