@@ -3,10 +3,10 @@
 =========================
 Component node connection
 =========================
-To define the components connections, the are two approaches allows more flexibility in the design process. The first
-approach is to select the starting port than connect to the desired port. The second approach is to configure the
-connection directly in each node properties shown in the right panel. The highlighted area of the following figure shows
-working area of the node component connection.
+To define the components' connections, and to allow more flexibility, two approaches are possible. The first
+approach is to select the starting port and then connect to the desired port. The second approach is to configure the
+connection directly in each node's properties, shown in the right panel. The highlighted area of the following figure shows
+the working area of the node component connection.
 
 .. image:: ../../../img/node_connection_highlight.svg
     :width: 600
@@ -24,8 +24,8 @@ will be drawn.
 
 Node connection by drop down menu
 =================================
-By selecting the desired connection in the drop down menus under the connection section of the right node properties
-panel, temporary connection will be established. To apply the changes, click on the blue ``Apply`` button at the bottom
+By selecting the desired connection in the drop-down menus under the connection section of the right node properties
+panel, a temporary connection will be established. To apply the changes, click on the blue ``Apply`` button at the bottom
 of the right panel. If the changes are not applied, the temporary connections will be removed when switching to another
 node or selecting another component.
 

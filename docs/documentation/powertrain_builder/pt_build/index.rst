@@ -4,8 +4,8 @@
 PT file Builder
 ===============
 The powertrain builder graphical user interface provides a convenient way to create and edit powertrain
-configurations for the FAST-GA-HE framework. Once the powertrain configuration is created, it can be saved as a PT file
-in YAML format, which can be use in later aircraft sizing or optimization.
+configurations for the FAST-OAD-CS23-HE framework. Once the powertrain configuration is created, it can be saved as a PT file
+in YAML format, which can be used in later aircraft sizing or optimization.
 
 .. toctree::
    :maxdepth: 1
@@ -25,7 +25,7 @@ To launch the builder, add the following code snippet to your Python script:
 
     PowertrainBuilderLauncher.launch()
 
-Once loaded from existed design the builder should look like this:
+Once loaded from existing design, the builder should look like this:
 
 .. image:: ../../../img/start_up_page.svg
     :width: 800
