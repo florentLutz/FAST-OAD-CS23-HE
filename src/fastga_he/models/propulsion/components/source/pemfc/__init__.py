@@ -8,5 +8,6 @@
 from .components.sizing_pemfc_stack import SizingPEMFCStack
 from .components.perf_pemfc_stack import PerformancesPEMFCStack
 from .components.slipstream_pemfc_stack import SlipstreamPEMFCStack
+from .components.pre_lca_pemfc_stack import PreLCAPEMFCStack
 from .components.lcc_pemfc_cost import LCCPEMFCStackCost
 from .components.lcc_pemfc_operational_cost import LCCPEMFCStackOperationalCost

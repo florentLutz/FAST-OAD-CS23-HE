@@ -154,6 +154,7 @@ from .source.pemfc import (
     SizingPEMFCStack,
     PerformancesPEMFCStack,
     SlipstreamPEMFCStack,
+    PreLCAPEMFCStack,
     LCCPEMFCStackCost,
     LCCPEMFCStackOperationalCost,
 )

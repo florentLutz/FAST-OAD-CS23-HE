@@ -54,6 +54,9 @@ from ..components.cstr_enforce import (
     ConstraintsPEMFCStackPowerEnforce,
 )
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAPEMFCStackProdWeightPerFU
+from ..components.pre_lca_use_emission_per_fu import PreLCAPEMFCStackUseEmissionPerFU
+
 from ..components.lcc_pemfc_cost import LCCPEMFCStackCost
 from ..components.lcc_pemfc_operational_cost import LCCPEMFCStackOperationalCost
 
@@ -931,6 +934,7 @@ def test_in_flight_emissions():
 
     problem.check_partials(compact_print=True)
 
+
 def test_performances_pemfc_stack_empirical():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
@@ -1047,6 +1051,130 @@ def test_performances_pemfc_stack_analytical():
     )
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass", units="kg", val=0.5
+    )
+    ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
+    ivc.add_output("data:TLAR:max_airframe_hours", units="h", val=1e4)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAPEMFCStackProdWeightPerFU(pemfc_stack_id="pemfc_stack_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:mass_per_fu", units="kg"
+    ) == pytest.approx(5e-7, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_emissions_per_fu():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:CO2_main_route",
+        val=0,
+        units="kg",
+    )
+    ivc.add_output(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:CO_main_route",
+        val=0,
+        units="kg",
+    )
+    ivc.add_output(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:NOx_main_route",
+        val=0,
+        units="kg",
+    )
+    ivc.add_output(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:SOx_main_route",
+        val=0,
+        units="kg",
+    )
+    ivc.add_output(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:HC_main_route",
+        val=0,
+        units="kg",
+    )
+    ivc.add_output(
+        "data:environmental_impact:operation:sizing:he_power_train:PEMFC_stack:pemfc_stack_1:H2O_main_route",
+        val=550.0,
+        units="kg",
+    )
+    ivc.add_output("data:environmental_impact:flight_per_fu", val=1e-4)
+    ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
+    ivc.add_output("data:environmental_impact:line_test:mission_ratio", val=7.5)
+    ivc.add_output("data:environmental_impact:delivery:mission_ratio", val=5.0)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCAPEMFCStackUseEmissionPerFU(pemfc_stack_id="pemfc_stack_1"), ivc)
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:PEMFC_stack:pemfc_stack_1:CO2_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:PEMFC_stack:pemfc_stack_1:CO_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:PEMFC_stack:pemfc_stack_1:NOx_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:PEMFC_stack:pemfc_stack_1:SOx_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:PEMFC_stack:pemfc_stack_1:H2O_per_fu",
+        units="kg",
+    ) == pytest.approx(0.055, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:PEMFC_stack:pemfc_stack_1:HC_per_fu",
+        units="kg",
+    ) == pytest.approx(0.0, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:PEMFC_stack:pemfc_stack_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:PEMFC_stack:pemfc_stack_1:CO_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:PEMFC_stack:pemfc_stack_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:PEMFC_stack:pemfc_stack_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:PEMFC_stack:pemfc_stack_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.004125, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:PEMFC_stack:pemfc_stack_1:HC_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:PEMFC_stack:pemfc_stack_1:CO2_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:PEMFC_stack:pemfc_stack_1:CO_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:PEMFC_stack:pemfc_stack_1:NOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:PEMFC_stack:pemfc_stack_1:SOx_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:PEMFC_stack:pemfc_stack_1:H2O_per_fu", units="kg"
+    ) == pytest.approx(0.00275, rel=1e-3)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:PEMFC_stack:pemfc_stack_1:HC_per_fu", units="kg"
+    ) == pytest.approx(0.0, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
