@@ -7,6 +7,7 @@ import pathlib
 
 import pytest
 
+import openmdao.api as om
 import fastoad.api as oad
 
 try:
@@ -29,6 +30,7 @@ from ..lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from ..lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from ..lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
 from ..lca_gasoline_per_fu import LCAGasolinePerFU
+from ..lca_hydrogen_per_fu import LCAHydrogenPerFU
 from ..lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from ..lca_kerosene_per_fu import LCAKerosenePerFU
 from ..lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
@@ -1284,6 +1286,54 @@ def test_gasoline_per_fu_sr22():
     assert problem.get_val(
         "data:LCA:distribution:he_power_train:gasoline:mass_per_fu"
     ) == pytest.approx(2.39111932e-05, rel=1e-5)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_hydrogen_per_fu():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:environmental_impact:flight_per_fu", val=1e-4)
+    ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
+    ivc.add_output("data:environmental_impact:line_test:mission_ratio", val=7.5)
+    ivc.add_output("data:environmental_impact:delivery:mission_ratio", val=5.0)
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:fuel_consumed_main_route",
+        val=20,
+        units="kg",
+    )
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_2:fuel_consumed_main_route",
+        val=30,
+        units="kg",
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCAHydrogenPerFU(
+            tanks_name_list=["gaseous_hydrogen_tank_1", "gaseous_hydrogen_tank_2"],
+            tanks_type_list=["gaseous_hydrogen_tank", "gaseous_hydrogen_tank"],
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:hydrogen:mass_per_fu"
+    ) == pytest.approx(0.00515464, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:operation:he_power_train:hydrogen:leakage_mass_per_fu"
+    ) == pytest.approx(0.00015464, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:hydrogen:mass_per_fu"
+    ) == pytest.approx(0.0003866, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:manufacturing:he_power_train:hydrogen:leakage_mass_per_fu"
+    ) == pytest.approx(1.15979381e-05, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:hydrogen:mass_per_fu"
+    ) == pytest.approx(0.00025773, rel=1e-5)
+    assert problem.get_val(
+        "data:LCA:distribution:he_power_train:hydrogen:leakage_mass_per_fu"
+    ) == pytest.approx(7.73195876e-06, rel=1e-5)
 
     problem.check_partials(compact_print=True)
 

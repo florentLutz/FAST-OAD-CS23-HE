@@ -37,6 +37,7 @@ from .lca_empty_aircraft_weight_per_fu import LCAEmptyAircraftWeightPerFU
 from .lca_flight_control_weight_per_fu import LCAFlightControlsWeightPerFU
 from .lca_fuselage_weight_per_fu import LCAFuselageWeightPerFU
 from .lca_gasoline_per_fu import LCAGasolinePerFU
+from .lca_hydrogen_per_fu import LCAHydrogenPerFU
 from .lca_htp_weight_per_fu import LCAHTPWeightPerFU
 from .lca_kerosene_per_fu import LCAKerosenePerFU
 from .lca_landing_gear_weight_per_fu import LCALandingGearWeightPerFU
@@ -323,6 +324,7 @@ class LCA(om.Group):
 
         gasoline_tank_names, gasoline_tank_types = [], []
         kerosene_tank_names, kerosene_tank_types = [], []
+        hydrogen_tank_names, hydrogen_tank_types = [], []
 
         tank_names, tank_types, contents = self.configurator.get_fuel_tank_list_and_fuel()
 
@@ -333,6 +335,9 @@ class LCA(om.Group):
             elif content == "avgas":
                 gasoline_tank_names.append(tank_name)
                 gasoline_tank_types.append(tank_type)
+            elif content == "hydrogen":
+                hydrogen_tank_names.append(tank_name)
+                hydrogen_tank_types.append(tank_type)
 
         if gasoline_tank_names:
             self.add_subsystem(
@@ -348,6 +353,15 @@ class LCA(om.Group):
                 name="pre_lca_kerosene",
                 subsys=LCAKerosenePerFU(
                     tanks_name_list=kerosene_tank_names, tanks_type_list=kerosene_tank_types
+                ),
+                promotes=["*"],
+            )
+
+        if hydrogen_tank_types:
+            self.add_subsystem(
+                name="pre_lca_hydrogen",
+                subsys=LCAHydrogenPerFU(
+                    tanks_name_list=hydrogen_tank_names, tanks_type_list=hydrogen_tank_types
                 ),
                 promotes=["*"],
             )

@@ -639,6 +639,20 @@ class LCACore(om.ExplicitComponent):
                                 my_file.write("        " + line_to_add)
                         my_file.write("\n")
 
+                if "hydrogen" in contents:
+                    path_to_hydrogen_prod_file = RESOURCE_FOLDER_PATH / "hydrogen_production.yml"
+                    with open(path_to_hydrogen_prod_file, "r") as hydrogen_prod_conf:
+                        lines_to_copy = hydrogen_prod_conf.readlines()
+                        for idx, line_to_copy in enumerate(lines_to_copy):
+                            if not self.configurator.belongs_to_custom_attribute_definition(
+                                line_to_copy, idx, lines_to_copy
+                            ):
+                                line_to_add = line_to_copy.replace(
+                                    "__operation__", "__manufacturing__"
+                                )
+                                my_file.write("        " + line_to_add)
+                        my_file.write("\n")
+
     def write_distribution(self, path_to_yaml: pathlib.Path, dict_with_distribution):
         """
         Writes in the LCA configuration file, the steps necessary to evaluate the impact of the
@@ -715,6 +729,22 @@ class LCACore(om.ExplicitComponent):
                                     my_file.write("        " + line_to_add)
                             my_file.write("\n")
 
+                    if "hydrogen" in contents:
+                        path_to_hydrogen_prod_file = (
+                            RESOURCE_FOLDER_PATH / "hydrogen_production.yml"
+                        )
+                        with open(path_to_hydrogen_prod_file, "r") as hydrogen_prod_conf:
+                            lines_to_copy = hydrogen_prod_conf.readlines()
+                            for idx, line_to_copy in enumerate(lines_to_copy):
+                                if not self.configurator.belongs_to_custom_attribute_definition(
+                                    line_to_copy, idx, lines_to_copy
+                                ):
+                                    line_to_add = line_to_copy.replace(
+                                        "__operation__", "__distribution__"
+                                    )
+                                    my_file.write("        " + line_to_add)
+                            my_file.write("\n")
+
             elif self.options["delivery_method"] == "train":
                 path_to_train_distribution_conf_file = (
                     RESOURCE_FOLDER_PATH / "delivery_via_train.yml"
@@ -763,6 +793,13 @@ class LCACore(om.ExplicitComponent):
                     path_to_gasoline_prod_file = RESOURCE_FOLDER_PATH / "gasoline_production.yml"
                     with open(path_to_gasoline_prod_file, "r") as gasoline_prod_conf:
                         for line_to_copy in gasoline_prod_conf.readlines():
+                            my_file.write("        " + line_to_copy)
+                        my_file.write("\n")
+
+                if "hydrogen" in contents:
+                    path_to_hydrogen_prod_file = RESOURCE_FOLDER_PATH / "hydrogen_production.yml"
+                    with open(path_to_hydrogen_prod_file, "r") as hydrogen_prod_conf:
+                        for line_to_copy in hydrogen_prod_conf.readlines():
                             my_file.write("        " + line_to_copy)
                         my_file.write("\n")
 
