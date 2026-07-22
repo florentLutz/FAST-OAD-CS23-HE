@@ -1,0 +1,24 @@
+title: Sample Weight computation applied to DHC 6 TWIN OTTER
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ../results/lca_inputs_pemfc_h2_gas.xml
+output_file: ../results/lca_process_outputs_pemfc_h2_gas.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+    lca:
+        id: fastga_he.lca.legacy
+        power_train_file_path: ./pemfc_h2_propulsion.yml
+        component_level_breakdown: true
+        airframe_material: aluminium
+        delivery_method: flight
+        impact_assessment_method: EF v3.1
+        normalization: true
+        weighting: true
+        aircraft_lifespan_in_hours: true
