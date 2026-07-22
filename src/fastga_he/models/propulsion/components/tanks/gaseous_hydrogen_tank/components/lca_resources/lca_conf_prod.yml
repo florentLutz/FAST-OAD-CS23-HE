@@ -6,4 +6,4 @@ ANCHOR_COMPONENT_NAME:
     name: 'market for carbon fibre reinforced plastic, injection moulded'
     amount: ANCHOR_COMPONENT_MASS
 
-    # Tank will be assumed to be mase purely out of composite.
+    # Tank will be assumed to be made purely out of composite.

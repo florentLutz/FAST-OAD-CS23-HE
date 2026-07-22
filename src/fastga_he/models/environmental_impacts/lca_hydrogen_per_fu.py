@@ -315,8 +315,9 @@ class LCAHydrogenPerFU(om.ExplicitComponent):
             "data:environmental_impact:hydrogen:infrastructure_leak_percentage",
         ] = (
             partial_flight_per_fu
-            * inputs["data:environmental_impact:aircraft_per_fu"]
+            * inputs["data:environmental_impact:flight_per_fu"]
             / (1.0 - leak_percentage) ** 2.0
+            / 100.0
         )
 
         partials[
@@ -328,8 +329,9 @@ class LCAHydrogenPerFU(om.ExplicitComponent):
             "data:environmental_impact:hydrogen:infrastructure_leak_percentage",
         ] = (
             partial_flight_per_fu
-            * inputs["data:environmental_impact:aircraft_per_fu"]
+            * inputs["data:environmental_impact:flight_per_fu"]
             / (1.0 - leak_percentage) ** 2.0
+            / 100.0
         )
 
         partials[

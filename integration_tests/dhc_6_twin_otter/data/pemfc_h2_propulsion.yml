@@ -48,7 +48,7 @@ power_train_components:
       model_fidelity: "analytical"
   hydrogen_fuel_system_1:
     id: fastga_he.pt_component.h2_fuel_system
-    option:
+    options:
       number_of_tanks: 1
       number_of_power_sources: 1
       wing_related: True

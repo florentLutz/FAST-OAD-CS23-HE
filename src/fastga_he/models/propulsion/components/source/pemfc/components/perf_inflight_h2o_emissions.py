@@ -10,7 +10,7 @@ class PerformancesPEMFCStackInFlightH2OEmissions(om.ExplicitComponent):
     """
     Computation of the PEMFC stack in flight water vapour emissions, will be based on a simple
     emissions index whose default value is computed based on the chemical equation in a PEMFC:
-    2 H2 + 02 -> 2 H20
+    2 H2 + 02 -> 2 H2O
     """
 
     def initialize(self):

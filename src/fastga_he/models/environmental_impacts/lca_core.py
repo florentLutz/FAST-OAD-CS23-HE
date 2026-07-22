@@ -995,7 +995,8 @@ class LCACore(om.ExplicitComponent):
                     methods_dict = yaml.safe_load(methods_file_stream)
 
                 self.write_methods(lca_conf_file_path, methods_dict)
-                self.write_custom_methods(lca_conf_file_path, methods_dict)
+                if "custom_methods" in methods_dict:
+                    self.write_custom_methods(lca_conf_file_path, methods_dict)
 
                 if self.options["electric_mix"] != "default":
                     self.change_electric_mix(lca_conf_file_path)

@@ -29,7 +29,8 @@ class PerformancesPEMFCStackInFlightEmissions(om.Group):
         number_of_points = self.options["number_of_points"]
         pemfc_stack_id = self.options["pemfc_stack_id"]
 
-        # No in-flight emissions for the battery pack
+        # For PEMFC, only H2O is considered here; other species are set to zero for consistency
+        # with other sources
         ivc_emissions = om.IndepVarComp()
         ivc_emissions.add_output("CO2_emissions", units="g", val=np.zeros(number_of_points))
         ivc_emissions.add_output("CO_emissions", units="g", val=np.zeros(number_of_points))

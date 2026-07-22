@@ -27,7 +27,7 @@ hydrogen_for_mission_production:
 hydrogen_leakage:
     custom_attributes:
         - attribute: "component"
-          value: infrastucture_hydrogen_leak_operation
+          value: infrastructure_hydrogen_leak_operation
 
     amount: data__LCA__operation__he_power_train__hydrogen__leakage_mass_per_fu
     name: dihydrogen
