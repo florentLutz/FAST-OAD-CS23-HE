@@ -23,6 +23,8 @@ from ..components.sizing_aux_load_cg_x import SizingDCAuxLoadCGX
 
 from ..components.sizing_aux_load import SizingDCAuxLoad
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCADCAuxLoadProdWeightPerFU
+
 from ..constants import POSSIBLE_POSITION
 
 from tests.testing_utilities import run_system, get_indep_var_comp
@@ -219,6 +221,22 @@ def test_generator_cg_x():
         ) == pytest.approx(expected_value, rel=1e-2)
 
         problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:propulsion:he_power_train:aux_load:aux_load_1:mass", units="kg", val=0.55)
+    ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(PreLCADCAuxLoadProdWeightPerFU(aux_load_id="aux_load_1"), ivc)
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:aux_load:aux_load_1:mass_per_fu", units="kg"
+    ) == pytest.approx(5.5e-7, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
 
 
 def test_sizing():
