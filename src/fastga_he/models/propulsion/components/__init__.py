@@ -174,6 +174,7 @@ from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
+    PreLCAGaseousHydrogenTank,
     LCCGaseousHydrogenTankCost,
 )
 from .connectors.h2_fuel_system import (

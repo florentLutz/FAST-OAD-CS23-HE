@@ -8,4 +8,5 @@
 from .components.sizing_tank import SizingGaseousHydrogenTank
 from .components.perf_gaseous_hydrogen_tank import PerformancesGaseousHydrogenTank
 from .components.slipstream_gaseous_hydrogen_tank import SlipstreamGaseousHydrogenTank
+from .components.pre_lca_gaseous_hydrogen_tank import PreLCAGaseousHydrogenTank
 from .components.lcc_gaseous_hydrogen_tank_cost import LCCGaseousHydrogenTankCost
