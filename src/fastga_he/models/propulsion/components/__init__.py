@@ -181,4 +181,5 @@ from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,
     PerformancesH2FuelSystem,
     SlipstreamH2FuelSystem,
+    PreLCAH2FuelSystem
 )

@@ -567,7 +567,7 @@ class LCACore(om.ExplicitComponent):
             for component_name in dict_with_production.keys():
                 for line_to_copy in dict_with_production[component_name]:
                     my_file.write("        " + line_to_copy)
-                my_file.write("\n")
+                my_file.write("\n\n")
 
     def write_manufacturing(self, path_to_yaml: pathlib.Path, dict_with_manufacturing):
         """

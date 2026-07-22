@@ -3,11 +3,11 @@ ANCHOR_COMPONENT_NAME:
         - attribute: "component"
           value: ANCHOR_COMPONENT_NAME
 
-    gearbox:
+    pemfc_stack:
         amount: ANCHOR_COMPONENT_MASS
         unit: kilogram
 
-        production:
+        production:  # Based on the LCI conducted in :cite:`evon:2026`
             tfe:
                 name: 'market for tetrafluoroethylene'
                 loc: 'GLO'
@@ -29,8 +29,8 @@ ANCHOR_COMPONENT_NAME:
                 amount: 73.09 * 1e-3
 
             chromium_steel:
-                name: ''
-                loc: ''
+                name: 'market for steel, chromium steel 18/8'
+                loc: 'GLO'
                 amount: 641.92 * 1e-3
 
             chromium_coating:
@@ -80,7 +80,7 @@ ANCHOR_COMPONENT_NAME:
 
             methanol:
                 name: 'market for methanol'
-                loc: 'RoW'
+                loc: 'GLO'
                 amount: 1.59 * 1e-3
 
             silicone:
@@ -117,5 +117,3 @@ ANCHOR_COMPONENT_NAME:
                 name: 'market for injection moulding'
                 loc: 'GLO'
                 amount: 118.5 * 1e-3
-
-        # Based on the LCI conducted in :cite:`evon:2026`

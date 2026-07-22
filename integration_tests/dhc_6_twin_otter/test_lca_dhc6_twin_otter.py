@@ -8,7 +8,6 @@ import pathlib
 import fastoad.api as oad
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
-RESULTS_FOLDER_PATH = pathlib.Path(__file__).parent / "results"
 
 
 def test_lca_twin_otter_pemfc_h2():
@@ -25,7 +24,7 @@ def test_lca_twin_otter_pemfc_h2():
     problem = configurator.get_problem()
 
     # Create inputs
-    ref_inputs = RESULTS_FOLDER_PATH / xml_file_name
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
