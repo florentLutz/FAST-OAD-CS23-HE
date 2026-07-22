@@ -22,9 +22,9 @@ if __name__ == "__main__":
     # - Piston 1 engine 1-3 seats
     # - Piston 1 engine 4+ seats
     # - Piston 1 engine total
-    # - Piston 2 engine 1-6 seats
-    # - Piston 2 engine 7+ seats
-    # - Piston 2 engine total
+    # - Piston 2 engines 1-6 seats
+    # - Piston 2 engines 7+ seats
+    # - Piston 2 engines total
     # - TP 1 engine total
     # - TP 2 engines 1-12 seats
     # - TP 2 engines 13+ seats
@@ -37,9 +37,9 @@ if __name__ == "__main__":
         "Piston 1 engine 1-3 seats",
         "Piston 1 engine 4+ seats",
         "Piston 1 engine total",
-        "Piston 2 engine 1-6 seats",
-        "Piston 2 engine 7+ seats",
-        "Piston 2 engine total",
+        "Piston 2 engines 1-6 seats",
+        "Piston 2 engines 7+ seats",
+        "Piston 2 engines total",
         "Turboprop 1 engine total",
         "Turboprop 2 engines 1-12 seats",
         "Turboprop 2 engines 13+ seats",
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     data_to_show = [
         "Piston 1 engine total",
-        "Piston 2 engine total",
+        "Piston 2 engines total",
         "Turboprop 1 engine total",
         "Turboprop 2 engines total",
     ]

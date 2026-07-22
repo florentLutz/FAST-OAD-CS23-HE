@@ -60,13 +60,16 @@ model:
       id: fastga.loop.wing_area
   #    power_train_file_path: ./pipistrel_assembly.yml
   post_process:
-    simple_energy:
-      id: fastga_he.environmental.energy_simple
-      mission: both
-      electricity_mix: france
+#    simple_energy:
+#      id: fastga_he.environmental.energy_simple
+#      mission: both
+#      electricity_mix: france
     esar:
       id: fastga_he.performances.energy_specific_air_range
-      mission: both
+      mission: design
+  connections:
+    - source: initialization.altitude
+      target: altitude
 
 
 submodels:

@@ -1,0 +1,50 @@
+title: Sample weight computation applied to Kodiak 100
+
+# na_iont of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ../results_time_sensitivity/lca_problem_inputs.xml
+output_file: ../results_time_sensitivity/lca_problem_outputs.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+    lca:
+        id: fastga_he.lca.legacy
+        power_train_file_path: ./assembly.yml
+        component_level_breakdown: true
+        airframe_material: aluminium
+        delivery_method: flight
+        impact_assessment_method: EF v3.1
+        normalization: true
+        weighting: true
+        aircraft_lifespan_in_hours: true
+        write_lca_conf: false
+        lca_conf_file_path: ./lca_conf_file.yml
+
+submodels:
+    submodel.geometry.wing.thickness_ratio: null
+    submodel.aerodynamics.high_lift.delta: null
+    submodel.geometry.mfw: fastga.submodel.geometry.mfw.advanced
+    submodel.geometry.vertical_tail.position.fd: null
+    submodel.performances.mission_vector.descent_speed: null
+    submodel.performances.mission_vector.climb_speed: null
+    submodel.propulsion.performances.dc_line.temperature_profile: fastga_he.submodel.propulsion.performances.dc_line.temperature_profile.steady_state
+    submodel.propulsion.inverter.junction_temperature: fastga_he.submodel.propulsion.inverter.junction_temperature.from_losses
+    submodel.propulsion.inverter.efficiency: fastga_he.submodel.propulsion.inverter.efficiency.from_losses
+    submodel.weight.cg.aircraft_empty.x: fastga_he.submodel.weight.cg.aircraft_empty.x.with_propulsion_as_one
+    service.weight.mass.systems: fastga.submodel.weight.mass.systems.legacy
+    submodel.weight.mass.system.power_system: null
+    submodel.geometry.nacelle.dimension: null
+    submodel.aerodynamics.nacelle.cd0: fastga_he.submodel.aerodynamics.powertrain.cd0.from_pt_file
+    submodel.weight.cg.loadcase.flight: fastga_he.submodel.weight.cg.loadcase.flight.simple
+    submodel.weight.mass_breakdown: fastga_he.submodel.weight.mass_breakdown.modular
+    submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
+    submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
+    submodel.propulsion.dc_dc_converter.inductor.inductance: null
+    service.propulsion.battery.lifespan: null
+    service.propulsion.battery.internal_resistance: fastga_he.submodel.propulsion.battery.internal_resistance.no_soc_effect
+    service.propulsion.battery.open_circuit_voltage: fastga_he.submodel.propulsion.battery.open_circuit_voltage.from_min_max

@@ -5,8 +5,8 @@ module_folders:
 
 
 # Input and output files
-input_file: ../results/oad_process_inputs_elec.xml
-output_file: ../results/oad_process_outputs_elec.xml
+input_file: ../results/oad_process_inputs_elec_with_lca.xml
+output_file: ../results/oad_process_outputs_elec_with_lca.xml
 
 # Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
 driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
@@ -61,10 +61,18 @@ model:
         wing_area:
             id: fastga.loop.wing_area
 
-    environmental_impact:
-        id: fastga_he.environmental.energy_simple
-        mission: design
-        electricity_mix: europe
+    lca:
+        id: fastga_he.lca.legacy
+        power_train_file_path: ./elec_kodiak_assembly.yml
+        component_level_breakdown: true
+        airframe_material: aluminium
+        delivery_method: flight
+        impact_assessment_method: EF v3.1
+        normalization: true
+        weighting: true
+        aircraft_lifespan_in_hours: true
+        write_lca_conf: false
+        lca_conf_file_path: ./elec_kodiak_assembly_lca.yml
 
 submodels:
     submodel.geometry.wing.thickness_ratio: null
@@ -86,4 +94,4 @@ submodels:
     submodel.propulsion.constraints.battery.state_of_charge: fastga_he.submodel.propulsion.constraints.battery.state_of_charge.enforce
     submodel.propulsion.dc_dc_converter.efficiency: fastga_he.submodel.propulsion.dc_dc_converter.efficiency.from_losses
     submodel.propulsion.dc_dc_converter.inductor.inductance: null
-
+    service.propulsion.battery.lifespan: null
