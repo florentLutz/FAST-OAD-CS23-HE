@@ -427,12 +427,13 @@ model:
         
         # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
         # with the custom methods possibilities brought by lca-modeller.
-        #hydrogen_leakage:
-        #    amount: data__LCA__manufacturing__he_power_train__hydrogen__leakage_mass_per_fu
-        #    name: dihydrogen
-        #    categories:
-        #        - 'air'
-        #        - 'lower stratosphere + upper troposphere'
+        hydrogen_leakage:
+        
+            amount: data__LCA__manufacturing__he_power_train__hydrogen__leakage_mass_per_fu
+            name: dihydrogen
+            categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
     distribution:
         custom_attributes:
@@ -507,12 +508,13 @@ model:
         
         # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
         # with the custom methods possibilities brought by lca-modeller.
-        #hydrogen_leakage:
-        #    amount: data__LCA__distribution__he_power_train__hydrogen__leakage_mass_per_fu
-        #    name: dihydrogen
-        #    categories:
-        #        - 'air'
-        #        - 'lower stratosphere + upper troposphere'
+        hydrogen_leakage:
+        
+            amount: data__LCA__distribution__he_power_train__hydrogen__leakage_mass_per_fu
+            name: dihydrogen
+            categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
     use:
         custom_attributes:
@@ -593,19 +595,19 @@ model:
         
         # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
         # with the custom methods possibilities brought by lca-modeller.
-        #hydrogen_leakage:
-        #    amount: data__LCA__operation__he_power_train__hydrogen__leakage_mass_per_fu
-        #    name: dihydrogen
-        #    categories:
-        #        - 'air'
-        #        - 'lower stratosphere + upper troposphere'
+        hydrogen_leakage:
+            custom_attributes:
+                - attribute: "component"
+                  value: infrastucture_hydrogen_leak_operation
+        
+            amount: data__LCA__operation__he_power_train__hydrogen__leakage_mass_per_fu
+            name: dihydrogen
+            categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
 methods:
     - "('EF v3.1', 'acidification', 'accumulated exceedance (AE)')"
-    - "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
     - "('EF v3.1', 'ecotoxicity: freshwater', 'comparative toxic unit for ecosystems (CTUe)')"
     - "('EF v3.1', 'ecotoxicity: freshwater, inorganics', 'comparative toxic unit for ecosystems (CTUe)')"
     - "('EF v3.1', 'ecotoxicity: freshwater, organics', 'comparative toxic unit for ecosystems (CTUe)')"
@@ -626,3 +628,25 @@ methods:
     - "('EF v3.1', 'particulate matter formation', 'impact on human health')"
     - "('EF v3.1', 'photochemical oxidant formation: human health', 'tropospheric ozone concentration increase')"
     - "('EF v3.1', 'water use', 'user deprivation potential (deprivation-weighted water consumption)')"
+
+custom_methods:
+    - name: "('Custom methods', 'climate change', 'global warming potential (GWP100)')"
+      filepath: "./data/lcia_gwp100_custom.csv"
+      unit: "kg CO2-Eq"
+      source_method: "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'climate change: biogenic', 'global warming potential (GWP100)')"
+      filepath: "./data/lcia_gwp100_custom.csv"
+      unit: "kg CO2-Eq"
+      source_method: "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'climate change: fossil', 'global warming potential (GWP100)')"
+      filepath: "./data/lcia_gwp100_custom.csv"
+      unit: "kg CO2-Eq"
+      source_method: "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
+      filepath: "./data/lcia_gwp100_custom.csv"
+      unit: "kg CO2-Eq"
+      source_method: "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
+

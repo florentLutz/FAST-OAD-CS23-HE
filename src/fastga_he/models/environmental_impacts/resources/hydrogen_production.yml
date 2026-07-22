@@ -9,8 +9,8 @@ hydrogen_for_mission_production:
 
         # There is no process for 700 bar hydrogen so we reconstruct it
         25_bar_hydrogen:
-            name: 'market for hydrogen, gaseous, low pressure'
-            loc: RoW
+            name: 'market for hydrogen, gaseous'
+            loc: 'GLO'
             amount: 1
 
         # This assumes the hydrogen is compressed to 700 bar which might not always be the case,
@@ -19,11 +19,16 @@ hydrogen_for_mission_production:
         # https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/9013_energy_requirements_for_hydrogen_gas_compression.pdf?Status=Master
         compression:
             name: 'market group for electricity, high voltage'
+            loc: 'RER'
             amount: 2.67
 
 # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
 # with the custom methods possibilities brought by lca-modeller.
 hydrogen_leakage:
+    custom_attributes:
+        - attribute: "component"
+          value: infrastucture_hydrogen_leak_operation
+
     amount: data__LCA__operation__he_power_train__hydrogen__leakage_mass_per_fu
     name: dihydrogen
     categories:

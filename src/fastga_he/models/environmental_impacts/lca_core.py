@@ -1,7 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
 # Copyright (C) 2022 ISAE-SUPAERO
-
+import os.path
 import pathlib
 import re
 import shutil
@@ -31,6 +31,7 @@ RESOURCE_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "resources"
 
 NAME_TO_UNIT = {
     "mass": "kg",
+    "leakage_mass": "kg",
     "length": "m",
     "OWE": "kg",
     "energy": "W*h",
@@ -536,6 +537,30 @@ class LCACore(om.ExplicitComponent):
             for method in dict_with_methods["methods"]:
                 my_file.write('    - "' + method + '"\n')
 
+    @staticmethod
+    def write_custom_methods(path_to_yaml: pathlib.Path, dict_with_custom_methods):
+        with open(path_to_yaml, "a") as my_file:
+            my_file.write("\n")
+            my_file.write("custom_methods:\n")
+            for method in dict_with_custom_methods["custom_methods"]:
+                # For customized LCIA methods to work custom csv with the updated characterization
+                # factors needs to be copied next to the lca_conf_file path. The original version
+                # of those csv will be assumed to be located in the resource folder.
+                src_path = RESOURCE_FOLDER_PATH / method["filepath"]
+                tgt_path = path_to_yaml.parent / method["filepath"]
+                if not os.path.exists(tgt_path):
+                    shutil.copy(src_path, tgt_path)
+
+                # We now need to change the path a little bit so that lca-modeller recognize it.
+                rel_path = path_to_yaml.parent.relative_to(path_to_yaml.parent.parent)
+                absolute_file_path = "./" + (rel_path / method["filepath"]).as_posix()
+
+                my_file.write('    - name: "' + method["name"] + '"\n')
+                my_file.write('      filepath: "' + absolute_file_path + '"\n')
+                my_file.write('      unit: "' + method["unit"] + '"\n')
+                my_file.write('      source_method: "' + method["source_method"] + '"\n')
+                my_file.write("\n")
+
     def write_production(self, path_to_yaml: pathlib.Path, dict_with_production):
         with open(path_to_yaml, "a") as my_file:
             my_file.write("\n")
@@ -970,6 +995,7 @@ class LCACore(om.ExplicitComponent):
                     methods_dict = yaml.safe_load(methods_file_stream)
 
                 self.write_methods(lca_conf_file_path, methods_dict)
+                self.write_custom_methods(lca_conf_file_path, methods_dict)
 
                 if self.options["electric_mix"] != "default":
                     self.change_electric_mix(lca_conf_file_path)

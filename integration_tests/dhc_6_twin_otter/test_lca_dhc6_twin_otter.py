@@ -6,6 +6,7 @@ import logging
 import pathlib
 
 import fastoad.api as oad
+import pytest
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data"
 
@@ -31,3 +32,7 @@ def test_lca_twin_otter_pemfc_h2():
     problem.setup()
     problem.run_model()
     problem.write_outputs()
+
+    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+        2.557e-05, rel=1e-3
+    )

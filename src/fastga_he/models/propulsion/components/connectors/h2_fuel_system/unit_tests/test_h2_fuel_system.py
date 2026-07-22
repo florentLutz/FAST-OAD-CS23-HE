@@ -474,7 +474,9 @@ def test_weight_per_fu():
     ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
 
     # Run problem and check obtained value(s) is/(are) correct
-    problem = run_system(PreLCAH2FuelSystemProdWeightPerFU(h2_fuel_system_id="h2_fuel_system_1"), ivc)
+    problem = run_system(
+        PreLCAH2FuelSystemProdWeightPerFU(h2_fuel_system_id="h2_fuel_system_1"), ivc
+    )
 
     assert problem.get_val(
         "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass_per_fu", units="kg"
