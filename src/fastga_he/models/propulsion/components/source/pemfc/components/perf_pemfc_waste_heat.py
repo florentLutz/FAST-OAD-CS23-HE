@@ -46,6 +46,6 @@ class PerformancesPEMFCStackWasteHeat(om.ExplicitComponent):
         clipped_power_out = np.clip(inputs["power_out"], 0.01, np.inf)
 
         partials["waste_heat", "power_out"] = np.where(
-            clipped_power_out == inputs["power_out"], 0.5 * (1.0 - inputs["efficiency"]), 0.0
+            clipped_power_out == inputs["power_out"], 0.5 * (1.0 - inputs["efficiency"]), 1e-6
         )
         partials["waste_heat", "efficiency"] = -0.5 * clipped_power_out

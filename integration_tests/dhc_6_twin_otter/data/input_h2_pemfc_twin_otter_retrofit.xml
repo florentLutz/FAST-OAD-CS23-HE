@@ -296,10 +296,27 @@
           <pemfc_stack_1>
             <area_ohmic_resistance units="ohm*m**2" is_input="True">1e-06<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
             <effective_area units="cm**2" is_input="True">1500.0<!--Effective area of the PEMFC's polymer electrolyte membrane--></effective_area>
-            <hydrogen_reactant_pressure units="atm" is_input="True">1.0</hydrogen_reactant_pressure>
+            <nominal_pressure units="atm" is_input="True">1.0</nominal_pressure>
             <number_of_layers is_input="True">1600.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
           </pemfc_stack_1>
         </PEMFC_stack>
+        <H2_fuel_system>
+          <hydrogen_fuel_system_1>
+            <pipe_pressure units="bar">700.</pipe_pressure>
+            <dimension>
+                <pipe_diameter units="m">0.04</pipe_diameter>
+                <inner_diameter units="m">0.037</inner_diameter>
+                <insulation_thickness units="m">0.005</insulation_thickness>
+                <overall_diameter units="m">0.05</overall_diameter>
+                <length units="m">2.0</length>
+            </dimension>
+            <material>
+                <yield_strength units="MPa">240</yield_strength>
+                <density units="kg/m**3">7700</density>
+                <insulation_density units="kg/m**3">160</insulation_density>
+            </material>
+          </hydrogen_fuel_system_1>
+        </H2_fuel_system>
         <SM_PMSM>
           <motor_1>
             <bearing_diameter units="m" is_input="True">0.03<!--The motor bearing bore diameter--></bearing_diameter>

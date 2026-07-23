@@ -171,8 +171,8 @@ def test_sizing_twin_otter_pemfc_h2():
     problem.read_inputs()
     problem.setup()
 
-    problem.set_val(name="data:weight:aircraft:MTOW", units="kg", val=5700.0)
-    problem.set_val(name="data:geometry:wing:area", units="m**2", val=45.0)
+    problem.set_val(name="data:weight:aircraft:MTOW", units="kg", val=6000.0)
+    problem.set_val(name="data:geometry:wing:area", units="m**2", val=50.0)
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 

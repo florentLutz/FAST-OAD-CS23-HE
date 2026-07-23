@@ -56,7 +56,7 @@ power_train_components:
     position: in_the_rear
   gaseous_hydrogen_tank_1:
     id: fastga_he.pt_component.gaseous_hydrogen_tank
-    position: in_the_cabin # "in_the_cabin", "wing_pod", "in_the_back", "underbelly"
+    position: underbelly # "in_the_cabin", "wing_pod", "in_the_back", "underbelly"
 
 component_connections:
   - source: propeller_1

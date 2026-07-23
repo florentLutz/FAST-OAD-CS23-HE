@@ -49,7 +49,14 @@ class PerformancesPowerIn(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["power_in"] = 0.0767 * inputs["waste_heat"] ** 1.114
+        clipped_waste_heat = np.clip(inputs["waste_heat"], 0.01, np.inf)
+        outputs["power_in"] = 0.0767 * clipped_waste_heat**1.114
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials["power_in", "waste_heat"] = 0.0854438 * inputs["waste_heat"] ** 0.114
+        clipped_waste_heat = np.clip(inputs["waste_heat"], 0.01, np.inf)
+
+        partials["power_in", "waste_heat"] = np.where(
+            clipped_waste_heat == inputs["waste_heat"],
+            0.0854438 * inputs["waste_heat"] ** 0.114,
+            1e-6,
+        )
