@@ -87,7 +87,7 @@ component_connections:
     target: [dc_bus_1, 3]
 
   - source: dc_aux_load_2
-    target: [ dc_bus_1, 4]
+    target: [dc_bus_1, 4]
 
   - source: [dc_bus_1, 1]
     target: dc_dc_converter_1
