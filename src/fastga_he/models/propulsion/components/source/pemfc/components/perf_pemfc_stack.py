@@ -18,6 +18,8 @@ from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackSingleLayerVoltageAnalytical,
 )
 
+from ..components.perf_inflight_emissions import PerformancesPEMFCStackInFlightEmissions
+
 
 class PerformancesPEMFCStack(om.Group):
     """Class that regroups all the subcomponents for the PEMFC stack performance computations."""
@@ -132,6 +134,14 @@ class PerformancesPEMFCStack(om.Group):
         self.add_subsystem(
             "pemfc_power",
             PerformancesPEMFCStackPower(number_of_points=number_of_points),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="emissions",
+            subsys=PerformancesPEMFCStackInFlightEmissions(
+                pemfc_stack_id=pemfc_stack_id, number_of_points=number_of_points
+            ),
             promotes=["*"],
         )
 

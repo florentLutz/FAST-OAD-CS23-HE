@@ -1,9 +1,5 @@
 methods:
     - "('EF v3.1', 'acidification', 'accumulated exceedance (AE)')"
-    - "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
-    - "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
     - "('EF v3.1', 'ecotoxicity: freshwater', 'comparative toxic unit for ecosystems (CTUe)')"
     - "('EF v3.1', 'ecotoxicity: freshwater, inorganics', 'comparative toxic unit for ecosystems (CTUe)')"
     - "('EF v3.1', 'ecotoxicity: freshwater, organics', 'comparative toxic unit for ecosystems (CTUe)')"
@@ -24,3 +20,26 @@ methods:
     - "('EF v3.1', 'particulate matter formation', 'impact on human health')"
     - "('EF v3.1', 'photochemical oxidant formation: human health', 'tropospheric ozone concentration increase')"
     - "('EF v3.1', 'water use', 'user deprivation potential (deprivation-weighted water consumption)')"
+
+# Need custom methods to include the effect of the release of H2 by ground infrastructure, see
+# :cite:`sand:2026`
+custom_methods:
+    - name: "('Custom methods', 'climate change', 'global warming potential (GWP100)')"
+      filepath: 'lcia_gwp100_custom.csv'  # the LCA module will automatically format it correctly. Just needs the filename and the file to be in the resources folder
+      unit: 'kg CO2-Eq'
+      source_method: "('EF v3.1', 'climate change', 'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'climate change: biogenic', 'global warming potential (GWP100)')"
+      filepath: 'lcia_gwp100_custom.csv'
+      unit: 'kg CO2-Eq'
+      source_method: "('EF v3.1', 'climate change: biogenic', 'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'climate change: fossil', 'global warming potential (GWP100)')"
+      filepath: 'lcia_gwp100_custom.csv'
+      unit: 'kg CO2-Eq'
+      source_method: "('EF v3.1', 'climate change: fossil', 'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'climate change: land use and land use change', 'global warming potential (GWP100)')"
+      filepath: 'lcia_gwp100_custom.csv'
+      unit: 'kg CO2-Eq'
+      source_method: "('EF v3.1', 'climate change: land use and land use change', 'global warming potential (GWP100)')"

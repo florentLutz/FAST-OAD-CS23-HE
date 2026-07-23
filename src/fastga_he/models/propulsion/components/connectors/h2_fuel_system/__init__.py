@@ -8,3 +8,4 @@
 from .components.sizing_h2_fuel_system import SizingH2FuelSystem
 from .components.perf_h2_fuel_system import PerformancesH2FuelSystem
 from .components.slipstream_h2_fuel_system import SlipstreamH2FuelSystem
+from .components.pre_lca_h2_fuel_system import PreLCAH2FuelSystem

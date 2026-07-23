@@ -428,10 +428,27 @@
             </CG>
           </propeller_2>
         </propeller>
+        <H2_fuel_system>
+          <hydrogen_fuel_system_1>
+            <pipe_pressure units="bar">700.</pipe_pressure>
+            <dimension>
+                <pipe_diameter units="m">0.04</pipe_diameter>
+                <inner_diameter units="m">0.037</inner_diameter>
+                <insulation_thickness units="m">0.005</insulation_thickness>
+                <overall_diameter units="m">0.05</overall_diameter>
+                <length units="m">2.0</length>
+            </dimension>
+            <material>
+                <yield_strength units="MPa">240</yield_strength>
+                <density units="kg/m**3">7700</density>
+                <insulation_density units="kg/m**3">160</insulation_density>
+            </material>
+          </hydrogen_fuel_system_1>
+        </H2_fuel_system>
         <speed_reducer>
           <speed_reducer_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
-            <gear_ratio is_input="True">2.0408163265306123<!--Gear ratio of the speed reducer r--></gear_ratio>
+            <gear_ratio is_input="True">6.0<!--Gear ratio of the speed reducer r--></gear_ratio>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the speed reducer, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.28<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -439,7 +456,7 @@
           </speed_reducer_1>
           <speed_reducer_2>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
-            <gear_ratio is_input="True">2.0408163265306123<!--Gear ratio of the speed reducer r--></gear_ratio>
+            <gear_ratio is_input="True">6.0<!--Gear ratio of the speed reducer r--></gear_ratio>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the speed reducer, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.28<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>

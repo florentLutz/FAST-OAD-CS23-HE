@@ -1,7 +1,7 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
-
+# Copyright (C) 2026 ISAE-SUPAERO
+import os.path
 import pathlib
 import re
 import shutil
@@ -31,6 +31,7 @@ RESOURCE_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "resources"
 
 NAME_TO_UNIT = {
     "mass": "kg",
+    "leakage_mass": "kg",
     "length": "m",
     "OWE": "kg",
     "energy": "W*h",
@@ -564,6 +565,30 @@ class LCACore(om.ExplicitComponent):
             for method in dict_with_methods["methods"]:
                 my_file.write('    - "' + method + '"\n')
 
+    @staticmethod
+    def write_custom_methods(path_to_yaml: pathlib.Path, dict_with_custom_methods):
+        with open(path_to_yaml, "a") as my_file:
+            my_file.write("\n")
+            my_file.write("custom_methods:\n")
+            for method in dict_with_custom_methods["custom_methods"]:
+                # For customized LCIA methods to work custom csv with the updated characterization
+                # factors needs to be copied next to the lca_conf_file path. The original version
+                # of those csv will be assumed to be located in the resource folder.
+                src_path = RESOURCE_FOLDER_PATH / method["filepath"]
+                tgt_path = path_to_yaml.parent / method["filepath"]
+                if not os.path.exists(tgt_path):
+                    shutil.copy(src_path, tgt_path)
+
+                # We now need to change the path a little bit so that lca-modeller recognize it.
+                rel_path = path_to_yaml.parent.relative_to(path_to_yaml.parent.parent)
+                absolute_file_path = "./" + (rel_path / method["filepath"]).as_posix()
+
+                my_file.write('    - name: "' + method["name"] + '"\n')
+                my_file.write('      filepath: "' + absolute_file_path + '"\n')
+                my_file.write('      unit: "' + method["unit"] + '"\n')
+                my_file.write('      source_method: "' + method["source_method"] + '"\n')
+                my_file.write("\n")
+
     def write_production(self, path_to_yaml: pathlib.Path, dict_with_production):
         with open(path_to_yaml, "a") as my_file:
             my_file.write("\n")
@@ -595,7 +620,7 @@ class LCACore(om.ExplicitComponent):
             for component_name in dict_with_production.keys():
                 for line_to_copy in dict_with_production[component_name]:
                     my_file.write("        " + line_to_copy)
-                my_file.write("\n")
+                my_file.write("\n\n")
 
     def write_manufacturing(self, path_to_yaml: pathlib.Path, dict_with_manufacturing):
         """
@@ -657,6 +682,20 @@ class LCACore(om.ExplicitComponent):
                     path_to_gasoline_prod_file = RESOURCE_FOLDER_PATH / "gasoline_production.yml"
                     with open(path_to_gasoline_prod_file, "r") as gasoline_prod_conf:
                         lines_to_copy = gasoline_prod_conf.readlines()
+                        for idx, line_to_copy in enumerate(lines_to_copy):
+                            if not self.configurator.belongs_to_custom_attribute_definition(
+                                line_to_copy, idx, lines_to_copy
+                            ):
+                                line_to_add = line_to_copy.replace(
+                                    "__operation__", "__manufacturing__"
+                                )
+                                my_file.write("        " + line_to_add)
+                        my_file.write("\n")
+
+                if "hydrogen" in contents:
+                    path_to_hydrogen_prod_file = RESOURCE_FOLDER_PATH / "hydrogen_production.yml"
+                    with open(path_to_hydrogen_prod_file, "r") as hydrogen_prod_conf:
+                        lines_to_copy = hydrogen_prod_conf.readlines()
                         for idx, line_to_copy in enumerate(lines_to_copy):
                             if not self.configurator.belongs_to_custom_attribute_definition(
                                 line_to_copy, idx, lines_to_copy
@@ -743,6 +782,22 @@ class LCACore(om.ExplicitComponent):
                                     my_file.write("        " + line_to_add)
                             my_file.write("\n")
 
+                    if "hydrogen" in contents:
+                        path_to_hydrogen_prod_file = (
+                            RESOURCE_FOLDER_PATH / "hydrogen_production.yml"
+                        )
+                        with open(path_to_hydrogen_prod_file, "r") as hydrogen_prod_conf:
+                            lines_to_copy = hydrogen_prod_conf.readlines()
+                            for idx, line_to_copy in enumerate(lines_to_copy):
+                                if not self.configurator.belongs_to_custom_attribute_definition(
+                                    line_to_copy, idx, lines_to_copy
+                                ):
+                                    line_to_add = line_to_copy.replace(
+                                        "__operation__", "__distribution__"
+                                    )
+                                    my_file.write("        " + line_to_add)
+                            my_file.write("\n")
+
             elif self.options["delivery_method"] == "train":
                 path_to_train_distribution_conf_file = (
                     RESOURCE_FOLDER_PATH / "delivery_via_train.yml"
@@ -791,6 +846,13 @@ class LCACore(om.ExplicitComponent):
                     path_to_gasoline_prod_file = RESOURCE_FOLDER_PATH / "gasoline_production.yml"
                     with open(path_to_gasoline_prod_file, "r") as gasoline_prod_conf:
                         for line_to_copy in gasoline_prod_conf.readlines():
+                            my_file.write("        " + line_to_copy)
+                        my_file.write("\n")
+
+                if "hydrogen" in contents:
+                    path_to_hydrogen_prod_file = RESOURCE_FOLDER_PATH / "hydrogen_production.yml"
+                    with open(path_to_hydrogen_prod_file, "r") as hydrogen_prod_conf:
+                        for line_to_copy in hydrogen_prod_conf.readlines():
                             my_file.write("        " + line_to_copy)
                         my_file.write("\n")
 
@@ -964,6 +1026,8 @@ class LCACore(om.ExplicitComponent):
                     methods_dict = yaml.safe_load(methods_file_stream)
 
                 self.write_methods(lca_conf_file_path, methods_dict)
+                if "custom_methods" in methods_dict:
+                    self.write_custom_methods(lca_conf_file_path, methods_dict)
 
                 if self.options["electric_mix"] != "default":
                     self.change_electric_mix(lca_conf_file_path)

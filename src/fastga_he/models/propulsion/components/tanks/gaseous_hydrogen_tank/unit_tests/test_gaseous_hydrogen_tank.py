@@ -33,6 +33,8 @@ from ..components.perf_fuel_consumed_mission import PerformancesGaseousHydrogenC
 from ..components.perf_fuel_consumed_main_route import PerformancesGaseousHydrogenConsumedMainRoute
 from ..components.perf_fuel_remaining import PerformancesGaseousHydrogenRemainingMission
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAGaseousHydrogenTankProdWeightPerFU
+
 from ..components.lcc_gaseous_hydrogen_tank_cost import LCCGaseousHydrogenTankCost
 
 from ..components.sizing_tank import SizingGaseousHydrogenTank
@@ -705,6 +707,32 @@ def test_hydrogen_gas_remaining_mission():
     assert problem.get_val("fuel_remaining_t", units="kg") == pytest.approx(
         np.array([140.0, 126.0, 112.0, 98.0, 84.0, 70.0, 56.0, 42.0, 28.0, 14.0]), rel=1e-2
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_weight_per_fu():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass",
+        units="kg",
+        val=2.476,
+    )
+    ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PreLCAGaseousHydrogenTankProdWeightPerFU(
+            gaseous_hydrogen_tank_id="gaseous_hydrogen_tank_1"
+        ),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:mass_per_fu",
+        units="kg",
+    ) == pytest.approx(2.476e-6, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 

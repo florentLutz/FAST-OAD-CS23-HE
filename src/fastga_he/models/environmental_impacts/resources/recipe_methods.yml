@@ -1,6 +1,5 @@
 methods:
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
-    - "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
@@ -17,6 +16,22 @@ methods:
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
     - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
-    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
     - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"
+
+# Need custom methods to include the effect of the release of H2 by ground infrastructure, see
+# :cite:`sand:2026`
+custom_methods:
+    - name: "('Custom methods', 'climate change', 'global warming potential (GWP100)')"
+      filepath: 'lcia_gwp100_custom.csv'  # the LCA module will automatically format it correctly. Just needs the filename and the file to be in the resources folder
+      unit: 'kg CO2-Eq'
+      source_method: "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'total: human health', 'human health')"
+      filepath: 'lcia_total_human_health_custom.csv'
+      unit: 'DALY'
+      source_method: "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
+
+    - name: "('Custom methods', 'total: ecosystem quality', 'ecosystem quality')"
+      filepath: 'lcia_total_ecosystem_quality_custom.csv'
+      unit: 'Species.year'
+      source_method: "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"

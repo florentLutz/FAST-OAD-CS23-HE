@@ -76,3 +76,6 @@ venv*/
 **/workdir/**
 
 **/.env
+
+# Package generated files
+*_updated.xlsx
