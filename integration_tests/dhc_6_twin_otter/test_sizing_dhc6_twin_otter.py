@@ -130,6 +130,21 @@ def test_retrofit_twin_otter_pemfc_h2_hybrid():
     print(residuals)
     problem.write_outputs()
 
+def test_hybrid_dhc_6_hybrid_powertrain_network():
+    pt_file_path = DATA_FOLDER_PATH / "turboshaft_pemfc_hybrid_propulsion_retrofit.yml"
+    network_file_path = RESULTS_FOLDER_PATH / "dhc_6_h2_hybrid.html"
+
+    power_train_network_viewer(
+        pt_file_path,
+        network_file_path,
+        animated_plot=True,
+        plot_scaling=1.3,
+        legend_position="BR",
+        legend_scaling=1.3,
+        from_propulsor=False
+    )
+
+
 def test_sizing_twin_otter_pemfc_h2():
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
@@ -163,7 +178,7 @@ def test_sizing_twin_otter_pemfc_h2():
 
     _, _, residuals = problem.model.get_nonlinear_vectors()
     residuals = filter_residuals(residuals)
-
+    print(residuals)
     problem.write_outputs()
 
 

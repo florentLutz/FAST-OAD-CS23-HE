@@ -277,7 +277,7 @@
           <planetary_gear_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <front_length_ratio is_input="True">0.9<!--Location of the planetary gear CG as a ratio of the aircraft front length--></front_length_ratio>
-            <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
+            <gear_ratio is_input="True">1.0<!--Gear ratio of the planetary gear--></gear_ratio>
             <power_share units="kW" is_input="True">278.<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
@@ -287,7 +287,7 @@
           <planetary_gear_2>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
             <front_length_ratio is_input="True">0.9<!--Location of the planetary gear CG as a ratio of the aircraft front length--></front_length_ratio>
-            <gear_ratio is_input="True">2.0<!--Gear ratio of the planetary gear--></gear_ratio>
+            <gear_ratio is_input="True">1.0<!--Gear ratio of the planetary gear--></gear_ratio>
             <power_share units="kW" is_input="True">278.<!--Share of the power going to the first (primary) input, in W--></power_share>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the gearbox, default value computed with the results from the source paper--></tech_level_constant>
              <CG>
@@ -649,7 +649,7 @@
         <speed_reducer>
           <speed_reducer_1>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
-            <gear_ratio is_input="True">2.0408163265306123<!--Gear ratio of the speed reducer r--></gear_ratio>
+            <gear_ratio is_input="True">6.0<!--Gear ratio of the speed reducer r--></gear_ratio>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the speed reducer, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.28<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>
@@ -657,7 +657,7 @@
           </speed_reducer_1>
           <speed_reducer_2>
             <efficiency is_input="True">0.98<!--Efficiency of the planetary gear--></efficiency>
-            <gear_ratio is_input="True">2.0408163265306123<!--Gear ratio of the speed reducer r--></gear_ratio>
+            <gear_ratio is_input="True">6.0<!--Gear ratio of the speed reducer r--></gear_ratio>
             <tech_level_constant is_input="True">6.157<!--Technology level constant for the speed reducer, default value computed with the results from the source paper--></tech_level_constant>
             <CG>
               <y_ratio is_input="True">0.28<!--Y position of the PMSM center of gravity as a ratio of the wing half-span--></y_ratio>
