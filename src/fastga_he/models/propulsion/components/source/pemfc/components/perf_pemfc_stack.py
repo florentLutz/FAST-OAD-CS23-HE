@@ -13,6 +13,7 @@ from ..components.perf_fuel_consumption import PerformancesPEMFCStackFuelConsump
 from ..components.perf_fuel_consumed import PerformancesPEMFCStackFuelConsumed
 from ..components.perf_pemfc_efficiency import PerformancesPEMFCStackEfficiency
 from ..components.perf_pemfc_voltage import PerformancesPEMFCStackVoltage
+from ..components.perf_pemfc_waste_heat import PerformancesPEMFCStackWasteHeat
 from ..components.perf_pemfc_layer_voltage import (
     PerformancesPEMFCStackSingleLayerVoltageEmpirical,
     PerformancesPEMFCStackSingleLayerVoltageAnalytical,
@@ -142,6 +143,11 @@ class PerformancesPEMFCStack(om.Group):
             subsys=PerformancesPEMFCStackInFlightEmissions(
                 pemfc_stack_id=pemfc_stack_id, number_of_points=number_of_points
             ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "waste_heat",
+            PerformancesPEMFCStackWasteHeat(number_of_points=number_of_points),
             promotes=["*"],
         )
 

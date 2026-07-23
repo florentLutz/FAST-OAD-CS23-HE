@@ -51,7 +51,7 @@ power_train_components:
     options:
       number_of_tanks: 1
       number_of_power_sources: 1
-      wing_related: True
+      wing_related: False
       compact: True
     position: in_the_rear
   gaseous_hydrogen_tank_1:

@@ -98,6 +98,7 @@ def test_retrofit_twin_otter_pemfc_h2():
     print(residuals)
     problem.write_outputs()
 
+
 def test_retrofit_twin_otter_pemfc_h2_hybrid():
     """Test the overall aircraft design process with wing positioning."""
     logging.basicConfig(level=logging.WARNING)
@@ -130,6 +131,7 @@ def test_retrofit_twin_otter_pemfc_h2_hybrid():
     print(residuals)
     problem.write_outputs()
 
+
 def test_hybrid_dhc_6_hybrid_powertrain_network():
     pt_file_path = DATA_FOLDER_PATH / "turboshaft_pemfc_hybrid_propulsion_retrofit.yml"
     network_file_path = RESULTS_FOLDER_PATH / "dhc_6_h2_hybrid.html"
@@ -141,7 +143,7 @@ def test_hybrid_dhc_6_hybrid_powertrain_network():
         plot_scaling=1.3,
         legend_position="BR",
         legend_scaling=1.3,
-        from_propulsor=False
+        from_propulsor=False,
     )
 
 
@@ -169,8 +171,8 @@ def test_sizing_twin_otter_pemfc_h2():
     problem.read_inputs()
     problem.setup()
 
-    problem.set_val(name="data:weight:aircraft:MTOW", units="kg", val=6000.0)
-    problem.set_val(name="data:geometry:wing:area", units="m**2", val=50.0)
+    problem.set_val(name="data:weight:aircraft:MTOW", units="kg", val=5700.0)
+    problem.set_val(name="data:geometry:wing:area", units="m**2", val=45.0)
 
     om.n2(problem, show_browser=False, outfile=n2_path)
 

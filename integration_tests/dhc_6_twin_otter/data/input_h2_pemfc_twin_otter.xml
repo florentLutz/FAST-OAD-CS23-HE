@@ -1,9 +1,9 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">4.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
-      <luggage_mass_design units="kg" is_input="True">49.8<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
-      <range units="NM" is_input="True">400.0<!--top-level requirement: design range--></range>
+      <NPAX_design is_input="True">5.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <luggage_mass_design units="kg" is_input="True">58.1<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
+      <range units="NM" is_input="True">200.0<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">75.4<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">182.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">170.0<!--maximum speed at sea level--></v_max_sl>
@@ -20,7 +20,7 @@
           <width units="m" is_input="True">0.76</width>
         </doors>
         <luggage>
-          <mass_max units="kg" is_input="True">49.8<!--maximum luggage mass--></mass_max>
+          <mass_max units="kg" is_input="True">66.4<!--maximum luggage mass--></mass_max>
         </luggage>
         <windows>
           <height units="m" is_input="True">0.3</height>
@@ -29,7 +29,7 @@
         </windows>
         <seats>
           <passenger>
-            <NPAX_max is_input="True">4.0<!--maximum seating capability of the aircraft--></NPAX_max>
+            <NPAX_max is_input="True">6.0<!--maximum seating capability of the aircraft--></NPAX_max>
             <count_by_row is_input="True">3.0<!--passenger seats per row--></count_by_row>
             <length units="m" is_input="True">0.7<!--passenger seats length--></length>
           </passenger>
@@ -555,8 +555,8 @@
     </handling_qualities>
     <weight>
       <aircraft>
-        <max_payload units="kg" is_input="True">617.26<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="True">617.26<!--design payload weight--></payload>
+        <max_payload units="kg" is_input="True">823.0<!--max payload weight--></max_payload>
+        <payload units="kg" is_input="True">719.8<!--design payload weight--></payload>
         <CG>
           <aft>
             <MAC_limit is_input="True">0.1<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
@@ -579,7 +579,7 @@
       </airframe>
       <furniture>
         <passenger_seats>
-          <mass units="kg" is_input="True">84.3<!--passenger/pilot seats total mass--></mass>
+          <mass units="kg" is_input="True">112.4<!--passenger/pilot seats total mass--></mass>
         </passenger_seats>
       </furniture>
       <propulsion>
@@ -729,7 +729,7 @@
         </efficiency>
         <pressure_loss>
           <combustion_chamber is_input="True">0.95<!--combustion chamber pressure loss--></combustion_chamber>
-          <inlet is_input="True">0.8<!--flush_inlet total pressure loss--></inlet>
+          <inlet is_input="True">0.8<!--inlet total pressure loss--></inlet>
         </pressure_loss>
       </turboprop>
       <he_power_train>
