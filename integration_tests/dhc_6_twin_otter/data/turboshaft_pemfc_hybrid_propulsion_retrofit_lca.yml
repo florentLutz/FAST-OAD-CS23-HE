@@ -106,6 +106,103 @@ model:
                 # we don't want to count twice. This means that we don't consider the assembly of the
                 # propeller, resulting in an underestimation.
 
+        planetary_gear_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: planetary_gear_1_production
+        
+            gearbox:
+              amount: data__propulsion__he_power_train__planetary_gear__planetary_gear_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the gearbox,
+                # but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # gearbox, resulting in an underestimation.
+
+        speed_reducer_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: speed_reducer_1_production
+        
+            gearbox:
+              amount: data__propulsion__he_power_train__speed_reducer__speed_reducer_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the gearbox,
+                # but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # gearbox, resulting in an underestimation.
+
+        turboshaft_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: turboshaft_1_production
+        
+            turboshaft:
+              amount: data__propulsion__he_power_train__turboshaft__turboshaft_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                # For all of those we use the weight ration from :cite:`thonemann:2024`
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.127
+        
+                titanium_aluminide:
+                  name: 'titanium production'
+                  loc: 'GLO'
+                  amount: 0.086
+        
+                magnesium_alloy:
+                  name: 'market for magnesium-alloy, AZ91'
+                  loc: 'GLO'
+                  amount: 0.040
+        
+                nickel_alloy:
+                  name: 'market for iron-nickel-chromium alloy'
+                  amount: 0.263
+        
+                metal_matrix_composite: # Also account for ceramic matrix composite as I couldn't find the process
+                  name: 'market for aluminium alloy, metal matrix composite'
+                  amount: 0.483
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+                # turboshaft, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # turboshaft, resulting in an underestimation.
+
+
+        inverter_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: inverter_1_production
+        
+            name: 'inverter production, for electric passenger car'
+            amount: data__propulsion__he_power_train__inverter__inverter_1__mass_per_fu
+
+
         propeller_2:
             custom_attributes:
                 - attribute: "component"
@@ -129,13 +226,13 @@ model:
                 # we don't want to count twice. This means that we don't consider the assembly of the
                 # propeller, resulting in an underestimation.
 
-        speed_reducer_1:
+        planetary_gear_2:
             custom_attributes:
                 - attribute: "component"
-                  value: speed_reducer_1_production
+                  value: planetary_gear_2_production
         
             gearbox:
-              amount: data__propulsion__he_power_train__speed_reducer__speed_reducer_1__mass_per_fu
+              amount: data__propulsion__he_power_train__planetary_gear__planetary_gear_2__mass_per_fu
               unit: kilogram
         
               production:
@@ -177,13 +274,44 @@ model:
                 # we don't want to count twice. This means that we don't consider the assembly of the
                 # gearbox, resulting in an underestimation.
 
-        inverter_1:
+        turboshaft_2:
             custom_attributes:
                 - attribute: "component"
-                  value: inverter_1_production
+                  value: turboshaft_2_production
         
-            name: 'inverter production, for electric passenger car'
-            amount: data__propulsion__he_power_train__inverter__inverter_1__mass_per_fu
+            turboshaft:
+              amount: data__propulsion__he_power_train__turboshaft__turboshaft_2__mass_per_fu
+              unit: kilogram
+        
+              production:
+                # For all of those we use the weight ration from :cite:`thonemann:2024`
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.127
+        
+                titanium_aluminide:
+                  name: 'titanium production'
+                  loc: 'GLO'
+                  amount: 0.086
+        
+                magnesium_alloy:
+                  name: 'market for magnesium-alloy, AZ91'
+                  loc: 'GLO'
+                  amount: 0.040
+        
+                nickel_alloy:
+                  name: 'market for iron-nickel-chromium alloy'
+                  amount: 0.263
+        
+                metal_matrix_composite: # Also account for ceramic matrix composite as I couldn't find the process
+                  name: 'market for aluminium alloy, metal matrix composite'
+                  amount: 0.483
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+                # turboshaft, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # turboshaft, resulting in an underestimation.
 
 
         inverter_2:
@@ -193,6 +321,31 @@ model:
         
             name: 'inverter production, for electric passenger car'
             amount: data__propulsion__he_power_train__inverter__inverter_2__mass_per_fu
+
+
+        fuel_system_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: fuel_system_1_production
+        
+            fuel_system:
+              amount: data__propulsion__he_power_train__fuel_system__fuel_system_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.667
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.333
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the fuel
+                # system, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't count the assembly of the fuel
+                # system, resulting in an underestimation.
 
         dc_aux_load_1:
           custom_attributes:
@@ -530,6 +683,96 @@ model:
             - attribute: "phase"
               value: "manufacturing"
 
+        turboshaft_1:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        turboshaft_2:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_2__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_2__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_2__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_2__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_2__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__turboshaft__turboshaft_2__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
         pemfc_stack_1:
         
             CO2:
@@ -575,6 +818,14 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
+        kerosene_for_mission_production:
+        
+            name: 'market for kerosene'
+            loc: 'RoW'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__manufacturing__he_power_train__kerosene__mass_per_fu
+
         hydrogen_for_mission_production:
         
             hydrogen:
@@ -610,6 +861,96 @@ model:
         custom_attributes:
             - attribute: "phase"
               value: "distribution"
+
+        turboshaft_1:
+        
+            CO2:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        turboshaft_2:
+        
+            CO2:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_2__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_2__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_2__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_2__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_2__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__distribution__he_power_train__turboshaft__turboshaft_2__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
         pemfc_stack_1:
         
@@ -656,6 +997,14 @@ model:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
 
+        kerosene_for_mission_production:
+        
+            name: 'market for kerosene'
+            loc: 'RoW'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__distribution__he_power_train__kerosene__mass_per_fu
+
         hydrogen_for_mission_production:
         
             hydrogen:
@@ -691,6 +1040,102 @@ model:
         custom_attributes:
             - attribute: "phase"
               value: "operation"
+
+        turboshaft_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: turboshaft_1_operation
+        
+            CO2:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        turboshaft_2:
+            custom_attributes:
+                - attribute: "component"
+                  value: turboshaft_2_operation
+        
+            CO2:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_2__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_2__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_2__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_2__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because EcoInvent considers that water released in the atmosphere is considered as water used
+        #    water_vapor: # For some reason this line doesn't seem to affect the impacts and takes a lot of time ?!?
+        #      amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_2__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__operation__he_power_train__turboshaft__turboshaft_2__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
 
         pemfc_stack_1:
             custom_attributes:
@@ -739,6 +1184,17 @@ model:
               categories:
                 - 'air'
                 - 'lower stratosphere + upper troposphere'
+
+        kerosene_for_mission_production:
+            custom_attributes:
+                - attribute: "component"
+                  value: kerosene_for_mission_operation
+        
+            name: 'market for kerosene'
+            loc: 'RoW'
+            # This variable should always exist since we will only add this part to the conf file if
+            # there are batteries and if there are batteries the component that computes this value will be added
+            amount: data__LCA__operation__he_power_train__kerosene__mass_per_fu
 
         hydrogen_for_mission_production:
             custom_attributes:
