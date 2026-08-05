@@ -93,7 +93,12 @@ from .loads.sm_pmsm import (
     LCCSMPMSMCost,
     LCCSMPMSMOperationalCost,
 )
-from .loads.dc_load import SizingDCAuxLoad, PerformancesDCAuxLoad, SlipstreamDCAuxLoad
+from .loads.dc_load import (
+    SizingDCAuxLoad,
+    PerformancesDCAuxLoad,
+    SlipstreamDCAuxLoad,
+    PreLCADCAuxLoad,
+)
 from .propulsor.propeller import (
     SizingPropeller,
     PerformancesPropeller,
@@ -154,6 +159,7 @@ from .source.pemfc import (
     SizingPEMFCStack,
     PerformancesPEMFCStack,
     SlipstreamPEMFCStack,
+    PreLCAPEMFCStack,
     LCCPEMFCStackCost,
     LCCPEMFCStackOperationalCost,
 )
@@ -168,10 +174,12 @@ from .tanks.gaseous_hydrogen_tank import (
     SizingGaseousHydrogenTank,
     PerformancesGaseousHydrogenTank,
     SlipstreamGaseousHydrogenTank,
+    PreLCAGaseousHydrogenTank,
     LCCGaseousHydrogenTankCost,
 )
 from .connectors.h2_fuel_system import (
     SizingH2FuelSystem,
     PerformancesH2FuelSystem,
     SlipstreamH2FuelSystem,
+    PreLCAH2FuelSystem,
 )

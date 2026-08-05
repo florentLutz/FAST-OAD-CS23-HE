@@ -34,6 +34,9 @@ power_train_components:
     options:
       closed_by_default: True
     position: in_the_front
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_front  # "inside_the_wing", "in_the_front", "in_the_back"
   battery_pack_1:
     id: fastga_he.pt_component.battery_pack
     position: in_the_front  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
@@ -43,6 +46,9 @@ power_train_components:
     options:
       closed_by_default: True
     position: in_the_back
+  dc_dc_converter_2:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back  # "inside_the_wing", "in_the_front", "in_the_back"
   battery_pack_2:
     id: fastga_he.pt_component.battery_pack
     position: in_the_back  # "inside_the_wing", "wing_pod", "in_the_front", "in_the_back", "underbelly"
@@ -70,12 +76,18 @@ component_connections:
     target: dc_sspc_1
 
   - source: dc_sspc_1
+    target: dc_dc_converter_1
+
+  - source: dc_dc_converter_1
     target: battery_pack_1
 
   - source: [dc_splitter_1, 2]
     target: dc_sspc_2
 
   - source: dc_sspc_2
+    target: dc_dc_converter_2
+
+  - source: dc_dc_converter_2
     target: battery_pack_2
 
 watcher_file_path: ../results/elec_kodiak_power_train_data.csv

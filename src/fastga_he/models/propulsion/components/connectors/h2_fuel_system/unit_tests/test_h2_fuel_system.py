@@ -25,6 +25,8 @@ from ..components.perf_h2_fuel_input import PerformancesH2FuelSystemInput
 from ..components.perf_h2_total_fuel_flowed import PerformancesTotalH2FuelFlowed
 from ..components.perf_h2_fuel_system import PerformancesH2FuelSystem
 
+from ..components.pre_lca_prod_weight_per_fu import PreLCAH2FuelSystemProdWeightPerFU
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..constants import POSSIBLE_POSITION
@@ -459,3 +461,25 @@ def test_sizing_h2_fuel_system():
 
     problem.check_partials(compact_print=True)
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_weight_per_fu():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass",
+        units="kg",
+        val=2.23,
+    )
+    ivc.add_output("data:environmental_impact:aircraft_per_fu", val=1e-6)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        PreLCAH2FuelSystemProdWeightPerFU(h2_fuel_system_id="h2_fuel_system_1"), ivc
+    )
+
+    assert problem.get_val(
+        "data:propulsion:he_power_train:H2_fuel_system:h2_fuel_system_1:mass_per_fu", units="kg"
+    ) == pytest.approx(2.23e-06, rel=1e-3)
+
+    problem.check_partials(compact_print=True)

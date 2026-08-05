@@ -146,6 +146,87 @@ PROPELLER = {
     ETA: 0.8,
     CTRL_PARAM: ["rpm_mission"],
 }
+DUCTED_FAN = {
+    ID: "fastga_he.pt_component.ducted_fan",
+    CN: "DuctedFan",
+    CN_ID: "ducted_fan_id",
+    CT: "ducted_fan",
+    ATT: None,
+    PT: ["convergence:*", "true_airspeed", "altitude", "density", "alpha", "settings:*"],
+    # NOTE (2026-07-09): SPT was [] (empty) while slipstream_ducted_fan_new.py was just a stub
+    # that zeroed delta_Cl/delta_Cd/delta_Cm and only needed "thrust" (force-connected separately
+    # in delta_from_pt_file.py, not via SPT promotion). Now that SlipstreamDuctedFan computes a
+    # real (if simple) delta_Cl from actuator-disk theory, it needs these promoted into its group
+    # boundary the same way the propeller's SPT does -- "data:*" covers the new wing_chord_ref
+    # sizing output plus data:geometry:wing:area; "true_airspeed"/"density" feed the
+    # thrust-loading/induction-factor computation; "cl_wing_clean" (computed once upstream in
+    # delta_from_pt_file.py, = CL0_wing + CL_alpha_wing*alpha) is reused directly as the unblown
+    # lift term instead of building a ducted-fan-specific one.
+    # "alpha" is deliberately NOT listed here (unlike the propeller's SPT) -- an earlier version
+    # of SlipstreamDuctedFan read "alpha" + "data:aerodynamics:wing:*:CL_alpha" directly instead
+    # of "cl_wing_clean", but that meant "cl_wing_clean" was promoted here without ever being
+    # consumed, and OpenMDAO's promotes_inputs crashed at setup with "'promotes_inputs' failed to
+    # find any matches ... ['cl_wing_clean']" the first time this ran through the real pipeline.
+    # Every name listed here MUST match an actual input declared in
+    # _SlipstreamDuctedFanDeltas.setup() -- keep this list and that file's add_input() calls in
+    # sync if either changes.
+    SPT: ["data:*", "true_airspeed", "cl_wing_clean", "density"],
+    PTS: [],
+    IN: [(None, "rpm"), (None, "shaft_power_in")],
+    OUT: None,
+    CTC: "propulsor",
+    MP: [
+        {"rpm": "1/min"},
+        {"shaft_power_in": "kW"},
+        {"torque_in": "N*m"},
+        {"power_coefficient": None},
+        # NOTE (2026-07-08): "advance_ratio" added back (per-point, unclipped J) now that
+        # perf_maximum.py exposes it as a real promoted output (was only advance_ratio_max
+        # before) -- lets the per-mission-point CSV show which points sit outside perf_rpm.py's
+        # J_MIN/J_MAX=[0.01, 1.20] surrogate training range, same purpose as the propeller's own
+        # "advance_ratio" MP entry above.
+        {"advance_ratio": None},
+        # NOTE (2026-07-02): "efficiency", "tip_mach", "thrust_coefficient" are STILL removed from
+        # this list -- the mission performances watcher hard-connects every entry here to an
+        # actual OpenMDAO output (see mission_vector.py), and none of those 3 exist as standalone
+        # promoted variables in the current ducted fan conversion (perf_maximum.py only exposes
+        # the *_max scalars for tip_mach, and there's no dedicated efficiency/thrust_coefficient
+        # component yet, unlike the propeller's perf_efficiency.py/perf_thrust_coefficient.py).
+        # Leaving them in would crash mission setup() with an unresolved connection. Add them back
+        # once the equivalent components are built.
+    ],
+    SMP: [
+        {"delta_Cd": None},
+        {"delta_Cl": None},
+        {"delta_Cm": None},
+    ],
+    ICON: "propeller",
+    ICON_SIZE: 15,
+    RSD: ["power_coefficient"],
+    SETS_V: False,
+    IO_INDEP_V: False,
+    V_TO_SET: [],
+    P_TO_SET: [("shaft_power_in", "in")],
+    I_TO_SET: [],
+    # SFR (Slipstream Flaps Required) is False here (was True, copied from the propeller entry
+    # without adjusting it) -- SFR=True makes the generic slipstream assembler
+    # (delta_from_pt_file.py) set a "flaps_position" option on SlipstreamDuctedFan, which this
+    # component's current implementation (slipstream_ducted_fan_new.py, a stub that zeroes
+    # delta_Cl/delta_Cd/delta_Cm) never declares -- crashed with "Option 'flaps_position' cannot
+    # be set because it has not been declared." Set back to True (and add a real flaps_position
+    # option to SlipstreamDuctedFan) once a flap-dependent slipstream model is built for this
+    # component, mirroring the propeller's slipstream_section_lift.py.
+    SFR: False,
+    SWL: True,
+    DST_W: [],
+    PCT_W: ["on_the_wing"],
+    DST_W_F: [],
+    PCT_W_F: [],
+    VARIES_MASS: False,
+    VARIESN_T_MASS: False,
+    ETA: 0.8,
+    CTRL_PARAM: ["rpm_mission"],
+}
 PMSM = {
     ID: "fastga_he.pt_component.pmsm",
     CN: "PMSM",
@@ -1187,6 +1268,7 @@ PEMFC_STACK = {
 
 KNOWN_COMPONENTS = [
     PROPELLER,
+    DUCTED_FAN,
     PMSM,
     SM_PMSM,
     INVERTER,

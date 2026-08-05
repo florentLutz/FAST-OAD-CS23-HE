@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 import pytest
@@ -1400,7 +1400,7 @@ def test_weight_per_fu():
 
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:mass_per_fu", units="kg"
-    ) == pytest.approx(0.000172, rel=1e-3)
+    ) == pytest.approx(8.6e-5, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1409,9 +1409,9 @@ def test_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output(
-        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:dc_power_in_rating",
-        364.0,
-        units="kW",
+        "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:number_of_switches",
+        4.0,
+        units="unitless",
     )
 
     problem = run_system(
@@ -1422,7 +1422,7 @@ def test_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
         units="USD",
-    ) == pytest.approx(6617.61, rel=1e-2)
+    ) == pytest.approx(4600.0, rel=1e-2)
 
     problem.check_partials(compact_print=True)
 
@@ -1432,7 +1432,7 @@ def test_operational_cost():
 
     ivc.add_output(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:purchase_cost",
-        6617.61,
+        4600.0,
         units="USD",
     )
 
@@ -1444,6 +1444,6 @@ def test_operational_cost():
     assert problem.get_val(
         "data:propulsion:he_power_train:DC_DC_converter:dc_dc_converter_1:operational_cost",
         units="USD/yr",
-    ) == pytest.approx(441.17, rel=1e-2)
+    ) == pytest.approx(38.3, rel=1e-2)
 
     problem.check_partials(compact_print=True)

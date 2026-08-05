@@ -69,6 +69,23 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
             val=np.nan,
         )
 
+        self.add_input(
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_igbt_switching_losses",
+            val=1.0,
+            units="unitless",
+            desc="K-factor to tune turn-on and turn-off switching losses in the IGBT module",
+        )
+        self.add_input(
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_diode_switching_losses",
+            val=1.0,
+            units="unitless",
+            desc="K-factor to tune the reverse recovery switching losses in the diode",
+        )
+
         self.add_output(
             "switching_losses_diode",
             units="W",
@@ -82,12 +99,19 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
             shape=number_of_points,
         )
 
+    def setup_partials(self):
+        rectifier_id = self.options["rectifier_id"]
+        number_of_points = self.options["number_of_points"]
+
         self.declare_partials(
             of="switching_losses_diode",
             wrt=[
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_rr:a",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_rr:b",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_rr:c",
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":k_diode_switching_losses",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -110,6 +134,9 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_off:a",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_off:b",
                 "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_off:c",
+                "settings:propulsion:he_power_train:rectifier:"
+                + rectifier_id
+                + ":k_igbt_switching_losses",
             ],
             method="exact",
             rows=np.arange(number_of_points),
@@ -141,6 +168,17 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         f_sw = inputs["switching_frequency"]
         current = inputs["ac_current_rms_in_one_phase"]
 
+        k_losses_igbt = inputs[
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_igbt_switching_losses"
+        ]
+        k_losses_diode = inputs[
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_diode_switching_losses"
+        ]
+
         loss_diode = f_sw * (a_rr / 2.0 + b_rr * current / np.pi + c_rr * current**2.0 / 4)
         loss_igbt = f_sw * (
             (a_on + a_off) / 2.0
@@ -149,8 +187,8 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         )
         # a, b and c coefficient on reference were interpolated to give the results in J
 
-        outputs["switching_losses_diode"] = loss_diode
-        outputs["switching_losses_IGBT"] = loss_igbt
+        outputs["switching_losses_diode"] = loss_diode * k_losses_diode
+        outputs["switching_losses_IGBT"] = loss_igbt * k_losses_igbt
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         rectifier_id = self.options["rectifier_id"]
@@ -170,54 +208,81 @@ class PerformancesSwitchingLosses(om.ExplicitComponent):
         f_sw = inputs["switching_frequency"]
         current = inputs["ac_current_rms_in_one_phase"]
 
+        k_losses_igbt = inputs[
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_igbt_switching_losses"
+        ]
+        k_losses_diode = inputs[
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_diode_switching_losses"
+        ]
+
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_rr:a",
-        ] = f_sw / 2.0
+        ] = f_sw / 2.0 * k_losses_diode
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_rr:b",
-        ] = f_sw * current / np.pi
+        ] = f_sw * current / np.pi * k_losses_diode
         partials[
             "switching_losses_diode",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_rr:c",
-        ] = f_sw * current**2.0 / 4
+        ] = f_sw * current**2.0 / 4 * k_losses_diode
         partials["switching_losses_diode", "switching_frequency"] = (
             a_rr / 2.0 + b_rr * current / np.pi + c_rr * current**2.0 / 4
+        ) * k_losses_diode
+        partials["switching_losses_diode", "ac_current_rms_in_one_phase"] = (
+            f_sw * (b_rr / np.pi + c_rr * current / 2.0) * k_losses_diode
         )
-        partials["switching_losses_diode", "ac_current_rms_in_one_phase"] = f_sw * (
-            b_rr / np.pi + c_rr * current / 2.0
-        )
+        partials[
+            "switching_losses_diode",
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_diode_switching_losses",
+        ] = f_sw * (a_rr / 2.0 + b_rr * current / np.pi + c_rr * current**2.0 / 4)
 
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_on:a",
-        ] = f_sw / 2.0
+        ] = f_sw / 2.0 * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_off:a",
-        ] = f_sw / 2.0
+        ] = f_sw / 2.0 * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_on:b",
-        ] = f_sw * current / np.pi
+        ] = f_sw * current / np.pi * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_off:b",
-        ] = f_sw * current / np.pi
+        ] = f_sw * current / np.pi * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_on:c",
-        ] = f_sw * current**2.0 / 4
+        ] = f_sw * current**2.0 / 4 * k_losses_igbt
         partials[
             "switching_losses_IGBT",
             "data:propulsion:he_power_train:rectifier:" + rectifier_id + ":energy_off:c",
-        ] = f_sw * current**2.0 / 4
+        ] = f_sw * current**2.0 / 4 * k_losses_igbt
         partials["switching_losses_IGBT", "switching_frequency"] = (
             (a_on + a_off) / 2.0
             + (b_on + b_off) * current / np.pi
             + (c_on + c_off) * current**2.0 / 4
+        ) * k_losses_igbt
+        partials["switching_losses_IGBT", "ac_current_rms_in_one_phase"] = (
+            f_sw * ((b_on + b_off) / np.pi + (c_on + c_off) * current / 2.0) * k_losses_igbt
         )
-        partials["switching_losses_IGBT", "ac_current_rms_in_one_phase"] = f_sw * (
-            (b_on + b_off) / np.pi + (c_on + c_off) * current / 2.0
+        partials[
+            "switching_losses_IGBT",
+            "settings:propulsion:he_power_train:rectifier:"
+            + rectifier_id
+            + ":k_igbt_switching_losses",
+        ] = f_sw * (
+            (a_on + a_off) / 2.0
+            + (b_on + b_off) * current / np.pi
+            + (c_on + c_off) * current**2.0 / 4
         )

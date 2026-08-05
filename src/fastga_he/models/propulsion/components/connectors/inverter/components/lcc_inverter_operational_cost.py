@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -8,7 +8,8 @@ import openmdao.api as om
 
 class LCCInverterOperationalCost(om.ExplicitComponent):
     """
-    Computation of the inverter annual operational cost.
+    Computation of the inverter annual operational cost. This is estimated based on the lifespan of
+    the IGBTs given by :cite:`sathik:2018`, which is indicated as the throttling component.
     """
 
     def initialize(self):
@@ -28,40 +29,63 @@ class LCCInverterOperationalCost(om.ExplicitComponent):
             val=np.nan,
         )
         self.add_input(
+            name="data:TLAR:flight_hours_per_year",
+            val=283.2,
+            units="h",
+            desc="Expected number of hours flown per year",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan",
-            units="yr",
-            val=15.0,
-            desc="Expected lifetime of the inverter, typically around 15 year",
+            units="h",
+            val=3.4e4,
+            desc="Expected lifetime of the inverter, based on the lifespan of the IGBTs",
         )
 
         self.add_output(
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             units="USD/yr",
-            val=350.0,
+            val=28.7,
         )
 
+    def setup_partials(self):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         inverter_id = self.options["inverter_id"]
 
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"
+        ]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
+
+        # The operational cost is estimated by dividing the purchase cost by the IGBT lifetime
+        # expectancy. However, for annual flight hours below 2000 h, the component is unlikely to
+        # reach its end-of-life within the operational period of 15 years.
         outputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost"] = (
-            inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"]
-            / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
+            purchase_cost * flight_hours_per_year / lifespan
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         inverter_id = self.options["inverter_id"]
 
+        purchase_cost = inputs[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"
+        ]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
+
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost",
-        ] = 1.0 / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"]
+        ] = flight_hours_per_year / lifespan
+
+        partials[
+            "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
+            "data:TLAR:flight_hours_per_year",
+        ] = purchase_cost / lifespan
 
         partials[
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":operational_cost",
             "data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan",
-        ] = (
-            -inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":purchase_cost"]
-            / inputs["data:propulsion:he_power_train:inverter:" + inverter_id + ":lifespan"] ** 2.0
-        )
+        ] = -purchase_cost * flight_hours_per_year / lifespan**2.0

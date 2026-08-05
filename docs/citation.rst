@@ -48,3 +48,12 @@ Bibtex
     abstract = {Hybrid aircraft offer a logical pathway to reducing aviation’s carbon footprint. The thermal management system (TMS) is often neglected in the assessment of hybrid aircraft performance despite it being of major importance. After presenting the TMS architecture, this study performs a sensitivity analysis on several parameters of a retrofitted hybrid fuel cell aircraft’s performance considering three hierarchical levels: the aircraft, fuel cell system, and TMS component levels. The objective is to minimize CO2 emissions while maintaining performance standards. At the aircraft level, cruise speed, fuel cell power, and ISA temperature were varied to assess their impact. Lowering cruise speeds can decrease emissions by up to 49%, and increasing fuel cell power from 200 kW to 400 kW cuts emissions by 18%. Higher ambient air temperatures also significantly impact cooling demands. As for the fuel cell, lowering the stack temperature from 80 °C to 60 °C increases the required cooling air mass flow by 49% and TMS drag by 40%. At the TMS component level, different coolants and HEX offset-fin geometries reveal low-to-moderate effects on emissions and payload. Overall, despite some design choice improvements, the conventional aircraft is still able to achieve lower CO2 emissions per unit payload.},
     doi = {10.3390/aerospace12050377}
     }
+
+
+References
+==========
+
+The technical documentation of individual models cites the scientific literature they are based
+on (e.g. :cite:`de:2019`). The full list of references is collected below.
+
+.. bibliography::

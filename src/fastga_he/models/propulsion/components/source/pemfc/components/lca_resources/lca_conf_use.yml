@@ -1,0 +1,47 @@
+ANCHOR_COMPONENT_NAME:
+    custom_attributes:
+        - attribute: "component"
+          value: ANCHOR_COMPONENT_NAME
+
+    CO2:
+      amount: ANCHOR_EMISSION_CO2
+      name: 'carbon dioxide, fossil'  # this is a biosphere process
+      categories:
+        - 'air'
+        - 'lower stratosphere + upper troposphere'
+
+    CO:
+      amount: ANCHOR_EMISSION_CO
+      name: 'carbon monoxide, fossil'
+      categories:
+        - 'air'
+        - 'lower stratosphere + upper troposphere'
+
+    SOx:
+      amount: ANCHOR_EMISSION_SOx
+      name: 'sulfur dioxide'
+      categories:
+        - 'air'
+        - 'lower stratosphere + upper troposphere'
+
+    NOx:
+      amount: ANCHOR_EMISSION_NOx
+      name: 'nitrogen oxides'
+      categories:
+        - 'air'
+        - 'lower stratosphere + upper troposphere'
+
+#    Commented for now because LCIA methods don't know how to handle vapor for now :cite:`evon:2026`
+#    water_vapor:
+#      amount: ANCHOR_EMISSION_H2O
+#      name: 'water'
+#      categories:
+#        - 'air'
+#        - 'lower stratosphere + upper troposphere'
+
+    PM:
+      amount: ANCHOR_EMISSION_HC
+      name: 'Particulate Matter, < 2.5 um'
+      categories:
+        - 'air'
+        - 'lower stratosphere + upper troposphere'

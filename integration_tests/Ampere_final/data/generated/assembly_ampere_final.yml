@@ -1,0 +1,1734 @@
+title: Generated ONERA Ampere assembly -- N_FANS_TOTAL=40, N_CLUSTERS=10 (GROUP_SIZE=4), hybrid PEMFC+H2+battery per cluster, NO NOSE ENGINE (generate_ampere_case.py)
+power_train_components:
+  # ===== Cluster 1 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_1:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_1:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_11:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_1:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_12:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_1:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_1:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_1:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_1:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_1:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_1:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_1:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_1:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_1:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_2:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_2:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_2:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_2:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_3:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_3:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_3:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_3:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_3:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_4:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_4:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_4:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_4:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_4:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 2 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_2:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_2:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_2:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_21:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_2:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_22:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_2:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_2:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_2:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_2:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_5:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_5:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_5:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_5:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_5:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_6:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_6:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_6:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_6:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_6:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_7:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_7:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_7:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_7:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_7:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_8:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_8:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_8:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_8:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_8:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 3 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_3:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_3:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_3:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_31:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_3:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_32:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_3:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_3:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_3:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_3:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_9:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_9:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_9:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_9:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_9:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_10:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_10:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_10:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_10:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_10:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_11:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_11:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_11:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_11:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_11:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_12:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_12:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_12:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_12:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_12:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 4 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_4:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_4:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_4:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_41:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_4:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_42:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_4:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_4:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_4:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_4:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_13:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_13:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_13:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_13:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_13:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_14:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_14:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_14:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_14:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_14:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_15:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_15:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_15:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_15:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_15:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_16:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_16:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_16:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_16:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_16:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 5 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_5:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_5:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_5:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_51:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_5:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_52:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_5:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_5:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_5:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_5:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_17:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_17:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_17:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_17:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_17:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_18:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_18:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_18:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_18:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_18:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_19:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_19:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_19:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_19:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_19:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_20:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_20:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_20:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_20:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_20:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 6 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_6:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_6:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_6:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_61:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_6:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_62:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_6:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_6:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_6:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_6:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_21:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_21:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_21:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_21:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_21:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_22:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_22:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_22:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_22:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_22:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_23:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_23:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_23:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_23:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_23:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_24:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_24:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_24:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_24:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_24:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 7 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_7:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_7:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_7:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_71:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_7:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_72:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_7:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_7:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_7:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_7:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_25:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_25:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_25:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_25:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_25:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_26:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_26:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_26:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_26:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_26:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_27:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_27:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_27:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_27:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_27:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_28:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_28:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_28:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_28:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_28:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 8 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_8:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_8:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_8:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_81:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_8:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_82:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_8:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_8:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_8:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_8:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_29:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_29:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_29:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_29:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_29:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_30:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_30:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_30:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_30:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_30:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_31:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_31:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_31:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_31:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_31:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_32:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_32:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_32:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_32:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_32:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 9 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_9:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_9:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_9:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_91:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_9:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_92:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_9:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_9:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_9:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_9:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_33:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_33:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_33:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_33:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_33:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_34:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_34:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_34:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_34:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_34:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_35:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_35:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_35:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_35:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_35:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_36:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_36:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_36:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_36:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_36:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  # ===== Cluster 10 (4 EDF + hybrid PEMFC/H2/battery source) =====
+  dc_bus_group_10:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 4
+    position: inside_the_wing
+  harness_central_10:
+    id: fastga_he.pt_component.dc_line
+    position: from_rear_to_front
+  dc_splitter_10:
+    id: fastga_he.pt_component.dc_splitter
+    position: in_the_back
+  dc_sspc_101:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_front
+  battery_pack_10:
+    id: fastga_he.pt_component.battery_pack
+    position: in_the_front
+  dc_sspc_102:
+    id: fastga_he.pt_component.dc_sspc
+    options:
+      closed_by_default: true
+    position: in_the_back
+  dc_dc_converter_10:
+    id: fastga_he.pt_component.dc_dc_converter
+    position: in_the_back
+  pemfc_stack_10:
+    id: fastga_he.pt_component.pemfc_stack
+    position: in_the_back
+  h2_fuel_system_10:
+    id: fastga_he.pt_component.h2_fuel_system
+    options:
+      number_of_tanks: 1
+      number_of_power_sources: 1
+      wing_related: false
+      compact: false
+    position: in_the_rear
+  gaseous_hydrogen_tank_10:
+    id: fastga_he.pt_component.gaseous_hydrogen_tank
+    position: in_the_cabin
+  ducted_fan_37:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_37:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_37:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_37:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_37:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_38:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_38:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_38:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_38:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_38:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_39:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_39:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_39:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_39:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_39:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+  ducted_fan_40:
+    id: fastga_he.pt_component.ducted_fan
+    position: on_the_wing
+  motor_40:
+    id: fastga_he.pt_component.sm_pmsm
+    position: on_the_wing
+  inverter_40:
+    id: fastga_he.pt_component.inverter
+    position: inside_the_wing
+  dc_bus_40:
+    id: fastga_he.pt_component.dc_bus
+    options:
+      number_of_inputs: 1
+      number_of_outputs: 1
+    position: inside_the_wing
+  harness_40:
+    id: fastga_he.pt_component.dc_line
+    position: from_wing_to_nose
+component_connections:
+  - source: ducted_fan_1
+    target: motor_1
+  - source: motor_1
+    target: inverter_1
+  - source: inverter_1
+    target: [dc_bus_1, 1]
+  - source: [dc_bus_1, 1]
+    target: harness_1
+  - source: harness_1
+    target: [dc_bus_group_1, 1]
+  - source: ducted_fan_2
+    target: motor_2
+  - source: motor_2
+    target: inverter_2
+  - source: inverter_2
+    target: [dc_bus_2, 1]
+  - source: [dc_bus_2, 1]
+    target: harness_2
+  - source: harness_2
+    target: [dc_bus_group_1, 2]
+  - source: ducted_fan_3
+    target: motor_3
+  - source: motor_3
+    target: inverter_3
+  - source: inverter_3
+    target: [dc_bus_3, 1]
+  - source: [dc_bus_3, 1]
+    target: harness_3
+  - source: harness_3
+    target: [dc_bus_group_1, 3]
+  - source: ducted_fan_4
+    target: motor_4
+  - source: motor_4
+    target: inverter_4
+  - source: inverter_4
+    target: [dc_bus_4, 1]
+  - source: [dc_bus_4, 1]
+    target: harness_4
+  - source: harness_4
+    target: [dc_bus_group_1, 4]
+  - source: [dc_bus_group_1, 1]
+    target: harness_central_1
+  - source: harness_central_1
+    target: dc_splitter_1
+  - source: [dc_splitter_1, 1]
+    target: dc_sspc_11
+  - source: dc_sspc_11
+    target: battery_pack_1
+  - source: [dc_splitter_1, 2]
+    target: dc_sspc_12
+  - source: dc_sspc_12
+    target: dc_dc_converter_1
+  - source: dc_dc_converter_1
+    target: pemfc_stack_1
+  - source: pemfc_stack_1
+    target: [h2_fuel_system_1, 1]
+  - source: [h2_fuel_system_1, 1]
+    target: gaseous_hydrogen_tank_1
+  - source: ducted_fan_5
+    target: motor_5
+  - source: motor_5
+    target: inverter_5
+  - source: inverter_5
+    target: [dc_bus_5, 1]
+  - source: [dc_bus_5, 1]
+    target: harness_5
+  - source: harness_5
+    target: [dc_bus_group_2, 1]
+  - source: ducted_fan_6
+    target: motor_6
+  - source: motor_6
+    target: inverter_6
+  - source: inverter_6
+    target: [dc_bus_6, 1]
+  - source: [dc_bus_6, 1]
+    target: harness_6
+  - source: harness_6
+    target: [dc_bus_group_2, 2]
+  - source: ducted_fan_7
+    target: motor_7
+  - source: motor_7
+    target: inverter_7
+  - source: inverter_7
+    target: [dc_bus_7, 1]
+  - source: [dc_bus_7, 1]
+    target: harness_7
+  - source: harness_7
+    target: [dc_bus_group_2, 3]
+  - source: ducted_fan_8
+    target: motor_8
+  - source: motor_8
+    target: inverter_8
+  - source: inverter_8
+    target: [dc_bus_8, 1]
+  - source: [dc_bus_8, 1]
+    target: harness_8
+  - source: harness_8
+    target: [dc_bus_group_2, 4]
+  - source: [dc_bus_group_2, 1]
+    target: harness_central_2
+  - source: harness_central_2
+    target: dc_splitter_2
+  - source: [dc_splitter_2, 1]
+    target: dc_sspc_21
+  - source: dc_sspc_21
+    target: battery_pack_2
+  - source: [dc_splitter_2, 2]
+    target: dc_sspc_22
+  - source: dc_sspc_22
+    target: dc_dc_converter_2
+  - source: dc_dc_converter_2
+    target: pemfc_stack_2
+  - source: pemfc_stack_2
+    target: [h2_fuel_system_2, 1]
+  - source: [h2_fuel_system_2, 1]
+    target: gaseous_hydrogen_tank_2
+  - source: ducted_fan_9
+    target: motor_9
+  - source: motor_9
+    target: inverter_9
+  - source: inverter_9
+    target: [dc_bus_9, 1]
+  - source: [dc_bus_9, 1]
+    target: harness_9
+  - source: harness_9
+    target: [dc_bus_group_3, 1]
+  - source: ducted_fan_10
+    target: motor_10
+  - source: motor_10
+    target: inverter_10
+  - source: inverter_10
+    target: [dc_bus_10, 1]
+  - source: [dc_bus_10, 1]
+    target: harness_10
+  - source: harness_10
+    target: [dc_bus_group_3, 2]
+  - source: ducted_fan_11
+    target: motor_11
+  - source: motor_11
+    target: inverter_11
+  - source: inverter_11
+    target: [dc_bus_11, 1]
+  - source: [dc_bus_11, 1]
+    target: harness_11
+  - source: harness_11
+    target: [dc_bus_group_3, 3]
+  - source: ducted_fan_12
+    target: motor_12
+  - source: motor_12
+    target: inverter_12
+  - source: inverter_12
+    target: [dc_bus_12, 1]
+  - source: [dc_bus_12, 1]
+    target: harness_12
+  - source: harness_12
+    target: [dc_bus_group_3, 4]
+  - source: [dc_bus_group_3, 1]
+    target: harness_central_3
+  - source: harness_central_3
+    target: dc_splitter_3
+  - source: [dc_splitter_3, 1]
+    target: dc_sspc_31
+  - source: dc_sspc_31
+    target: battery_pack_3
+  - source: [dc_splitter_3, 2]
+    target: dc_sspc_32
+  - source: dc_sspc_32
+    target: dc_dc_converter_3
+  - source: dc_dc_converter_3
+    target: pemfc_stack_3
+  - source: pemfc_stack_3
+    target: [h2_fuel_system_3, 1]
+  - source: [h2_fuel_system_3, 1]
+    target: gaseous_hydrogen_tank_3
+  - source: ducted_fan_13
+    target: motor_13
+  - source: motor_13
+    target: inverter_13
+  - source: inverter_13
+    target: [dc_bus_13, 1]
+  - source: [dc_bus_13, 1]
+    target: harness_13
+  - source: harness_13
+    target: [dc_bus_group_4, 1]
+  - source: ducted_fan_14
+    target: motor_14
+  - source: motor_14
+    target: inverter_14
+  - source: inverter_14
+    target: [dc_bus_14, 1]
+  - source: [dc_bus_14, 1]
+    target: harness_14
+  - source: harness_14
+    target: [dc_bus_group_4, 2]
+  - source: ducted_fan_15
+    target: motor_15
+  - source: motor_15
+    target: inverter_15
+  - source: inverter_15
+    target: [dc_bus_15, 1]
+  - source: [dc_bus_15, 1]
+    target: harness_15
+  - source: harness_15
+    target: [dc_bus_group_4, 3]
+  - source: ducted_fan_16
+    target: motor_16
+  - source: motor_16
+    target: inverter_16
+  - source: inverter_16
+    target: [dc_bus_16, 1]
+  - source: [dc_bus_16, 1]
+    target: harness_16
+  - source: harness_16
+    target: [dc_bus_group_4, 4]
+  - source: [dc_bus_group_4, 1]
+    target: harness_central_4
+  - source: harness_central_4
+    target: dc_splitter_4
+  - source: [dc_splitter_4, 1]
+    target: dc_sspc_41
+  - source: dc_sspc_41
+    target: battery_pack_4
+  - source: [dc_splitter_4, 2]
+    target: dc_sspc_42
+  - source: dc_sspc_42
+    target: dc_dc_converter_4
+  - source: dc_dc_converter_4
+    target: pemfc_stack_4
+  - source: pemfc_stack_4
+    target: [h2_fuel_system_4, 1]
+  - source: [h2_fuel_system_4, 1]
+    target: gaseous_hydrogen_tank_4
+  - source: ducted_fan_17
+    target: motor_17
+  - source: motor_17
+    target: inverter_17
+  - source: inverter_17
+    target: [dc_bus_17, 1]
+  - source: [dc_bus_17, 1]
+    target: harness_17
+  - source: harness_17
+    target: [dc_bus_group_5, 1]
+  - source: ducted_fan_18
+    target: motor_18
+  - source: motor_18
+    target: inverter_18
+  - source: inverter_18
+    target: [dc_bus_18, 1]
+  - source: [dc_bus_18, 1]
+    target: harness_18
+  - source: harness_18
+    target: [dc_bus_group_5, 2]
+  - source: ducted_fan_19
+    target: motor_19
+  - source: motor_19
+    target: inverter_19
+  - source: inverter_19
+    target: [dc_bus_19, 1]
+  - source: [dc_bus_19, 1]
+    target: harness_19
+  - source: harness_19
+    target: [dc_bus_group_5, 3]
+  - source: ducted_fan_20
+    target: motor_20
+  - source: motor_20
+    target: inverter_20
+  - source: inverter_20
+    target: [dc_bus_20, 1]
+  - source: [dc_bus_20, 1]
+    target: harness_20
+  - source: harness_20
+    target: [dc_bus_group_5, 4]
+  - source: [dc_bus_group_5, 1]
+    target: harness_central_5
+  - source: harness_central_5
+    target: dc_splitter_5
+  - source: [dc_splitter_5, 1]
+    target: dc_sspc_51
+  - source: dc_sspc_51
+    target: battery_pack_5
+  - source: [dc_splitter_5, 2]
+    target: dc_sspc_52
+  - source: dc_sspc_52
+    target: dc_dc_converter_5
+  - source: dc_dc_converter_5
+    target: pemfc_stack_5
+  - source: pemfc_stack_5
+    target: [h2_fuel_system_5, 1]
+  - source: [h2_fuel_system_5, 1]
+    target: gaseous_hydrogen_tank_5
+  - source: ducted_fan_21
+    target: motor_21
+  - source: motor_21
+    target: inverter_21
+  - source: inverter_21
+    target: [dc_bus_21, 1]
+  - source: [dc_bus_21, 1]
+    target: harness_21
+  - source: harness_21
+    target: [dc_bus_group_6, 1]
+  - source: ducted_fan_22
+    target: motor_22
+  - source: motor_22
+    target: inverter_22
+  - source: inverter_22
+    target: [dc_bus_22, 1]
+  - source: [dc_bus_22, 1]
+    target: harness_22
+  - source: harness_22
+    target: [dc_bus_group_6, 2]
+  - source: ducted_fan_23
+    target: motor_23
+  - source: motor_23
+    target: inverter_23
+  - source: inverter_23
+    target: [dc_bus_23, 1]
+  - source: [dc_bus_23, 1]
+    target: harness_23
+  - source: harness_23
+    target: [dc_bus_group_6, 3]
+  - source: ducted_fan_24
+    target: motor_24
+  - source: motor_24
+    target: inverter_24
+  - source: inverter_24
+    target: [dc_bus_24, 1]
+  - source: [dc_bus_24, 1]
+    target: harness_24
+  - source: harness_24
+    target: [dc_bus_group_6, 4]
+  - source: [dc_bus_group_6, 1]
+    target: harness_central_6
+  - source: harness_central_6
+    target: dc_splitter_6
+  - source: [dc_splitter_6, 1]
+    target: dc_sspc_61
+  - source: dc_sspc_61
+    target: battery_pack_6
+  - source: [dc_splitter_6, 2]
+    target: dc_sspc_62
+  - source: dc_sspc_62
+    target: dc_dc_converter_6
+  - source: dc_dc_converter_6
+    target: pemfc_stack_6
+  - source: pemfc_stack_6
+    target: [h2_fuel_system_6, 1]
+  - source: [h2_fuel_system_6, 1]
+    target: gaseous_hydrogen_tank_6
+  - source: ducted_fan_25
+    target: motor_25
+  - source: motor_25
+    target: inverter_25
+  - source: inverter_25
+    target: [dc_bus_25, 1]
+  - source: [dc_bus_25, 1]
+    target: harness_25
+  - source: harness_25
+    target: [dc_bus_group_7, 1]
+  - source: ducted_fan_26
+    target: motor_26
+  - source: motor_26
+    target: inverter_26
+  - source: inverter_26
+    target: [dc_bus_26, 1]
+  - source: [dc_bus_26, 1]
+    target: harness_26
+  - source: harness_26
+    target: [dc_bus_group_7, 2]
+  - source: ducted_fan_27
+    target: motor_27
+  - source: motor_27
+    target: inverter_27
+  - source: inverter_27
+    target: [dc_bus_27, 1]
+  - source: [dc_bus_27, 1]
+    target: harness_27
+  - source: harness_27
+    target: [dc_bus_group_7, 3]
+  - source: ducted_fan_28
+    target: motor_28
+  - source: motor_28
+    target: inverter_28
+  - source: inverter_28
+    target: [dc_bus_28, 1]
+  - source: [dc_bus_28, 1]
+    target: harness_28
+  - source: harness_28
+    target: [dc_bus_group_7, 4]
+  - source: [dc_bus_group_7, 1]
+    target: harness_central_7
+  - source: harness_central_7
+    target: dc_splitter_7
+  - source: [dc_splitter_7, 1]
+    target: dc_sspc_71
+  - source: dc_sspc_71
+    target: battery_pack_7
+  - source: [dc_splitter_7, 2]
+    target: dc_sspc_72
+  - source: dc_sspc_72
+    target: dc_dc_converter_7
+  - source: dc_dc_converter_7
+    target: pemfc_stack_7
+  - source: pemfc_stack_7
+    target: [h2_fuel_system_7, 1]
+  - source: [h2_fuel_system_7, 1]
+    target: gaseous_hydrogen_tank_7
+  - source: ducted_fan_29
+    target: motor_29
+  - source: motor_29
+    target: inverter_29
+  - source: inverter_29
+    target: [dc_bus_29, 1]
+  - source: [dc_bus_29, 1]
+    target: harness_29
+  - source: harness_29
+    target: [dc_bus_group_8, 1]
+  - source: ducted_fan_30
+    target: motor_30
+  - source: motor_30
+    target: inverter_30
+  - source: inverter_30
+    target: [dc_bus_30, 1]
+  - source: [dc_bus_30, 1]
+    target: harness_30
+  - source: harness_30
+    target: [dc_bus_group_8, 2]
+  - source: ducted_fan_31
+    target: motor_31
+  - source: motor_31
+    target: inverter_31
+  - source: inverter_31
+    target: [dc_bus_31, 1]
+  - source: [dc_bus_31, 1]
+    target: harness_31
+  - source: harness_31
+    target: [dc_bus_group_8, 3]
+  - source: ducted_fan_32
+    target: motor_32
+  - source: motor_32
+    target: inverter_32
+  - source: inverter_32
+    target: [dc_bus_32, 1]
+  - source: [dc_bus_32, 1]
+    target: harness_32
+  - source: harness_32
+    target: [dc_bus_group_8, 4]
+  - source: [dc_bus_group_8, 1]
+    target: harness_central_8
+  - source: harness_central_8
+    target: dc_splitter_8
+  - source: [dc_splitter_8, 1]
+    target: dc_sspc_81
+  - source: dc_sspc_81
+    target: battery_pack_8
+  - source: [dc_splitter_8, 2]
+    target: dc_sspc_82
+  - source: dc_sspc_82
+    target: dc_dc_converter_8
+  - source: dc_dc_converter_8
+    target: pemfc_stack_8
+  - source: pemfc_stack_8
+    target: [h2_fuel_system_8, 1]
+  - source: [h2_fuel_system_8, 1]
+    target: gaseous_hydrogen_tank_8
+  - source: ducted_fan_33
+    target: motor_33
+  - source: motor_33
+    target: inverter_33
+  - source: inverter_33
+    target: [dc_bus_33, 1]
+  - source: [dc_bus_33, 1]
+    target: harness_33
+  - source: harness_33
+    target: [dc_bus_group_9, 1]
+  - source: ducted_fan_34
+    target: motor_34
+  - source: motor_34
+    target: inverter_34
+  - source: inverter_34
+    target: [dc_bus_34, 1]
+  - source: [dc_bus_34, 1]
+    target: harness_34
+  - source: harness_34
+    target: [dc_bus_group_9, 2]
+  - source: ducted_fan_35
+    target: motor_35
+  - source: motor_35
+    target: inverter_35
+  - source: inverter_35
+    target: [dc_bus_35, 1]
+  - source: [dc_bus_35, 1]
+    target: harness_35
+  - source: harness_35
+    target: [dc_bus_group_9, 3]
+  - source: ducted_fan_36
+    target: motor_36
+  - source: motor_36
+    target: inverter_36
+  - source: inverter_36
+    target: [dc_bus_36, 1]
+  - source: [dc_bus_36, 1]
+    target: harness_36
+  - source: harness_36
+    target: [dc_bus_group_9, 4]
+  - source: [dc_bus_group_9, 1]
+    target: harness_central_9
+  - source: harness_central_9
+    target: dc_splitter_9
+  - source: [dc_splitter_9, 1]
+    target: dc_sspc_91
+  - source: dc_sspc_91
+    target: battery_pack_9
+  - source: [dc_splitter_9, 2]
+    target: dc_sspc_92
+  - source: dc_sspc_92
+    target: dc_dc_converter_9
+  - source: dc_dc_converter_9
+    target: pemfc_stack_9
+  - source: pemfc_stack_9
+    target: [h2_fuel_system_9, 1]
+  - source: [h2_fuel_system_9, 1]
+    target: gaseous_hydrogen_tank_9
+  - source: ducted_fan_37
+    target: motor_37
+  - source: motor_37
+    target: inverter_37
+  - source: inverter_37
+    target: [dc_bus_37, 1]
+  - source: [dc_bus_37, 1]
+    target: harness_37
+  - source: harness_37
+    target: [dc_bus_group_10, 1]
+  - source: ducted_fan_38
+    target: motor_38
+  - source: motor_38
+    target: inverter_38
+  - source: inverter_38
+    target: [dc_bus_38, 1]
+  - source: [dc_bus_38, 1]
+    target: harness_38
+  - source: harness_38
+    target: [dc_bus_group_10, 2]
+  - source: ducted_fan_39
+    target: motor_39
+  - source: motor_39
+    target: inverter_39
+  - source: inverter_39
+    target: [dc_bus_39, 1]
+  - source: [dc_bus_39, 1]
+    target: harness_39
+  - source: harness_39
+    target: [dc_bus_group_10, 3]
+  - source: ducted_fan_40
+    target: motor_40
+  - source: motor_40
+    target: inverter_40
+  - source: inverter_40
+    target: [dc_bus_40, 1]
+  - source: [dc_bus_40, 1]
+    target: harness_40
+  - source: harness_40
+    target: [dc_bus_group_10, 4]
+  - source: [dc_bus_group_10, 1]
+    target: harness_central_10
+  - source: harness_central_10
+    target: dc_splitter_10
+  - source: [dc_splitter_10, 1]
+    target: dc_sspc_101
+  - source: dc_sspc_101
+    target: battery_pack_10
+  - source: [dc_splitter_10, 2]
+    target: dc_sspc_102
+  - source: dc_sspc_102
+    target: dc_dc_converter_10
+  - source: dc_dc_converter_10
+    target: pemfc_stack_10
+  - source: pemfc_stack_10
+    target: [h2_fuel_system_10, 1]
+  - source: [h2_fuel_system_10, 1]
+    target: gaseous_hydrogen_tank_10
+watcher_file_path: ../results/ampere_final_power_train_data.csv

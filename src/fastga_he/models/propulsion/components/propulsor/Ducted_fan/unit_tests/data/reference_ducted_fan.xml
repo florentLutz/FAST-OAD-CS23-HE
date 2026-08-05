@@ -1,0 +1,74 @@
+<FASTOAD_model>
+    <!--
+    Ducted fan geometry and wing values below are taken from a converged run of the AMPERE case
+    (integration_tests/ampere_final/, ducted_fan_1) so the test exercises the model with a
+    physically plausible, real 40-fan DEP configuration rather than arbitrary numbers.
+    -->
+    <data>
+        <geometry>
+            <wing>
+                <span units="m">14.878805839110456<!--AMPERE case, converged wing span--></span>
+                <area units="m**2">27.970476164466078<!--AMPERE case, converged wing area--></area>
+                <MAC>
+                    <length units="m">1.8346246410740386<!--AMPERE case, converged MAC length--></length>
+                    <at25percent>
+                        <x units="m">2.616060764269595<!--AMPERE case, converged 25%MAC x-position--></x>
+                    </at25percent>
+                </MAC>
+            </wing>
+        </geometry>
+        <aerodynamics>
+            <wing>
+                <low_speed>
+                    <!--
+                    Synthetic (rectangular, taper_ratio=1) chord distribution consistent with the
+                    AMPERE wing area/span above; the converged AMPERE run does not save these
+                    spanwise vectors to its output XML, so they are rebuilt here for this test
+                    rather than copied from a run.
+                    -->
+                    <Y_vector units="m">[0.0, 1.24, 2.48, 3.72, 4.96, 6.2, 7.44]</Y_vector>
+                    <chord_vector units="m">[1.8801, 1.8801, 1.8801, 1.8801, 1.8801, 1.8801, 1.8801]</chord_vector>
+                    <CL_vector>[0.95, 0.93, 0.90, 0.85, 0.78, 0.65, 0.40]</CL_vector>
+                </low_speed>
+            </wing>
+        </aerodynamics>
+        <propulsion>
+            <he_power_train>
+                <ducted_fan>
+                    <ducted_fan_1>
+                        <diameter units="m">0.25<!--AMPERE case, converged fan diameter--></diameter>
+                        <number_blades>11.0<!--AMPERE case, converged blade count--></number_blades>
+                        <blade_chord units="m">0.015<!--AMPERE case, converged blade chord--></blade_chord>
+                        <beta_ref>0.0<!--AMPERE case value--></beta_ref>
+                        <cb_ratio>0.3<!--AMPERE case value--></cb_ratio>
+                        <depth units="m">0.1<!--AMPERE case, converged duct depth--></depth>
+                        <from_LE units="m">0.16666666666666669<!--AMPERE case, converged distance to wing LE--></from_LE>
+                        <CG>
+                            <y_ratio>0.3<!--AMPERE case, converged spanwise station--></y_ratio>
+                        </CG>
+                    </ducted_fan_1>
+                </ducted_fan>
+            </he_power_train>
+        </propulsion>
+    </data>
+    <settings>
+        <propulsion>
+            <he_power_train>
+                <ducted_fan>
+                    <ducted_fan_1>
+                        <k_duct>0.4<!--AMPERE case value--></k_duct>
+                        <interference_factor>1.25<!--AMPERE case value--></interference_factor>
+                        <low_speed>
+                            <reference_velocity units="m/s">30.094974<!--AMPERE case value--></reference_velocity>
+                            <reference_altitude units="m">0.0<!--AMPERE case value--></reference_altitude>
+                        </low_speed>
+                        <cruise>
+                            <reference_velocity units="m/s">47.843292<!--AMPERE case value--></reference_velocity>
+                            <reference_altitude units="m">0.0<!--AMPERE case value--></reference_altitude>
+                        </cruise>
+                    </ducted_fan_1>
+                </ducted_fan>
+            </he_power_train>
+        </propulsion>
+    </settings>
+</FASTOAD_model>

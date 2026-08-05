@@ -1,0 +1,644 @@
+project: pemfc_h2_propulsion
+
+ecoinvent:
+    version: 3.9.1
+    model: cutoff
+
+model:
+    production:
+        custom_attributes:
+            - attribute: "phase"
+              value: "production"
+
+        wing:
+            custom_attributes:
+                - attribute: "component"
+                  value: wing_production
+        
+            name: market for aluminium, cast alloy
+            amount: data__weight__airframe__wing__mass_per_fu
+        
+        fuselage:
+            custom_attributes:
+                - attribute: "component"
+                  value: fuselage_production
+        
+            name: market for aluminium, cast alloy
+            amount: data__weight__airframe__fuselage__mass_per_fu
+        
+        horizontal_tail:
+            custom_attributes:
+                - attribute: "component"
+                  value: horizontal_tail_production
+        
+            name: market for aluminium, cast alloy
+            amount: data__weight__airframe__horizontal_tail__mass_per_fu
+        
+        vertical_tail:
+            custom_attributes:
+                - attribute: "component"
+                  value: vertical_tail_production
+        
+            name: market for aluminium, cast alloy
+            amount: data__weight__airframe__vertical_tail__mass_per_fu
+        
+        flight_controls:
+            custom_attributes:
+                - attribute: "component"
+                  value: flight_controls_production
+        
+            name: 'market for aluminium, cast alloy'
+            amount: data__weight__airframe__flight_controls__mass_per_fu
+        
+        landing_gear:
+            custom_attributes:
+                - attribute: "component"
+                  value: landing_gear_production
+        
+            name: 'market for steel, unalloyed'
+            amount: data__weight__airframe__landing_gear__mass_per_fu
+        
+        assembly:  # Airframe assembly, assumed to be the same as aircraft assembly given the absence of this data in :cite:`thonemann:2024`
+            custom_attributes:
+                - attribute: "component"
+                  value: assembly_production
+        
+            airframe:
+              amount: data__weight__aircraft__OWE_per_fu
+              unit: kilogram
+        
+              assembly:
+                # For all of those we use the value from :cite:`arvidsson:2024` then we do a cross product
+                # with the mass. Originally, data from :cite:`thonemann:2024` were used, but it seemed like
+                # the production of materials was already included and as per :cite:`arvidsson:2024`, most
+                # of the things except electricity can be discarded.
+                electricity:
+                  name: 'market group for electricity, high voltage'
+                  loc: 'RER'
+                  amount: 2.43 # We are giving here the amount for 1 kg of OWE since we are defining a custom process
+        
+                VOC:
+                  amount: 0.0049
+                  name: 'VOC, volatile organic compounds'
+                  categories:
+                    - 'air'
+
+        propeller_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: propeller_1_production
+        
+            propeller:
+              amount: data__propulsion__he_power_train__propeller__propeller_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                composite:
+                  name: 'market for carbon fibre reinforced plastic, injection moulded'
+                  amount: data__propulsion__he_power_train__propeller__propeller_1__material
+        
+                aluminium:
+                  name: 'market for aluminium, cast alloy'
+                  amount: 1.0 - data__propulsion__he_power_train__propeller__propeller_1__material
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+                # propeller, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # propeller, resulting in an underestimation.
+
+        propeller_2:
+            custom_attributes:
+                - attribute: "component"
+                  value: propeller_2_production
+        
+            propeller:
+              amount: data__propulsion__he_power_train__propeller__propeller_2__mass_per_fu
+              unit: kilogram
+        
+              production:
+                composite:
+                  name: 'market for carbon fibre reinforced plastic, injection moulded'
+                  amount: data__propulsion__he_power_train__propeller__propeller_2__material
+        
+                aluminium:
+                  name: 'market for aluminium, cast alloy'
+                  amount: 1.0 - data__propulsion__he_power_train__propeller__propeller_2__material
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the
+                # propeller, but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # propeller, resulting in an underestimation.
+
+        speed_reducer_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: speed_reducer_1_production
+        
+            gearbox:
+              amount: data__propulsion__he_power_train__speed_reducer__speed_reducer_1__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the gearbox,
+                # but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # gearbox, resulting in an underestimation.
+
+        speed_reducer_2:
+            custom_attributes:
+                - attribute: "component"
+                  value: speed_reducer_2_production
+        
+            gearbox:
+              amount: data__propulsion__he_power_train__speed_reducer__speed_reducer_2__mass_per_fu
+              unit: kilogram
+        
+              production:
+                cast_steel:
+                  name: 'market for steel, unalloyed'
+                  amount: 0.750
+        
+                aluminium_alloy:
+                  name: 'market for aluminium, cast alloy'
+                  loc: 'GLO'
+                  amount: 0.250
+        
+                # Originally, values from :cite:`thonemann:2024` were used for the assembly of the gearbox,
+                # but it seems like the value they give also include materials production which
+                # we don't want to count twice. This means that we don't consider the assembly of the
+                # gearbox, resulting in an underestimation.
+
+        inverter_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: inverter_1_production
+        
+            name: 'inverter production, for electric passenger car'
+            amount: data__propulsion__he_power_train__inverter__inverter_1__mass_per_fu
+
+
+        inverter_2:
+            custom_attributes:
+                - attribute: "component"
+                  value: inverter_2_production
+        
+            name: 'inverter production, for electric passenger car'
+            amount: data__propulsion__he_power_train__inverter__inverter_2__mass_per_fu
+
+
+        dc_bus_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: dc_bus_1_production
+        
+            name: 'power distribution unit production, for electric passenger car'
+            amount: data__propulsion__he_power_train__DC_bus__dc_bus_1__mass_per_fu
+
+
+        dc_dc_converter_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: dc_dc_converter_1_production
+        
+            name: 'inverter production, for electric passenger car' # For lack of a better proxy, i'll use that
+            amount: data__propulsion__he_power_train__DC_DC_converter__dc_dc_converter_1__mass_per_fu
+
+
+        pemfc_stack_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: pemfc_stack_1_production
+        
+            pemfc_stack:
+                amount: data__propulsion__he_power_train__PEMFC_stack__pemfc_stack_1__mass_per_fu
+                unit: kilogram
+        
+                production:  # Based on the LCI conducted in :cite:`evon:2026`
+                    tfe:
+                        name: 'market for tetrafluoroethylene'
+                        loc: 'GLO'
+                        amount: 20.97 * 1e-3
+        
+                    acrylonitrile:
+                        name: 'market for acrylonitrile'
+                        loc: 'GLO'
+                        amount: 65.25 * 1e-3
+        
+                    carbon_black:
+                        name: 'market for carbon black'
+                        loc: 'GLO'
+                        amount: 5.93 * 1e-3
+        
+                    thermoforming:
+                        name: 'market for thermoforming of plastic sheets'
+                        loc: 'GLO'
+                        amount: 73.09 * 1e-3
+        
+                    chromium_steel:
+                        name: 'market for steel, chromium steel 18/8'
+                        loc: 'GLO'
+                        amount: 641.92 * 1e-3
+        
+                    chromium_coating:
+                        name: 'market for hard chromium coat, electroplating, steel substrate, 0.14 mm thickness'
+                        loc: 'GLO'
+                        amount: 3674.71 * 1e-4
+        
+                    steel_drawing:
+                        name: 'market for deep drawing, steel, 650 kN press, single stroke'
+                        loc: 'GLO'
+                        amount: 561.43 * 1e-3
+        
+                    sulfuric_acid:
+                        name: 'market for sulfuric acid'
+                        loc: 'RoW'
+                        amount: 7.1 * 1e-3
+        
+                    titanium_dioxide:
+                        name: 'market for titanium dioxide'
+                        loc: 'RoW'
+                        amount: 1.96 * 1e-3
+        
+                    extrusion:
+                        name: 'market for extrusion, plastic film'
+                        loc: 'GLO'
+                        amount: 18.43 * 1e-3
+        
+                    platinium:
+                        name: 'market for platinum'
+                        loc: 'GLO'
+                        amount: 6.0 * 1e-4 * 1e-3  # 0.6 mg in kg
+        
+                    water:
+                        name: 'market for water, deionised'
+                        loc: 'RoW'
+                        amount: 14.52 * 1e-3
+        
+                    propanol:
+                        name: 'market for 1-propanol'
+                        loc: 'GLO'
+                        amount: 14.33 * 1e-3
+        
+                    polyethylene:
+                        name: 'market for polyethylene, low density, granulate'
+                        loc: 'GLO'
+                        amount: 1.43 * 1e-3
+        
+                    methanol:
+                        name: 'market for methanol'
+                        loc: 'GLO'
+                        amount: 1.59 * 1e-3
+        
+                    silicone:
+                        name: 'market for silicone product'
+                        loc: 'RoW'
+                        amount: 76.06 * 1e-3
+        
+                    aluminium:
+                        name: 'market for aluminium, primary, ingot'
+                        loc: 'RoW'
+                        amount: 118.65 * 1e-3
+        
+                    nylon:
+                        name: 'market for nylon 6-6'
+                        loc: 'RoW'
+                        amount: 8.31 * 1e-3
+        
+                    copper:
+                        name: 'market for copper, cathode'
+                        loc: 'GLO'
+                        amount: 30.64 * 1e-3
+        
+                    nickel:
+                        name: 'market for nickel, class 1'
+                        loc: 'GLO'
+                        amount: 0.052 * 1e-3
+        
+                    gold:
+                        name: 'market for gold'
+                        loc: 'GLO'
+                        amount: 0.05 * 1e-3
+        
+                    moulding:
+                        name: 'market for injection moulding'
+                        loc: 'GLO'
+                        amount: 118.5 * 1e-3
+
+        hydrogen_fuel_system_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: hydrogen_fuel_system_1_production
+        
+            name: 'market for carbon fibre reinforced plastic, injection moulded'
+            amount: data__propulsion__he_power_train__H2_fuel_system__hydrogen_fuel_system_1__mass_per_fu
+        
+            # Fuel system will be assumed to be made purely out of composite.
+
+        gaseous_hydrogen_tank_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: gaseous_hydrogen_tank_1_production
+        
+            name: 'market for carbon fibre reinforced plastic, injection moulded'
+            amount: data__propulsion__he_power_train__gaseous_hydrogen_tank__gaseous_hydrogen_tank_1__mass_per_fu
+        
+            # Tank will be assumed to be made purely out of composite.
+
+
+    manufacturing:
+        custom_attributes:
+            - attribute: "phase"
+              value: "manufacturing"
+
+        pemfc_stack_1:
+        
+            CO2:
+              amount: data__LCA__manufacturing__he_power_train__PEMFC_stack__pemfc_stack_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__manufacturing__he_power_train__PEMFC_stack__pemfc_stack_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__manufacturing__he_power_train__PEMFC_stack__pemfc_stack_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__manufacturing__he_power_train__PEMFC_stack__pemfc_stack_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because LCIA methods don't know how to handle vapor for now :cite:`evon:2026`
+        #    water_vapor:
+        #      amount: data__LCA__manufacturing__he_power_train__PEMFC_stack__pemfc_stack_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__manufacturing__he_power_train__PEMFC_stack__pemfc_stack_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        hydrogen_for_mission_production:
+        
+            hydrogen:
+                amount: data__LCA__manufacturing__he_power_train__hydrogen__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for 700 bar hydrogen so we reconstruct it
+                25_bar_hydrogen:
+                    name: 'market for hydrogen, gaseous'
+                    loc: 'GLO'
+                    amount: 1
+        
+                # This assumes the hydrogen is compressed to 700 bar which might not always be the case,
+                # but at worse we are conservative. Value for the actual energy required to compress
+                # hydrogen is taken from
+                # https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/9013_energy_requirements_for_hydrogen_gas_compression.pdf?Status=Master
+                compression:
+                    name: 'market group for electricity, high voltage'
+                    loc: 'RER'
+                    amount: 2.67
+        
+        # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
+        # with the custom methods possibilities brought by lca-modeller.
+        hydrogen_leakage:
+        
+            amount: data__LCA__manufacturing__he_power_train__hydrogen__leakage_mass_per_fu
+            name: dihydrogen
+            categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+    distribution:
+        custom_attributes:
+            - attribute: "phase"
+              value: "distribution"
+
+        pemfc_stack_1:
+        
+            CO2:
+              amount: data__LCA__distribution__he_power_train__PEMFC_stack__pemfc_stack_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__distribution__he_power_train__PEMFC_stack__pemfc_stack_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__distribution__he_power_train__PEMFC_stack__pemfc_stack_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__distribution__he_power_train__PEMFC_stack__pemfc_stack_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because LCIA methods don't know how to handle vapor for now :cite:`evon:2026`
+        #    water_vapor:
+        #      amount: data__LCA__distribution__he_power_train__PEMFC_stack__pemfc_stack_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__distribution__he_power_train__PEMFC_stack__pemfc_stack_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        hydrogen_for_mission_production:
+        
+            hydrogen:
+                amount: data__LCA__distribution__he_power_train__hydrogen__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for 700 bar hydrogen so we reconstruct it
+                25_bar_hydrogen:
+                    name: 'market for hydrogen, gaseous'
+                    loc: 'GLO'
+                    amount: 1
+        
+                # This assumes the hydrogen is compressed to 700 bar which might not always be the case,
+                # but at worse we are conservative. Value for the actual energy required to compress
+                # hydrogen is taken from
+                # https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/9013_energy_requirements_for_hydrogen_gas_compression.pdf?Status=Master
+                compression:
+                    name: 'market group for electricity, high voltage'
+                    loc: 'RER'
+                    amount: 2.67
+        
+        # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
+        # with the custom methods possibilities brought by lca-modeller.
+        hydrogen_leakage:
+        
+            amount: data__LCA__distribution__he_power_train__hydrogen__leakage_mass_per_fu
+            name: dihydrogen
+            categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+    use:
+        custom_attributes:
+            - attribute: "phase"
+              value: "operation"
+
+        pemfc_stack_1:
+            custom_attributes:
+                - attribute: "component"
+                  value: pemfc_stack_1_operation
+        
+            CO2:
+              amount: data__LCA__operation__he_power_train__PEMFC_stack__pemfc_stack_1__CO2_per_fu
+              name: 'carbon dioxide, fossil'  # this is a biosphere process
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            CO:
+              amount: data__LCA__operation__he_power_train__PEMFC_stack__pemfc_stack_1__CO_per_fu
+              name: 'carbon monoxide, fossil'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            SOx:
+              amount: data__LCA__operation__he_power_train__PEMFC_stack__pemfc_stack_1__SOx_per_fu
+              name: 'sulfur dioxide'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+            NOx:
+              amount: data__LCA__operation__he_power_train__PEMFC_stack__pemfc_stack_1__NOx_per_fu
+              name: 'nitrogen oxides'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+        
+        #    Commented for now because LCIA methods don't know how to handle vapor for now :cite:`evon:2026`
+        #    water_vapor:
+        #      amount: data__LCA__operation__he_power_train__PEMFC_stack__pemfc_stack_1__H2O_per_fu
+        #      name: 'water'
+        #      categories:
+        #        - 'air'
+        #        - 'lower stratosphere + upper troposphere'
+        
+            PM:
+              amount: data__LCA__operation__he_power_train__PEMFC_stack__pemfc_stack_1__HC_per_fu
+              name: 'Particulate Matter, < 2.5 um'
+              categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+        hydrogen_for_mission_production:
+            custom_attributes:
+                - attribute: "component"
+                  value: hydrogen_for_mission_operation
+        
+            hydrogen:
+                amount: data__LCA__operation__he_power_train__hydrogen__mass_per_fu
+                unit: kilogram
+        
+                # There is no process for 700 bar hydrogen so we reconstruct it
+                25_bar_hydrogen:
+                    name: 'market for hydrogen, gaseous'
+                    loc: 'GLO'
+                    amount: 1
+        
+                # This assumes the hydrogen is compressed to 700 bar which might not always be the case,
+                # but at worse we are conservative. Value for the actual energy required to compress
+                # hydrogen is taken from
+                # https://www.hydrogen.energy.gov/docs/hydrogenprogramlibraries/pdfs/9013_energy_requirements_for_hydrogen_gas_compression.pdf?Status=Master
+                compression:
+                    name: 'market group for electricity, high voltage'
+                    loc: 'RER'
+                    amount: 2.67
+        
+        # Di-hydrogen is a custom process to account for the leakage of hydrogen in the air. It should work
+        # with the custom methods possibilities brought by lca-modeller.
+        hydrogen_leakage:
+            custom_attributes:
+                - attribute: "component"
+                  value: infrastucture_hydrogen_leak_operation
+        
+            amount: data__LCA__operation__he_power_train__hydrogen__leakage_mass_per_fu
+            name: dihydrogen
+            categories:
+                - 'air'
+                - 'lower stratosphere + upper troposphere'
+
+methods:
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'acidification: terrestrial', 'terrestrial acidification potential (TAP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: freshwater', 'freshwater ecotoxicity potential (FETP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: marine', 'marine ecotoxicity potential (METP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ecotoxicity: terrestrial', 'terrestrial ecotoxicity potential (TETP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'energy resources: non-renewable, fossil', 'fossil fuel potential (FFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: freshwater', 'freshwater eutrophication potential (FEP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'eutrophication: marine', 'marine eutrophication potential (MEP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: carcinogenic', 'human toxicity potential (HTPc)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'human toxicity: non-carcinogenic', 'human toxicity potential (HTPnc)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ionising radiation', 'ionising radiation potential (IRP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'land use', 'agricultural land occupation (LOP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'material resources: metals/minerals', 'surplus ore potential (SOP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'ozone depletion', 'ozone depletion potential (ODPinfinite)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'particulate matter formation', 'particulate matter formation potential (PMFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: human health', 'photochemical oxidant formation potential: humans (HOFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'photochemical oxidant formation: terrestrial ecosystems', 'photochemical oxidant formation potential: ecosystems (EOFP)')"
+    - "('ReCiPe 2016 v1.03, midpoint (H)', 'water use', 'water consumption potential (WCP)')"
+    - "('ReCiPe 2016 v1.03, endpoint (H)', 'total: natural resources', 'natural resources')"
+
+custom_methods:
+    - name: "('Custom methods', 'climate change', 'global warming potential (GWP100)')"
+      filepath: "./data/lcia_gwp100_custom.csv"
+      unit: "kg CO2-Eq"
+      source_method: "('ReCiPe 2016 v1.03, midpoint (H)', 'climate change',  'global warming potential (GWP100)')"
+
+    - name: "('Custom methods', 'total: human health', 'human health')"
+      filepath: "./data/lcia_total_human_health_custom.csv"
+      unit: "DALY"
+      source_method: "('ReCiPe 2016 v1.03, endpoint (H)', 'total: human health', 'human health')"
+
+    - name: "('Custom methods', 'total: ecosystem quality', 'ecosystem quality')"
+      filepath: "./data/lcia_total_ecosystem_quality_custom.csv"
+      unit: "Species.year"
+      source_method: "('ReCiPe 2016 v1.03, endpoint (H)', 'total: ecosystem quality', 'ecosystem quality')"
+

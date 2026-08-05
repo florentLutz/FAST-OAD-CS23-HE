@@ -15,6 +15,7 @@ from ..lca_impact import (
     lca_impacts_sun_breakdown,
     lca_impacts_bar_chart_normalised,
     lca_impacts_bar_chart_with_contributors,
+    lca_raw_impact_comparison_advanced,
 )
 
 DATA_FOLDER_PATH = pathlib.Path(__file__).parent / "data_lca_pipistrel"
@@ -141,6 +142,42 @@ def test_lca_bar_chart_absolute_phase_hybrid():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
+def test_lca_bar_chart_absolute_phase_pipistrel_electro():
+    fig = lca_impacts_bar_chart_with_contributors(
+        DATA_FOLDER_PATH / "pipistrel_out_with_lca_reference_cell.xml",
+        name_aircraft="pipistrel Velis Electro",
+        impact_step="normalized",
+        impact_filter_list=[
+            "material_resources_metals_minerals",
+            "ionising_radiation_human_health",
+            "ecotoxicity_freshwater",
+            "human_toxicity_carcinogenic",
+            "energy_resources_non-renewable",
+            "climate_change",
+        ],
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": [
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+            "Use phase": "electricity_for_mission",
+            "Propeller": "propeller_1",
+        },
+    )
+    fig.update_layout(title_text=None, height=800, width=1200)
+    fig.show()
+
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="This test is not meant to run in Github Actions.")
 def test_lca_bar_chart_normalized_comparison_with_heavy():
     fig = lca_impacts_bar_chart_simple(
         [
@@ -252,7 +289,7 @@ def test_lca_bar_chart_normalized_comparison_with_heavy_btf_both():
 
     pdf_path = FIGURE_FOLDER_PATH / "pipistrel_velis_vs_heavy.pdf"
 
-    write = True
+    write = False
 
     if write:
         fig.update_layout(title=None)
@@ -326,5 +363,39 @@ def test_lca_bar_chart_relative_contribution_reference():
     fig["layout"]["yaxis"]["tickfont"]["size"] = 20
     fig["layout"]["xaxis"]["title"]["font"]["size"] = 20
     fig["layout"]["xaxis"]["tickfont"]["size"] = 20
+
+    fig.show()
+
+
+def test_compare_impacts_designs_with_contributor():
+    fig = lca_raw_impact_comparison_advanced(
+        [
+            DATA_FOLDER_PATH / "pipistrel_electro_lca_out_recipe_fr_mix_btf.xml",
+            DATA_FOLDER_PATH / "pipistrel_electro_heavy_lca_out_recipe_fr_mix_btf.xml",
+        ],
+        names_aircraft=[
+            "Pipistrel Velis Electro<br>(composite version, buy-to-fly=1.5)",
+            "Pipistrel Velis Electro<br>(metallic version, buy-to-fly=7.5)",
+        ],
+        impact_category="climate change",
+        aggregate_and_sort_contributor={
+            "Airframe": "airframe",
+            "Battery pack": ["battery_pack_1", "battery_pack_2"],
+            "Others": [
+                "motor_1",
+                "inverter_1",
+                "harness_1",
+                "dc_sspc_1",
+                "dc_sspc_2",
+                "dc_splitter_1",
+                "dc_bus_1",
+                "manufacturing",
+                "distribution",
+            ],
+            "Use phase": "electricity_for_mission",
+            "Propeller": "propeller_1",
+        },
+    )
+    fig.update_layout(width=1000)
 
     fig.show()

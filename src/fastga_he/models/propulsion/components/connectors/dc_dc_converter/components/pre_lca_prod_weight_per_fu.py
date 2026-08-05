@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2022 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -36,12 +36,18 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
             desc="Number of aircraft required for a functional unit",
         )
         self.add_input(
+            name="data:TLAR:flight_hours_per_year",
+            val=283.2,
+            units="h",
+            desc="Expected number of hours flown per year",
+        )
+        self.add_input(
             name="data:propulsion:he_power_train:DC_DC_converter:"
             + dc_dc_converter_id
             + ":lifespan",
-            units="yr",
-            val=15.0,
-            desc="Expected lifetime of the DC_DC_converter, typically around 15 year",
+            units="h",
+            val=3.4e4,
+            desc="Expected lifetime of the DC_DC_converter, based on the lifespan of the IGBTs",
         )
         self.add_input(
             name="data:TLAR:aircraft_lifespan",
@@ -58,6 +64,9 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
             val=1e-6,
             desc="Mass of the DC_DC_converter required for a functional unit",
         )
+
+    def setup_partials(self):
+        dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
         self.declare_partials(
             of="*",
@@ -76,6 +85,7 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
                 + dc_dc_converter_id
                 + ":lifespan",
                 "data:TLAR:aircraft_lifespan",
+                "data:TLAR:flight_hours_per_year",
             ],
             method="fd",
         )
@@ -83,41 +93,39 @@ class PreLCADCDCConverterProdWeightPerFU(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
+        mass = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"
+        ]
+        aircraft_per_fu = inputs["data:environmental_impact:aircraft_per_fu"]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+        ]
+        aircraft_lifespan = inputs["data:TLAR:aircraft_lifespan"]
+
         outputs[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu"
-        ] = (
-            inputs["data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"]
-            * inputs["data:environmental_impact:aircraft_per_fu"]
-            * np.ceil(
-                inputs["data:TLAR:aircraft_lifespan"]
-                / inputs[
-                    "data:propulsion:he_power_train:DC_DC_converter:"
-                    + dc_dc_converter_id
-                    + ":lifespan"
-                ]
-            )
-        )
+        ] = mass * aircraft_per_fu * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         dc_dc_converter_id = self.options["dc_dc_converter_id"]
 
+        mass = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"
+        ]
+        aircraft_per_fu = inputs["data:environmental_impact:aircraft_per_fu"]
+        flight_hours_per_year = inputs["data:TLAR:flight_hours_per_year"]
+        lifespan = inputs[
+            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
+        ]
+        aircraft_lifespan = inputs["data:TLAR:aircraft_lifespan"]
+
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu",
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass",
-        ] = inputs["data:environmental_impact:aircraft_per_fu"] * np.ceil(
-            inputs["data:TLAR:aircraft_lifespan"]
-            / inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
-            ]
-        )
+        ] = aircraft_per_fu * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)
+
         partials[
             "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass_per_fu",
             "data:environmental_impact:aircraft_per_fu",
-        ] = inputs[
-            "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":mass"
-        ] * np.ceil(
-            inputs["data:TLAR:aircraft_lifespan"]
-            / inputs[
-                "data:propulsion:he_power_train:DC_DC_converter:" + dc_dc_converter_id + ":lifespan"
-            ]
-        )
+        ] = mass * np.ceil(aircraft_lifespan * flight_hours_per_year / lifespan)

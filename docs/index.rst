@@ -43,6 +43,7 @@ Contents
    License <license>
    Authors <authors>
    Powertrain Builder <pt_builder>
+   Application examples <examples/index>
    Citation <citation>
    Changelog <changelog>
    API Reference <api/modules>

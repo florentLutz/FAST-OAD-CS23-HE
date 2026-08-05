@@ -1,0 +1,3 @@
+from .perf_ducted_fan_new import PerformancesDuctedFan
+from .sizing_ducted_fan_new import SizingDuctedFan
+from .slipstream_ducted_fan_new import SlipstreamDuctedFan

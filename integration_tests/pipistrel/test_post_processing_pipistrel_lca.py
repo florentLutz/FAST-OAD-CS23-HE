@@ -86,7 +86,7 @@ def test_visualize_mass_divergence_long_lifespan_cell():
         go.Scatter(
             x=battery_energy_density,
             y=mtow,
-            name="MTOW [kg]",
+            name="MTOM [kg]",
             yaxis="y1",
             line=dict(color="black", width=3),
             marker={
@@ -125,7 +125,7 @@ def test_visualize_mass_divergence_long_lifespan_cell():
     fig.update_layout(
         # title="Evolution of battery mass and MTOW with battery energy density",
         xaxis=dict(title="Battery energy density [Wh/kg]", range=[60, None]),
-        yaxis=dict(title="MTOW, Battery mass [kg]"),
+        yaxis=dict(title="MTOM, Battery mass [kg]"),
         template="plotly_white",
         font=dict(size=20),
         height=800,

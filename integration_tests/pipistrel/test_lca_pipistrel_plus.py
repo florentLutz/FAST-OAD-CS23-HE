@@ -360,7 +360,7 @@ def test_post_process_results_pipistrel_plus():
         showarrow=False,
         xanchor="right",
         yanchor="bottom",
-        font=dict(size=17, color="black"),
+        font=dict(size=22, color="black"),
         align="right",
     )
     _draw_arrow(
@@ -378,7 +378,7 @@ def test_post_process_results_pipistrel_plus():
         showarrow=False,
         xanchor="center",
         yanchor="top",
-        font=dict(size=17, color="black"),
+        font=dict(size=22, color="black"),
         align="center",
     )
 
@@ -389,7 +389,7 @@ def test_post_process_results_pipistrel_plus():
         showarrow=False,
         xanchor="center",
         yanchor="top",
-        font=dict(size=17, color="black"),
+        font=dict(size=22, color="black"),
         align="center",
     )
 
@@ -400,7 +400,7 @@ def test_post_process_results_pipistrel_plus():
         showarrow=False,
         xanchor="center",
         yanchor="top",
-        font=dict(size=17, color="black"),
+        font=dict(size=22, color="black"),
         align="center",
     )
 
@@ -416,10 +416,12 @@ def test_post_process_results_pipistrel_plus():
     if write:
         fig.update_layout(title=None)
         pdf_path = "results/pipistrel_plus_soc_start_variation.pdf"
+        svg_path = "results/pipistrel_plus_soc_start_variation.svg"
 
         pio.write_image(fig, pdf_path, width=1900, height=900)
         time.sleep(3)
         pio.write_image(fig, pdf_path, width=1900, height=900)
+        pio.write_image(fig, svg_path, width=1900, height=900)
 
 
 def test_lca_pipistrel_plus_plus_high_bed_cell():

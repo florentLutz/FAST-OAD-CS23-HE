@@ -1,4 +1,4 @@
-project: hybrid_propulsion_with_lca
+project: FAST-OAD-CS23-HE project
 
 ecoinvent:
     version: 3.9.1
