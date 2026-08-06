@@ -1257,7 +1257,12 @@ def lca_raw_impact_comparison_advanced(
         ].value[0]
 
         for available_component, contribution in available_components_and_contribution.items():
-            component_contribution = contribution[un_beautified_impact] * normalization_coefficient
+            if un_beautified_impact in contribution:
+                component_contribution = (
+                    contribution[un_beautified_impact] * normalization_coefficient
+                )
+            else:
+                component_contribution = 0.0
 
             if available_component not in component_contribution_on_each_aircraft:
                 component_contribution_on_each_aircraft[available_component] = {

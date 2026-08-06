@@ -247,6 +247,14 @@
         </wing>
       </slipstream>
     </aerodynamics>
+    <environmental_impact>
+      <delivery>
+        <distance units="km">8000.0</distance>
+      </delivery>
+      <line_test>
+        <duration units="h">10.0</duration>
+      </line_test>
+    </environmental_impact>
     <propulsion>
       <he_power_train>
         <thrust_distribution is_input="True">[1.0, 1.0]</thrust_distribution>
@@ -292,6 +300,23 @@
             </tube>
           </dc_dc_converter_1>
         </DC_DC_converter>
+        <H2_fuel_system>
+          <hydrogen_fuel_system_1>
+            <pipe_pressure units="bar">700.0</pipe_pressure>
+            <dimension>
+              <inner_diameter units="m">0.037</inner_diameter>
+              <insulation_thickness units="m">0.005</insulation_thickness>
+              <length units="m">2.0</length>
+              <overall_diameter units="m">0.05</overall_diameter>
+              <pipe_diameter units="m">0.04</pipe_diameter>
+            </dimension>
+            <material>
+              <density units="kg/m**3">7700.0</density>
+              <insulation_density units="kg/m**3">160.0</insulation_density>
+              <yield_strength units="MPa">240.0</yield_strength>
+            </material>
+          </hydrogen_fuel_system_1>
+        </H2_fuel_system>
         <PEMFC_stack>
           <pemfc_stack_1>
             <area_ohmic_resistance units="ohm*m**2" is_input="True">1e-06<!--Area ohmic resistance of the single-layered PEMFC--></area_ohmic_resistance>
@@ -300,23 +325,6 @@
             <number_of_layers is_input="True">1600.0<!--length: 3.428e-3 m per layer 1600 underbelly, 750 front, 970 rear--></number_of_layers>
           </pemfc_stack_1>
         </PEMFC_stack>
-        <H2_fuel_system>
-          <hydrogen_fuel_system_1>
-            <pipe_pressure units="bar">700.</pipe_pressure>
-            <dimension>
-                <pipe_diameter units="m">0.04</pipe_diameter>
-                <inner_diameter units="m">0.037</inner_diameter>
-                <insulation_thickness units="m">0.005</insulation_thickness>
-                <overall_diameter units="m">0.05</overall_diameter>
-                <length units="m">2.0</length>
-            </dimension>
-            <material>
-                <yield_strength units="MPa">240</yield_strength>
-                <density units="kg/m**3">7700</density>
-                <insulation_density units="kg/m**3">160</insulation_density>
-            </material>
-          </hydrogen_fuel_system_1>
-        </H2_fuel_system>
         <SM_PMSM>
           <motor_1>
             <bearing_diameter units="m" is_input="True">0.03<!--The motor bearing bore diameter--></bearing_diameter>
@@ -545,6 +553,7 @@
             <from_LE units="m" is_input="True">1.444<!--Distance between the propeller and the leading edge--></from_LE>
             <input_mass units="kg" is_input="True">61.2<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <material>0.0</material>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <CG>
@@ -559,6 +568,7 @@
             <from_LE units="m" is_input="True">1.444<!--Distance between the propeller and the leading edge--></from_LE>
             <input_mass units="kg" is_input="True">61.2<!--Propeller mass as an input, because of some convention adopted, it must be a different variable than the actual weight--></input_mass>
             <installation_angle units="rad" is_input="True">0.0<!--Diameter of the propeller as a ratio of the wing chord behind the propeller--></installation_angle>
+            <material>0.0</material>
             <rpm_mission units="1/min" is_input="True">2000.0<!--RPM of the propeller for the points--></rpm_mission>
             <solidity is_input="True">0.2<!--Solidity of the propeller--></solidity>
             <CG>
