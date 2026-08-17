@@ -294,7 +294,7 @@ class IOMixin:
         if self.state.undo_stack is None:
             return
         snapshot = make_snapshot(self.state)
-        self.state.undo_stack.push(snapshot)
+        self.state.undo_stack.push_undo(snapshot)
         self._refresh_undo_redo_buttons()
 
     def _restore_from_snapshot(self, snapshot: dict):
@@ -386,7 +386,7 @@ class IOMixin:
         if self.state.undo_stack is None or not self.state.undo_stack.can_redo:
             return
 
-        # Capture current state onto the undo stack directly (bypassing push()
+        # Capture current state onto the undo stack directly (bypassing push_undo()
         # which would wipe the redo stack).
         current_snapshot = make_snapshot(self.state)
         self.state.undo_stack._undo.append(current_snapshot)

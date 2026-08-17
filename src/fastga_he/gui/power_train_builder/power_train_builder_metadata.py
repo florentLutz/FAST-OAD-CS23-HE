@@ -44,15 +44,15 @@ def _map_possible_component_types_to_icons() -> dict:
 
     :return: A dictionary of the form ``{icon_key: [component_type, …]}``.
     """
-    component_type_to_icon_key_map = {}
+    icon_key_to_component_type_map = {}
     for component in KNOWN_COMPONENTS:
         component_type = component["components_type"]
         icon_key = component["icon_for_network_graph"]
-        if icon_key not in component_type_to_icon_key_map:
-            component_type_to_icon_key_map[icon_key] = [component_type]
+        if icon_key not in icon_key_to_component_type_map:
+            icon_key_to_component_type_map[icon_key] = [component_type]
         else:
-            component_type_to_icon_key_map[icon_key].append(component_type)
-    return component_type_to_icon_key_map
+            icon_key_to_component_type_map[icon_key].append(component_type)
+    return icon_key_to_component_type_map
 
 
 # ============================================================================
@@ -146,11 +146,14 @@ def _read_constant_from_ast(constants_file_path: Path, variable_name: str):
         return None, False
 
     try:
+        # Extract the source code of the constants.py file
         source_code = constants_file_path.read_text(encoding="utf-8")
+        # Convert the source code into an AST (Abstract Syntax Tree)
         syntax_tree = ast.parse(source_code)
     except (OSError, SyntaxError):
         return None, False
-
+    # Walk through each variable assignment in the AST and return the value of the possible
+    # choices for the given variable name if found.
     for syntax_node in ast.walk(syntax_tree):
         if isinstance(syntax_node, ast.Assign) and any(
             isinstance(target_node, ast.Name) and target_node.id == variable_name
@@ -233,7 +236,7 @@ def _get_performance_component_names(
     option_results: dict = {}
 
     # Build a reverse map: OM_components_name -> components_type
-    open_mdao_name_to_component_type = {
+    openmdao_name_to_component_type = {
         component["OM_components_name"]: component["components_type"]
         for component in KNOWN_COMPONENTS
     }
@@ -250,7 +253,7 @@ def _get_performance_component_names(
                         continue
 
                     stripped_class_name = import_alias.name.removeprefix("Performances")
-                    component_type = open_mdao_name_to_component_type.get(stripped_class_name)
+                    component_type = openmdao_name_to_component_type.get(stripped_class_name)
                     if component_type is None:
                         continue
 

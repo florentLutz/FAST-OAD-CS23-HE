@@ -159,7 +159,7 @@ class ConfigPanelMixin:
     # Options table
     # -----------------------------------------------------------------------
 
-    def _refresh_options_table(self, node_type: str, overrides: dict = None):
+    def _refresh_options_table(self, node_type: str, overrides: dict = {}):
         """
         Rebuild the Options section of the config panel for a given node type.
 
@@ -171,8 +171,7 @@ class ConfigPanelMixin:
         :param overrides: Optional ``{option_name: current_value}`` mapping used
             to pre-populate widgets with previously saved values.
         """
-        if overrides is None:
-            overrides = {}
+
         options_definition = self.state.possible_options.get(node_type, {})
         option_names = list(options_definition.keys())
         opt_values = []

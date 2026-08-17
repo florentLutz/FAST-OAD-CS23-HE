@@ -582,63 +582,63 @@ class PowertrainBuilderLauncher:
                 handler._refresh_connections_table(current_selected_node_index)
 
                 # Log applied state
-                edge_data_snapshot = state.edge_source.data if state.edge_source is not None else {}
-                all_placed_names = list(state.placed_nodes_source.data.get("name", []))
-                connection_log_entries = []
-                for edge_index in range(len(edge_data_snapshot.get("starting_node_index", []))):
-                    starting_node_index = edge_data_snapshot["starting_node_index"][edge_index]
-                    ending_node_index = edge_data_snapshot["ending_node_index"][edge_index]
-                    if (
-                        starting_node_index == current_selected_node_index
-                        or ending_node_index == current_selected_node_index
-                    ):
-                        connected_node_index = (
-                            ending_node_index
-                            if starting_node_index == current_selected_node_index
-                            else starting_node_index
-                        )
-                        connected_node_name = (
-                            all_placed_names[connected_node_index]
-                            if connected_node_index < len(all_placed_names)
-                            else f"node_{connected_node_index}"
-                        )
-                        my_port_kind = (
-                            edge_data_snapshot["starting_port_kind"][edge_index]
-                            if starting_node_index == current_selected_node_index
-                            else edge_data_snapshot["ending_port_kind"][edge_index]
-                        )
-                        my_port_label = (
-                            edge_data_snapshot["starting_port_label"][edge_index]
-                            if starting_node_index == current_selected_node_index
-                            else edge_data_snapshot["ending_port_label"][edge_index]
-                        )
-                        connected_port_kind = (
-                            edge_data_snapshot["ending_port_kind"][edge_index]
-                            if starting_node_index == current_selected_node_index
-                            else edge_data_snapshot["starting_port_kind"][edge_index]
-                        )
-                        connected_port_label = (
-                            edge_data_snapshot["ending_port_label"][edge_index]
-                            if starting_node_index == current_selected_node_index
-                            else edge_data_snapshot["starting_port_label"][edge_index]
-                        )
-                        connection_log_entries.append(
-                            {
-                                "my_port": f"{my_port_kind}:{my_port_label}",
-                                "connected_to_node": connected_node_name,
-                                "connected_to_port": f"{connected_port_kind}:{connected_port_label}",
-                            }
-                        )
-
-                _LOGGER.info(
-                    "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
-                    current_selected_node_index,
-                    new_node_name_id,
-                    new_node_type,
-                    new_position,
-                    options_json_string,
-                    json.dumps(connection_log_entries),
-                )
+                # edge_data_snapshot = state.edge_source.data if state.edge_source is not None else {}
+                # all_placed_names = list(state.placed_nodes_source.data.get("name", []))
+                # connection_log_entries = []
+                # for edge_index in range(len(edge_data_snapshot.get("starting_node_index", []))):
+                #     starting_node_index = edge_data_snapshot["starting_node_index"][edge_index]
+                #     ending_node_index = edge_data_snapshot["ending_node_index"][edge_index]
+                #     if (
+                #         starting_node_index == current_selected_node_index
+                #         or ending_node_index == current_selected_node_index
+                #     ):
+                #         connected_node_index = (
+                #             ending_node_index
+                #             if starting_node_index == current_selected_node_index
+                #             else starting_node_index
+                #         )
+                #         connected_node_name = (
+                #             all_placed_names[connected_node_index]
+                #             if connected_node_index < len(all_placed_names)
+                #             else f"node_{connected_node_index}"
+                #         )
+                #         my_port_kind = (
+                #             edge_data_snapshot["starting_port_kind"][edge_index]
+                #             if starting_node_index == current_selected_node_index
+                #             else edge_data_snapshot["ending_port_kind"][edge_index]
+                #         )
+                #         my_port_label = (
+                #             edge_data_snapshot["starting_port_label"][edge_index]
+                #             if starting_node_index == current_selected_node_index
+                #             else edge_data_snapshot["ending_port_label"][edge_index]
+                #         )
+                #         connected_port_kind = (
+                #             edge_data_snapshot["ending_port_kind"][edge_index]
+                #             if starting_node_index == current_selected_node_index
+                #             else edge_data_snapshot["starting_port_kind"][edge_index]
+                #         )
+                #         connected_port_label = (
+                #             edge_data_snapshot["ending_port_label"][edge_index]
+                #             if starting_node_index == current_selected_node_index
+                #             else edge_data_snapshot["starting_port_label"][edge_index]
+                #         )
+                #         connection_log_entries.append(
+                #             {
+                #                 "my_port": f"{my_port_kind}:{my_port_label}",
+                #                 "connected_to_node": connected_node_name,
+                #                 "connected_to_port": f"{connected_port_kind}:{connected_port_label}",
+                #             }
+                #         )
+                #
+                # _LOGGER.info(
+                #     "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
+                #     current_selected_node_index,
+                #     new_node_name_id,
+                #     new_node_type,
+                #     new_position,
+                #     options_json_string,
+                #     json.dumps(connection_log_entries),
+                # )
                 handler._mark_unsaved()
 
             state.apply_button.on_click(apply_node_configurations)

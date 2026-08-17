@@ -61,7 +61,7 @@ class UndoStack:
     # Public API
     # ------------------------------------------------------------------
 
-    def push(self, snapshot: dict) -> None:
+    def push_undo(self, snapshot: dict) -> None:
         """
         Push *snapshot* onto the undo stack and clear the redo stack.
 
