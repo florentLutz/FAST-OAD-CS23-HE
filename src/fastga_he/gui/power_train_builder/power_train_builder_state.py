@@ -13,7 +13,6 @@ they all operate on the same objects.
 around a circular node icon.
 """
 
-import math
 from dataclasses import dataclass, field
 
 import bokeh.models as bkmodel
@@ -36,86 +35,6 @@ BUTTON_SELECTED_COLOR_TYPE = "primary"  # Selected button state (blue highlight)
 
 NODE_SELECT_COLOR = "#FFD700"  # Gold colour for the selected-node overlay (semi-transparent).
 _EMPTY = ""
-
-
-# ============================================================================
-# Port placement
-# ============================================================================
-
-
-def compute_ports(
-    center_x: float,
-    center_y: float,
-    node_radius: float = NODE_RADIUS,
-    port_radius: float = PORT_RADIUS,
-    number_of_outputs: int = 0,
-    number_of_inputs: int = 0,
-    spread_angle_degrees: float = 120.0,
-    gap_pixels: float = 20.0,
-) -> dict:
-    """
-    Place port balls evenly around a circular node.
-
-    Output ports fan around the top half (centred at −90°);
-    input ports fan around the bottom half (centred at +90°).
-
-    :param center_x: Node centre x in canvas coordinates.
-    :param center_y: Node centre y in canvas coordinates.
-    :param node_radius: Radius of the node circle in data-units / pixels.
-    :param port_radius: Radius of each port ball in data-units / pixels.
-    :param number_of_outputs: Number of output (source) ports.
-    :param number_of_inputs: Number of input (target) ports.
-    :param spread_angle_degrees: Angular fan for each half in degrees (default 120).
-    :param gap_pixels: Clearance between the node edge and each port centre in pixels.
-    :return: A dictionary ``{"outputs": [Port, …], "inputs": [Port, …]}`` where
-        each Port is a dict with keys ``index``, ``kind``, ``angle_deg``, ``x``,
-        and ``y``.
-    """
-    orbit_radius = node_radius + port_radius + gap_pixels
-
-    def _angle_for_port(port_index: int, total_port_count: int, centre_angle: float) -> float:
-        if total_port_count == 1:
-            return centre_angle
-        start_angle = centre_angle - spread_angle_degrees / 2
-        angle_step = spread_angle_degrees / (total_port_count - 1)
-        return start_angle + port_index * angle_step
-
-    def _coordinates_from_angle(angle_degrees: float):
-        angle_radians = math.radians(angle_degrees)
-        return (
-            center_x + orbit_radius * math.cos(angle_radians),
-            center_y + orbit_radius * math.sin(angle_radians),
-        )
-
-    output_ports = []
-    for port_index in range(number_of_outputs):
-        angle_degrees = _angle_for_port(port_index, number_of_outputs, -90.0)
-        port_x, port_y = _coordinates_from_angle(angle_degrees)
-        output_ports.append(
-            {
-                "index": port_index,
-                "kind": "output",
-                "angle_deg": angle_degrees,
-                "x": port_x,
-                "y": port_y,
-            }
-        )
-
-    input_ports = []
-    for port_index in range(number_of_inputs):
-        angle_degrees = _angle_for_port(port_index, number_of_inputs, 90.0)
-        port_x, port_y = _coordinates_from_angle(angle_degrees)
-        input_ports.append(
-            {
-                "index": port_index,
-                "kind": "input",
-                "angle_deg": angle_degrees,
-                "x": port_x,
-                "y": port_y,
-            }
-        )
-
-    return {"outputs": output_ports, "inputs": input_ports}
 
 
 # ============================================================================
