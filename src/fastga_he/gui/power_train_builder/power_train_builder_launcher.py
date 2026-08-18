@@ -16,7 +16,6 @@ Typical usage::
     PowertrainBuilderLauncher.launch(port=5007)
 """
 
-import json
 import logging
 import webbrowser
 
@@ -41,11 +40,9 @@ from .power_train_builder_state import (
     NODE_SELECT_COLOR,
     PALETTE_WIDTH,
     PORT_RADIUS,
-    _EMPTY,
 )
 from .power_train_builder_toolbox import ComponentToolboxConfigurationTableBuilder
 from .power_train_builder_handler import BuilderHandler
-from .power_train_builder_handler_config_panel import _strings_to_option_values
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,8 +58,6 @@ _LEGEND_ENTRIES = [
     ("mechanical", "Mechanical Power", MECHANICAL_POWER_COLOR_CODE),
     ("electricity", "Electrical Current", ELECTRICITY_CURRENT_COLOR_CODE),
 ]
-
-_NO_SYMMETRY_PEER = -1
 
 _LEGEND_X_ICON = 680  # center-x of the PNG icon
 _LEGEND_X_LABEL = 691  # left edge of the text label (icon_center + ~11)
@@ -383,265 +378,10 @@ class PowertrainBuilderLauncher:
             state.placed_nodes_source.on_change("data", _sync_labels)
 
             # ── Wire canvas interaction ───────────────────────────────────────
+            # Also wires the type_select live-refresh callback and the Apply
+            # button (config panel commit) — see BuilderHandler._wire_buttons.
             handler = BuilderHandler(state, canvas)
             canvas.on_event(Tap, handler.on_canvas_tap)
-
-            # ── type_select callback: refresh position + options on type change
-            def _on_type_select_change(attr, old, new):
-                pos_choices = state.possible_position.get(new, [])
-                state.position_select.options = pos_choices
-                state.position_select.value = pos_choices[0] if pos_choices else _EMPTY
-
-                current_selected_node_index_for_type = state.selected_node_index
-                saved_options = {}
-                if current_selected_node_index_for_type is not None:
-                    saved_options_json_list = list(
-                        state.placed_nodes_source.data.get("options", [])
-                    )
-                    if current_selected_node_index_for_type < len(saved_options_json_list):
-                        try:
-                            saved_options = (
-                                json.loads(
-                                    saved_options_json_list[current_selected_node_index_for_type]
-                                )
-                                or {}
-                            )
-                        except (json.JSONDecodeError, TypeError):
-                            pass
-                handler._refresh_options_table(new, saved_options)
-                state.options_table.visible = bool(state.possible_options.get(new, {}))
-
-                if current_selected_node_index_for_type is not None:
-                    icon_type_list = list(state.placed_nodes_source.data.get("icon_type", []))
-                    icon_type = (
-                        icon_type_list[current_selected_node_index_for_type]
-                        if current_selected_node_index_for_type < len(icon_type_list)
-                        else _EMPTY
-                    )
-                    handler._refresh_symmetry_select(
-                        current_selected_node_index_for_type, icon_type
-                    )
-
-            state.type_select.on_change("value", _on_type_select_change)
-
-            # ── Apply button: commit config panel edits to placed_nodes_source ─
-            def apply_node_configurations():
-                current_selected_node_index = state.selected_node_index
-                if current_selected_node_index is None:
-                    return
-
-                # Push undo snapshot *before* any mutation so the user can
-                # revert the entire Apply operation with a single Undo click.
-                handler._push_undo()
-
-                # Get node properties from the configurator panel
-                new_node_name_id = state.name_input.value
-                new_node_type = state.type_select.value
-                new_position = state.position_select.value
-
-                option_names = list(state.options_source.data.get("options", []))
-                option_values = list(state.options_source.data.get("value", []))
-                option_values_dict = {
-                    option_name: _strings_to_option_values(option_value)
-                    for option_name, option_value in zip(option_names, option_values)
-                }
-                # convert the options dict to a JSON string for storage in the ColumnDataSource
-                options_json_string = json.dumps(option_values_dict)
-
-                placed_nodes_data = {
-                    key: list(values) for key, values in state.placed_nodes_source.data.items()
-                }
-
-                # Check first if the current_selected_node_index is within bounds for each property
-                # before updating, to avoid IndexErrors.
-                if current_selected_node_index < len(placed_nodes_data.get("name", [])):
-                    placed_nodes_data["name"][current_selected_node_index] = new_node_name_id
-                if current_selected_node_index < len(placed_nodes_data.get("node_type", [])):
-                    placed_nodes_data["node_type"][current_selected_node_index] = new_node_type
-                    # Reset port counts to defaults when the type changes and spinners are hidden.
-                    if not state.source_count_spinner.visible:
-                        placed_nodes_data["n_sources"][current_selected_node_index] = int(
-                            state.default_source_count.get(new_node_type, 0)
-                        )
-                        placed_nodes_data["n_targets"][current_selected_node_index] = int(
-                            state.default_target_count.get(new_node_type, 0)
-                        )
-                if current_selected_node_index < len(placed_nodes_data.get("position", [])):
-                    placed_nodes_data["position"][current_selected_node_index] = new_position
-                # Place empty dict if there is no options entry for this node yet
-                if "options" not in placed_nodes_data:
-                    placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
-                # Update options JSON string for this node
-                if current_selected_node_index < len(placed_nodes_data["options"]):
-                    placed_nodes_data["options"][current_selected_node_index] = options_json_string
-
-                # These two spinners shows only if the node type supports multiple ports
-                if state.source_count_spinner is not None and state.source_count_spinner.visible:
-                    new_source_port_count = int(state.source_count_spinner.value)
-                    if "n_sources" in placed_nodes_data and current_selected_node_index < len(
-                        placed_nodes_data["n_sources"]
-                    ):
-                        placed_nodes_data["n_sources"][current_selected_node_index] = (
-                            new_source_port_count
-                        )
-                if state.target_count_spinner is not None and state.target_count_spinner.visible:
-                    new_target_port_count = int(state.target_count_spinner.value)
-                    if "n_targets" in placed_nodes_data and current_selected_node_index < len(
-                        placed_nodes_data["n_targets"]
-                    ):
-                        placed_nodes_data["n_targets"][current_selected_node_index] = (
-                            new_target_port_count
-                        )
-
-                # Update hover_source name and type
-                hover_data = {key: list(values) for key, values in state.hover_source.data.items()}
-                if current_selected_node_index < len(hover_data.get("name", [])):
-                    hover_data["name"][current_selected_node_index] = new_node_name_id
-                if current_selected_node_index < len(hover_data.get("node_type", [])):
-                    hover_data["node_type"][current_selected_node_index] = new_node_type
-                state.hover_source.data = hover_data
-
-                # ── Persist symmetry selection ────────────────────────────────
-
-                all_node_names = placed_nodes_data.get("name", [])
-                node_count = len(all_node_names)
-
-                # Guard: current index must be valid before we touch names.
-                if current_selected_node_index >= node_count:
-                    return
-
-                current_node_name = all_node_names[current_selected_node_index]
-                new_symmetry_name = (
-                    state.symmetry_select.value if state.symmetry_select is not None else _EMPTY
-                )
-
-                # Ensure symmetry columns exist and are fully sized (handles newly added nodes).
-                symmetry_names = list(placed_nodes_data.get("symmetry_name", []))
-                symmetry_indices = list(placed_nodes_data.get("symmetry_node_index", []))
-                if len(symmetry_names) < node_count:
-                    symmetry_names += [_EMPTY] * (node_count - len(symmetry_names))
-                if len(symmetry_indices) < node_count:
-                    symmetry_indices += [_NO_SYMMETRY_PEER] * (node_count - len(symmetry_indices))
-
-                # Resolve the newly chosen peer index.
-                new_peer_index = _NO_SYMMETRY_PEER
-                if new_symmetry_name and new_symmetry_name != _EMPTY:
-                    for node_position, node_name in enumerate(all_node_names):
-                        if node_name == new_symmetry_name:
-                            new_peer_index = node_position
-                            break
-
-                # ── Clear stale references on both sides before writing ────────
-                #
-                # Two nodes may be displaced by this Apply:
-                #   (a) current node's *old* peer  — it pointed back at current_node;
-                #       now current_node is leaving, so clear it.
-                #   (b) new peer's *old* partner   — new_peer previously pointed at
-                #       some other node D; D still points at new_peer, so clear D too.
-                #
-                # We handle both by scanning the full table and wiping every node
-                # whose symmetry_name matches current_node_name OR new_symmetry_name,
-                # excluding the two nodes that will get fresh values written below.
-
-                nodes_getting_fresh_write = {current_selected_node_index}
-                if new_peer_index != _NO_SYMMETRY_PEER:
-                    nodes_getting_fresh_write.add(new_peer_index)
-
-                for position in range(node_count):
-                    if position in nodes_getting_fresh_write:
-                        continue
-                    sym_name = symmetry_names[position]
-                    if sym_name == current_node_name or (
-                        new_symmetry_name
-                        and new_symmetry_name != _EMPTY
-                        and sym_name == new_symmetry_name
-                    ):
-                        symmetry_names[position] = _EMPTY
-                        symmetry_indices[position] = _NO_SYMMETRY_PEER
-
-                # Write the current node's new symmetry entry.
-                symmetry_names[current_selected_node_index] = new_symmetry_name
-                symmetry_indices[current_selected_node_index] = new_peer_index
-
-                # Write the new peer's back-reference (if a peer was chosen).
-                if new_peer_index != _NO_SYMMETRY_PEER:
-                    symmetry_names[new_peer_index] = current_node_name
-                    symmetry_indices[new_peer_index] = current_selected_node_index
-
-                placed_nodes_data["symmetry_name"] = symmetry_names
-                placed_nodes_data["symmetry_node_index"] = symmetry_indices
-
-                # Update the placed_nodes_source with the modified data
-                state.placed_nodes_source.data = placed_nodes_data
-
-                # ── Commit pending connections ─────────────────────────────────
-                for starting_port, ending_port in list(state.pending_connections):
-                    handler._add_edge(starting_port, ending_port)
-                handler._clear_temp_edges()
-                handler._rebuild_all_ports()
-                handler._refresh_connections_table(current_selected_node_index)
-
-                # Log applied state
-                # edge_data_snapshot = state.edge_source.data if state.edge_source is not None else {}
-                # all_placed_names = list(state.placed_nodes_source.data.get("name", []))
-                # connection_log_entries = []
-                # for edge_index in range(len(edge_data_snapshot.get("starting_node_index", []))):
-                #     starting_node_index = edge_data_snapshot["starting_node_index"][edge_index]
-                #     ending_node_index = edge_data_snapshot["ending_node_index"][edge_index]
-                #     if (
-                #         starting_node_index == current_selected_node_index
-                #         or ending_node_index == current_selected_node_index
-                #     ):
-                #         connected_node_index = (
-                #             ending_node_index
-                #             if starting_node_index == current_selected_node_index
-                #             else starting_node_index
-                #         )
-                #         connected_node_name = (
-                #             all_placed_names[connected_node_index]
-                #             if connected_node_index < len(all_placed_names)
-                #             else f"node_{connected_node_index}"
-                #         )
-                #         my_port_kind = (
-                #             edge_data_snapshot["starting_port_kind"][edge_index]
-                #             if starting_node_index == current_selected_node_index
-                #             else edge_data_snapshot["ending_port_kind"][edge_index]
-                #         )
-                #         my_port_label = (
-                #             edge_data_snapshot["starting_port_label"][edge_index]
-                #             if starting_node_index == current_selected_node_index
-                #             else edge_data_snapshot["ending_port_label"][edge_index]
-                #         )
-                #         connected_port_kind = (
-                #             edge_data_snapshot["ending_port_kind"][edge_index]
-                #             if starting_node_index == current_selected_node_index
-                #             else edge_data_snapshot["starting_port_kind"][edge_index]
-                #         )
-                #         connected_port_label = (
-                #             edge_data_snapshot["ending_port_label"][edge_index]
-                #             if starting_node_index == current_selected_node_index
-                #             else edge_data_snapshot["starting_port_label"][edge_index]
-                #         )
-                #         connection_log_entries.append(
-                #             {
-                #                 "my_port": f"{my_port_kind}:{my_port_label}",
-                #                 "connected_to_node": connected_node_name,
-                #                 "connected_to_port": f"{connected_port_kind}:{connected_port_label}",
-                #             }
-                #         )
-                #
-                # _LOGGER.info(
-                #     "Applied: node[%d] name=%s type=%s position=%s options=%s connections=%s",
-                #     current_selected_node_index,
-                #     new_node_name_id,
-                #     new_node_type,
-                #     new_position,
-                #     options_json_string,
-                #     json.dumps(connection_log_entries),
-                # )
-                handler._mark_unsaved()
-
-            state.apply_button.on_click(apply_node_configurations)
 
             # ── Startup overlay ───────────────────────────────────────────────
             startup_overlay = column(

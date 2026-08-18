@@ -104,43 +104,41 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         * The browse_watcher_trigger → :meth:`_on_browse_watcher` (tkinter CSV path dialog).
         * The Undo button → :meth:`_on_undo`.
         * The Redo button → :meth:`_on_redo`.
+        * The type_select → :meth:`_on_type_select_change` (refreshes
+          position / options / symmetry choices as the user edits).
+        * The Apply button → :meth:`apply_node_configurations` (commits the
+          config panel's current values to the selected node).
         """
         # End Session is handled entirely via JS + end_session_trigger to avoid the
         # Python on_click firing unconditionally (before JS can gate on save state).
-        if self.state.end_session_trigger is not None:
-            self.state.end_session_trigger.on_change("value", self._on_end_session_trigger)
+        self.state.end_session_trigger.on_change("value", self._on_end_session_trigger)
 
         # New Design: wipe canvas and dismiss overlay immediately
-        if self.state.new_design_button is not None:
-            self.state.new_design_button.on_click(self._on_new_design)
+        self.state.new_design_button.on_click(self._on_new_design)
 
         for toolbox_button_index, toolbox_button in enumerate(self.state.buttons):
             toolbox_button.on_click(self._make_select_callback(toolbox_button_index))
 
-        if self.state.delete_button is not None:
-            self.state.delete_button.on_click(self._toggle_delete_mode)
+        self.state.delete_button.on_click(self._toggle_delete_mode)
 
-        if self.state.browse_load_trigger is not None:
-            self.state.browse_load_trigger.on_change("value", self._on_browse_load)
+        self.state.browse_load_trigger.on_change("value", self._on_browse_load)
 
-        if self.state.browse_save_trigger is not None:
-            self.state.browse_save_trigger.on_change("value", self._on_browse_save)
+        self.state.browse_save_trigger.on_change("value", self._on_browse_save)
 
         # Open a native OS file dialog to choose the watcher CSV path
-        if self.state.browse_watcher_trigger is not None:
-            self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
+        self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
 
-        if self.state.end_session_save_trigger is not None:
-            self.state.end_session_save_trigger.on_change(
-                "value", self._on_end_session_save_trigger
-            )
+        self.state.end_session_save_trigger.on_change("value", self._on_end_session_save_trigger)
 
         # Undo / redo buttons (created by the launcher and stored in state)
-        if self.state.undo_button is not None:
-            self.state.undo_button.on_click(self._on_undo)
+        self.state.undo_button.on_click(self._on_undo)
 
-        if self.state.redo_button is not None:
-            self.state.redo_button.on_click(self._on_redo)
+        self.state.redo_button.on_click(self._on_redo)
+
+        # Config panel: live type-select refresh + Apply button commit.
+        self.state.type_select.on_change("value", self._on_type_select_change)
+
+        self.state.apply_button.on_click(self.apply_node_configurations)
 
     def _make_select_callback(self, button_index: int):
         """
@@ -277,8 +275,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                 self._clear_temp_edges()
                 self.state.selected_node_index = best_node_index
                 self._populate_node_table(best_node_index)
-                if self.state.table_panel is not None:
-                    self.state.table_panel.visible = True
+                self.state.table_panel.visible = True
             return
 
         # A component is selected in the toolbox: place it at the tap coordinates.

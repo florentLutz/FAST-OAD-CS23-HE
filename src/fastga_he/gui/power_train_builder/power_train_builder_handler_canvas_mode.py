@@ -57,10 +57,8 @@ class CanvasModeMixin:
         """
         if self.state.startup_overlay is not None:
             self.state.startup_overlay.visible = False
-        if self.state.new_design_button is not None:
-            self.state.new_design_button.visible = False
-        if self.state.load_design_button is not None:
-            self.state.load_design_button.visible = False
+        self.state.new_design_button.visible = False
+        self.state.load_design_button.visible = False
 
     def _on_new_design(self):
         """
@@ -136,8 +134,7 @@ class CanvasModeMixin:
             self.state.edit_history_stack.clear()
         self._refresh_undo_redo_buttons()
 
-        if self.state.save_button is not None:
-            self.state.save_button.button_type = "success"
+        self.state.save_button.button_type = "success"
 
         _LOGGER.info("New Design started – canvas cleared.")
 
@@ -186,8 +183,7 @@ class CanvasModeMixin:
             return
         self.state.delete_mode = False
         self.state.status_div.text = "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
-        if self.state.delete_button is not None:
-            self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+        self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
     # -----------------------------------------------------------------------
     # Toolbox component selection

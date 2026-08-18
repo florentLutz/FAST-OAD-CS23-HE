@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base64
 
-from .power_train_builder_state import _EMPTY
+from .power_train_builder_state import _EMPTY, _NO_SYMMETRY_PEER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -113,7 +113,8 @@ class PlacementMixin:
             "n_sources": list(nodes_data.get("n_sources", [])) + [default_source_port_count],
             "n_targets": list(nodes_data.get("n_targets", [])) + [default_target_port_count],
             "symmetry_name": list(nodes_data.get("symmetry_name", [])) + [_EMPTY],
-            "symmetry_node_index": list(nodes_data.get("symmetry_node_index", [])) + [-1],
+            "symmetry_node_index": list(nodes_data.get("symmetry_node_index", []))
+            + [_NO_SYMMETRY_PEER],
         }
 
         if self.state.hover_source is not None:

@@ -35,6 +35,9 @@ BUTTON_SELECTED_COLOR_TYPE = "primary"  # Selected button state (blue highlight)
 
 NODE_SELECT_COLOR = "#FFD700"  # Gold colour for the selected-node overlay (semi-transparent).
 _EMPTY = ""
+# Sentinel stored in placed_nodes_source["symmetry_node_index"] for a node
+# that has no symmetry peer selected.
+_NO_SYMMETRY_PEER = -1
 
 
 # ============================================================================

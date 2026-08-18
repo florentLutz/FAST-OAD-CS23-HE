@@ -51,8 +51,7 @@ class IOMixin:
         Called by every method that mutates the canvas. The save button returns
         to green only after a successful save.
         """
-        if self.state.save_button is not None:
-            self.state.save_button.button_type = "warning"
+        self.state.save_button.button_type = "warning"
         self._refresh_undo_redo_buttons()
 
     def _save_canvas_state(self, yaml_path: str = "", json_path: str = ""):
@@ -113,8 +112,7 @@ class IOMixin:
                 json.dump(canvas_state, f, indent=2)
             _LOGGER.info("Canvas state (JSON backup) saved to %s", json_file)
 
-        if self.state.save_button is not None:
-            self.state.save_button.button_type = "success"
+        self.state.save_button.button_type = "success"
 
     def _load_canvas_state(self, json_path: str):
         """
@@ -217,8 +215,7 @@ class IOMixin:
         self._rebuild_all_ports()
         self._rebuild_edges()
 
-        if self.state.save_button is not None:
-            self.state.save_button.button_type = "success"
+        self.state.save_button.button_type = "success"
 
         _LOGGER.info(
             "Canvas restored (%d nodes, %d edges).",
