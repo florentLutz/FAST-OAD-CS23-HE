@@ -5,7 +5,7 @@
 """
 Snapshot-based undo / redo stack for the powertrain builder.
 
-:class:`UndoStack` is the single, self-contained history manager used by
+:class:`EditHistoryStack` is the single, self-contained history manager used by
 :class:`BuilderHandler`.  It keeps a bounded list of canvas snapshots and
 a separate *redo* stack that is populated whenever the user undoes an action.
 
@@ -31,7 +31,7 @@ Typical usage inside a mutating handler method::
 
 Then in :meth:`_on_undo`::
 
-    snapshot = self.state.undo_stack.undo()
+    snapshot = self.state.edit_history_stack.undo()
     if snapshot is not None:
         self._restore_from_snapshot(snapshot)
 """
@@ -45,7 +45,7 @@ _LOGGER = logging.getLogger(__name__)
 _DEFAULT_MAX_DEPTH = 50
 
 
-class UndoStack:
+class EditHistoryStack:
     """
     Bounded snapshot stack supporting undo and redo.
 
@@ -150,7 +150,7 @@ def make_snapshot(state) -> dict:
     snapshot is cheap to pickle and safe to hold indefinitely.
 
     :param state: :class:`~.power_train_builder_state.BuilderState` instance.
-    :return: Snapshot dict suitable for :meth:`UndoStack.push`.
+    :return: Snapshot dict suitable for :meth:`EditHistoryStack.push`.
     """
     return {
         "nodes": copy.deepcopy(

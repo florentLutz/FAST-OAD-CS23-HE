@@ -48,7 +48,7 @@ class PlacementMixin:
 
     def _place_new_node(self, x: float, y: float):
         """
-        Create a new component of the currently-selected palette type at ``(x, y)``.
+        Create a new component of the currently-selected toolbox type at ``(x, y)``.
 
         Deselects any previously-selected node, pushes an undo snapshot, then
         computes the new node's default component type, position, options,

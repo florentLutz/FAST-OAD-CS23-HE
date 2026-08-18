@@ -3,11 +3,11 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 """
-Startup-overlay, new-design, delete-mode, and palette-selection logic.
+Startup-overlay, new-design, delete-mode, and toolbox-selection logic.
 
 This is the "what interaction mode is the canvas in" module: every method
 here sets up state for a *future* tap (which overlay button was pressed,
-whether delete mode is on, which palette component is armed) rather than
+whether delete mode is on, which toolbox component is armed) rather than
 mutating the canvas itself.
 
 Mixin class :class:`CanvasModeMixin` is not meant to be instantiated directly;
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 class CanvasModeMixin:
     """
-    Handles the startup overlay choices, palette button selection, and delete-mode toggling.
+    Handles the startup overlay choices, toolbox button selection, and delete-mode toggling.
 
     Every method on this mixin arms or disarms a mode that a *subsequent*
     canvas tap will act on — it never places, deletes, or edits anything on
@@ -131,9 +131,9 @@ class CanvasModeMixin:
         self.state.delete_mode = False
         self._clear_node_table()
 
-        # Clear undo / redo history: a new design has no prior actions to undo.
-        if self.state.undo_stack is not None:
-            self.state.undo_stack.clear()
+        # Clear edit history: a new design has no prior edits.
+        if self.state.edit_history_stack is not None:
+            self.state.edit_history_stack.clear()
         self._refresh_undo_redo_buttons()
 
         if self.state.save_button is not None:
@@ -190,10 +190,10 @@ class CanvasModeMixin:
             self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
     # -----------------------------------------------------------------------
-    # Palette selection
+    # Toolbox component selection
     # -----------------------------------------------------------------------
 
-    def on_palette_select(self, component_index: int):
+    def on_toolbox_select(self, component_index: int):
         """
         Select the component at position *component_index* in :data:`ICONS_CONFIG`.
 
@@ -220,8 +220,8 @@ class CanvasModeMixin:
 
         self._exit_delete_mode()
 
-        for button_position, palette_button in enumerate(self.state.buttons):
-            palette_button.button_type = (
+        for button_position, toolbox_button in enumerate(self.state.buttons):
+            toolbox_button.button_type = (
                 BUTTON_SELECTED_COLOR_TYPE
                 if button_position == component_index
                 else BUTTON_DEFAULT_COLOR_TYPE

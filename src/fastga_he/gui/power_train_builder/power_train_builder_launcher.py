@@ -6,7 +6,7 @@
 Standalone Bokeh server launcher for the powertrain builder.
 
 :class:`PowertrainBuilderLauncher` builds the full Bokeh document — canvas,
-palette, configurator panel, undo / redo toolbar, and startup overlay — and
+toolbox, configurator panel, undo / redo toolbar, and startup overlay — and
 starts a local Bokeh server, opening the application in the default browser.
 
 Typical usage::
@@ -43,7 +43,7 @@ from .power_train_builder_state import (
     PORT_RADIUS,
     _EMPTY,
 )
-from .power_train_builder_palette import ComponentPaletteConfigurationTableBuilder
+from .power_train_builder_toolbox import ComponentToolboxConfigurationTableBuilder
 from .power_train_builder_handler import BuilderHandler
 from .power_train_builder_handler_config_panel import _strings_to_option_values
 
@@ -120,7 +120,7 @@ class PowertrainBuilderLauncher:
     """
     Launch a self-contained Bokeh server running the powertrain builder.
 
-    A blank canvas is placed in the centre, flanked by the component palette
+    A blank canvas is placed in the centre, flanked by the component toolbox
     on the left and the component configurator panel on the right.  An
     Undo / Redo toolbar row sits above the canvas.  The server stops
     automatically when the browser session ends.
@@ -145,8 +145,8 @@ class PowertrainBuilderLauncher:
         logging.getLogger("tornado").setLevel(logging.WARNING)
 
         def make_document(doc):
-            """Build the complete Bokeh document: palette, canvas, and configurator panel."""
-            palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+            """Build the complete Bokeh document: toolbox, canvas, and configurator panel."""
+            toolbox_layout, table_panel, state = ComponentToolboxConfigurationTableBuilder.build()
 
             # ── Undo / Redo buttons ───────────────────────────────────────────
             # Created here (before BuilderHandler) so they exist on the state
@@ -694,7 +694,7 @@ class PowertrainBuilderLauncher:
                     "box-shadow": "0 2px 8px rgba(0,0,0,0.1)",
                 },
             )
-            doc.add_root(row(palette_layout, canvas, table_panel))
+            doc.add_root(row(toolbox_layout, canvas, table_panel))
             state.startup_overlay = startup_overlay
             doc.add_root(startup_overlay)
             doc.add_root(undo_redo_overlay)

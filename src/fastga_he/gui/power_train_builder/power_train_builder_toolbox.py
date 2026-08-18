@@ -12,11 +12,11 @@ here; that responsibility belongs to :class:`BuilderHandler`.
 
 Typical usage::
 
-    from fastga_he.gui.power_train_builder_palette import (
+    from fastga_he.gui.power_train_builder_toolbox import (
         ComponentPaletteConfigurationTableBuilder,
     )
 
-    palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+    toolbox_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
 """
 
 from pathlib import Path
@@ -70,9 +70,9 @@ if (save_button_widget.button_type === 'warning') {
 """
 
 
-class ComponentPaletteConfigurationTableBuilder:
+class ComponentToolboxConfigurationTableBuilder:
     """
-    Build the palette sidebar and component-configurator panel as Bokeh widgets.
+    Build the toolbox sidebar and component-configurator panel as Bokeh widgets.
 
     This class is **pure**: it only constructs Bokeh objects and returns them.
     All event callbacks are wired by :class:`BuilderHandler`.
@@ -81,12 +81,12 @@ class ComponentPaletteConfigurationTableBuilder:
     @staticmethod
     def build() -> tuple:
         """
-        Construct the button palette, configurator panel, and shared builder state.
+        Construct the button toolbox, configurator panel, and shared builder state.
 
         :return: A three-element tuple
-            ``(palette_column_layout, table_panel, BuilderState)`` where
+            ``(toolbox_column_layout, table_panel, BuilderState)`` where
 
-            * ``palette_column_layout`` is the left-side Bokeh column widget
+            * ``toolbox_column_layout`` is the left-side Bokeh column widget
               containing the tabbed component buttons and action buttons.
             * ``table_panel`` is the right-side Bokeh column widget for the
               component configurator.
@@ -249,7 +249,7 @@ class ComponentPaletteConfigurationTableBuilder:
             code=_JS_LOAD_DIALOG,
         )
 
-        # Temporary load button (kept for any direct palette-bar placement)
+        # Temporary load button (kept for any direct toolbox-bar placement)
         load_design_button_tmp = bkmodel.Button(
             label="Load Design",
             icon=bkmodel.TablerIcon(icon_name="folder-open"),
@@ -260,7 +260,7 @@ class ComponentPaletteConfigurationTableBuilder:
         load_design_button_tmp.js_on_click(_load_js)
 
         # ── Watcher-path overlay widgets ──────────────────────────────────────
-        # Built here (palette) so they can be wired to JS args; registered in
+        # Built here (toolbox) so they can be wired to JS args; registered in
         # BuilderState so the launcher can add the overlay to the document and
         # the handler can read watcher_path_input.value at save time.
         watcher_path_input = bkmodel.TextInput(
@@ -762,7 +762,7 @@ class ComponentPaletteConfigurationTableBuilder:
             close_window_trigger=close_window_trigger,
         )
 
-        # ── Build tabbed palette sidebar ──────────────────────────────────────
+        # ── Build tabbed toolbox sidebar ──────────────────────────────────────
         tab_panels = []
         for category, keys_in_category in category_to_icon_keys.items():
             category_buttons = [
@@ -781,7 +781,7 @@ class ComponentPaletteConfigurationTableBuilder:
 
         tabs = bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
 
-        palette_layout = column(
+        toolbox_layout = column(
             title_div,
             tabs,
             status_div,
@@ -798,4 +798,4 @@ class ComponentPaletteConfigurationTableBuilder:
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
 
-        return palette_layout, table_panel, state
+        return toolbox_layout, table_panel, state

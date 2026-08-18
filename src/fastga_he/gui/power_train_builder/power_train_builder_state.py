@@ -137,8 +137,8 @@ class BuilderState:
     close_window_trigger: bkmodel.TextInput = field(default=None)
 
     # ── Undo / redo ───────────────────────────────────────────────────────────
-    # UndoStack instance (set by BuilderHandler.__init__).
-    undo_stack: object = field(default=None)
+    # EditHistoryStack instance (set by BuilderHandler.__init__).
+    edit_history_stack: object = field(default=None)
     # Bokeh Button widgets for Undo and Redo, placed above the canvas.
     undo_button: bkmodel.Button = field(default=None)
     redo_button: bkmodel.Button = field(default=None)

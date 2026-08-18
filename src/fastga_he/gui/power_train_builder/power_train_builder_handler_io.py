@@ -48,8 +48,8 @@ class IOMixin:
         Turn the Save button yellow to signal unsaved changes, and refresh the
         enabled / disabled appearance of the Undo and Redo buttons.
 
-        Called by every method that mutates the canvas.  The save button
-        returns to green only after a successful save.
+        Called by every method that mutates the canvas. The save button returns
+        to green only after a successful save.
         """
         if self.state.save_button is not None:
             self.state.save_button.button_type = "warning"
@@ -150,7 +150,7 @@ class IOMixin:
         :param canvas_state: Parsed canvas-state dict with keys ``"components"``,
             ``"connections"``, ``"source_ports"``, and ``"target_ports"``.
         """
-        # Since the palette buttons are still active while loading, reset is required
+        # Since the toolbox buttons are still active while loading, reset is required
         self.state.selected_node_index = None
         self.state.selected_component = None
         self.state.delete_mode = False
@@ -291,10 +291,10 @@ class IOMixin:
         ``edge_source``, ``source_port_source``, or ``target_port_source`` so
         that the snapshot reflects the state the user wants to return to.
         """
-        if self.state.undo_stack is None:
+        if self.state.edit_history_stack is None:
             return
         snapshot = make_snapshot(self.state)
-        self.state.undo_stack.push_undo(snapshot)
+        self.state.edit_history_stack.push_undo(snapshot)
         self._refresh_undo_redo_buttons()
 
     def _restore_from_snapshot(self, snapshot: dict):
@@ -356,14 +356,14 @@ class IOMixin:
         the most recent undo snapshot.  The save button turns yellow because
         the canvas is now different from the last saved state.
         """
-        if self.state.undo_stack is None or not self.state.undo_stack.can_undo:
+        if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_undo:
             return
 
         # Save the current state for redo before wiping it.
         current_snapshot = make_snapshot(self.state)
-        self.state.undo_stack.push_redo(current_snapshot)
+        self.state.edit_history_stack.push_redo(current_snapshot)
 
-        snapshot = self.state.undo_stack.undo()
+        snapshot = self.state.edit_history_stack.undo()
         if snapshot is None:
             return
 
@@ -372,7 +372,7 @@ class IOMixin:
         self._mark_unsaved()
         _LOGGER.info(
             "Undo applied; undo depth now %d.",
-            len(self.state.undo_stack),
+            len(self.state.edit_history_stack),
         )
 
     def _on_redo(self):
@@ -383,15 +383,15 @@ class IOMixin:
         the top redo snapshot.  The save button turns yellow because the canvas
         is now different from the last saved state.
         """
-        if self.state.undo_stack is None or not self.state.undo_stack.can_redo:
+        if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_redo:
             return
 
         # Capture current state onto the undo stack directly (bypassing push_undo()
         # which would wipe the redo stack).
         current_snapshot = make_snapshot(self.state)
-        self.state.undo_stack._undo.append(current_snapshot)
+        self.state.edit_history_stack._undo.append(current_snapshot)
 
-        snapshot = self.state.undo_stack.redo()
+        snapshot = self.state.edit_history_stack.redo()
         if snapshot is None:
             return
 
@@ -400,7 +400,7 @@ class IOMixin:
         self._mark_unsaved()
         _LOGGER.info(
             "Redo applied; undo depth now %d.",
-            len(self.state.undo_stack),
+            len(self.state.edit_history_stack),
         )
 
     def _refresh_undo_redo_buttons(self):
@@ -411,16 +411,16 @@ class IOMixin:
         Uses ``"primary"`` when active and ``"default"`` (dimmed) when the
         corresponding stack is empty.
         """
-        if self.state.undo_stack is None:
+        if self.state.edit_history_stack is None:
             return
-        if self.state.undo_button is not None:
-            self.state.undo_button.button_type = (
-                "primary" if self.state.undo_stack.can_undo else "default"
-            )
-        if self.state.redo_button is not None:
-            self.state.redo_button.button_type = (
-                "primary" if self.state.undo_stack.can_redo else "default"
-            )
+
+        self.state.undo_button.button_type = (
+            "primary" if self.state.edit_history_stack.can_undo else "default"
+        )
+
+        self.state.redo_button.button_type = (
+            "primary" if self.state.edit_history_stack.can_redo else "default"
+        )
 
     # -----------------------------------------------------------------------
     # End session

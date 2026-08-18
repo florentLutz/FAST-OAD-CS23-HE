@@ -5,7 +5,7 @@
 """
 Canvas interaction handler for the powertrain builder.
 
-:class:`BuilderHandler` wires every palette button and canvas tap event to
+:class:`BuilderHandler` wires every toolbox button and canvas tap event to
 the appropriate action: placing a component on the canvas, selecting a node
 for editing, deleting a node or edge, managing port connections, and saving
 or loading the canvas state.
@@ -13,7 +13,7 @@ or loading the canvas state.
 The class is assembled from five single-responsibility mixins:
 
 * :class:`~.power_train_builder_handler_canvas_mode.CanvasModeMixin` –
-  startup overlay, new-design reset, delete mode, palette selection. These
+  startup overlay, new-design reset, delete mode, toolbox selection. These
   all arm a mode for a *future* tap rather than mutating the canvas.
 * :class:`~.power_train_builder_handler_placement.PlacementMixin` –
   the actual "place a new component on the canvas" logic: computing default
@@ -28,7 +28,7 @@ The class is assembled from five single-responsibility mixins:
 
 Typical usage::
 
-    palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+    toolbox_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
     handler = BuilderHandler(state, canvas)
     canvas.on_event(Tap, handler.on_canvas_tap)
 """
@@ -36,7 +36,7 @@ Typical usage::
 import logging
 
 from .power_train_builder_state import BuilderState
-from .power_train_builder_history import UndoStack
+from .power_train_builder_history import EditHistoryStack
 from .power_train_builder_handler_canvas_mode import CanvasModeMixin
 from .power_train_builder_handler_placement import PlacementMixin
 from .power_train_builder_handler_io import IOMixin
@@ -48,12 +48,12 @@ _LOGGER = logging.getLogger(__name__)
 
 class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin):
     """
-    Wires palette button events to canvas placement and interaction events.
+    Wires toolbox button events to canvas placement and interaction events.
 
-    Instantiate **after** building the palette; the constructor automatically
+    Instantiate **after** building the toolbox; the constructor automatically
     wires all button ``on_click`` callbacks and initialises the undo stack::
 
-        palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+        toolbox_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
         handler = BuilderHandler(state, main_plot)
         main_plot.on_event(Tap, handler.on_canvas_tap)
         main_plot.image_url(
@@ -78,8 +78,8 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.icon_size = icon_size
 
         # Initialise the undo stack on the shared state so all mixins can
-        # reach it via self.state.undo_stack.
-        self.state.undo_stack = UndoStack()
+        # reach it via self.state.edit_history_stack.
+        self.state.edit_history_stack = EditHistoryStack()
 
         self._wire_buttons()
         # Set the initial enabled/disabled appearance of the undo/redo buttons.
@@ -91,11 +91,11 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
 
     def _wire_buttons(self):
         """
-        Attach ``on_click`` callbacks to every palette and action button.
+        Attach ``on_click`` callbacks to every toolbox and action button.
 
         Called once from :meth:`__init__`. Connects:
 
-        * Each component palette button → :meth:`on_palette_select`.
+        * Each component toolbox button → :meth:`on_toolbox_select`.
         * The End Session button → :meth:`_end_session`.
         * The Delete button → :meth:`_toggle_delete_mode`.
         * The New Design button → :meth:`_on_new_design`.
@@ -114,8 +114,8 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         if self.state.new_design_button is not None:
             self.state.new_design_button.on_click(self._on_new_design)
 
-        for palette_button_index, palette_button in enumerate(self.state.buttons):
-            palette_button.on_click(self._make_select_callback(palette_button_index))
+        for toolbox_button_index, toolbox_button in enumerate(self.state.buttons):
+            toolbox_button.on_click(self._make_select_callback(toolbox_button_index))
 
         if self.state.delete_button is not None:
             self.state.delete_button.on_click(self._toggle_delete_mode)
@@ -147,9 +147,9 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         Return a zero-argument closure that selects the component at *button_index*.
 
         :param button_index: Zero-based index into ``list(ICONS_CONFIG.keys())``.
-        :return: Callback function suitable for wiring to a palette button.
+        :return: Callback function suitable for wiring to a toolbox button.
         """
-        return lambda: self.on_palette_select(button_index)
+        return lambda: self.on_toolbox_select(button_index)
 
     # -----------------------------------------------------------------------
     # Canvas tap handler
@@ -281,7 +281,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                     self.state.table_panel.visible = True
             return
 
-        # A component is selected in the palette: place it at the tap coordinates.
+        # A component is selected in the toolbox: place it at the tap coordinates.
         # All the actual node-creation work (defaults, icon URL, appending to
         # placed_nodes_source / hover_source, port rebuild) lives in PlacementMixin.
         self._place_new_node(x, y)
