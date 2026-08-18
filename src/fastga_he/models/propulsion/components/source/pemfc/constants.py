@@ -9,7 +9,6 @@ SUBMODEL_CONSTRAINTS_PEMFC_POWER = "submodel.propulsion.constraints.pemfc.power"
 POSSIBLE_POSITION = ["in_the_front", "wing_pod", "underbelly", "in_the_back"]
 POSSIBLE_OPTION = {
     "model_fidelity": ["empirical", "analytical"],
-    "direct_bus_connection": [False, True],
     "compressor_connection": [False, True],
 }
 

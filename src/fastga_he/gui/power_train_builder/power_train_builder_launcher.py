@@ -44,7 +44,7 @@ from .power_train_builder_state import (
     _EMPTY,
 )
 from .power_train_builder_palette import ComponentPaletteConfigurationTableBuilder
-from .power_train_builder_handler import PlacementHandler
+from .power_train_builder_handler import BuilderHandler
 from .power_train_builder_handler_config_panel import _strings_to_option_values
 
 _LOGGER = logging.getLogger(__name__)
@@ -149,7 +149,7 @@ class PowertrainBuilderLauncher:
             palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
 
             # ── Undo / Redo buttons ───────────────────────────────────────────
-            # Created here (before PlacementHandler) so they exist on the state
+            # Created here (before BuilderHandler) so they exist on the state
             # when _wire_buttons() runs and can be wired immediately.
             _undo_redo_stylesheet = [":host button { font-size: 1.25em; min-width: 90px; }"]
 
@@ -170,7 +170,7 @@ class PowertrainBuilderLauncher:
                 stylesheets=_undo_redo_stylesheet,
             )
 
-            # Store on state so PlacementHandler._wire_buttons() can reach them.
+            # Store on state so BuilderHandler._wire_buttons() can reach them.
             state.undo_button = undo_button
             state.redo_button = redo_button
 
@@ -383,7 +383,7 @@ class PowertrainBuilderLauncher:
             state.placed_nodes_source.on_change("data", _sync_labels)
 
             # ── Wire canvas interaction ───────────────────────────────────────
-            handler = PlacementHandler(state, canvas)
+            handler = BuilderHandler(state, canvas)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
             # ── type_select callback: refresh position + options on type change

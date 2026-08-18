@@ -8,7 +8,7 @@ Palette sidebar and component-configurator panel builder.
 :class:`ComponentPaletteConfigurationTableBuilder` is a pure factory that
 constructs every Bokeh widget and data source needed by the builder UI and
 packages them into a :class:`BuilderState`. No event callbacks are wired
-here; that responsibility belongs to :class:`PlacementHandler`.
+here; that responsibility belongs to :class:`BuilderHandler`.
 
 Typical usage::
 
@@ -75,7 +75,7 @@ class ComponentPaletteConfigurationTableBuilder:
     Build the palette sidebar and component-configurator panel as Bokeh widgets.
 
     This class is **pure**: it only constructs Bokeh objects and returns them.
-    All event callbacks are wired by :class:`PlacementHandler`.
+    All event callbacks are wired by :class:`BuilderHandler`.
     """
 
     @staticmethod

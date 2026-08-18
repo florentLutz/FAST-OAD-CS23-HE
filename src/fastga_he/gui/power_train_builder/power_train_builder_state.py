@@ -48,7 +48,7 @@ class BuilderState:
     Holds references to all Bokeh widgets of the powertrain builder.
 
     Passed by reference between :class:`ComponentPaletteConfigurationTableBuilder`,
-    :class:`PlacementHandler`, and :class:`PowertrainBuilderLauncher` so that
+    :class:`BuilderHandler`, and :class:`PowertrainBuilderLauncher` so that
     all parties share the same widget instances.
     """
 
@@ -137,7 +137,7 @@ class BuilderState:
     close_window_trigger: bkmodel.TextInput = field(default=None)
 
     # ── Undo / redo ───────────────────────────────────────────────────────────
-    # UndoStack instance (set by PlacementHandler.__init__).
+    # UndoStack instance (set by BuilderHandler.__init__).
     undo_stack: object = field(default=None)
     # Bokeh Button widgets for Undo and Redo, placed above the canvas.
     undo_button: bkmodel.Button = field(default=None)

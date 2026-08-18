@@ -6,7 +6,7 @@
 Config-panel helpers: node table, options table, connections table, symmetry widget.
 
 Mixin class :class:`ConfigPanelMixin` is not meant to be instantiated directly;
-it is composed into :class:`PlacementHandler` via multiple inheritance.
+it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import functools

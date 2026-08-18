@@ -6,7 +6,7 @@
 Save / load, end-session, and undo / redo logic.
 
 Mixin class :class:`IOMixin` is not meant to be instantiated directly;
-it is composed into :class:`PlacementHandler` via multiple inheritance.
+it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import json
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 
 class IOMixin:
     """
-    Handles serialisation (YAML + JSON), deserialisation, session termination,
+    Handles serialisation (YAML + JSON), de-serialisation, session termination,
     and snapshot-based undo / redo.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) being set by

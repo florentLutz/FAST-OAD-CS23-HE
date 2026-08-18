@@ -6,7 +6,7 @@
 Port and edge management logic.
 
 Mixin class :class:`PortEdgeMixin` is not meant to be instantiated directly;
-it is composed into :class:`PlacementHandler` via multiple inheritance.
+it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import logging
@@ -26,8 +26,12 @@ if TYPE_CHECKING:
 
 class PortEdgeMixin:
     """
-    Handles all port and edge geometry: finding, adding, removing, and redrawing
-    ports and edges on the Bokeh canvas.
+    Handles all node, port, and edge geometry: finding the nearest placed
+    node (:meth:`_best_possible_node`), the nearest port
+    (:meth:`_find_nearest_port`), and the nearest edge
+    (:meth:`_find_nearest_edge`) to a tap — a cohesive hit-testing trio used
+    by delete mode, selection, and the port-connection workflow — plus
+    adding, removing, and redrawing ports and edges on the Bokeh canvas.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) being set by
     the concrete class before any method is called.

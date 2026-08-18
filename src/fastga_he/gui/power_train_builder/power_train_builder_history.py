@@ -6,7 +6,7 @@
 Snapshot-based undo / redo stack for the powertrain builder.
 
 :class:`UndoStack` is the single, self-contained history manager used by
-:class:`PlacementHandler`.  It keeps a bounded list of canvas snapshots and
+:class:`BuilderHandler`.  It keeps a bounded list of canvas snapshots and
 a separate *redo* stack that is populated whenever the user undoes an action.
 
 A **snapshot** is a plain ``dict`` that freezes the four mutable

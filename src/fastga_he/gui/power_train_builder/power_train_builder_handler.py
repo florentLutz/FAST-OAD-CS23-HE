@@ -5,38 +5,39 @@
 """
 Canvas interaction handler for the powertrain builder.
 
-:class:`PlacementHandler` wires every palette button and canvas tap event to
+:class:`BuilderHandler` wires every palette button and canvas tap event to
 the appropriate action: placing a component on the canvas, selecting a node
 for editing, deleting a node or edge, managing port connections, and saving
 or loading the canvas state.
 
-The class is assembled from four single-responsibility mixins:
+The class is assembled from five single-responsibility mixins:
 
-* :class:`~.power_train_builder_handler_overlay.OverlayMixin` –
-  startup overlay, new-design reset, delete mode, palette selection.
+* :class:`~.power_train_builder_handler_canvas_mode.CanvasModeMixin` –
+  startup overlay, new-design reset, delete mode, palette selection. These
+  all arm a mode for a *future* tap rather than mutating the canvas.
+* :class:`~.power_train_builder_handler_placement.PlacementMixin` –
+  the actual "place a new component on the canvas" logic: computing default
+  type / position / options / port counts and appending the new node.
 * :class:`~.power_train_builder_handler_io.IOMixin` –
   save / load (YAML + JSON), tkinter file dialogs, end-session triggers,
   undo / redo snapshot management.
 * :class:`~.power_train_builder_handler_ports.PortEdgeMixin` –
-  port hit-testing, edge add / remove / rebuild, nearest-node helpers.
+  node / port / edge hit-testing, edge add / remove / rebuild.
 * :class:`~.power_train_builder_handler_config_panel.ConfigPanelMixin` –
   node-table, options table, connections table, symmetry select.
 
 Typical usage::
 
     palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
-    handler = PlacementHandler(state, canvas)
+    handler = BuilderHandler(state, canvas)
     canvas.on_event(Tap, handler.on_canvas_tap)
 """
 
-import json
 import logging
-from pathlib import Path
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base64
-
-from .power_train_builder_state import BuilderState, _EMPTY
+from .power_train_builder_state import BuilderState
 from .power_train_builder_history import UndoStack
+from .power_train_builder_handler_canvas_mode import CanvasModeMixin
 from .power_train_builder_handler_placement import PlacementMixin
 from .power_train_builder_handler_io import IOMixin
 from .power_train_builder_handler_ports import PortEdgeMixin
@@ -45,7 +46,7 @@ from .power_train_builder_handler_config_panel import ConfigPanelMixin
 _LOGGER = logging.getLogger(__name__)
 
 
-class PlacementHandler(PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin):
+class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin):
     """
     Wires palette button events to canvas placement and interaction events.
 
@@ -53,7 +54,7 @@ class PlacementHandler(PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin)
     wires all button ``on_click`` callbacks and initialises the undo stack::
 
         palette_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
-        handler = PlacementHandler(state, main_plot)
+        handler = BuilderHandler(state, main_plot)
         main_plot.on_event(Tap, handler.on_canvas_tap)
         main_plot.image_url(
             url="url", x="x", y="y", w="w", h="h",
@@ -280,78 +281,7 @@ class PlacementHandler(PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin)
                     self.state.table_panel.visible = True
             return
 
-        # Deselect any previously selected node before placing a new component
-        if self.state.selected_node_index is not None:
-            self.state.selected_node_index = None
-            self._clear_temp_edges()
-            self._clear_node_table()
-
-        # Capture state before placing a new component.
-        self._push_undo()
-
-        icon_key = self.state.selected_component
-        placement_count = self.state.placed_counter.get(icon_key, 0) + 1
-        self.state.placed_counter[icon_key] = placement_count
-        node_name = f"{icon_key}_{placement_count}"
-
-        icon_path = ICONS_CONFIG[icon_key]["icon_path"]
-        file_url = "file://" + str(Path(icon_path).resolve())
-        base64_url = _url_to_base64(file_url)
-
-        default_component_type = self.state.component_type_to_icon.get(icon_key, icon_key)[0]
-        position_choices = self.state.possible_position.get(default_component_type, [])
-        default_position = position_choices[0] if position_choices else _EMPTY
-
-        options_definition = self.state.possible_options.get(default_component_type, {})
-        default_options = {
-            option_key: (
-                True
-                if option_values[0] is True
-                else (False if option_values[0] is False else option_values[0])
-            )
-            for option_key, option_values in options_definition.items()
-            if option_values
-        }
-        default_options_json = json.dumps(default_options)
-
-        default_source_port_count = self.state.default_source_count.get(default_component_type, 0)
-        default_target_port_count = self.state.default_target_count.get(default_component_type, 0)
-
-        icon_pixel_size = self.icon_size
-        nodes_data = self.state.placed_nodes_source.data
-        self.state.placed_nodes_source.data = {
-            "x": list(nodes_data["x"]) + [x],
-            "y": list(nodes_data["y"]) + [y],
-            "url": list(nodes_data["url"]) + [base64_url],
-            "w": list(nodes_data["w"]) + [icon_pixel_size],
-            "h": list(nodes_data["h"]) + [icon_pixel_size],
-            "name": list(nodes_data["name"]) + [node_name],
-            "icon_type": list(nodes_data.get("icon_type", [])) + [icon_key],
-            "node_type": list(nodes_data.get("node_type", [])) + [default_component_type],
-            "position": list(nodes_data.get("position", [])) + [default_position],
-            "options": list(nodes_data.get("options", [])) + [default_options_json],
-            "n_sources": list(nodes_data.get("n_sources", [])) + [default_source_port_count],
-            "n_targets": list(nodes_data.get("n_targets", [])) + [default_target_port_count],
-            "symmetry_name": list(nodes_data.get("symmetry_name", [])) + [_EMPTY],
-            "symmetry_node_index": list(nodes_data.get("symmetry_node_index", [])) + [-1],
-        }
-
-        if self.state.hover_source is not None:
-            hdata = self.state.hover_source.data
-            self.state.hover_source.data = {
-                "x": list(hdata["x"]) + [x],
-                "y": list(hdata["y"]) + [y],
-                "name": list(hdata["name"]) + [node_name],
-                "node_type": list(hdata.get("node_type", [])) + [default_component_type],
-            }
-
-        self._rebuild_all_ports()
-        self._mark_unsaved()
-        _LOGGER.info(
-            "Placed %s (node_type=%s, position=%s) at (%.1f, %.1f)",
-            node_name,
-            default_component_type,
-            default_position,
-            x,
-            y,
-        )
+        # A component is selected in the palette: place it at the tap coordinates.
+        # All the actual node-creation work (defaults, icon URL, appending to
+        # placed_nodes_source / hover_source, port rebuild) lives in PlacementMixin.
+        self._place_new_node(x, y)
