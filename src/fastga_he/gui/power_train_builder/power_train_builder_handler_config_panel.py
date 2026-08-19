@@ -147,8 +147,6 @@ class ConfigPanelMixin:
 
         if self.state.selected_node_overlay_source is not None:
             self.state.selected_node_overlay_source.data = dict(x=[], y=[])
-        if self.state.connections_source is not None:
-            self.state.connections_source.data = dict(my_port=[], connected_to=[], edge_index=[])
         self.state.connections_rows_column.children = []
 
         self.state.symmetry_select.options = [_EMPTY]
@@ -515,46 +513,6 @@ class ConfigPanelMixin:
 
         self.state.connections_rows_column.children = new_rows
 
-        # Keep connections_source in sync
-        if self.state.connections_source is not None:
-            my_port, connected_to, edge_index = [], [], []
-            for i in range(len(edge_data.get("starting_node_index", []))):
-                starting_node_position = edge_data["starting_node_index"][i]
-                ending_node_position = edge_data["ending_node_index"][i]
-                starting_port_label_value = edge_data["starting_port_label"][i]
-                ending_port_label_value = edge_data["ending_port_label"][i]
-                starting_port_kind_value = edge_data["starting_port_kind"][i]
-                ending_port_kind_value = edge_data["ending_port_kind"][i]
-
-                if starting_node_position == node_index:
-                    far_name = (
-                        node_data["name"][ending_node_position]
-                        if ending_node_position < len(node_data.get("name", []))
-                        else f"node_{ending_node_position}"
-                    )
-                    my_port.append(f"{starting_port_kind_value}:{starting_port_label_value}")
-                    connected_to.append(
-                        f"{far_name} ({ending_port_kind_value}:{ending_port_label_value})"
-                    )
-                    edge_index.append(i)
-                elif ending_node_position == node_index:
-                    far_name = (
-                        node_data["name"][starting_node_position]
-                        if starting_node_position < len(node_data.get("name", []))
-                        else f"node_{starting_node_position}"
-                    )
-                    my_port.append(f"{ending_port_kind_value}:{ending_port_label_value}")
-                    connected_to.append(
-                        f"{far_name} ({starting_port_kind_value}:{starting_port_label_value})"
-                    )
-                    edge_index.append(i)
-
-            self.state.connections_source.data = dict(
-                my_port=my_port,
-                connected_to=connected_to,
-                edge_index=edge_index,
-            )
-
     @staticmethod
     def _far_string(node_data: dict, far_node_index: int, far_label: str, far_kind: str) -> str:
         """
@@ -803,35 +761,6 @@ class ConfigPanelMixin:
 
         self.state.pending_connections.append((starting_port, ending_port))
         self._add_edge_temp(starting_port, ending_port)
-
-    # -----------------------------------------------------------------------
-    # Delete selected connection
-    # -----------------------------------------------------------------------
-
-    def _delete_selected_connection(self):
-        """
-        Delete the edge(s) currently selected in the Connections DataTable.
-
-        Reads the highlighted row indices from ``connections_source.selected``,
-        resolves them to actual edge indices, removes those rows from
-        ``edge_source``, and refreshes the Connections panel.
-        """
-        if self.state.connections_source is None or self.state.edge_source is None:
-            return
-        selected = list(self.state.connections_source.selected.indices)
-        if not selected:
-            return
-        # Update undo stack
-        self._push_undo()
-        edge_index_list = list(self.state.connections_source.data.get("edge_index", []))
-        to_delete = {edge_index_list[i] for i in selected if i < len(edge_index_list)}
-        edge_data = copy_column_data(self.state.edge_source.data)
-        keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
-        self.state.edge_source.data = {k: [edge_data[k][j] for j in keep] for k in edge_data}
-        self._mark_unsaved()
-        _LOGGER.info("Deleted connection(s) at edge indices %s", sorted(to_delete))
-        if self.state.selected_node_index is not None:
-            self._refresh_connections_table(self.state.selected_node_index)
 
     # -----------------------------------------------------------------------
     # Type-select live refresh

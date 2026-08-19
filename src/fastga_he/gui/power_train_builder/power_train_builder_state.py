@@ -127,7 +127,6 @@ class BuilderState:
     edge_source: bkmodel.ColumnDataSource = field(default=None)
     pending_port: dict = field(default=None)
     pending_port_source: bkmodel.ColumnDataSource = field(default=None)
-    connections_source: bkmodel.ColumnDataSource = field(default=None)
     connections_table_widget: bkmodel.DataTable = field(default=None)
     # Dynamic column of connection rows – children rebuilt by _refresh_connections_table.
     connections_rows_column: object = field(default=None)

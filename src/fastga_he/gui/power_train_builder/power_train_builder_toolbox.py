@@ -564,9 +564,6 @@ class ComponentToolboxConfigurationTableBuilder:
         )
         selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
-        connections_source = bkmodel.ColumnDataSource(
-            data=dict(my_port=[], connected_to=[], edge_index=[])
-        )
         edge_source = bkmodel.ColumnDataSource(
             data=dict(
                 xs=[],
@@ -738,7 +735,6 @@ class ComponentToolboxConfigurationTableBuilder:
             selected_node_overlay_source=selected_node_overlay_source,
             edge_source=edge_source,
             pending_port_source=pending_port_source,
-            connections_source=connections_source,
             connections_table_widget=connections_table_widget,
             connections_rows_column=connections_rows_column,
             temp_edge_source=temp_edge_source,
