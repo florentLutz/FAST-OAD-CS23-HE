@@ -11,6 +11,11 @@ they all operate on the same objects.
 
 :func:`compute_ports` is the geometric helper that places port balls evenly
 around a circular node icon.
+
+:func:`copy_column_data` is the small helper every mutating handler method
+uses to take an independent, per-column copy of a ``ColumnDataSource.data``
+dict before mutating and reassigning it (see its docstring for why the copy
+step itself is required, not just a style preference).
 """
 
 from dataclasses import dataclass, field
@@ -38,6 +43,32 @@ _EMPTY = ""
 # Sentinel stored in placed_nodes_source["symmetry_node_index"] for a node
 # that has no symmetry peer selected.
 _NO_SYMMETRY_PEER = -1
+
+
+# ============================================================================
+# ColumnDataSource copy helper
+# ============================================================================
+
+
+def copy_column_data(data: dict) -> dict:
+    """
+    Return an independent, per-column-list copy of a ``ColumnDataSource.data`` dict.
+
+    Bokeh's ``ColumnDataSource`` only detects changes on whole-column or
+    whole-``.data`` reassignment — it does **not** track in-place mutation of
+    a column's existing list (``.pop()``, ``.append()``, index assignment).
+    Mutating ``source.data['x']`` directly would silently desync the browser
+    from the server: the Python-side data would be correct, but the glyph on
+    screen wouldn't update. Every mutating operation in this codebase
+    therefore follows the same copy → mutate copy → single
+    ``source.data = new_data`` reassignment pattern, and this helper is the
+    shared "copy" half of it.
+
+    :param data: The live ``.data`` dict of a ``ColumnDataSource``.
+    :return: A new dict with the same keys, each mapped to a new ``list``
+        containing the same values (a shallow copy per column).
+    """
+    return {key: list(values) for key, values in data.items()}
 
 
 # ============================================================================

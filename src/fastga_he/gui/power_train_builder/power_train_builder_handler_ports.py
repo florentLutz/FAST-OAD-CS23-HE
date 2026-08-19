@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 import math
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
-from .power_train_builder_state import NODE_RADIUS, PORT_RADIUS
+from .power_train_builder_state import NODE_RADIUS, PORT_RADIUS, copy_column_data
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -239,7 +239,7 @@ class PortEdgeMixin:
         """
         if self.state.edge_source is None:
             return
-        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
+        edge_data = copy_column_data(self.state.edge_source.data)
 
         for i in range(len(edge_data.get("starting_node_index", []))):
             starting_port_already_used = (
@@ -294,12 +294,8 @@ class PortEdgeMixin:
             starting_port["node_index"] == self.state.selected_node_index
             or ending_port["node_index"] == self.state.selected_node_index
         ):
-            source_data = {
-                key: list(value) for key, value in self.state.source_port_source.data.items()
-            }
-            target_data = {
-                key: list(value) for key, value in self.state.target_port_source.data.items()
-            }
+            source_data = copy_column_data(self.state.source_port_source.data)
+            target_data = copy_column_data(self.state.target_port_source.data)
 
             if starting_port["kind"] == "source":
                 self._mark_connected(source_data, starting_port)
@@ -354,9 +350,7 @@ class PortEdgeMixin:
         """
         if self.state.temp_edge_source is None:
             return
-        temp_edge_data = {
-            key: list(value) for key, value in self.state.temp_edge_source.data.items()
-        }
+        temp_edge_data = copy_column_data(self.state.temp_edge_source.data)
         temp_edge_data["xs"].append([starting_port["x"], ending_port["x"]])
         temp_edge_data["ys"].append([starting_port["y"], ending_port["y"]])
         temp_edge_data["color"].append(starting_port["color"])
@@ -389,7 +383,7 @@ class PortEdgeMixin:
         """
         if self.state.edge_source is None:
             return
-        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
+        edge_data = copy_column_data(self.state.edge_source.data)
         if not edge_data.get("starting_node_index"):
             return
 

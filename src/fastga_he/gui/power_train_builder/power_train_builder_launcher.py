@@ -113,12 +113,25 @@ def _add_canvas_legend(canvas) -> None:
 
 class PowertrainBuilderLauncher:
     """
-    Launch a self-contained Bokeh server running the powertrain builder.
+    Launches a self-contained Bokeh server that runs the powertrain builder GUI.
 
-    A blank canvas is placed in the centre, flanked by the component toolbox
-    on the left and the component configurator panel on the right.  An
-    Undo / Redo toolbar row sits above the canvas.  The server stops
-    automatically when the browser session ends.
+    Assembles the full page layout around three pieces built by
+    :class:`~.power_train_builder_toolbox.ComponentToolboxConfigurationTableBuilder`
+    (itself composed of several mixins for the toolbox and configuration panel):
+
+    * the **component toolbox** — on the left, one button per known component
+      type, used to arm a component for placement;
+    * the **canvas** — centred, the interactive Bokeh figure where components
+      are placed, connected, selected, and edited;
+    * the **configuration panel** — on the right, the node / options /
+      connections tables for the currently selected component.
+
+    An Undo / Redo button row sits directly above the canvas.
+
+    :class:`~.power_train_builder_handler.BuilderHandler` wires all
+    interaction logic onto this layout; this class is only responsible for
+    layout assembly and server lifecycle. The Bokeh server it starts stops
+    automatically once the browser session ends.
     """
 
     @staticmethod

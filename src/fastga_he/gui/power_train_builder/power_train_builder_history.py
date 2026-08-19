@@ -40,6 +40,8 @@ import copy
 import logging
 from collections import deque
 
+from .power_train_builder_state import copy_column_data
+
 _LOGGER = logging.getLogger(__name__)
 
 _DEFAULT_MAX_DEPTH = 50
@@ -153,15 +155,9 @@ def make_snapshot(state) -> dict:
     :return: Snapshot dict suitable for :meth:`EditHistoryStack.push`.
     """
     return {
-        "nodes": copy.deepcopy(
-            {key: list(value) for key, value in state.placed_nodes_source.data.items()}
-        ),
-        "edges": copy.deepcopy({key: list(value) for key, value in state.edge_source.data.items()}),
-        "source_ports": copy.deepcopy(
-            {key: list(value) for key, value in state.source_port_source.data.items()}
-        ),
-        "target_ports": copy.deepcopy(
-            {key: list(value) for key, value in state.target_port_source.data.items()}
-        ),
+        "nodes": copy.deepcopy(copy_column_data(state.placed_nodes_source.data)),
+        "edges": copy.deepcopy(copy_column_data(state.edge_source.data)),
+        "source_ports": copy.deepcopy(copy_column_data(state.source_port_source.data)),
+        "target_ports": copy.deepcopy(copy_column_data(state.target_port_source.data)),
         "placed_counter": copy.deepcopy(state.placed_counter),
     }

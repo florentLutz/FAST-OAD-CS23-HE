@@ -20,6 +20,7 @@ from tornado.ioloop import IOLoop
 
 from .power_train_network_writer import PowerTrainYAML
 from .power_train_builder_history import make_snapshot
+from .power_train_builder_state import copy_column_data
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,16 +67,10 @@ class IOMixin:
         :param yaml_path: File name (or full path) for the YAML config.
         :param json_path: File name (or full path) for the JSON backup.
         """
-        nodes_data = {
-            key: list(values) for key, values in self.state.placed_nodes_source.data.items()
-        }
-        edges_data = {key: list(values) for key, values in self.state.edge_source.data.items()}
-        source_port_data = {
-            key: list(values) for key, values in self.state.source_port_source.data.items()
-        }
-        target_port_data = {
-            key: list(values) for key, values in self.state.target_port_source.data.items()
-        }
+        nodes_data = copy_column_data(self.state.placed_nodes_source.data)
+        edges_data = copy_column_data(self.state.edge_source.data)
+        source_port_data = copy_column_data(self.state.source_port_source.data)
+        target_port_data = copy_column_data(self.state.target_port_source.data)
 
         if yaml_path:
             yaml_file = Path(yaml_path)
@@ -184,16 +179,10 @@ class IOMixin:
             nodes_data.setdefault(col, default)
 
         # Fill the data sources with the loaded data
-        self.state.placed_nodes_source.data = {
-            key: list(value) for key, value in nodes_data.items()
-        }
-        self.state.edge_source.data = {key: list(value) for key, value in edges_data.items()}
-        self.state.source_port_source.data = {
-            key: list(value) for key, value in source_data.items()
-        }
-        self.state.target_port_source.data = {
-            key: list(value) for key, value in target_data.items()
-        }
+        self.state.placed_nodes_source.data = copy_column_data(nodes_data)
+        self.state.edge_source.data = copy_column_data(edges_data)
+        self.state.source_port_source.data = copy_column_data(source_data)
+        self.state.target_port_source.data = copy_column_data(target_data)
 
         self.state.hover_source.data = {
             "x": list(nodes_data.get("x", [])),
@@ -316,16 +305,10 @@ class IOMixin:
         source_data = snapshot.get("source_ports", {})
         target_data = snapshot.get("target_ports", {})
 
-        self.state.placed_nodes_source.data = {
-            key: list(value) for key, value in nodes_data.items()
-        }
-        self.state.edge_source.data = {key: list(value) for key, value in edges_data.items()}
-        self.state.source_port_source.data = {
-            key: list(value) for key, value in source_data.items()
-        }
-        self.state.target_port_source.data = {
-            key: list(value) for key, value in target_data.items()
-        }
+        self.state.placed_nodes_source.data = copy_column_data(nodes_data)
+        self.state.edge_source.data = copy_column_data(edges_data)
+        self.state.source_port_source.data = copy_column_data(source_data)
+        self.state.target_port_source.data = copy_column_data(target_data)
 
         self.state.hover_source.data = {
             "x": list(nodes_data.get("x", [])),

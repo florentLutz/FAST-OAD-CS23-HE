@@ -17,7 +17,7 @@ import bokeh.models as bkmodel
 from bokeh.layouts import row
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
-from .power_train_builder_state import _EMPTY, _NO_SYMMETRY_PEER
+from .power_train_builder_state import _EMPTY, _NO_SYMMETRY_PEER, copy_column_data
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,6 +49,7 @@ class ConfigPanelMixin:
         :param index: Zero-based index into ``placed_nodes_source`` data arrays.
         """
         placed_node_data = self.state.placed_nodes_source.data
+
         node_name = list(placed_node_data.get("name", []))[index]
         node_type = list(placed_node_data.get("node_type", []))[index]
         icon_key = list(placed_node_data.get("icon_type", []))[index]
@@ -66,10 +67,12 @@ class ConfigPanelMixin:
         self.state.options_table.visible = saved_options_json != "{}"
         self.state.name_input.value = node_name
 
-        choices = self.state.component_type_to_icon.get(icon_key, icon_key)
-        self.state.type_select.options = choices
-        self.state.type_select.value = node_type if node_type in choices else choices[0]
+        # extract possible component type of the icon
+        type_choices = self.state.component_type_to_icon.get(icon_key, icon_key)
+        self.state.type_select.options = type_choices
+        self.state.type_select.value = node_type if node_type in type_choices else type_choices[0]
 
+        # extract possible component position in aircraft based on default/selected node type
         pos_choices = self.state.possible_position.get(node_type, [])
         self.state.position_select.options = pos_choices
         if pos_choices:
@@ -122,7 +125,7 @@ class ConfigPanelMixin:
             )
         self._rebuild_all_ports()
         self._refresh_connections_table(index)
-        self._refresh_symmetry_select(index, icon_key)
+        self._refresh_symmetry_select(index, node_type)
 
     def _clear_node_table(self):
         """
@@ -210,12 +213,12 @@ class ConfigPanelMixin:
         self._options_value_selects = value_selects
         self._options_names = option_names
 
+        self.state.options_rows_column.children = new_rows
+        # Fill the options_source
+        self.state.options_source.data = dict(options=option_names, value=opt_values)
+        # Wire the shared callback to every Select in the options table
         for value_selected in value_selects:
             value_selected.on_change("value", self._sync_options)
-
-        self.state.options_rows_column.children = new_rows
-
-        self.state.options_source.data = dict(options=option_names, value=opt_values)
 
     def _sync_options(self, attr, old, new):
         """
@@ -241,27 +244,31 @@ class ConfigPanelMixin:
     # Symmetry select
     # -----------------------------------------------------------------------
 
-    def _refresh_symmetry_select(self, current_node_index: int, icon_type: str):
+    def _refresh_symmetry_select(self, current_node_index: int, node_type: str):
         """
         Populate ``symmetry_select`` with the names of all placed nodes that
-        share *icon_type* with the currently selected node, excluding itself.
+        share *node_type* with the currently selected node, excluding itself.
 
         :param current_node_index: Index of the node being edited.
-        :param icon_type: The ``icon_type`` key of the selected node.
+        :param node_type: The ``node_type`` to filter candidates by — either
+            the node's currently saved type, or the type currently selected
+            in ``type_select`` if the user hasn't applied their change yet.
         """
         if self.state.symmetry_select is None:
             return
 
         placed_nodes_data = self.state.placed_nodes_source.data
         names = list(placed_nodes_data.get("name", []))
-        icon_types = list(placed_nodes_data.get("icon_type", []))
+        node_types = list(placed_nodes_data.get("node_type", []))
         saved_symmetry = list(placed_nodes_data.get("symmetry_name", []))
 
+        # Build a list of names of all other nodes that share the same icon_type
         symmetry_candidates = [
             names[i]
             for i in range(len(names))
-            if i != current_node_index and icon_types[i] == icon_type
+            if i != current_node_index and node_types[i] == node_type
         ]
+
         choices = [_EMPTY] + symmetry_candidates
         self.state.symmetry_select.options = choices
 
@@ -297,14 +304,10 @@ class ConfigPanelMixin:
         ):
             return
 
-        source_data = {
-            key: list(value) for key, value in self.state.source_port_source.data.items()
-        }
-        target_data = {
-            key: list(value) for key, value in self.state.target_port_source.data.items()
-        }
-        node_data = {key: list(value) for key, value in self.state.placed_nodes_source.data.items()}
-        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
+        source_data = copy_column_data(self.state.source_port_source.data)
+        target_data = copy_column_data(self.state.target_port_source.data)
+        node_data = copy_column_data(self.state.placed_nodes_source.data)
+        edge_data = copy_column_data(self.state.edge_source.data)
 
         # Build lookup: port label → (far_node_index, far_label) for every edge
         # that touches node_index.
@@ -710,7 +713,7 @@ class ConfigPanelMixin:
             # Disconnect: remove all permanent edges that touch the own port.
             if self.state.edge_source is not None:
                 self._push_undo()
-                edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
+                edge_data = copy_column_data(self.state.edge_source.data)
                 keep = [
                     i
                     for i in range(len(edge_data.get("starting_node_index", [])))
@@ -822,7 +825,7 @@ class ConfigPanelMixin:
         self._push_undo()
         edge_index_list = list(self.state.connections_source.data.get("edge_index", []))
         to_delete = {edge_index_list[i] for i in selected if i < len(edge_index_list)}
-        edge_data = {key: list(value) for key, value in self.state.edge_source.data.items()}
+        edge_data = copy_column_data(self.state.edge_source.data)
         keep = [i for i in range(len(edge_data.get("xs", []))) if i not in to_delete]
         self.state.edge_source.data = {k: [edge_data[k][j] for j in keep] for k in edge_data}
         self._mark_unsaved()
@@ -841,7 +844,10 @@ class ConfigPanelMixin:
         Refreshes the Position select's choices, rebuilds the Options table
         for the newly chosen component type (pre-populated with the selected
         node's previously saved option values, if any), and refreshes the
-        Symmetry select so its candidate list matches the node's icon type.
+        Symmetry select so its candidate list matches ``new`` — the type
+        currently chosen in the dropdown, not the node's previously saved
+        type — so the symmetry candidates update live as the user browses
+        component types, before Apply is clicked.
 
         This only refreshes the config panel widgets in place; it does not
         write anything back to ``placed_nodes_source`` — that happens when
@@ -871,13 +877,7 @@ class ConfigPanelMixin:
         self.state.options_table.visible = bool(self.state.possible_options.get(new, {}))
 
         if current_selected_node_index_for_type is not None:
-            icon_type_list = list(self.state.placed_nodes_source.data.get("icon_type", []))
-            icon_type = (
-                icon_type_list[current_selected_node_index_for_type]
-                if current_selected_node_index_for_type < len(icon_type_list)
-                else _EMPTY
-            )
-            self._refresh_symmetry_select(current_selected_node_index_for_type, icon_type)
+            self._refresh_symmetry_select(current_selected_node_index_for_type, new)
 
     # -----------------------------------------------------------------------
     # Apply button
@@ -919,9 +919,7 @@ class ConfigPanelMixin:
         # convert the options dict to a JSON string for storage in the ColumnDataSource
         options_json_string = json.dumps(option_values_dict)
 
-        placed_nodes_data = {
-            key: list(values) for key, values in self.state.placed_nodes_source.data.items()
-        }
+        placed_nodes_data = copy_column_data(self.state.placed_nodes_source.data)
 
         # Check first if the current_selected_node_index is within bounds for each property
         # before updating, to avoid IndexErrors.
@@ -962,7 +960,7 @@ class ConfigPanelMixin:
 
         # Keep the hover-tooltip source's name / node_type in sync with the edits above.
         if self.state.hover_source is not None:
-            hover_data = {key: list(values) for key, values in self.state.hover_source.data.items()}
+            hover_data = copy_column_data(self.state.hover_source.data)
             if current_selected_node_index < len(hover_data.get("name", [])):
                 hover_data["name"][current_selected_node_index] = new_node_name_id
             if current_selected_node_index < len(hover_data.get("node_type", [])):

@@ -18,6 +18,7 @@ from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
+from .power_train_builder_state import copy_column_data
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,16 +46,10 @@ class PowerTrainYAML:
             "component_connections": [],
             "watcher_file_path": "",
         }
-        self.node_data = {
-            key: list(values) for key, values in state.placed_nodes_source.data.items()
-        }
-        self.edge_data = {key: list(values) for key, values in state.edge_source.data.items()}
-        self.source_port_data = {
-            key: list(values) for key, values in state.source_port_source.data.items()
-        }
-        self.target_port_data = {
-            key: list(values) for key, values in state.target_port_source.data.items()
-        }
+        self.node_data = copy_column_data(state.placed_nodes_source.data)
+        self.edge_data = copy_column_data(state.edge_source.data)
+        self.source_port_data = copy_column_data(state.source_port_source.data)
+        self.target_port_data = copy_column_data(state.target_port_source.data)
         self.possible_options = state.possible_options
         self.default_source_count = state.default_source_count
 

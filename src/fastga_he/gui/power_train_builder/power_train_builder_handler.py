@@ -35,7 +35,7 @@ Typical usage::
 
 import logging
 
-from .power_train_builder_state import BuilderState
+from .power_train_builder_state import BuilderState, copy_column_data
 from .power_train_builder_history import EditHistoryStack
 from .power_train_builder_handler_canvas_mode import CanvasModeMixin
 from .power_train_builder_handler_placement import PlacementMixin
@@ -187,24 +187,20 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                 # Capture state before deleting the node.
                 self._push_undo()
 
-                new_data = {key: list(values) for key, values in nodes_data.items()}
+                new_data = copy_column_data(nodes_data)
                 for column in new_data:
                     new_data[column].pop(best_node_index)
                 self.state.placed_nodes_source.data = new_data
 
                 if self.state.hover_source is not None:
-                    hover_data = {
-                        key: list(values) for key, values in self.state.hover_source.data.items()
-                    }
+                    hover_data = copy_column_data(self.state.hover_source.data)
                     for column in hover_data:
                         if best_node_index < len(hover_data[column]):
                             hover_data[column].pop(best_node_index)
                     self.state.hover_source.data = hover_data
 
                 if self.state.edge_source is not None:
-                    edge_data = {
-                        key: list(values) for key, values in self.state.edge_source.data.items()
-                    }
+                    edge_data = copy_column_data(self.state.edge_source.data)
                     keep_indices = [
                         i
                         for i, (starting_node_index, ending_node_index) in enumerate(
@@ -246,9 +242,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                     # Capture state before deleting the edge.
                     self._push_undo()
 
-                    edge_data = {
-                        key: list(value) for key, value in self.state.edge_source.data.items()
-                    }
+                    edge_data = copy_column_data(self.state.edge_source.data)
                     for k in edge_data:
                         edge_data[k].pop(edge_index)
                     self.state.edge_source.data = edge_data
