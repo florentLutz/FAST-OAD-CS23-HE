@@ -78,7 +78,7 @@ class PlacementMixin:
         file_url = "file://" + str(Path(icon_path).resolve())
         base64_url = _url_to_base64(file_url)
 
-        default_component_type = self.state.component_type_to_icon.get(icon_key, icon_key)[0]
+        default_component_type = self.state.icon_to_component_types.get(icon_key, icon_key)[0]
         position_choices = self.state.possible_position.get(default_component_type, [])
         default_position = position_choices[0] if position_choices else _EMPTY
 

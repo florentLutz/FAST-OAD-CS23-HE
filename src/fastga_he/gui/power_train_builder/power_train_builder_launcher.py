@@ -154,7 +154,9 @@ class PowertrainBuilderLauncher:
 
         def make_document(doc):
             """Build the complete Bokeh document: toolbox, canvas, and configurator panel."""
-            toolbox_layout, table_panel, state = ComponentToolboxConfigurationTableBuilder.build()
+            toolbox_layout, config_panel_column, state = (
+                ComponentToolboxConfigurationTableBuilder.build()
+            )
 
             # ── Undo / Redo buttons ───────────────────────────────────────────
             # Created here (before BuilderHandler) so they exist on the state
@@ -218,7 +220,7 @@ class PowertrainBuilderLauncher:
                 line_width=3,
                 line_alpha=0.65,
                 line_dash="dashed",
-                source=state.temp_edge_source,
+                source=state.panel_preview_edge_source,
             )
             # Gold ring around the currently selected node
             canvas.scatter(
@@ -247,7 +249,7 @@ class PowertrainBuilderLauncher:
                 x="x",
                 y="y",
                 size=PORT_RADIUS * 2 + 12,
-                source=state.pending_port_source,
+                source=state.awaiting_second_port_click_source,
                 fill_color="color",
                 fill_alpha=0.35,
                 line_color="white",
@@ -447,7 +449,7 @@ class PowertrainBuilderLauncher:
                     "box-shadow": "0 2px 8px rgba(0,0,0,0.1)",
                 },
             )
-            doc.add_root(row(toolbox_layout, canvas, table_panel))
+            doc.add_root(row(toolbox_layout, canvas, config_panel_column))
             state.startup_overlay = startup_overlay
             doc.add_root(startup_overlay)
             doc.add_root(undo_redo_overlay)

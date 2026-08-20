@@ -68,7 +68,7 @@ class ConfigPanelMixin:
         self.state.name_input.value = node_name
 
         # extract possible component type of the icon
-        type_choices = self.state.component_type_to_icon.get(icon_key, icon_key)
+        type_choices = self.state.icon_to_component_types.get(icon_key, icon_key)
         self.state.type_select.options = type_choices
         self.state.type_select.value = node_type if node_type in type_choices else type_choices[0]
 
@@ -143,7 +143,7 @@ class ConfigPanelMixin:
         self.state.source_count_spinner.visible = False
         self.state.target_count_spinner.visible = False
 
-        self.state.table_panel.visible = False
+        self.state.config_panel_column.visible = False
 
         if self.state.selected_node_overlay_source is not None:
             self.state.selected_node_overlay_source.data = dict(x=[], y=[])
@@ -152,6 +152,71 @@ class ConfigPanelMixin:
         self.state.symmetry_select.options = [_EMPTY]
         self.state.symmetry_select.value = _EMPTY
         self._rebuild_all_ports()
+
+    # -----------------------------------------------------------------------
+    # Port-count spinners: live preview
+    # -----------------------------------------------------------------------
+
+    def _on_port_count_spinner_change(self, attr, old, new):
+        """
+        Live-preview callback wired to both port-count spinners.
+
+        Redraws the selected node's port balls at the spinners' *current*
+        values so the canvas updates as the user spins, and hides any edge
+        that a shrunk count would drop — all without writing anything to
+        ``placed_nodes_source`` and without permanently losing an edge from
+        ``edge_source`` (see the ``override_counts`` docstring on
+        :meth:`~.power_train_builder_handler_ports.PortEdgeMixin._rebuild_all_ports`
+        for the snapshot/restore mechanism that makes this reversible). The
+        change only becomes permanent when :meth:`apply_node_configurations`
+        reads the same spinner values and commits them; simply navigating
+        away (reselecting, deleting, placing a new node, or opening Delete
+        mode) discards the preview for free, because every one of those
+        paths already triggers a real, non-preview call to
+        ``_rebuild_all_ports`` that restores the true edge list and reads
+        port counts straight from the last-committed values again.
+
+        No-op if no node is currently selected (can happen if a spinner's
+        value is programmatically reset while the panel is being cleared).
+
+        :param attr: Bokeh on_change attribute name (``"value"``); unused.
+        :param old: Previous spinner value; unused.
+        :param new: New spinner value; unused — both spinners are re-read
+            directly since either one may be the one that changed.
+        """
+        node_index = self.state.selected_node_index
+        if node_index is None:
+            return
+
+        placed_nodes_data = self.state.placed_nodes_source.data
+        committed_n_sources = (
+            int(placed_nodes_data["n_sources"][node_index])
+            if node_index < len(placed_nodes_data.get("n_sources", []))
+            else 0
+        )
+        committed_n_targets = (
+            int(placed_nodes_data["n_targets"][node_index])
+            if node_index < len(placed_nodes_data.get("n_targets", []))
+            else 0
+        )
+
+        # Only a spinner that is currently visible represents an in-progress
+        # edit; a hidden spinner's stale value must not override the
+        # committed count for the other side of the node.
+        preview_n_sources = (
+            int(self.state.source_count_spinner.value)
+            if self.state.source_count_spinner.visible
+            else committed_n_sources
+        )
+        preview_n_targets = (
+            int(self.state.target_count_spinner.value)
+            if self.state.target_count_spinner.visible
+            else committed_n_targets
+        )
+
+        self._rebuild_all_ports(
+            override_counts={node_index: (preview_n_sources, preview_n_targets)}
+        )
 
     # -----------------------------------------------------------------------
     # Options table
@@ -643,9 +708,9 @@ class ConfigPanelMixin:
         # Drop any pending preview edge that has the own port at its own end
         # (starting end for source rows, ending end for target rows).
         if _own_kind == "source":
-            self.state.pending_connections = [
+            self.state.panel_pending_connections = [
                 (sp, ep)
-                for sp, ep in self.state.pending_connections
+                for sp, ep in self.state.panel_pending_connections
                 if not (
                     sp["kind"] == "source"
                     and sp["node_index"] == _own_node_index
@@ -653,9 +718,9 @@ class ConfigPanelMixin:
                 )
             ]
         else:
-            self.state.pending_connections = [
+            self.state.panel_pending_connections = [
                 (sp, ep)
-                for sp, ep in self.state.pending_connections
+                for sp, ep in self.state.panel_pending_connections
                 if not (
                     ep["kind"] == "target"
                     and ep["node_index"] == _own_node_index
@@ -664,7 +729,7 @@ class ConfigPanelMixin:
             ]
 
         self._clear_temp_edge_visuals()
-        for sp, ep in list(self.state.pending_connections):
+        for sp, ep in list(self.state.panel_pending_connections):
             self._add_edge_temp(sp, ep)
 
         if new_value == _EMPTY:
@@ -759,7 +824,7 @@ class ConfigPanelMixin:
                 "color": _own_color,
             }
 
-        self.state.pending_connections.append((starting_port, ending_port))
+        self.state.panel_pending_connections.append((starting_port, ending_port))
         self._add_edge_temp(starting_port, ending_port)
 
     # -----------------------------------------------------------------------
@@ -966,7 +1031,7 @@ class ConfigPanelMixin:
         self.state.placed_nodes_source.data = placed_nodes_data
 
         # ── Commit pending connections ─────────────────────────────────
-        for starting_port, ending_port in list(self.state.pending_connections):
+        for starting_port, ending_port in list(self.state.panel_pending_connections):
             self._add_edge(starting_port, ending_port)
         self._clear_temp_edges()
         self._rebuild_all_ports()

@@ -216,12 +216,16 @@ class CanvasModeMixin:
 
         self._exit_delete_mode()
 
-        for button_position, toolbox_button in enumerate(self.state.buttons):
-            toolbox_button.button_type = (
-                BUTTON_SELECTED_COLOR_TYPE
-                if button_position == component_index
-                else BUTTON_DEFAULT_COLOR_TYPE
-            )
+        # Find the previously selected button (if any) and reset its color to default.
+        previously_selected_button = next(
+            (btn for btn in self.state.buttons if btn.button_type == BUTTON_SELECTED_COLOR_TYPE),
+            None,
+        )
+        if previously_selected_button is not None:
+            previously_selected_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+
+        # Highlight the newly selected button.
+        self.state.buttons[component_index].button_type = BUTTON_SELECTED_COLOR_TYPE
 
         label = _string_cleanup(self.state.selected_component)
         self.state.status_div.text = f"<b style='color:#FFD700;font-size:14pt'>Placing: {label}</b>"

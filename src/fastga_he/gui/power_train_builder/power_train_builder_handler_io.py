@@ -153,7 +153,7 @@ class IOMixin:
         self.state.selected_node_index = None
         self.state.selected_component = None
         self.state.delete_mode = False
-        self.state.pending_connections.clear()
+        self.state.panel_pending_connections.clear()
         self.state.placed_counter.clear()
         self._clear_node_table()
         self._clear_temp_edges()
@@ -302,7 +302,7 @@ class IOMixin:
         self.state.selected_node_index = None
         self.state.selected_component = None
         self._exit_delete_mode()
-        self.state.pending_connections.clear()
+        self.state.panel_pending_connections.clear()
         self._clear_node_table()
         self._clear_temp_edges()
 

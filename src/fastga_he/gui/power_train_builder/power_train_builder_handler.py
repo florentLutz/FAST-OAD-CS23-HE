@@ -28,7 +28,7 @@ The class is assembled from five single-responsibility mixins:
 
 Typical usage::
 
-    toolbox_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+    toolbox_layout, config_panel_column, state = ComponentPaletteConfigurationTableBuilder.build()
     handler = BuilderHandler(state, canvas)
     canvas.on_event(Tap, handler.on_canvas_tap)
 """
@@ -53,7 +53,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
     Instantiate **after** building the toolbox; the constructor automatically
     wires all button ``on_click`` callbacks and initialises the undo stack::
 
-        toolbox_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+        toolbox_layout, config_panel_column, state = ComponentPaletteConfigurationTableBuilder.build()
         handler = BuilderHandler(state, main_plot)
         main_plot.on_event(Tap, handler.on_canvas_tap)
         main_plot.image_url(
@@ -108,6 +108,10 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
           position / options / symmetry choices as the user edits).
         * The Apply button -> :meth:`apply_node_configurations` (commits the
           config panel's current values to the selected node).
+        * The source/target port-count spinners ->
+          :meth:`_on_port_count_spinner_change` (live visual preview only;
+          the new counts are committed on Apply, same as every other
+          config-panel field).
         """
         # End Session is handled entirely via JS + end_session_trigger to avoid the
         # Python on_click firing unconditionally (before JS can gate on save state).
@@ -139,6 +143,12 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.state.type_select.on_change("value", self._on_type_select_change)
 
         self.state.apply_button.on_click(self.apply_node_configurations)
+
+        # Port-count spinners: live visual preview only (see
+        # ConfigPanelMixin._on_port_count_spinner_change) — the new counts
+        # are committed to placed_nodes_source only when Apply is clicked.
+        self.state.source_count_spinner.on_change("value", self._on_port_count_spinner_change)
+        self.state.target_count_spinner.on_change("value", self._on_port_count_spinner_change)
 
     def _make_select_callback(self, button_index: int):
         """
@@ -269,7 +279,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                 self._clear_temp_edges()
                 self.state.selected_node_index = best_node_index
                 self._populate_node_table(best_node_index)
-                self.state.table_panel.visible = True
+                self.state.config_panel_column.visible = True
             return
 
         # A component is selected in the toolbox: place it at the tap coordinates.

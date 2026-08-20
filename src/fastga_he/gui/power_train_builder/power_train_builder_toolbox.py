@@ -16,7 +16,7 @@ Typical usage::
         ComponentPaletteConfigurationTableBuilder,
     )
 
-    toolbox_layout, table_panel, state = ComponentPaletteConfigurationTableBuilder.build()
+    toolbox_layout, config_panel_column, state = ComponentPaletteConfigurationTableBuilder.build()
 """
 
 from pathlib import Path
@@ -84,11 +84,11 @@ class ComponentToolboxConfigurationTableBuilder:
         Construct the button toolbox, configurator panel, and shared builder state.
 
         :return: A three-element tuple
-            ``(toolbox_column_layout, table_panel, BuilderState)`` where
+            ``(toolbox_column_layout, config_panel_column, BuilderState)`` where
 
             * ``toolbox_column_layout`` is the left-side Bokeh column widget
               containing the tabbed component buttons and action buttons.
-            * ``table_panel`` is the right-side Bokeh column widget for the
+            * ``config_panel_column`` is the right-side Bokeh column widget for the
               component configurator.
             * :class:`BuilderState` holds references to every shared widget
               and data source.
@@ -577,8 +577,10 @@ class ComponentToolboxConfigurationTableBuilder:
                 ending_port_kind=[],
             )
         )
-        pending_port_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], color=[]))
-        temp_edge_source = bkmodel.ColumnDataSource(data=dict(xs=[], ys=[], color=[]))
+        awaiting_second_port_click_source = bkmodel.ColumnDataSource(
+            data=dict(x=[], y=[], color=[])
+        )
+        panel_preview_edge_source = bkmodel.ColumnDataSource(data=dict(xs=[], ys=[], color=[]))
 
         # ── Configurator panel widgets ────────────────────────────────────────
         options_rows_column = column([], styles={"background": BACKGROUND_COLOR_CODE})
@@ -664,7 +666,7 @@ class ComponentToolboxConfigurationTableBuilder:
             styles={"background": BACKGROUND_COLOR_CODE},
         )
 
-        table_panel = column(
+        config_panel_column = column(
             bkmodel.Div(
                 text="<b style='color:white;font-size:18pt'>Component Configurator</b>",
                 width=380,
@@ -705,7 +707,7 @@ class ComponentToolboxConfigurationTableBuilder:
 
         # ── Metadata lookup tables ────────────────────────────────────────────
         default_source_port_count, default_target_port_count = _build_port_count_defaults()
-        component_type_to_icon_map = _map_possible_component_types_to_icons()
+        icon_to_component_types_map = _map_possible_component_types_to_icons()
         possible_position_map, possible_options_map = _get_performance_component_names(
             COMPONENTS_PATH
         )
@@ -731,18 +733,18 @@ class ComponentToolboxConfigurationTableBuilder:
             type_select=type_select,
             position_select=position_select,
             apply_button=apply_button,
-            table_panel=table_panel,
+            config_panel_column=config_panel_column,
             selected_node_overlay_source=selected_node_overlay_source,
             edge_source=edge_source,
-            pending_port_source=pending_port_source,
+            awaiting_second_port_click_source=awaiting_second_port_click_source,
             connections_table_widget=connections_table_widget,
             connections_rows_column=connections_rows_column,
-            temp_edge_source=temp_edge_source,
-            pending_connections=[],
+            panel_preview_edge_source=panel_preview_edge_source,
+            panel_pending_connections=[],
             symmetry_select=symmetry_select,
             default_source_count=default_source_port_count,
             default_target_count=default_target_port_count,
-            component_type_to_icon=component_type_to_icon_map,
+            icon_to_component_types=icon_to_component_types_map,
             possible_position=possible_position_map,
             possible_options=possible_options_map,
             browse_load_trigger=browse_load_trigger,
@@ -794,4 +796,4 @@ class ComponentToolboxConfigurationTableBuilder:
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
         )
 
-        return toolbox_layout, table_panel, state
+        return toolbox_layout, config_panel_column, state
