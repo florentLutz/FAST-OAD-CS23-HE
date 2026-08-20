@@ -18,8 +18,6 @@ from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
-from .power_train_builder_state import copy_column_data
-
 _LOGGER = logging.getLogger(__name__)
 
 
