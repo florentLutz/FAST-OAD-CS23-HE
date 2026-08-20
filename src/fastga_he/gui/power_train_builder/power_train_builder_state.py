@@ -60,7 +60,7 @@ def copy_column_data(data: dict) -> dict:
     Mutating ``source.data['x']`` directly would silently desync the browser
     from the server: the Python-side data would be correct, but the glyph on
     screen wouldn't update. Every mutating operation in this codebase
-    therefore follows the same copy → mutate copy → single
+    therefore follows the same copy -> mutate copy -> single
     ``source.data = new_data`` reassignment pattern, and this helper is the
     shared "copy" half of it.
 
@@ -140,7 +140,7 @@ class BuilderState:
     default_source_count: dict = field(default_factory=dict)
     default_target_count: dict = field(default_factory=dict)
     component_type_to_icon: dict = field(default_factory=dict)
-    possible_position: dict = field(default_factory=dict)  # component_type → list of positions
+    possible_position: dict = field(default_factory=dict)  # component_type -> list of positions
     possible_options: dict = field(default_factory=dict)
     # Watcher file path: visible TextInput in the save overlay where the user
     # types or browses to a watcher file path; its value is read by Python at save time.

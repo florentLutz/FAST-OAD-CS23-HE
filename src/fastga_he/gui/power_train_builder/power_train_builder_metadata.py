@@ -39,7 +39,7 @@ def _map_possible_component_types_to_icons() -> dict:
     Build a dictionary mapping each icon key to the list of component types that use it.
 
     Iterates over :data:`KNOWN_COMPONENTS` and inverts the
-    ``icon_for_network_graph`` → ``components_type`` relationship so callers
+    ``icon_for_network_graph`` -> ``components_type`` relationship so callers
     can look up all component types associated with a given icon.
 
     :return: A dictionary of the form ``{icon_key: [component_type, …]}``.
@@ -67,14 +67,14 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
     Iterates over :data:`KNOWN_COMPONENTS` and applies the following rules in
     priority order:
 
-    * Any attribute containing ``"number_of_"`` → 3 sources, 3 targets
+    * Any attribute containing ``"number_of_"`` -> 3 sources, 3 targets
       (variable-count component).
-    * Any attribute containing ``"_mode"`` → 2 sources, 1 target.
-    * ``"gearbox"`` → 1 source, 2 targets.
-    * ``"propeller"`` or ``"aux_load"`` → 1 source, 0 targets.
+    * Any attribute containing ``"_mode"`` -> 2 sources, 1 target.
+    * ``"gearbox"`` -> 1 source, 2 targets.
+    * ``"propeller"`` or ``"aux_load"`` -> 1 source, 0 targets.
     * ``"fuel_tank"``, ``"gaseous_hydrogen_tank"``, or ``"battery_pack"``
-      → 0 sources, 1 target.
-    * Everything else → 1 source, 1 target.
+      -> 0 sources, 1 target.
+    * Everything else -> 1 source, 1 target.
 
     :return: A two-element tuple ``(default_source_count, default_target_count)``
         where both dictionaries are keyed by ``components_type`` string.
@@ -228,8 +228,8 @@ def _get_performance_component_names(
         cached-module fallback.
     :return: A two-element tuple ``(possible_position, possible_options)`` where:
 
-        * ``possible_position`` maps ``component_type → list[str]``
-        * ``possible_options``  maps ``component_type → {option_name: list[values]}``
+        * ``possible_position`` maps ``component_type -> list[str]``
+        * ``possible_options``  maps ``component_type -> {option_name: list[values]}``
     """
     components_root_path = Path(components_root_path)
     position_results: dict = {}

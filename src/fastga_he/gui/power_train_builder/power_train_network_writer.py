@@ -31,14 +31,38 @@ class PowerTrainYAML:
     :class:`BuilderState` at construction time, so all subsequent calls to
     :meth:`add_component`, :meth:`add_connection`, and :meth:`write` work on
     an immutable snapshot.
+
+    Callers that have already taken their own ``copy_column_data`` snapshot
+    (e.g. to also write a JSON backup) can pass it in directly via
+    ``node_data`` / ``edge_data`` / ``source_port_data`` / ``target_port_data``
+    to avoid re-copying the same live sources a second time. Any of these
+    left as ``None`` is copied from ``state`` as before, so the class remains
+    safe to construct standalone with just ``state``.
     """
 
-    def __init__(self, state):
+    def __init__(
+        self,
+        state,
+        node_data: dict = None,
+        edge_data: dict = None,
+        source_port_data: dict = None,
+        target_port_data: dict = None,
+    ):
         """
         Snapshot the builder state needed for serialisation.
 
         :param state: :class:`BuilderState` instance whose data sources are
-            copied at construction time.
+            copied at construction time (used for any of the four data
+            arguments left as ``None``, and always for
+            ``possible_options`` / ``default_source_count``).
+        :param node_data: Optional pre-copied ``placed_nodes_source.data``
+            (via :func:`copy_column_data`). Copied from *state* if ``None``.
+        :param edge_data: Optional pre-copied ``edge_source.data``. Copied
+            from *state* if ``None``.
+        :param source_port_data: Optional pre-copied ``source_port_source.data``.
+            Copied from *state* if ``None``.
+        :param target_port_data: Optional pre-copied ``target_port_source.data``.
+            Copied from *state* if ``None``.
         """
         self.data = {
             "title": "",
@@ -46,10 +70,10 @@ class PowerTrainYAML:
             "component_connections": [],
             "watcher_file_path": "",
         }
-        self.node_data = copy_column_data(state.placed_nodes_source.data)
-        self.edge_data = copy_column_data(state.edge_source.data)
-        self.source_port_data = copy_column_data(state.source_port_source.data)
-        self.target_port_data = copy_column_data(state.target_port_source.data)
+        self.node_data = node_data
+        self.edge_data = edge_data
+        self.source_port_data = source_port_data
+        self.target_port_data = target_port_data
         self.possible_options = state.possible_options
         self.default_source_count = state.default_source_count
 

@@ -95,18 +95,18 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
 
         Called once from :meth:`__init__`. Connects:
 
-        * Each component toolbox button → :meth:`on_toolbox_select`.
-        * The End Session button → :meth:`_end_session`.
-        * The Delete button → :meth:`_toggle_delete_mode`.
-        * The New Design button → :meth:`_on_new_design`.
-        * The browse_load_trigger → :meth:`_on_browse_load` (tkinter open-file dialog).
-        * The browse_save_trigger → :meth:`_on_browse_save` (tkinter save-file dialogs).
-        * The browse_watcher_trigger → :meth:`_on_browse_watcher` (tkinter CSV path dialog).
-        * The Undo button → :meth:`_on_undo`.
-        * The Redo button → :meth:`_on_redo`.
-        * The type_select → :meth:`_on_type_select_change` (refreshes
+        * Each component toolbox button -> :meth:`on_toolbox_select`.
+        * The End Session button -> :meth:`_end_session`.
+        * The Delete button -> :meth:`_toggle_delete_mode`.
+        * The New Design button -> :meth:`_on_new_design`.
+        * The browse_load_trigger -> :meth:`_on_browse_load` (tkinter open-file dialog).
+        * The browse_save_trigger -> :meth:`_on_browse_save` (tkinter save-file dialogs).
+        * The browse_watcher_trigger -> :meth:`_on_browse_watcher` (tkinter CSV path dialog).
+        * The Undo button -> :meth:`_on_undo`.
+        * The Redo button -> :meth:`_on_redo`.
+        * The type_select -> :meth:`_on_type_select_change` (refreshes
           position / options / symmetry choices as the user edits).
-        * The Apply button → :meth:`apply_node_configurations` (commits the
+        * The Apply button -> :meth:`apply_node_configurations` (commits the
           config panel's current values to the selected node).
         """
         # End Session is handled entirely via JS + end_session_trigger to avoid the

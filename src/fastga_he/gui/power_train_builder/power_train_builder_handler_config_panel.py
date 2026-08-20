@@ -307,7 +307,7 @@ class ConfigPanelMixin:
         node_data = copy_column_data(self.state.placed_nodes_source.data)
         edge_data = copy_column_data(self.state.edge_source.data)
 
-        # Build lookup: port label → (far_node_index, far_label) for every edge
+        # Build lookup: port label -> (far_node_index, far_label) for every edge
         # that touches node_index.
         connected_source: dict[str, tuple[int, str]] = {}
         connected_target: dict[str, tuple[int, str]] = {}
@@ -566,7 +566,7 @@ class ConfigPanelMixin:
         * When ``_own_kind == "target"``:  own port = ending_port,
           far port = starting_port (source kind).
 
-        The edge is always stored as source → target regardless of which
+        The edge is always stored as source -> target regardless of which
         direction was clicked, so ``starting_port`` is always source-kind
         and ``ending_port`` is always target-kind.
 
@@ -614,7 +614,7 @@ class ConfigPanelMixin:
         2. **Disconnect** (if *new_value* is empty): remove the permanent edge
            that involves the own port and refresh the canvas.
         3. **Connect** (otherwise): resolve the chosen far-end port, re-fetch
-           live coordinates for both ends, build source→target port dicts, and
+           live coordinates for both ends, build source->target port dicts, and
            register a new preview edge.
 
         :param attr: Bokeh change attribute name (unused, required by protocol).
@@ -723,7 +723,7 @@ class ConfigPanelMixin:
                 live_own_y = own_data["y"][j]
                 break
 
-        # Build the edge always as source → target.
+        # Build the edge always as source -> target.
         if _own_kind == "source":
             starting_port = {
                 "kind": "source",
@@ -770,7 +770,7 @@ class ConfigPanelMixin:
         """
         Bokeh ``on_change`` callback wired to ``state.type_select``.
 
-        Refreshes the Position select's choices, rebuilds the Options table
+        Refreshes the choices in position select object, rebuilds the Options table
         for the newly chosen component type (pre-populated with the selected
         node's previously saved option values, if any), and refreshes the
         Symmetry select so its candidate list matches ``new`` — the type

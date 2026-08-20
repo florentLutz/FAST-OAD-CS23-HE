@@ -146,7 +146,7 @@ class PortEdgeMixin:
                     x=[port["x"]], y=[port["y"]], color=[port["color"]]
                 )
             return
-        # Same port tapped again → cancel
+        # Same port tapped again -> cancel
         if (
             port["kind"] == pending["kind"]
             and port["node_index"] == pending["node_index"]
@@ -154,7 +154,7 @@ class PortEdgeMixin:
         ):
             self._cancel_pending_connection()
             return
-        # Connect source ↔ target of the same energy type (colour).
+        # Connect source <-> target of the same energy type (colour).
         # Push undo *before* committing the edge so the action is reversible.
         if port["kind"] != pending["kind"] and port["color"] == pending["color"]:
             self._push_undo()
@@ -310,7 +310,7 @@ class PortEdgeMixin:
 
         self._mark_unsaved()
         _LOGGER.info(
-            "Edge: %s port %s (node %d) ↔ %s port %s (node %d)",
+            "Edge: %s port %s (node %d) <-> %s port %s (node %d)",
             starting_port["kind"],
             starting_port["label"],
             starting_port["node_index"],
@@ -356,7 +356,7 @@ class PortEdgeMixin:
         temp_edge_data["color"].append(starting_port["color"])
         self.state.temp_edge_source.data = temp_edge_data
         _LOGGER.info(
-            "Temp edge: %s:%s → %s:%s",
+            "Temp edge: %s:%s -> %s:%s",
             starting_port["kind"],
             starting_port["label"],
             ending_port["kind"],

@@ -216,20 +216,20 @@ class ComponentToolboxConfigurationTableBuilder:
         # '0' or '1' from a previous click.
         #
         # Trigger routing:
-        #   browse_load_trigger    → IOMixin._on_browse_load
+        #   browse_load_trigger    -> IOMixin._on_browse_load
         #                            Opens a tkinter open-file dialog; restores the
         #                            canvas from the chosen JSON backup.
-        #   browse_save_trigger    → IOMixin._on_browse_save
+        #   browse_save_trigger    -> IOMixin._on_browse_save
         #                            Opens two tkinter save-file dialogs (YAML config
         #                            and JSON backup); writes both files.
-        #   browse_watcher_trigger → IOMixin._on_browse_watcher
+        #   browse_watcher_trigger -> IOMixin._on_browse_watcher
         #                            Opens a tkinter save-file dialog to choose the
         #                            watcher CSV path; writes it into watcher_path_input.
-        #   end_session_trigger    → IOMixin._on_end_session_trigger
+        #   end_session_trigger    -> IOMixin._on_end_session_trigger
         #                            Stops the Bokeh IOLoop, terminating the server.
         #                            Flipped by JS only when it is safe to do so (design
         #                            already saved, or "End Anyway" confirmed).
-        #   close_window_trigger   → js_on_change CustomJS (window.close())
+        #   close_window_trigger   -> js_on_change CustomJS (window.close())
         #                            Flipped by Python after a Save & Exit save completes
         #                            so the browser tab closes before the IOLoop stops.
 
@@ -243,7 +243,7 @@ class ComponentToolboxConfigurationTableBuilder:
             bkmodel.CustomJS(code="window.close();"),
         )
 
-        # ── Wire Load Design buttons → signal Python to open tkinter dialog ───
+        # ── Wire Load Design buttons -> signal Python to open tkinter dialog ───
         _load_js = bkmodel.CustomJS(
             args=dict(browse_load_trigger=browse_load_trigger),
             code=_JS_LOAD_DIALOG,
@@ -340,7 +340,7 @@ class ComponentToolboxConfigurationTableBuilder:
             },
         )
 
-        # ── Wire Save button: click → show watcher overlay ────────────────────
+        # ── Wire Save button: click -> show watcher overlay ────────────────────
         save_button.js_on_click(
             bkmodel.CustomJS(
                 args=dict(save_overlay_widget=save_overlay),
@@ -356,7 +356,7 @@ class ComponentToolboxConfigurationTableBuilder:
             )
         )
 
-        # ── Wire Continue button → signal Python to open tkinter save dialogs ─
+        # ── Wire Continue button -> signal Python to open tkinter save dialogs ─
         _continue_save_btn.js_on_click(
             bkmodel.CustomJS(
                 args=dict(
@@ -526,7 +526,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 node_type=[],
                 icon_type=[],
                 position=[],
-                options=[],  # JSON-encoded dict of option_name → value
+                options=[],  # JSON-encoded dict of option_name -> value
                 n_sources=[],  # current source-port count for this node
                 n_targets=[],  # current target-port count for this node
                 symmetry_name=[],  # name of the symmetry peer node

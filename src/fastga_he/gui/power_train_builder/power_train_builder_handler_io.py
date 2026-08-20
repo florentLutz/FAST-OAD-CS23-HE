@@ -76,7 +76,13 @@ class IOMixin:
             yaml_file = Path(yaml_path)
             yaml_file.parent.mkdir(parents=True, exist_ok=True)
             try:
-                pt_yaml = PowerTrainYAML(self.state)
+                pt_yaml = PowerTrainYAML(
+                    self.state,
+                    node_data=nodes_data,
+                    edge_data=edges_data,
+                    source_port_data=source_port_data,
+                    target_port_data=target_port_data,
+                )
                 pt_yaml.set_title(yaml_file.stem)
                 for node_index in range(len(nodes_data.get("name", []))):
                     pt_yaml.add_component(node_index)
