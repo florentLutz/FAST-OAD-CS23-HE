@@ -279,7 +279,7 @@ class PortEdgeMixin:
         if loop_connection:
             _LOGGER.info("Loop connection detected; edge rejected.")
             return
-
+        # Update the local copy of the edge data and push it back to the Bokeh source
         edge_data["xs"].append([starting_port["x"], ending_port["x"]])
         edge_data["ys"].append([starting_port["y"], ending_port["y"]])
         edge_data["color"].append(starting_port["color"])
@@ -352,9 +352,11 @@ class PortEdgeMixin:
         if self.state.panel_preview_edge_source is None:
             return
         temp_edge_data = copy_column_data(self.state.panel_preview_edge_source.data)
+        # Update the temp edge data with the new edge coordinates and color
         temp_edge_data["xs"].append([starting_port["x"], ending_port["x"]])
         temp_edge_data["ys"].append([starting_port["y"], ending_port["y"]])
         temp_edge_data["color"].append(starting_port["color"])
+        # Push the updated temp edge data back to the Bokeh source
         self.state.panel_preview_edge_source.data = temp_edge_data
         _LOGGER.info(
             "Temp edge: %s:%s -> %s:%s",
