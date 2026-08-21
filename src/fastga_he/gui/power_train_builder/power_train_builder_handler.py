@@ -81,7 +81,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         # reach it via self.state.edit_history_stack.
         self.state.edit_history_stack = EditHistoryStack()
 
-        self._wire_buttons()
+        self._wire_buttons_widgets()
         # Set the initial enabled/disabled appearance of the undo/redo buttons.
         self._refresh_undo_redo_buttons()
 
@@ -89,9 +89,10 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
     # Internal wiring
     # -----------------------------------------------------------------------
 
-    def _wire_buttons(self):
+    def _wire_buttons_widgets(self):
         """
-        Attach ``on_click`` callbacks to every toolbox and action button.
+        Attach ``on_click`` callbacks of all static Bokeh buttons/ widgets in the left toolbox
+        and the right component configuration table panel.
 
         Called once from :meth:`__init__`. Connects:
 

@@ -11,7 +11,8 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 
 import logging
 from typing import TYPE_CHECKING
-import math
+
+import numpy as np
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
 from .power_train_builder_state import NODE_RADIUS, PORT_RADIUS, copy_column_data
@@ -179,13 +180,13 @@ class PortEdgeMixin:
         if segment_delta_x == 0 and segment_delta_y == 0:
             return ((px - x1) ** 2 + (py - y1) ** 2) ** 0.5
 
-        projection_parameter = max(
-            0.0,
-            min(
-                1.0,
+        projection_parameter = float(
+            np.clip(
                 ((px - x1) * segment_delta_x + (py - y1) * segment_delta_y)
                 / (segment_delta_x**2 + segment_delta_y**2),
-            ),
+                0.0,
+                1.0,
+            )
         )
         return (
             (px - (x1 + projection_parameter * segment_delta_x)) ** 2
@@ -663,10 +664,10 @@ class PortEdgeMixin:
             return start_angle + port_index * angle_step
 
         def _coordinates_from_angle(angle_degrees: float):
-            angle_radians = math.radians(angle_degrees)
+            angle_radians = float(np.radians(angle_degrees))
             return (
-                center_x + orbit_radius * math.cos(angle_radians),
-                center_y + orbit_radius * math.sin(angle_radians),
+                float(center_x + orbit_radius * np.cos(angle_radians)),
+                float(center_y + orbit_radius * np.sin(angle_radians)),
             )
 
         output_ports = []
