@@ -45,6 +45,8 @@ from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
+from ..lcc_project_total_non_recursive_cost import LCCTotalNonRecursiveProjectCost
+from ..lcc_recursive_cost_per_unit import LCCRecursiveCost
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
@@ -1132,3 +1134,51 @@ def test_cost_pipistrel():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_non_recursive_project_cost():
+    ivc = get_indep_var_comp(
+        list_inputs(LCCTotalNonRecursiveProjectCost()),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCTotalNonRecursiveProjectCost(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:total_non_recursive_project_cost", units="USD"
+    ) == pytest.approx(1.66032181e08, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_recursive_project_cost_per_unit():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCRecursiveCost(
+                cost_components_type=["propeller", "turboshaft", "fuel_tank", "fuel_tank"],
+                cost_components_name=["propeller_1", "turboshaft_1", "fuel_tank_1", "fuel_tank_2"],
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCRecursiveCost(
+            cost_components_type=["propeller", "turboshaft", "fuel_tank", "fuel_tank"],
+            cost_components_name=["propeller_1", "turboshaft_1", "fuel_tank_1", "fuel_tank_2"],
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:recursive_cost_per_unit", units="USD") == pytest.approx(
+        1793666.08, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
