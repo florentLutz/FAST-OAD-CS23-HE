@@ -4,6 +4,8 @@
 
 import os
 import pathlib
+
+import numpy as np
 import pytest
 import os.path as pth
 import openmdao.api as om
@@ -47,12 +49,14 @@ from ..lcc_operational_cost import LCCOperationalCost
 from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
 from ..lcc_project_total_non_recursive_cost import LCCTotalNonRecursiveProjectCost
 from ..lcc_recursive_cost_per_unit import LCCRecursiveCost
+from ..lcc_project_cost_distribution import LCCProjectDevelopmentCostDistribution
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
 
 XML_FILE = "tbm_900_inputs.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
+DEFAULT_DEVELOPMENT_YEARS = 5
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -1180,5 +1184,29 @@ def test_recursive_project_cost_per_unit():
     assert problem.get_val("data:cost:recursive_cost_per_unit", units="USD") == pytest.approx(
         1793666.08, rel=1e-3
     )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_cumulative_project_cost_distribution():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:cost:production:total_non_recursive_project_cost", units="USD", val=10000.0
+    )
+
+    problem = run_system(
+        LCCProjectDevelopmentCostDistribution(
+            number_of_development_years=DEFAULT_DEVELOPMENT_YEARS
+        ),
+        ivc,
+    )
+
+    progression_percentage = np.linspace(0.0, 1.0, DEFAULT_DEVELOPMENT_YEARS + 1)
+    expected = ((1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97) * 10000.0
+
+    assert problem.get_val(
+        "data:cost:project_development_cost_cumulative_distribution", units="USD"
+    ) == pytest.approx(expected, rel=1e-3)
 
     problem.check_partials(compact_print=True)

@@ -33,27 +33,27 @@ class LCCProjectDevelopmentCostDistribution(om.ExplicitComponent):
             "data:cost:project_development_cost_cumulative_distribution",
             units="USD",
             val=0.0,
-            shape=number_of_development_years,
+            shape=number_of_development_years + 1,
             desc="Project development cost cumulative distribution over the development years",
         )
 
     def setup_partials(self):
         number_of_development_years = self.options["number_of_development_years"]
-        progression_percentage = np.linspace(0.0, 1.0, number_of_development_years)
+        progression_percentage = np.linspace(0.0, 1.0, number_of_development_years + 1)
 
         self.declare_partials(
             "*",
             "*",
             method="exact",
-            rows=np.arange(number_of_development_years),
-            cols=np.zeros(number_of_development_years),
-            val=(1.0 - np.exp(-3.52 * progression_percentage**2.0) / 0.97),
+            rows=np.arange(number_of_development_years + 1),
+            cols=np.zeros(number_of_development_years + 1),
+            val=((1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         number_of_development_years = self.options["number_of_development_years"]
-        progression_percentage = np.linspace(0.0, 1.0, number_of_development_years)
+        progression_percentage = np.linspace(0.0, 1.0, number_of_development_years + 1)
 
         outputs["data:cost:project_development_cost_cumulative_distribution"] = (
-            1.0 - np.exp(-3.52 * progression_percentage**2.0) / 0.97
+            (1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97
         ) * inputs["data:cost:production:total_non_recursive_project_cost"]
