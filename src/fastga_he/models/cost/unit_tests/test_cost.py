@@ -392,18 +392,17 @@ def test_landing_gear_cost_reduction():
 
 def test_learning_curve_discount():
     ivc = om.IndepVarComp()
-    ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=85.0)
-    ivc.add_output("data:cost:production:similar_aircraft_made", val=1500.0)
-    ivc.add_output("data:cost:production:number_aircraft_5_years", val=50.0)
+    ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=95.0)
+    ivc.add_output("data:cost:production:similar_aircraft_made", val=[1, 30, 60, 100, 150])
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCLearningCurveDiscount(),
+        LCCLearningCurveDiscount(years_of_development=5, years_of_program=10),
         ivc,
     )
 
     assert problem.get_val("data:cost:production:maturity_discount") == pytest.approx(
-        0.4504, rel=1e-3
+        [1.0, 0.7775, 0.7386, 0.7112, 0.6902], rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
