@@ -63,6 +63,7 @@ class LCCRecursiveCost(om.ExplicitComponent):
 
         self.add_output("data:cost:recursive_cost_per_unit", units="USD", val=0.0)
 
+    def setup_partials(self):
         self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

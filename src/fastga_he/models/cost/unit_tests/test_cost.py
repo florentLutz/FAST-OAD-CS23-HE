@@ -50,6 +50,7 @@ from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
 from ..lcc_project_total_non_recursive_cost import LCCTotalNonRecursiveProjectCost
 from ..lcc_recursive_cost_per_unit import LCCRecursiveCost
 from ..lcc_project_cost_distribution import LCCProjectDevelopmentCostDistribution
+from ..lcc_unit_sales_gross_profit import LCCGrossProfitPerUnit
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
@@ -1208,5 +1209,23 @@ def test_cumulative_project_cost_distribution():
     assert problem.get_val(
         "data:cost:project_development_cost_cumulative_distribution", units="USD"
     ) == pytest.approx(expected, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_unit_sales_gross_profit():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
+    ivc.add_output("data:cost:recursive_cost_per_unit", units="USD", val=1793666.08)
+
+    problem = run_system(
+        LCCGrossProfitPerUnit(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:unit_gross_profit", units="USD") == pytest.approx(
+        2720761.1, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
