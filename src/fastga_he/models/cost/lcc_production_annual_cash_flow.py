@@ -56,7 +56,6 @@ class LCCProductionAnnualCashFlow(om.ExplicitComponent):
         years_of_development = self.options["years_of_development"]
         years_of_program = self.options["years_of_program"]
 
-        # wrt development_costs: output[i] = -development_costs[i] for i = 0..n
         self.declare_partials(
             of="data:cost:production:annual_cash_flow",
             wrt="data:cost:project_development_cost_distribution",
@@ -65,7 +64,6 @@ class LCCProductionAnnualCashFlow(om.ExplicitComponent):
             cols=np.arange(years_of_development + 1),
         )
 
-        # wrt gross_profits: output[n + j] = gross_profits[j] for j = 0..N-n
         self.declare_partials(
             of="data:cost:production:annual_cash_flow",
             wrt="data:cost:production:annual_gross_profit",

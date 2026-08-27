@@ -63,7 +63,7 @@ class LCCProductionNetPresentValue(om.Group):
             subsys=LCCAnnualDeliveryCount(
                 years_of_development=years_of_development, years_of_program=years_of_program
             ),
-            promotes=["*"],
+            promotes=["data:*"],
         )
 
         self.add_subsystem(
@@ -77,11 +77,20 @@ class LCCProductionNetPresentValue(om.Group):
         self.add_subsystem(
             name="npv_discount_factor",
             subsys=LCCNPVDiscountFactor(duration_in_years=years_of_program),
-            promotes=["*"],
+            promotes=[
+                ("discount_rate", "data:cost:production:discount_rate"),
+            ],
         )
 
         self.add_subsystem(
             name="net_present_value",
             subsys=LCCNetPresentValue(duration_in_years=years_of_program),
-            promotes=["*"],
+            promotes=[
+                ("annual_net_cash_flow", "data:cost:production:annual_cash_flow"),
+                ("net_present_value", "data:cost:production:net_present_value"),
+            ],
+        )
+
+        self.connect(
+            "npv_discount_factor.annual_discount_factor", "net_present_value.annual_discount_factor"
         )
