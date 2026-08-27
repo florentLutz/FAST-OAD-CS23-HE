@@ -49,15 +49,20 @@ from ..lcc_operational_cost import LCCOperationalCost
 from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
 from ..lcc_project_total_non_recursive_cost import LCCTotalNonRecursiveProjectCost
 from ..lcc_recursive_cost_per_unit import LCCRecursiveCost
-from ..lcc_project_cost_distribution import LCCProjectDevelopmentCostDistribution
-from ..lcc_unit_sales_gross_profit import LCCGrossProfitPerUnit
+from ..lcc_project_development_cost_distribution import LCCProjectDevelopmentCostDistribution
+from ..lcc_annual_sales_gross_profit import LCCAnnualSalesGrossProfit
+from ..lcc_annual_delivery_count import LCCAnnualDeliveryCount
+from ..lcc_production_annual_cash_flow import LCCProductionAnnualCashFlow
+from ..lcc_npv_discount_factor import LCCNPVDiscountFactor
+from ..lcc_net_present_value import LCCNetPresentValue
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
 
 XML_FILE = "tbm_900_inputs.xml"
 DATA_FOLDER_PATH = pathlib.Path(__file__).parents[0] / "data"
-DEFAULT_DEVELOPMENT_YEARS = 5
+TEST_DEVELOPMENT_YEARS = 5
+TEST_PROGAM_YEARS = 10
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
@@ -393,16 +398,20 @@ def test_landing_gear_cost_reduction():
 def test_learning_curve_discount():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=95.0)
-    ivc.add_output("data:cost:production:similar_aircraft_made", val=[1, 30, 60, 100, 150])
+    ivc.add_output(
+        "data:cost:production:cumulative_annual_delivery_count", val=[1, 30, 60, 100, 120, 150]
+    )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCLearningCurveDiscount(years_of_development=5, years_of_program=10),
+        LCCLearningCurveDiscount(
+            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
+        ),
         ivc,
     )
 
     assert problem.get_val("data:cost:production:maturity_discount") == pytest.approx(
-        [1.0, 0.7775, 0.7386, 0.7112, 0.6902], rel=1e-3
+        [1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902], rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1181,50 +1190,187 @@ def test_recursive_project_cost_per_unit():
         ivc,
     )
 
-    assert problem.get_val("data:cost:recursive_cost_per_unit", units="USD") == pytest.approx(
-        1793666.08, rel=1e-3
-    )
+    assert problem.get_val(
+        "data:cost:production:recursive_cost_per_unit", units="USD"
+    ) == pytest.approx(1793666.08, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
-def test_cumulative_project_cost_distribution():
+def test_project_cost_distribution():
     ivc = om.IndepVarComp()
 
-    ivc.add_output(
-        "data:cost:production:total_non_recursive_project_cost", units="USD", val=10000.0
-    )
+    ivc.add_output("data:cost:production:total_non_recursive_project_cost", units="USD", val=10000)
 
     problem = run_system(
-        LCCProjectDevelopmentCostDistribution(
-            number_of_development_years=DEFAULT_DEVELOPMENT_YEARS
-        ),
+        LCCProjectDevelopmentCostDistribution(years_of_development=TEST_DEVELOPMENT_YEARS),
         ivc,
     )
 
-    progression_percentage = np.linspace(0.0, 1.0, DEFAULT_DEVELOPMENT_YEARS + 1)
-    expected = ((1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97) * 10000.0
+    progression_percentage = np.linspace(0.0, 1.0, TEST_DEVELOPMENT_YEARS + 1)
+    expected = ((1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97) * 10000
 
     assert problem.get_val(
         "data:cost:project_development_cost_cumulative_distribution", units="USD"
     ) == pytest.approx(expected, rel=1e-3)
 
+    assert problem.get_val(
+        "data:cost:project_development_cost_distribution", units="USD"
+    ) == pytest.approx([0.0, 1354.0, 3085.3, 2966.7, 1819.7, 778.4], rel=1e-3)
+
     problem.check_partials(compact_print=True)
 
 
-def test_unit_sales_gross_profit():
+def test_annual_sales_gross_profit():
     ivc = om.IndepVarComp()
 
     ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
-    ivc.add_output("data:cost:recursive_cost_per_unit", units="USD", val=1793666.08)
+    ivc.add_output("data:cost:production:recursive_cost_per_unit", units="USD", val=1793666.08)
+    ivc.add_output(
+        "data:cost:production:maturity_discount", val=[1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902]
+    )
+    ivc.add_output("data:cost:production:annual_delivery_count", val=[3, 13, 19, 23, 26, 27])
 
     problem = run_system(
-        LCCGrossProfitPerUnit(),
+        LCCAnnualSalesGrossProfit(
+            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
+        ),
         ivc,
     )
 
-    assert problem.get_val("data:cost:unit_gross_profit", units="USD") == pytest.approx(
-        2720761.1, rel=1e-3
+    assert problem.get_val(
+        "data:cost:production:annual_gross_profit", units="USD"
+    ) == pytest.approx(
+        [8162283.3, 40558073.4, 60602882.9, 74491752.9, 84651104.0, 88463849.0], rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_annual_delivery_count():
+    ivc = om.IndepVarComp()
+    ivc.add_output("data:cost:production:number_aircraft_5_years", val=100)
+    ivc.add_output("data:cost:production:launch_aircraft_count", val=3)
+    ivc.add_output("data:cost:production:annual_delivery_target", val=30)
+
+    problem = run_system(
+        LCCAnnualDeliveryCount(
+            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:annual_delivery_count") == pytest.approx(
+        [3, 13, 19, 23, 26, 27], rel=1e-3
+    )
+    assert problem.get_val(
+        "data:cost:production:cumulative_annual_delivery_count"
+    ) == pytest.approx([3, 16, 35, 58, 84, 111], rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_production_annual_cash_flow():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "data:cost:production:annual_gross_profit",
+        units="USD",
+        val=[8162283.3, 40558073.4, 60602882.9, 74491752.9, 84651104.0, 88463849.0],
+    )
+    ivc.add_output(
+        "data:cost:project_development_cost_distribution",
+        units="USD",
+        val=[0.0, 22480757.3, 51225908.8, 49256767.1, 30212876.0, 12923945.0],
+    )
+
+    problem = run_system(
+        LCCProductionAnnualCashFlow(
+            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:annual_cash_flow", units="USD") == pytest.approx(
+        [
+            -0.0,
+            -22480757.3,
+            -51225908.8,
+            -49256767.1,
+            -30212876.0,
+            -4761661.7,
+            40558073.4,
+            60602882.9,
+            74491752.9,
+            84651104.0,
+            88463849.0,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_npv_discount_factor():
+    ivc = om.IndepVarComp()
+    ivc.add_output("discount_rate", val=0.12)
+
+    problem = run_system(
+        LCCNPVDiscountFactor(duration_in_years=TEST_PROGAM_YEARS),
+        ivc,
+    )
+
+    assert problem.get_val("annual_discount_factor") == pytest.approx(
+        [1.0, 0.8929, 0.7972, 0.7118, 0.6355, 0.5674, 0.5066, 0.4524, 0.4039, 0.3606, 0.3220],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_net_present_value():
+    ivc = om.IndepVarComp()
+    ivc.add_output(
+        "annual_net_cash_flow",
+        units="USD",
+        val=[
+            0.0,
+            -22480757.3,
+            -51225908.8,
+            -49256767.1,
+            -30212876.0,
+            -4761661.7,
+            40558073.4,
+            60602882.9,
+            74491752.9,
+            84651104.0,
+            88463849.0,
+        ],
+    )
+    ivc.add_output(
+        "annual_discount_factor",
+        val=[1.0, 0.8929, 0.7972, 0.7118, 0.6355, 0.5674, 0.5066, 0.4524, 0.4039, 0.3606, 0.3220],
+    )
+
+    problem = run_system(
+        LCCNetPresentValue(duration_in_years=TEST_PROGAM_YEARS),
+        ivc,
+    )
+
+    assert problem.get_val("net_present_value", units="USD") == pytest.approx(
+        [
+            0.0,
+            -2.00730682e07,
+            -6.09103627e07,
+            -9.59713295e07,
+            -1.15171612e08,
+            -1.17873379e08,
+            -9.73266591e07,
+            -6.99099148e07,
+            -3.98226959e07,
+            -9.29750775e06,
+            1.91878516e07,
+        ],
+        rel=1e-3,
     )
 
     problem.check_partials(compact_print=True)

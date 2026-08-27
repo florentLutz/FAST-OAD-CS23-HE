@@ -61,10 +61,15 @@ class LCCRecursiveCost(om.ExplicitComponent):
                 val=np.nan,
             )
 
-        self.add_output("data:cost:recursive_cost_per_unit", units="USD", val=0.0)
+        self.add_output(
+            "data:cost:production:recursive_cost_per_unit",
+            units="USD",
+            val=0.0,
+            desc="Unadjusted recursive production cost per unit of the aircraft.",
+        )
 
     def setup_partials(self):
         self.declare_partials("*", "*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:recursive_cost_per_unit"] = np.sum(inputs.values())
+        outputs["data:cost:production:recursive_cost_per_unit"] = np.sum(inputs.values())

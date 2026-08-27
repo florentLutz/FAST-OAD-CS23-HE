@@ -39,17 +39,17 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
             desc="The percentage decrease in unit production cost after extensive learning",
         )
         self.add_input(
-            "data:cost:production:similar_aircraft_made",
-            val=1.0,
+            "data:cost:production:cumulative_annual_delivery_count",
+            val=np.nan,
             desc="The cumulative number of similar aircraft produced over the production",
-            shape=years_of_program - years_of_development,
+            shape=years_of_program - years_of_development + 1,
         )
 
         self.add_output(
             "data:cost:production:maturity_discount",
             val=1.0,
             desc="The discount factor in manufacturing and tooling bsed on process maturity",
-            shape=years_of_program - years_of_development,
+            shape=years_of_program - years_of_development + 1,
         )
 
     def setup_partials(self):
@@ -58,31 +58,31 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
 
         self.declare_partials(
             of="*",
-            wrt="data:cost:production:similar_aircraft_made",
+            wrt="data:cost:production:cumulative_annual_delivery_count",
             method="exact",
-            rows=np.arange(years_of_program - years_of_development),
-            cols=np.arange(years_of_program - years_of_development),
+            rows=np.arange(years_of_program - years_of_development + 1),
+            cols=np.arange(years_of_program - years_of_development + 1),
         )
         self.declare_partials(
             of="*",
             wrt="data:cost:production:learning_curve_percentage",
             method="exact",
-            rows=np.arange(years_of_program - years_of_development),
-            cols=np.zeros(years_of_program - years_of_development),
+            rows=np.arange(years_of_program - years_of_development + 1),
+            cols=np.zeros(years_of_program - years_of_development + 1),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         outputs["data:cost:production:maturity_discount"] = (
-            inputs["data:cost:production:similar_aircraft_made"]
+            inputs["data:cost:production:cumulative_annual_delivery_count"]
         ) ** (np.log2(0.02 * inputs["data:cost:production:learning_curve_percentage"]) - 1.0)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        aircraft_made = inputs["data:cost:production:similar_aircraft_made"]
+        aircraft_made = inputs["data:cost:production:cumulative_annual_delivery_count"]
         factor = np.log2(0.02 * inputs["data:cost:production:learning_curve_percentage"])
 
         partials[
             "data:cost:production:maturity_discount",
-            "data:cost:production:similar_aircraft_made",
+            "data:cost:production:cumulative_annual_delivery_count",
         ] = (factor - 1.0) * aircraft_made ** (factor - 1.0) / aircraft_made
 
         partials[
