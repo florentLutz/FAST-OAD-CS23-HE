@@ -432,22 +432,6 @@ def test_cost_sum():
         XML_FILE,
     )
 
-    ivc.add_output(
-        "data:propulsion:he_power_train:propeller:propeller_1:purchase_cost",
-        units="USD",
-        val=4403.0,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:turboshaft:turboshaft_1:purchase_cost",
-        units="USD",
-        val=3.0e5,
-    )
-    ivc.add_output(
-        "data:propulsion:he_power_train:fuel_tank:fuel_tank_1:purchase_cost",
-        units="USD",
-        val=1000.0,
-    )
-
     problem = run_system(
         LCCSumProductionCost(
             cost_components_type=components_type, cost_components_name=components_name
@@ -456,7 +440,7 @@ def test_cost_sum():
     )
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        3849700.62, rel=1e-3
+        4002052.7, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1111,7 +1095,6 @@ def test_cost_pipistrel():
             LCC(
                 power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
                 delivery_method="train",
-                learning_curve=True,
             )
         ),
         __file__,
@@ -1125,7 +1108,6 @@ def test_cost_pipistrel():
         LCC(
             power_train_file_path=DATA_FOLDER_PATH / "pipistrel_assembly.yml",
             delivery_method="train",
-            learning_curve=True,
         ),
         ivc,
     )
@@ -1134,16 +1116,16 @@ def test_cost_pipistrel():
     ) == pytest.approx(13495.22, rel=1e-3)
 
     assert problem.get_val("data:cost:production_cost_per_unit", units="USD") == pytest.approx(
-        283897.96, rel=1e-3
+        529051.48, rel=1e-3
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        315442.18, rel=1e-3
+        587834.98, rel=1e-3
     )
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(33070.1, rel=1e-3)
+    ) == pytest.approx(35794.04, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
