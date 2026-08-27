@@ -55,6 +55,7 @@ from ..lcc_annual_delivery_count import LCCAnnualDeliveryCount
 from ..lcc_production_annual_cash_flow import LCCProductionAnnualCashFlow
 from ..lcc_npv_discount_factor import LCCNPVDiscountFactor
 from ..lcc_net_present_value import LCCNetPresentValue
+from ..lcc_production_net_present_value import LCCProductionNetPresentValue
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
@@ -1374,3 +1375,45 @@ def test_net_present_value():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_production_npv():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:production:number_aircraft_5_years", val=100)
+    ivc.add_output("data:cost:production:launch_aircraft_count", val=3)
+    ivc.add_output("data:cost:production:annual_delivery_target", val=30)
+    ivc.add_output("data:cost:production:discount_rate", val=0.12)
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
+    ivc.add_output(
+        "data:cost:production:total_non_recursive_project_cost", units="USD", val=1.66032181e08
+    )
+    ivc.add_output("data:cost:production:recursive_cost_per_unit", units="USD", val=1793666.08)
+
+    problem = run_system(
+        LCCProductionNetPresentValue(
+            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:net_present_value", units="USD") == pytest.approx(
+        [
+            0.0,
+            -2.00719478e07,
+            -6.09095851e07,
+            -9.59689898e07,
+            -1.15170214e08,
+            -1.17633730e08,
+            -9.75229189e07,
+            -7.05727578e07,
+            -4.09744214e07,
+            -1.07636609e07,
+            1.74770137e07,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

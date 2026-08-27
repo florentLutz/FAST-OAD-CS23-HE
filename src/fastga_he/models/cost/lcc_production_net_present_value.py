@@ -37,6 +37,14 @@ class LCCProductionNetPresentValue(om.Group):
         years_of_program = self.options["years_of_program"]
 
         self.add_subsystem(
+            name="annual_delivery_count",
+            subsys=LCCAnnualDeliveryCount(
+                years_of_development=years_of_development, years_of_program=years_of_program
+            ),
+            promotes=["data:*"],
+        )
+
+        self.add_subsystem(
             name="learning_curve_discount",
             subsys=LCCLearningCurveDiscount(
                 years_of_development=years_of_development, years_of_program=years_of_program
@@ -56,14 +64,6 @@ class LCCProductionNetPresentValue(om.Group):
                 years_of_development=years_of_development, years_of_program=years_of_program
             ),
             promotes=["*"],
-        )
-
-        self.add_subsystem(
-            name="annual_delivery_count",
-            subsys=LCCAnnualDeliveryCount(
-                years_of_development=years_of_development, years_of_program=years_of_program
-            ),
-            promotes=["data:*"],
         )
 
         self.add_subsystem(
