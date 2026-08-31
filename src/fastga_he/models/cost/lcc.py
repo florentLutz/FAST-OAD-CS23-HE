@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -8,6 +8,8 @@ from fastoad.module_management.constants import ModelDomain
 
 from .lcc_production_cost import LCCProductionCost
 from .lcc_operational_cost import LCCOperationalCost
+from .lcc_production_net_present_value import LCCProductionNetPresentValue
+from .lcc_operational_net_present_value import LCCOperationalNetPresentValue
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
@@ -32,17 +34,28 @@ class LCC(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="learning_curve",
-            default=False,
-            types=bool,
-            desc="Learning curve for providing the discount rate of the manufacturing and tooling "
-            "man hours.",
-        )
-        self.options.declare(
             name="loan",
             default=True,
             types=bool,
             desc="True if loan is taken for financing the aircraft",
+        )
+        self.options.declare(
+            "years_of_development",
+            types=int,
+            default=10,
+            desc="The number of years of development for the aircraft, before the first delivery.",
+        )
+        self.options.declare(
+            "years_of_program",
+            types=int,
+            default=30,
+            desc="The total number of years of the aircraft program, including development and production.",
+        )
+        self.options.declare(
+            "years_of_service",
+            types=int,
+            default=30,
+            desc="The total service life of the aircraft in years.",
         )
 
     def setup(self):
@@ -51,15 +64,30 @@ class LCC(om.Group):
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
                 delivery_method=self.options["delivery_method"],
-                learning_curve=self.options["learning_curve"],
             ),
             promotes=["*"],
         )
+
         self.add_subsystem(
             name="operational_cost",
             subsys=LCCOperationalCost(
                 power_train_file_path=self.options["power_train_file_path"],
                 loan=self.options["loan"],
             ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="production_net_present_value",
+            subsys=LCCProductionNetPresentValue(
+                years_of_development=self.options["years_of_development"],
+                years_of_program=self.options["years_of_program"],
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="operational_net_present_value",
+            subsys=LCCOperationalNetPresentValue(years_of_service=self.options["years_of_service"]),
             promotes=["*"],
         )

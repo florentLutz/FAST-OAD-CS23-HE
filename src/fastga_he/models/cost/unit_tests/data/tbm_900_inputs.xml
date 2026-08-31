@@ -246,6 +246,7 @@
       <prototype_number>2.0</prototype_number>
       <msp_per_unit unit="USD">4190476.61</msp_per_unit>
       <production>
+        <total_non_recursive_project_cost unit="USD">1.66032181e08</total_non_recursive_project_cost>
         <number_aircraft_5_years>75.0</number_aircraft_5_years>
         <engineering_cost_per_hour unit="USD/h">126.54</engineering_cost_per_hour>
         <engineering_cost_per_unit unit="USD">781122.525</engineering_cost_per_unit>
@@ -260,6 +261,8 @@
         <avionics_cost_per_unit unit="USD">21000.0</avionics_cost_per_unit>
         <certification_cost_per_unit unit="USD">1106881.2</certification_cost_per_unit>
         <fixed_landing_gear>0.0</fixed_landing_gear>
+        <discount_rate>0.12<!--NPV discount rate based on USAF research--></discount_rate>
+        <annual_delivery_target>20<!--Delivery target set by manufacturer--></annual_delivery_target>
       </production>
       <operation>
         <number_of_pilot>1.0</number_of_pilot>
@@ -269,6 +272,7 @@
         <annual_insurance_cost unit="USD/yr">6691.38</annual_insurance_cost>
         <maintenance_cost unit="USD/yr">90181.17</maintenance_cost>
         <miscellaneous_cost unit="USD/yr">24000.0</miscellaneous_cost>
+        <discount_rate>0.08<!--NPV discount rate based on industry average--></discount_rate>
       </operation>
     </cost>
     <propulsion>
@@ -312,6 +316,7 @@
         </fuel_system>
         <fuel_tank>
           <fuel_tank_1>
+            <purchase_cost units="USD" is_input="False">5375.795948202739<!--Unit purchase cost of the fuel tank--></purchase_cost>
             <capacity units="kg" is_input="False">404.9771307259898<!--Capacity of the tank in terms of weight--></capacity>
             <fuel_consumed_mission units="kg" is_input="False">400.40936746787276<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
             <fuel_consumed_main_route units="kg" is_input="False">400.40936746787276<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
@@ -345,6 +350,7 @@
             </low_speed>
           </fuel_tank_1>
           <fuel_tank_2>
+            <purchase_cost units="USD" is_input="False">5375.795948202739<!--Unit purchase cost of the fuel tank--></purchase_cost>
             <capacity units="kg" is_input="False">404.9771307259898<!--Capacity of the tank in terms of weight--></capacity>
             <fuel_consumed_mission units="kg" is_input="False">400.40936746787276<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_mission>
             <fuel_consumed_main_route units="kg" is_input="False">400.40936746787276<!--Amount of fuel from that tank which will be consumed during mission (does not account for takeoff and initial climb, the amount used for sizing does)--></fuel_consumed_main_route>
@@ -381,6 +387,7 @@
         <propeller>
           <propeller_1>
             <type>2.0</type>
+            <purchase_cost units="USD" is_input="False">3163.4537009512487<!--Unit purchase cost of the propeller--></purchase_cost>
             <activity_factor is_input="True">156.0<!--Activity factor of the propeller--></activity_factor>
             <advance_ratio_max is_input="False">2.167765350850807<!--Maximum value of the propeller tip mach Number--></advance_ratio_max>
             <blade_twist units="deg" is_input="True">25.5<!--Twist between the propeller blade root and tip--></blade_twist>
@@ -419,6 +426,7 @@
         </propeller>
         <turboshaft>
           <turboshaft_1>
+            <purchase_cost units="USD" is_input="False">449215.82405793207<!--Unit purchase cost of the turboshaft engine--></purchase_cost>
             <mass units="kg" is_input="False">231.57095999999999<!--Installed weight of the turboshaft--></mass>
             <max_shaft_power units="kW" is_input="False">601.1023676773475<!--Maximum shaft power the turboshaft has to provide--></max_shaft_power>
             <power_max units="kW" is_input="False">638.3873676773475<!--Maximum power the turboshaft has to provide--></power_max>

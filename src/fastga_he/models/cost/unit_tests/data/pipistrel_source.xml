@@ -19,9 +19,12 @@
         <learning_curve_percentage units="percent">80</learning_curve_percentage>
         <landing_gear_cost_reduction>1.0</landing_gear_cost_reduction>
         <composite_fraction>1.0</composite_fraction>
+        <discount_rate>0.12<!--NPV discount rate based on USAF research--></discount_rate>
+        <annual_delivery_target>16<!--Delivery target set by manufacturer--></annual_delivery_target>
       </production>
       <operation>
         <loan_principal units="USD">18000</loan_principal>
+        <discount_rate>0.08<!--NPV discount rate based on industry average--></discount_rate>
       </operation>
     </cost>
     <geometry>
