@@ -600,6 +600,23 @@
         </sizing>
       </operation>
     </environmental_impact>
+    <cost>
+      <production>
+        <net_present_value units="USD" is_input="True">[
+            0.0,
+            -2.00719478e07,
+            -6.09095851e07,
+            -9.59689898e07,
+            -1.15170214e08,
+            -1.17633730e08,
+            -9.75229189e07,
+            -7.05727578e07,
+            -4.09744214e07,
+            -1.07636609e07,
+            1.74770137e07,
+        ]<!--net present value of production cost--></net_present_value>
+      </production>
+    </cost>
     <mission>
       <sizing>
         <duration units="s" is_input="True">16588.350196741827</duration>
