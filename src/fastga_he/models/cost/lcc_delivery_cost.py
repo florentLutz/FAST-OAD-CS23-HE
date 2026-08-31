@@ -51,10 +51,10 @@ class LCCDeliveryCost(om.ExplicitComponent):
                 desc="Electric energy cost for single flight mission",
             )
             self.add_input(
-                name="data:cost:fuel_cost",
+                name="data:cost:total_fuel_cost",
                 val=0.0,
                 units="USD",
-                desc="Fuel cost for single flight mission",
+                desc="Total Fuel cost for single flight mission",
             )
             self.add_input(
                 name="data:cost:delivery:mission_ratio",
@@ -86,7 +86,7 @@ class LCCDeliveryCost(om.ExplicitComponent):
 
         elif delivery_method == "flight":
             outputs["data:cost:delivery_cost_per_unit"] = (
-                (inputs["data:cost:fuel_cost"] + inputs["data:cost:electricity_cost"])
+                (inputs["data:cost:total_fuel_cost"] + inputs["data:cost:electricity_cost"])
                 * inputs["data:cost:production:flight_cost_factor"]
                 * inputs["data:cost:delivery:mission_ratio"]
             )
@@ -97,10 +97,10 @@ class LCCDeliveryCost(om.ExplicitComponent):
         if delivery_method == "flight":
             cost_factor = inputs["data:cost:production:flight_cost_factor"]
             duration_ratio = inputs["data:cost:delivery:mission_ratio"]
-            fuel_cost = inputs["data:cost:fuel_cost"]
+            fuel_cost = inputs["data:cost:total_fuel_cost"]
             electricity_cost = inputs["data:cost:electricity_cost"]
 
-            partials["data:cost:delivery_cost_per_unit", "data:cost:fuel_cost"] = (
+            partials["data:cost:delivery_cost_per_unit", "data:cost:total_fuel_cost"] = (
                 cost_factor * duration_ratio
             )
 

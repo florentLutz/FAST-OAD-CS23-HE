@@ -56,6 +56,12 @@ from ..lcc_production_annual_cash_flow import LCCProductionAnnualCashFlow
 from ..lcc_npv_discount_factor import LCCNPVDiscountFactor
 from ..lcc_net_present_value import LCCNetPresentValue
 from ..lcc_production_net_present_value import LCCProductionNetPresentValue
+from ..lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
+from ..lcc_operational_passenger_load_factor import LCCOperationalPassengerLoadFactor
+from ..lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
+from ..lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
+from ..lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
+from ..lcc_operational_net_present_value import LCCOperationalNetPresentValue
 
 from ..constants import SERVICE_COST_CERTIFICATION
 
@@ -498,7 +504,7 @@ def test_delivery_cost():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:delivery:mission_ratio", val=1.0)
     ivc.add_output("data:cost:electricity_cost", units="USD", val=8.204)
-    ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
+    ivc.add_output("data:cost:total_fuel_cost", units="USD", val=91.56)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
@@ -825,7 +831,32 @@ def test_fuel_cost():
         ivc,
     )
 
-    assert problem.get_val("data:cost:fuel_cost", units="USD") == pytest.approx(2257.1, rel=1e-3)
+    assert problem.get_val("data:cost:hydrocarbon_fuel_cost", units="USD") == pytest.approx(
+        2257.1, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+    tank_types = ["gaseous_hydrogen_tank"]
+    tank_names = ["gaseous_hydrogen_tank_1"]
+    fuel_types = ["hydrogen"]
+
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types)
+        ),
+        __file__,
+        "data_pemfc.xml",
+    )
+
+    problem = run_system(
+        LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:hydrogen_fuel_cost", units="USD") == pytest.approx(
+        97.16, rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -866,7 +897,7 @@ def test_electricity_cost():
 def test_energy_cost():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:electricity_cost", units="USD", val=8.204)
-    ivc.add_output("data:cost:fuel_cost", units="USD", val=91.56)
+    ivc.add_output("data:cost:hydrocarbon_fuel_cost", units="USD", val=91.56)
     ivc.add_output("data:TLAR:flight_per_year", val=10.0)
 
     problem = run_system(
@@ -1146,7 +1177,7 @@ def test_non_recursive_project_cost():
     )
 
     assert problem.get_val(
-        "data:cost:total_non_recursive_project_cost", units="USD"
+        "data:cost:production:total_non_recursive_project_cost", units="USD"
     ) == pytest.approx(1.66032181e08, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -1399,3 +1430,183 @@ def test_production_npv():
     problem.check_partials(compact_print=True)
 
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+
+
+def test_operation_annual_revenue():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+    ivc.add_output("data:cost:operation:profit_margin", val=0.07)
+
+    problem = run_system(
+        LCCOperationalAnnualRevenue(),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_revenue_per_unit", units="USD/yr"
+    ) == pytest.approx(495673.85, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+
+def test_passenger_load_factor():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:TLAR:NPAX_design", val=3)
+    ivc.add_output("data:geometry:cabin:seats:passenger:NPAX_max", val=4)
+
+    problem = run_system(
+        LCCOperationalPassengerLoadFactor(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:passenger_load_factor") == pytest.approx(
+        0.75, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_revenue_per_passenger_per_km():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:annual_revenue_per_unit", units="USD/yr", val=495673.85)
+    ivc.add_output("data:TLAR:NPAX_design", val=4)
+    ivc.add_output("data:TLAR:range", units="km", val=2037)
+    ivc.add_output("data:TLAR:flight_per_year", val=66)
+
+    problem = run_system(
+        LCCOperationalRevenuePerRPK(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
+        0.9217, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_energy_cost_projection():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output(
+        "data:cost:operation:annual_hydrocarbon_fuel_cost", units="USD/yr", val=156817.93
+    )
+    ivc.add_output("data:cost:operation:annual_electricity_cost", units="USD/yr", val=0.0)
+    ivc.add_output("data:cost:operation:annual_hydrogen_fuel_cost", units="USD/yr", val=0.0)
+
+    problem = run_system(
+        LCCOperationalAnnualEnergyCostProjection(years_of_service=TEST_PROGAM_YEARS),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_energy_cost_projection", units="USD/yr"
+    ) == pytest.approx(
+        [
+            156817.93,
+            157669.45,
+            158525.6,
+            159386.39,
+            160251.86,
+            161122.03,
+            161996.92,
+            162876.56,
+            163760.98,
+            164650.20,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_annual_cash_flow():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+    ivc.add_output("data:cost:operation:annual_revenue_per_unit", units="USD/yr", val=495673.85)
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
+    ivc.add_output("data:cost:operation:annual_fuel_cost", units="USD/yr", val=156817.93)
+    ivc.add_output(
+        "data:cost:operation:annual_energy_cost_projection",
+        units="USD/yr",
+        val=[
+            156817.93,
+            157669.45,
+            158525.6,
+            159386.39,
+            160251.86,
+            161122.03,
+            161996.92,
+            162876.56,
+            163760.98,
+            164650.20,
+        ],
+    )
+
+    problem = run_system(
+        LCCOperationAnnualCashFlow(years_of_service=TEST_PROGAM_YEARS),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:annual_cash_flow", units="USD") == pytest.approx(
+        [
+            -4514427.18,
+            34697.17,
+            33845.65,
+            32989.5,
+            32128.71,
+            31263.24,
+            30393.07,
+            29518.18,
+            28638.54,
+            27754.12,
+            26864.9,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_operational_npv():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
+    ivc.add_output("data:cost:operation:annual_fuel_cost", units="USD/yr", val=156817.93)
+    ivc.add_output(
+        "data:cost:operation:annual_hydrocarbon_fuel_cost", units="USD/yr", val=156817.93
+    )
+    ivc.add_output("data:cost:operation:discount_rate", val=0.08)
+    ivc.add_output("data:TLAR:NPAX_design", val=4)
+    ivc.add_output("data:TLAR:range", units="km", val=2037)
+    ivc.add_output("data:TLAR:flight_per_year", val=66)
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+    ivc.add_output("data:geometry:cabin:seats:passenger:NPAX_max", val=4)
+
+    problem = run_system(
+        LCCOperationalNetPresentValue(years_of_service=TEST_PROGAM_YEARS),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:net_present_value", units="USD") == pytest.approx(
+        [
+            -4514427.18,
+            -4482300.17,
+            -4453282.98,
+            -4427094.85,
+            -4403479.29,
+            -4382202.06,
+            -4363049.26,
+            -4345825.69,
+            -4330353.18,
+            -4316469.21,
+            -4304025.56,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)

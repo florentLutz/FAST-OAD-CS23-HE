@@ -261,6 +261,8 @@
         <avionics_cost_per_unit unit="USD">21000.0</avionics_cost_per_unit>
         <certification_cost_per_unit unit="USD">1106881.2</certification_cost_per_unit>
         <fixed_landing_gear>0.0</fixed_landing_gear>
+        <discount_rate>0.12<!--NPV discount rate based on USAF research--></discount_rate>
+        <annual_delivery_target>20<!--Delivery target set by manufacturer--></annual_delivery_target>
       </production>
       <operation>
         <number_of_pilot>1.0</number_of_pilot>
@@ -270,6 +272,7 @@
         <annual_insurance_cost unit="USD/yr">6691.38</annual_insurance_cost>
         <maintenance_cost unit="USD/yr">90181.17</maintenance_cost>
         <miscellaneous_cost unit="USD/yr">24000.0</miscellaneous_cost>
+        <discount_rate>0.08<!--NPV discount rate based on industry average--></discount_rate>
       </operation>
     </cost>
     <propulsion>

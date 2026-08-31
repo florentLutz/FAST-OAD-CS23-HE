@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import numpy as np
 import openmdao.api as om
@@ -19,10 +19,16 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
             desc="Electric energy cost for single flight mission",
         )
         self.add_input(
-            name="data:cost:fuel_cost",
-            val=0.0,
+            "data:cost:hydrocarbon_fuel_cost",
             units="USD",
-            desc="Fuel cost for single flight mission",
+            val=0.0,
+            desc="Fossil Fuel cost for single flight mission",
+        )
+        self.add_input(
+            "data:cost:hydrogen_fuel_cost",
+            units="USD",
+            val=0.0,
+            desc="Hydrogen Fuel cost for single flight mission",
         )
         self.add_input(
             name="data:TLAR:flight_per_year",
@@ -36,15 +42,26 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
             units="USD/yr",
         )
         self.add_output(
+            name="data:cost:operation:annual_hydrocarbon_fuel_cost",
+            val=1000.0,
+            units="USD/yr",
+        )
+        self.add_output(
+            name="data:cost:operation:annual_hydrogen_fuel_cost",
+            val=1000.0,
+            units="USD/yr",
+        )
+        self.add_output(
             name="data:cost:operation:annual_electricity_cost",
             val=1000.0,
             units="USD/yr",
         )
 
+    def setup_partials(self):
         self.declare_partials("*", "data:TLAR:flight_per_year", method="exact")
         self.declare_partials(
             of="data:cost:operation:annual_fuel_cost",
-            wrt="data:cost:fuel_cost",
+            wrt=["data:cost:hydrocarbon_fuel_cost", "data:cost:hydrogen_fuel_cost"],
             method="exact",
         )
         self.declare_partials(
@@ -52,30 +69,78 @@ class LCCAnnualEnergyCost(om.ExplicitComponent):
             wrt="data:cost:electricity_cost",
             method="exact",
         )
-
-    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:operation:annual_fuel_cost"] = (
-            inputs["data:TLAR:flight_per_year"] * inputs["data:cost:fuel_cost"]
+        self.declare_partials(
+            of="data:cost:operation:annual_hydrocarbon_fuel_cost",
+            wrt="data:cost:hydrocarbon_fuel_cost",
+            method="exact",
+        )
+        self.declare_partials(
+            of="data:cost:operation:annual_hydrogen_fuel_cost",
+            wrt="data:cost:hydrogen_fuel_cost",
+            method="exact",
         )
 
-        outputs["data:cost:operation:annual_electricity_cost"] = (
-            inputs["data:TLAR:flight_per_year"] * inputs["data:cost:electricity_cost"]
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        hydrocarbon_fuel_cost = inputs["data:cost:hydrocarbon_fuel_cost"]
+        hydrogen_fuel_cost = inputs["data:cost:hydrogen_fuel_cost"]
+        electricity_cost = inputs["data:cost:electricity_cost"]
+        flight_per_year = inputs["data:TLAR:flight_per_year"]
+
+        outputs["data:cost:operation:annual_fuel_cost"] = (
+            hydrogen_fuel_cost + hydrocarbon_fuel_cost
+        ) * flight_per_year
+
+        outputs["data:cost:operation:annual_electricity_cost"] = electricity_cost * flight_per_year
+
+        outputs["data:cost:operation:annual_hydrocarbon_fuel_cost"] = (
+            hydrocarbon_fuel_cost * flight_per_year
+        )
+
+        outputs["data:cost:operation:annual_hydrogen_fuel_cost"] = (
+            hydrogen_fuel_cost * flight_per_year
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
+        hydrocarbon_fuel_cost = inputs["data:cost:hydrocarbon_fuel_cost"]
+        hydrogen_fuel_cost = inputs["data:cost:hydrogen_fuel_cost"]
+        electricity_cost = inputs["data:cost:electricity_cost"]
+        flight_per_year = inputs["data:TLAR:flight_per_year"]
+
         partials[
             "data:cost:operation:annual_electricity_cost",
             "data:cost:electricity_cost",
-        ] = inputs["data:TLAR:flight_per_year"]
+        ] = flight_per_year
 
-        partials["data:cost:operation:annual_fuel_cost", "data:cost:fuel_cost"] = inputs[
-            "data:TLAR:flight_per_year"
-        ]
-
-        partials["data:cost:operation:annual_electricity_cost", "data:TLAR:flight_per_year"] = (
-            inputs["data:cost:electricity_cost"]
+        partials["data:cost:operation:annual_fuel_cost", "data:cost:hydrocarbon_fuel_cost"] = (
+            flight_per_year
         )
 
-        partials["data:cost:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] = inputs[
-            "data:cost:fuel_cost"
-        ]
+        partials["data:cost:operation:annual_fuel_cost", "data:cost:hydrogen_fuel_cost"] = (
+            flight_per_year
+        )
+
+        partials[
+            "data:cost:operation:annual_hydrocarbon_fuel_cost",
+            "data:cost:hydrocarbon_fuel_cost",
+        ] = flight_per_year
+
+        partials[
+            "data:cost:operation:annual_hydrogen_fuel_cost",
+            "data:cost:hydrogen_fuel_cost",
+        ] = flight_per_year
+
+        partials["data:cost:operation:annual_fuel_cost", "data:TLAR:flight_per_year"] = (
+            hydrocarbon_fuel_cost + hydrogen_fuel_cost
+        )
+
+        partials["data:cost:operation:annual_electricity_cost", "data:TLAR:flight_per_year"] = (
+            electricity_cost
+        )
+
+        partials[
+            "data:cost:operation:annual_hydrocarbon_fuel_cost", "data:TLAR:flight_per_year"
+        ] = hydrocarbon_fuel_cost
+
+        partials["data:cost:operation:annual_hydrogen_fuel_cost", "data:TLAR:flight_per_year"] = (
+            hydrogen_fuel_cost
+        )
