@@ -66,7 +66,12 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             units="USD/yr",
             shape=years_of_service,
         )
-        self.add_input("data:cost:operation:annual_revenue_per_unit", units="USD/yr", val=np.nan)
+        self.add_input(
+            "data:cost:operation:annual_revenue_projection",
+            units="USD/yr",
+            val=np.nan,
+            shape=years_of_service,
+        )
 
         self.add_output(
             name="data:cost:operation:annual_cash_flow",
@@ -107,6 +112,14 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         )
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
+            "data:cost:operation:annual_revenue_projection",
+            rows=np.arange(1, years_of_service + 1),
+            cols=np.arange(years_of_service),
+            method="exact",
+            val=1.0,
+        )
+        self.declare_partials(
+            "data:cost:operation:annual_cash_flow",
             "data:cost:operation:annual_cost_per_unit",
             rows=np.arange(1, years_of_service + 1),
             cols=np.zeros(years_of_service),
@@ -116,7 +129,6 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
             [
-                "data:cost:operation:annual_revenue_per_unit",
                 "data:cost:operation:annual_fuel_cost",
                 "data:cost:operation:annual_electricity_cost",
             ],
@@ -133,7 +145,7 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         annual_fuel_cost = inputs["data:cost:operation:annual_fuel_cost"]
         annual_electricity_cost = inputs["data:cost:operation:annual_electricity_cost"]
         annual_energy_cost_projection = inputs["data:cost:operation:annual_energy_cost_projection"]
-        annual_revenue = inputs["data:cost:operation:annual_revenue_per_unit"]
+        annual_revenue = inputs["data:cost:operation:annual_revenue_projection"]
 
         if loan:
             first_payment = (

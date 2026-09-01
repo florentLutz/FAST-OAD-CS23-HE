@@ -8,8 +8,8 @@ from fastoad.module_management.constants import ModelDomain
 
 from .lcc_production_cost import LCCProductionCost
 from .lcc_operational_cost import LCCOperationalCost
-from .lcc_production_net_present_value import LCCProductionNetPresentValue
-from .lcc_operational_net_present_value import LCCOperationalNetPresentValue
+from .lcc_production_profitability import LCCProductionProfitability
+from .lcc_operational_profitability import LCCOperationalProfitability
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
@@ -78,8 +78,8 @@ class LCC(om.Group):
         )
 
         self.add_subsystem(
-            name="production_net_present_value",
-            subsys=LCCProductionNetPresentValue(
+            name="production_profitability",
+            subsys=LCCProductionProfitability(
                 years_of_development=self.options["years_of_development"],
                 years_of_program=self.options["years_of_program"],
             ),
@@ -87,8 +87,8 @@ class LCC(om.Group):
         )
 
         self.add_subsystem(
-            name="operational_net_present_value",
-            subsys=LCCOperationalNetPresentValue(
+            name="operational_profitability",
+            subsys=LCCOperationalProfitability(
                 years_of_service=self.options["years_of_service"], loan=self.options["loan"]
             ),
             promotes=["*"],

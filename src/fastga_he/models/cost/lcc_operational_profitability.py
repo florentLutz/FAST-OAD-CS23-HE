@@ -11,9 +11,10 @@ from .lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostPro
 from .lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
 from .lcc_npv_discount_factor import LCCNPVDiscountFactor
 from .lcc_net_present_value import LCCNetPresentValue
+from .lcc_profidibility_index import LCCProfitabilityIndex
 
 
-class LCCOperationalNetPresentValue(om.Group):
+class LCCOperationalProfitability(om.Group):
     """
     Group collects all the Net Present Value (NPV) projection calculation.
     """
@@ -44,7 +45,7 @@ class LCCOperationalNetPresentValue(om.Group):
 
         self.add_subsystem(
             name="annual_operational_revenue",
-            subsys=LCCOperationalAnnualRevenue(),
+            subsys=LCCOperationalAnnualRevenue(years_of_service=years_of_service),
             promotes=["*"],
         )
 
@@ -80,6 +81,16 @@ class LCCOperationalNetPresentValue(om.Group):
             promotes=[
                 ("annual_net_cash_flow", "data:cost:operation:annual_cash_flow"),
                 ("net_present_value", "data:cost:operation:net_present_value"),
+            ],
+        )
+
+        self.add_subsystem(
+            name="operational_profitability_index",
+            subsys=LCCProfitabilityIndex(duration_in_years=years_of_service),
+            promotes=[
+                ("initial_investment", "data:cost:msp_per_unit"),
+                ("net_present_value", "data:cost:operation:net_present_value"),
+                ("profitability_index", "data:cost:operation:profitability_index"),
             ],
         )
 
