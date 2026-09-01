@@ -4,7 +4,7 @@
 
 import openmdao.api as om
 
-from .sizing_pemfc_weight import SizingPEMFCStackWeight
+from .sizing_pemfc_weight import SizingPEMFCStackWeight, SizingPEMFCStackWeightFromSpecificPower
 from .sizing_pemfc_power_density import SizingPEMFCStackPowerDensity
 from .sizing_pemfc_specific_power import SizingPEMFCStackSpecificPower
 from .sizing_pemfc_dimensions import SizingPEMFCStackDimensions
@@ -57,6 +57,11 @@ class SizingPEMFCStack(om.Group):
             desc="The PEMFC stack operation pressure have to adjust based on compressor "
             "connection for the oxygen/air flush_inlet",
         )
+        self.options.declare(
+            name="mass_from_specific_power",
+            default=False,
+            types=bool,
+        )
 
     def setup(self):
         pemfc_stack_id = self.options["pemfc_stack_id"]
@@ -82,11 +87,19 @@ class SizingPEMFCStack(om.Group):
             subsys=SizingPEMFCStackPowerDensity(pemfc_stack_id=pemfc_stack_id),
             promotes=["*"],
         )
-        self.add_subsystem(
-            name="pemfc_weight",
-            subsys=SizingPEMFCStackWeight(pemfc_stack_id=pemfc_stack_id),
-            promotes=["*"],
-        )
+        if not self.options["mass_from_specific_power"]:
+            self.add_subsystem(
+                name="pemfc_weight",
+                subsys=SizingPEMFCStackWeight(pemfc_stack_id=pemfc_stack_id),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                name="pemfc_weight",
+                subsys=SizingPEMFCStackWeightFromSpecificPower(pemfc_stack_id=pemfc_stack_id),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             name="pemfc_volume",
             subsys=SizingPEMFCStackVolume(pemfc_stack_id=pemfc_stack_id),
