@@ -88,6 +88,8 @@ class LCC(om.Group):
 
         self.add_subsystem(
             name="operational_net_present_value",
-            subsys=LCCOperationalNetPresentValue(years_of_service=self.options["years_of_service"]),
+            subsys=LCCOperationalNetPresentValue(
+                years_of_service=self.options["years_of_service"], loan=self.options["loan"]
+            ),
             promotes=["*"],
         )

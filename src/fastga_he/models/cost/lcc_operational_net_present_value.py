@@ -25,9 +25,16 @@ class LCCOperationalNetPresentValue(om.Group):
             default=30,
             desc="The total service life of the aircraft in years for NPV calculation.",
         )
+        self.options.declare(
+            name="loan",
+            default=True,
+            types=bool,
+            desc="True if loan is taken for financing the aircraft",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
+        loan = self.options["loan"]
 
         self.add_subsystem(
             name="passenger_load_factor",
@@ -55,7 +62,7 @@ class LCCOperationalNetPresentValue(om.Group):
 
         self.add_subsystem(
             name="annual_cash_flow",
-            subsys=LCCOperationAnnualCashFlow(years_of_service=years_of_service),
+            subsys=LCCOperationAnnualCashFlow(years_of_service=years_of_service, loan=loan),
             promotes=["*"],
         )
 

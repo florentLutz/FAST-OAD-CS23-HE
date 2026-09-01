@@ -10,6 +10,7 @@ from .lcc_landing_cost import LCCLandingCost
 from .lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from .lcc_daily_parking_cost import LCCDailyParkingCost
 from .lcc_annual_airport_cost import LCCAnnualAirportCost
+from .lcc_purchase_loan_principal import LCCPurchaseLoanPrincipal
 from .lcc_annual_loan_cost import LCCAnnualLoanCost
 from .lcc_annual_depreciation import LCCAnnualDepreciation
 from .lcc_maintenance_cost import LCCMaintenanceCost
@@ -74,6 +75,9 @@ class LCCOperationalCost(om.Group):
         )
 
         if loan:
+            self.add_subsystem(
+                name="loan_principal", subsys=LCCPurchaseLoanPrincipal(), promotes=["*"]
+            )
             self.add_subsystem(name="annual_loan_cost", subsys=LCCAnnualLoanCost(), promotes=["*"])
 
         self.add_subsystem(
