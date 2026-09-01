@@ -11,9 +11,10 @@ from .lcc_annual_delivery_count import LCCAnnualDeliveryCount
 from .lcc_production_annual_cash_flow import LCCProductionAnnualCashFlow
 from .lcc_npv_discount_factor import LCCNPVDiscountFactor
 from .lcc_net_present_value import LCCNetPresentValue
+from .lcc_profidibility_index import LCCProfitabilityIndex
 
 
-class LCCProductionNetPresentValue(om.Group):
+class LCCProductionProfitability(om.Group):
     """
     Group collects all the Net Present Value (NPV) projection calculation.
     """
@@ -88,6 +89,16 @@ class LCCProductionNetPresentValue(om.Group):
             promotes=[
                 ("annual_net_cash_flow", "data:cost:production:annual_cash_flow"),
                 ("net_present_value", "data:cost:production:net_present_value"),
+            ],
+        )
+
+        self.add_subsystem(
+            name="production_profitability_index",
+            subsys=LCCProfitabilityIndex(duration_in_years=years_of_program),
+            promotes=[
+                ("initial_investment", "data:cost:production:total_non_recursive_project_cost"),
+                ("net_present_value", "data:cost:production:net_present_value"),
+                ("profitability_index", "data:cost:production:profitability_index"),
             ],
         )
 
