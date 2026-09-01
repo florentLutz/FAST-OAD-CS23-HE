@@ -129,3 +129,81 @@ class SizingPEMFCStackWeight(om.ExplicitComponent):
             "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
             "settings:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":k_mass",
         ] = CELL_DENSITY * specific_power_ratio * effective_area * number_of_layers
+
+
+class SizingPEMFCStackWeightFromSpecificPower(om.ExplicitComponent):
+    def initialize(self):
+        self.options.declare(
+            name="pemfc_stack_id",
+            default=None,
+            desc="Identifier of the PEMFC stack",
+            allow_none=False,
+        )
+
+    def setup(self):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+
+        self.add_input(
+            name="data:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":specific_power_input",
+            units="kW/kg",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+            units="kW",
+            val=np.nan,
+            desc="Maximum power that the PEMFC stack can supply continuously",
+        )
+
+        self.add_output(
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
+            units="kg",
+            val=500.0,
+            desc="Mass of the PEMFC stack",
+        )
+
+    def setup_partials(self):
+        self.declare_partials(of="*", wrt="*", method="exact")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+        outputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass"] = (
+            inputs["data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating"]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":specific_power_input"
+            ]
+        )
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        pemfc_stack_id = self.options["pemfc_stack_id"]
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating",
+        ] = (
+            1.0
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":specific_power_input"
+            ]
+        )
+        partials[
+            "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":mass",
+            "data:propulsion:he_power_train:PEMFC_stack:"
+            + pemfc_stack_id
+            + ":specific_power_input",
+        ] = (
+            -inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:" + pemfc_stack_id + ":power_rating"
+            ]
+            / inputs[
+                "data:propulsion:he_power_train:PEMFC_stack:"
+                + pemfc_stack_id
+                + ":specific_power_input"
+            ]
+            ** 2.0
+        )
