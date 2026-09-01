@@ -988,7 +988,10 @@ def test_operational_sum():
 def test_operational_cost_hydrogen():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml")
+            LCCOperationalCost(
+                power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml",
+                delivery_method="train",
+            )
         ),
         __file__,
         "data_pemfc.xml",
@@ -997,7 +1000,9 @@ def test_operational_cost_hydrogen():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCOperationalCost(power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml"),
+        LCCOperationalCost(
+            power_train_file_path=DATA_FOLDER_PATH / "propulsion_pemfc.yml", delivery_method="train"
+        ),
         ivc,
     )
     assert problem.get_val(
@@ -1026,7 +1031,8 @@ def test_operational_cost_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
             LCCOperationalCost(
-                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+                delivery_method="train",
             )
         ),
         __file__,
@@ -1036,7 +1042,8 @@ def test_operational_cost_tbm_900():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         LCCOperationalCost(
-            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml"
+            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+            delivery_method="train",
         ),
         ivc,
     )
@@ -1065,7 +1072,8 @@ def test_operational_cost_hybrid_tbm_900():
     ivc = get_indep_var_comp(
         list_inputs(
             LCCOperationalCost(
-                power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"
+                power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml",
+                delivery_method="train",
             )
         ),
         __file__,
@@ -1075,7 +1083,8 @@ def test_operational_cost_hybrid_tbm_900():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
         LCCOperationalCost(
-            power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml"
+            power_train_file_path=DATA_FOLDER_PATH / "turbo_electric_propulsion.yml",
+            delivery_method="train",
         ),
         ivc,
     )

@@ -72,6 +72,7 @@ class LCC(om.Group):
             name="operational_cost",
             subsys=LCCOperationalCost(
                 power_train_file_path=self.options["power_train_file_path"],
+                delivery_method=self.options["delivery_method"],
                 loan=self.options["loan"],
             ),
             promotes=["*"],
