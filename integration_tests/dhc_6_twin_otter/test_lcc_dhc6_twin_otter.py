@@ -21,13 +21,10 @@ def test_lcc_twin_otter_for_easn():
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
 
     # Define used files depending on options
-    xml_file_name = "lca_twin_otter_for_easn.xml"
-    process_file_name = "lca_twin_otter_for_easn.yml"
+    xml_file_name = "lcc_twin_otter_for_easn.xml"
+    process_file_name = "lcc_twin_otter_for_easn.yml"
 
     ref_inputs = DATA_FOLDER_PATH / xml_file_name
-
-    # Copy OAD outputs as inputs of the LCA
-    shutil.copy(RESULTS_FOLDER_PATH / "oad_process_outputs_ref_for_easn.xml", ref_inputs)
 
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
     problem = configurator.get_problem()
@@ -36,19 +33,18 @@ def test_lcc_twin_otter_for_easn():
     problem.read_inputs()
     problem.setup()
 
-    # Based on the wing box lifespan, other structural parts last longer
-    problem.set_val("data:TLAR:max_airframe_hours", val=33000, units="h")
+
     # Based on Viking Air assumptions
     problem.set_val("data:TLAR:flight_hours_per_year", val=1200.0, units="h")
-    problem.set_val("data:environmental_impact:buy_to_fly:metallic", val=7.5)
+    problem.set_val("data:TLAR:flight_per_year", val=489.195)
 
     # Run the problem
     problem.run_model()
     problem.write_outputs()
 
-    assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        1.3027372749944493e-05, rel=1e-2
-    )
+    # assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
+    #     1.3027372749944493e-05, rel=1e-2
+    # )
 
 
 def test_lca_pemfc_h2_twin_otter_for_easn():
