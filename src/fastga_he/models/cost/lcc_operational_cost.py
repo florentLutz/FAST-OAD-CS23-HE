@@ -45,10 +45,19 @@ class LCCOperationalCost(om.Group):
             types=bool,
             desc="True if loan is taken for financing the aircraft",
         )
+        self.options.declare(
+            name="delivery_method",
+            default="flight",
+            desc="Method with which the aircraft will be brought from the assembly plant to the "
+            "end user. Can be either flown or carried by train",
+            allow_none=False,
+            values=["flight", "train"],
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
+        delivery_method = self.options["delivery_method"]
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -133,19 +142,23 @@ class LCCOperationalCost(om.Group):
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
 
-        self.add_subsystem(
-            name="fuel_cost",
-            subsys=LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="electricity_cost",
-            subsys=LCCElectricityCost(
-                electricity_components_types=electricity_components_types,
-                electricity_components_names=electricity_components_names,
-            ),
-            promotes=["*"],
-        )
+        if delivery_method != "flight":
+            self.add_subsystem(
+                name="fuel_cost",
+                subsys=LCCFuelCost(
+                    tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="electricity_cost",
+                subsys=LCCElectricityCost(
+                    electricity_components_types=electricity_components_types,
+                    electricity_components_names=electricity_components_names,
+                ),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             name="annual_energy_cost",
             subsys=LCCAnnualEnergyCost(),
