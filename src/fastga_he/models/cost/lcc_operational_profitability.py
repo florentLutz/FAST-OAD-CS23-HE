@@ -5,6 +5,7 @@
 import openmdao.api as om
 
 from .lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
+from .lcc_passenger_per_flight import LCCOperationalPassengerPerFlight
 from .lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from .lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
 from .lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
@@ -37,29 +38,30 @@ class LCCOperationalProfitability(om.Group):
         loan = self.options["loan"]
 
         self.add_subsystem(
+            name="passenger_per_flight",
+            subsys=LCCOperationalPassengerPerFlight(),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             name="annual_operational_revenue",
             subsys=LCCOperationalAnnualRevenue(years_of_service=years_of_service),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="revenue_per_rpk",
             subsys=LCCOperationalRevenuePerRPK(),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_energy_cost_projection",
             subsys=LCCOperationalAnnualEnergyCostProjection(years_of_service=years_of_service),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_cash_flow",
             subsys=LCCOperationAnnualCashFlow(years_of_service=years_of_service, loan=loan),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="operational_npv_discount_factor",
             subsys=LCCNPVDiscountFactor(duration_in_years=years_of_service),
@@ -67,7 +69,6 @@ class LCCOperationalProfitability(om.Group):
                 ("discount_rate", "data:cost:operation:discount_rate"),
             ],
         )
-
         self.add_subsystem(
             name="operational_net_present_value",
             subsys=LCCNetPresentValue(duration_in_years=years_of_service),
@@ -76,7 +77,6 @@ class LCCOperationalProfitability(om.Group):
                 ("net_present_value", "data:cost:operation:net_present_value"),
             ],
         )
-
         self.add_subsystem(
             name="operational_profitability_index",
             subsys=LCCProfitabilityIndex(duration_in_years=years_of_service),

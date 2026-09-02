@@ -273,6 +273,7 @@
         <maintenance_cost unit="USD/yr">90181.17</maintenance_cost>
         <miscellaneous_cost unit="USD/yr">24000.0</miscellaneous_cost>
         <discount_rate>0.08<!--NPV discount rate based on industry average--></discount_rate>
+        <passenger_per_flight_baseline>3</passenger_per_flight_baseline>
       </operation>
     </cost>
     <propulsion>

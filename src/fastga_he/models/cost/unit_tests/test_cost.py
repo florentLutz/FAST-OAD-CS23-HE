@@ -57,6 +57,7 @@ from ..lcc_production_annual_cash_flow import LCCProductionAnnualCashFlow
 from ..lcc_npv_discount_factor import LCCNPVDiscountFactor
 from ..lcc_net_present_value import LCCNetPresentValue
 from ..lcc_production_profitability import LCCProductionProfitability
+from ..lcc_passenger_per_flight import LCCOperationalPassengerPerFlight
 from ..lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
 from ..lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from ..lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
@@ -1533,12 +1534,27 @@ def test_operation_annual_revenue():
 
     problem.check_partials(compact_print=True)
 
+def test_passenger_per_flight():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:TLAR:NPAX_design", val=4)
+    ivc.add_output("data:cost:operation:passenger_per_flight_baseline", val=3)
+
+    problem = run_system(
+        LCCOperationalPassengerPerFlight(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:passenger_per_flight") == pytest.approx(3, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
 
 def test_revenue_per_passenger_per_km():
     ivc = om.IndepVarComp()
 
     ivc.add_output("data:cost:operation:annual_revenue_per_unit", units="USD/yr", val=495673.85)
-    ivc.add_output("data:TLAR:NPAX_design", val=4)
+    ivc.add_output("data:cost:operation:passenger_per_flight", val=3)
     ivc.add_output("data:TLAR:range", units="km", val=2037)
     ivc.add_output("data:TLAR:flight_per_year", val=66)
 
@@ -1548,7 +1564,7 @@ def test_revenue_per_passenger_per_km():
     )
 
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        1.317, rel=1e-3
+        1.229, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1665,6 +1681,7 @@ def test_operational_profitability():
     )
     ivc.add_output("data:cost:operation:discount_rate", val=0.08)
     ivc.add_output("data:TLAR:NPAX_design", val=4)
+    ivc.add_output("data:cost:operation:passenger_per_flight_baseline", val=3)
     ivc.add_output("data:TLAR:range", units="km", val=2037)
     ivc.add_output("data:TLAR:flight_per_year", val=66)
     ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
