@@ -4,7 +4,6 @@
 
 import openmdao.api as om
 
-from .lcc_operational_passenger_load_factor import LCCOperationalPassengerLoadFactor
 from .lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
 from .lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from .lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
@@ -36,12 +35,6 @@ class LCCOperationalProfitability(om.Group):
     def setup(self):
         years_of_service = self.options["years_of_service"]
         loan = self.options["loan"]
-
-        self.add_subsystem(
-            name="passenger_load_factor",
-            subsys=LCCOperationalPassengerLoadFactor(),
-            promotes=["*"],
-        )
 
         self.add_subsystem(
             name="annual_operational_revenue",

@@ -37,6 +37,11 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
             units="km",
             desc="The range of the aircraft",
         )
+        self.add_input(
+            "data:cost:operation:passenger_load_factor",
+            val=0.7,
+            desc="The passenger load factor of the aircraft",
+        )
 
         self.add_output(
             "data:cost:operation:revenue_per_rpk",
@@ -53,9 +58,10 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
         number_of_passenger = inputs["data:TLAR:NPAX_design"]
         flight_per_year = inputs["data:TLAR:flight_per_year"]
         range_km = inputs["data:TLAR:range"]
+        passenger_load_factor = inputs["data:cost:operation:passenger_load_factor"]
 
         outputs["data:cost:operation:revenue_per_rpk"] = annual_revenue_per_unit / (
-            number_of_passenger * flight_per_year * range_km
+            number_of_passenger * flight_per_year * range_km * passenger_load_factor
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
@@ -63,8 +69,11 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
         number_of_passenger = inputs["data:TLAR:NPAX_design"]
         flight_per_year = inputs["data:TLAR:flight_per_year"]
         range_km = inputs["data:TLAR:range"]
+        passenger_load_factor = inputs["data:cost:operation:passenger_load_factor"]
 
-        common_denominator = number_of_passenger * flight_per_year * range_km
+        common_denominator = (
+            number_of_passenger * flight_per_year * range_km * passenger_load_factor
+        )
 
         partials[
             "data:cost:operation:revenue_per_rpk", "data:cost:operation:annual_revenue_per_unit"
@@ -81,3 +90,7 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
         partials["data:cost:operation:revenue_per_rpk", "data:TLAR:range"] = (
             -annual_revenue_per_unit / (common_denominator * range_km)
         )
+
+        partials[
+            "data:cost:operation:revenue_per_rpk", "data:cost:operation:passenger_load_factor"
+        ] = -annual_revenue_per_unit / (common_denominator * passenger_load_factor)

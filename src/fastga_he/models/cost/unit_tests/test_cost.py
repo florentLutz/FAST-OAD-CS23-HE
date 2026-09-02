@@ -58,7 +58,6 @@ from ..lcc_npv_discount_factor import LCCNPVDiscountFactor
 from ..lcc_net_present_value import LCCNetPresentValue
 from ..lcc_production_profitability import LCCProductionProfitability
 from ..lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
-from ..lcc_operational_passenger_load_factor import LCCOperationalPassengerLoadFactor
 from ..lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from ..lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
 from ..lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
@@ -1535,24 +1534,6 @@ def test_operation_annual_revenue():
     problem.check_partials(compact_print=True)
 
 
-def test_passenger_load_factor():
-    ivc = om.IndepVarComp()
-
-    ivc.add_output("data:TLAR:NPAX_design", val=3)
-    ivc.add_output("data:geometry:cabin:seats:passenger:NPAX_max", val=4)
-
-    problem = run_system(
-        LCCOperationalPassengerLoadFactor(),
-        ivc,
-    )
-
-    assert problem.get_val("data:cost:operation:passenger_load_factor") == pytest.approx(
-        0.75, rel=1e-3
-    )
-
-    problem.check_partials(compact_print=True)
-
-
 def test_revenue_per_passenger_per_km():
     ivc = om.IndepVarComp()
 
@@ -1567,7 +1548,7 @@ def test_revenue_per_passenger_per_km():
     )
 
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        0.9217, rel=1e-3
+        1.317, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
