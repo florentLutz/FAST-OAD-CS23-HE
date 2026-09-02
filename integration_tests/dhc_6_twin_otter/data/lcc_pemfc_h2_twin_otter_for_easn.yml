@@ -1,0 +1,22 @@
+title: LCC computation for reference DHC 6 TWIN OTTER
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ../results/lcc_inputs_pemfc_h2_twin_otter_for_easn.xml
+output_file: ../results/lcc_outputs_pemfc_h2_twin_otter_for_easn.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+    lcc:
+        id: fastga_he.lcc.legacy
+        power_train_file_path: ./pemfc_h2_propulsion.yml
+        delivery_method: flight
+        loan: True
+        years_of_development: 10
+        years_of_program: 20
+        years_of_service: 20
