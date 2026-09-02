@@ -325,11 +325,20 @@ def test_lca_doe_pemfc_h2_twin_otter_hybrid_for_easn():
 
     # Any lower than 60% gives unrealistic values for turboshaft.
     for power_split in [60, 65, 70, 75, 80]:
-
-        problem.set_val("data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split", val=power_split, units="percent")
-        problem.set_val("data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split", val=power_split, units="percent")
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+            val=power_split,
+            units="percent",
+        )
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+            val=power_split,
+            units="percent",
+        )
         # Run the problem
-        problem.output_file_path = RESULTS_FOLDER_PATH / "percent_split_doe" / (str(power_split) + ".xml")
+        problem.output_file_path = (
+            RESULTS_FOLDER_PATH / "percent_split_doe" / (str(power_split) + ".xml")
+        )
         problem.run_model()
         problem.write_outputs()
 
@@ -380,10 +389,16 @@ def test_lca_pemfc_h2_twin_otter_optim_for_easn():
 
     problem.setup()
 
-    problem.set_val("data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
-                    val=60, units="percent")
-    problem.set_val("data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
-                    val=60, units="percent")
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        val=60,
+        units="percent",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+        val=60,
+        units="percent",
+    )
 
     problem.run_driver()
     problem.output_file_path = RESULTS_FOLDER_PATH / "optim_power_split_with_lca.xml"

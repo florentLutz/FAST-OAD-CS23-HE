@@ -23,10 +23,28 @@
       <v_approach units="m/s" is_input="True">38.78911111111112<!--approach speed--></v_approach>
       <v_cruise units="m/s" is_input="True">93.6288888888889<!--cruise speed--></v_cruise>
       <v_max_sl units="knot" is_input="True">170.0<!--maximum speed at sea level--></v_max_sl>
+      <flight_per_year>489.195</flight_per_year>
+      <flight_hours_per_year units="h">1200</flight_hours_per_year>
     </TLAR>
+    <cost>
+      <cpi_2012>1.4</cpi_2012>
+      <prototype_number>5</prototype_number>
+      <delivery>
+        <duration units="s" is_input="False">11530.826537296722</duration>
+      </delivery>
+      <production>
+        <number_aircraft_5_years>70</number_aircraft_5_years>
+        <annual_delivery_target>30</annual_delivery_target>
+        <discount_rate>0.12</discount_rate>
+      </production>
+      <operation>
+        <discount_rate>0.08</discount_rate>
+      </operation>
+    </cost>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
       <wing_configuration is_input="True">3.0<!--1=low wing configuration / 2=mid wing configuration / 3=high wing configuration--></wing_configuration>
+      <flap_type>1.0</flap_type>
       <aircraft>
         <wet_area units="m**2" is_input="False">197.2102191518564<!--aircraft total wet area--></wet_area>
       </aircraft>

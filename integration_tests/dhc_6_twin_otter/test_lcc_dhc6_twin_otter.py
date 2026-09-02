@@ -33,7 +33,6 @@ def test_lcc_twin_otter_for_easn():
     problem.read_inputs()
     problem.setup()
 
-
     # Based on Viking Air assumptions
     problem.set_val("data:TLAR:flight_hours_per_year", val=1200.0, units="h")
     problem.set_val("data:TLAR:flight_per_year", val=489.195)
@@ -41,10 +40,6 @@ def test_lcc_twin_otter_for_easn():
     # Run the problem
     problem.run_model()
     problem.write_outputs()
-
-    # assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-    #     1.3027372749944493e-05, rel=1e-2
-    # )
 
 
 def test_lca_pemfc_h2_twin_otter_for_easn():
