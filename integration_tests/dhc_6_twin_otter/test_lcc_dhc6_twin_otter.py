@@ -38,7 +38,7 @@ def test_lcc_twin_otter_for_easn():
     problem.write_outputs()
 
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        0.78, rel=1e-2
+        0.789, rel=1e-2
     )
 
 

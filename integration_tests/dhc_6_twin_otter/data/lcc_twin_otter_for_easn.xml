@@ -39,6 +39,7 @@
       </production>
       <operation>
         <discount_rate>0.08</discount_rate>
+        <passenger_per_flight_baseline>9</passenger_per_flight_baseline>
       </operation>
     </cost>
     <geometry>
