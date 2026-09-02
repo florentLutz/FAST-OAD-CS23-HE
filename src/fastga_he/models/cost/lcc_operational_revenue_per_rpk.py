@@ -23,11 +23,6 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
             desc="Annual operational cost per unit of the aircraft",
         )
         self.add_input(
-            "data:TLAR:NPAX_design",
-            val=np.nan,
-            desc="Number of passengers for the sizing mission",
-        )
-        self.add_input(
             "data:TLAR:flight_per_year",
             val=np.nan,
         )
@@ -38,9 +33,9 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
             desc="The range of the aircraft",
         )
         self.add_input(
-            "data:cost:operation:passenger_load_factor",
-            val=0.7,
-            desc="The passenger load factor of the aircraft",
+            "data:cost:operation:passenger_per_flight",
+            val=np.nan,
+            desc="The number of passengers per flight",
         )
 
         self.add_output(
@@ -55,31 +50,29 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         annual_revenue_per_unit = inputs["data:cost:operation:annual_revenue_per_unit"]
-        number_of_passenger = inputs["data:TLAR:NPAX_design"]
+        number_of_passenger = inputs["data:cost:operation:passenger_per_flight"]
         flight_per_year = inputs["data:TLAR:flight_per_year"]
         range_km = inputs["data:TLAR:range"]
-        passenger_load_factor = inputs["data:cost:operation:passenger_load_factor"]
 
         outputs["data:cost:operation:revenue_per_rpk"] = annual_revenue_per_unit / (
-            number_of_passenger * flight_per_year * range_km * passenger_load_factor
+            number_of_passenger * flight_per_year * range_km
         )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         annual_revenue_per_unit = inputs["data:cost:operation:annual_revenue_per_unit"]
-        number_of_passenger = inputs["data:TLAR:NPAX_design"]
+        number_of_passenger = inputs["data:cost:operation:passenger_per_flight"]
         flight_per_year = inputs["data:TLAR:flight_per_year"]
         range_km = inputs["data:TLAR:range"]
-        passenger_load_factor = inputs["data:cost:operation:passenger_load_factor"]
 
         common_denominator = (
-            number_of_passenger * flight_per_year * range_km * passenger_load_factor
+            number_of_passenger * flight_per_year * range_km
         )
 
         partials[
             "data:cost:operation:revenue_per_rpk", "data:cost:operation:annual_revenue_per_unit"
         ] = 1.0 / common_denominator
 
-        partials["data:cost:operation:revenue_per_rpk", "data:TLAR:NPAX_design"] = (
+        partials["data:cost:operation:revenue_per_rpk", "data:cost:operation:passenger_per_flight"] = (
             -annual_revenue_per_unit / (common_denominator * number_of_passenger)
         )
 
@@ -90,7 +83,3 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
         partials["data:cost:operation:revenue_per_rpk", "data:TLAR:range"] = (
             -annual_revenue_per_unit / (common_denominator * range_km)
         )
-
-        partials[
-            "data:cost:operation:revenue_per_rpk", "data:cost:operation:passenger_load_factor"
-        ] = -annual_revenue_per_unit / (common_denominator * passenger_load_factor)

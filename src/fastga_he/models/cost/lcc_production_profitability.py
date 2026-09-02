@@ -44,7 +44,6 @@ class LCCProductionProfitability(om.Group):
             ),
             promotes=["data:*"],
         )
-
         self.add_subsystem(
             name="learning_curve_discount",
             subsys=LCCLearningCurveDiscount(
@@ -52,13 +51,11 @@ class LCCProductionProfitability(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="project_development_cost_distribution",
             subsys=LCCProjectDevelopmentCostDistribution(years_of_development=years_of_development),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="annual_sales_gross_profit",
             subsys=LCCAnnualSalesGrossProfit(
@@ -66,7 +63,6 @@ class LCCProductionProfitability(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="production_annual_cash_flow",
             subsys=LCCProductionAnnualCashFlow(
@@ -74,7 +70,6 @@ class LCCProductionProfitability(om.Group):
             ),
             promotes=["*"],
         )
-
         self.add_subsystem(
             name="production_npv_discount_factor",
             subsys=LCCNPVDiscountFactor(duration_in_years=years_of_program),
@@ -82,7 +77,6 @@ class LCCProductionProfitability(om.Group):
                 ("discount_rate", "data:cost:production:discount_rate"),
             ],
         )
-
         self.add_subsystem(
             name="production_net_present_value",
             subsys=LCCNetPresentValue(duration_in_years=years_of_program),
@@ -91,7 +85,6 @@ class LCCProductionProfitability(om.Group):
                 ("net_present_value", "data:cost:production:net_present_value"),
             ],
         )
-
         self.add_subsystem(
             name="production_profitability_index",
             subsys=LCCProfitabilityIndex(duration_in_years=years_of_program),

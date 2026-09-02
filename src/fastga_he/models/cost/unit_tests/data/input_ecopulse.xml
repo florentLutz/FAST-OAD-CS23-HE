@@ -292,6 +292,7 @@
       <operation>
         <number_of_pilot>1.0</number_of_pilot>
         <loan_principal unit="USD">42000.0</loan_principal>
+        <passenger_per_flight_baseline>3</passenger_per_flight_baseline>
       </operation>
     </cost>
     <loads>

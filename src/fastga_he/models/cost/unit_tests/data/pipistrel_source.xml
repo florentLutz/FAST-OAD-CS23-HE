@@ -25,6 +25,7 @@
       <operation>
         <loan_principal units="USD">18000</loan_principal>
         <discount_rate>0.08<!--NPV discount rate based on industry average--></discount_rate>
+        <passenger_per_flight_baseline>0</passenger_per_flight_baseline>
       </operation>
     </cost>
     <geometry>
