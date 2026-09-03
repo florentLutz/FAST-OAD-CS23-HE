@@ -40,6 +40,12 @@ class LCC(om.Group):
             desc="True if loan is taken for financing the aircraft",
         )
         self.options.declare(
+            name="calculate_npax_design",
+            default=False,
+            types=bool,
+            desc="True if NPAX_design is not provided",
+        )
+        self.options.declare(
             "years_of_development",
             types=int,
             default=10,
@@ -90,7 +96,9 @@ class LCC(om.Group):
         self.add_subsystem(
             name="operational_profitability",
             subsys=LCCOperationalProfitability(
-                years_of_service=self.options["years_of_service"], loan=self.options["loan"]
+                years_of_service=self.options["years_of_service"],
+                loan=self.options["loan"],
+                calculate_npax_design=self.options["calculate_npax_design"],
             ),
             promotes=["*"],
         )

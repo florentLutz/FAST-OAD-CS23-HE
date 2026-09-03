@@ -5,10 +5,14 @@
       <max_airframe_hours units="h">33000</max_airframe_hours>
       <range units="m" is_input="True">740800.0<!--design range--></range>
       <v_cruise units="knot" is_input="True">182.0<!--cruise speed--></v_cruise>
+      <NPAX_design is_input="True">9.0<!--top-level requirement: design number of passengers--></NPAX_design>
+      <flight_per_year>489.195</flight_per_year>
+      <v_max_sl units="knot" is_input="True">170.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
     <geometry>
       <has_T_tail is_input="True">0.0<!--0=horizontal tail is attached to fuselage / 1=horizontal tail is attached to top of vertical tail--></has_T_tail>
       <wing_configuration is_input="True">3.0<!--1=low wing configuration / 2=mid wing configuration / 3=high wing configuration--></wing_configuration>
+      <flap_type>1.0</flap_type>
       <aircraft>
         <wet_area units="m**2" is_input="True">197.88218920375218<!--aircraft total wet area--></wet_area>
       </aircraft>
@@ -167,6 +171,24 @@
         </nacelle>
       </propulsion>
     </geometry>
+    <cost>
+      <cpi_2012>1.4</cpi_2012>
+      <prototype_number>5</prototype_number>
+      <delivery>
+        <duration units="s" is_input="False">11530.826537296722</duration>
+      </delivery>
+      <production>
+        <number_aircraft_5_years>70</number_aircraft_5_years>
+        <annual_delivery_target>30</annual_delivery_target>
+        <discount_rate>0.12</discount_rate>
+        <passenger_load_factor>1.0</passenger_load_factor>
+      </production>
+      <operation>
+        <discount_rate>0.08</discount_rate>
+        <number_of_pilot>2.0</number_of_pilot>
+        <passenger_per_flight_baseline>9</passenger_per_flight_baseline>
+      </operation>
+    </cost>
     <aerodynamics>
       <cruise>
         <mach is_input="True">0.2851163924282996<!--mach number representative of high speed aerodynamics--></mach>
@@ -1646,7 +1668,7 @@
         <OWE units="kg" is_input="False">3836.6308210358643<!--Mass of aircraft--></OWE>
         <ZFW units="kg" is_input="False">5104.217776273772<!--aircraft mass with payload, without fuel--></ZFW>
         <max_payload units="kg" is_input="True">1542.2<!--max payload weight--></max_payload>
-        <payload units="kg" is_input="False">1267.5921476186627<!--design payload weight--></payload>
+        <payload units="kg" is_input="False">1163.346396950851<!--design payload weight--></payload>
         <target_MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></target_MTOW>
         <CG>
           <aft>
@@ -2000,6 +2022,10 @@
             </MAC_position>
           </fwd>
         </CG>
+        <payload>
+          <design_mass_per_passenger units="kg" is_input="True">94.5<!--design payload mass carried by passenger--></design_mass_per_passenger>
+          <design_luggage_per_passenger units="kg" is_input="True">8.0<!--design luggage per passenger--></design_luggage_per_passenger>
+        </payload>
       </aircraft>
       <airframe>
         <paint>
@@ -2055,7 +2081,7 @@
         </DC_bus>
         <PEMFC_stack>
           <pemfc_stack_1>
-            <k_mass is_input="True">0.34<!--A tuning factor allows the PEMFC stack weight to be changed manually. This increases the power density by factor of 2.5--></k_mass>
+            <k_mass is_input="True">1.0<!--A tuning factor allows the PEMFC stack weight to be changed manually. This increases the power density by factor of 2.5--></k_mass>
             <k_volume is_input="True">1.0<!--A tuning factor allows the PEMFC stack volume to be changed manually.--></k_volume>
           </pemfc_stack_1>
         </PEMFC_stack>

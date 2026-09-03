@@ -12,6 +12,7 @@ from .lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
 from .lcc_npv_discount_factor import LCCNPVDiscountFactor
 from .lcc_net_present_value import LCCNetPresentValue
 from .lcc_profidibility_index import LCCProfitabilityIndex
+from .lcc_calculate_npax_design import LCCOperationalCalculateNPAXDesign
 
 
 class LCCOperationalProfitability(om.Group):
@@ -32,10 +33,23 @@ class LCCOperationalProfitability(om.Group):
             types=bool,
             desc="True if loan is taken for financing the aircraft",
         )
+        self.options.declare(
+            name="calculate_npax_design",
+            default=False,
+            types=bool,
+            desc="True if NPAX_design is not provided",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
         loan = self.options["loan"]
+
+        if self.options["calculate_npax_design"]:
+            self.add_subsystem(
+                name="calculate_npax_design",
+                subsys=LCCOperationalCalculateNPAXDesign(),
+                promotes=["*"],
+            )
 
         self.add_subsystem(
             name="passenger_per_flight",

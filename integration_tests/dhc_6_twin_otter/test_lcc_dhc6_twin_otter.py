@@ -94,3 +94,43 @@ def test_lcc_pemfc_h2_twin_otter_hybrid_for_easn():
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
         0.686, rel=1e-2
     )
+
+
+def test_lcc_doe_pemfc_h2_twin_otter_hybrid_for_easn():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_retrofit_pemfc_h2_twin_otter_hybrid_optim_for_easn.xml"
+    process_file_name = "retrofit_pemfc_h2_twin_otter_hybrid_optim_lcc_for_easn.yml"
+
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.setup()
+
+    # Any lower than 60% gives unrealistic values for turboshaft.
+    for power_split in [60, 65, 70, 75, 80]:
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+            val=power_split,
+            units="percent",
+        )
+        problem.set_val(
+            "data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+            val=power_split,
+            units="percent",
+        )
+        # Run the problem
+        problem.output_file_path = (
+            RESULTS_FOLDER_PATH / "percent_split_doe_lcc" / (str(power_split) + ".xml")
+        )
+        problem.run_model()
+        problem.write_outputs()
