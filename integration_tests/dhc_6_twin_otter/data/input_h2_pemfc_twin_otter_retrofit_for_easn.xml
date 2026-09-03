@@ -29,7 +29,7 @@
         </windows>
         <seats>
           <passenger>
-            <NPAX_max is_input="True">9.0<!--maximum number of passengers in the aircraft--></NPAX_max>
+            <NPAX_max is_input="True">4.0<!--maximum number of passengers in the aircraft--></NPAX_max>
             <count_by_row is_input="True">3.0<!--number of passenger seats per row--></count_by_row>
             <length units="m" is_input="True">0.7<!--passenger seats length--></length>
           </passenger>
@@ -611,7 +611,7 @@
     <weight>
       <aircraft>
         <MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></MTOW>
-        <max_payload units="kg" is_input="True">1542.0<!--max payload weight--></max_payload>
+        <max_payload units="kg" is_input="True">617.25<!--max payload weight--></max_payload>
         <target_MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></target_MTOW>
         <CG>
           <aft>
@@ -635,7 +635,7 @@
       </airframe>
       <furniture>
         <passenger_seats>
-          <mass units="kg" is_input="True">154.55<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
+          <mass units="kg" is_input="True">84.3<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
         </passenger_seats>
       </furniture>
       <propulsion>

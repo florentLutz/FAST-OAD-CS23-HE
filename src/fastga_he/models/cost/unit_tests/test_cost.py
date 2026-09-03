@@ -1534,6 +1534,7 @@ def test_operation_annual_revenue():
 
     problem.check_partials(compact_print=True)
 
+
 def test_passenger_per_flight():
     ivc = om.IndepVarComp()
 

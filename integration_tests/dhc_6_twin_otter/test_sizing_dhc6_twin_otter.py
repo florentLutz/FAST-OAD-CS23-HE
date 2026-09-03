@@ -369,13 +369,48 @@ def test_retrofit_twin_otter_pemfc_h2_for_easn():
     xml_file_name = "input_h2_pemfc_twin_otter_retrofit_for_easn.xml"
     process_file_name = "retrofit_pemfc_h2_twin_otter_for_easn.yml"
 
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+    # Copy OAD outputs as inputs of the LCA
+    copy(
+        ref_inputs,
+        RESULTS_FOLDER_PATH / "oad_process_input_h2_pemfc_twin_otter_retrofit_for_easn.xml",
+    )
+
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
     problem = configurator.get_problem()
 
     # Create inputs
-    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    ref_inputs = RESULTS_FOLDER_PATH / "oad_process_input_h2_pemfc_twin_otter_retrofit_for_easn.xml"
+
+    # Create inputs, setup, and complete with missing definitions
+    datafile = oad.DataFile(ref_inputs)
+
+    # Reset k_mass to 1.0
+    datafile.append(
+        oad.Variable("settings:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:k_mass", val=1.0)
+    )
+    # Define PEMFC stack specific power input
+    datafile.append(
+        oad.Variable(
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1" ":specific_power_input",
+            val=3.0,
+            units="kW/kg",
+        )
+    )
+    # Define hydrogen tank safety factor input
+    datafile.append(
+        oad.Variable(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:safety_factor",
+            val=2.25,
+            units=None,
+        )
+    )
+
+    datafile.save()
 
     problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
@@ -394,13 +429,50 @@ def test_retrofit_twin_otter_pemfc_h2_hybrid_for_easn():
     xml_file_name = "input_h2_pemfc_twin_otter_retrofit_hybrid_for_easn.xml"
     process_file_name = "retrofit_pemfc_h2_twin_otter_hybrid_for_easn.yml"
 
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+
+    # Copy OAD outputs as inputs of the LCA
+    copy(
+        ref_inputs,
+        RESULTS_FOLDER_PATH / "oad_process_input_h2_pemfc_twin_otter_retrofit_hybrid_for_easn.xml",
+    )
+
     configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
     problem = configurator.get_problem()
 
     # Create inputs
-    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    ref_inputs = (
+        RESULTS_FOLDER_PATH / "oad_process_input_h2_pemfc_twin_otter_retrofit_hybrid_for_easn.xml"
+    )
+
+    # Create inputs, setup, and complete with missing definitions
+    datafile = oad.DataFile(ref_inputs)
+
+    # Reset k_mass to 1.0
+    datafile.append(
+        oad.Variable("settings:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:k_mass", val=1.0)
+    )
+    # Define PEMFC stack specific power input
+    datafile.append(
+        oad.Variable(
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1" ":specific_power_input",
+            val=3.0,
+            units="kW/kg",
+        )
+    )
+    # Define hydrogen tank safety factor input
+    datafile.append(
+        oad.Variable(
+            "data:propulsion:he_power_train:gaseous_hydrogen_tank:gaseous_hydrogen_tank_1:safety_factor",
+            val=2.25,
+            units=None,
+        )
+    )
+
+    datafile.save()
 
     problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
 
     problem.write_needed_inputs(ref_inputs)
     problem.read_inputs()
