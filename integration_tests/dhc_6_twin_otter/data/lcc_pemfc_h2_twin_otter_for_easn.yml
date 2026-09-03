@@ -16,7 +16,7 @@ model:
         id: fastga_he.lcc.legacy
         power_train_file_path: ./pemfc_h2_propulsion.yml
         delivery_method: flight
-        loan: True
+        loan: False
         years_of_development: 10
         years_of_program: 20
         years_of_service: 20
