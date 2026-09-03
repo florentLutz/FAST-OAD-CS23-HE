@@ -393,7 +393,7 @@ def test_retrofit_twin_otter_pemfc_h2_for_easn():
     # Define PEMFC stack specific power input
     datafile.append(
         oad.Variable(
-            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1" ":specific_power_input",
+            "data:propulsion:he_power_train:PEMFC_stack:pemfc_stack_1:specific_power_input",
             val=3.0,
             units="kW/kg",
         )

@@ -419,7 +419,7 @@
           <gaseous_hydrogen_tank_1>
             <diameter_height_ratio is_input="True">0.9<!--Fraction between the tank outer diameter and fuselage height--></diameter_height_ratio>
             <number_of_tank is_input="True">1.0<!--Number of gaseous hydrogen tank in a stack in fuselage. Default set 1.0 for single tank in fuselage and outside fuselage uses.--></number_of_tank>
-            <safety_factor is_input="True">1.0<!--gaseous hydrogen tank design safety factor--></safety_factor>
+            <safety_factor is_input="True">2.25<!--gaseous hydrogen tank design safety factor--></safety_factor>
             <tank_pressure units="Pa" is_input="True">70000000.0<!--Hydrogen gas tank static pressure--></tank_pressure>
             <trapped_ratio is_input="True">0.03<!--Ratio between the hydrogen reactant pressure for fuel cell or the injection pressure for hydrogen engines and filling pressure of hydrogen tank--></trapped_ratio>
             <material>
@@ -611,7 +611,7 @@
     <weight>
       <aircraft>
         <MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></MTOW>
-        <max_payload units="kg" is_input="True">617.25<!--max payload weight--></max_payload>
+        <max_payload units="kg" is_input="True">867.0<!--max payload weight--></max_payload>
         <target_MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></target_MTOW>
         <CG>
           <aft>

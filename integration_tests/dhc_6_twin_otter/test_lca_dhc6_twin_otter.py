@@ -173,7 +173,7 @@ def test_lca_pemfc_h2_twin_otter_for_easn():
     problem.write_outputs()
 
     assert problem.get_val("data:environmental_impact:single_score") == pytest.approx(
-        5.44161007e-06, rel=1e-2
+        8.3922553e-06, rel=1e-2
     )
 
 
