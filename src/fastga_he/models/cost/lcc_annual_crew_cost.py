@@ -45,7 +45,7 @@ class LCCAnnualCrewCost(om.ExplicitComponent):
 
         outputs["data:cost:operation:annual_crew_cost"] = (
             113556.7 * number_of_pilot + 25200.0 * number_of_cabin_crew
-        )(1.0 + social_benefits_rate)
+        ) * (1.0 + social_benefits_rate)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         number_of_pilot = inputs["data:cost:operation:number_of_pilot"]

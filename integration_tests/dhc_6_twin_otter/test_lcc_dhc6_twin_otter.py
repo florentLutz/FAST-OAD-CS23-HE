@@ -38,7 +38,7 @@ def test_lcc_twin_otter_for_easn():
     problem.write_outputs()
 
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        0.739, rel=1e-2
+        0.7615, rel=1e-2
     )
 
 
@@ -65,7 +65,7 @@ def test_lcc_pemfc_h2_twin_otter_for_easn():
     problem.write_outputs()
 
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        1.278, rel=1e-2
+        1.3288, rel=1e-2
     )
 
 
@@ -92,7 +92,7 @@ def test_lcc_pemfc_h2_twin_otter_hybrid_for_easn():
     problem.write_outputs()
 
     assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        0.686, rel=1e-2
+        0.708, rel=1e-2
     )
 
 
