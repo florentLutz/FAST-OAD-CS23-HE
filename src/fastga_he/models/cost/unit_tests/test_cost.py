@@ -1534,6 +1534,26 @@ def test_operation_annual_revenue():
 
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+    ivc.add_output("data:cost:operation:revenue_per_rpk", units="USD/km", val=1.2)
+    ivc.add_output("data:cost:operation:passenger_per_flight", val=3)
+    ivc.add_output("data:TLAR:range", units="km", val=2037)
+    ivc.add_output("data:TLAR:flight_per_year", val=66)
+
+    problem = run_system(
+        LCCOperationalAnnualRevenue(years_of_service=TEST_PROGAM_YEARS, fix_revenue_per_rpk=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:profit_margin") == pytest.approx(0.04755, rel=1e-3)
+    assert problem.get_val(
+        "data:cost:operation:annual_revenue_per_unit", units="USD/yr"
+    ) == pytest.approx(483991.2, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
 
 def test_passenger_per_flight():
     ivc = om.IndepVarComp()

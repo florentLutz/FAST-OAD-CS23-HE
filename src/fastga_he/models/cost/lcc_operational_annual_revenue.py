@@ -18,14 +18,30 @@ class LCCOperationalAnnualRevenue(om.Group):
             default=30,
             desc="The total service life of the aircraft in years for NPV calculation.",
         )
+        self.options.declare(
+            "fix_revenue_per_rpk",
+            types=bool,
+            default=False,
+            desc="If True, the revenue per RPK will be an input.",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
-        self.add_subsystem(
-            "annual_revenue",
-            _OperationalAnnualRevenue(),
-            promotes=["*"],
-        )
+        fix_revenue_per_rpk = self.options["fix_revenue_per_rpk"]
+
+        if fix_revenue_per_rpk:
+            self.add_subsystem(
+                "annual_revenue_fixed_revenue_per_rpk",
+                _OperationalAnnualRevenueFixedRevenuePerRPK(),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                "annual_revenue",
+                _OperationalAnnualRevenue(),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             "airfare_gain_factor",
             _AirfareGainFactor(years_of_service=years_of_service),
@@ -137,6 +153,134 @@ class _OperationalAnnualRevenue(om.ExplicitComponent):
         ] = inputs["data:cost:operation:annual_cost_per_unit"] / (
             (1.0 - inputs["data:cost:operation:profit_margin"]) ** 2.0
         )
+
+
+class _OperationalAnnualRevenueFixedRevenuePerRPK(om.ExplicitComponent):
+    """
+    Computation of the annual revenue of the aircraft. The profit margin and the revenue is
+    derived from the annual ticket sales revenue.
+    """
+
+    def setup(self):
+        self.add_input(
+            "data:cost:operation:revenue_per_rpk",
+            units="USD/km",
+            val=np.nan,
+            desc="Revenue per Revenue Passenger Kilometer (RPK)",
+        )
+        self.add_input(
+            "data:TLAR:flight_per_year",
+            val=np.nan,
+        )
+        self.add_input(
+            "data:TLAR:range",
+            val=np.nan,
+            units="km",
+            desc="The range of the aircraft",
+        )
+        self.add_input(
+            "data:cost:operation:passenger_per_flight",
+            val=np.nan,
+            desc="The number of passengers per flight",
+        )
+        self.add_input(
+            "data:cost:operation:annual_cost_per_unit",
+            val=np.nan,
+            units="USD/yr",
+            desc="Annual operational cost per unit of the aircraft",
+        )
+
+        self.add_output("data:cost:operation:annual_revenue_per_unit", units="USD/yr", val=0.0)
+        self.add_output(
+            "data:cost:operation:profit_margin",
+            val=0.07,
+            desc="Profit margin as a fraction of the annual revenue",
+        )
+
+    def setup_partials(self):
+        self.declare_partials("data:cost:operation:profit_margin", "*", method="exact")
+        self.declare_partials(
+            "data:cost:operation:annual_revenue_per_unit",
+            [
+                "data:cost:operation:revenue_per_rpk",
+                "data:TLAR:flight_per_year",
+                "data:TLAR:range",
+                "data:cost:operation:passenger_per_flight",
+            ],
+            method="exact",
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        revenue_per_rpk = inputs["data:cost:operation:revenue_per_rpk"]
+        flight_per_year = inputs["data:TLAR:flight_per_year"]
+        range_km = inputs["data:TLAR:range"]
+        passenger_per_flight = inputs["data:cost:operation:passenger_per_flight"]
+        annual_cost_per_unit = inputs["data:cost:operation:annual_cost_per_unit"]
+
+        outputs["data:cost:operation:annual_revenue_per_unit"] = (
+            revenue_per_rpk * flight_per_year * range_km * passenger_per_flight
+        )
+        outputs["data:cost:operation:profit_margin"] = (
+            outputs["data:cost:operation:annual_revenue_per_unit"] - annual_cost_per_unit
+        ) / outputs["data:cost:operation:annual_revenue_per_unit"]
+
+    def compute_partials(self, inputs, partials, discrete_inputs=None):
+        revenue_per_rpk = inputs["data:cost:operation:revenue_per_rpk"]
+        flight_per_year = inputs["data:TLAR:flight_per_year"]
+        range_km = inputs["data:TLAR:range"]
+        passenger_per_flight = inputs["data:cost:operation:passenger_per_flight"]
+        annual_cost_per_unit = inputs["data:cost:operation:annual_cost_per_unit"]
+
+        # Partial derivatives for annual revenue per unit
+        partials[
+            "data:cost:operation:annual_revenue_per_unit", "data:cost:operation:revenue_per_rpk"
+        ] = flight_per_year * range_km * passenger_per_flight
+
+        partials["data:cost:operation:annual_revenue_per_unit", "data:TLAR:flight_per_year"] = (
+            revenue_per_rpk * range_km * passenger_per_flight
+        )
+
+        partials["data:cost:operation:annual_revenue_per_unit", "data:TLAR:range"] = (
+            revenue_per_rpk * flight_per_year * passenger_per_flight
+        )
+
+        partials[
+            "data:cost:operation:annual_revenue_per_unit",
+            "data:cost:operation:passenger_per_flight",
+        ] = revenue_per_rpk * flight_per_year * range_km
+
+        # Partial derivatives for profit margin
+        annual_revenue = revenue_per_rpk * flight_per_year * range_km * passenger_per_flight
+        profit_margin_denominator = annual_revenue**2.0
+
+        partials["data:cost:operation:profit_margin", "data:cost:operation:revenue_per_rpk"] = (
+            (annual_cost_per_unit - annual_revenue)
+            / profit_margin_denominator
+            * (flight_per_year * range_km * passenger_per_flight)
+        )
+        partials["data:cost:operation:profit_margin", "data:TLAR:flight_per_year"] = (
+            (annual_cost_per_unit - annual_revenue)
+            / profit_margin_denominator
+            * (revenue_per_rpk * range_km * passenger_per_flight)
+        )
+
+        partials["data:cost:operation:profit_margin", "data:TLAR:range"] = (
+            (annual_cost_per_unit - annual_revenue)
+            / profit_margin_denominator
+            * (revenue_per_rpk * flight_per_year * passenger_per_flight)
+        )
+
+        partials[
+            "data:cost:operation:profit_margin", "data:cost:operation:passenger_per_flight"
+        ] = (
+            (annual_cost_per_unit - annual_revenue)
+            / profit_margin_denominator
+            * (revenue_per_rpk * flight_per_year * range_km)
+        )
+
+        partials[
+            "data:cost:operation:profit_margin", "data:cost:operation:annual_cost_per_unit"
+        ] = 1.0 / annual_revenue
 
 
 class _OperationalAnnualRevenueProjection(om.ExplicitComponent):

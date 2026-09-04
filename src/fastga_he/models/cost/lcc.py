@@ -46,6 +46,12 @@ class LCC(om.Group):
             desc="True if NPAX_design is not provided",
         )
         self.options.declare(
+            "fix_revenue_per_rpk",
+            types=bool,
+            default=False,
+            desc="If True, the revenue per RPK will be an input.",
+        )
+        self.options.declare(
             "years_of_development",
             types=int,
             default=10,
@@ -99,6 +105,7 @@ class LCC(om.Group):
                 years_of_service=self.options["years_of_service"],
                 loan=self.options["loan"],
                 calculate_npax_design=self.options["calculate_npax_design"],
+                fix_revenue_per_rpk=self.options["fix_revenue_per_rpk"],
             ),
             promotes=["*"],
         )

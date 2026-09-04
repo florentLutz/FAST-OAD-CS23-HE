@@ -39,10 +39,17 @@ class LCCOperationalProfitability(om.Group):
             types=bool,
             desc="True if NPAX_design is not provided",
         )
+        self.options.declare(
+            "fix_revenue_per_rpk",
+            types=bool,
+            default=False,
+            desc="If True, the revenue per RPK will be an input.",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
         loan = self.options["loan"]
+        fix_revenue_per_rpk = self.options["fix_revenue_per_rpk"]
 
         if self.options["calculate_npax_design"]:
             self.add_subsystem(
@@ -58,14 +65,19 @@ class LCCOperationalProfitability(om.Group):
         )
         self.add_subsystem(
             name="annual_operational_revenue",
-            subsys=LCCOperationalAnnualRevenue(years_of_service=years_of_service),
+            subsys=LCCOperationalAnnualRevenue(
+                years_of_service=years_of_service, fix_revenue_per_rpk=fix_revenue_per_rpk
+            ),
             promotes=["*"],
         )
-        self.add_subsystem(
-            name="revenue_per_rpk",
-            subsys=LCCOperationalRevenuePerRPK(),
-            promotes=["*"],
-        )
+
+        if not fix_revenue_per_rpk:
+            self.add_subsystem(
+                name="revenue_per_rpk",
+                subsys=LCCOperationalRevenuePerRPK(),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             name="annual_energy_cost_projection",
             subsys=LCCOperationalAnnualEnergyCostProjection(years_of_service=years_of_service),
