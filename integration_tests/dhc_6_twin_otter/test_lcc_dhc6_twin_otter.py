@@ -96,7 +96,7 @@ def test_lcc_pemfc_h2_twin_otter_hybrid_for_easn():
     )
 
 
-def test_lcc_doe_pemfc_h2_twin_otter_hybrid_for_easn():
+def test_lcc_doe_pemfc_h2_twin_otter_hybrid_for_easn_with_baseline_ticket_price():
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -134,3 +134,135 @@ def test_lcc_doe_pemfc_h2_twin_otter_hybrid_for_easn():
         )
         problem.run_model()
         problem.write_outputs()
+
+
+def test_lcc_pemfc_h2_twin_otter_optim_for_easn_with_baseline_ticket_price_operation():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_retrofit_pemfc_h2_twin_otter_hybrid_optim_for_easn.xml"
+    process_file_name = "retrofit_pemfc_h2_twin_otter_hybrid_optim_lcc_for_easn.yml"
+
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals()
+
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        lower=60.0,
+        upper=90.0,
+    )
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+        units="percent",
+        lower=60.0,
+        upper=90.0,
+    )
+
+    problem.model.add_objective(
+        name="data:cost:operation:profitability_index_factor",
+    )
+    recorder = om.SqliteRecorder("driver_cases_for_easn_lcc_operation.sql")
+    problem.driver.add_recorder(recorder)
+
+    problem.driver.recording_options["record_desvars"] = True
+    problem.driver.recording_options["record_objectives"] = True
+
+    problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        val=60,
+        units="percent",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+        val=60,
+        units="percent",
+    )
+
+    problem.run_driver()
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "optim_power_split_with_lcc_operation_profit.xml"
+    )
+    problem.write_outputs()
+
+
+def test_lcc_pemfc_h2_twin_otter_optim_for_easn_with_baseline_ticket_price_production():
+    logging.basicConfig(level=logging.WARNING)
+    logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
+    logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
+
+    # Define used files depending on options
+    xml_file_name = "input_retrofit_pemfc_h2_twin_otter_hybrid_optim_for_easn.xml"
+    process_file_name = "retrofit_pemfc_h2_twin_otter_hybrid_optim_lcc_for_easn.yml"
+
+    ref_inputs = DATA_FOLDER_PATH / xml_file_name
+    configurator = oad.FASTOADProblemConfigurator(DATA_FOLDER_PATH / process_file_name)
+    problem = configurator.get_problem()
+
+    problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
+
+    problem.write_needed_inputs(ref_inputs)
+    problem.read_inputs()
+    problem.model.approx_totals()
+
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        units="percent",
+        lower=60.0,
+        upper=90.0,
+    )
+    problem.model.add_design_var(
+        name="data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+        units="percent",
+        lower=60.0,
+        upper=90.0,
+    )
+
+    problem.model.add_objective(
+        name="data:cost:production:profitability_index",
+        index=-1,
+        scaler=-1e7,
+    )
+    recorder = om.SqliteRecorder("driver_cases_for_easn_lcc_production.sql")
+    problem.driver.add_recorder(recorder)
+
+    problem.driver.recording_options["record_desvars"] = True
+    problem.driver.recording_options["record_objectives"] = True
+
+    problem.model_options["*propeller_*"] = {"mass_as_input": True}
+    problem.model_options["*pemfc_stack_*"] = {"mass_from_specific_power": True}
+
+    problem.setup()
+
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
+        val=60,
+        units="percent",
+    )
+    problem.set_val(
+        "data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
+        val=60,
+        units="percent",
+    )
+
+    problem.run_driver()
+    problem.output_file_path = (
+        RESULTS_FOLDER_PATH / "optim_power_split_with_lcc_production_profit.xml"
+    )
+    problem.write_outputs()
