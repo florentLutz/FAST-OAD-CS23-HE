@@ -122,9 +122,11 @@ class _HydrogenFuelCost(om.ExplicitComponent):
         tank_names = self.options["tank_names"]
         fuel_types = self.options["fuel_types"]
 
+        hydrogen_fuel_cost = 0.0
+
         for tank_type, tank_id, fuel_type in zip(tank_types, tank_names, fuel_types):
             if fuel_type == "hydrogen":
-                outputs["data:cost:hydrogen_fuel_cost"] += (
+                hydrogen_fuel_cost += (
                     inputs[
                         "data:propulsion:he_power_train:"
                         + tank_type
@@ -141,6 +143,8 @@ class _HydrogenFuelCost(om.ExplicitComponent):
                         + ":fuel_consumed_main_route"
                     ]
                 )
+
+        outputs["data:cost:hydrogen_fuel_cost"] = hydrogen_fuel_cost
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         tank_types = self.options["tank_types"]
@@ -173,7 +177,7 @@ class _HydrogenFuelCost(om.ExplicitComponent):
                     + tank_id
                     + ":fuel_type_cost:"
                     + fuel_type,
-                ] += inputs[
+                ] = inputs[
                     "data:propulsion:he_power_train:"
                     + tank_type
                     + ":"
@@ -255,9 +259,11 @@ class _HydrocarbonFuelCost(om.ExplicitComponent):
         tank_names = self.options["tank_names"]
         fuel_types = self.options["fuel_types"]
 
+        hydrocarbon_fuel_cost = 0.0
+
         for tank_type, tank_id, fuel_type in zip(tank_types, tank_names, fuel_types):
             if fuel_type != "hydrogen":
-                outputs["data:cost:hydrocarbon_fuel_cost"] += (
+                hydrocarbon_fuel_cost += (
                     inputs[
                         "data:propulsion:he_power_train:"
                         + tank_type
@@ -274,6 +280,8 @@ class _HydrocarbonFuelCost(om.ExplicitComponent):
                         + ":fuel_consumed_main_route"
                     ]
                 )
+
+        outputs["data:cost:hydrocarbon_fuel_cost"] = hydrocarbon_fuel_cost
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         tank_types = self.options["tank_types"]
@@ -306,7 +314,7 @@ class _HydrocarbonFuelCost(om.ExplicitComponent):
                     + tank_id
                     + ":fuel_type_cost:"
                     + fuel_type,
-                ] += inputs[
+                ] = inputs[
                     "data:propulsion:he_power_train:"
                     + tank_type
                     + ":"

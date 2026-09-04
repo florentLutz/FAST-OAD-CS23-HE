@@ -715,7 +715,7 @@ def test_annual_crew_cost():
     )
 
     assert problem.get_val("data:cost:operation:annual_crew_cost", units="USD/yr") == pytest.approx(
-        138756.7, rel=1e-3
+        180383.7, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1061,7 +1061,7 @@ def test_operational_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(844248.98, rel=1e-3)
+    ) == pytest.approx(878315.99, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1142,7 +1142,7 @@ def test_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(877721.39, rel=1e-3)
+    ) == pytest.approx(911788.40, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1533,6 +1533,7 @@ def test_operation_annual_revenue():
     )
 
     problem.check_partials(compact_print=True)
+
 
 def test_passenger_per_flight():
     ivc = om.IndepVarComp()

@@ -64,17 +64,15 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
         flight_per_year = inputs["data:TLAR:flight_per_year"]
         range_km = inputs["data:TLAR:range"]
 
-        common_denominator = (
-            number_of_passenger * flight_per_year * range_km
-        )
+        common_denominator = number_of_passenger * flight_per_year * range_km
 
         partials[
             "data:cost:operation:revenue_per_rpk", "data:cost:operation:annual_revenue_per_unit"
         ] = 1.0 / common_denominator
 
-        partials["data:cost:operation:revenue_per_rpk", "data:cost:operation:passenger_per_flight"] = (
-            -annual_revenue_per_unit / (common_denominator * number_of_passenger)
-        )
+        partials[
+            "data:cost:operation:revenue_per_rpk", "data:cost:operation:passenger_per_flight"
+        ] = -annual_revenue_per_unit / (common_denominator * number_of_passenger)
 
         partials["data:cost:operation:revenue_per_rpk", "data:TLAR:flight_per_year"] = (
             -annual_revenue_per_unit / (common_denominator * flight_per_year)
