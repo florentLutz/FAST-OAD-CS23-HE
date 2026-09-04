@@ -170,7 +170,9 @@ def test_lcc_pemfc_h2_twin_otter_optim_for_easn_with_baseline_ticket_price_opera
     )
 
     problem.model.add_objective(
-        name="data:cost:operation:profitability_index_factor",
+        name="data:cost:operation:profitability_index",
+        index=-1,
+        scaler=-1e7,
     )
     recorder = om.SqliteRecorder("driver_cases_for_easn_lcc_operation.sql")
     problem.driver.add_recorder(recorder)

@@ -87,12 +87,12 @@ class LCCElectricityCost(om.ExplicitComponent):
                 + ":energy_consumed_main_route",
             ] = inputs["data:cost:operation:electricity_unit_price"]
 
-            partials[
-                "data:cost:electricity_cost", "data:cost:operation:electricity_unit_price"
-            ] = inputs[
-                "data:propulsion:he_power_train:"
-                + electricity_storage_type
-                + ":"
-                + electricity_storage_id
-                + ":energy_consumed_main_route"
-            ]
+            partials["data:cost:electricity_cost", "data:cost:operation:electricity_unit_price"] = (
+                inputs[
+                    "data:propulsion:he_power_train:"
+                    + electricity_storage_type
+                    + ":"
+                    + electricity_storage_id
+                    + ":energy_consumed_main_route"
+                ]
+            )

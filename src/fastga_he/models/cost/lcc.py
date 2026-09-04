@@ -10,7 +10,6 @@ from .lcc_production_cost import LCCProductionCost
 from .lcc_operational_cost import LCCOperationalCost
 from .lcc_production_profitability import LCCProductionProfitability
 from .lcc_operational_profitability import LCCOperationalProfitability
-from .lcc_profidibility_index_optim import LCCProfitabilityIndexOptimization
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
@@ -109,14 +108,4 @@ class LCC(om.Group):
                 fix_revenue_per_rpk=self.options["fix_revenue_per_rpk"],
             ),
             promotes=["*"],
-        )
-
-        self.add_subsystem(
-            "profitability_index_optim",
-            LCCProfitabilityIndexOptimization(
-                duration_in_years=self.options["years_of_service"]
-        ),
-            promotes=[("profitability_index","data:cost:operation:profitability_index"),
-                      ("profitability_index_factor",
-                       "data:cost:operation:profitability_index_factor")],
         )
