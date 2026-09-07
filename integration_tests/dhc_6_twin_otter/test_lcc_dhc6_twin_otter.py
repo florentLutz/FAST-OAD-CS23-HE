@@ -41,8 +41,15 @@ def test_lcc_twin_otter_for_easn():
         0.7615, rel=1e-2
     )
 
+    assert problem.get_val("data:cost:production:profitability_index")[-1] == pytest.approx(
+        1.4243, rel=1e-2
+    )
+    assert problem.get_val("data:cost:operation:profitability_index")[-1] == pytest.approx(
+        1.809, rel=1e-2
+    )
 
-def test_lcc_pemfc_h2_twin_otter_for_easn():
+
+def test_lcc_pemfc_h2_twin_otter_for_easn_with_baseline_ticket_price():
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -64,12 +71,19 @@ def test_lcc_pemfc_h2_twin_otter_for_easn():
     problem.run_model()
     problem.write_outputs()
 
-    assert problem.get_val("data:cost:operation:revenue_per_rpk", units="USD/km") == pytest.approx(
-        1.3288, rel=1e-2
+    assert problem.get_val("data:cost:production:profitability_index")[-1] == pytest.approx(
+        1.1915, rel=1e-2
+    )
+    assert problem.get_val("data:cost:operation:profitability_index")[-1] == pytest.approx(
+        -1.5026, rel=1e-2
     )
 
 
 def test_lcc_pemfc_h2_twin_otter_hybrid_for_easn():
+    """
+    Calculate the revenue per passenger-kilometer of a hybrid model with defined annual profit
+    margin.
+    """
     logging.basicConfig(level=logging.WARNING)
     logging.getLogger("fastoad.module_management._bundle_loader").disabled = True
     logging.getLogger("fastoad.openmdao.variables.variable").disabled = True
@@ -172,7 +186,7 @@ def test_lcc_pemfc_h2_twin_otter_optim_for_easn_with_baseline_ticket_price_opera
     problem.model.add_objective(
         name="data:cost:operation:profitability_index",
         index=-1,
-        scaler=-1e7,
+        scaler=-10,
     )
     recorder = om.SqliteRecorder("driver_cases_for_easn_lcc_operation.sql")
     problem.driver.add_recorder(recorder)
@@ -187,12 +201,12 @@ def test_lcc_pemfc_h2_twin_otter_optim_for_easn_with_baseline_ticket_price_opera
 
     problem.set_val(
         "data:propulsion:he_power_train:planetary_gear:planetary_gear_1:power_split",
-        val=60,
+        val=70,
         units="percent",
     )
     problem.set_val(
         "data:propulsion:he_power_train:planetary_gear:planetary_gear_2:power_split",
-        val=60,
+        val=70,
         units="percent",
     )
 
@@ -239,7 +253,7 @@ def test_lcc_pemfc_h2_twin_otter_optim_for_easn_with_baseline_ticket_price_produ
     problem.model.add_objective(
         name="data:cost:production:profitability_index",
         index=-1,
-        scaler=-1e7,
+        scaler=-10,
     )
     recorder = om.SqliteRecorder("driver_cases_for_easn_lcc_production.sql")
     problem.driver.add_recorder(recorder)

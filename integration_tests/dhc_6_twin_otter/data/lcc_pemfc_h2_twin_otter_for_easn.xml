@@ -186,6 +186,7 @@
         <discount_rate>0.08</discount_rate>
         <number_of_pilot>2.0</number_of_pilot>
         <passenger_per_flight_baseline>9</passenger_per_flight_baseline>
+        <revenue_per_rpk units="USD/km" is_input="True">0.7615<!--revenue per revenue passenger kilometer--></revenue_per_rpk>
       </operation>
     </cost>
     <aerodynamics>
