@@ -1,0 +1,190 @@
+<FASTOAD_model>
+  <data>
+    <TLAR>
+      <NPAX_design is_input="True">13.0<!--Number of passengers for the sizing mission--></NPAX_design>
+      <aircraft_lifespan units="year" is_input="True">20.0<!--Expected lifetime of the aircraft--></aircraft_lifespan>
+      <flight_hours_per_year units="h" is_input="True">1200.0<!--Expected number of hours flown per year--></flight_hours_per_year>
+      <flight_per_year is_input="True">489.195<!--Average number of flight per year--></flight_per_year>
+      <range units="km" is_input="True">740.8000000000001<!--The range of the aircraft--></range>
+      <v_max_sl units="knot" is_input="True">170.0<!--maximum speed at sea level--></v_max_sl>
+    </TLAR>
+    <cost>
+      <cpi_2012 is_input="True">1.4<!--Consumer price index relative to the year 2012--></cpi_2012>
+      <delivery_cost_per_unit units="USD" is_input="False">2036.2564204501166<!--Freight cost per aircraft--></delivery_cost_per_unit>
+      <electricity_cost units="USD" is_input="False">0.0<!--Electric energy cost for single flight mission--></electricity_cost>
+      <hydrocarbon_fuel_cost units="USD" is_input="False">2036.2564204501166<!--Fossil Fuel cost for single flight mission--></hydrocarbon_fuel_cost>
+      <hydrogen_fuel_cost units="USD" is_input="True">0.0<!--Hydrogen Fuel cost for single flight mission--></hydrogen_fuel_cost>
+      <msp_per_unit units="USD" is_input="False">4043321.7895340943<!--Manufacturer suggested price of the aircraft--></msp_per_unit>
+      <production_cost_per_unit units="USD" is_input="False">3638989.6105806846</production_cost_per_unit>
+      <project_development_cost_cumulative_distribution units="USD" is_input="False">[0.0, 3652109.0911475206, 13867853.4342269, 28670136.852250624, 45468673.60963775, 61792994.14596791, 75853748.27155294, 86772834.60267866, 94491894.18904468, 99489417.18036377, 102464465.95436358]<!--Project development cost cumulative distribution over the development years--></project_development_cost_cumulative_distribution>
+      <project_development_cost_distribution units="USD" is_input="False">[0.0, 3652109.0911475206, 10215744.34307938, 14802283.418023724, 16798536.757387128, 16324320.536330156, 14060754.125585027, 10919086.331125721, 7719059.586366028, 4997522.99131909, 2975048.77399981]<!--Project development cost distribution over the development years--></project_development_cost_distribution>
+      <prototype_number is_input="True">5.0<!--number of prototypes--></prototype_number>
+      <total_fuel_cost units="USD" is_input="False">2036.2564204501166<!--Total fuel cost for single flight mission--></total_fuel_cost>
+      <delivery>
+        <duration units="h" is_input="True">3.2030073714713114</duration>
+        <mission_ratio is_input="False">1.0<!--Ratio between the delivery flight duration and the sizing mission duration--></mission_ratio>
+      </delivery>
+      <operation>
+        <additional_cost units="USD/year" is_input="True">0.0<!--Yearly additional cost that doesn't considered in this model--></additional_cost>
+        <airfare_compound_annual_gain_factor is_input="False">[1.0, 1.0298, 1.06048804, 1.092090583592, 1.1246348829830417, 1.1581490024959364, 1.1926618427703155, 1.2282031656848709, 1.26480362002228, 1.3024947678989443, 1.3413091119823328, 1.3812801235194063, 1.4224422712002847, 1.4648310508820532, 1.5084830161983385, 1.553435810081049, 1.5997281972214645, 1.6474000974986642, 1.6964926204041244, 1.7470481004921674]<!--The airfare gain factor over the service life of the aircraft.--></airfare_compound_annual_gain_factor>
+        <airfare_compound_annual_gain_rate is_input="True">0.0298<!--The compound annual growth rate (CAGR) of the airfare index.--></airfare_compound_annual_gain_rate>
+        <airport_charge_VAT is_input="True">0.2<!--VAT cost of the airport fees--></airport_charge_VAT>
+        <annual_airport_cost units="USD/year" is_input="False">38008.53918<!--Annual airport related cost for the aircraft--></annual_airport_cost>
+        <annual_cash_flow units="USD" is_input="False">[-4043321.7895340943, 173852.9942739522, 242455.7308749382, 313234.64554451883, 386255.3041528305, 461585.23031953606, 539293.9637758661, 619453.1204659618, 702136.4544393512, 787419.9215879465, 875381.7452825058, 966102.4839651892, 1059665.1007564901, 1156155.0351365653, 1255660.276762795, 1358271.4414872176, 1464081.8496394155, 1573187.6066423405, 1685687.6860306177, 1801684.0149429203, 1921281.5621621336]<!--Annual net cash flow of the aircraft manufacturer/operator over the aircraft production / service life.--></annual_cash_flow>
+        <annual_cost_per_unit units="USD/year" is_input="False">2309761.2096396484<!--Annual operational cost per unit of the aircraft--></annual_cost_per_unit>
+        <annual_crew_cost units="USD/year" is_input="False">295247.42<!--Annual flight crew cost of the aircraft--></annual_crew_cost>
+        <annual_depreciation_cost units="USD/year" is_input="False">181949.48052903425<!--Annual depreciation cost of the aircraft--></annual_depreciation_cost>
+        <annual_electricity_cost units="USD/year" is_input="False">0.0</annual_electricity_cost>
+        <annual_electricity_cost_projection units="USD/year" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</annual_electricity_cost_projection>
+        <annual_energy_cost_projection units="USD/year" is_input="False">[996126.4596020947, 1001535.4262777341, 1006973.7636424223, 1012441.6311790007, 1017939.1892363026, 1023466.599033856, 1029024.0226666098, 1034611.6231096896, 1040229.5642231753, 1045878.0107569069, 1051557.1283553173, 1057267.0835622866, 1063008.0438260299, 1068780.1775040051, 1074583.6538678522, 1080418.6431083546, 1086285.3163404327, 1092183.8456081615, 1098114.403889814, 1104077.1651029356]</annual_energy_cost_projection>
+        <annual_fuel_cost units="USD/year" is_input="False">996126.4596020947</annual_fuel_cost>
+        <annual_hydrocarbon_fuel_cost units="USD/year" is_input="False">996126.4596020947</annual_hydrocarbon_fuel_cost>
+        <annual_hydrocarbon_fuel_cost_projection units="USD/year" is_input="False">[996126.4596020947, 1001535.4262777341, 1006973.7636424223, 1012441.6311790007, 1017939.1892363026, 1023466.599033856, 1029024.0226666098, 1034611.6231096896, 1040229.5642231753, 1045878.0107569069, 1051557.1283553173, 1057267.0835622866, 1063008.0438260299, 1068780.1775040051, 1074583.6538678522, 1080418.6431083546, 1086285.3163404327, 1092183.8456081615, 1098114.403889814, 1104077.1651029356]</annual_hydrocarbon_fuel_cost_projection>
+        <annual_hydrogen_fuel_cost units="USD/year" is_input="False">0.0</annual_hydrogen_fuel_cost>
+        <annual_hydrogen_fuel_cost_projection units="USD/year" is_input="False">[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</annual_hydrogen_fuel_cost_projection>
+        <annual_insurance_cost units="USD/year" is_input="False">40933.217895340946<!--Annual insurance cost of the aircraft--></annual_insurance_cost>
+        <annual_loan_cost units="USD/year" is_input="True">0.0<!--Annual loan cost of the aircraft--></annual_loan_cost>
+        <annual_revenue_per_unit units="USD/year" is_input="False">2483614.2039136006<!--Annual operational revenue per unit of the aircraft--></annual_revenue_per_unit>
+        <annual_revenue_projection units="USD/year" is_input="False">[2483614.2039136006, 2557625.907190226, 2633843.159224495, 2712331.685369385, 2793159.1695933924, 2876395.3128472758, 2962111.8931701253, 3050382.8275865945, 3141284.2358486755, 3234894.5060769664, 3331294.36235806, 3430566.9343563304, 3532797.829000149, 3638075.204304354, 3746489.8453926235, 3858135.242785324, 3973107.673020327, 4091506.281676333, 4213433.168870288, 4338993.477302623]</annual_revenue_projection>
+        <daily_parking_cost units="USD/d" is_input="False">7.2<!--Daily parking cost of the aircraft--></daily_parking_cost>
+        <depreciation_rate is_input="True">0.9<!--The portion of value that depreciates over the service life--></depreciation_rate>
+        <discount_rate is_input="True">0.08<!--The discount rate used to compute the NPV.--></discount_rate>
+        <electricity_compound_annual_gain_factor is_input="False">[1.0, 1.032, 1.065024, 1.0991047680000001, 1.1342761205760001, 1.1705729564344323, 1.2080312910403341, 1.2466882923536247, 1.2865823177089408, 1.3277529518756268, 1.370241046335647, 1.4140887598183878, 1.4593396001325762, 1.5060384673368188, 1.554231698291597, 1.6039671126369281, 1.6552940602413098, 1.7082634701690318, 1.7629279012144408, 1.819341594053303]</electricity_compound_annual_gain_factor>
+        <electricity_compound_annual_gain_rate is_input="True">0.032</electricity_compound_annual_gain_rate>
+        <electricity_unit_price units="USD/kW/h" is_input="True">0.655<!--Price per kW.h of electricity--></electricity_unit_price>
+        <hydrocarbon_fuel_compound_annual_gain_factor is_input="False">[1.0, 1.00543, 1.0108894849, 1.0163786148030072, 1.0218975506813874, 1.0274464543815875, 1.0330254886288797, 1.0386348170321344, 1.044274604088619, 1.04994501518882, 1.0556462166212957, 1.0613783755775492, 1.0671416601569355, 1.0729362393715876, 1.0787622831513755, 1.0846199623488875, 1.0905094487444418, 1.0964309150511242, 1.102384534919852, 1.1083704829444667]</hydrocarbon_fuel_compound_annual_gain_factor>
+        <hydrocarbon_fuel_compound_annual_gain_rate is_input="True">0.00543</hydrocarbon_fuel_compound_annual_gain_rate>
+        <hydrogen_fuel_compound_annual_gain_factor is_input="False">[1.0, 1.033, 1.0670889999999997, 1.1023029369999997, 1.1386789339209997, 1.1762553387403925, 1.2150717649188254, 1.2551691331611465, 1.2965897145554643, 1.3393771751357946, 1.3835766219152756, 1.4292346504384796, 1.4763993939029494, 1.5251205739017464, 1.575449552840504, 1.6274393880842406, 1.6811448878910202, 1.736622669191424, 1.7939312172747406, 1.853130947444807]</hydrogen_fuel_compound_annual_gain_factor>
+        <hydrogen_fuel_compound_annual_gain_rate is_input="True">0.033</hydrogen_fuel_compound_annual_gain_rate>
+        <landing_cost units="USD" is_input="False">72.324<!--Landing cost per operation of the aircraft--></landing_cost>
+        <maintenance_cost units="USD/year" is_input="False">531111.2239092005<!--Annual maintenance cost per aircraft--></maintenance_cost>
+        <miscellaneous_cost units="USD/year" is_input="False">156911.70869001566<!--Annual airframe maintenance material cost per aircraft--></miscellaneous_cost>
+        <net_present_value units="USD" is_input="False">[-4043321.7895340943, -3882346.7948359903, -3674480.0845522643, -3425824.3239145004, -3141915.144561196, -2827767.9928067653, -2487921.3168738172, -2126476.370766771, -1747133.8917586505, -1353227.8892855458, -947756.7652824835, -533411.9695462673, -112604.37847887451, 312511.42854017124, 740014.8339651875, 1168198.638986095, 1595550.174624931, 2020733.9394990215, 2442575.6463211346, 2860047.5680928454, 3272255.0831731963]<!--Net Present Value of the aircraft manufacturer/operator over the aircraft production / service life.--></net_present_value>
+        <number_of_cabin_crew is_input="True">0.0</number_of_cabin_crew>
+        <number_of_pilot is_input="True">2.0</number_of_pilot>
+        <parking_fee_per_ton units="USD" is_input="True">11.8<!--Daily parking fee per tons, apply for MTOW > 6.0 tons--></parking_fee_per_ton>
+        <passenger_per_flight is_input="False">9.0<!--The number of passengers per flight--></passenger_per_flight>
+        <passenger_per_flight_baseline is_input="True">9.0<!--The passenger per flight mission for the baseline aircraft, computed with passenger load factor of 0.7 and round down to the nearest integer.--></passenger_per_flight_baseline>
+        <profit_margin is_input="True">0.07<!--Profit margin as a fraction of the annual revenue--></profit_margin>
+        <profitability_index is_input="False">[0.0, 0.03981256082926132, 0.09122244634017396, 0.15272033683244068, 0.2229371521470631, 0.3006324650869293, 0.38468382029012427, 0.47407688988023844, 0.5678964023390356, 0.665317785789818, 0.7655994712724331, 0.8680758056588587, 0.9721505276254924, 1.0772907635867839, 1.1830215037251484, 1.2889205212431794, 1.3946137007336197, 1.4997707441266672, 1.6041012250480784, 1.7073509646192182, 1.8092987037646227]<!--The profitability index of the aircraft manufacturer/operator.--></profitability_index>
+        <revenue_per_rpk units="USD/km" is_input="False">0.7614802473465019<!--Revenue per Revenue Passenger Kilometer (RPK)--></revenue_per_rpk>
+        <social_benefits_rate is_input="True">0.3<!--Social benefits rate for the flight crew--></social_benefits_rate>
+      </operation>
+      <production>
+        <annual_cash_flow units="USD" is_input="False">[-0.0, -3652109.0911475206, -10215744.34307938, -14802283.418023724, -16798536.757387128, -16324320.536330156, -14060754.125585027, -10919086.331125721, -7719059.586366028, -4997522.99131909, -344143.23207925167, 19826459.86465507, 37905644.193581305, 47393596.9698993, 59922565.468925245, 66464611.015418515, 72983755.82723796, 76424471.15541942, 79829994.04593045, 83212542.20873822, 83478249.07033525]<!--Annual cash flow of the aircraft manufacturer--></annual_cash_flow>
+        <annual_delivery_count is_input="False">[1.0, 7.0, 13.0, 16.0, 20.0, 22.0, 24.0, 25.0, 26.0, 27.0, 27.0]<!--The annual delivery count of aircraft over the program duration.--></annual_delivery_count>
+        <annual_delivery_target is_input="True">30.0<!--The planned target annual delivery count of aircraft.--></annual_delivery_target>
+        <annual_gross_profit units="USD" is_input="False">[2630905.5419205585, 19826459.86465507, 37905644.193581305, 47393596.9698993, 59922565.468925245, 66464611.015418515, 72983755.82723796, 76424471.15541942, 79829994.04593045, 83212542.20873822, 83478249.07033525]<!--Gross profit per unit sales of the aircraft manufacturer--></annual_gross_profit>
+        <avionics is_input="True">15000.0<!--Default avionics cost based on the USD of 2022--></avionics>
+        <avionics_cost_per_unit units="USD" is_input="False">21000.0<!--Avionics adjusted cost per aircraft--></avionics_cost_per_unit>
+        <certification_cost_per_unit units="USD" is_input="False">731586.9311948114<!--Certification adjusted cost per aircraft--></certification_cost_per_unit>
+        <composite_fraction is_input="True">0.0<!--Fraction of airframe made of composite, range from 0.0 to 1.0--></composite_fraction>
+        <cumulative_annual_delivery_count is_input="False">[1.0, 8.0, 21.0, 37.0, 57.0, 79.0, 103.0, 128.0, 154.0, 181.0, 208.0]<!--The cumulative annual delivery count of aircraft over the program duration.--></cumulative_annual_delivery_count>
+        <dev_support_cost_per_unit units="USD" is_input="False">26710.171935341074<!--Development support adjusted cost per aircraft--></dev_support_cost_per_unit>
+        <discount_rate is_input="True">0.12<!--The discount rate used to compute the NPV.--></discount_rate>
+        <engineering_cost_per_hour units="USD/h" is_input="True">126.54<!--Engineering cost per hour--></engineering_cost_per_hour>
+        <engineering_cost_per_unit units="USD" is_input="False">459688.15370223013<!--Engineering adjusted cost per aircraft--></engineering_cost_per_unit>
+        <engineering_man_hours_5_years units="h" is_input="False">1237.4558881699543<!--Number of engineering man-hours required per aircraft--></engineering_man_hours_5_years>
+        <flight_cost_factor is_input="True">1.0<!--Adjustment factor to consider other flight delivery related costs--></flight_cost_factor>
+        <flight_test_cost_per_unit units="USD" is_input="False">10777.679257181791<!--Development flight test adjusted cost per aircraft--></flight_test_cost_per_unit>
+        <landing_gear_cost_reduction units="USD" is_input="False">-7500.0<!--Cost reduction if fixed landing gear design is selected--></landing_gear_cost_reduction>
+        <launch_aircraft_count is_input="True">1.0<!--The number of aircraft produced at the launch of deliveries--></launch_aircraft_count>
+        <learning_curve_percentage units="percent" is_input="True">95.0<!--The percentage decrease in unit production cost after extensive learning--></learning_curve_percentage>
+        <manufacturing_cost_per_hour units="USD/h" is_input="True">72.97<!--Manufacturing labor cost per hour--></manufacturing_cost_per_hour>
+        <manufacturing_cost_per_unit units="USD" is_input="False">1180681.0880114834<!--Manufacturing adjusted cost per aircraft--></manufacturing_cost_per_unit>
+        <manufacturing_man_hours_5_years units="h" is_input="False">5511.661091083402<!--Number of engineering man-hours required per aircraft--></manufacturing_man_hours_5_years>
+        <material_cost_per_unit units="USD" is_input="False">64746.618160559265<!--Development flight test adjusted cost per aircraft--></material_cost_per_unit>
+        <maturity_discount is_input="False">[1.0, 0.8573750000000002, 0.7982795491892148, 0.7655122778021395, 0.7414199021408908, 0.7237265280275688, 0.7096576275533163, 0.6983372960937504, 0.6888460854199749, 0.6806603814048592, 0.6736928922595085]<!--The discount factor in manufacturing and tooling bsed on process maturity--></maturity_discount>
+        <net_present_value units="USD" is_input="False">[-0.0, -3260811.6885245717, -11404740.533453925, -21940713.492939193, -32616487.293006785, -41879345.16667916, -49002960.79392294, -53942200.92800346, -57059799.630710065, -58861956.52145566, -58972761.431739, -53273127.991776034, -43543693.245233715, -32682304.042318355, -20420959.924602687, -8278123.985706415, 3627107.55237893, 14757899.284831705, 25138958.98962424, 34800499.062334776, 43454419.098056406]<!--Net Present Value of the aircraft manufacturer/operator over the aircraft production / service life.--></net_present_value>
+        <number_aircraft_5_years is_input="True">70.0<!--Number of planned aircraft to be produced over a 5-year period or 60 months--></number_aircraft_5_years>
+        <profitability_index is_input="False">[1.0, 0.9681630287970691, 0.8886496889046785, 0.7857815996843024, 0.6815485634013809, 0.5911105474868882, 0.5215590470480735, 0.4733347210416142, 0.44289601141920265, 0.4253006325643778, 0.42421878758993514, 0.47986722209903376, 0.5748606665032456, 0.6809059608371553, 0.8006197305585736, 0.9191764443574857, 1.0354133049453313, 1.1440889138739363, 1.2454445058084491, 1.3397750598092617, 1.4242677043674634]<!--The profitability index of the aircraft manufacturer/operator.--></profitability_index>
+        <quality_control_cost_per_unit units="USD" is_input="False">153488.54144149285<!--Quality control adjusted cost per aircraft--></quality_control_cost_per_unit>
+        <recursive_cost_per_unit units="USD" is_input="False">1412416.2476135357<!--Unadjusted recursive production cost per unit of the aircraft.--></recursive_cost_per_unit>
+        <tooling_cost_per_hour units="USD/h" is_input="True">83.97<!--Tooling labor cost per hour--></tooling_cost_per_hour>
+        <tooling_cost_per_unit units="USD" is_input="False">234410.92630005835<!--Tooling adjusted cost per aircraft--></tooling_cost_per_unit>
+        <tooling_man_hours_5_years units="h" is_input="False">950.9286724769025<!--Number of tooling man-hours required per aircraft--></tooling_man_hours_5_years>
+        <total_non_recursive_project_cost units="USD" is_input="False">102422170.36727358<!--The initial investment of the aircraft manufacturer/operator.--></total_non_recursive_project_cost>
+      </production>
+    </cost>
+    <geometry>
+      <flap_type is_input="True">1.0<!--flap type (0.0 - plain flap, 2.0 - single slotted flap, 3.0 - split flap)--></flap_type>
+      <cabin>
+        <pressurized is_input="True">0.0<!--Cabin pressurization; 0.0 for no pressurization, 1.0 for pressurization--></pressurized>
+      </cabin>
+      <landing_gear>
+        <type is_input="True">0.0<!--Set to 0.0 if fixed, 1.0 for retractable landing gear--></type>
+      </landing_gear>
+      <wing>
+        <taper_ratio is_input="True">1.0<!--taper ratio of wing--></taper_ratio>
+      </wing>
+    </geometry>
+    <mission>
+      <sizing>
+        <duration units="h" is_input="True">3.2030073714713114</duration>
+      </sizing>
+    </mission>
+    <weight>
+      <aircraft>
+        <MTOW units="t" is_input="True">5.713742982648432<!--maximum takeoff weight--></MTOW>
+        <OWE units="kg" is_input="True">3345.528480210887<!--operating weight - empty--></OWE>
+      </aircraft>
+      <airframe>
+        <mass units="kg" is_input="True">1857.7955888596512<!--airframe (A): mass--></mass>
+      </airframe>
+    </weight>
+    <propulsion>
+      <he_power_train>
+        <fuel_tank>
+          <fuel_tank_1>
+            <fuel_consumed_main_route units="kg" is_input="True">343.1507280839428<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_main_route>
+            <purchase_cost units="USD" is_input="False">5532.08047327461<!--Unit purchase cost of the fuel tank--></purchase_cost>
+            <volume units="galUS" is_input="True">136.9326849820448<!--Capacity of the tank in term of volume--></volume>
+            <fuel_type_cost>
+              <jet_fuel units="USD/kg" is_input="True">2.967<!--Amount of fuel from that tank which will be consumed during main route--></jet_fuel>
+            </fuel_type_cost>
+          </fuel_tank_1>
+          <fuel_tank_2>
+            <fuel_consumed_main_route units="kg" is_input="True">343.1507280839428<!--Amount of fuel from that tank which will be consumed during mission--></fuel_consumed_main_route>
+            <purchase_cost units="USD" is_input="False">5532.08047327461<!--Unit purchase cost of the fuel tank--></purchase_cost>
+            <volume units="galUS" is_input="True">136.9326849820448<!--Capacity of the tank in term of volume--></volume>
+            <fuel_type_cost>
+              <jet_fuel units="USD/kg" is_input="True">2.967<!--Amount of fuel from that tank which will be consumed during main route--></jet_fuel>
+            </fuel_type_cost>
+          </fuel_tank_2>
+        </fuel_tank>
+        <propeller>
+          <propeller_1>
+            <diameter units="m" is_input="True">2.59<!--Diameter of the propeller--></diameter>
+            <operational_cost units="USD/year" is_input="False">517.0</operational_cost>
+            <purchase_cost units="USD" is_input="False">3831.8413248943893<!--Unit purchase cost of the propeller--></purchase_cost>
+            <rpm_rating units="1/min" is_input="True">2000.0<!--Maximum value of the propeller rpm--></rpm_rating>
+            <torque_rating units="lbf*ft" is_input="True">1744.9370461418414<!--Maximum value of the propeller torque--></torque_rating>
+            <turboprop_connection is_input="True">0.0<!--Value set to 1.0 if powered by turboprop, 0.0 for other type of engine--></turboprop_connection>
+            <type is_input="True">2.0<!--Value set to 1.0 if fixed-pitch propeller, 2.0 for constant-speed propeller. This is only use in cost estimation, does not affect other propeller-related models.--></type>
+          </propeller_1>
+          <propeller_2>
+            <diameter units="m" is_input="True">2.59<!--Diameter of the propeller--></diameter>
+            <operational_cost units="USD/year" is_input="False">517.0</operational_cost>
+            <purchase_cost units="USD" is_input="False">3831.8413248943893<!--Unit purchase cost of the propeller--></purchase_cost>
+            <rpm_rating units="1/min" is_input="True">2000.0<!--Maximum value of the propeller rpm--></rpm_rating>
+            <torque_rating units="lbf*ft" is_input="True">1744.9370461418414<!--Maximum value of the propeller torque--></torque_rating>
+            <turboprop_connection is_input="True">0.0<!--Value set to 1.0 if powered by turboprop, 0.0 for other type of engine--></turboprop_connection>
+            <type is_input="True">2.0<!--Value set to 1.0 if fixed-pitch propeller, 2.0 for constant-speed propeller. This is only use in cost estimation, does not affect other propeller-related models.--></type>
+          </propeller_2>
+        </propeller>
+        <turboshaft>
+          <turboshaft_1>
+            <operational_cost units="USD/year" is_input="False">125194.32018149839</operational_cost>
+            <power_rating units="hp" is_input="True">704.7010153883608</power_rating>
+            <purchase_cost units="USD" is_input="False">372335.8284905943<!--Unit purchase cost of the turboshaft engine--></purchase_cost>
+          </turboshaft_1>
+          <turboshaft_2>
+            <operational_cost units="USD/year" is_input="False">125194.32018149839</operational_cost>
+            <power_rating units="hp" is_input="True">704.7010153883608</power_rating>
+            <purchase_cost units="USD" is_input="False">372335.8284905943<!--Unit purchase cost of the turboshaft engine--></purchase_cost>
+          </turboshaft_2>
+        </turboshaft>
+      </he_power_train>
+    </propulsion>
+  </data>
+</FASTOAD_model>
