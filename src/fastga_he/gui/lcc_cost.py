@@ -23,7 +23,7 @@ Two independent sunbursts are provided:
 """
 
 import pathlib
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -105,6 +105,70 @@ def _get_color(category_key: str, color_dict: dict) -> str:
 # ---------------------------------------------------------------------------------------------
 
 
+def _compute_category_values(
+    datafile: oad.DataFile, categories: List[Dict]
+) -> Tuple[Dict[str, Dict[str, float]], Dict[str, float]]:
+    """
+    Computes, for each category, the (positive) value of every leaf and the category subtotal.
+    Shared between the sunburst builder and the comparison bar chart so both stay consistent
+    on what counts as a displayable leaf.
+
+    :param datafile: the FAST-OAD output datafile.
+    :param categories: resolved categories, see :func:`_make_categories`.
+
+    :return: a tuple ``(category_leaf_values, category_totals)`` where ``category_leaf_values``
+    maps ``{category_key: {leaf_label: value}}`` and ``category_totals`` maps
+    ``{category_key: subtotal}``.
+    """
+
+    category_totals = {}
+    category_leaf_values = {}
+
+    for category in categories:
+        divisor = 1.0
+        if category.get("divide_by"):
+            divisor = _get_value(datafile, category["divide_by"], default=1.0) or 1.0
+
+        leaf_values = {}
+        for var_name, disp_label in category["leaves"].items():
+            value = _get_value(datafile, var_name) / divisor
+            # Cost reductions (negative leaves) and zero/absent costs are not representable in
+            # a "branchvalues=total" sunburst, nor meaningfully comparable in a relative bar
+            # chart; they are simply left out.
+            if value > 0.0:
+                leaf_values[disp_label] = value
+
+        category_leaf_values[category["key"]] = leaf_values
+        category_totals[category["key"]] = sum(leaf_values.values())
+
+    return category_leaf_values, category_totals
+
+
+def _get_cost_dict(
+    aircraft_file_path: Union[str, pathlib.Path], spec: List[Dict]
+) -> Dict[str, float]:
+    """
+    Returns a flat dict mapping every leaf's display label (across all categories of ``spec``,
+    e.g. "Manufacturing", "Engineering", or an auto-discovered power train component) to its
+    value, for a single aircraft. Mirrors ``lca_impact._get_impact_dict`` so
+    :func:`_cost_bar_chart_simple` can follow the same logic as
+    ``lca_impacts_bar_chart_simple``.
+
+    :param aircraft_file_path: path to the FAST-OAD output file containing the cost results.
+    :param spec: either ``_PRODUCTION_SPEC`` or ``_OPERATION_SPEC``.
+    """
+
+    datafile = oad.DataFile(aircraft_file_path)
+    categories = _make_categories(datafile, spec)
+    category_leaf_values, _ = _compute_category_values(datafile, categories)
+
+    cost_dict = {}
+    for leaf_values in category_leaf_values.values():
+        cost_dict.update(leaf_values)
+
+    return cost_dict
+
+
 def _build_cost_sunburst(
     datafile: oad.DataFile,
     root_label: str,
@@ -132,25 +196,8 @@ def _build_cost_sunburst(
     figure_color = [None]
     color_dict = {}
 
-    category_totals = {}
-    category_leaf_values = {}
-
     # First pass: compute every leaf's (positive) value and each category's subtotal.
-    for category in categories:
-        divisor = 1.0
-        if category.get("divide_by"):
-            divisor = _get_value(datafile, category["divide_by"], default=1.0) or 1.0
-
-        leaf_values = {}
-        for var_name, disp_label in category["leaves"].items():
-            value = _get_value(datafile, var_name) / divisor
-            # Cost reductions (negative leaves) and zero/absent costs are not representable in
-            # a "branchvalues=total" sunburst; they are simply left out of the visual breakdown.
-            if value > 0.0:
-                leaf_values[disp_label] = value
-
-        category_leaf_values[category["key"]] = leaf_values
-        category_totals[category["key"]] = sum(leaf_values.values())
+    category_leaf_values, category_totals = _compute_category_values(datafile, categories)
 
     root_value = sum(category_totals.values())
 
@@ -298,6 +345,95 @@ def _sun_breakdown(
 
 
 # ---------------------------------------------------------------------------------------------
+# Generic comparison bar chart, mirroring lca_impact.lca_impacts_bar_chart_simple
+# ---------------------------------------------------------------------------------------------
+
+
+def _cost_bar_chart_simple(
+    aircraft_file_paths: List[Union[str, pathlib.Path]],
+    names_aircraft: List[str],
+    spec: List[Dict],
+    default_comparison_label: str,
+    graph_title: str = None,
+    item_filter_list: list = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiple aircraft designs across all the cost items of
+    ``spec`` (e.g. every leaf of the production or operation cost breakdown), plotted as raw
+    USD values (all items already share the same unit, so no normalisation is needed). Can be
+    used with only one design.
+
+    :param aircraft_file_paths: paths to the output files that contain the cost results.
+    :param names_aircraft: names of the aircraft.
+    :param spec: either ``_PRODUCTION_SPEC`` or ``_OPERATION_SPEC``.
+    :param default_comparison_label: used to build the default graph title when none is given,
+    e.g. "production cost per unit".
+    :param graph_title: title of the graph, if None are specified one is created based on the
+    aircraft names.
+    :param item_filter_list: filter to only show cost items in the list in output graph. By
+    default, everything is plotted.
+    """
+
+    fig = go.Figure()
+
+    for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
+        cost_dict = _get_cost_dict(aircraft_file_path, spec)
+
+        item_names = list(cost_dict.keys())
+        item_values = list(cost_dict.values())
+
+        if item_filter_list:
+            filtered_item_names = []
+            filtered_item_values = []
+            for tl_item in item_filter_list:
+                if tl_item in item_names:
+                    filtered_item_names.append(tl_item)
+                    filtered_item_values.append(item_values[item_names.index(tl_item)])
+        else:
+            filtered_item_names = item_names
+            filtered_item_values = item_values
+
+        bar_chart = go.Bar(name=name_aircraft, x=filtered_item_names, y=filtered_item_values)
+        fig.add_trace(bar_chart)
+
+    if graph_title:
+        title = graph_title
+    else:
+        title = "Comparison of " + default_comparison_label + " for " + ", ".join(names_aircraft)
+
+    fig.update_layout(
+        barmode="group",
+        plot_bgcolor="white",
+        title_font=dict(size=20),
+        legend_font=dict(size=20),
+        title_x=0.5,
+        title_text=title,
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        title_font=dict(size=20),
+        tickfont=dict(size=20),
+        showline=True,
+        linecolor="black",
+        linewidth=3,
+    )
+    fig.update_yaxes(
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+        linewidth=3,
+        tickfont=dict(size=20),
+        title="Cost [USD]",
+    )
+    fig.update_yaxes(
+        title_font=dict(size=20),
+    )
+
+    return go.FigureWidget(fig)
+
+
+# ---------------------------------------------------------------------------------------------
 # Production cost sunburst: Recursive vs Non-recursive
 # ---------------------------------------------------------------------------------------------
 
@@ -366,6 +502,36 @@ def lcc_production_cost_sun_breakdown(
         full_burst=full_burst,
         name_aircraft=name_aircraft,
         rel=rel,
+    )
+
+
+def lcc_production_cost_bar_chart_simple(
+    aircraft_file_paths: List[Union[str, pathlib.Path]],
+    names_aircraft: List[str],
+    graph_title: str = None,
+    item_filter_list: list = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiple aircraft designs across all the items of the
+    production cost breakdown (manufacturing, quality control, material, avionics, engineering,
+    tooling, flight test, development support, certification, and every power train component
+    purchase cost). This comparison is done relative to the first design given in the inputs.
+
+    :param aircraft_file_paths: paths to the output files that contain the cost results.
+    :param names_aircraft: names of the aircraft.
+    :param graph_title: title of the graph, if None are specified one is created based on the
+    aircraft names.
+    :param item_filter_list: filter to only show cost items in the list in output graph. By
+    default, everything is plotted.
+    """
+
+    return _cost_bar_chart_simple(
+        aircraft_file_paths=aircraft_file_paths,
+        names_aircraft=names_aircraft,
+        spec=_PRODUCTION_SPEC,
+        default_comparison_label="production cost per unit",
+        graph_title=graph_title,
+        item_filter_list=item_filter_list,
     )
 
 
@@ -438,4 +604,34 @@ def lcc_operation_cost_sun_breakdown(
         full_burst=full_burst,
         name_aircraft=name_aircraft,
         rel=rel,
+    )
+
+
+def lcc_operation_cost_bar_chart_simple(
+    aircraft_file_paths: List[Union[str, pathlib.Path]],
+    names_aircraft: List[str],
+    graph_title: str = None,
+    item_filter_list: list = None,
+) -> go.FigureWidget:
+    """
+    Give a bar chart that compares multiple aircraft designs across all the items of the
+    annual operating cost breakdown (insurance, loan, additional, maintenance, miscellaneous,
+    fuel, electricity, crew, airport, and every power train component operational cost). This
+    comparison is done relative to the first design given in the inputs.
+
+    :param aircraft_file_paths: paths to the output files that contain the cost results.
+    :param names_aircraft: names of the aircraft.
+    :param graph_title: title of the graph, if None are specified one is created based on the
+    aircraft names.
+    :param item_filter_list: filter to only show cost items in the list in output graph. By
+    default, everything is plotted.
+    """
+
+    return _cost_bar_chart_simple(
+        aircraft_file_paths=aircraft_file_paths,
+        names_aircraft=names_aircraft,
+        spec=_OPERATION_SPEC,
+        default_comparison_label="annual operating cost",
+        graph_title=graph_title,
+        item_filter_list=item_filter_list,
     )
