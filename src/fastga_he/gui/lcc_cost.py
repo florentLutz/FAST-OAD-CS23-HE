@@ -45,11 +45,9 @@ OPERATION_PREFIX = "data:cost:operation:"
 
 
 def _round_value(value: float) -> float:
-    if value == 0.0:
-        return value
-    else:
-        # Same trick as in the LCA sunburst: a value rounded to zero simply won't display.
-        return round(value, int(np.ceil(abs(np.log10(abs(value))))) + 5)
+    # Rounding to the nearest integer no longer risks a value vanishing to 0.0 (that was only
+    # a concern with the old magnitude-scaled decimal rounding), so no special-casing needed.
+    return round(value)
 
 
 def _get_value(datafile: oad.DataFile, name: str, default: float = 0.0) -> float:
@@ -62,7 +60,7 @@ def _get_value(datafile: oad.DataFile, name: str, default: float = 0.0) -> float
 
 
 def _label(display_name: str, value: float, unit_suffix: str = "USD") -> str:
-    return display_name + "<br> " + str(_round_value(value)) + " " + unit_suffix
+    return display_name + "<br> " + f"{_round_value(value):,}" + " " + unit_suffix
 
 
 _POWER_TRAIN_PREFIX = "data:propulsion:he_power_train:"
@@ -166,23 +164,31 @@ def _build_cost_sunburst(
     figure_parents.append("")
     figure_values.append(100.0 if rel in ("total", "parent") else root_value)
 
+    # Unit shown in every label: raw dollar amounts in "absolute" mode, a percentage sign
+    # otherwise. Note this is about what the *text* says, independently of what the sunburst
+    # arc *size* represents (which is always driven by _scaled(), further below).
+    unit_suffix = "%" if rel in ("total", "parent") else "USD"
+
     # Category + leaf nodes
     for category in categories:
         cat_total = category_totals[category["key"]]
         if cat_total <= 0.0:
             continue
 
-        cat_denom = root_value if rel == "total" else root_value
-        figure_labels.append(_label(category["label"], cat_total))
+        cat_denom = root_value
+        cat_display_value = _scaled(cat_total, cat_denom)
+        category_label = _label(category["label"], cat_display_value, unit_suffix)
+        figure_labels.append(category_label)
         figure_parents.append(root_label)
-        figure_values.append(_scaled(cat_total, cat_denom))
+        figure_values.append(cat_display_value)
         figure_color.append(_get_color(category["key"], color_dict))
 
         parent_denom = cat_total if rel == "parent" else root_value
         for disp_label, value in category_leaf_values[category["key"]].items():
-            figure_labels.append(_label(disp_label, value))
-            figure_parents.append(_label(category["label"], cat_total))
-            figure_values.append(_scaled(value, parent_denom))
+            leaf_display_value = _scaled(value, parent_denom)
+            figure_labels.append(_label(disp_label, leaf_display_value, unit_suffix))
+            figure_parents.append(category_label)
+            figure_values.append(leaf_display_value)
             figure_color.append(_get_color(category["key"], color_dict))
 
     return go.Sunburst(
@@ -281,6 +287,12 @@ def _sun_breakdown(
     else:
         # Root + category only, hiding individual leaf items.
         fig.update_traces(maxdepth=2, selector=dict(type="sunburst"))
+
+    # Default sizing: the sunburst has several nested rings with fairly long labels
+    # (component names + cost values), so the default 700x450 layout renders far too
+    # cramped/small (e.g. in a notebook cell) without this.
+    fig.update_layout(width=800, height=800)
+    fig.update_layout(font=dict(size=16))
 
     return go.FigureWidget(fig)
 
