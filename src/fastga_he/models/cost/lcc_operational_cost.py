@@ -20,6 +20,7 @@ from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_annual_energy_cost import LCCAnnualEnergyCost
 from .lcc_operational_cost_sum import LCCSumOperationalCost
+from .lcc_overhaul_replacement_deposit import LCCOverhaulReplacementDeposit
 
 
 class LCCOperationalCost(om.Group):
@@ -167,6 +168,14 @@ class LCCOperationalCost(om.Group):
         self.add_subsystem(
             name="operational_cost_sum",
             subsys=LCCSumOperationalCost(
+                cost_components_type=cost_components_type,
+                cost_components_name=cost_components_name,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="overhaul_replacement_deposit",
+            subsys=LCCOverhaulReplacementDeposit(
                 cost_components_type=cost_components_type,
                 cost_components_name=cost_components_name,
             ),

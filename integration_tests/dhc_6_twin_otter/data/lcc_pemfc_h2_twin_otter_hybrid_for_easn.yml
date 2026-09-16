@@ -20,3 +20,4 @@ model:
         years_of_development: 10
         years_of_program: 20
         years_of_service: 20
+        fix_revenue_per_rpk: True

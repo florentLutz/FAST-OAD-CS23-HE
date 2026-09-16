@@ -698,7 +698,7 @@
     <weight>
       <aircraft>
         <MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></MTOW>
-        <max_payload units="kg" is_input="True">1542.2<!--max payload weight--></max_payload>
+        <max_payload units="kg" is_input="True">925.32<!--max payload weight--></max_payload>
         <target_MTOW units="kg" is_input="True">5670.598433742953<!--maximum takeoff weight--></target_MTOW>
         <CG>
           <aft>
@@ -722,7 +722,7 @@
       </airframe>
       <furniture>
         <passenger_seats>
-          <mass units="kg" is_input="True">210.75<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
+          <mass units="kg" is_input="True">112.4<!--Mass of aircraft furniture_inp_data:weight:furniture:passenger_seats:mass--></mass>
         </passenger_seats>
       </furniture>
       <propulsion>
