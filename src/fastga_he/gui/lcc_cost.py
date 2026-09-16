@@ -105,9 +105,26 @@ def _get_color(category_key: str, color_dict: dict) -> str:
 # ---------------------------------------------------------------------------------------------
 
 
+def _leaf_aliases(var_name: str, disp_label: str) -> List[str]:
+    """
+    Every string that should be accepted as a way to refer to a given leaf in
+    ``item_filter_list``: its display label (e.g. "Fuel"), its full variable name, and, for the
+    named (non-discovered) leaves, the tail of the variable name after the ``data:cost:...:``
+    prefix (e.g. "annual_fuel_cost") since that's how the leaves are declared in
+    ``_PRODUCTION_SPEC``/``_OPERATION_SPEC`` and how callers are likely to refer to them.
+    """
+
+    aliases = [disp_label, var_name]
+    for prefix in (PRODUCTION_PREFIX, OPERATION_PREFIX, _POWER_TRAIN_PREFIX):
+        if var_name.startswith(prefix):
+            aliases.append(var_name[len(prefix) :])
+
+    return aliases
+
+
 def _compute_category_values(
-    datafile: oad.DataFile, categories: List[Dict]
-) -> Tuple[Dict[str, Dict[str, float]], Dict[str, float]]:
+    datafile: oad.DataFile, categories: List[Dict], include_bar_only: bool = False
+) -> Tuple[Dict[str, Dict[str, float]], Dict[str, float], Dict[str, str]]:
     """
     Computes, for each category, the (positive) value of every leaf and the category subtotal.
     Shared between the sunburst builder and the comparison bar chart so both stay consistent
@@ -115,38 +132,50 @@ def _compute_category_values(
 
     :param datafile: the FAST-OAD output datafile.
     :param categories: resolved categories, see :func:`_make_categories`.
+    :param include_bar_only: if True, also includes each category's ``bar_only_leaves`` (see
+    :func:`_make_categories`) alongside its regular ``leaves``. The sunburst builder leaves
+    this False so those items stay out of the sunburst; the bar chart's :func:`_get_cost_dict`
+    passes True so they show up there.
 
-    :return: a tuple ``(category_leaf_values, category_totals)`` where ``category_leaf_values``
-    maps ``{category_key: {leaf_label: value}}`` and ``category_totals`` maps
-    ``{category_key: subtotal}``.
+    :return: a tuple ``(category_leaf_values, category_totals, leaf_aliases)`` where
+    ``category_leaf_values`` maps ``{category_key: {leaf_label: value}}``, ``category_totals``
+    maps ``{category_key: subtotal}``, and ``leaf_aliases`` maps every accepted alias (see
+    :func:`_leaf_aliases`) of a leaf to its display label.
     """
 
     category_totals = {}
     category_leaf_values = {}
+    leaf_aliases = {}
 
     for category in categories:
         divisor = 1.0
         if category.get("divide_by"):
             divisor = _get_value(datafile, category["divide_by"], default=1.0) or 1.0
 
+        leaves = dict(category["leaves"])
+        if include_bar_only and category.get("bar_only_leaves"):
+            leaves.update(category["bar_only_leaves"])
+
         leaf_values = {}
-        for var_name, disp_label in category["leaves"].items():
+        for var_name, disp_label in leaves.items():
             value = _get_value(datafile, var_name) / divisor
             # Cost reductions (negative leaves) and zero/absent costs are not representable in
             # a "branchvalues=total" sunburst, nor meaningfully comparable in a relative bar
             # chart; they are simply left out.
             if value > 0.0:
                 leaf_values[disp_label] = value
+                for alias in _leaf_aliases(var_name, disp_label):
+                    leaf_aliases[alias] = disp_label
 
         category_leaf_values[category["key"]] = leaf_values
         category_totals[category["key"]] = sum(leaf_values.values())
 
-    return category_leaf_values, category_totals
+    return category_leaf_values, category_totals, leaf_aliases
 
 
 def _get_cost_dict(
     aircraft_file_path: Union[str, pathlib.Path], spec: List[Dict]
-) -> Dict[str, float]:
+) -> Tuple[Dict[str, float], Dict[str, str]]:
     """
     Returns a flat dict mapping every leaf's display label (across all categories of ``spec``,
     e.g. "Manufacturing", "Engineering", or an auto-discovered power train component) to its
@@ -156,17 +185,21 @@ def _get_cost_dict(
 
     :param aircraft_file_path: path to the FAST-OAD output file containing the cost results.
     :param spec: either ``_PRODUCTION_SPEC`` or ``_OPERATION_SPEC``.
+
+    :return: a tuple ``(cost_dict, leaf_aliases)``, see :func:`_compute_category_values`.
     """
 
     datafile = oad.DataFile(aircraft_file_path)
     categories = _make_categories(datafile, spec)
-    category_leaf_values, _ = _compute_category_values(datafile, categories)
+    category_leaf_values, _, leaf_aliases = _compute_category_values(
+        datafile, categories, include_bar_only=True
+    )
 
     cost_dict = {}
     for leaf_values in category_leaf_values.values():
         cost_dict.update(leaf_values)
 
-    return cost_dict
+    return cost_dict, leaf_aliases
 
 
 def _build_cost_sunburst(
@@ -197,7 +230,7 @@ def _build_cost_sunburst(
     color_dict = {}
 
     # First pass: compute every leaf's (positive) value and each category's subtotal.
-    category_leaf_values, category_totals = _compute_category_values(datafile, categories)
+    category_leaf_values, category_totals, _ = _compute_category_values(datafile, categories)
 
     root_value = sum(category_totals.values())
 
@@ -270,6 +303,10 @@ def _make_categories(
                 "key": category["key"],
                 "label": category["label"],
                 "leaves": leaves,
+                # Leaves that should only appear in the comparison bar chart, not in the
+                # sunburst (see "bar_only_leaves" in the spec and "include_bar_only" in
+                # _compute_category_values).
+                "bar_only_leaves": dict(category.get("bar_only_leaves", {})),
                 "divide_by": category.get("divide_by"),
             }
         )
@@ -356,6 +393,7 @@ def _cost_bar_chart_simple(
     default_comparison_label: str,
     graph_title: str = None,
     item_filter_list: list = None,
+    color_list: List[str] = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiple aircraft designs across all the cost items of
@@ -370,14 +408,21 @@ def _cost_bar_chart_simple(
     e.g. "production cost per unit".
     :param graph_title: title of the graph, if None are specified one is created based on the
     aircraft names.
-    :param item_filter_list: filter to only show cost items in the list in output graph. By
-    default, everything is plotted.
+    :param item_filter_list: filter to only show cost items in the list in output graph. Items
+    can be given either as their display label (e.g. "Fuel") or as the raw variable name used
+    in ``_PRODUCTION_SPEC``/``_OPERATION_SPEC`` (e.g. "annual_fuel_cost", with or without the
+    ``data:cost:...:`` prefix). By default, everything is plotted.
+    :param color_list: colors to use for each aircraft's bars (e.g. "#1f77b4", "rgb(31,119,180)",
+    or a CSS color name), given in the same order as ``aircraft_file_paths``. By default,
+    Plotly's automatic color cycling is used.
     """
 
     fig = go.Figure()
 
-    for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        cost_dict = _get_cost_dict(aircraft_file_path, spec)
+    for i, (aircraft_file_path, name_aircraft) in enumerate(
+        zip(aircraft_file_paths, names_aircraft)
+    ):
+        cost_dict, leaf_aliases = _get_cost_dict(aircraft_file_path, spec)
 
         item_names = list(cost_dict.keys())
         item_values = list(cost_dict.values())
@@ -386,14 +431,24 @@ def _cost_bar_chart_simple(
             filtered_item_names = []
             filtered_item_values = []
             for tl_item in item_filter_list:
-                if tl_item in item_names:
-                    filtered_item_names.append(tl_item)
-                    filtered_item_values.append(item_values[item_names.index(tl_item)])
+                # Resolve the filter entry to a display label, whether it was already given as
+                # one or provided as a raw variable name/suffix (see _leaf_aliases).
+                resolved_label = leaf_aliases.get(tl_item, tl_item)
+                if resolved_label in item_names:
+                    filtered_item_names.append(resolved_label)
+                    filtered_item_values.append(item_values[item_names.index(resolved_label)])
         else:
             filtered_item_names = item_names
             filtered_item_values = item_values
 
-        bar_chart = go.Bar(name=name_aircraft, x=filtered_item_names, y=filtered_item_values)
+        marker_color = color_list[i] if color_list and i < len(color_list) else None
+
+        bar_chart = go.Bar(
+            name=name_aircraft,
+            x=filtered_item_names,
+            y=filtered_item_values,
+            marker_color=marker_color,
+        )
         fig.add_trace(bar_chart)
 
     if graph_title:
@@ -453,6 +508,13 @@ _PRODUCTION_SPEC = [
         # Every data:propulsion:he_power_train:<type>:<name>:purchase_cost variable found in
         # the datafile is added here automatically (battery, motor, inverter, turboshaft, ...).
         "discover_suffix": ":purchase_cost",
+        # Shown only in lcc_production_cost_bar_chart_simple, not in the sunburst: it would
+        # double-count against the individual power train component purchase costs above.
+        # Adjust the variable name below if it differs from your actual output variable.
+        "bar_only_leaves": {
+            PRODUCTION_PREFIX + "powertrain_cost_per_unit": "Powertrain",
+            "data:cost:msp_per_unit": "MSP",
+        },
     },
     {
         "key": "non_recursive",
@@ -510,6 +572,7 @@ def lcc_production_cost_bar_chart_simple(
     names_aircraft: List[str],
     graph_title: str = None,
     item_filter_list: list = None,
+    color_list: List[str] = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiple aircraft designs across all the items of the
@@ -523,6 +586,8 @@ def lcc_production_cost_bar_chart_simple(
     aircraft names.
     :param item_filter_list: filter to only show cost items in the list in output graph. By
     default, everything is plotted.
+    :param color_list: colors to use for each aircraft's bars (e.g. "#1f77b4"), given in the
+    same order as ``aircraft_file_paths``. By default, Plotly's automatic color cycling is used.
     """
 
     return _cost_bar_chart_simple(
@@ -532,6 +597,7 @@ def lcc_production_cost_bar_chart_simple(
         default_comparison_label="production cost per unit",
         graph_title=graph_title,
         item_filter_list=item_filter_list,
+        color_list=color_list,
     )
 
 
@@ -560,6 +626,9 @@ _OPERATION_SPEC = [
         # These are yearly per-component costs, not tied to the number of flights, so they
         # belong in the fixed branch rather than the mission-based one.
         "discover_suffix": ":operational_cost",
+        "bar_only_leaves": {
+            OPERATION_PREFIX + "annual_overhaul_deposit": "Overhaul Deposit",
+        },
     },
     {
         "key": "mission",
@@ -612,6 +681,7 @@ def lcc_operation_cost_bar_chart_simple(
     names_aircraft: List[str],
     graph_title: str = None,
     item_filter_list: list = None,
+    color_list: List[str] = None,
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiple aircraft designs across all the items of the
@@ -625,6 +695,8 @@ def lcc_operation_cost_bar_chart_simple(
     aircraft names.
     :param item_filter_list: filter to only show cost items in the list in output graph. By
     default, everything is plotted.
+    :param color_list: colors to use for each aircraft's bars (e.g. "#1f77b4"), given in the
+    same order as ``aircraft_file_paths``. By default, Plotly's automatic color cycling is used.
     """
 
     return _cost_bar_chart_simple(
@@ -634,4 +706,5 @@ def lcc_operation_cost_bar_chart_simple(
         default_comparison_label="annual operating cost",
         graph_title=graph_title,
         item_filter_list=item_filter_list,
+        color_list=color_list,
     )

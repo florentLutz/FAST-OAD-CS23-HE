@@ -27,6 +27,7 @@ from .lcc_delivery_cost import LCCDeliveryCost
 from .lcc_delivery_duration_ratio import LCCDeliveryDurationRatio
 from .lcc_project_total_non_recursive_cost import LCCTotalNonRecursiveProjectCost
 from .lcc_recursive_cost_per_unit import LCCRecursiveCost
+from .lcc_powertrain_cost import LCCPowertrainCost
 
 from .constants import SERVICE_COST_CERTIFICATION
 
@@ -205,6 +206,16 @@ class LCCProductionCost(om.Group):
 
         self.add_subsystem(
             name="recursive_cost_per_unit",
-            subsys=LCCRecursiveCost(),
+            subsys=LCCRecursiveCost(
+                cost_components_type=cost_components_type, cost_components_name=cost_components_name
+            ),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            name="powertrain_cost",
+            subsys=LCCPowertrainCost(
+                cost_components_type=cost_components_type, cost_components_name=cost_components_name
+            ),
             promotes=["*"],
         )
