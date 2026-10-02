@@ -190,7 +190,7 @@ class BuilderState:
     # per-connection rows rebuilt by
     # ConfigPanelMixin._refresh_connections_table() for the selected node.
     # There is no backing CDS here — rows are read directly from edge_source.
-    connections_table_widget: bkmodel.DataTable = field(default=None)
+    connections_table_widget: bkmodel.ColumnDataSource = field(default=None)
     connections_rows_column: object = field(default=None)
 
     # Dashed preview edges drawn while a connection is queued in the config

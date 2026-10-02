@@ -590,7 +590,6 @@ class PortEdgeMixin:
             node_type=source_node_type,
             fill_alpha=source_fill_alpha,
             line_alpha=source_line_alpha,
-            kind=["source"] * len(source_x),
             connected=[
                 "True"
                 if ("source", source_node_index[i], source_label[i]) in connected_ports
@@ -608,7 +607,6 @@ class PortEdgeMixin:
             node_type=target_node_type,
             fill_alpha=target_fill_alpha,
             line_alpha=target_line_alpha,
-            kind=["target"] * len(target_x),
             connected=[
                 "True"
                 if ("target", target_node_index[i], target_label[i]) in connected_ports

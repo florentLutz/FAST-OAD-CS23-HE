@@ -249,16 +249,6 @@ class ComponentToolboxConfigurationTableBuilder:
             code=_JS_LOAD_DIALOG,
         )
 
-        # Temporary load button (kept for any direct toolbox-bar placement)
-        load_design_button_tmp = bkmodel.Button(
-            label="Load Design",
-            icon=bkmodel.TablerIcon(icon_name="folder-open"),
-            button_type="light",
-            width=220,
-            height=70,
-        )
-        load_design_button_tmp.js_on_click(_load_js)
-
         # ── Watcher-path overlay widgets ──────────────────────────────────────
         # Built here (toolbox) so they can be wired to JS args; registered in
         # BuilderState so the launcher can add the overlay to the document and

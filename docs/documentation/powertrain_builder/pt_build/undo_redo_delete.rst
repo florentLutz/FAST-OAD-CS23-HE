@@ -20,6 +20,8 @@ reverting to a saved design.
     :width: 600px
     :align: center
 
+.. _delete_mode:
+
 Delete mode
 ===========
 The Powertrain builder GUI allows users to delete selected components or connections in the design. To activate the

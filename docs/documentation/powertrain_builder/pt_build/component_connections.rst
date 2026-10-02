@@ -35,7 +35,8 @@ node or selecting another component.
 
 Delete connection by drop down menu
 ===================================
-Another way to delete the connection is to select the empty value in the drop down menu of the right node properties
+Other than delete the connection by activating the :ref:`delete mode <delete_mode>`  and clicking on the connection line on the canvas, it can
+be also achieved by selecting the empty value in the drop down menu of the right node properties
 panel and apply the changes.
 
 .. image:: ../../../img/delete_edge_drop_menu.gif
