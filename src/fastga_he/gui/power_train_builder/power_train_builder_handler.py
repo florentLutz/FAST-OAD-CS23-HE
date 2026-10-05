@@ -170,8 +170,8 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
 
         Behaviour depends on the current interaction mode:
 
-        * **Delete mode** – remove the nearest placed icon or edge.
-        * **Component selected** – place a new icon at the tap coordinates.
+        * **Delete mode** – remove the nearest placed node or edge.
+        * **Component selected** – place a new node at the tap coordinates.
         * **Neither** – select or deselect the nearest existing node.
 
         An undo snapshot is pushed **before** every action that mutates the
@@ -186,18 +186,22 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         # Undo for port connections is pushed inside _handle_port_tap, just
         # before the permanent edge is committed.
         if not self.state.delete_mode and self.state.selected_component is None:
+            # No component is selected to place and not in delete mode: check for a port tap first.
             nearest_port = self._find_nearest_port(x, y)
             if nearest_port is not None:
+                # Find the port that was tapped and handle the connection.
                 self._handle_port_tap(nearest_port)
                 return
 
         if self.state.delete_mode:
+            # Delete mode: find if any component (node) on the canvas is tapped
             best_node_index, best_node_distance, nodes_data = self._best_possible_node(x, y)
 
             if best_node_index is not None:
-                # Capture state before deleting the node.
+                # Push the state into the history stack before deleting the node.
                 self._push_undo()
 
+                # Remove the node from the placed_nodes_source and hover_source (if it exists).
                 new_data = copy_column_data(nodes_data)
                 for column in new_data:
                     new_data[column].pop(best_node_index)
@@ -210,6 +214,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                             hover_data[column].pop(best_node_index)
                     self.state.hover_source.data = hover_data
 
+                # Remove any edges connected to the deleted node and adjust indices of remaining edges.
                 if self.state.edge_source is not None:
                     edge_data = copy_column_data(self.state.edge_source.data)
                     keep_indices = [
@@ -226,18 +231,21 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
                     new_edge_data = {}
                     for column_key, column_values in edge_data.items():
                         kept_values = [column_values[i] for i in keep_indices]
-                        if column_key == "starting_node_index":
+                        if column_key in ("starting_node_index", "ending_node_index"):
                             kept_values = [v - 1 if v > best_node_index else v for v in kept_values]
-                        elif column_key == "ending_node_index":
-                            kept_values = [v - 1 if v > best_node_index else v for v in kept_values]
+
                         new_edge_data[column_key] = kept_values
                     self.state.edge_source.data = new_edge_data
 
                 self._rebuild_all_ports()
 
+                # If the deleted node was selected, clear the selection and the node table.
                 if self.state.selected_node_index == best_node_index:
                     self.state.selected_node_index = None
                     self._clear_node_table()
+
+                # index correction: advance the selected_node_index if it was after the deleted node
+                # [A,B,C,D] -> delete B -> [A,C,D], C and D needs to shift left by 1
                 elif (
                     self.state.selected_node_index is not None
                     and self.state.selected_node_index > best_node_index
@@ -249,10 +257,12 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
 
             else:
                 edge_index = self._find_nearest_edge(x, y)
+                # Check if an edge (connection) is tapped. If so, delete it.
                 if edge_index is not None and self.state.edge_source is not None:
                     # Capture state before deleting the edge.
                     self._push_undo()
 
+                    # Remove the edge from the edge_source data.
                     edge_data = copy_column_data(self.state.edge_source.data)
                     for k in edge_data:
                         edge_data[k].pop(edge_index)
@@ -266,17 +276,23 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
             return
 
         if self.state.selected_component is None:
+            # No component is selected to place and not in delete mode: check for a node tap.
             best_node_index, best_node_distance, nodes_data = self._best_possible_node(x, y)
+            # Unselect port highlight and clean up the pending array
             self._cancel_pending_connection()
 
             if best_node_index is None and best_node_distance is None:
                 return
             elif best_node_index is None or self.state.selected_node_index == best_node_index:
+                # Deselect the node if the tap is not on any node or if the tap is on the already
+                # selected node.
                 self.state.selected_node_index = None
                 self._clear_temp_edges()
                 self._clear_node_table()
                 return
             else:
+                # A node is tapped and is not the currently selected node: select it and
+                # populate the config panel.
                 self._clear_temp_edges()
                 self.state.selected_node_index = best_node_index
                 self._populate_node_table(best_node_index)
@@ -284,6 +300,4 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
             return
 
         # A component is selected in the toolbox: place it at the tap coordinates.
-        # All the actual node-creation work (defaults, icon URL, appending to
-        # placed_nodes_source / hover_source, port rebuild) lives in PlacementMixin.
         self._place_new_node(x, y)

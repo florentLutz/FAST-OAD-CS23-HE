@@ -25,6 +25,12 @@ To launch the builder, add the following code snippet to your Python script:
 
     PowertrainBuilderLauncher.launch()
 
+Or run the following command in the terminal:
+
+.. code:: commandline
+
+    powewtrain-builder
+
 Once loaded from existing design, the builder should look like this:
 
 .. image:: ../../../img/start_up_page.svg

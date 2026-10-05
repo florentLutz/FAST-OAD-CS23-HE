@@ -374,8 +374,8 @@ class ConfigPanelMixin:
 
         # Build lookup: port label -> (far_node_index, far_label) for every edge
         # that touches node_index.
-        connected_source: dict[str, tuple[int, str]] = {}
-        connected_target: dict[str, tuple[int, str]] = {}
+        connected_source = {}
+        connected_target = {}
 
         for i in range(len(edge_data.get("starting_node_index", []))):
             starting_node_position = edge_data["starting_node_index"][i]
@@ -385,37 +385,55 @@ class ConfigPanelMixin:
             starting_port_kind_value = edge_data["starting_port_kind"][i]
             ending_port_kind_value = edge_data["ending_port_kind"][i]
 
-            if starting_node_position == node_index and starting_port_kind_value == "source":
+            # AS the starting node could be the source or the target, we need to check both cases
+
+            node_is_starting_node = starting_node_position == node_index
+            node_is_ending_node = ending_node_position == node_index
+            port_on_starting_node_is_source = starting_port_kind_value == "source"
+            port_on_starting_node_is_target = starting_port_kind_value == "target"
+            port_on_ending_node_is_source = ending_port_kind_value == "source"
+            port_on_ending_node_is_target = ending_port_kind_value == "target"
+
+            if node_is_starting_node and port_on_starting_node_is_source:
                 connected_source[starting_port_label_value] = (
                     ending_node_position,
                     ending_port_label_value,
                 )
-            elif ending_node_position == node_index and ending_port_kind_value == "source":
+            elif node_is_ending_node and port_on_ending_node_is_source:
                 connected_source[ending_port_label_value] = (
                     starting_node_position,
                     starting_port_label_value,
                 )
-            if starting_node_position == node_index and starting_port_kind_value == "target":
+
+            if node_is_starting_node and port_on_starting_node_is_target:
                 connected_target[starting_port_label_value] = (
                     ending_node_position,
                     ending_port_label_value,
                 )
-            elif ending_node_position == node_index and ending_port_kind_value == "target":
+            elif node_is_ending_node and port_on_ending_node_is_target:
                 connected_target[ending_port_label_value] = (
                     starting_node_position,
                     starting_port_label_value,
                 )
-
+        # Get node port color for filtering compatible ports
         selected_source_color = ICONS_CONFIG.get(node_data["icon_type"][node_index], {}).get(
             "source_color", ""
         )
-        free_targets: list[tuple[int, str, str, str]] = []
+
+        # Build a list of all unconnected target ports that match the color
+        free_targets = []
         for j in range(len(target_data.get("node_index", []))):
+            target_port_is_free = target_data["connected"][j] == "False"
+            target_port_not_selected = target_data["node_index"][j] != node_index
+            same_source_color_as_node_target_color = (
+                target_data["color"][j] == selected_source_color
+            )
             if (
-                target_data["connected"][j] == "False"
-                and target_data["node_index"][j] != node_index
-                and target_data["color"][j] == selected_source_color
+                target_port_is_free
+                and target_port_not_selected
+                and same_source_color_as_node_target_color
             ):
+                # The port id free, not selected and has the same color as the source port of the node
                 free_targets.append(
                     (
                         target_data["node_index"][j],
@@ -433,12 +451,18 @@ class ConfigPanelMixin:
         selected_target_color = ICONS_CONFIG.get(node_data["icon_type"][node_index], {}).get(
             "target_color", ""
         )
-        free_sources: list[tuple[int, str, str, str]] = []
+        free_sources = []
         for j in range(len(source_data.get("node_index", []))):
+            source_port_is_free = source_data["connected"][j] == "False"
+            source_port_not_selected = source_data["node_index"][j] != node_index
+            same_target_color_as_node_source_color = (
+                source_data["color"][j] == selected_target_color
+            )
+
             if (
-                source_data["connected"][j] == "False"
-                and source_data["node_index"][j] != node_index
-                and source_data["color"][j] == selected_target_color
+                source_port_is_free
+                and source_port_not_selected
+                and same_target_color_as_node_source_color
             ):
                 free_sources.append(
                     (
@@ -461,6 +485,7 @@ class ConfigPanelMixin:
             if source_data["node_index"][i] != node_index:
                 continue
 
+            # Set up the source port label of the node
             source_label = source_data["label"][i]
             is_connected = source_data["connected"][i] == "True"
 
@@ -471,9 +496,14 @@ class ConfigPanelMixin:
                 styles={"color": "white", "font-size": "14px"},
             )
 
-            candidates = list(free_targets)
+            candidates = free_targets
             current_string = _EMPTY
             if is_connected and source_label in connected_source:
+                # Add the connected target port to the candidates list so that it will show up in
+                # the dropdown, even if it is not free
+                # far here means possible target port that could be connected to the source port of
+                # the node
+
                 far_node_i, far_label = connected_source[source_label]
                 current_string = self._far_string(node_data, far_node_i, far_label, "target")
                 candidates = [
@@ -489,9 +519,12 @@ class ConfigPanelMixin:
                     )
                 ]
 
+            # Index 3 ensure that the display string is used for the dropdown, not shown as default
             choices = [_EMPTY] + [
                 candidate[3] for candidate in candidates if candidate[3] != current_string
             ]
+
+            # Add the current string to the choices if it is not already present
             if current_string and current_string not in choices:
                 choices = [current_string] + choices
 
@@ -531,7 +564,7 @@ class ConfigPanelMixin:
                 styles={"color": "white", "font-size": "14px"},
             )
 
-            candidates = list(free_sources)
+            candidates = free_sources
             current_string = _EMPTY
             if is_connected and target_label in connected_target:
                 far_node_i, far_label = connected_target[target_label]
@@ -582,6 +615,8 @@ class ConfigPanelMixin:
     def _far_string(node_data: dict, far_node_index: int, far_label: str, far_kind: str) -> str:
         """
         Format a port reference as ``"<node_name> (<kind>:<label>)"``.
+        The far hear represent the possible candidates for the port selection, either source or
+        target.
 
         :param node_data: Snapshot of ``placed_nodes_source.data``.
         :param far_node_index: Node index of the far-end port.
