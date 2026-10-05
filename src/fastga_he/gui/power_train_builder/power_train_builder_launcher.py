@@ -454,11 +454,11 @@ class PowertrainBuilderLauncher:
             doc.add_root(startup_overlay)
             doc.add_root(undo_redo_overlay)
 
-            # Save-options overlay (watcher path dialog) – floats above the canvas.
-            # state.save_overlay was created and wired in ComponentPaletteConfigurationTableBuilder;
-            # it is already visible=False and will be shown by the Save button's CustomJS.
-            if state.save_overlay is not None:
-                doc.add_root(state.save_overlay)
+            # "Final version?" overlay – floats above the canvas; created hidden in
+            # ComponentToolboxConfigurationTableBuilder and shown by the Save button's
+            # (or Save & Exit's) CustomJS.
+            if state.save_version_overlay is not None:
+                doc.add_root(state.save_version_overlay)
             # Unsaved-exit overlay – floats above the canvas, shown when the user
             # clicks End Session with unsaved changes (save button is yellow).
             if state.unsaved_exit_overlay is not None:

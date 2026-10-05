@@ -221,19 +221,20 @@ class BuilderState:
     # from the four dicts above — read the name carefully.
     icon_to_component_types: dict = field(default_factory=dict)
 
-    # ── Save / load overlay ──────────────────────────────────────────────────
-    # Visible TextInput in the save overlay where the user types or browses
-    # to a watcher CSV path; its value is read by Python at save time.
-    watcher_path_input: bkmodel.TextInput = field(default=None)
-    # The save-options overlay column — shown by the Save button before the
-    # native file dialogs open.
-    save_overlay: object = field(default=None)
-    # Toggle triggers: JS flips '0' / '1' on these hidden TextInputs to fire
+    # ── Save / load ──────────────────────────────────────────────────────────
+    # "Is this the final version?" overlay — shown by the Save button (and by
+    # Save & Exit). "Final Version" saves without the GUI-only canvas_layout
+    # section; "Edit Later" keeps it (see IOMixin._on_browse_save).
+    save_version_overlay: object = field(default=None)
+    # watcher_file_path found in the last loaded YAML (empty if none). There
+    # is no UI for it; it is only carried over so re-saving a loaded design
+    # does not silently drop a path the user set by hand in the file.
+    watcher_file_path: str = field(default="")
+    # Toggle triggers: JS changes the value of these hidden TextInputs to fire
     # the corresponding Python on_change callback (used to bridge JS-driven
     # UI actions, like a native OS file dialog, back into Python).
     browse_load_trigger: bkmodel.TextInput = field(default=None)
     browse_save_trigger: bkmodel.TextInput = field(default=None)
-    browse_watcher_trigger: bkmodel.TextInput = field(default=None)
 
     # ── Startup overlay ──────────────────────────────────────────────────────
     new_design_button: bkmodel.Button = field(default=None)

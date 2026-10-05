@@ -53,10 +53,24 @@ _JS_LOAD_DIALOG = """
 browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';
 """
 
-# ── Save click: show watcher-path overlay ─────────────────────────────────────
-_JS_SAVE_CLICK = """
-save_overlay_widget.visible = true;
+# ── "Final version?" overlay buttons: hide it and send the mode to Python ──
+#    (__MODE__ is replaced by final / editable / cancel). The timestamp makes
+#    every click a new value, so on_change always fires.
+_JS_SAVE_MODE_CLICK = """
+save_version_overlay_widget.visible = false;
+browse_save_trigger.value = '__MODE__:' + Date.now();
 """
+
+# Shared by the startup overlay and the "final version?" overlay buttons.
+_STARTUP_BUTTON_CSS = [
+    """:host button {
+        font-size: 1.6em;
+        padding: 18px 40px;
+        border-radius: 10px;
+        font-weight: bold;
+        letter-spacing: 0.04em;
+    }"""
+]
 
 # ── End Session click: show unsaved-exit overlay if save_button is yellow,
 #    otherwise flip end_session_trigger so Python stops the server cleanly. ──
@@ -218,13 +232,12 @@ class ComponentToolboxConfigurationTableBuilder:
         # Trigger routing:
         #   browse_load_trigger    -> IOMixin._on_browse_load
         #                            Opens a tkinter open-file dialog; restores the
-        #                            canvas from the chosen JSON backup.
+        #                            canvas from the chosen powertrain YAML.
         #   browse_save_trigger    -> IOMixin._on_browse_save
-        #                            Opens two tkinter save-file dialogs (YAML config
-        #                            and JSON backup); writes both files.
-        #   browse_watcher_trigger -> IOMixin._on_browse_watcher
-        #                            Opens a tkinter save-file dialog to choose the
-        #                            watcher CSV path; writes it into watcher_path_input.
+        #                            Set by the "final version?" overlay to
+        #                            "<final|editable|cancel>:<timestamp>". Opens a
+        #                            tkinter save-file dialog and writes the YAML config,
+        #                            with the canvas_layout section only if "editable".
         #   end_session_trigger    -> IOMixin._on_end_session_trigger
         #                            Stops the Bokeh IOLoop, terminating the server.
         #                            Flipped by JS only when it is safe to do so (design
@@ -235,7 +248,6 @@ class ComponentToolboxConfigurationTableBuilder:
 
         browse_load_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
-        browse_watcher_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         end_session_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger.js_on_change(
@@ -249,73 +261,57 @@ class ComponentToolboxConfigurationTableBuilder:
             code=_JS_LOAD_DIALOG,
         )
 
-        # ── Watcher-path overlay widgets ──────────────────────────────────────
-        # Built here (toolbox) so they can be wired to JS args; registered in
-        # BuilderState so the launcher can add the overlay to the document and
-        # the handler can read watcher_path_input.value at save time.
-        watcher_path_input = bkmodel.TextInput(
-            title="Watcher file path (optional):",
-            value=_EMPTY,
-            width=340,
-            placeholder="Leave blank to skip",
-            styles={"color": "white", "font-size": "14px"},
-            # visible=False
+        # ── "Final version?" overlay ──────────────────────────────────────────
+        # Shown when the Save button (or Save & Exit) is clicked. The choice decides whether the GUI-only
+        # canvas_layout section is written. Each button sends its mode to Python
+        # inside the browse_save_trigger value itself ("<mode>:<timestamp>"), so
+        # the mode and the "go" signal arrive as one change.
+        _final_version_btn = bkmodel.Button(
+            label="Final Version",
+            icon=bkmodel.TablerIcon(icon_name="circle-check"),
+            button_type="success",
+            width=240,
+            height=70,
+            stylesheets=_STARTUP_BUTTON_CSS,
         )
-        _browse_watcher_btn = bkmodel.Button(
-            label="...",
-            button_type="light",
-            width=40,
-            height=31,
-        )
-        _browse_watcher_btn.js_on_click(
-            bkmodel.CustomJS(
-                args=dict(browse_trigger=browse_watcher_trigger),
-                code="browse_trigger.value = browse_trigger.value === '1' ? '0' : '1';",
-            )
-        )
-        _continue_save_btn = bkmodel.Button(
-            label="Continue to Save",
-            icon=bkmodel.TablerIcon(icon_name="device-floppy"),
+        _editable_version_btn = bkmodel.Button(
+            label="Edit Later",
+            icon=bkmodel.TablerIcon(icon_name="pencil"),
             button_type="primary",
-            width=200,
-            height=40,
+            width=240,
+            height=70,
+            stylesheets=_STARTUP_BUTTON_CSS,
         )
-        _cancel_watcher_btn = bkmodel.Button(
+        _cancel_version_btn = bkmodel.Button(
             label="Cancel",
             button_type="light",
             width=100,
             height=40,
         )
-
-        # The overlay column – hidden until the Save button is clicked
-        save_overlay = column(
+        save_version_overlay = column(
             bkmodel.Div(
                 text=(
                     "<div style='"
                     "color:white;font-size:22pt;font-weight:bold;"
                     "text-align:center;padding:24px 0 18px 0;letter-spacing:0.04em;"
-                    "'>Save Design</div>"
+                    "'>Is this the final version?</div>"
                     "<div style='"
                     "color:#aaa;font-size:12pt;"
                     "text-align:center;padding-bottom:28px;"
-                    "'>Optionally specify a watcher file path, then click "
-                    "<b>Continue</b> to choose output locations.</div>"
+                    "'><b>Final Version</b> writes only the FAST-OAD configuration.<br>"
+                    "<b>Edit Later</b> also stores the canvas layout so the design "
+                    "re-opens exactly as it is now.</div>"
                 ),
-                width=500,
+                width=560,
             ),
             row(
-                watcher_path_input,
-                bkmodel.Spacer(width=6),
-                _browse_watcher_btn,
-                styles={"align-items": "flex-end"},
-            ),
-            bkmodel.Spacer(height=14),
-            row(
-                _cancel_watcher_btn,
+                _final_version_btn,
                 bkmodel.Div(text="", width=30),
-                _continue_save_btn,
+                _editable_version_btn,
                 styles={"justify-content": "center"},
             ),
+            bkmodel.Spacer(height=14),
+            row(_cancel_version_btn, styles={"justify-content": "center"}),
             visible=False,
             styles={
                 "background": "rgba(30,30,40,0.97)",
@@ -323,45 +319,39 @@ class ComponentToolboxConfigurationTableBuilder:
                 "border-radius": "16px",
                 "padding": "10px 40px 30px 40px",
                 "position": "absolute",
-                "left": f"{PALETTE_WIDTH + 150}px",
+                "left": f"{PALETTE_WIDTH + 120}px",
                 "top": "340px",
                 "z-index": "100",
                 "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
             },
         )
+        for mode_button, save_mode in (
+            (_final_version_btn, "final"),
+            (_editable_version_btn, "editable"),
+            (_cancel_version_btn, "cancel"),
+        ):
+            mode_button.js_on_click(
+                bkmodel.CustomJS(
+                    args=dict(
+                        save_version_overlay_widget=save_version_overlay,
+                        browse_save_trigger=browse_save_trigger,
+                    ),
+                    code=_JS_SAVE_MODE_CLICK.replace("__MODE__", save_mode),
+                )
+            )
 
-        # ── Wire Save button: click -> show watcher overlay ────────────────────
+        # ── Wire Save button: click -> ask "final version?" ────────────────────
         save_button.js_on_click(
             bkmodel.CustomJS(
-                args=dict(save_overlay_widget=save_overlay),
-                code=_JS_SAVE_CLICK,
-            )
-        )
-
-        # ── Wire Cancel button: hide overlay without saving ───────────────────
-        _cancel_watcher_btn.js_on_click(
-            bkmodel.CustomJS(
-                args=dict(save_overlay_widget=save_overlay),
-                code="save_overlay_widget.visible = false;",
-            )
-        )
-
-        # ── Wire Continue button -> signal Python to open tkinter save dialogs ─
-        _continue_save_btn.js_on_click(
-            bkmodel.CustomJS(
-                args=dict(
-                    save_overlay_widget=save_overlay,
-                    browse_save_trigger=browse_save_trigger,
-                ),
-                code="save_overlay_widget.visible = false; "
-                "browse_save_trigger.value = browse_save_trigger.value === '1' ? '0' : '1';",
+                args=dict(save_version_overlay_widget=save_version_overlay),
+                code="save_version_overlay_widget.visible = true;",
             )
         )
 
         # ── Unsaved-exit overlay ──────────────────────────────────────────────
         # Shown when the user clicks End Session while save_button is yellow.
-        # Hidden trigger used by "Save & Exit" to open the watcher-path overlay,
-        # then chain straight into the save flow and end the session on completion.
+        # Hidden trigger used by "Save & Exit" to flag Python that the session must
+        # end once the save (started from the "final version?" overlay) completes.
         end_session_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
 
         _end_anyway_btn = bkmodel.Button(
@@ -446,18 +436,18 @@ class ComponentToolboxConfigurationTableBuilder:
             )
         )
 
-        # Save & Exit: open the watcher-path / save overlay, then Python handler
-        # ends the session after the files are written (via end_session_save_trigger).
+        # Save & Exit: open the "final version?" overlay; the Python handler ends the
+        # session after the file is written (flagged via end_session_save_trigger).
         _save_and_exit_btn.js_on_click(
             bkmodel.CustomJS(
                 args=dict(
                     unsaved_exit_overlay_widget=unsaved_exit_overlay,
-                    save_overlay_widget=save_overlay,
+                    save_version_overlay_widget=save_version_overlay,
                     end_session_save_trigger=end_session_save_trigger,
                 ),
                 code=(
                     "unsaved_exit_overlay_widget.visible = false; "
-                    "save_overlay_widget.visible = true; "
+                    "save_version_overlay_widget.visible = true; "
                     "end_session_save_trigger.value = "
                     "    end_session_save_trigger.value === '1' ? '0' : '1';"
                 ),
@@ -477,22 +467,13 @@ class ComponentToolboxConfigurationTableBuilder:
         )
 
         # ── Startup overlay buttons ───────────────────────────────────────────
-        _startup_button_css = [
-            """:host button {
-                font-size: 1.6em;
-                padding: 18px 40px;
-                border-radius: 10px;
-                font-weight: bold;
-                letter-spacing: 0.04em;
-            }"""
-        ]
         new_design_button = bkmodel.Button(
             label="New Design",
             icon=bkmodel.TablerIcon(icon_name="file-plus"),
             button_type="primary",
             width=220,
             height=70,
-            stylesheets=_startup_button_css,
+            stylesheets=_STARTUP_BUTTON_CSS,
         )
         load_design_button = bkmodel.Button(
             label="Load Design",
@@ -500,7 +481,7 @@ class ComponentToolboxConfigurationTableBuilder:
             button_type="light",
             width=220,
             height=70,
-            stylesheets=_startup_button_css,
+            stylesheets=_STARTUP_BUTTON_CSS,
         )
         load_design_button.js_on_click(_load_js)
 
@@ -739,9 +720,7 @@ class ComponentToolboxConfigurationTableBuilder:
             possible_options=possible_options_map,
             browse_load_trigger=browse_load_trigger,
             browse_save_trigger=browse_save_trigger,
-            browse_watcher_trigger=browse_watcher_trigger,
-            watcher_path_input=watcher_path_input,
-            save_overlay=save_overlay,
+            save_version_overlay=save_version_overlay,
             new_design_button=new_design_button,
             load_design_button=load_design_button,
             unsaved_exit_overlay=unsaved_exit_overlay,
@@ -778,7 +757,6 @@ class ComponentToolboxConfigurationTableBuilder:
             end_session_button,
             browse_load_trigger,
             browse_save_trigger,
-            browse_watcher_trigger,
             end_session_save_trigger,
             end_session_trigger,
             close_window_trigger,

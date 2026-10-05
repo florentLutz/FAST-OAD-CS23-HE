@@ -8,6 +8,13 @@ YAML serialiser for the powertrain network.
 :class:`PowerTrainYAML` collects component and connection data from a
 :class:`BuilderState` snapshot and writes a formatted YAML powertrain
 configuration file, mirroring the schema consumed by FAST-OAD_CS23-HE.
+
+Unless the design is saved as a final version, the file also carries a
+GUI-only ``canvas_layout`` section that stores the canvas (x, y) of every
+component, so the same YAML can be re-opened in the builder for later edits
+with the exact same arrangement (see :mod:`.power_train_network_reader`).
+This replaces the former JSON canvas backup. FAST-OAD_CS23-HE ignores unknown top-level keys
+(it only logs a warning), so the section does not affect the analysis.
 """
 
 import json
@@ -18,7 +25,31 @@ from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
+from .power_train_builder_state import copy_column_data
+
 _LOGGER = logging.getLogger(__name__)
+
+# Top-level YAML keys (the first four mirror FAST-OAD_CS23-HE's powertrain.py).
+KEY_TITLE = "title"
+KEY_PT_COMPONENTS = "power_train_components"
+KEY_PT_CONNECTIONS = "component_connections"
+KEY_PT_WATCHER = "watcher_file_path"
+# GUI-only section: {component_name: {"x": float, "y": float}}.
+KEY_CANVAS_LAYOUT = "canvas_layout"
+
+_CANVAS_LAYOUT_HEADER = (
+    "# Canvas positions used only by the powertrain builder GUI to re-open this file.\n"
+    "# FAST-OAD_CS23-HE does not use this section.\n"
+)
+
+# Keywords used to tell which "number_of_*" attribute of a variable-port
+# component drives its source-side vs target-side port count. Shared with the
+# reader so that save and load stay symmetric.
+SOURCE_SIDE_KEYWORDS = ("_inputs", "_tanks")
+TARGET_SIDE_KEYWORDS = ("_outputs", "_engines", "_power_sources")
+
+# Decimal places kept for canvas coordinates (sub-pixel precision is noise).
+_LAYOUT_DECIMALS = 1
 
 
 class PowerTrainYAML:
@@ -31,7 +62,7 @@ class PowerTrainYAML:
     an immutable snapshot.
 
     Callers that have already taken their own ``copy_column_data`` snapshot
-    (e.g. to also write a JSON backup) can pass it in directly via
+    can pass it in directly via
     ``node_data`` / ``edge_data`` / ``source_port_data`` / ``target_port_data``
     to avoid re-copying the same live sources a second time. Any of these
     left as ``None`` is copied from ``state`` as before, so the class remains
@@ -45,6 +76,7 @@ class PowerTrainYAML:
         edge_data: dict = None,
         source_port_data: dict = None,
         target_port_data: dict = None,
+        include_canvas_layout: bool = True,
     ):
         """
         Snapshot the builder state needed for serialisation.
@@ -61,17 +93,35 @@ class PowerTrainYAML:
             Copied from *state* if ``None``.
         :param target_port_data: Optional pre-copied ``target_port_source.data``.
             Copied from *state* if ``None``.
+        :param include_canvas_layout: ``True`` (default) to append the GUI-only
+            ``canvas_layout`` section for later edits; ``False`` for a "final
+            version" file containing only what FAST-OAD_CS23-HE reads.
         """
+        self.include_canvas_layout = include_canvas_layout
         self.data = {
-            "title": "",
-            "power_train_components": {},
-            "component_connections": [],
-            "watcher_file_path": "",
+            KEY_TITLE: "",
+            KEY_PT_COMPONENTS: {},
+            KEY_PT_CONNECTIONS: [],
+            KEY_PT_WATCHER: "",
+            KEY_CANVAS_LAYOUT: {},
         }
-        self.node_data = node_data
-        self.edge_data = edge_data
-        self.source_port_data = source_port_data
-        self.target_port_data = target_port_data
+        # Fall back to copying the live sources, as documented above.
+        self.node_data = (
+            node_data if node_data is not None else copy_column_data(state.placed_nodes_source.data)
+        )
+        self.edge_data = (
+            edge_data if edge_data is not None else copy_column_data(state.edge_source.data)
+        )
+        self.source_port_data = (
+            source_port_data
+            if source_port_data is not None
+            else copy_column_data(state.source_port_source.data)
+        )
+        self.target_port_data = (
+            target_port_data
+            if target_port_data is not None
+            else copy_column_data(state.target_port_source.data)
+        )
         self.possible_options = state.possible_options
         self.default_source_count = state.default_source_count
 
@@ -81,7 +131,7 @@ class PowerTrainYAML:
 
         :param title: Human-readable title for the powertrain design.
         """
-        self.data["title"] = title
+        self.data[KEY_TITLE] = title
 
     def add_component(self, node_index: int) -> None:
         """
@@ -96,9 +146,16 @@ class PowerTrainYAML:
         the current port counts are written as ``number_of_*`` option keys so
         that FAST-OAD can reconstruct the correct topology.
 
+        The component's canvas (x, y) is also recorded under ``canvas_layout``
+        so the file can be re-opened in the builder.
+
         :param node_index: Zero-based row index into the snapshotted node data arrays.
         """
         component_name = self.node_data["name"][node_index]
+        self.data[KEY_CANVAS_LAYOUT][component_name] = {
+            "x": round(float(self.node_data["x"][node_index]), _LAYOUT_DECIMALS),
+            "y": round(float(self.node_data["y"][node_index]), _LAYOUT_DECIMALS),
+        }
         component_type = self.node_data["node_type"][node_index]
         source_port_count = self.node_data["n_sources"][node_index]
         target_port_count = self.node_data["n_targets"][node_index]
@@ -149,37 +206,35 @@ class PowerTrainYAML:
                 ).get("attributes")
                 or []
             )
-            _SOURCE_SIDE_KEYWORDS = ("_inputs", "_tanks")
-            _TARGET_SIDE_KEYWORDS = ("_outputs", "_engines", "_power_sources")
             for attribute_name in component_attributes:
                 if "number_of_" not in attribute_name:
                     continue
-                if any(keyword in attribute_name for keyword in _SOURCE_SIDE_KEYWORDS):
+                if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS):
                     options_dict[attribute_name] = source_port_count
-                elif any(keyword in attribute_name for keyword in _TARGET_SIDE_KEYWORDS):
+                elif any(keyword in attribute_name for keyword in TARGET_SIDE_KEYWORDS):
                     options_dict[attribute_name] = target_port_count
 
         if not options_dict:
             if not symmetry_component_name:
-                self.data["power_train_components"][component_name] = {
+                self.data[KEY_PT_COMPONENTS][component_name] = {
                     "id": component_id,
                     "position": self.node_data["position"][node_index],
                 }
             else:
-                self.data["power_train_components"][component_name] = {
+                self.data[KEY_PT_COMPONENTS][component_name] = {
                     "id": component_id,
                     "position": self.node_data["position"][node_index],
                     "symmetrical": symmetry_component_name,
                 }
         else:
             if not symmetry_component_name:
-                self.data["power_train_components"][component_name] = {
+                self.data[KEY_PT_COMPONENTS][component_name] = {
                     "id": component_id,
                     "options": options_dict,
                     "position": self.node_data["position"][node_index],
                 }
             else:
-                self.data["power_train_components"][component_name] = {
+                self.data[KEY_PT_COMPONENTS][component_name] = {
                     "id": component_id,
                     "options": options_dict,
                     "position": self.node_data["position"][node_index],
@@ -249,18 +304,16 @@ class PowerTrainYAML:
                 if target_port_count > 1:
                     target_name = f"[{target_name}, {int(self.edge_data['starting_port_label'][connection_index])}]"
 
-            self.data["component_connections"].append(
-                {"source": source_name, "target": target_name}
-            )
+            self.data[KEY_PT_CONNECTIONS].append({"source": source_name, "target": target_name})
 
     def set_watcher_file_path(self, watcher_path: str) -> None:
         """
         Set the ``watcher_file_path`` field of the YAML output.
 
         :param watcher_path: Filesystem path to the watcher CSV file, or an
-            empty string to leave the field blank.
+            empty string to omit the field from the output.
         """
-        self.data["watcher_file_path"] = watcher_path
+        self.data[KEY_PT_WATCHER] = watcher_path
 
     def _build_output(self) -> str:
         """
@@ -275,6 +328,9 @@ class PowerTrainYAML:
         * Insert a blank line between each ``- source:`` connection entry.
         * Insert a blank line between each component under
           ``power_train_components``.
+        * Leave the trailing ``canvas_layout`` section (omitted entirely when
+          ``include_canvas_layout`` is ``False``) compact and prefix it with a
+          short "GUI-only" comment.
 
         :return: The formatted YAML string ready to write to disk.
         """
@@ -283,7 +339,14 @@ class PowerTrainYAML:
         yaml_serialiser.indent(mapping=2, sequence=4, offset=2)
 
         string_buffer = StringIO()
-        yaml_serialiser.dump(self.data, string_buffer)
+        data_to_dump = {
+            key: value
+            for key, value in self.data.items()
+            if not (key == KEY_CANVAS_LAYOUT and not self.include_canvas_layout)
+            # watcher_file_path is optional for FAST-OAD: only write it when set.
+            and not (key == KEY_PT_WATCHER and not value)
+        }
+        yaml_serialiser.dump(data_to_dump, string_buffer)
         output_string = string_buffer.getvalue()
 
         # Remove quotes around [component_name, N] patterns.
@@ -297,24 +360,30 @@ class PowerTrainYAML:
             output_string,
         )
 
+        # The GUI-only canvas_layout section is always dumped last (it is the
+        # last key of self.data). Split it off so the spacing rules below only
+        # apply to the FAST-OAD part of the file and the layout stays compact.
+        layout_marker = f"\n{KEY_CANVAS_LAYOUT}:"
+        fastoad_part, marker, layout_part = output_string.partition(layout_marker)
+
         # Add a blank line before each top-level key (except the first one).
-        top_level_keys = [
-            "title",
-            "power_train_components",
-            "component_connections",
-            "watcher_file_path",
-        ]
+        top_level_keys = [KEY_TITLE, KEY_PT_COMPONENTS, KEY_PT_CONNECTIONS, KEY_PT_WATCHER]
         for key in top_level_keys[1:]:
-            output_string = output_string.replace(f"\n{key}:", f"\n\n{key}:")
+            fastoad_part = fastoad_part.replace(f"\n{key}:", f"\n\n{key}:")
 
         # Add a blank line between each connection entry (- source:).
-        output_string = re.sub(r"\n(\s+- source:)", r"\n\n\1", output_string)
+        fastoad_part = re.sub(r"\n(\s+- source:)", r"\n\n\1", fastoad_part)
 
         # Add a blank line between each component under power_train_components
         # (2-space-indented keys).
-        output_string = re.sub(r"\n(\s{2}\w)", r"\n\n\1", output_string)
+        fastoad_part = re.sub(r"\n(\s{2}\w)", r"\n\n\1", fastoad_part)
 
-        return output_string
+        if not marker:
+            return fastoad_part
+
+        # Re-attach the layout section, preceded by a blank line and a short
+        # comment so readers of the YAML know it is GUI-only.
+        return fastoad_part + "\n\n" + _CANVAS_LAYOUT_HEADER + marker.lstrip("\n") + layout_part
 
     def write(self, file_path: str) -> None:
         """

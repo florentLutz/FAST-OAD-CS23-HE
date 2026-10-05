@@ -19,7 +19,8 @@ The class is assembled from five single-responsibility mixins:
   the actual "place a new component on the canvas" logic: computing default
   type / position / options / port counts and appending the new node.
 * :class:`~.power_train_builder_handler_io.IOMixin` –
-  save / load (YAML + JSON), tkinter file dialogs, end-session triggers,
+  save / load (one YAML file incl. a canvas_layout section), tkinter file
+  dialogs, end-session triggers,
   undo / redo snapshot management.
 * :class:`~.power_train_builder_handler_ports.PortEdgeMixin` –
   node / port / edge hit-testing, edge add / remove / rebuild.
@@ -51,15 +52,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
     Wires toolbox button events to canvas placement and interaction events.
 
     Instantiate **after** building the toolbox; the constructor automatically
-    wires all button ``on_click`` callbacks and initialises the undo stack::
-
-        toolbox_layout, config_panel_column, state = ComponentPaletteConfigurationTableBuilder.build()
-        handler = BuilderHandler(state, main_plot)
-        main_plot.on_event(Tap, handler.on_canvas_tap)
-        main_plot.image_url(
-            url="url", x="x", y="y", w="w", h="h",
-            anchor="center", source=state.placed_nodes_source,
-        )
+    wires all button ``on_click`` callbacks and initialises the undo stack.
 
     All public and private methods of this class operate exclusively on the
     shared :class:`BuilderState` instance passed at construction time.
@@ -94,23 +87,22 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         Attach ``on_click`` callbacks of all static Bokeh buttons/ widgets in the left toolbox
         and the right component configuration table panel.
 
-        Called once from :meth:`__init__`. Connects:
+        Called once from ``__init__``. Connects:
 
-        * Each component toolbox button -> :meth:`on_toolbox_select`.
-        * The End Session button -> :meth:`_end_session`.
-        * The Delete button -> :meth:`_toggle_delete_mode`.
-        * The New Design button -> :meth:`_on_new_design`.
-        * The browse_load_trigger -> :meth:`_on_browse_load` (tkinter open-file dialog).
-        * The browse_save_trigger -> :meth:`_on_browse_save` (tkinter save-file dialogs).
-        * The browse_watcher_trigger -> :meth:`_on_browse_watcher` (tkinter CSV path dialog).
-        * The Undo button -> :meth:`_on_undo`.
-        * The Redo button -> :meth:`_on_redo`.
-        * The type_select -> :meth:`_on_type_select_change` (refreshes
+        * Each component toolbox button -> ``on_toolbox_select``.
+        * The End Session button -> ``_end_session``.
+        * The Delete button -> ``_toggle_delete_mode``.
+        * The New Design button -> ``_on_new_design``.
+        * The browse_load_trigger -> ``_on_browse_load`` (tkinter open-file dialog).
+        * The browse_save_trigger -> ``_on_browse_save`` (tkinter save-file dialog).
+        * The Undo button -> ``_on_undo``.
+        * The Redo button -> ``_on_redo``.
+        * The type_select -> ``_on_type_select_change`` (refreshes
           position / options / symmetry choices as the user edits).
-        * The Apply button -> :meth:`apply_node_configurations` (commits the
+        * The Apply button -> ``apply_node_configurations`` (commits the
           config panel's current values to the selected node).
         * The source/target port-count spinners ->
-          :meth:`_on_port_count_spinner_change` (live visual preview only;
+          ``_on_port_count_spinner_change`` (live visual preview only;
           the new counts are committed on Apply, same as every other
           config-panel field).
         """
@@ -129,9 +121,6 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.state.browse_load_trigger.on_change("value", self._on_browse_load)
 
         self.state.browse_save_trigger.on_change("value", self._on_browse_save)
-
-        # Open a native OS file dialog to choose the watcher CSV path
-        self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
 
         self.state.end_session_save_trigger.on_change("value", self._on_end_session_save_trigger)
 

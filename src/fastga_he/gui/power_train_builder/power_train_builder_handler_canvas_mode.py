@@ -127,6 +127,7 @@ class CanvasModeMixin:
         self.state.selected_node_index = None
         self.state.selected_component = None
         self.state.delete_mode = False
+        self.state.watcher_file_path = ""
         self._clear_node_table()
 
         # Clear edit history: a new design has no prior edits.

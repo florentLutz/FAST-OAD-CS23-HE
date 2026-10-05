@@ -5,6 +5,15 @@
 """
 Save / load, end-session, and undo / redo logic.
 
+A design is saved as a single YAML file: the FAST-OAD powertrain
+configuration, plus (unless the user saves it as a final version) a GUI-only
+``canvas_layout`` section holding the canvas position of each component.
+Loading that YAML restores the canvas (see
+:class:`~.power_train_network_reader.PowerTrainYAMLReader`); without the
+section, the components are arranged automatically. JSON canvas
+backups written by older versions can still be loaded, but are no longer
+written.
+
 Mixin class :class:`IOMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
@@ -19,8 +28,17 @@ from typing import TYPE_CHECKING
 from tornado.ioloop import IOLoop
 
 from .power_train_network_writer import PowerTrainYAML
+from .power_train_network_reader import PowerTrainYAMLReader
 from .power_train_builder_history import make_snapshot
 from .power_train_builder_state import copy_column_data
+
+_YAML_SUFFIXES = (".yml", ".yaml")
+
+# Save-mode prefixes sent by the "final version?" overlay through
+# browse_save_trigger (value = "<mode>:<timestamp>"; see the toolbox).
+SAVE_MODE_FINAL = "final"
+SAVE_MODE_EDITABLE = "editable"
+SAVE_MODE_CANCEL = "cancel"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,8 +49,8 @@ if TYPE_CHECKING:
 
 class IOMixin:
     """
-    Handles serialisation (YAML + JSON), de-serialisation, session termination,
-    and snapshot-based undo / redo.
+    Handles YAML serialisation / de-serialisation (plus legacy JSON loading),
+    session termination, and snapshot-based undo / redo.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) being set by
     the concrete class before any method is called.
@@ -55,99 +73,101 @@ class IOMixin:
         self.state.save_button.button_type = "warning"
         self._refresh_undo_redo_buttons()
 
-    def _save_canvas_state(self, yaml_path: str = "", json_path: str = ""):
+    def _save_canvas_state(self, yaml_path: str = "", include_canvas_layout: bool = True) -> bool:
         """
-        Serialise the current canvas to the file paths chosen by the user.
+        Write the current canvas to *yaml_path*.
 
-        Used only by the ``prompt()`` fallback path where the browser cannot
-        write files directly and the user supplies a filesystem path manually.
-        Both parameters are optional – an empty string means that file is
-        skipped.
+        The file is the FAST-OAD powertrain configuration, plus a GUI-only
+        ``canvas_layout`` section when *include_canvas_layout* is ``True``, so
+        it is both the analysis input and the file to re-open for later edits.
+        The Save button only turns green when the write actually succeeds.
 
-        :param yaml_path: File name (or full path) for the YAML config.
-        :param json_path: File name (or full path) for the JSON backup.
+        :param yaml_path: File name (or full path) for the YAML config. An
+            empty string skips the save.
+        :param include_canvas_layout: ``False`` for a "final version" file
+            without the ``canvas_layout`` section.
+        :return: ``True`` if the file was written.
         """
+        if not yaml_path:
+            return False
+
         nodes_data = copy_column_data(self.state.placed_nodes_source.data)
         edges_data = copy_column_data(self.state.edge_source.data)
         source_port_data = copy_column_data(self.state.source_port_source.data)
         target_port_data = copy_column_data(self.state.target_port_source.data)
 
-        if yaml_path:
-            yaml_file = Path(yaml_path)
+        yaml_file = Path(yaml_path)
+        try:
             yaml_file.parent.mkdir(parents=True, exist_ok=True)
-            try:
-                pt_yaml = PowerTrainYAML(
-                    self.state,
-                    node_data=nodes_data,
-                    edge_data=edges_data,
-                    source_port_data=source_port_data,
-                    target_port_data=target_port_data,
-                )
-                pt_yaml.set_title(yaml_file.stem)
-                for node_index in range(len(nodes_data.get("name", []))):
-                    pt_yaml.add_component(node_index)
-                pt_yaml.add_connection()
-                # Apply watcher file path when the user supplied one in the overlay.
-                watcher_path = (
-                    self.state.watcher_path_input.value.strip()
-                    if self.state.watcher_path_input is not None
-                    else ""
-                )
-                if watcher_path:
-                    pt_yaml.set_watcher_file_path(watcher_path)
-                pt_yaml.write(str(yaml_file))
-                _LOGGER.info("Powertrain YAML config saved to %s", yaml_file)
-            except Exception:
-                _LOGGER.exception("Failed to write YAML config to %s.", yaml_file)
+            pt_yaml = PowerTrainYAML(
+                self.state,
+                node_data=nodes_data,
+                edge_data=edges_data,
+                source_port_data=source_port_data,
+                target_port_data=target_port_data,
+                include_canvas_layout=include_canvas_layout,
+            )
+            pt_yaml.set_title(yaml_file.stem)
+            for node_index in range(len(nodes_data.get("name", []))):
+                pt_yaml.add_component(node_index)
+            pt_yaml.add_connection()
+            # Carry over a watcher_file_path that came from a loaded YAML, if any.
+            if self.state.watcher_file_path:
+                pt_yaml.set_watcher_file_path(self.state.watcher_file_path)
+            pt_yaml.write(str(yaml_file))
+        except Exception:
+            _LOGGER.exception("Failed to write YAML config to %s.", yaml_file)
+            return False
 
-        if json_path:
-            json_file = Path(json_path)
-            json_file.parent.mkdir(parents=True, exist_ok=True)
-            canvas_state = {
-                "components": nodes_data,
-                "connections": edges_data,
-                "source_ports": source_port_data,
-                "target_ports": target_port_data,
-            }
-            with open(json_file, "w") as f:
-                json.dump(canvas_state, f, indent=2)
-            _LOGGER.info("Canvas state (JSON backup) saved to %s", json_file)
-
+        _LOGGER.info(
+            "Powertrain YAML config saved to %s (%s).",
+            yaml_file,
+            "with canvas layout" if include_canvas_layout else "final version, no canvas layout",
+        )
         self.state.save_button.button_type = "success"
+        return True
 
-    def _load_canvas_state(self, json_path: str):
+    def _load_canvas_state(self, file_path: str):
         """
-        Restore the canvas from a JSON canvas-state backup file.
+        Restore the canvas from a saved design.
 
-        Used only by the ``prompt()`` fallback where the user types a
-        filesystem path manually.
+        ``.yml`` / ``.yaml`` files are read with
+        :class:`~.power_train_network_reader.PowerTrainYAMLReader`; any other
+        extension is treated as a legacy JSON canvas backup.
 
-        :param json_path: Path to the JSON file written by a previous save.
+        :param file_path: Path to the file chosen by the user.
         """
-        json_file = Path(json_path)
-        if not json_file.exists():
-            _LOGGER.error("Load failed – file not found: %s", json_file)
+        input_file = Path(file_path)
+        if not input_file.exists():
+            _LOGGER.error("Load failed – file not found: %s", input_file)
             return
 
         try:
-            with open(json_file) as f:
-                canvas_state = json.load(f)
+            if input_file.suffix.lower() in _YAML_SUFFIXES:
+                canvas_state = PowerTrainYAMLReader(self.state, self.icon_size).read(input_file)
+            else:
+                with open(input_file, encoding="utf-8") as f:
+                    canvas_state = json.load(f)
         except Exception:
-            _LOGGER.exception("Load failed – could not parse JSON from %s", json_file)
+            _LOGGER.exception("Load failed – could not parse %s", input_file)
             return
 
-        _LOGGER.info("Loading canvas state from file: %s", json_file)
+        _LOGGER.info("Loading canvas state from file: %s", input_file)
         self._restore_canvas_from_dict(canvas_state)
 
     def _restore_canvas_from_dict(self, canvas_state: dict):
         """
-        Shared canvas-restoration logic used by both load paths.
+        Shared canvas-restoration logic used by both load paths (YAML and
+        legacy JSON).
 
-        Clears the current canvas entirely, then replays every node, edge, and
-        port that was serialised by a previous save.
+        Clears the current canvas entirely, then replays every node and edge.
+        Port balls (and edge coordinates) are always recomputed from the nodes
+        by ``_rebuild_all_ports``, so they do not need to be in the file.
 
-        :param canvas_state: Parsed canvas-state dict with keys ``"components"``,
-            ``"connections"``, ``"source_ports"``, and ``"target_ports"``.
+        :param canvas_state: Dict with keys ``"components"`` (node columns) and
+            ``"connections"`` (edge columns), plus an optional
+            ``"watcher_file_path"`` (YAML only). Port keys found in legacy JSON
+            backups are ignored.
         """
         # Since the toolbox buttons are still active while loading, reset is required
         self.state.selected_node_index = None
@@ -158,11 +178,9 @@ class IOMixin:
         self._clear_node_table()
         self._clear_temp_edges()
 
-        # Read from canvas_state extract from JSON, defaulting to empty dicts if keys are missing
+        # Defaulting to empty dicts if keys are missing
         nodes_data = canvas_state.get("components", {})
         edges_data = canvas_state.get("connections", {})
-        source_data = canvas_state.get("source_ports", {})
-        target_data = canvas_state.get("target_ports", {})
 
         # Ensure every expected column exists (forward-compatibility with older saves)
         _node_defaults = {
@@ -187,8 +205,6 @@ class IOMixin:
         # Fill the data sources with the loaded data
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
         self.state.edge_source.data = copy_column_data(edges_data)
-        self.state.source_port_source.data = copy_column_data(source_data)
-        self.state.target_port_source.data = copy_column_data(target_data)
 
         self.state.hover_source.data = {
             "x": list(nodes_data.get("x", [])),
@@ -196,6 +212,9 @@ class IOMixin:
             "name": list(nodes_data.get("name", [])),
             "node_type": list(nodes_data.get("node_type", [])),
         }
+
+        # Remember the YAML's watcher_file_path (if any) so a re-save keeps it.
+        self.state.watcher_file_path = str(canvas_state.get("watcher_file_path") or "")
 
         # Rebuild placed_counter so future placements continue from the right index
         for name in nodes_data.get("name", []):
@@ -206,9 +225,9 @@ class IOMixin:
                     self.state.placed_counter.get(key, 0), int(parts[1])
                 )
 
-        # Redraw the canvas elements based on the restored data sources
+        # Redraw ports from the restored nodes; this also recomputes every
+        # edge's xs / ys and drops edges pointing at non-existent ports.
         self._rebuild_all_ports()
-        self._rebuild_edges()
 
         self.state.save_button.button_type = "success"
 
@@ -220,20 +239,25 @@ class IOMixin:
 
     def _on_browse_load(self, attr, old, new):
         """
-        Open a native OS open-file dialog (tkinter) for loading a JSON canvas
-        backup, then restore the canvas from the chosen file.
+        Open a native OS open-file dialog (tkinter) for loading a saved
+        powertrain YAML (or a legacy JSON canvas backup), then restore the
+        canvas from the chosen file.
 
         Triggered by the hidden ``browse_load_trigger`` TextInput toggling.
         """
         path = self._open_tkinter_dialog(
             filedialog.askopenfilename,
-            title="Load canvas state",
-            filetypes=[("JSON canvas backup", "*.json"), ("All files", "*.*")],
+            title="Load powertrain design",
+            filetypes=[
+                ("Powertrain YAML", "*.yml *.yaml"),
+                ("Legacy JSON canvas backup", "*.json"),
+                ("All files", "*.*"),
+            ],
         )
         if not path:
             return
         self._dismiss_startup_overlay()
-        self._load_canvas_state(json_path=path)
+        self._load_canvas_state(path)
 
     @staticmethod
     def _open_tkinter_dialog(func, **kwargs):
@@ -253,23 +277,6 @@ class IOMixin:
         finally:
             root.destroy()
         return result or ""
-
-    def _on_browse_watcher(self, attr, old, new):
-        """
-        Open a native OS save-file dialog (tkinter) to choose the watcher CSV
-        path and write it back into ``state.watcher_path_input``.
-
-        Triggered by the hidden ``browse_watcher_trigger`` TextInput toggling.
-        """
-        path = self._open_tkinter_dialog(
-            filedialog.asksaveasfilename,
-            title="Choose watcher CSV file",
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
-        )
-        if path and self.state.watcher_path_input is not None:
-            self.state.watcher_path_input.value = path
-            _LOGGER.info("Watcher CSV path set to: %s", path)
 
     # -----------------------------------------------------------------------
     # Undo / redo
@@ -445,8 +452,8 @@ class IOMixin:
         Triggered by the ``end_session_save_trigger`` TextInput when the user
         clicks **Save & Exit** in the unsaved-exit overlay.
 
-        The JS side has already opened the watcher-path overlay for the user
-        to fill in; once they click **Continue to Save** the
+        The JS side has already opened the "final version?" overlay; once the
+        user picks **Final Version** or **Edit Later**, the
         ``browse_save_trigger`` fires ``_on_browse_save``.  We simply set an
         internal flag here so that ``_on_browse_save`` knows it should call
         ``_end_session`` after saving.
@@ -456,33 +463,54 @@ class IOMixin:
 
     def _on_browse_save(self, attr, old, new):
         """
-        Open native OS save-file dialogs (tkinter) for the YAML config and JSON
-        backup, then write both files.  The watcher file path is read from
-        ``state.watcher_path_input`` which the user filled in the overlay.
+        Open a native OS save-file dialog (tkinter) for the YAML config, then
+        write it.
+
+        Fired by the "final version?" overlay, which sets the trigger to
+        ``"<mode>:<timestamp>"`` (the timestamp guarantees a value change on
+        every click; the mode travels in the same change, so it cannot be read
+        out of order):
+
+        * ``"final"`` -> FAST-OAD configuration only, no ``canvas_layout``.
+        * ``"editable"`` (or any other value, e.g. a legacy ``"0"`` / ``"1"``
+          toggle) -> configuration + ``canvas_layout`` for later edits.
+        * ``"cancel"`` -> no dialog, nothing saved; also aborts a pending
+          Save & Exit so a later ordinary save does not close the session.
 
         If ``_pending_exit_after_save`` is ``True`` (set by
         ``_on_end_session_save_trigger``), the session is ended automatically
-        after a successful save.
+        after a successful save. If the dialog is cancelled or the write
+        fails, the session stays open so no work is lost.
 
         Triggered by the hidden ``browse_save_trigger`` TextInput toggling.
         """
+        save_mode = str(new).split(":", 1)[0]
+        if save_mode == SAVE_MODE_CANCEL:
+            if getattr(self, "_pending_exit_after_save", False):
+                _LOGGER.info("Save & Exit cancelled – keeping the session open.")
+            self._pending_exit_after_save = False
+            return
+
+        include_canvas_layout = save_mode != SAVE_MODE_FINAL
         yaml_path = self._open_tkinter_dialog(
             filedialog.asksaveasfilename,
-            title="Save YAML powertrain config",
+            title=(
+                "Save powertrain design (YAML, editable)"
+                if include_canvas_layout
+                else "Save powertrain design (YAML, final version)"
+            ),
             defaultextension=".yml",
             filetypes=[("YAML files", "*.yml *.yaml"), ("All files", "*.*")],
         )
-        json_path = self._open_tkinter_dialog(
-            filedialog.asksaveasfilename,
-            title="Save JSON canvas backup",
-            defaultextension=".json",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+        saved = self._save_canvas_state(
+            yaml_path=yaml_path, include_canvas_layout=include_canvas_layout
         )
-        if yaml_path or json_path:
-            self._save_canvas_state(yaml_path=yaml_path, json_path=json_path)
 
         if getattr(self, "_pending_exit_after_save", False):
             self._pending_exit_after_save = False
+            if not saved:
+                _LOGGER.info("Save & Exit: nothing was saved – keeping the session open.")
+                return
             _LOGGER.info("Save & Exit: save complete – signalling browser then ending session.")
             # Flip close_window_trigger BEFORE stopping the IOLoop so Bokeh can
             # push the value change to the browser (which fires window.close() via
