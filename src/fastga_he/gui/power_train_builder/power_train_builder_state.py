@@ -34,6 +34,17 @@ ICON_SIZE = 45
 PORT_RADIUS = 8  # Radius of each port ball in data-units (approximately pixels).
 NODE_RADIUS = ICON_SIZE / 2  # Half icon size used as the orbit base.
 
+# Node icon size (canvas data units) and the range offered by the size slider
+# in the toolbox header. Everything drawn around a node (hover ring, selection
+# ring, name label, port orbit) scales by  current_size / DEFAULT_NODE_ICON_SIZE.
+DEFAULT_NODE_ICON_SIZE = 50
+NODE_ICON_SIZE_MIN = 20
+NODE_ICON_SIZE_MAX = 80
+# Screen-pixel sizes of the rings / label offset at the default icon size.
+HOVER_RING_BASE_SIZE = ICON_SIZE + 10
+SELECTION_RING_BASE_SIZE = ICON_SIZE + 14
+NODE_LABEL_BASE_OFFSET = -ICON_SIZE // 2 - 2
+
 # Button appearance
 BUTTON_DEFAULT_COLOR_TYPE = "light"  # Unselected button state.
 BUTTON_SELECTED_COLOR_TYPE = "primary"  # Selected button state (blue highlight).
@@ -111,6 +122,14 @@ class BuilderState:
     save_button: bkmodel.Button = field(default=None)
     end_session_button: bkmodel.Button = field(default=None)
     status_div: bkmodel.Div = field(default=None)
+    # Slider next to the "Components" title that resizes every node icon
+    # (see PlacementMixin._on_node_size_slider_change).
+    node_size_slider: bkmodel.Slider = field(default=None)
+    # Canvas renderers / annotation resized together with the icons; set by
+    # the launcher once the canvas is built (None in headless use / tests).
+    hover_ring_renderer: object = field(default=None)
+    selection_ring_renderer: object = field(default=None)
+    node_label_set: object = field(default=None)
 
     # ── Canvas node data ─────────────────────────────────────────────────────
     # One row per placed component: position, icon URL, type, options JSON,

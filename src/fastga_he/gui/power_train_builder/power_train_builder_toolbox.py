@@ -37,6 +37,9 @@ from .power_train_builder_state import (
     PALETTE_WIDTH,
     ROW_HEIGHT,
     BUTTON_DEFAULT_COLOR_TYPE,
+    DEFAULT_NODE_ICON_SIZE,
+    NODE_ICON_SIZE_MAX,
+    NODE_ICON_SIZE_MIN,
     _EMPTY,
 )
 from .power_train_builder_metadata import (
@@ -134,10 +137,29 @@ class ComponentToolboxConfigurationTableBuilder:
         _action_stylesheet = [":host button { font-size: 1.4em; }"]
 
         # ── Palette buttons (one per icon, kept in ICONS_CONFIG order) ────────
+        # Header row: "Components" title + node-size slider. Both widths add up to
+        # PALETTE_WIDTH so the row never grows wider than the left panel.
+        _title_width = 140
         title_div = bkmodel.Div(
             text="<b style='color:white;font-size:16pt'>Components</b>",
-            width=PALETTE_WIDTH,
+            width=_title_width,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
+        )
+        node_size_slider = bkmodel.Slider(
+            title=f"Icon size (default {DEFAULT_NODE_ICON_SIZE})",
+            start=NODE_ICON_SIZE_MIN,
+            end=NODE_ICON_SIZE_MAX,
+            step=1,
+            value=DEFAULT_NODE_ICON_SIZE,
+            width=PALETTE_WIDTH - _title_width - 20,
+            styles={"color": "white"},
+            stylesheets=[":host .bk-slider-title { color: white; font-size: 10pt; }"],
+        )
+        toolbox_header = row(
+            title_div,
+            node_size_slider,
+            width=PALETTE_WIDTH,
+            styles={"background": BACKGROUND_COLOR_CODE},
         )
 
         _btn_stylesheet = [
@@ -688,6 +710,7 @@ class ComponentToolboxConfigurationTableBuilder:
             buttons=buttons,
             placed_nodes_source=placed_nodes_source,
             status_div=status_div,
+            node_size_slider=node_size_slider,
             delete_button=delete_button,
             save_button=save_button,
             end_session_button=end_session_button,
@@ -749,7 +772,7 @@ class ComponentToolboxConfigurationTableBuilder:
         tabs = bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
 
         toolbox_layout = column(
-            title_div,
+            toolbox_header,
             tabs,
             status_div,
             delete_button,

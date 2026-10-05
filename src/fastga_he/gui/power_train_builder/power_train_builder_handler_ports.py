@@ -15,9 +15,17 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
-from .power_train_builder_state import NODE_RADIUS, PORT_RADIUS, copy_column_data
+from .power_train_builder_state import (
+    DEFAULT_NODE_ICON_SIZE,
+    NODE_RADIUS,
+    PORT_RADIUS,
+    copy_column_data,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+# Clearance between the icon edge and each port centre at the default icon size.
+_PORT_GAP = 20.0
 
 
 # For IDE type-checking only
@@ -492,6 +500,11 @@ class PortEdgeMixin:
                 self.state.edge_preview_backup = None
 
         selected_node_fill_alpha, selected_node_line_alpha = 0.3, 0.5
+        # Port positions scale with the icon-size slider: every term of the
+        # orbit radius (icon radius + port radius + gap) is multiplied by
+        # factor = icon_size / DEFAULT_NODE_ICON_SIZE, so each port sits at
+        # exactly `factor` times its default offset from the node centre.
+        size_factor = self.icon_size / DEFAULT_NODE_ICON_SIZE
 
         placed_nodes_data = self.state.placed_nodes_source.data
         xs = list(placed_nodes_data.get("x", []))
@@ -553,7 +566,15 @@ class PortEdgeMixin:
             raw_source_color = cfg.get("source_color") or DEFAULT_COLOR
             raw_target_color = cfg.get("target_color") or DEFAULT_COLOR
 
-            ports = self.compute_ports(cx, cy, NODE_RADIUS, PORT_RADIUS, n_source, n_target)
+            ports = self.compute_ports(
+                cx,
+                cy,
+                NODE_RADIUS * size_factor,
+                PORT_RADIUS * size_factor,
+                n_source,
+                n_target,
+                gap_pixels=_PORT_GAP * size_factor,
+            )
             is_selected = has_selected_node and i == selected_node_index
             fill_alpha = selected_node_fill_alpha if is_selected else 0.0
             line_alpha = selected_node_line_alpha if is_selected else 0.0
@@ -634,7 +655,7 @@ class PortEdgeMixin:
         number_of_outputs: int = 0,
         number_of_inputs: int = 0,
         spread_angle_degrees: float = 120.0,
-        gap_pixels: float = 20.0,
+        gap_pixels: float = 20.0,  # = _PORT_GAP
     ) -> dict:
         """
         Place port balls evenly around the component node placed on canvas.

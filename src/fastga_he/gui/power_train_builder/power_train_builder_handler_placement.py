@@ -3,7 +3,7 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 """
-Node-placement logic for the powertrain builder.
+Node-placement and node-size logic for the powertrain builder.
 
 This is the module that actually creates a new component on the canvas:
 computing its default type / position / options / port counts, building the
@@ -21,7 +21,15 @@ from typing import TYPE_CHECKING
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base64
 
-from .power_train_builder_state import _EMPTY, _NO_SYMMETRY_PEER
+from .power_train_builder_state import (
+    DEFAULT_NODE_ICON_SIZE,
+    HOVER_RING_BASE_SIZE,
+    NODE_LABEL_BASE_OFFSET,
+    SELECTION_RING_BASE_SIZE,
+    _EMPTY,
+    _NO_SYMMETRY_PEER,
+    copy_column_data,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -136,3 +144,67 @@ class PlacementMixin:
             x,
             y,
         )
+
+    # -----------------------------------------------------------------------
+    # Node icon size (toolbox slider)
+    # -----------------------------------------------------------------------
+
+    def _on_node_size_slider_change(self, attr, old, new):
+        """
+        Bokeh ``on_change`` callback of the icon-size slider.
+
+        Sets the size used for every node (existing and future placements) and
+        rescales everything drawn around a node by ``new / DEFAULT_NODE_ICON_SIZE``.
+        This is a display setting only: it is not an undoable edit and does not
+        mark the design as unsaved.
+
+        :param attr: Bokeh attribute name (unused, required by protocol).
+        :param old: Previous slider value (unused).
+        :param new: New icon size in canvas data units.
+        """
+        self.icon_size = int(new)
+        self._apply_node_icon_size()
+        # Port orbits depend on the icon size; this also re-routes the edges.
+        self._rebuild_all_ports()
+        if self.state.selected_node_index is not None:
+            self._refresh_connections_table(self.state.selected_node_index)
+
+    def _apply_node_icon_size(self):
+        """
+        Push the current ``self.icon_size`` to the canvas.
+
+        * Icons: ``w`` / ``h`` of every placed node = ``icon_size``.
+        * Hover ring, selection ring and name-label offset: base size x factor,
+          with ``factor = icon_size / DEFAULT_NODE_ICON_SIZE``.
+
+        Also called after undo / redo and loading, whose node data may carry
+        icon sizes from before the slider moved. Does not rebuild ports.
+        """
+        size = self.icon_size
+        factor = size / DEFAULT_NODE_ICON_SIZE
+
+        nodes_data = self.state.placed_nodes_source.data
+        node_count = len(nodes_data.get("x", []))
+        if node_count and (
+            list(nodes_data.get("w", [])) != [size] * node_count
+            or list(nodes_data.get("h", [])) != [size] * node_count
+        ):
+            new_nodes_data = copy_column_data(nodes_data)
+            new_nodes_data["w"] = [size] * node_count
+            new_nodes_data["h"] = [size] * node_count
+            self.state.placed_nodes_source.data = new_nodes_data
+
+        for renderer, base_size in (
+            (self.state.hover_ring_renderer, HOVER_RING_BASE_SIZE),
+            (self.state.selection_ring_renderer, SELECTION_RING_BASE_SIZE),
+        ):
+            if renderer is None:
+                continue
+            renderer.glyph.size = base_size * factor
+            # The hover ring has an explicit hover_glyph copy that must follow.
+            hover_glyph = getattr(renderer, "hover_glyph", None)
+            if hover_glyph is not None and hasattr(hover_glyph, "size"):
+                hover_glyph.size = base_size * factor
+
+        if self.state.node_label_set is not None:
+            self.state.node_label_set.y_offset = NODE_LABEL_BASE_OFFSET * factor

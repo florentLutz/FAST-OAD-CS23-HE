@@ -36,7 +36,7 @@ Typical usage::
 
 import logging
 
-from .power_train_builder_state import BuilderState, copy_column_data
+from .power_train_builder_state import BuilderState, DEFAULT_NODE_ICON_SIZE, copy_column_data
 from .power_train_builder_history import EditHistoryStack
 from .power_train_builder_handler_canvas_mode import CanvasModeMixin
 from .power_train_builder_handler_placement import PlacementMixin
@@ -58,13 +58,14 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
     shared :class:`BuilderState` instance passed at construction time.
     """
 
-    def __init__(self, state: BuilderState, main_plot, icon_size: int = 50):
+    def __init__(self, state: BuilderState, main_plot, icon_size: int = DEFAULT_NODE_ICON_SIZE):
         """
         Initialise the handler, set up the undo stack, and wire all button callbacks.
 
         :param state: Shared :class:`BuilderState` instance.
         :param main_plot: The Bokeh ``figure`` that acts as the placement canvas.
-        :param icon_size: Pixel size (width = height) used for placed icons.
+        :param icon_size: Initial size (width = height, canvas data units) of
+            placed icons; changed afterwards with the icon-size slider.
         """
         self.state = state
         self.main_plot = main_plot
@@ -95,6 +96,8 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         * The New Design button -> ``_on_new_design``.
         * The browse_load_trigger -> ``_on_browse_load`` (tkinter open-file dialog).
         * The browse_save_trigger -> ``_on_browse_save`` (tkinter save-file dialog).
+        * The icon-size slider -> ``_on_node_size_slider_change`` (rescales
+          icons, hover / selection rings, labels and port orbits).
         * The Undo button -> ``_on_undo``.
         * The Redo button -> ``_on_redo``.
         * The type_select -> ``_on_type_select_change`` (refreshes
@@ -123,6 +126,11 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.state.browse_save_trigger.on_change("value", self._on_browse_save)
 
         self.state.end_session_save_trigger.on_change("value", self._on_end_session_save_trigger)
+
+        # Icon-size slider in the toolbox header.
+        if self.state.node_size_slider is not None:
+            self.state.node_size_slider.value = self.icon_size
+            self.state.node_size_slider.on_change("value", self._on_node_size_slider_change)
 
         # Undo / redo buttons (created by the launcher and stored in state)
         self.state.undo_button.on_click(self._on_undo)

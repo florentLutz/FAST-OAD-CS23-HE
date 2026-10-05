@@ -36,8 +36,11 @@ from fastga_he.gui.power_train_network_viewer import (
 )
 
 from .power_train_builder_state import (
-    ICON_SIZE,
+    DEFAULT_NODE_ICON_SIZE,
+    HOVER_RING_BASE_SIZE,
+    NODE_LABEL_BASE_OFFSET,
     NODE_SELECT_COLOR,
+    SELECTION_RING_BASE_SIZE,
     PALETTE_WIDTH,
     PORT_RADIUS,
 )
@@ -52,12 +55,18 @@ _LOGGER = logging.getLogger(__name__)
 # Each row: icon anchored at (x_icon, y), label left-aligned at x_label
 # and drawn in the edge color of that connection type.
 #
-# All coordinates are in canvas data space (x_range 0–800, y_range 0–950).
+# Coordinates below are given in canvas data space at the *initial* view
+# (x_range 0–800, y_range 0–950). The legend is pinned to that screen spot:
+# whenever the view is panned / zoomed / reset, _JS_PIN_LEGEND re-maps these
+# positions into the new ranges, so the legend never moves or resizes.
 _LEGEND_ENTRIES = [
     ("fuel", "Fuel Flow", FUEL_FLOW_COLOR_CODE),
     ("mechanical", "Mechanical Power", MECHANICAL_POWER_COLOR_CODE),
     ("electricity", "Electrical Current", ELECTRICITY_CURRENT_COLOR_CODE),
 ]
+
+_CANVAS_X_RANGE = (0, 800)
+_CANVAS_Y_RANGE = (0, 950)
 
 _LEGEND_X_ICON = 680  # center-x of the PNG icon
 _LEGEND_X_LABEL = 691  # left edge of the text label (icon_center + ~11)
@@ -66,10 +75,36 @@ _LEGEND_ROW_STEP = 22  # vertical spacing between rows
 _LEGEND_ICON_W = 9  # icon width  in data units (matches viewer)
 _LEGEND_ICON_H = 12  # icon height in data units (matches viewer)
 
+# Client-side only (no server round-trip). Converts the legend's initial
+# data-space layout to fractions of the initial view, then places it at the
+# same fractions of the current view; icon w/h scale with the view span so
+# they keep their on-screen size. Labels are canvas text, so their size is
+# already fixed on screen. Only the two legend sources are touched.
+_JS_PIN_LEGEND = """
+const x0 = x_range.start, xspan = x_range.end - x_range.start;
+const y0 = y_range.start, yspan = y_range.end - y_range.start;
+const fx = (v) => x0 + (v - base.x_start) / base.x_span * xspan;
+const fy = (v) => y0 + (v - base.y_start) / base.y_span * yspan;
+
+icon_source.data = {
+    url: icon_source.data.url,
+    x: base.icon_x.map(fx),
+    y: base.row_y.map(fy),
+    w: base.icon_x.map(() => base.icon_w * xspan / base.x_span),
+    h: base.icon_x.map(() => base.icon_h * yspan / base.y_span),
+};
+label_source.data = {
+    text: label_source.data.text,
+    color: label_source.data.color,
+    x: base.row_y.map(() => fx(base.label_x)),
+    y: base.row_y.map(fy),
+};
+"""
+
 
 def _add_canvas_legend(canvas) -> None:
     """
-    Draw a static three-entry connection-type legend in the upper-right corner
+    Draw a three-entry connection-type legend in the upper-right corner
     of the builder canvas, mirroring the layout of the network viewer's
     :meth:`LegendBuilder._add_legend`.
 
@@ -77,38 +112,80 @@ def _add_canvas_legend(canvas) -> None:
     electricity) on the left — loaded via :func:`_url_to_base64` — and a
     text label drawn in the edge colour of that connection type on the right.
 
+    The legend is pinned to the screen: panning, zooming and resetting the
+    canvas move the components but not the legend (see ``_JS_PIN_LEGEND``).
+    Bokeh's image glyph only accepts data coordinates, so the pinning is done
+    by re-mapping the legend's coordinates in the browser on every range change.
+
     :param canvas: The Bokeh ``Figure`` to annotate.
     """
-    for entry_index, (icon_key, description, edge_color) in enumerate(_LEGEND_ENTRIES):
-        entry_y = _LEGEND_Y_TOP - entry_index * _LEGEND_ROW_STEP
+    row_y = [
+        _LEGEND_Y_TOP - entry_index * _LEGEND_ROW_STEP
+        for entry_index in range(len(_LEGEND_ENTRIES))
+    ]
+    icon_urls = [
+        _url_to_base64("file://" + str(COLOR_ICON_CONFIG[icon_key].resolve()))
+        for icon_key, _, _ in _LEGEND_ENTRIES
+    ]
 
-        # ── PNG icon (left) ───────────────────────────────────────────────────
-        icon_file_path = COLOR_ICON_CONFIG[icon_key]
-        icon_base64_url = _url_to_base64("file://" + str(icon_file_path.resolve()))
-        canvas.image_url(
-            url=[icon_base64_url],
-            x=[_LEGEND_X_ICON],
-            y=[entry_y],
-            w=_LEGEND_ICON_W,
-            h=_LEGEND_ICON_H,
-            anchor="center",
+    # ── PNG icons (left) ──────────────────────────────────────────────────────
+    icon_source = bkmodel.ColumnDataSource(
+        data=dict(
+            url=icon_urls,
+            x=[_LEGEND_X_ICON] * len(row_y),
+            y=row_y,
+            w=[_LEGEND_ICON_W] * len(row_y),
+            h=[_LEGEND_ICON_H] * len(row_y),
         )
+    )
+    canvas.image_url(url="url", x="x", y="y", w="w", h="h", anchor="center", source=icon_source)
 
-        # ── Colored text label (right) ────────────────────────────────────────
-        canvas.add_layout(
-            bkmodel.LabelSet(
-                x="x",
-                y="y",
-                text="text",
-                source=bkmodel.ColumnDataSource(
-                    data=dict(x=[_LEGEND_X_LABEL], y=[entry_y], text=[description])
-                ),
-                text_align="left",
-                text_baseline="middle",
-                text_color=edge_color,
-                text_font_size="9pt",
-            )
+    # ── Colored text labels (right) ───────────────────────────────────────────
+    label_source = bkmodel.ColumnDataSource(
+        data=dict(
+            x=[_LEGEND_X_LABEL] * len(row_y),
+            y=row_y,
+            text=[description for _, description, _ in _LEGEND_ENTRIES],
+            color=[edge_color for _, _, edge_color in _LEGEND_ENTRIES],
         )
+    )
+    canvas.add_layout(
+        bkmodel.LabelSet(
+            x="x",
+            y="y",
+            text="text",
+            source=label_source,
+            text_align="left",
+            text_baseline="middle",
+            text_color="color",
+            text_font_size="9pt",
+        )
+    )
+
+    # ── Pin to the screen ─────────────────────────────────────────────────────
+    pin_legend = bkmodel.CustomJS(
+        args=dict(
+            x_range=canvas.x_range,
+            y_range=canvas.y_range,
+            icon_source=icon_source,
+            label_source=label_source,
+            base=dict(
+                x_start=_CANVAS_X_RANGE[0],
+                x_span=_CANVAS_X_RANGE[1] - _CANVAS_X_RANGE[0],
+                y_start=_CANVAS_Y_RANGE[0],
+                y_span=_CANVAS_Y_RANGE[1] - _CANVAS_Y_RANGE[0],
+                icon_x=[_LEGEND_X_ICON] * len(row_y),
+                label_x=_LEGEND_X_LABEL,
+                row_y=row_y,
+                icon_w=_LEGEND_ICON_W,
+                icon_h=_LEGEND_ICON_H,
+            ),
+        ),
+        code=_JS_PIN_LEGEND,
+    )
+    for canvas_range in (canvas.x_range, canvas.y_range):
+        canvas_range.js_on_change("start", pin_legend)
+        canvas_range.js_on_change("end", pin_legend)
 
 
 class PowertrainBuilderLauncher:
@@ -188,8 +265,8 @@ class PowertrainBuilderLauncher:
             canvas = bkplot.figure(
                 width=800,
                 height=950,
-                x_range=(0, 800),
-                y_range=(0, 950),
+                x_range=_CANVAS_X_RANGE,
+                y_range=_CANVAS_Y_RANGE,
                 toolbar_location="above",
                 background_fill_color=BACKGROUND_COLOR_CODE,
                 title="Powertrain Builder – click to place components",
@@ -222,11 +299,11 @@ class PowertrainBuilderLauncher:
                 line_dash="dashed",
                 source=state.panel_preview_edge_source,
             )
-            # Gold ring around the currently selected node
-            canvas.scatter(
+            # Gold ring around the currently selected node (resized by the icon-size slider)
+            state.selection_ring_renderer = canvas.scatter(
                 x="x",
                 y="y",
-                size=ICON_SIZE + 14,
+                size=SELECTION_RING_BASE_SIZE,
                 source=state.selected_node_overlay_source,
                 fill_color=NODE_SELECT_COLOR,
                 fill_alpha=0.3,
@@ -261,7 +338,7 @@ class PowertrainBuilderLauncher:
             scatter_glyph = canvas.scatter(
                 x="x",
                 y="y",
-                size=ICON_SIZE + 10,
+                size=HOVER_RING_BASE_SIZE,
                 source=state.hover_source,
                 fill_alpha=0,
                 line_alpha=0,
@@ -369,19 +446,18 @@ class PowertrainBuilderLauncher:
 
             # ── Node-name labels ──────────────────────────────────────────────
             placed_label_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], text=[]))
-            canvas.add_layout(
-                bkmodel.LabelSet(
-                    x="x",
-                    y="y",
-                    text="text",
-                    source=placed_label_source,
-                    text_color="white",
-                    text_font_size="8pt",
-                    text_align="center",
-                    text_baseline="top",
-                    y_offset=-ICON_SIZE // 2 - 2,
-                )
+            state.node_label_set = bkmodel.LabelSet(
+                x="x",
+                y="y",
+                text="text",
+                source=placed_label_source,
+                text_color="white",
+                text_font_size="8pt",
+                text_align="center",
+                text_baseline="top",
+                y_offset=NODE_LABEL_BASE_OFFSET,
             )
+            canvas.add_layout(state.node_label_set)
 
             def _sync_labels(attr, old, new_data):
                 placed_label_source.data = dict(
@@ -392,10 +468,13 @@ class PowertrainBuilderLauncher:
 
             state.placed_nodes_source.on_change("data", _sync_labels)
 
+            # Hover ring, resized together with the icons by the icon-size slider.
+            state.hover_ring_renderer = scatter_glyph
+
             # ── Wire canvas interaction ───────────────────────────────────────
             # Also wires the type_select live-refresh callback and the Apply
             # button (config panel commit) — see BuilderHandler._wire_buttons.
-            handler = BuilderHandler(state, canvas)
+            handler = BuilderHandler(state, canvas, icon_size=DEFAULT_NODE_ICON_SIZE)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
             # ── Startup overlay ───────────────────────────────────────────────

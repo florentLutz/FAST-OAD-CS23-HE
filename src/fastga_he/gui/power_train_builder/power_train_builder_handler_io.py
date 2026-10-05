@@ -225,6 +225,9 @@ class IOMixin:
                     self.state.placed_counter.get(key, 0), int(parts[1])
                 )
 
+        # Show restored nodes at the slider's current size (legacy JSON stores w/h).
+        self._apply_node_icon_size()
+
         # Redraw ports from the restored nodes; this also recomputes every
         # edge's xs / ys and drops edges pointing at non-existent ports.
         self._rebuild_all_ports()
@@ -333,6 +336,9 @@ class IOMixin:
         self.state.placed_counter.clear()
         self.state.placed_counter.update(snapshot.get("placed_counter", {}))
 
+        # The icon size is a display setting, not part of the undo history:
+        # keep the slider's current size even if the snapshot predates it.
+        self._apply_node_icon_size()
         self._rebuild_all_ports()
 
         _LOGGER.info(
