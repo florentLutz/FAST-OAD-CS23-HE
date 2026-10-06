@@ -18,6 +18,7 @@ Mixin class :class:`IOMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
+import html
 import json
 import logging
 from pathlib import Path
@@ -27,18 +28,17 @@ from typing import TYPE_CHECKING
 
 from tornado.ioloop import IOLoop
 
-from .power_train_network_writer import PowerTrainYAML
+from .power_train_network_writer import PowerTrainYAMLWriter
 from .power_train_network_reader import PowerTrainYAMLReader
 from .power_train_builder_history import make_snapshot
-from .power_train_builder_state import copy_column_data
+from .power_train_builder_state import (
+    NODE_COLUMNS,
+    SAVE_MODE_CANCEL,
+    SAVE_MODE_FINAL,
+    copy_column_data,
+)
 
 _YAML_SUFFIXES = (".yml", ".yaml")
-
-# Save-mode prefixes sent by the "final version?" overlay through
-# browse_save_trigger (value = "<mode>:<timestamp>"; see the toolbox)
-SAVE_MODE_FINAL = "final"
-SAVE_MODE_EDITABLE = "editable"
-SAVE_MODE_CANCEL = "cancel"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -99,7 +99,7 @@ class IOMixin:
         yaml_file = Path(yaml_path)
         try:
             yaml_file.parent.mkdir(parents=True, exist_ok=True)
-            pt_yaml = PowerTrainYAML(
+            pt_yaml = PowerTrainYAMLWriter(
                 self.state,
                 node_data=nodes_data,
                 edge_data=edges_data,
@@ -117,6 +117,7 @@ class IOMixin:
             pt_yaml.write(str(yaml_file))
         except Exception:
             _LOGGER.exception("Failed to write YAML config to %s.", yaml_file)
+            self._show_status_error(f"Could not save {yaml_file.name}; see the log for details.")
             return False
 
         _LOGGER.info(
@@ -140,6 +141,7 @@ class IOMixin:
         input_file = Path(file_path)
         if not input_file.exists():
             _LOGGER.error("Load failed – file not found: %s", input_file)
+            self._show_status_error(f"Could not load {input_file.name}: file not found.")
             return
 
         try:
@@ -150,10 +152,25 @@ class IOMixin:
                     canvas_state = json.load(json_file)
         except Exception:
             _LOGGER.exception("Load failed – could not parse %s", input_file)
+            self._show_status_error(f"Could not load {input_file.name}; see the log for details.")
             return
 
         _LOGGER.info("Loading canvas state from file: %s", input_file)
         self._restore_canvas_from_dict(canvas_state)
+
+    def _show_status_error(self, message: str):
+        """
+        Show an error in the status line above the canvas.
+
+        Load and save failures are otherwise only logged, so the user would see
+        nothing happen. The next mode change replaces the message.
+
+        :param message: Plain-text message (HTML special characters are escaped).
+        """
+        if self.state.status_div is not None:
+            self.state.status_div.text = (
+                f"<b style='color:#FF4444;font-size:14pt'>{html.escape(message)}</b>"
+            )
 
     def _restore_canvas_from_dict(self, canvas_state: dict):
         """
@@ -183,24 +200,8 @@ class IOMixin:
         edges_data = canvas_state.get("connections", {})
 
         # Ensure every expected column exists (forward-compatibility with older saves)
-        node_column_defaults_dict = {
-            "x": [],
-            "y": [],
-            "url": [],
-            "w": [],
-            "h": [],
-            "name": [],
-            "node_type": [],
-            "icon_type": [],
-            "position": [],
-            "options": [],
-            "n_sources": [],
-            "n_targets": [],
-            "symmetry_name": [],
-            "symmetry_node_index": [],
-        }
-        for column_name, default_values in node_column_defaults_dict.items():
-            nodes_data.setdefault(column_name, default_values)
+        for column_name in NODE_COLUMNS:
+            nodes_data.setdefault(column_name, [])
 
         # Fill the data sources with the loaded data
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
@@ -398,10 +399,9 @@ class IOMixin:
         if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_redo:
             return
 
-        # Capture current state onto the undo stack directly (bypassing push_undo()
-        # which would wipe the redo stack)
+        # Save the current state for undo, keeping the remaining redo steps
         current_snapshot = make_snapshot(self.state)
-        self.state.edit_history_stack._undo.append(current_snapshot)
+        self.state.edit_history_stack.push_undo_keep_redo(current_snapshot)
 
         snapshot = self.state.edit_history_stack.redo()
         if snapshot is None:

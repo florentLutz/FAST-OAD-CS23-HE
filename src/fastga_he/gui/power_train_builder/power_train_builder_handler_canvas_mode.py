@@ -21,6 +21,11 @@ from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _string_clean
 from .power_train_builder_state import (
     BUTTON_DEFAULT_COLOR_TYPE,
     BUTTON_SELECTED_COLOR_TYPE,
+    EDGE_COLUMNS,
+    HOVER_COLUMNS,
+    NODE_COLUMNS,
+    PORT_COLUMNS,
+    empty_columns,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,59 +75,11 @@ class CanvasModeMixin:
         """
         self._dismiss_startup_overlay()
 
-        # Reset all data sources to empty, clearing the canvas
-        self.state.placed_nodes_source.data = {
-            "x": [],
-            "y": [],
-            "url": [],
-            "w": [],
-            "h": [],
-            "name": [],
-            "node_type": [],
-            "icon_type": [],
-            "position": [],
-            "options": [],
-            "n_sources": [],
-            "n_targets": [],
-            "symmetry_name": [],
-            "symmetry_node_index": [],
-        }
-        self.state.hover_source.data = dict(x=[], y=[], name=[], node_type=[])
-        self.state.edge_source.data = dict(
-            xs=[],
-            ys=[],
-            color=[],
-            starting_node_index=[],
-            starting_port_label=[],
-            starting_port_kind=[],
-            ending_node_index=[],
-            ending_port_label=[],
-            ending_port_kind=[],
-        )
-        self.state.source_port_source.data = dict(
-            x=[],
-            y=[],
-            color=[],
-            label=[],
-            node_index=[],
-            node_name=[],
-            node_type=[],
-            fill_alpha=[],
-            line_alpha=[],
-            connected=[],
-        )
-        self.state.target_port_source.data = dict(
-            x=[],
-            y=[],
-            color=[],
-            label=[],
-            node_index=[],
-            node_name=[],
-            node_type=[],
-            fill_alpha=[],
-            line_alpha=[],
-            connected=[],
-        )
+        self.state.placed_nodes_source.data = empty_columns(NODE_COLUMNS)
+        self.state.hover_source.data = empty_columns(HOVER_COLUMNS)
+        self.state.edge_source.data = empty_columns(EDGE_COLUMNS)
+        self.state.source_port_source.data = empty_columns(PORT_COLUMNS)
+        self.state.target_port_source.data = empty_columns(PORT_COLUMNS)
         self._clear_temp_edges()
         self.state.placed_counter.clear()
         self.state.selected_node_index = None
@@ -151,15 +108,13 @@ class CanvasModeMixin:
         Toggle delete mode on / off, updating button styling and status text.
 
         When entering delete mode any active component selection and pending
-        port (dashed) connection are cleared, the config panel is hidden, the Delete
+        port connection are cleared, the config panel is hidden, the Delete
         button turns red, and the status label prompts the user to click a
         node or edge to remove it.  Leaving delete mode restores the defaults.
         """
         self._cancel_pending_connection()
-        # Switch the delete mode flag and update the UI accordingly
         self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
-            # actions if switching *on* delete mode
             self.state.selected_component = None
             self.state.selected_node_index = None
             self._clear_temp_edges()
@@ -172,7 +127,6 @@ class CanvasModeMixin:
             )
             self.state.delete_button.button_type = "danger"
         else:
-            # actions if switching *off* delete mode
             self.state.status_div.text = (
                 "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
             )
@@ -210,6 +164,7 @@ class CanvasModeMixin:
         if component_index < 0 or component_index >= len(icon_keys):
             return
 
+        # If the user clicks the same component again, deselect it
         if self.state.selected_component == icon_keys[component_index]:
             self.state.selected_component = None
             self.state.buttons[component_index].button_type = BUTTON_DEFAULT_COLOR_TYPE
@@ -218,6 +173,8 @@ class CanvasModeMixin:
             )
             return
 
+        # If the user clicks a different component, cancel any pending connection and select the
+        # new component
         self._cancel_pending_connection()
         self.state.selected_component = icon_keys[component_index]
 

@@ -41,7 +41,15 @@ from .power_train_builder_state import (
     DIALOG_POSITION_STYLES,
     NODE_ICON_SIZE_MAX,
     NODE_ICON_SIZE_MIN,
+    EDGE_COLUMNS,
+    HOVER_COLUMNS,
+    NODE_COLUMNS,
+    PORT_COLUMNS,
+    SAVE_MODE_CANCEL,
+    SAVE_MODE_EDITABLE,
+    SAVE_MODE_FINAL,
     _EMPTY,
+    empty_columns,
 )
 from .power_train_builder_metadata import (
     _build_port_count_defaults,
@@ -51,13 +59,13 @@ from .power_train_builder_metadata import (
 
 COMPONENTS_PATH = Path(__file__).resolve().parents[2] / "models" / "propulsion" / "components"
 
-# ── Load dialog ───────────────────────────────────────────────────────────────
+# Load dialog
 # Toggles browse_load_trigger to signal Python to open a tkinter open-file dialog
 _JS_LOAD_DIALOG = """
 browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';
 """
 
-# ── "Final version?" overlay buttons: hide it and send the mode to Python ──
+# "Final version?" overlay buttons: hide it and send the mode to Python
 #    (__MODE__ is replaced by final / editable / cancel). The timestamp makes
 #    every click a new value, so on_change always fires
 _JS_SAVE_MODE_CLICK = """
@@ -76,7 +84,7 @@ _STARTUP_BUTTON_CSS = [
     }"""
 ]
 
-# ── End Session click: show unsaved-exit overlay if save_button is yellow,
+# End Session click: show unsaved-exit overlay if save_button is yellow,
 #    otherwise flip end_session_trigger so Python stops the server cleanly. ──
 _JS_END_SESSION_CLICK = """
 if (save_button_widget.button_type === 'warning') {
@@ -111,7 +119,7 @@ class ComponentToolboxConfigurationTableBuilder:
             * :class:`BuilderState` holds references to every shared widget
               and data source.
         """
-        # ── Categorise icons into tab groups ──────────────────────────────────
+        # Categorise icons into tab groups
         component_icon_keys = list(ICONS_CONFIG.keys())
         category_to_icon_keys: dict = {}
         for component in KNOWN_COMPONENTS:
@@ -134,10 +142,10 @@ class ComponentToolboxConfigurationTableBuilder:
             elif icon_key not in category_to_icon_keys[component_type_class]:
                 category_to_icon_keys[component_type_class].append(icon_key)
 
-        # ── Shared stylesheet for action buttons (Delete, Save, End Session) ──
+        # Shared stylesheet for action buttons (Delete, Save, End Session)
         _action_stylesheet = [":host button { font-size: 1.4em; }"]
 
-        # ── Palette buttons (one per icon, kept in ICONS_CONFIG order) ────────
+        # Palette buttons (one per icon, kept in ICONS_CONFIG order)
         # Header row: "Components" title + node-size slider. Both widths add up to
         # PALETTE_WIDTH so the row never grows wider than the left panel
         _title_div_width = 140
@@ -213,7 +221,7 @@ class ComponentToolboxConfigurationTableBuilder:
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "14px"},
         )
 
-        # ── Action buttons ────────────────────────────────────────────────────
+        # Action buttons
         delete_button = bkmodel.Button(
             label="Delete",
             icon=bkmodel.TablerIcon(icon_name="trash"),
@@ -244,7 +252,7 @@ class ComponentToolboxConfigurationTableBuilder:
         # ``unsaved_exit_overlay_widget``, and ``end_session_trigger``) as args, so the
         # wiring must be deferred until all of them exist
 
-        # ── Hidden TextInput relay widgets ────────────────────────────────────
+        # Hidden TextInput relay widgets
         # Bokeh's CustomJS cannot call Python directly, so each action that needs
         # server-side logic (file dialogs, session shutdown) is routed through a
         # hidden TextInput whose value is toggled between '0' and '1' by JS.
@@ -284,13 +292,13 @@ class ComponentToolboxConfigurationTableBuilder:
             bkmodel.CustomJS(code="window.close();"),
         )
 
-        # ── Wire Load Design buttons -> signal Python to open tkinter dialog ───
+        # Wire Load Design buttons -> signal Python to open tkinter dialog
         _load_js = bkmodel.CustomJS(
             args=dict(browse_load_trigger=browse_load_trigger),
             code=_JS_LOAD_DIALOG,
         )
 
-        # ── "Final version?" overlay ──────────────────────────────────────────
+        # "Final version?" overlay
         # Shown when the Save button (or Save & Exit) is clicked. The choice decides whether the GUI-only
         # canvas_layout section is written. Each button sends its mode to Python
         # inside the browse_save_trigger value itself ("<mode>:<timestamp>"), so
@@ -353,9 +361,9 @@ class ComponentToolboxConfigurationTableBuilder:
             },
         )
         for mode_button, save_mode in (
-            (_final_version_btn, "final"),
-            (_editable_version_btn, "editable"),
-            (_cancel_version_btn, "cancel"),
+            (_final_version_btn, SAVE_MODE_FINAL),
+            (_editable_version_btn, SAVE_MODE_EDITABLE),
+            (_cancel_version_btn, SAVE_MODE_CANCEL),
         ):
             mode_button.js_on_click(
                 bkmodel.CustomJS(
@@ -367,7 +375,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 )
             )
 
-        # ── Wire Save button: click -> ask "final version?" ────────────────────
+        # Wire Save button: click -> ask "final version?"
         save_button.js_on_click(
             bkmodel.CustomJS(
                 args=dict(save_version_overlay_widget=save_version_overlay),
@@ -375,7 +383,7 @@ class ComponentToolboxConfigurationTableBuilder:
             )
         )
 
-        # ── Unsaved-exit overlay ──────────────────────────────────────────────
+        # Unsaved-exit overlay
         # Shown when the user clicks End Session while save_button is yellow.
         # Hidden trigger used by "Save & Exit" to flag Python that the session must
         # end once the save (started from the "final version?" overlay) completes
@@ -479,7 +487,7 @@ class ComponentToolboxConfigurationTableBuilder:
             )
         )
 
-        # ── Wire End Session button: check for unsaved state before closing ───
+        # Wire End Session button: check for unsaved state before closing
         end_session_button.js_on_click(
             bkmodel.CustomJS(
                 args=dict(
@@ -491,7 +499,7 @@ class ComponentToolboxConfigurationTableBuilder:
             )
         )
 
-        # ── Startup overlay buttons ───────────────────────────────────────────
+        # Startup overlay buttons
         new_design_button = bkmodel.Button(
             label="New Design",
             icon=bkmodel.TablerIcon(icon_name="file-plus"),
@@ -510,75 +518,20 @@ class ComponentToolboxConfigurationTableBuilder:
         )
         load_design_button.js_on_click(_load_js)
 
-        # ── Canvas data sources ───────────────────────────────────────────────
-        placed_nodes_source = bkmodel.ColumnDataSource(
-            data=dict(
-                x=[],
-                y=[],
-                url=[],
-                w=[],
-                h=[],
-                name=[],
-                node_type=[],
-                icon_type=[],
-                position=[],
-                options=[],  # JSON-encoded dict of option_name -> value
-                n_sources=[],  # current source-port count for this node
-                n_targets=[],  # current target-port count for this node
-                symmetry_name=[],  # name of the symmetry peer node
-                symmetry_node_index=[],
-            )
-        )
-        hover_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], name=[], node_type=[]))
-        source_port_source = bkmodel.ColumnDataSource(
-            data=dict(
-                x=[],
-                y=[],
-                color=[],
-                label=[],
-                node_index=[],
-                node_name=[],
-                node_type=[],
-                fill_alpha=[],
-                line_alpha=[],
-                connected=[],
-            )
-        )
-        target_port_source = bkmodel.ColumnDataSource(
-            data=dict(
-                x=[],
-                y=[],
-                color=[],
-                label=[],
-                node_index=[],
-                node_name=[],
-                node_type=[],
-                fill_alpha=[],
-                line_alpha=[],
-                connected=[],
-            )
-        )
+        # Canvas data sources
+        placed_nodes_source = bkmodel.ColumnDataSource(data=empty_columns(NODE_COLUMNS))
+        hover_source = bkmodel.ColumnDataSource(data=empty_columns(HOVER_COLUMNS))
+        source_port_source = bkmodel.ColumnDataSource(data=empty_columns(PORT_COLUMNS))
+        target_port_source = bkmodel.ColumnDataSource(data=empty_columns(PORT_COLUMNS))
         selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
         options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
-        edge_source = bkmodel.ColumnDataSource(
-            data=dict(
-                xs=[],
-                ys=[],
-                color=[],
-                starting_node_index=[],
-                starting_port_label=[],
-                starting_port_kind=[],
-                ending_node_index=[],
-                ending_port_label=[],
-                ending_port_kind=[],
-            )
-        )
+        edge_source = bkmodel.ColumnDataSource(data=empty_columns(EDGE_COLUMNS))
         awaiting_second_port_click_source = bkmodel.ColumnDataSource(
             data=dict(x=[], y=[], color=[])
         )
         panel_preview_edge_source = bkmodel.ColumnDataSource(data=dict(xs=[], ys=[], color=[]))
 
-        # ── Configurator panel widgets ────────────────────────────────────────
+        # Configurator panel widgets
         options_rows_column = column([], styles={"background": BACKGROUND_COLOR_CODE})
         connections_rows_column = column([], styles={"background": BACKGROUND_COLOR_CODE})
         connections_table_widget = column(
@@ -707,14 +660,14 @@ class ComponentToolboxConfigurationTableBuilder:
             },
         )
 
-        # ── Metadata lookup tables ────────────────────────────────────────────
+        # Metadata lookup tables
         default_source_port_count, default_target_port_count = _build_port_count_defaults()
         icon_to_component_types_map = _map_possible_component_types_to_icons()
         possible_position_map, possible_options_map = _get_performance_component_names(
             COMPONENTS_PATH
         )
 
-        # ── Assemble BuilderState ─────────────────────────────────────────────
+        # Assemble BuilderState
         state = BuilderState(
             buttons=buttons,
             placed_nodes_source=placed_nodes_source,
@@ -763,7 +716,7 @@ class ComponentToolboxConfigurationTableBuilder:
             fit_view_trigger=fit_view_trigger,
         )
 
-        # ── Build tabbed toolbox sidebar ──────────────────────────────────────
+        # Build tabbed toolbox sidebar
         tab_panels = []
         for category, keys_in_category in category_to_icon_keys.items():
             category_buttons = [

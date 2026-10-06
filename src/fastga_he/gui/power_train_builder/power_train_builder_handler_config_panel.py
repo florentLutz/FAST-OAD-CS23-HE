@@ -12,12 +12,19 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 import functools
 import json
 import logging
-from typing import TYPE_CHECKING
 import bokeh.models as bkmodel
 from bokeh.layouts import row
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
-from .power_train_builder_state import _EMPTY, _NO_SYMMETRY_PEER, copy_column_data
+from .power_train_builder_state import (
+    _EMPTY,
+    _NO_SYMMETRY_PEER,
+    copy_column_data,
+    edge_indices_not_touching_node,
+    edge_indices_not_touching_port,
+    select_edges,
+    BuilderState,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,10 +37,6 @@ PRIMARY_PORT_LABEL_COLOR = "#ADD8E6"  # light blue
 PRIMARY_PORT_LABEL = "1"
 PRIMARY_SOURCE_PORT_TYPE_KEYWORDS = ("splitter", "gearbox")
 PRIMARY_TARGET_PORT_TYPE_KEYWORDS = ("planetary_gear",)
-
-# For IDE type-checking only
-if TYPE_CHECKING:
-    from .power_train_builder_state import BuilderState
 
 
 class ConfigPanelMixin:
@@ -78,6 +81,7 @@ class ConfigPanelMixin:
             else "{}"
         )
 
+        # Show the config panel and the options table if there is any options
         self.state.options_table.visible = saved_options_json != "{}"
         self.state.name_input.value = node_name
 
@@ -112,6 +116,7 @@ class ConfigPanelMixin:
 
         self._refresh_options_table(node_type, saved_options)
 
+        # Show or hide the port-count spinners based on the default counts for this node type.
         default_source_port_count = self.state.default_source_count.get(node_type, 0)
         default_target_port_count = self.state.default_target_count.get(node_type, 0)
         source_ports_are_editable = default_source_port_count == 3
@@ -244,7 +249,7 @@ class ConfigPanelMixin:
     # Options table
     # -----------------------------------------------------------------------
 
-    def _refresh_options_table(self, node_type: str, overrides: dict = {}):
+    def _refresh_options_table(self, node_type: str, overrides: dict | None = None):
         """
         Rebuild the Options section of the config panel for a given node type.
 
@@ -263,6 +268,7 @@ class ConfigPanelMixin:
         new_row_widgets = []
         value_selects = []
 
+        overrides = overrides or {}
         for option_name, value_list in options_definition.items():
             current_values = (
                 overrides[option_name]
@@ -394,113 +400,16 @@ class ConfigPanelMixin:
         node_data = copy_column_data(self.state.placed_nodes_source.data)
         edge_data = copy_column_data(self.state.edge_source.data)
 
-        # Build lookup: port label -> (far_node_index, far_label) for every edge
-        # that touches node_index
-        connected_source = {}
-        connected_target = {}
+        connected_source, connected_target = _connected_far_ports(edge_data, node_index)
 
-        for i in range(len(edge_data.get("starting_node_index", []))):
-            starting_node_position = edge_data["starting_node_index"][i]
-            ending_node_position = edge_data["ending_node_index"][i]
-            starting_port_label_value = edge_data["starting_port_label"][i]
-            ending_port_label_value = edge_data["ending_port_label"][i]
-            starting_port_kind_value = edge_data["starting_port_kind"][i]
-            ending_port_kind_value = edge_data["ending_port_kind"][i]
-
-            # AS the starting node could be the source or the target, we need to check both cases
-
-            node_is_starting_node = starting_node_position == node_index
-            node_is_ending_node = ending_node_position == node_index
-            port_on_starting_node_is_source = starting_port_kind_value == "source"
-            port_on_starting_node_is_target = starting_port_kind_value == "target"
-            port_on_ending_node_is_source = ending_port_kind_value == "source"
-            port_on_ending_node_is_target = ending_port_kind_value == "target"
-
-            if node_is_starting_node and port_on_starting_node_is_source:
-                connected_source[starting_port_label_value] = (
-                    ending_node_position,
-                    ending_port_label_value,
-                )
-            elif node_is_ending_node and port_on_ending_node_is_source:
-                connected_source[ending_port_label_value] = (
-                    starting_node_position,
-                    starting_port_label_value,
-                )
-
-            if node_is_starting_node and port_on_starting_node_is_target:
-                connected_target[starting_port_label_value] = (
-                    ending_node_position,
-                    ending_port_label_value,
-                )
-            elif node_is_ending_node and port_on_ending_node_is_target:
-                connected_target[ending_port_label_value] = (
-                    starting_node_position,
-                    starting_port_label_value,
-                )
-        # Get node port color for filtering compatible ports
-        selected_source_color = ICONS_CONFIG.get(node_data["icon_type"][node_index], {}).get(
-            "source_color", ""
+        # Only free ports of the matching energy type (colour) can be offered
+        icon_config = ICONS_CONFIG.get(node_data["icon_type"][node_index], {})
+        free_targets = self._free_port_candidates(
+            target_data, "target", node_index, icon_config.get("source_color", ""), node_data
         )
-
-        # Build a list of all unconnected target ports that match the color
-        free_targets = []
-        for j in range(len(target_data.get("node_index", []))):
-            target_port_is_free = target_data["connected"][j] == "False"
-            target_port_not_selected = target_data["node_index"][j] != node_index
-            same_source_color_as_node_target_color = (
-                target_data["color"][j] == selected_source_color
-            )
-            if (
-                target_port_is_free
-                and target_port_not_selected
-                and same_source_color_as_node_target_color
-            ):
-                # The port id free, not selected and has the same color as the source port of the node
-                free_targets.append(
-                    (
-                        target_data["node_index"][j],
-                        target_data["label"][j],
-                        "target",
-                        self._far_string(
-                            node_data,
-                            target_data["node_index"][j],
-                            target_data["label"][j],
-                            "target",
-                        ),
-                    )
-                )
-
-        selected_target_color = ICONS_CONFIG.get(node_data["icon_type"][node_index], {}).get(
-            "target_color", ""
+        free_sources = self._free_port_candidates(
+            source_data, "source", node_index, icon_config.get("target_color", ""), node_data
         )
-        free_sources = []
-        for j in range(len(source_data.get("node_index", []))):
-            source_port_is_free = source_data["connected"][j] == "False"
-            source_port_not_selected = source_data["node_index"][j] != node_index
-            same_target_color_as_node_source_color = (
-                source_data["color"][j] == selected_target_color
-            )
-
-            if (
-                source_port_is_free
-                and source_port_not_selected
-                and same_target_color_as_node_source_color
-            ):
-                free_sources.append(
-                    (
-                        source_data["node_index"][j],
-                        source_data["label"][j],
-                        "source",
-                        self._far_string(
-                            node_data,
-                            source_data["node_index"][j],
-                            source_data["label"][j],
-                            "source",
-                        ),
-                    )
-                )
-
-        new_row_widgets = []
 
         # Component type of the selected node, used to highlight its primary port
         node_types = list(node_data.get("node_type", []))
@@ -510,98 +419,143 @@ class ConfigPanelMixin:
         # label and a dropdown of the free ports on the opposite side. Sources are
         # listed first, then targets
         port_sides = (
-            (
-                "source",
-                "target",
-                source_data,
-                free_targets,
-                connected_source,
-                PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
-            ),
-            (
-                "target",
-                "source",
-                target_data,
-                free_sources,
-                connected_target,
-                PRIMARY_TARGET_PORT_TYPE_KEYWORDS,
-            ),
+            (source_data, "source", free_targets, connected_source),
+            (target_data, "target", free_sources, connected_target),
         )
-
-        for (
-            own_kind,
-            far_kind,
-            port_data,
-            free_far_ports,
-            connected_ports,
-            primary_type_keywords,
-        ) in port_sides:
-            for i in range(len(port_data.get("node_index", []))):
-                if port_data["node_index"][i] != node_index:
-                    continue
-
-                # Set up the port label of the node
-                own_label = port_data["label"][i]
-                is_connected = port_data["connected"][i] == "True"
-
-                label_input = bkmodel.TextInput(
-                    value=f"{own_kind}:{own_label}",
-                    width=180,
-                    disabled=True,
-                    styles={"color": "white", "font-size": "14px"},
-                    stylesheets=_port_label_stylesheets(
-                        selected_node_type, own_label, primary_type_keywords
-                    ),
-                )
-
-                candidates = free_far_ports
-                current_string = _EMPTY
-                if is_connected and own_label in connected_ports:
-                    # Add the connected far port to the candidates list so that it shows up in
-                    # the dropdown even though it is not free. "Far" means the port on the
-                    # opposite side that this port of the node is (or could be) connected to
-                    far_node_index, far_label = connected_ports[own_label]
-                    current_string = self._far_string(
-                        node_data, far_node_index, far_label, far_kind
-                    )
-                    candidates = [
-                        candidate
-                        for candidate in candidates
-                        if not (candidate[0] == far_node_index and candidate[1] == far_label)
-                    ] + [(far_node_index, far_label, far_kind, current_string)]
-
-                # Index 3 is the display string, used for the dropdown entries; the current
-                # string is excluded here so it is not listed twice
-                choices = [_EMPTY] + [
-                    candidate[3] for candidate in candidates if candidate[3] != current_string
-                ]
-
-                # Add the current string to the choices if it is not already present
-                if current_string and current_string not in choices:
-                    choices = [current_string] + choices
-
-                value_select = bkmodel.Select(
-                    value=current_string if current_string else _EMPTY,
-                    options=choices,
-                    width=180,
-                    styles={"color": "white", "font-size": "12px"},
-                )
-
-                value_select.on_change(
-                    "value",
-                    self._make_port_callback(
-                        _own_kind=own_kind,
-                        _own_label=own_label,
-                        _own_node_index=node_index,
-                        _own_color=port_data["color"][i],
-                        _own_x=port_data["x"][i],
-                        _own_y=port_data["y"][i],
-                        _candidates=candidates,
-                    ),
-                )
-                new_row_widgets.append(row(label_input, value_select, spacing=4))
+        new_row_widgets = [
+            self._build_port_row(
+                port_data,
+                port_position,
+                own_kind,
+                selected_node_type,
+                free_far_ports,
+                connected_ports,
+                node_data,
+            )
+            for port_data, own_kind, free_far_ports, connected_ports in port_sides
+            for port_position in range(len(port_data.get("node_index", [])))
+            if port_data["node_index"][port_position] == node_index
+        ]
 
         self.state.connections_rows_column.children = new_row_widgets
+
+    def _free_port_candidates(
+        self, port_data: dict, kind: str, node_index: int, color: str, node_data: dict
+    ) -> list:
+        """
+        Unconnected ports of other nodes that match the energy type *color*.
+
+        :param port_data: ``source_port_source.data`` or ``target_port_source.data``.
+        :param kind: ``"source"`` or ``"target"``, the side *port_data* holds.
+        :param node_index: Selected node, whose own ports are excluded.
+        :param color: Energy-type colour the port must have.
+        :param node_data: Snapshot of ``placed_nodes_source.data``.
+        :return: List of ``(node_index, label, kind, display_string)`` candidates.
+        """
+        return [
+            (
+                port_data["node_index"][port_position],
+                port_data["label"][port_position],
+                kind,
+                self._far_string(
+                    node_data,
+                    port_data["node_index"][port_position],
+                    port_data["label"][port_position],
+                    kind,
+                ),
+            )
+            for port_position in range(len(port_data.get("node_index", [])))
+            if port_data["connected"][port_position] == "False"
+            and port_data["node_index"][port_position] != node_index
+            and port_data["color"][port_position] == color
+        ]
+
+    def _build_port_row(
+        self,
+        port_data: dict,
+        port_position: int,
+        own_kind: str,
+        node_type: str,
+        free_far_ports: list,
+        connected_ports: dict,
+        node_data: dict,
+    ):
+        """
+        One Connections panel row: the port label and its connection dropdown.
+
+        :param port_data: Data of the port source that holds the port.
+        :param port_position: Position of the port in *port_data*.
+        :param own_kind: ``"source"`` or ``"target"``, the side of the port.
+        :param node_type: Component type of the selected node.
+        :param free_far_ports: Free candidates on the opposite side
+            (see :meth:`_free_port_candidates`).
+        :param connected_ports: ``{own_label: (far_node_index, far_label)}`` for the
+            node's connected ports on this side.
+        :param node_data: Snapshot of ``placed_nodes_source.data``.
+        :return: Bokeh ``row`` holding the label and the dropdown.
+        """
+        far_kind = "target" if own_kind == "source" else "source"
+        primary_type_keywords = (
+            PRIMARY_SOURCE_PORT_TYPE_KEYWORDS
+            if own_kind == "source"
+            else PRIMARY_TARGET_PORT_TYPE_KEYWORDS
+        )
+        node_index = port_data["node_index"][port_position]
+        own_label = port_data["label"][port_position]
+        is_connected = port_data["connected"][port_position] == "True"
+
+        label_input = bkmodel.TextInput(
+            value=f"{own_kind}:{own_label}",
+            width=180,
+            disabled=True,
+            styles={"color": "white", "font-size": "14px"},
+            stylesheets=_port_label_stylesheets(node_type, own_label, primary_type_keywords),
+        )
+
+        candidates = free_far_ports
+        current_string = _EMPTY
+        if is_connected and own_label in connected_ports:
+            # Add the connected far port to the candidates list so that it shows up in
+            # the dropdown even though it is not free. "Far" means the port on the
+            # opposite side that this port of the node is (or could be) connected to
+            far_node_index, far_label = connected_ports[own_label]
+            current_string = self._far_string(node_data, far_node_index, far_label, far_kind)
+            candidates = [
+                candidate
+                for candidate in candidates
+                if not (candidate[0] == far_node_index and candidate[1] == far_label)
+            ] + [(far_node_index, far_label, far_kind, current_string)]
+
+        # Index 3 is the display string, used for the dropdown entries; the current
+        # string is excluded here so it is not listed twice
+        choices = [_EMPTY] + [
+            candidate[3] for candidate in candidates if candidate[3] != current_string
+        ]
+
+        # Add the current string to the choices if it is not already present
+        if current_string and current_string not in choices:
+            choices = [current_string] + choices
+
+        value_select = bkmodel.Select(
+            value=current_string if current_string else _EMPTY,
+            options=choices,
+            width=180,
+            styles={"color": "white", "font-size": "12px"},
+        )
+
+        value_select.on_change(
+            "value",
+            self._make_port_callback(
+                _own_kind=own_kind,
+                _own_label=own_label,
+                _own_node_index=node_index,
+                _own_color=port_data["color"][port_position],
+                _own_x=port_data["x"][port_position],
+                _own_y=port_data["y"][port_position],
+                _candidates=candidates,
+            ),
+        )
+        return row(label_input, value_select, spacing=4)
 
     @staticmethod
     def _far_string(node_data: dict, far_node_index: int, far_label: str, far_kind: str) -> str:
@@ -721,137 +675,101 @@ class ConfigPanelMixin:
         :param _candidates: Candidate ``(node_index, label, kind, display_str)``
             tuples for the far end, built when the row was rendered.
         """
-        _own_port_source = (
-            self.state.source_port_source
-            if _own_kind == "source"
-            else self.state.target_port_source
-        )
-        _far_port_source = (
-            self.state.target_port_source
-            if _own_kind == "source"
-            else self.state.source_port_source
-        )
-
-        # Drop any pending preview edge that has the own port at its own end
-        # (starting end for source rows, ending end for target rows)
-        if _own_kind == "source":
-            self.state.panel_pending_connections = [
-                (sp, ep)
-                for sp, ep in self.state.panel_pending_connections
-                if not (
-                    sp["kind"] == "source"
-                    and sp["node_index"] == _own_node_index
-                    and sp["label"] == _own_label
-                )
-            ]
-        else:
-            self.state.panel_pending_connections = [
-                (sp, ep)
-                for sp, ep in self.state.panel_pending_connections
-                if not (
-                    ep["kind"] == "target"
-                    and ep["node_index"] == _own_node_index
-                    and ep["label"] == _own_label
-                )
-            ]
+        # Drop any pending preview edge that already uses the own port. Pending
+        # connections are stored as (source port, target port) pairs
+        own_end = 0 if _own_kind == "source" else 1
+        self.state.panel_pending_connections = [
+            pending_connection
+            for pending_connection in self.state.panel_pending_connections
+            if not _is_same_port(
+                pending_connection[own_end], _own_kind, _own_node_index, _own_label
+            )
+        ]
 
         self._clear_temp_edge_visuals()
-        for sp, ep in list(self.state.panel_pending_connections):
-            self._add_edge_temp(sp, ep)
+        for starting_port, ending_port in list(self.state.panel_pending_connections):
+            self._add_edge_temp(starting_port, ending_port)
 
         if new_value == _EMPTY:
-            # Disconnect: remove all permanent edges that touch the own port
-            if self.state.edge_source is not None:
-                self._push_undo()
-                edge_data = copy_column_data(self.state.edge_source.data)
-                kept_edge_indices = [
-                    i
-                    for i in range(len(edge_data.get("starting_node_index", [])))
-                    if not (
-                        (
-                            edge_data["starting_node_index"][i] == _own_node_index
-                            and edge_data["starting_port_label"][i] == _own_label
-                            and edge_data["starting_port_kind"][i] == _own_kind
-                        )
-                        or (
-                            edge_data["ending_node_index"][i] == _own_node_index
-                            and edge_data["ending_port_label"][i] == _own_label
-                            and edge_data["ending_port_kind"][i] == _own_kind
-                        )
-                    )
-                ]
-                self.state.edge_source.data = {
-                    k: [edge_data[k][j] for j in kept_edge_indices] for k in edge_data
-                }
-                self._rebuild_all_ports()
-                self._mark_unsaved()
+            self._disconnect_port(_own_kind, _own_node_index, _own_label)
             return
 
         # Resolve the chosen far-end port from the candidates list
         parsed_choice = self._parse_choice(new_value, _candidates)
         if parsed_choice is None:
             return
-        far_node_index, far_label, _ = parsed_choice
+        far_node_index, far_label, far_kind = parsed_choice
 
         # Look up the far port's live coordinates and colour
-        far_data = _far_port_source.data
-        far_x, far_y, far_color = None, None, None
-        for j in range(len(far_data.get("node_index", []))):
-            if far_data["node_index"][j] == far_node_index and far_data["label"][j] == far_label:
-                far_x = far_data["x"][j]
-                far_y = far_data["y"][j]
-                far_color = far_data["color"][j]
-                break
-        if far_x is None:
+        far_port = self._live_port(far_kind, far_node_index, far_label)
+        if far_port is None:
             return
 
         # Re-fetch own port's live coordinates (may have moved since the row was built)
-        live_own_x, live_own_y = _own_x, _own_y
-        own_data = _own_port_source.data
-        for j in range(len(own_data.get("node_index", []))):
-            if own_data["node_index"][j] == _own_node_index and own_data["label"][j] == _own_label:
-                live_own_x = own_data["x"][j]
-                live_own_y = own_data["y"][j]
-                break
+        own_port = self._live_port(_own_kind, _own_node_index, _own_label) or {
+            "kind": _own_kind,
+            "node_index": _own_node_index,
+            "label": _own_label,
+            "x": _own_x,
+            "y": _own_y,
+        }
+        own_port["color"] = _own_color
 
         # Build the edge always as source -> target
-        if _own_kind == "source":
-            starting_port = {
-                "kind": "source",
-                "node_index": _own_node_index,
-                "label": _own_label,
-                "x": live_own_x,
-                "y": live_own_y,
-                "color": _own_color,
-            }
-            ending_port = {
-                "kind": "target",
-                "node_index": far_node_index,
-                "label": far_label,
-                "x": far_x,
-                "y": far_y,
-                "color": far_color,
-            }
-        else:
-            starting_port = {
-                "kind": "source",
-                "node_index": far_node_index,
-                "label": far_label,
-                "x": far_x,
-                "y": far_y,
-                "color": far_color,
-            }
-            ending_port = {
-                "kind": "target",
-                "node_index": _own_node_index,
-                "label": _own_label,
-                "x": live_own_x,
-                "y": live_own_y,
-                "color": _own_color,
-            }
-
+        starting_port, ending_port = (
+            (own_port, far_port) if _own_kind == "source" else (far_port, own_port)
+        )
         self.state.panel_pending_connections.append((starting_port, ending_port))
         self._add_edge_temp(starting_port, ending_port)
+
+    def _disconnect_port(self, port_kind: str, node_index: int, port_label: str):
+        """
+        Remove every permanent edge attached to one port, as a single undoable step.
+
+        :param port_kind: ``"source"`` or ``"target"``.
+        :param node_index: Zero-based index of the node that owns the port.
+        :param port_label: Port label (``"1"``, ``"2"``, ...).
+        """
+        if self.state.edge_source is None:
+            return
+        self._push_undo()
+        edge_data = copy_column_data(self.state.edge_source.data)
+        self.state.edge_source.data = select_edges(
+            edge_data, edge_indices_not_touching_port(edge_data, node_index, port_label, port_kind)
+        )
+        self._rebuild_all_ports()
+        self._mark_unsaved()
+
+    def _live_port(self, port_kind: str, node_index: int, port_label: str) -> dict | None:
+        """
+        Current metadata of one port ball, read from its port data source.
+
+        :param port_kind: ``"source"`` or ``"target"``.
+        :param node_index: Zero-based index of the node that owns the port.
+        :param port_label: Port label (``"1"``, ``"2"``, ...).
+        :return: Dict with keys ``kind``, ``node_index``, ``label``, ``x``, ``y``
+            and ``color``, or ``None`` if the port does not exist.
+        """
+        port_source = (
+            self.state.source_port_source
+            if port_kind == "source"
+            else self.state.target_port_source
+        )
+        port_data = port_source.data
+        for port_position in range(len(port_data.get("node_index", []))):
+            if (
+                port_data["node_index"][port_position] == node_index
+                and port_data["label"][port_position] == port_label
+            ):
+                return {
+                    "kind": port_kind,
+                    "node_index": node_index,
+                    "label": port_label,
+                    "x": port_data["x"][port_position],
+                    "y": port_data["y"][port_position],
+                    "color": port_data["color"][port_position],
+                }
+        return None
 
     # -----------------------------------------------------------------------
     # Type-select live refresh
@@ -942,35 +860,23 @@ class ConfigPanelMixin:
             else {}
         )
         num_edges = len(edge_data.get("starting_node_index", []))
-        kept_edge_indices = [
-            edge_position
-            for edge_position in range(num_edges)
-            if edge_data["starting_node_index"][edge_position] != node_index
-            and edge_data["ending_node_index"][edge_position] != node_index
-        ]
+        kept_edge_indices = edge_indices_not_touching_node(edge_data, node_index)
 
         placed_nodes_data = copy_column_data(self.state.placed_nodes_source.data)
         node_names = list(placed_nodes_data.get("name", []))
-        num_nodes = len(node_names)
-        symmetry_names = list(placed_nodes_data.get("symmetry_name", []))
-        symmetry_indices = list(placed_nodes_data.get("symmetry_node_index", []))
-        symmetry_names += [_EMPTY] * (num_nodes - len(symmetry_names))
-        symmetry_indices += [_NO_SYMMETRY_PEER] * (num_nodes - len(symmetry_indices))
+        node_name = node_names[node_index] if node_index < len(node_names) else None
+        symmetry_names, symmetry_indices = _padded_symmetry_columns(placed_nodes_data)
 
         # The node itself plus any node pointing back at it
-        node_name = node_names[node_index] if node_index < num_nodes else None
-        symmetry_positions_to_clear = [
-            node_position
-            for node_position in range(num_nodes)
-            if (
-                node_position == node_index
-                or (node_name is not None and symmetry_names[node_position] == node_name)
-            )
-            and (
-                symmetry_names[node_position] not in (_EMPTY, None)
-                or symmetry_indices[node_position] != _NO_SYMMETRY_PEER
-            )
-        ]
+        symmetry_positions_to_clear = _positions_linked_to(
+            symmetry_names, symmetry_indices, {node_index}, {node_name}
+        )
+        node_has_link = node_index < len(symmetry_names) and (
+            symmetry_names[node_index] not in (_EMPTY, None)
+            or symmetry_indices[node_index] != _NO_SYMMETRY_PEER
+        )
+        if node_has_link and node_index not in symmetry_positions_to_clear:
+            symmetry_positions_to_clear.append(node_index)
 
         has_edges_to_remove = len(kept_edge_indices) < num_edges
         if not has_edges_to_remove and not symmetry_positions_to_clear:
@@ -981,15 +887,10 @@ class ConfigPanelMixin:
         self._push_undo()
 
         if has_edges_to_remove:
-            self.state.edge_source.data = {
-                column_name: [column_values[edge_position] for edge_position in kept_edge_indices]
-                for column_name, column_values in edge_data.items()
-            }
+            self.state.edge_source.data = select_edges(edge_data, kept_edge_indices)
 
         if symmetry_positions_to_clear:
-            for node_position in symmetry_positions_to_clear:
-                symmetry_names[node_position] = _EMPTY
-                symmetry_indices[node_position] = _NO_SYMMETRY_PEER
+            _unlink_symmetry(symmetry_names, symmetry_indices, symmetry_positions_to_clear)
             placed_nodes_data["symmetry_name"] = symmetry_names
             placed_nodes_data["symmetry_node_index"] = symmetry_indices
             self.state.placed_nodes_source.data = placed_nodes_data
@@ -1022,104 +923,98 @@ class ConfigPanelMixin:
         No-op if no node is currently selected.
         """
         current_selected_node_index = self.state.selected_node_index
-        if current_selected_node_index is None:
+        num_nodes = len(self.state.placed_nodes_source.data.get("name", []))
+        if current_selected_node_index is None or current_selected_node_index >= num_nodes:
             return
 
         # Push undo snapshot *before* any mutation so the user can revert the
         # entire Apply operation with a single Undo click
         self._push_undo()
 
-        # Get node properties from the configurator panel
-        new_node_name_id = self.state.name_input.value
-        new_node_type = self.state.type_select.value
-        new_position = self.state.position_select.value
+        placed_nodes_data = copy_column_data(self.state.placed_nodes_source.data)
+        self._write_node_fields(placed_nodes_data, current_selected_node_index)
+        self._write_symmetry(placed_nodes_data, current_selected_node_index)
+        self.state.placed_nodes_source.data = placed_nodes_data
+        self._sync_hover_source(placed_nodes_data, current_selected_node_index)
 
+        # Commit the connections picked in the Connections panel
+        for starting_port, ending_port in list(self.state.panel_pending_connections):
+            self._add_edge(starting_port, ending_port)
+        self._clear_temp_edges()
+        self._rebuild_all_ports()
+
+        self._mark_unsaved()
+
+    def _write_node_fields(self, placed_nodes_data: dict, node_index: int):
+        """
+        Write the panel's name, type, position, options and port counts into a node row.
+
+        :param placed_nodes_data: Copy of ``placed_nodes_source.data``, edited in place.
+        :param node_index: Zero-based index of the node being applied.
+        """
+        new_node_type = self.state.type_select.value
+        _set_cell(placed_nodes_data, "name", node_index, self.state.name_input.value)
+        _set_cell(placed_nodes_data, "position", node_index, self.state.position_select.value)
+
+        type_is_written = _set_cell(placed_nodes_data, "node_type", node_index, new_node_type)
+        # Reset port counts to defaults when the type changes and spinners are hidden
+        if type_is_written and not self.state.source_count_spinner.visible:
+            default_source_port_count = int(self.state.default_source_count.get(new_node_type, 0))
+            default_target_port_count = int(self.state.default_target_count.get(new_node_type, 0))
+            _set_cell(placed_nodes_data, "n_sources", node_index, default_source_port_count)
+            _set_cell(placed_nodes_data, "n_targets", node_index, default_target_port_count)
+
+        # Place empty dict if there is no options entry for this node yet
+        if "options" not in placed_nodes_data:
+            placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
         option_names = list(self.state.options_source.data.get("options", []))
         option_values = list(self.state.options_source.data.get("value", []))
         option_values_dict = {
             option_name: _strings_to_option_values(option_value)
-            for option_name, option_value in zip(option_names, option_values)
+            for option_name, option_value in zip(option_names, option_values, strict=True)
         }
-        # convert the options dict to a JSON string for storage in the ColumnDataSource
-        options_json_string = json.dumps(option_values_dict)
+        # Stored as a JSON string in the ColumnDataSource
+        _set_cell(placed_nodes_data, "options", node_index, json.dumps(option_values_dict))
 
-        placed_nodes_data = copy_column_data(self.state.placed_nodes_source.data)
-
-        # Check first if the current_selected_node_index is within bounds for each property
-        # before updating, to avoid IndexErrors
-        if current_selected_node_index < len(placed_nodes_data.get("name", [])):
-            placed_nodes_data["name"][current_selected_node_index] = new_node_name_id
-        if current_selected_node_index < len(placed_nodes_data.get("node_type", [])):
-            placed_nodes_data["node_type"][current_selected_node_index] = new_node_type
-            # Reset port counts to defaults when the type changes and spinners are hidden
-            if not self.state.source_count_spinner.visible:
-                placed_nodes_data["n_sources"][current_selected_node_index] = int(
-                    self.state.default_source_count.get(new_node_type, 0)
-                )
-                placed_nodes_data["n_targets"][current_selected_node_index] = int(
-                    self.state.default_target_count.get(new_node_type, 0)
-                )
-        if current_selected_node_index < len(placed_nodes_data.get("position", [])):
-            placed_nodes_data["position"][current_selected_node_index] = new_position
-        # Place empty dict if there is no options entry for this node yet
-        if "options" not in placed_nodes_data:
-            placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
-        # Update options JSON string for this node
-        if current_selected_node_index < len(placed_nodes_data["options"]):
-            placed_nodes_data["options"][current_selected_node_index] = options_json_string
-
-        # These two spinners shows only if the node type supports multiple ports
+        # These two spinners show only if the node type supports multiple ports
         if self.state.source_count_spinner.visible:
             new_source_port_count = int(self.state.source_count_spinner.value)
-            if "n_sources" in placed_nodes_data and current_selected_node_index < len(
-                placed_nodes_data["n_sources"]
-            ):
-                placed_nodes_data["n_sources"][current_selected_node_index] = new_source_port_count
+            _set_cell(placed_nodes_data, "n_sources", node_index, new_source_port_count)
         if self.state.target_count_spinner.visible:
             new_target_port_count = int(self.state.target_count_spinner.value)
-            if "n_targets" in placed_nodes_data and current_selected_node_index < len(
-                placed_nodes_data["n_targets"]
-            ):
-                placed_nodes_data["n_targets"][current_selected_node_index] = new_target_port_count
+            _set_cell(placed_nodes_data, "n_targets", node_index, new_target_port_count)
 
-        # Keep the hover-tooltip source's name / node_type in sync with the edits above
-        if self.state.hover_source is not None:
-            hover_data = copy_column_data(self.state.hover_source.data)
-            if current_selected_node_index < len(hover_data.get("name", [])):
-                hover_data["name"][current_selected_node_index] = new_node_name_id
-            if current_selected_node_index < len(hover_data.get("node_type", [])):
-                hover_data["node_type"][current_selected_node_index] = new_node_type
-            self.state.hover_source.data = hover_data
+    def _write_symmetry(self, placed_nodes_data: dict, node_index: int):
+        """
+        Link node *node_index* with the peer chosen in ``symmetry_select``.
 
-        # ── Persist symmetry selection ────────────────────────────────
+        Both nodes point at each other afterwards, and any older link to either
+        of them is removed.
 
+        :param placed_nodes_data: Copy of ``placed_nodes_source.data`` whose name
+            column already holds the applied name; edited in place.
+        :param node_index: Zero-based index of the node being applied.
+        """
         all_node_names = placed_nodes_data.get("name", [])
-        node_count = len(all_node_names)
-
-        # Guard: current index must be valid before we touch names
-        if current_selected_node_index >= node_count:
-            return
-
-        current_node_name = all_node_names[current_selected_node_index]
+        current_node_name = all_node_names[node_index]
         new_symmetry_name = self.state.symmetry_select.value
 
         # Ensure symmetry columns exist and are fully sized (handles newly added nodes)
-        symmetry_names = list(placed_nodes_data.get("symmetry_name", []))
-        symmetry_indices = list(placed_nodes_data.get("symmetry_node_index", []))
-        if len(symmetry_names) < node_count:
-            symmetry_names += [_EMPTY] * (node_count - len(symmetry_names))
-        if len(symmetry_indices) < node_count:
-            symmetry_indices += [_NO_SYMMETRY_PEER] * (node_count - len(symmetry_indices))
+        symmetry_names, symmetry_indices = _padded_symmetry_columns(placed_nodes_data)
 
         # Resolve the newly chosen peer index
         new_peer_index = _NO_SYMMETRY_PEER
         if new_symmetry_name and new_symmetry_name != _EMPTY:
-            for node_position, node_name in enumerate(all_node_names):
-                if node_name == new_symmetry_name:
-                    new_peer_index = node_position
-                    break
+            new_peer_index = next(
+                (
+                    node_position
+                    for node_position, node_name in enumerate(all_node_names)
+                    if node_name == new_symmetry_name
+                ),
+                _NO_SYMMETRY_PEER,
+            )
 
-        # ── Clear stale references on both sides before writing ────────
+        # Clear stale references on both sides before writing
         #
         # Two nodes may be displaced by this Apply:
         #   (a) current node's *old* peer  — it pointed back at current_node;
@@ -1127,46 +1022,174 @@ class ConfigPanelMixin:
         #   (b) new peer's *old* partner   — new_peer previously pointed at
         #       some other node D; D still points at new_peer, so clear D too.
         #
-        # We handle both by scanning the full table and wiping every node
-        # whose symmetry_name matches current_node_name OR new_symmetry_name,
-        # excluding the two nodes that will get fresh values written below
+        # We handle both by wiping every node that points at the current node or
+        # at the new peer, excluding the two nodes that get fresh values below.
+        # Links are matched by peer index too, as the current node's name may
+        # have just changed in this same Apply
 
-        nodes_getting_fresh_write = {current_selected_node_index}
+        nodes_getting_fresh_write = {node_index}
+        linked_node_indices = {node_index}
+        linked_node_names = {current_node_name}
         if new_peer_index != _NO_SYMMETRY_PEER:
             nodes_getting_fresh_write.add(new_peer_index)
+            linked_node_indices.add(new_peer_index)
+            linked_node_names.add(new_symmetry_name)
 
-        for position in range(node_count):
-            if position in nodes_getting_fresh_write:
-                continue
-            sym_name = symmetry_names[position]
-            if sym_name == current_node_name or (
-                new_symmetry_name and new_symmetry_name != _EMPTY and sym_name == new_symmetry_name
-            ):
-                symmetry_names[position] = _EMPTY
-                symmetry_indices[position] = _NO_SYMMETRY_PEER
+        stale_positions = [
+            node_position
+            for node_position in _positions_linked_to(
+                symmetry_names, symmetry_indices, linked_node_indices, linked_node_names
+            )
+            if node_position not in nodes_getting_fresh_write
+        ]
+        _unlink_symmetry(symmetry_names, symmetry_indices, stale_positions)
 
         # Write the current node's new symmetry entry
-        symmetry_names[current_selected_node_index] = new_symmetry_name
-        symmetry_indices[current_selected_node_index] = new_peer_index
+        symmetry_names[node_index] = new_symmetry_name
+        symmetry_indices[node_index] = new_peer_index
 
         # Write the new peer's back-reference (if a peer was chosen)
         if new_peer_index != _NO_SYMMETRY_PEER:
             symmetry_names[new_peer_index] = current_node_name
-            symmetry_indices[new_peer_index] = current_selected_node_index
+            symmetry_indices[new_peer_index] = node_index
 
         placed_nodes_data["symmetry_name"] = symmetry_names
         placed_nodes_data["symmetry_node_index"] = symmetry_indices
 
-        # Update the placed_nodes_source with the modified data
-        self.state.placed_nodes_source.data = placed_nodes_data
+    def _sync_hover_source(self, placed_nodes_data: dict, node_index: int):
+        """
+        Copy the applied name and type of node *node_index* into ``hover_source``.
 
-        # ── Commit pending connections ─────────────────────────────────
-        for starting_port, ending_port in list(self.state.panel_pending_connections):
-            self._add_edge(starting_port, ending_port)
-        self._clear_temp_edges()
-        self._rebuild_all_ports()
+        :param placed_nodes_data: Node columns after the Apply.
+        :param node_index: Zero-based index of the node being applied.
+        """
+        if self.state.hover_source is None:
+            return
+        hover_data = copy_column_data(self.state.hover_source.data)
+        for column_name in ("name", "node_type"):
+            if node_index < len(placed_nodes_data.get(column_name, [])):
+                _set_cell(
+                    hover_data, column_name, node_index, placed_nodes_data[column_name][node_index]
+                )
+        self.state.hover_source.data = hover_data
 
-        self._mark_unsaved()
+
+def _set_cell(column_data: dict, column_name: str, row_index: int, value) -> bool:
+    """
+    Set one cell of column data if the column exists and the row is in range.
+
+    :param column_data: ``ColumnDataSource.data`` copy, edited in place.
+    :param column_name: Column to write.
+    :param row_index: Zero-based row to write.
+    :param value: New value of the cell.
+    :return: ``True`` if the cell was written.
+    """
+    column_values = column_data.get(column_name)
+    if column_values is None or row_index >= len(column_values):
+        return False
+    column_values[row_index] = value
+    return True
+
+
+def _is_same_port(port: dict, port_kind: str, node_index: int, port_label: str) -> bool:
+    """
+    Whether the port dict *port* is the port ``(port_kind, node_index, port_label)``.
+
+    :param port: Port dict with keys ``kind``, ``node_index`` and ``label``.
+    :param port_kind: ``"source"`` or ``"target"``.
+    :param node_index: Zero-based index of the node that owns the port.
+    :param port_label: Port label (``"1"``, ``"2"``, ...).
+    :return: ``True`` for the same port.
+    """
+    return (
+        port["kind"] == port_kind
+        and port["node_index"] == node_index
+        and port["label"] == port_label
+    )
+
+
+def _connected_far_ports(edge_data: dict, node_index: int) -> tuple[dict, dict]:
+    """
+    Far end of every connection of node *node_index*, split by the node's port side.
+
+    An edge is stored with whichever port was clicked first as its start, so
+    both ends are checked, each on its own.
+
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :param node_index: Zero-based index of the node.
+    :return: Tuple ``(connected_source, connected_target)`` of dictionaries
+        mapping the node's own port label to ``(far_node_index, far_label)``.
+    """
+    connected_ports = {"source": {}, "target": {}}
+    for edge_position in range(len(edge_data.get("starting_node_index", []))):
+        starting_end = (
+            edge_data["starting_node_index"][edge_position],
+            edge_data["starting_port_label"][edge_position],
+            edge_data["starting_port_kind"][edge_position],
+        )
+        ending_end = (
+            edge_data["ending_node_index"][edge_position],
+            edge_data["ending_port_label"][edge_position],
+            edge_data["ending_port_kind"][edge_position],
+        )
+        for own_end, far_end in ((starting_end, ending_end), (ending_end, starting_end)):
+            own_node_index, own_label, own_kind = own_end
+            if own_node_index == node_index and own_kind in connected_ports:
+                connected_ports[own_kind][own_label] = far_end[:2]
+    return connected_ports["source"], connected_ports["target"]
+
+
+def _padded_symmetry_columns(placed_nodes_data: dict) -> tuple[list, list]:
+    """
+    Copies of the two symmetry columns, padded to one entry per node.
+
+    :param placed_nodes_data: ``placed_nodes_source.data`` (or a copy of it).
+    :return: Tuple ``(symmetry_names, symmetry_indices)`` of new lists.
+    """
+    num_nodes = len(placed_nodes_data.get("name", []))
+    symmetry_names = list(placed_nodes_data.get("symmetry_name", []))
+    symmetry_indices = list(placed_nodes_data.get("symmetry_node_index", []))
+    symmetry_names += [_EMPTY] * (num_nodes - len(symmetry_names))
+    symmetry_indices += [_NO_SYMMETRY_PEER] * (num_nodes - len(symmetry_indices))
+    return symmetry_names, symmetry_indices
+
+
+def _positions_linked_to(
+    symmetry_names: list, symmetry_indices: list, node_indices: set, node_names: set
+) -> list:
+    """
+    Positions of the nodes whose symmetry peer is one of the given nodes.
+
+    A link counts if it matches either the peer index or the peer name, so a
+    link is still found when one of the two is out of date.
+
+    :param symmetry_names: ``symmetry_name`` column.
+    :param symmetry_indices: ``symmetry_node_index`` column.
+    :param node_indices: Indices of the nodes whose incoming links are wanted.
+    :param node_names: Names of the same nodes.
+    :return: List of node positions, in order.
+    """
+    peer_names = {node_name for node_name in node_names if node_name not in (_EMPTY, None)}
+    return [
+        node_position
+        for node_position, (peer_name, peer_index) in enumerate(
+            zip(symmetry_names, symmetry_indices, strict=True)
+        )
+        if peer_index in node_indices or peer_name in peer_names
+    ]
+
+
+def _unlink_symmetry(symmetry_names: list, symmetry_indices: list, node_positions: list) -> None:
+    """
+    Reset the symmetry entries at *node_positions*, in place.
+
+    :param symmetry_names: ``symmetry_name`` column, edited in place.
+    :param symmetry_indices: ``symmetry_node_index`` column, edited in place.
+    :param node_positions: Positions of the nodes to unlink.
+    """
+    for node_position in node_positions:
+        symmetry_names[node_position] = _EMPTY
+        symmetry_indices[node_position] = _NO_SYMMETRY_PEER
 
 
 def _port_label_stylesheets(node_type: str, port_label: str, primary_type_keywords: tuple) -> list:

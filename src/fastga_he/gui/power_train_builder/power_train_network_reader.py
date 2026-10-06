@@ -6,7 +6,7 @@
 YAML de-serialiser for the powertrain builder.
 
 :class:`PowerTrainYAMLReader` is the inverse of
-:class:`~.power_train_network_writer.PowerTrainYAML`: it reads a powertrain
+:class:`~.power_train_network_writer.PowerTrainYAMLWriter`: it reads a powertrain
 YAML configuration file and rebuilds the canvas state (nodes + edges) the
 builder needs to display and edit it.
 
@@ -52,8 +52,11 @@ from .power_train_builder_state import (
     CANVAS_FIT_NODE_MARGIN,
     CANVAS_WORLD_X_RANGE,
     CANVAS_WORLD_Y_RANGE,
+    EDGE_COLUMNS,
+    NODE_COLUMNS,
     _EMPTY,
     _NO_SYMMETRY_PEER,
+    empty_columns,
 )
 from .power_train_network_writer import (
     KEY_CANVAS_LAYOUT,
@@ -131,35 +134,6 @@ _ENERGY_STORAGE_COMPONENT_TYPES = _matching_component_types(_ENERGY_STORAGE_KEYW
 _LAYOUT_FROM_PROPULSOR = False
 
 
-_NODE_COLUMNS = (
-    "x",
-    "y",
-    "url",
-    "w",
-    "h",
-    "name",
-    "node_type",
-    "icon_type",
-    "position",
-    "options",
-    "n_sources",
-    "n_targets",
-    "symmetry_name",
-    "symmetry_node_index",
-)
-_EDGE_COLUMNS = (
-    "xs",
-    "ys",
-    "color",
-    "starting_node_index",
-    "starting_port_label",
-    "starting_port_kind",
-    "ending_node_index",
-    "ending_port_label",
-    "ending_port_kind",
-)
-
-
 class PowerTrainYAMLReader:
     """
     Rebuild builder canvas data from a powertrain YAML configuration file.
@@ -172,6 +146,12 @@ class PowerTrainYAMLReader:
     """
 
     def __init__(self, state, icon_size: int):
+        """
+        Keep the per-type metadata the reader needs from *state*.
+
+        :param state: :class:`~.power_train_builder_state.BuilderState` instance.
+        :param icon_size: Pixel size (width = height) of placed icons.
+        """
         self.possible_position = state.possible_position
         self.possible_options = state.possible_options
         self.default_source_count = state.default_source_count
@@ -235,15 +215,15 @@ class PowerTrainYAMLReader:
 
         :return: ``(nodes_data, name_to_index, nodes_without_layout, propulsor_names)``.
         """
-        nodes_data = {column: [] for column in _NODE_COLUMNS}
+        nodes_data = empty_columns(NODE_COLUMNS)
         name_to_index: dict = {}
         symmetry_requests: list = []  # (node_index, peer_name)
         nodes_without_layout: list = []
         propulsor_names: set = set()
 
-        for raw_name, component in components.items():
+        for raw_name, raw_component in components.items():
             name = str(raw_name)
-            component = component or {}
+            component = raw_component or {}
 
             known_component = _KNOWN_COMPONENT_BY_ID.get(component.get("id"))
             if known_component is None:
@@ -406,7 +386,7 @@ class PowerTrainYAMLReader:
         """
         Port counts for a node: the type's defaults, except for variable-port
         components whose ``number_of_*`` options (written by
-        ``PowerTrainYAML.add_component`` with the same keyword rules) override them.
+        ``PowerTrainYAMLWriter.add_component`` with the same keyword rules) override them.
 
         :param component_type: Component type key used to look up the default port counts.
         :param known_component: Matching entry of ``KNOWN_COMPONENTS``.
@@ -468,7 +448,7 @@ class PowerTrainYAMLReader:
         :param name_to_index: Dictionary mapping component names to their node index.
         :return: Dictionary of edge columns.
         """
-        edges_data = {column: [] for column in _EDGE_COLUMNS}
+        edges_data = empty_columns(EDGE_COLUMNS)
 
         for connection in connections:
             if not isinstance(connection, dict):
@@ -631,6 +611,7 @@ def _layout_area(canvas_area: dict) -> tuple[float, float, float, float]:
     per_px = canvas_area["per_px"]
 
     def inset(side: str) -> float:
+        """Margin on *side* in data units, never below ``CANVAS_FIT_NODE_MARGIN``."""
         return max(CANVAS_FIT_NODE_MARGIN, _LAYOUT_MARGIN_PX[side] * per_px)
 
     # Rounded inwards to the 0.1 data-unit precision of saved positions
@@ -688,10 +669,12 @@ def _hierarchical_canvas_positions(
     names = list(nodes_data["name"])
     graph = nx.DiGraph()
     graph.add_nodes_from(names)
-    for start, end in zip(edges_data["starting_node_index"], edges_data["ending_node_index"]):
+    for start, end in zip(
+        edges_data["starting_node_index"], edges_data["ending_node_index"], strict=True
+    ):
         graph.add_edge(names[start], names[end])
 
-    node_types = dict(zip(names, nodes_data["node_type"]))
+    node_types = dict(zip(names, nodes_data["node_type"], strict=True))
     layers = _hierarchy_layers(graph, node_types, propulsor_names, from_propulsor)
 
     # The viewer's layout works in abstract units: x = slot inside a layer
@@ -714,7 +697,7 @@ def _hierarchical_canvas_positions(
         y_max,
         _LAYOUT_STEP_MAX_FRACTION_Y * (y_max - y_min),
     )
-    return {name: (x, y) for name, x, y in zip(layout_names, xs, ys)}
+    return {name: (x, y) for name, x, y in zip(layout_names, xs, ys, strict=True)}
 
 
 def _grid_positions(count: int, area: tuple) -> list[tuple[float, float]]:

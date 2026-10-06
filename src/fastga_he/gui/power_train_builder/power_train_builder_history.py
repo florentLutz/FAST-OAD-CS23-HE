@@ -56,12 +56,17 @@ class EditHistoryStack:
     """
 
     def __init__(self, max_depth: int = _DEFAULT_MAX_DEPTH):
+        """
+        Create empty undo and redo stacks.
+
+        :param max_depth: Maximum number of snapshots kept on each stack.
+        """
         self._undo: deque = deque(maxlen=max_depth)
         self._redo: deque = deque(maxlen=max_depth)
 
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
     # Public API
-    # ------------------------------------------------------------------
+    # -----------------------------------------------------------------------
 
     def push_undo(self, snapshot: dict) -> None:
         """
@@ -106,6 +111,17 @@ class EditHistoryStack:
         _LOGGER.debug("Redo pop: remaining=%d", len(self._redo))
         return snapshot
 
+    def push_undo_keep_redo(self, snapshot: dict) -> None:
+        """
+        Push *snapshot* onto the undo stack without clearing the redo stack.
+
+        Used by the redo handler, which must save the current state for a later
+        undo while the remaining redo steps stay available.
+
+        :param snapshot: Snapshot dict produced by :func:`make_snapshot`.
+        """
+        self._undo.append(snapshot)
+
     def push_redo(self, snapshot: dict) -> None:
         """
         Push *snapshot* onto the redo stack (called by the undo handler before
@@ -137,9 +153,9 @@ class EditHistoryStack:
         return len(self._undo)
 
 
-# ------------------------------------------------------------------
+# ============================================================================
 # Snapshot helper (module-level so it can be imported independently)
-# ------------------------------------------------------------------
+# ============================================================================
 
 
 def make_snapshot(state) -> dict:

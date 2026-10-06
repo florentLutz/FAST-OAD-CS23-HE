@@ -56,7 +56,7 @@ from .power_train_builder_handler import BuilderHandler
 
 _LOGGER = logging.getLogger(__name__)
 
-# ── Canvas legend ─────────────────────────────────────────────────────────────
+# Canvas legend
 # Mirrors the viewer's LegendBuilder._add_legend layout:
 #   [icon PNG]  [colored label text]
 # drawn in the edge color of each connection type.
@@ -131,7 +131,7 @@ def _add_canvas_legend(canvas) -> None:
         y_end - _LEGEND_TOP_PX - row_index * _LEGEND_ROW_STEP_PX for row_index in range(num_entries)
     ]
 
-    # ── PNG icons (left) ──────────────────────────────────────────────────────
+    # PNG icons (left)
     icon_source = bkmodel.ColumnDataSource(
         data=dict(
             url=icon_urls,
@@ -143,7 +143,7 @@ def _add_canvas_legend(canvas) -> None:
     )
     canvas.image_url(url="url", x="x", y="y", w="w", h="h", anchor="center", source=icon_source)
 
-    # ── Colored text labels (right) ───────────────────────────────────────────
+    # Colored text labels (right)
     label_source = bkmodel.ColumnDataSource(
         data=dict(
             x=[x_end - _LEGEND_LABEL_FROM_RIGHT_PX] * num_entries,
@@ -165,7 +165,7 @@ def _add_canvas_legend(canvas) -> None:
         )
     )
 
-    # ── Pin to the screen ─────────────────────────────────────────────────────
+    # Pin to the screen
     pin_legend = bkmodel.CustomJS(
         args=dict(
             plot=canvas,
@@ -192,7 +192,7 @@ def _add_canvas_legend(canvas) -> None:
     canvas.js_on_change("inner_height", pin_legend)
 
 
-# ── Window-fitted canvas ──────────────────────────────────────────────────────
+# Window-fitted canvas
 # The canvas takes the space between the two side panels, whatever the
 # screen / window aspect ratio (16:9, 16:10, ...), and is refitted on resize.
 # Two client-side steps:
@@ -351,7 +351,7 @@ class PowertrainBuilderLauncher:
                 ComponentToolboxConfigurationTableBuilder.build()
             )
 
-            # ── Undo / Redo buttons ───────────────────────────────────────────
+            # Undo / Redo buttons
             # Created here (before BuilderHandler) so they exist on the state
             # when _wire_buttons() runs and can be wired immediately
             _undo_redo_stylesheet = [":host button { font-size: 1.25em; min-width: 90px; }"]
@@ -377,7 +377,7 @@ class PowertrainBuilderLauncher:
             state.undo_button = undo_button
             state.redo_button = redo_button
 
-            # ── Canvas ────────────────────────────────────────────────────────
+            # Canvas
             # Initial size only: resized to the browser window on load / resize
             # (see _make_canvas_fit_window)
             canvas = bkplot.figure(
@@ -396,10 +396,10 @@ class PowertrainBuilderLauncher:
             canvas.yaxis.visible = False
             canvas.title.text_color = BACKGROUND_COLOR_CODE
 
-            # ── Static connection-type legend (upper-right corner) ────────────
+            # Static connection-type legend (upper-right corner)
             _add_canvas_legend(canvas)
 
-            # ── Permanent edge lines ──────────────────────────────────────────
+            # Permanent edge lines
             canvas.multi_line(
                 xs="xs",
                 ys="ys",
@@ -453,7 +453,7 @@ class PowertrainBuilderLauncher:
                 line_dash="dashed",
             )
 
-            # ── Hover glyphs ──────────────────────────────────────────────────
+            # Hover glyphs
             scatter_glyph = canvas.scatter(
                 x="x",
                 y="y",
@@ -465,7 +465,7 @@ class PowertrainBuilderLauncher:
                 hover_line_alpha=0.3,
             )
 
-            # ── Source port balls ─────────────────────────────────────────────
+            # Source port balls
             canvas.scatter(
                 x="x",
                 y="y",
@@ -501,7 +501,7 @@ class PowertrainBuilderLauncher:
                 text_color="color",
             )
 
-            # ── Target port balls ─────────────────────────────────────────────
+            # Target port balls
             canvas.scatter(
                 x="x",
                 y="y",
@@ -537,7 +537,7 @@ class PowertrainBuilderLauncher:
                 text_color="white",
             )
 
-            # ── Hover tooltips ────────────────────────────────────────────────
+            # Hover tooltips
             canvas.add_tools(
                 bkmodel.HoverTool(
                     renderers=[scatter_glyph],
@@ -563,7 +563,7 @@ class PowertrainBuilderLauncher:
                 ),
             )
 
-            # ── Node-name labels ──────────────────────────────────────────────
+            # Node-name labels
             placed_label_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], text=[]))
             state.node_label_set = bkmodel.LabelSet(
                 x="x",
@@ -579,6 +579,7 @@ class PowertrainBuilderLauncher:
             canvas.add_layout(state.node_label_set)
 
             def _sync_labels(attr, old, new_data):
+                """Keep the canvas name labels on the placed nodes' positions and names."""
                 placed_label_source.data = dict(
                     x=list(new_data.get("x", [])),
                     y=list(new_data.get("y", [])),
@@ -590,7 +591,7 @@ class PowertrainBuilderLauncher:
             # Hover ring, resized together with the icons by the icon-size slider
             state.hover_ring_renderer = scatter_glyph
 
-            # ── Wire canvas interaction ───────────────────────────────────────
+            # Wire canvas interaction
             # Also wires the type_select live-refresh callback and the Apply
             # button (config panel commit) — see BuilderHandler._wire_buttons
             handler = BuilderHandler(state, canvas, icon_size=DEFAULT_NODE_ICON_SIZE)
@@ -599,7 +600,7 @@ class PowertrainBuilderLauncher:
             # Size the canvas to the browser window (any aspect ratio)
             _make_canvas_fit_window(doc, canvas, state)
 
-            # ── Startup overlay ───────────────────────────────────────────────
+            # Startup overlay
             startup_overlay = column(
                 bkmodel.Div(
                     text=(
@@ -631,7 +632,7 @@ class PowertrainBuilderLauncher:
                 },
             )
 
-            # ── Undo / Redo toolbar row (above the canvas) ────────────────────
+            # Undo / Redo toolbar row (above the canvas)
             # Floated in the upper-left of the canvas area via absolute positioning
             # so it does not shift the canvas itself.  z-index keeps it above the
             # Bokeh toolbar but below the startup / save overlays (z-index 100)
@@ -669,6 +670,7 @@ class PowertrainBuilderLauncher:
             make_document(doc)
 
             def on_destroy(session_context):
+                """Stop the server once the browser session is closed."""
                 IOLoop.current().stop()
 
             doc.on_session_destroyed(on_destroy)

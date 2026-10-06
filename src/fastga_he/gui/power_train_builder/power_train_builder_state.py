@@ -87,6 +87,12 @@ _EMPTY = ""
 # that has no symmetry peer selected
 _NO_SYMMETRY_PEER = -1
 
+# Save modes sent by the "final version?" overlay through browse_save_trigger
+# (value = "<mode>:<timestamp>"): a final file has no canvas_layout section
+SAVE_MODE_FINAL = "final"
+SAVE_MODE_EDITABLE = "editable"
+SAVE_MODE_CANCEL = "cancel"
+
 
 # ============================================================================
 # ColumnDataSource copy helper
@@ -112,6 +118,145 @@ def copy_column_data(data: dict) -> dict:
         containing the same values (a shallow copy per column).
     """
     return {key: list(values) for key, values in data.items()}
+
+
+# ============================================================================
+# Column layouts of the canvas data sources
+# ============================================================================
+
+# Columns of placed_nodes_source, one row per placed component. "options" is a
+# JSON-encoded dict of option_name -> value, "n_sources" / "n_targets" the
+# current port counts, and "symmetry_name" / "symmetry_node_index" the
+# symmetry peer (_EMPTY / _NO_SYMMETRY_PEER when there is none)
+NODE_COLUMNS = (
+    "x",
+    "y",
+    "url",
+    "w",
+    "h",
+    "name",
+    "node_type",
+    "icon_type",
+    "position",
+    "options",
+    "n_sources",
+    "n_targets",
+    "symmetry_name",
+    "symmetry_node_index",
+)
+
+# Columns of edge_source, one row per connection between two ports
+EDGE_COLUMNS = (
+    "xs",
+    "ys",
+    "color",
+    "starting_node_index",
+    "starting_port_label",
+    "starting_port_kind",
+    "ending_node_index",
+    "ending_port_label",
+    "ending_port_kind",
+)
+
+# Columns of source_port_source and target_port_source, one row per port ball
+PORT_COLUMNS = (
+    "x",
+    "y",
+    "color",
+    "label",
+    "node_index",
+    "node_name",
+    "node_type",
+    "fill_alpha",
+    "line_alpha",
+    "connected",
+)
+
+# Columns of hover_source, the node subset shown in the hover tooltip
+HOVER_COLUMNS = ("x", "y", "name", "node_type")
+
+
+def empty_columns(column_names: tuple) -> dict:
+    """
+    Return ``ColumnDataSource.data`` with every column in *column_names* empty.
+
+    :param column_names: One of :data:`NODE_COLUMNS`, :data:`EDGE_COLUMNS`,
+        :data:`PORT_COLUMNS` or :data:`HOVER_COLUMNS`.
+    :return: Dictionary mapping each column name to a new empty list.
+    """
+    return {column_name: [] for column_name in column_names}
+
+
+# ============================================================================
+# Edge selection helpers
+# ============================================================================
+
+
+def select_edges(edge_data: dict, kept_edge_indices: list) -> dict:
+    """
+    Return a copy of *edge_data* holding only the edges at *kept_edge_indices*.
+
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :param kept_edge_indices: Positions of the edges to keep, in order.
+    :return: New edge data with the same columns.
+    """
+    return {
+        column_name: [column_values[edge_position] for edge_position in kept_edge_indices]
+        for column_name, column_values in edge_data.items()
+    }
+
+
+def edge_indices_not_touching_node(edge_data: dict, node_index: int) -> list:
+    """
+    Positions of the edges that are not attached to node *node_index*.
+
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :param node_index: Zero-based index of the node in ``placed_nodes_source``.
+    :return: List of edge positions, in order.
+    """
+    return [
+        edge_position
+        for edge_position, (starting_node_index, ending_node_index) in enumerate(
+            zip(
+                edge_data.get("starting_node_index", []),
+                edge_data.get("ending_node_index", []),
+                strict=True,
+            )
+        )
+        if node_index not in (starting_node_index, ending_node_index)
+    ]
+
+
+def edge_indices_not_touching_port(
+    edge_data: dict, node_index: int, port_label: str, port_kind: str
+) -> list:
+    """
+    Positions of the edges that are not attached to one port.
+
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :param node_index: Zero-based index of the node that owns the port.
+    :param port_label: Port label (``"1"``, ``"2"``, ...).
+    :param port_kind: ``"source"`` or ``"target"``.
+    :return: List of edge positions, in order.
+    """
+    port_key = (node_index, port_label, port_kind)
+    return [
+        edge_position
+        for edge_position in range(len(edge_data.get("starting_node_index", [])))
+        if port_key
+        not in (
+            (
+                edge_data["starting_node_index"][edge_position],
+                edge_data["starting_port_label"][edge_position],
+                edge_data["starting_port_kind"][edge_position],
+            ),
+            (
+                edge_data["ending_node_index"][edge_position],
+                edge_data["ending_port_label"][edge_position],
+                edge_data["ending_port_kind"][edge_position],
+            ),
+        )
+    ]
 
 
 # ============================================================================
@@ -141,7 +286,7 @@ class BuilderState:
       ``"battery_pack"``), *not* the toolbox icon key.
     """
 
-    # ── Toolbox / palette ───────────────────────────────────────────────────
+    # Toolbox / palette
     # One Button per entry in ICONS_CONFIG, in the same order
     buttons: list = field(default_factory=list)
     # icon_key of the toolbox button currently armed for placement, or None
@@ -163,7 +308,7 @@ class BuilderState:
     selection_ring_renderer: object = field(default=None)
     node_label_set: object = field(default=None)
 
-    # ── Window-fitted canvas ─────────────────────────────────────────────────
+    # Window-fitted canvas
     # Data units per screen pixel of the current fitted view (1.0 = the
     # original fixed 800 x 950 canvas). Sent from the browser through
     # view_scale_input; used to keep screen-pixel glyphs (hover / selection
@@ -182,7 +327,7 @@ class BuilderState:
     # browser re-fits the view to the (new) components (Python -> JS)
     fit_view_trigger: bkmodel.TextInput = field(default=None)
 
-    # ── Canvas node data ─────────────────────────────────────────────────────
+    # Canvas node data
     # One row per placed component: position, icon URL, type, options JSON,
     # port counts, and symmetry link. The primary data source driving the
     # canvas's image_url glyph
@@ -197,7 +342,7 @@ class BuilderState:
     # config panel, or None if nothing is selected
     selected_node_index: int = field(default=None)
 
-    # ── Ports ────────────────────────────────────────────────────────────────
+    # Ports
     # One row per port ball currently drawn on the canvas, keyed by
     # node_index (matching a row in placed_nodes_source) + label. Rebuilt
     # from scratch by PortEdgeMixin._rebuild_all_ports() on every node
@@ -219,7 +364,7 @@ class BuilderState:
     # awaiting_second_port_click while the second click is awaited
     awaiting_second_port_click_source: bkmodel.ColumnDataSource = field(default=None)
 
-    # ── Edges (permanent connections) ───────────────────────────────────────
+    # Edges (permanent connections)
     # One row per committed connection between a source port and a target
     # port. Unlike the port sources, edges persist across
     # _rebuild_all_ports() calls (their xs/ys are recomputed in place by
@@ -234,7 +379,7 @@ class BuilderState:
     # currently in progress
     edge_preview_backup: dict = field(default=None)
 
-    # ── Config / edit panel ──────────────────────────────────────────────────
+    # Config / edit panel
     # The whole config panel column (name, type, position, options,
     # connections, symmetry, Apply button) — toggled visible when a node is
     # selected on the canvas, hidden otherwise
@@ -272,7 +417,7 @@ class BuilderState:
     # ConfigPanelMixin.apply_node_configurations()
     panel_pending_connections: list = field(default_factory=list)
 
-    # ── Per-component-type metadata (built once at startup) ─────────────────
+    # Per-component-type metadata (built once at startup)
     # All four dicts below are keyed by components_type string (see class
     # docstring), built once by ComponentPaletteBuilder.build() from
     # KNOWN_COMPONENTS / each component's constants.py, and treated as
@@ -291,7 +436,7 @@ class BuilderState:
     # from the four dicts above — read the name carefully
     icon_to_component_types: dict = field(default_factory=dict)
 
-    # ── Save / load ──────────────────────────────────────────────────────────
+    # Save / load
     # "Is this the final version?" overlay — shown by the Save button (and by
     # Save & Exit). "Final Version" saves without the GUI-only canvas_layout
     # section; "Edit Later" keeps it (see IOMixin._on_browse_save)
@@ -306,13 +451,13 @@ class BuilderState:
     browse_load_trigger: bkmodel.TextInput = field(default=None)
     browse_save_trigger: bkmodel.TextInput = field(default=None)
 
-    # ── Startup overlay ──────────────────────────────────────────────────────
+    # Startup overlay
     new_design_button: bkmodel.Button = field(default=None)
     load_design_button: bkmodel.Button = field(default=None)
     # The whole startup overlay column — hidden (not just its two buttons) on dismiss
     startup_overlay: object = field(default=None)
 
-    # ── End-session flow ─────────────────────────────────────────────────────
+    # End-session flow
     # "Unsaved changes" confirmation overlay — shown by End Session when
     # save_button is yellow (i.e. there are unsaved edits)
     unsaved_exit_overlay: object = field(default=None)
@@ -329,7 +474,7 @@ class BuilderState:
     # Uses js_on_change so the JS callback runs when the server pushes the value
     close_window_trigger: bkmodel.TextInput = field(default=None)
 
-    # ── Undo / redo ──────────────────────────────────────────────────────────
+    # Undo / redo
     # EditHistoryStack instance (set by BuilderHandler.__init__)
     edit_history_stack: object = field(default=None)
     # Bokeh Button widgets for Undo and Redo, placed above the canvas

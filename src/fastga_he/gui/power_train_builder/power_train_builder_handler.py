@@ -36,7 +36,15 @@ Typical usage::
 
 import logging
 
-from .power_train_builder_state import BuilderState, DEFAULT_NODE_ICON_SIZE, copy_column_data
+from .power_train_builder_state import (
+    BuilderState,
+    DEFAULT_NODE_ICON_SIZE,
+    _EMPTY,
+    _NO_SYMMETRY_PEER,
+    copy_column_data,
+    edge_indices_not_touching_node,
+    select_edges,
+)
 from .power_train_builder_history import EditHistoryStack
 from .power_train_builder_handler_canvas_mode import CanvasModeMixin
 from .power_train_builder_handler_placement import PlacementMixin
@@ -185,129 +193,167 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         """
         x, y = event.x, event.y
 
-        # Port connection has highest priority in idle mode.
-        # Undo for port connections is pushed inside _handle_port_tap, just
-        # before the permanent edge is committed
-        if not self.state.delete_mode and self.state.selected_component is None:
-            # No component is selected to place and not in delete mode: check for a port tap first
+        if self.state.delete_mode:
+            self._delete_at(x, y)
+        elif self.state.selected_component is not None:
+            # A component is selected in the toolbox: place it at the tap coordinates
+            self._place_new_node(x, y)
+        else:
+            # Idle mode: a port tap (connection) has priority over a node tap
+            # (selection). Undo for port connections is pushed inside
+            # _handle_port_tap, just before the permanent edge is committed
             nearest_port = self._find_nearest_port(x, y)
             if nearest_port is not None:
-                # Find the port that was tapped and handle the connection
                 self._handle_port_tap(nearest_port)
-                return
-
-        if self.state.delete_mode:
-            # Delete mode: find if any component (node) on the canvas is tapped
-            best_node_index, best_node_distance, nodes_data = self._best_possible_node(x, y)
-
-            if best_node_index is not None:
-                # Push the state into the history stack before deleting the node
-                self._push_undo()
-
-                # Remove the node from the placed_nodes_source and hover_source (if it exists)
-                new_nodes_data = copy_column_data(nodes_data)
-                for column_name in new_nodes_data:
-                    new_nodes_data[column_name].pop(best_node_index)
-                self.state.placed_nodes_source.data = new_nodes_data
-
-                if self.state.hover_source is not None:
-                    hover_data = copy_column_data(self.state.hover_source.data)
-                    for column_name in hover_data:
-                        if best_node_index < len(hover_data[column_name]):
-                            hover_data[column_name].pop(best_node_index)
-                    self.state.hover_source.data = hover_data
-
-                # Remove any edges connected to the deleted node and adjust indices of remaining edges
-                if self.state.edge_source is not None:
-                    edge_data = copy_column_data(self.state.edge_source.data)
-                    kept_edge_indices = [
-                        edge_position
-                        for edge_position, (starting_node_index, ending_node_index) in enumerate(
-                            zip(
-                                edge_data.get("starting_node_index", []),
-                                edge_data.get("ending_node_index", []),
-                            )
-                        )
-                        if starting_node_index != best_node_index
-                        and ending_node_index != best_node_index
-                    ]
-                    new_edge_data = {}
-                    for column_key, column_values in edge_data.items():
-                        kept_values = [
-                            column_values[edge_position] for edge_position in kept_edge_indices
-                        ]
-                        if column_key in ("starting_node_index", "ending_node_index"):
-                            kept_values = [
-                                index - 1 if index > best_node_index else index
-                                for index in kept_values
-                            ]
-
-                        new_edge_data[column_key] = kept_values
-                    self.state.edge_source.data = new_edge_data
-
-                self._rebuild_all_ports()
-
-                # If the deleted node was selected, clear the selection and the node table
-                if self.state.selected_node_index == best_node_index:
-                    self.state.selected_node_index = None
-                    self._clear_node_table()
-
-                # Shift the selected node index left by one if it was located after the deleted node
-                # [A, B, C, D] -> delete B -> [A, C, D], so C and D shift left by one
-                elif (
-                    self.state.selected_node_index is not None
-                    and self.state.selected_node_index > best_node_index
-                ):
-                    self.state.selected_node_index -= 1
-
-                _LOGGER.info("Deleted node at index %d", best_node_index)
-                self._mark_unsaved()
-
             else:
-                edge_index = self._find_nearest_edge(x, y)
-                # Check if an edge (connection) is tapped. If so, delete it
-                if edge_index is not None and self.state.edge_source is not None:
-                    # Capture state before deleting the edge
-                    self._push_undo()
+                self._select_at(x, y)
 
-                    # Remove the edge from the edge_source data
-                    edge_data = copy_column_data(self.state.edge_source.data)
-                    for column_name in edge_data:
-                        edge_data[column_name].pop(edge_index)
-                    self.state.edge_source.data = edge_data
-                    # Recompute the ports so the freed ports are no longer flagged connected
-                    self._rebuild_all_ports()
-                    self._mark_unsaved()
-                    _LOGGER.info("Deleted edge at index %d", edge_index)
+    # -----------------------------------------------------------------------
+    # Tap actions
+    # -----------------------------------------------------------------------
 
-                if self.state.selected_node_index is not None:
-                    self._refresh_connections_table(self.state.selected_node_index)
+    def _delete_at(self, x: float, y: float):
+        """
+        Delete mode: remove the node at ``(x, y)``, or else the edge there.
 
+        :param x: Tap x coordinate in canvas data-units.
+        :param y: Tap y coordinate in canvas data-units.
+        """
+        best_node_index, _, nodes_data = self._best_possible_node(x, y)
+        if best_node_index is not None:
+            self._delete_node(best_node_index, nodes_data)
             return
 
-        if self.state.selected_component is None:
-            # No component is selected to place and not in delete mode: check for a node tap
-            best_node_index, best_node_distance, nodes_data = self._best_possible_node(x, y)
-            # Unselect port highlight and clean up the pending array
-            self._cancel_pending_connection()
+        edge_index = self._find_nearest_edge(x, y)
+        if edge_index is not None and self.state.edge_source is not None:
+            self._delete_edge(edge_index)
 
-            if best_node_index is None and best_node_distance is None:
-                return
-            elif best_node_index is None or self.state.selected_node_index == best_node_index:
-                # Deselect the node if the tap is not on any node or if the tap is on the already
-                # selected node
-                self.state.selected_node_index = None
-                self._clear_temp_edges()
-                self._clear_node_table()
-                return
-            else:
-                # A node is tapped and is not the currently selected node: select it and
-                # populate the config panel
-                self._clear_temp_edges()
-                self.state.selected_node_index = best_node_index
-                self._populate_node_table(best_node_index)
-                self.state.config_panel_column.visible = True
+        if self.state.selected_node_index is not None:
+            self._refresh_connections_table(self.state.selected_node_index)
+
+    def _delete_node(self, node_index: int, nodes_data: dict):
+        """
+        Remove node *node_index* with its edges, as a single undoable step.
+
+        Later nodes move up by one index, so edge endpoints, symmetry links and
+        the selection are shifted to match.
+
+        :param node_index: Zero-based index of the node to delete.
+        :param nodes_data: Current ``placed_nodes_source.data``.
+        """
+        # Push the state into the history stack before deleting the node
+        self._push_undo()
+
+        # Remove the node from the placed_nodes_source and hover_source (if it exists)
+        new_nodes_data = copy_column_data(nodes_data)
+        for column_name in new_nodes_data:
+            new_nodes_data[column_name].pop(node_index)
+        _reindex_symmetry_after_deletion(new_nodes_data, node_index)
+        self.state.placed_nodes_source.data = new_nodes_data
+
+        if self.state.hover_source is not None:
+            hover_data = copy_column_data(self.state.hover_source.data)
+            for column_name in hover_data:
+                if node_index < len(hover_data[column_name]):
+                    hover_data[column_name].pop(node_index)
+            self.state.hover_source.data = hover_data
+
+        # Remove any edges connected to the deleted node and adjust indices of remaining edges
+        if self.state.edge_source is not None:
+            edge_data = copy_column_data(self.state.edge_source.data)
+            new_edge_data = select_edges(
+                edge_data, edge_indices_not_touching_node(edge_data, node_index)
+            )
+            # Nodes after the deleted one move up by one index
+            for column_name in ("starting_node_index", "ending_node_index"):
+                new_edge_data[column_name] = [
+                    index - 1 if index > node_index else index
+                    for index in new_edge_data[column_name]
+                ]
+            self.state.edge_source.data = new_edge_data
+
+        self._rebuild_all_ports()
+
+        # If the deleted node was selected, clear the selection and the node table
+        if self.state.selected_node_index == node_index:
+            self.state.selected_node_index = None
+            self._clear_node_table()
+
+        # Shift the selected node index left by one if it was located after the deleted node
+        # [A, B, C, D] -> delete B -> [A, C, D], so C and D shift left by one
+        elif (
+            self.state.selected_node_index is not None
+            and self.state.selected_node_index > node_index
+        ):
+            self.state.selected_node_index -= 1
+
+        _LOGGER.info("Deleted node at index %d", node_index)
+        self._mark_unsaved()
+
+    def _delete_edge(self, edge_index: int):
+        """
+        Remove edge *edge_index*, as a single undoable step.
+
+        :param edge_index: Zero-based position of the edge in ``edge_source``.
+        """
+        # Capture state before deleting the edge
+        self._push_undo()
+
+        # Remove the edge from the edge_source data
+        edge_data = copy_column_data(self.state.edge_source.data)
+        for column_name in edge_data:
+            edge_data[column_name].pop(edge_index)
+        self.state.edge_source.data = edge_data
+        # Recompute the ports so the freed ports are no longer flagged connected
+        self._rebuild_all_ports()
+        self._mark_unsaved()
+        _LOGGER.info("Deleted edge at index %d", edge_index)
+
+    def _select_at(self, x: float, y: float):
+        """
+        Idle mode: select the node at ``(x, y)``, or deselect.
+
+        Tapping empty canvas or the already selected node deselects; tapping
+        another node selects it and fills the config panel.
+
+        :param x: Tap x coordinate in canvas data-units.
+        :param y: Tap y coordinate in canvas data-units.
+        """
+        best_node_index, best_node_distance, _ = self._best_possible_node(x, y)
+        # Unselect port highlight and clean up the pending array
+        self._cancel_pending_connection()
+
+        if best_node_index is None and best_node_distance is None:
             return
+        self._clear_temp_edges()
+        if best_node_index is None or self.state.selected_node_index == best_node_index:
+            # Deselect the node if the tap is not on any node or if the tap is on the
+            # already selected node
+            self.state.selected_node_index = None
+            self._clear_node_table()
+        else:
+            # A node is tapped and is not the currently selected node: select it and
+            # populate the config panel
+            self.state.selected_node_index = best_node_index
+            self._populate_node_table(best_node_index)
+            self.state.config_panel_column.visible = True
 
-        # A component is selected in the toolbox: place it at the tap coordinates
-        self._place_new_node(x, y)
+
+def _reindex_symmetry_after_deletion(nodes_data: dict, deleted_node_index: int) -> None:
+    """
+    Keep the symmetry links of *nodes_data* valid after a node was removed.
+
+    The peer of the deleted node loses its link, and every peer index after the
+    deleted node moves up by one, like the node rows themselves.
+
+    :param nodes_data: Node columns with the deleted row already removed; edited in place.
+    :param deleted_node_index: Index the deleted node had before its removal.
+    """
+    symmetry_names = nodes_data.get("symmetry_name", [])
+    symmetry_indices = nodes_data.get("symmetry_node_index", [])
+    for node_position, peer_index in enumerate(symmetry_indices):
+        if peer_index == deleted_node_index:
+            symmetry_names[node_position] = _EMPTY
+            symmetry_indices[node_position] = _NO_SYMMETRY_PEER
+        elif peer_index > deleted_node_index:
+            symmetry_indices[node_position] = peer_index - 1

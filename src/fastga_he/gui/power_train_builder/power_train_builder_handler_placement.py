@@ -23,7 +23,9 @@ from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base6
 
 from .power_train_builder_state import (
     DEFAULT_NODE_ICON_SIZE,
+    HOVER_COLUMNS,
     HOVER_RING_BASE_SIZE,
+    NODE_COLUMNS,
     NODE_LABEL_BASE_OFFSET,
     SELECTION_RING_BASE_SIZE,
     _EMPTY,
@@ -105,33 +107,34 @@ class PlacementMixin:
         default_source_port_count = self.state.default_source_count.get(default_component_type, 0)
         default_target_port_count = self.state.default_target_count.get(default_component_type, 0)
 
-        icon_pixel_size = self.icon_size
+        # One value per column of placed_nodes_source for the new component
+        new_node_row = {
+            "x": x,
+            "y": y,
+            "url": base64_url,
+            "w": self.icon_size,
+            "h": self.icon_size,
+            "name": node_name,
+            "node_type": default_component_type,
+            "icon_type": icon_key,
+            "position": default_position,
+            "options": default_options_json,
+            "n_sources": default_source_port_count,
+            "n_targets": default_target_port_count,
+            "symmetry_name": _EMPTY,
+            "symmetry_node_index": _NO_SYMMETRY_PEER,
+        }
         nodes_data = self.state.placed_nodes_source.data
         self.state.placed_nodes_source.data = {
-            "x": list(nodes_data["x"]) + [x],
-            "y": list(nodes_data["y"]) + [y],
-            "url": list(nodes_data["url"]) + [base64_url],
-            "w": list(nodes_data["w"]) + [icon_pixel_size],
-            "h": list(nodes_data["h"]) + [icon_pixel_size],
-            "name": list(nodes_data["name"]) + [node_name],
-            "icon_type": list(nodes_data.get("icon_type", [])) + [icon_key],
-            "node_type": list(nodes_data.get("node_type", [])) + [default_component_type],
-            "position": list(nodes_data.get("position", [])) + [default_position],
-            "options": list(nodes_data.get("options", [])) + [default_options_json],
-            "n_sources": list(nodes_data.get("n_sources", [])) + [default_source_port_count],
-            "n_targets": list(nodes_data.get("n_targets", [])) + [default_target_port_count],
-            "symmetry_name": list(nodes_data.get("symmetry_name", [])) + [_EMPTY],
-            "symmetry_node_index": list(nodes_data.get("symmetry_node_index", []))
-            + [_NO_SYMMETRY_PEER],
+            column_name: list(nodes_data.get(column_name, [])) + [new_node_row[column_name]]
+            for column_name in NODE_COLUMNS
         }
 
         if self.state.hover_source is not None:
             hover_data = self.state.hover_source.data
             self.state.hover_source.data = {
-                "x": list(hover_data["x"]) + [x],
-                "y": list(hover_data["y"]) + [y],
-                "name": list(hover_data["name"]) + [node_name],
-                "node_type": list(hover_data.get("node_type", [])) + [default_component_type],
+                column_name: list(hover_data.get(column_name, [])) + [new_node_row[column_name]]
+                for column_name in HOVER_COLUMNS
             }
 
         self._rebuild_all_ports()

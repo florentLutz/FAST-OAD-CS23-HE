@@ -208,10 +208,7 @@ def _read_constant_via_cached_import(
 # ============================================================================
 
 
-def _get_performance_component_names(
-    components_root_path: str | Path,
-    base_package: str = "fastga_he.models.propulsion.components",
-) -> tuple[dict, dict]:
+def _get_performance_component_names(components_root_path: str | Path) -> tuple[dict, dict]:
     """
     Scan the components tree and return per-component-type possible positions
     and possible options, both read from each component's ``constants.py``.
@@ -223,8 +220,6 @@ def _get_performance_component_names(
     already present in ``sys.modules`` — so it is always side-effect-free.
 
     :param components_root_path: Root path of the components tree.
-    :param base_package: Dotted package name used as the import root for the
-        cached-module fallback.
     :return: A two-element tuple ``(possible_position, possible_options)`` where:
 
         * ``possible_position`` maps ``component_type -> list[str]``
@@ -258,7 +253,7 @@ def _get_performance_component_names(
 
                     constants_file_path = init_file_path.parent / "constants.py"
 
-                    # ── POSSIBLE_POSITION ──────────────────────────────────────
+                    # POSSIBLE_POSITION
                     position_value, position_found = _read_constant_from_ast(
                         constants_file_path, "POSSIBLE_POSITION"
                     )
@@ -268,7 +263,7 @@ def _get_performance_component_names(
                         )
                     position_results[component_type] = position_value or []
 
-                    # ── POSSIBLE_OPTION ────────────────────────────────────────
+                    # POSSIBLE_OPTION
                     option_value, option_found = _read_constant_from_ast(
                         constants_file_path, "POSSIBLE_OPTION"
                     )

@@ -17,15 +17,23 @@ import numpy as np
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
 from .power_train_builder_state import (
     DEFAULT_NODE_ICON_SIZE,
+    EDGE_COLUMNS,
     NODE_RADIUS,
+    PORT_COLUMNS,
     PORT_RADIUS,
     copy_column_data,
+    empty_columns,
+    select_edges,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 # Clearance between the icon edge and each port centre at the default icon size
 _PORT_GAP = 20.0
+
+# Fill and outline opacity of the port balls of the selected node (others are hidden)
+_SELECTED_PORT_FILL_ALPHA = 0.3
+_SELECTED_PORT_LINE_ALPHA = 0.5
 
 
 # For IDE type-checking only
@@ -74,7 +82,7 @@ class PortEdgeMixin:
         snap = self.icon_size
         best_index = None
         shortest_distance = float("inf")
-        for node_position_index, (node_x, node_y) in enumerate(zip(xs, ys)):
+        for node_position_index, (node_x, node_y) in enumerate(zip(xs, ys, strict=True)):
             distance_to_tap = ((x - node_x) ** 2 + (y - node_y) ** 2) ** 0.5
             # Only consider nodes within snap distance and track the closest one
             if distance_to_tap < snap and distance_to_tap < shortest_distance:
@@ -110,7 +118,7 @@ class PortEdgeMixin:
                 continue
             data = port_source.data
             for i, (port_x, port_y) in enumerate(
-                zip(list(data.get("x", [])), list(data.get("y", [])))
+                zip(list(data.get("x", [])), list(data.get("y", [])), strict=True)
             ):
                 distance = ((x - port_x) ** 2 + (y - port_y) ** 2) ** 0.5
                 if distance < nearest_port_distance:
@@ -225,7 +233,9 @@ class PortEdgeMixin:
 
         edge_data = self.state.edge_source.data
         best_index, best_distance = None, snap
-        for i, (xs, ys) in enumerate(zip(edge_data.get("xs", []), edge_data.get("ys", []))):
+        for i, (xs, ys) in enumerate(
+            zip(edge_data.get("xs", []), edge_data.get("ys", []), strict=True)
+        ):
             if len(xs) < 2:
                 continue
             distance = self._cursor_to_segment_distance(x, y, xs[0], ys[0], xs[1], ys[1])
@@ -246,9 +256,9 @@ class PortEdgeMixin:
         the edge silently if either check fails.
 
         .. note::
-            This method does **not** push an undo snapshot.  Callers that
-            invoke ``_add_edge`` directly (e.g. the Apply button in
-            :class:`~.power_train_builder_launcher.PowertrainBuilderLauncher`)
+            This method does **not** push an undo snapshot. Callers that
+            invoke ``_add_edge`` directly (e.g. Apply, see
+            :meth:`~.power_train_builder_handler_config_panel.ConfigPanelMixin.apply_node_configurations`)
             are responsible for calling :meth:`_push_undo` beforehand.
 
         :param starting_port: Metadata dict for the source-side (starting) port.
@@ -258,71 +268,43 @@ class PortEdgeMixin:
             return
         edge_data = copy_column_data(self.state.edge_source.data)
 
-        for i in range(len(edge_data.get("starting_node_index", []))):
-            starting_port_already_used = (
-                edge_data["starting_node_index"][i] == starting_port["node_index"]
-                and edge_data["starting_port_label"][i] == starting_port["label"]
-                and edge_data["starting_port_kind"][i] == starting_port["kind"]
-            ) or (
-                edge_data["ending_node_index"][i] == starting_port["node_index"]
-                and edge_data["ending_port_label"][i] == starting_port["label"]
-                and edge_data["ending_port_kind"][i] == starting_port["kind"]
-            )
-            ending_port_already_used = (
-                edge_data["starting_node_index"][i] == ending_port["node_index"]
-                and edge_data["starting_port_label"][i] == ending_port["label"]
-                and edge_data["starting_port_kind"][i] == ending_port["kind"]
-            ) or (
-                edge_data["ending_node_index"][i] == ending_port["node_index"]
-                and edge_data["ending_port_label"][i] == ending_port["label"]
-                and edge_data["ending_port_kind"][i] == ending_port["kind"]
-            )
-            if starting_port_already_used or ending_port_already_used:
-                _LOGGER.info("Port already connected; edge rejected.")
-                return
+        connected_port_keys = _connected_port_keys(edge_data)
+        if any(
+            (port["kind"], port["node_index"], port["label"]) in connected_port_keys
+            for port in (starting_port, ending_port)
+        ):
+            _LOGGER.info("Port already connected; edge rejected.")
+            return
 
-        loop_connection = any(
-            (
-                edge_data["starting_node_index"][i] == ending_port["node_index"]
-                and edge_data["ending_node_index"][i] == starting_port["node_index"]
+        # A second edge between the same two nodes, in either direction
+        node_pair = {starting_port["node_index"], ending_port["node_index"]}
+        if any(
+            {starting_node_index, ending_node_index} == node_pair
+            for starting_node_index, ending_node_index in zip(
+                edge_data.get("starting_node_index", []),
+                edge_data.get("ending_node_index", []),
+                strict=True,
             )
-            or (
-                edge_data["starting_node_index"][i] == starting_port["node_index"]
-                and edge_data["ending_node_index"][i] == ending_port["node_index"]
-            )
-            for i in range(len(edge_data.get("starting_node_index", [])))
-        )
-        if loop_connection:
+        ):
             _LOGGER.info("Loop connection detected; edge rejected.")
             return
+
         # Update the local copy of the edge data and push it back to the Bokeh source
-        edge_data["xs"].append([starting_port["x"], ending_port["x"]])
-        edge_data["ys"].append([starting_port["y"], ending_port["y"]])
-        edge_data["color"].append(starting_port["color"])
-        edge_data["starting_node_index"].append(starting_port["node_index"])
-        edge_data["starting_port_label"].append(starting_port["label"])
-        edge_data["starting_port_kind"].append(starting_port["kind"])
-        edge_data["ending_node_index"].append(ending_port["node_index"])
-        edge_data["ending_port_label"].append(ending_port["label"])
-        edge_data["ending_port_kind"].append(ending_port["kind"])
+        new_edge_row = {
+            "xs": [starting_port["x"], ending_port["x"]],
+            "ys": [starting_port["y"], ending_port["y"]],
+            "color": starting_port["color"],
+        }
+        for end, port in (("starting", starting_port), ("ending", ending_port)):
+            new_edge_row[f"{end}_node_index"] = port["node_index"]
+            new_edge_row[f"{end}_port_label"] = port["label"]
+            new_edge_row[f"{end}_port_kind"] = port["kind"]
+        for column_name in EDGE_COLUMNS:
+            edge_data[column_name].append(new_edge_row[column_name])
         self.state.edge_source.data = edge_data
 
-        if self.state.selected_node_index is not None and (
-            starting_port["node_index"] == self.state.selected_node_index
-            or ending_port["node_index"] == self.state.selected_node_index
-        ):
-            source_data = copy_column_data(self.state.source_port_source.data)
-            target_data = copy_column_data(self.state.target_port_source.data)
-
-            if starting_port["kind"] == "source":
-                self._mark_connected(source_data, starting_port)
-                self._mark_connected(target_data, ending_port)
-            else:
-                self._mark_connected(target_data, starting_port)
-                self._mark_connected(source_data, ending_port)
-
-            self.state.source_port_source.data = source_data
-            self.state.target_port_source.data = target_data
+        if self.state.selected_node_index in node_pair:
+            self._mark_ports_connected(starting_port, ending_port)
             self._refresh_connections_table(self.state.selected_node_index)
 
         self._mark_unsaved()
@@ -335,6 +317,19 @@ class PortEdgeMixin:
             ending_port["label"],
             ending_port["node_index"],
         )
+
+    def _mark_ports_connected(self, *ports: dict):
+        """
+        Flag each port in *ports* as connected in its port data source.
+
+        :param ports: Port metadata dicts with keys ``kind``, ``node_index`` and ``label``.
+        """
+        source_data = copy_column_data(self.state.source_port_source.data)
+        target_data = copy_column_data(self.state.target_port_source.data)
+        for port in ports:
+            self._mark_connected(source_data if port["kind"] == "source" else target_data, port)
+        self.state.source_port_source.data = source_data
+        self.state.target_port_source.data = target_data
 
     @staticmethod
     def _mark_connected(data: dict, port: dict) -> None:
@@ -425,7 +420,7 @@ class PortEdgeMixin:
                 continue
             dataset = data_source.data
             for i, (port_x, port_y) in enumerate(
-                zip(list(dataset.get("x", [])), list(dataset.get("y", [])))
+                zip(list(dataset.get("x", [])), list(dataset.get("y", [])), strict=True)
             ):
                 key = (kind, list(dataset["node_index"])[i], list(dataset["label"])[i])
                 port_position_dict[key] = (port_x, port_y)
@@ -449,7 +444,7 @@ class PortEdgeMixin:
                 new_ys.append([starting_y, ending_y])
                 valid_edge_indices.append(i)  # only keep edges whose ports still exist
 
-        new_edge_data = {k: [edge_data[k][j] for j in valid_edge_indices] for k in edge_data}
+        new_edge_data = select_edges(edge_data, valid_edge_indices)
         new_edge_data["xs"] = new_xs
         new_edge_data["ys"] = new_ys
         self.state.edge_source.data = new_edge_data
@@ -499,88 +494,36 @@ class PortEdgeMixin:
             return
 
         override_counts = override_counts or {}
+        self._sync_edge_preview_backup(is_preview=bool(override_counts))
 
-        if self.state.edge_source is not None:
-            if override_counts:
-                if self.state.edge_preview_backup is None:
-                    # First preview tick of this session: remember the truth (backup)
-                    self.state.edge_preview_backup = copy_column_data(self.state.edge_source.data)
-                else:
-                    # Later ticks: always prune from the truth (backup), not from
-                    # whatever the previous tick (preview) already hid
-                    self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
-            elif self.state.edge_preview_backup is not None:
-                # Real rebuild after a preview: put the true edges back before
-                # this call's own (real, committed-count-based) pruning runs
-                self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
-                self.state.edge_preview_backup = None
-
-        selected_node_fill_alpha, selected_node_line_alpha = 0.3, 0.5
         # Port positions scale with the icon-size slider: every term of the
         # orbit radius (icon radius + port radius + gap) is multiplied by
-        # factor = icon_size / DEFAULT_NODE_ICON_SIZE, so each port sits at
-        # exactly `factor` times its default offset from the node centre
+        # size_factor = icon_size / DEFAULT_NODE_ICON_SIZE, so each port sits at
+        # exactly `size_factor` times its default offset from the node centre
         size_factor = self.icon_size / DEFAULT_NODE_ICON_SIZE
 
         placed_nodes_data = self.state.placed_nodes_source.data
-        xs = list(placed_nodes_data.get("x", []))
-        ys = list(placed_nodes_data.get("y", []))
-        icon_types = list(placed_nodes_data.get("icon_type", []))
-        node_types = list(placed_nodes_data.get("node_type", []))
-        node_names = list(placed_nodes_data.get("name", []))
         n_sources_list = list(placed_nodes_data.get("n_sources", []))
         n_targets_list = list(placed_nodes_data.get("n_targets", []))
-
-        source_x, source_y, source_color, source_label = [], [], [], []
-        source_node_index, source_node_name, source_node_type = [], [], []
-        source_fill_alpha, source_line_alpha = [], []
-
-        target_x, target_y, target_color, target_label = [], [], [], []
-        target_node_index, target_node_name, target_node_type = [], [], []
-        target_fill_alpha, target_line_alpha = [], []
-
-        connected_ports: set = set()
-        if self.state.edge_source is not None:
-            edge_data = self.state.edge_source.data
-            for i in range(len(edge_data.get("starting_node_index", []))):
-                connected_ports.add(
-                    (
-                        edge_data["starting_port_kind"][i],
-                        edge_data["starting_node_index"][i],
-                        edge_data["starting_port_label"][i],
-                    )
-                )
-                connected_ports.add(
-                    (
-                        edge_data["ending_port_kind"][i],
-                        edge_data["ending_node_index"][i],
-                        edge_data["ending_port_label"][i],
-                    )
-                )
-
-        has_selected_node = self.state.selected_node_index is not None
-        selected_node_index = self.state.selected_node_index
+        source_ports = empty_columns(PORT_COLUMNS)
+        target_ports = empty_columns(PORT_COLUMNS)
 
         for i, (center_x, center_y, icon_type, node_type, node_name) in enumerate(
-            zip(xs, ys, icon_types, node_types, node_names)
+            zip(
+                list(placed_nodes_data.get("x", [])),
+                list(placed_nodes_data.get("y", [])),
+                list(placed_nodes_data.get("icon_type", [])),
+                list(placed_nodes_data.get("node_type", [])),
+                list(placed_nodes_data.get("name", [])),
+                # Columns missing from an older save are empty: draw no ports
+                # rather than fail
+                strict=False,
+            )
         ):
-            if i in override_counts:
-                n_source, n_target = override_counts[i]
-            else:
-                n_source = (
-                    int(n_sources_list[i])
-                    if i < len(n_sources_list)
-                    else self.state.default_source_count.get(node_type, 0)
-                )
-                n_target = (
-                    int(n_targets_list[i])
-                    if i < len(n_targets_list)
-                    else self.state.default_target_count.get(node_type, 0)
-                )
-
-            icon_config = ICONS_CONFIG.get(icon_type, {})
-            raw_source_color = icon_config.get("source_color") or DEFAULT_COLOR
-            raw_target_color = icon_config.get("target_color") or DEFAULT_COLOR
+            n_source, n_target = override_counts.get(i) or (
+                _stored_port_count(n_sources_list, i, self.state.default_source_count, node_type),
+                _stored_port_count(n_targets_list, i, self.state.default_target_count, node_type),
+            )
 
             ports = self.compute_ports(
                 center_x,
@@ -591,70 +534,36 @@ class PortEdgeMixin:
                 n_target,
                 gap_pixels=_PORT_GAP * size_factor,
             )
-            is_selected = has_selected_node and i == selected_node_index
-            fill_alpha = selected_node_fill_alpha if is_selected else 0.0
-            line_alpha = selected_node_line_alpha if is_selected else 0.0
+            # Port balls are only visible on the selected node
+            is_selected = i == self.state.selected_node_index
+            node_row = {
+                "node_index": i,
+                "node_name": [node_name],
+                "node_type": [node_type],
+                "fill_alpha": _SELECTED_PORT_FILL_ALPHA if is_selected else 0.0,
+                "line_alpha": _SELECTED_PORT_LINE_ALPHA if is_selected else 0.0,
+            }
+            icon_config = ICONS_CONFIG.get(icon_type, {})
+            for port_columns, side_ports, color in (
+                (source_ports, ports["outputs"], icon_config.get("source_color")),
+                (target_ports, ports["inputs"], icon_config.get("target_color")),
+            ):
+                for port in side_ports:
+                    _append_port_row(port_columns, port, color or DEFAULT_COLOR, node_row)
 
-            for port in ports["outputs"]:
-                source_x.append(port["x"])
-                source_y.append(port["y"])
-                source_color.append(raw_source_color)
-                source_label.append(str(port["index"] + 1))
-                source_node_index.append(i)
-                source_node_name.append([node_name])
-                source_node_type.append([node_type])
-                source_fill_alpha.append(fill_alpha)
-                source_line_alpha.append(line_alpha)
-
-            for port in ports["inputs"]:
-                target_x.append(port["x"])
-                target_y.append(port["y"])
-                target_color.append(raw_target_color)
-                target_label.append(str(port["index"] + 1))
-                target_node_index.append(i)
-                target_node_name.append([node_name])
-                target_node_type.append([node_type])
-                target_fill_alpha.append(fill_alpha)
-                target_line_alpha.append(line_alpha)
-
-        self.state.source_port_source.data = dict(
-            x=source_x,
-            y=source_y,
-            color=source_color,
-            label=source_label,
-            node_index=source_node_index,
-            node_name=source_node_name,
-            node_type=source_node_type,
-            fill_alpha=source_fill_alpha,
-            line_alpha=source_line_alpha,
-            connected=[
-                (
-                    "True"
-                    if ("source", source_node_index[i], source_label[i]) in connected_ports
-                    else "False"
-                )
-                for i in range(len(source_x))
-            ],
+        connected_port_keys = _connected_port_keys(
+            self.state.edge_source.data if self.state.edge_source is not None else {}
         )
-        self.state.target_port_source.data = dict(
-            x=target_x,
-            y=target_y,
-            color=target_color,
-            label=target_label,
-            node_index=target_node_index,
-            node_name=target_node_name,
-            node_type=target_node_type,
-            fill_alpha=target_fill_alpha,
-            line_alpha=target_line_alpha,
-            connected=[
-                (
-                    "True"
-                    if ("target", target_node_index[i], target_label[i]) in connected_ports
-                    else "False"
+        for kind, port_columns in (("source", source_ports), ("target", target_ports)):
+            port_columns["connected"] = [
+                "True" if (kind, node_index, label) in connected_port_keys else "False"
+                for node_index, label in zip(
+                    port_columns["node_index"], port_columns["label"], strict=True
                 )
-                for i in range(len(target_x))
-            ],
-        )
+            ]
+        self.state.source_port_source.data = source_ports
+        self.state.target_port_source.data = target_ports
+
         # Always reposition/prune edges against whatever ports were just
         # drawn (real or preview) — see the snapshot/restore logic at the
         # top of this method for why a preview pass is still safe to reverse
@@ -663,9 +572,34 @@ class PortEdgeMixin:
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
 
-    # ============================================================================
+    def _sync_edge_preview_backup(self, is_preview: bool):
+        """
+        Keep the true edge list safe while a port-count preview hides edges.
+
+        See :meth:`_rebuild_all_ports` for the full snapshot / restore protocol.
+
+        :param is_preview: ``True`` when the current rebuild is a port-count preview.
+        """
+        if self.state.edge_source is None:
+            return
+        if is_preview:
+            if self.state.edge_preview_backup is None:
+                # First preview tick of this session: remember the truth (backup)
+                self.state.edge_preview_backup = copy_column_data(self.state.edge_source.data)
+            else:
+                # Later ticks: always prune from the truth (backup), not from
+                # whatever the previous tick (preview) already hid
+                self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
+        elif self.state.edge_preview_backup is not None:
+            # Real rebuild after a preview: put the true edges back before
+            # this call's own (real, committed-count-based) pruning runs
+            self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
+            self.state.edge_preview_backup = None
+
+    # -----------------------------------------------------------------------
     # Port placement
-    # ============================================================================
+    # -----------------------------------------------------------------------
+
     @staticmethod
     def compute_ports(
         center_x: float,
@@ -698,6 +632,7 @@ class PortEdgeMixin:
         orbit_radius = node_radius + port_radius + gap_pixels
 
         def _angle_for_port(port_index: int, total_port_count: int, centre_angle: float) -> float:
+            """Angle (degrees) of port *port_index*, spread evenly around *centre_angle*."""
             if total_port_count == 1:
                 return centre_angle
             start_angle = centre_angle - spread_angle_degrees / 2
@@ -705,6 +640,7 @@ class PortEdgeMixin:
             return start_angle + port_index * angle_step
 
         def _coordinates_from_angle(angle_degrees: float):
+            """Canvas ``(x, y)`` of the point on the port orbit at *angle_degrees*."""
             angle_radians = float(np.radians(angle_degrees))
             return (
                 float(center_x + orbit_radius * np.cos(angle_radians)),
@@ -740,3 +676,58 @@ class PortEdgeMixin:
             )
 
         return {"outputs": output_ports, "inputs": input_ports}
+
+
+def _append_port_row(port_columns: dict, port: dict, color: str, node_row: dict) -> None:
+    """
+    Append one port ball to port data built with :data:`PORT_COLUMNS`.
+
+    The ``connected`` column is filled afterwards, once every port is known.
+
+    :param port_columns: Port data being built, edited in place.
+    :param port: Port from :meth:`PortEdgeMixin.compute_ports` (``x``, ``y``, ``index``).
+    :param color: Energy-type colour of the port.
+    :param node_row: Values shared by every port of the node (``node_index``,
+        ``node_name``, ``node_type``, ``fill_alpha``, ``line_alpha``).
+    """
+    port_columns["x"].append(port["x"])
+    port_columns["y"].append(port["y"])
+    port_columns["color"].append(color)
+    port_columns["label"].append(str(port["index"] + 1))
+    for column_name, value in node_row.items():
+        port_columns[column_name].append(value)
+
+
+def _connected_port_keys(edge_data: dict) -> set:
+    """
+    ``(kind, node_index, label)`` of every port that has an edge.
+
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :return: Set of port keys.
+    """
+    connected_port_keys: set = set()
+    for edge_position in range(len(edge_data.get("starting_node_index", []))):
+        for end in ("starting", "ending"):
+            connected_port_keys.add(
+                (
+                    edge_data[f"{end}_port_kind"][edge_position],
+                    edge_data[f"{end}_node_index"][edge_position],
+                    edge_data[f"{end}_port_label"][edge_position],
+                )
+            )
+    return connected_port_keys
+
+
+def _stored_port_count(port_counts: list, node_index: int, default_counts: dict, node_type: str):
+    """
+    Port count of one side of a node, falling back to its type's default.
+
+    :param port_counts: ``n_sources`` or ``n_targets`` column.
+    :param node_index: Zero-based index of the node.
+    :param default_counts: ``default_source_count`` or ``default_target_count``.
+    :param node_type: Component type of the node.
+    :return: Number of ports on that side.
+    """
+    if node_index < len(port_counts):
+        return int(port_counts[node_index])
+    return default_counts.get(node_type, 0)

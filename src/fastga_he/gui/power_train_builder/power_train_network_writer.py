@@ -5,7 +5,7 @@
 """
 YAML serialiser for the powertrain network.
 
-:class:`PowerTrainYAML` collects component and connection data from a
+:class:`PowerTrainYAMLWriter` collects component and connection data from a
 :class:`BuilderState` snapshot and writes a formatted YAML powertrain
 configuration file, mirroring the schema consumed by FAST-OAD_CS23-HE.
 
@@ -50,8 +50,13 @@ TARGET_SIDE_KEYWORDS = ("_outputs", "_engines", "_power_sources")
 # Decimal places kept for canvas coordinates (sub-pixel precision is noise)
 _LAYOUT_DECIMALS = 1
 
+# KNOWN_COMPONENTS entry for each component type (the first one, if several share it)
+_KNOWN_COMPONENT_BY_TYPE: dict = {}
+for _known_component in KNOWN_COMPONENTS:
+    _KNOWN_COMPONENT_BY_TYPE.setdefault(_known_component["components_type"], _known_component)
 
-class PowerTrainYAML:
+
+class PowerTrainYAMLWriter:
     """
     Assemble and write a YAML powertrain configuration from builder state data.
 
@@ -104,7 +109,7 @@ class PowerTrainYAML:
             KEY_PT_WATCHER: "",
             KEY_CANVAS_LAYOUT: {},
         }
-        # Fall back to copying the live sources
+        # Fall back to copying the live sources, as documented above
         self.node_data = (
             node_data if node_data is not None else copy_column_data(state.placed_nodes_source.data)
         )
@@ -143,7 +148,7 @@ class PowerTrainYAML:
 
         For variable-port components (those whose default source count is 3),
         the current port counts are written as ``number_of_*`` option keys so
-        that FAST-OAD-GA-HE can reconstruct the correct topology.
+        that FAST-OAD can reconstruct the correct topology.
 
         The component's canvas (x, y) is also recorded under ``canvas_layout``
         so the file can be re-opened in the builder.
@@ -164,14 +169,8 @@ class PowerTrainYAML:
             if symmetry_node_index < node_index
             else None
         )
-        component_id = next(
-            (
-                known_component
-                for known_component in KNOWN_COMPONENTS
-                if known_component["components_type"] == component_type
-            ),
-            None,
-        )["id"]
+        known_component = _KNOWN_COMPONENT_BY_TYPE.get(component_type, {})
+        component_id = known_component["id"]
 
         # Parse the options JSON string for this node into a dict.
         # This already contains every option the user configured in the GUI,
@@ -190,60 +189,23 @@ class PowerTrainYAML:
             if option_name not in options_dict and option_values:
                 options_dict[option_name] = option_values[0]
 
-        # Add multi-port options for variable-port components (default count == 3).
-        # Each such component has exactly two "number_of_" attributes in KNOWN_COMPONENTS:
-        # one for the source side and one for the target side, in that order.
-        # We assign source_port_count to the source-side attribute and
-        # target_port_count to the target-side attribute, mirroring the convention
-        # in _build_port_count_defaults.
-        # Source-side keywords: inputs, tanks.
-        # Target-side keywords: outputs, engines, power_sources
+        # Variable-port components (default count == 3) store their port counts
+        # as number_of_* options, which FAST-OAD reads to build the topology
         if self.default_source_count.get(component_type, 0) == 3:
-            component_attributes = (
-                next(
-                    (
-                        known_component
-                        for known_component in KNOWN_COMPONENTS
-                        if known_component["components_type"] == component_type
-                    ),
-                    {},
-                ).get("attributes")
-                or []
+            options_dict.update(
+                _variable_port_options(
+                    known_component.get("attributes") or [], source_port_count, target_port_count
+                )
             )
-            for attribute_name in component_attributes:
-                if "number_of_" not in attribute_name:
-                    continue
-                if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS):
-                    options_dict[attribute_name] = source_port_count
-                elif any(keyword in attribute_name for keyword in TARGET_SIDE_KEYWORDS):
-                    options_dict[attribute_name] = target_port_count
 
-        if not options_dict:
-            if not symmetry_component_name:
-                self.data[KEY_PT_COMPONENTS][component_name] = {
-                    "id": component_id,
-                    "position": self.node_data["position"][node_index],
-                }
-            else:
-                self.data[KEY_PT_COMPONENTS][component_name] = {
-                    "id": component_id,
-                    "position": self.node_data["position"][node_index],
-                    "symmetrical": symmetry_component_name,
-                }
-        else:
-            if not symmetry_component_name:
-                self.data[KEY_PT_COMPONENTS][component_name] = {
-                    "id": component_id,
-                    "options": options_dict,
-                    "position": self.node_data["position"][node_index],
-                }
-            else:
-                self.data[KEY_PT_COMPONENTS][component_name] = {
-                    "id": component_id,
-                    "options": options_dict,
-                    "position": self.node_data["position"][node_index],
-                    "symmetrical": symmetry_component_name,
-                }
+        # Keys in the order FAST-OAD files use: id, options, position, symmetrical
+        component_entry = {"id": component_id}
+        if options_dict:
+            component_entry["options"] = options_dict
+        component_entry["position"] = self.node_data["position"][node_index]
+        if symmetry_component_name:
+            component_entry["symmetrical"] = symmetry_component_name
+        self.data[KEY_PT_COMPONENTS][component_name] = component_entry
 
     def add_connection(self) -> None:
         """
@@ -405,3 +367,31 @@ class PowerTrainYAML:
         :param output_stream: A writable file-like object (e.g. ``io.StringIO``).
         """
         output_stream.write(self._build_output())
+
+
+def _variable_port_options(
+    component_attributes: list, source_port_count: int, target_port_count: int
+) -> dict:
+    """
+    ``number_of_*`` options of a variable-port component, from its port counts.
+
+    Each such component has exactly two ``number_of_`` attributes in
+    ``KNOWN_COMPONENTS``: one for the source side (keywords in
+    :data:`SOURCE_SIDE_KEYWORDS`, e.g. inputs, tanks) and one for the target
+    side (:data:`TARGET_SIDE_KEYWORDS`, e.g. outputs, engines, power_sources),
+    mirroring the convention in ``_build_port_count_defaults``.
+
+    :param component_attributes: ``attributes`` of the component's ``KNOWN_COMPONENTS`` entry.
+    :param source_port_count: Number of source ports on the canvas.
+    :param target_port_count: Number of target ports on the canvas.
+    :return: Dictionary mapping each ``number_of_*`` attribute to its port count.
+    """
+    port_options = {}
+    for attribute_name in component_attributes:
+        if "number_of_" not in attribute_name:
+            continue
+        if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS):
+            port_options[attribute_name] = source_port_count
+        elif any(keyword in attribute_name for keyword in TARGET_SIDE_KEYWORDS):
+            port_options[attribute_name] = target_port_count
+    return port_options
