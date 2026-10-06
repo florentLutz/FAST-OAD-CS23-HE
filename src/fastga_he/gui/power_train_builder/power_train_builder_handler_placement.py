@@ -173,15 +173,42 @@ class PlacementMixin:
         """
         Bokeh ``on_change`` callback of the hidden ``view_scale_input``.
 
-        The browser writes the data-units-per-pixel of the window-fitted view
-        here (see the launcher's ``_JS_FIT_VIEW``). Icons are sized in data
-        units, so they shrink on screen when ``view_scale`` > 1; the rings and
-        label offset are in screen pixels and are rescaled to match.
+        The browser writes a JSON report here (see the launcher's
+        ``_JS_FIT_VIEW``)::
 
-        :param new: New scale as a string (e.g. ``"1.2500"``).
+            {"k": 1.27, "area": [x0, x1, y0, y1], "area_k": 1.27}
+
+        * ``k`` -> ``state.view_scale``: data units per pixel of the fitted
+          view. Icons are sized in data units, so they shrink on screen when
+          it is > 1; the rings and label offset are in screen pixels and are
+          rescaled to match.
+        * ``area`` / ``area_k`` -> ``state.canvas_area``: what an empty design
+          shows in this window, used to spread automatic layouts.
+
+        A bare number (e.g. ``"1.25"``) is accepted as ``k`` alone.
         """
         try:
-            view_scale = float(new)
+            report = json.loads(new)
+        except (TypeError, ValueError):
+            return
+        if isinstance(report, (int, float)):
+            report = {"k": report}
+        if not isinstance(report, dict):
+            return
+
+        area = report.get("area")
+        if isinstance(area, list) and len(area) == 4:
+            try:
+                x0, x1, y0, y1 = (float(value) for value in area)
+                per_px = float(report.get("area_k", report.get("k", 1.0)))
+            except (TypeError, ValueError):
+                pass
+            else:
+                if x1 > x0 and y1 > y0 and per_px > 0:
+                    self.state.canvas_area = dict(x0=x0, x1=x1, y0=y0, y1=y1, per_px=per_px)
+
+        try:
+            view_scale = float(report.get("k"))
         except (TypeError, ValueError):
             return
         if view_scale <= 0 or view_scale == self.state.view_scale:

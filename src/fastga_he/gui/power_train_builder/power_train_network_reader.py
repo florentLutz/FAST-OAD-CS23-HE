@@ -48,7 +48,13 @@ from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 from ..layout_generation import HierarchicalLayout
-from .power_train_builder_state import _EMPTY, _NO_SYMMETRY_PEER
+from .power_train_builder_state import (
+    CANVAS_FIT_NODE_MARGIN,
+    CANVAS_WORLD_X_RANGE,
+    CANVAS_WORLD_Y_RANGE,
+    _EMPTY,
+    _NO_SYMMETRY_PEER,
+)
 from .power_train_network_writer import (
     KEY_CANVAS_LAYOUT,
     KEY_PT_COMPONENTS,
@@ -67,21 +73,34 @@ _KNOWN_COMPONENT_BY_ID = {component["id"]: component for component in KNOWN_COMP
 # Matches a "[name, N]" endpoint that was written as a quoted string.
 _QUOTED_ENDPOINT_PATTERN = re.compile(r"^\s*\[\s*([^,\]]+?)\s*,\s*(\d+)\s*\]\s*$")
 
-# Canvas area used when generating a layout (canvas data space is
-# x 0–800, y 0–950; the legend sits in the top-right corner).
-_AUTO_X_MIN, _AUTO_X_MAX = 30.0, 800.0
-_AUTO_Y_MIN, _AUTO_Y_MAX = 90.0, 890.0
-_AUTO_X_STEP_MAX, _AUTO_Y_STEP_MAX = 150.0, 170.0
+# Automatic layouts are spread over the canvas area of the user's current
+# browser window (BuilderState.canvas_area, reported by the browser; with the
+# window maximized this is the maximized canvas), inset by these margins in
+# screen pixels. The top margin clears the Undo / Redo buttons (top-left) and
+# the legend (top-right). Margins never go below CANVAS_FIT_NODE_MARGIN (data
+# units), so the loaded design fits the current view without re-zooming.
+_LAYOUT_MARGIN_PX = {"left": 50.0, "right": 50.0, "top": 110.0, "bottom": 50.0}
+
+# Largest gap between two neighbouring components, as a fraction of the layout
+# area's width / height. Keeps small designs (e.g. two layers) compact and
+# centred instead of pushed to opposite edges of a large screen.
+_LAYOUT_STEP_MAX_FRACTION_X = 0.25
+_LAYOUT_STEP_MAX_FRACTION_Y = 0.30
+
+# Area assumed when the browser has not reported one (headless use / tests):
+# the 800 x 950 design world at 1 data unit per pixel.
+_DEFAULT_CANVAS_AREA = dict(
+    x0=float(CANVAS_WORLD_X_RANGE[0]),
+    x1=float(CANVAS_WORLD_X_RANGE[1]),
+    y0=float(CANVAS_WORLD_Y_RANGE[0]),
+    y1=float(CANVAS_WORLD_Y_RANGE[1]),
+    per_px=1.0,
+)
 
 # Energy-storage component types used as the hierarchy reference, matching
 # the viewer's get_component_distance(["tank", "battery_pack"]).
 _ENERGY_STORAGE_KEYWORDS = ("tank", "battery_pack")
 
-# Last-resort grid if the hierarchical layout fails.
-_GRID_COLUMNS = 5
-_GRID_X_START, _GRID_X_STEP = 100.0, 140.0
-_GRID_Y_START, _GRID_Y_STEP_MAX = 850.0, 150.0
-_GRID_Y_SPAN = 780.0
 
 _NODE_COLUMNS = (
     "x",
@@ -129,6 +148,8 @@ class PowerTrainYAMLReader:
         self.default_source_count = state.default_source_count
         self.default_target_count = state.default_target_count
         self.icon_size = icon_size
+        # Canvas area of the user's window (None until the browser reports it).
+        self.canvas_area = getattr(state, "canvas_area", None) or _DEFAULT_CANVAS_AREA
         self._icon_url_cache: dict = {}
 
     # -----------------------------------------------------------------------
@@ -186,12 +207,13 @@ class PowerTrainYAMLReader:
         :return: ``(nodes_data, name_to_index, nodes_without_layout, propulsor_names)``.
         """
         nodes_data = {column: [] for column in _NODE_COLUMNS}
-        name_to_index = {}
-        symmetry_requests = []  # (node_index, peer_name)
-        nodes_without_layout = []
-        propulsor_names = set()
+        name_to_index: dict = {}
+        symmetry_requests: list = []  # (node_index, peer_name)
+        nodes_without_layout: list = []
+        propulsor_names: set = set()
 
-        for name, component in components.items():
+        for raw_name, component in components.items():
+            name = str(raw_name)
             component = component or {}
 
             known_component = _KNOWN_COMPONENT_BY_ID.get(component.get("id"))
@@ -261,27 +283,30 @@ class PowerTrainYAMLReader:
     # Automatic layout (no canvas_layout entry)
     # -----------------------------------------------------------------------
 
-    @staticmethod
     def _place_nodes_without_layout(
-        nodes_data: dict, edges_data: dict, nodes_without_layout: list, propulsor_names: set
+        self, nodes_data: dict, edges_data: dict, nodes_without_layout: list, propulsor_names: set
     ) -> None:
         """
         Position the nodes that have no ``canvas_layout`` entry, in place.
 
         Uses the network viewer's :class:`HierarchicalLayout` (top-to-bottom,
-        Tutte crossing reduction) on the whole graph, then keeps the generated
-        position only for the nodes that need one. Falls back to a grid if
-        the layout cannot be computed.
+        Tutte crossing reduction) on the whole graph, spread over the canvas
+        area of the user's window (see :func:`_layout_area`), then keeps the
+        generated position only for the nodes that need one. Falls back to a
+        grid over the same area if the layout cannot be computed.
         """
+        area = _layout_area(self.canvas_area)
         try:
-            positions = _hierarchical_canvas_positions(nodes_data, edges_data, propulsor_names)
+            positions = _hierarchical_canvas_positions(
+                nodes_data, edges_data, propulsor_names, area
+            )
             method = "hierarchical layout"
         except Exception:  # pragma: no cover - defensive: never block a load on layout
             _LOGGER.exception("Hierarchical layout failed; placing components on a grid.")
             positions = None
 
         if positions is None:
-            grid = _grid_positions(len(nodes_without_layout))
+            grid = _grid_positions(len(nodes_without_layout), area)
             positions = {
                 nodes_data["name"][node_index]: grid[i]
                 for i, node_index in enumerate(nodes_without_layout)
@@ -488,12 +513,54 @@ def _hierarchy_layers(graph: nx.DiGraph, node_types: dict, propulsor_names: set)
     return {name: int(layer) for name, layer in layers.items()}
 
 
+def _layout_area(canvas_area: dict) -> tuple[float, float, float, float]:
+    """
+    Area available to generated layouts: the window's canvas area inset by
+    :data:`_LAYOUT_MARGIN_PX` (converted to data units with the area's
+    ``per_px``, and never less than ``CANVAS_FIT_NODE_MARGIN``).
+
+    :param canvas_area: ``{"x0", "x1", "y0", "y1", "per_px"}`` in data units.
+    :return: ``(x_min, x_max, y_min, y_max)``.
+    """
+    per_px = canvas_area["per_px"]
+
+    def inset(side: str) -> float:
+        return max(CANVAS_FIT_NODE_MARGIN, _LAYOUT_MARGIN_PX[side] * per_px)
+
+    # Rounded inwards to the 0.1 data-unit precision of saved positions.
+    x_min = math.ceil((canvas_area["x0"] + inset("left")) * 10) / 10
+    x_max = math.floor((canvas_area["x1"] - inset("right")) * 10) / 10
+    y_min = math.ceil((canvas_area["y0"] + inset("bottom")) * 10) / 10
+    y_max = math.floor((canvas_area["y1"] - inset("top")) * 10) / 10
+    # Degenerate (tiny window): collapse onto the centre instead of inverting.
+    if x_max < x_min:
+        x_min = x_max = (canvas_area["x0"] + canvas_area["x1"]) / 2
+    if y_max < y_min:
+        y_min = y_max = (canvas_area["y0"] + canvas_area["y1"]) / 2
+    return x_min, x_max, y_min, y_max
+
+
+def _spread(values: list, low: float, high: float, step_max: float) -> list:
+    """
+    Map abstract coordinates (evenly spaced, any origin) onto ``[low, high]``:
+    as spread out as the range allows, but at most ``step_max`` per unit, and
+    centred in the range.
+    """
+    span = max(values) - min(values)
+    step = min(step_max, (high - low) / span) if span else 0.0
+    middle = (max(values) + min(values)) / 2
+    centre = (low + high) / 2
+    return [
+        min(high, max(low, round(centre + (float(value) - middle) * step, 1))) for value in values
+    ]
+
+
 def _hierarchical_canvas_positions(
-    nodes_data: dict, edges_data: dict, propulsor_names: set
+    nodes_data: dict, edges_data: dict, propulsor_names: set, area: tuple
 ) -> dict:
     """
-    Run :class:`HierarchicalLayout` on the loaded design and scale the result
-    to builder canvas coordinates.
+    Run :class:`HierarchicalLayout` on the loaded design and spread the result
+    over *area* (see :func:`_layout_area`).
 
     :return: ``{component_name: (x, y)}`` for every node.
     """
@@ -512,34 +579,40 @@ def _hierarchical_canvas_positions(
         graph, orientation="TB", node_layer_dict=layers, sorting=True
     ).generate_networkx_layout()
 
-    xs = [position[0] for position in raw_positions.values()]
-    ys = [position[1] for position in raw_positions.values()]
-    x_centre = (_AUTO_X_MIN + _AUTO_X_MAX) / 2
-    y_centre = (_AUTO_Y_MIN + _AUTO_Y_MAX) / 2
-    x_span = max(xs) - min(xs)
-    y_span = max(ys) - min(ys)
-    x_step = min(_AUTO_X_STEP_MAX, (_AUTO_X_MAX - _AUTO_X_MIN) / x_span) if x_span else 0.0
-    y_step = min(_AUTO_Y_STEP_MAX, (_AUTO_Y_MAX - _AUTO_Y_MIN) / y_span) if y_span else 0.0
-    x_mid = (max(xs) + min(xs)) / 2
-    y_mid = (max(ys) + min(ys)) / 2
-
-    return {
-        name: (
-            round(x_centre + (float(x) - x_mid) * x_step, 1),
-            round(y_centre + (float(y) - y_mid) * y_step, 1),
-        )
-        for name, (x, y) in raw_positions.items()
-    }
+    x_min, x_max, y_min, y_max = area
+    layout_names = list(raw_positions)
+    xs = _spread(
+        [raw_positions[name][0] for name in layout_names],
+        x_min,
+        x_max,
+        _LAYOUT_STEP_MAX_FRACTION_X * (x_max - x_min),
+    )
+    ys = _spread(
+        [raw_positions[name][1] for name in layout_names],
+        y_min,
+        y_max,
+        _LAYOUT_STEP_MAX_FRACTION_Y * (y_max - y_min),
+    )
+    return {name: (x, y) for name, x, y in zip(layout_names, xs, ys)}
 
 
-def _grid_positions(count: int) -> list[tuple[float, float]]:
-    """Evenly spaced canvas positions, row by row from the top-left."""
-    rows = max(1, math.ceil(count / _GRID_COLUMNS))
-    y_step = min(_GRID_Y_STEP_MAX, _GRID_Y_SPAN / rows)
-    return [
-        (
-            _GRID_X_START + (i % _GRID_COLUMNS) * _GRID_X_STEP,
-            _GRID_Y_START - (i // _GRID_COLUMNS) * y_step,
-        )
-        for i in range(count)
-    ]
+def _grid_positions(count: int, area: tuple) -> list[tuple[float, float]]:
+    """
+    Evenly spaced positions over *area*, row by row from the top-left.
+
+    The number of columns follows the area's aspect ratio (no fixed limit),
+    so the grid fills wide and tall canvases alike.
+    """
+    if count <= 0:
+        return []
+    x_min, x_max, y_min, y_max = area
+    width, height = x_max - x_min, y_max - y_min
+    aspect = width / height if height > 0 else 1.0
+    columns = min(count, max(1, round(math.sqrt(count * aspect))))
+    rows = math.ceil(count / columns)
+
+    column_xs = _spread(list(range(columns)), x_min, x_max, _LAYOUT_STEP_MAX_FRACTION_X * width)
+    row_ys = _spread(
+        [-row for row in range(rows)], y_min, y_max, _LAYOUT_STEP_MAX_FRACTION_Y * height
+    )
+    return [(column_xs[i % columns], row_ys[i // columns]) for i in range(count)]

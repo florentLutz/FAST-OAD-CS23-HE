@@ -36,6 +36,7 @@ from fastga_he.gui.power_train_network_viewer import (
 )
 
 from .power_train_builder_state import (
+    CANVAS_FIT_NODE_MARGIN,
     CANVAS_MIN_HEIGHT,
     CANVAS_MIN_WIDTH,
     CANVAS_WORLD_X_RANGE,
@@ -201,9 +202,10 @@ def _add_canvas_legend(canvas) -> None:
 #      design world (CANVAS_WORLD_*) plus every placed component is visible.
 #      Extra room goes to the right / bottom. The new view is also what the
 #      Reset tool returns to. The data-per-pixel scale is sent to Python
-#      (view_scale_input) to keep screen-pixel glyphs in step with the icons.
+#      (view_scale_input) to keep screen-pixel glyphs in step with the icons,
+#      together with the area an *empty* design shows in this window (used to
+#      spread automatically generated layouts over the whole canvas).
 _CANVAS_BOTTOM_MARGIN_PX = 8
-_FIT_VIEW_NODE_MARGIN = 60  # data units kept around the outermost components
 
 _JS_FIT_CANVAS_SIZE = """
 const fit_size = () => {
@@ -243,8 +245,14 @@ const k = Math.max((x1 - x0) / fw, (y1 - y0) / fh);
 const x_end = x0 + fw * k, y_start = y1 - fh * k;
 x_range.setv({start: x0, end: x_end, reset_start: x0, reset_end: x_end});
 y_range.setv({start: y_start, end: y1, reset_start: y_start, reset_end: y1});
-const k_text = k.toFixed(4);
-if (view_scale_input.value != k_text) { view_scale_input.value = k_text; }
+// Canvas area of this window for an empty design (world only), for Python.
+const k0 = Math.max((world.x1 - world.x0) / fw, (world.y1 - world.y0) / fh);
+const report = JSON.stringify({
+    k: +k.toFixed(4),
+    area: [world.x0, +(world.x0 + fw * k0).toFixed(1), +(world.y1 - fh * k0).toFixed(1), world.y1],
+    area_k: +k0.toFixed(4),
+});
+if (view_scale_input.value != report) { view_scale_input.value = report; }
 """
 
 
@@ -265,7 +273,7 @@ def _make_canvas_fit_window(doc, canvas, state) -> None:
             y_range=canvas.y_range,
             nodes=state.placed_nodes_source,
             view_scale_input=state.view_scale_input,
-            margin=_FIT_VIEW_NODE_MARGIN,
+            margin=CANVAS_FIT_NODE_MARGIN,
             world=dict(
                 x0=CANVAS_WORLD_X_RANGE[0],
                 x1=CANVAS_WORLD_X_RANGE[1],

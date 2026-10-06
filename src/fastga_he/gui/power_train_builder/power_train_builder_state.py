@@ -57,6 +57,11 @@ DIALOG_POSITION_STYLES = {
     "transform": "translate(-50%, -50%)",
 }
 
+# Data units kept between the outermost components and the edge of the fitted
+# view. Also the minimum edge margin of generated layouts, so loading a design
+# laid out automatically does not make the view zoom out.
+CANVAS_FIT_NODE_MARGIN = 60.0
+
 # Smallest canvas size (px) used when the window is very small.
 CANVAS_MIN_WIDTH = 480
 CANVAS_MIN_HEIGHT = 420
@@ -164,7 +169,14 @@ class BuilderState:
     # view_scale_input; used to keep screen-pixel glyphs (hover / selection
     # rings, name labels) matched to the icons, which are sized in data units.
     view_scale: float = field(default=1.0)
-    # Hidden TextInput written by the browser-side fit callback (JS -> Python).
+    # Visible canvas area of the current browser window, in data units, when
+    # showing an empty design: {"x0", "x1", "y0", "y1", "per_px"}. Reported by
+    # the browser with view_scale; None until then (headless use / tests), in
+    # which case the 800 x 950 world at 1 unit / px is assumed. Automatic
+    # layouts (YAML without canvas_layout) are spread over this area.
+    canvas_area: dict = field(default=None)
+    # Hidden TextInput written by the browser-side fit callback (JS -> Python),
+    # as JSON: {"k": view_scale, "area": [x0, x1, y0, y1], "area_k": per_px}.
     view_scale_input: bkmodel.TextInput = field(default=None)
     # Hidden TextInput flipped by Python after a load / New Design so the
     # browser re-fits the view to the (new) components (Python -> JS).
