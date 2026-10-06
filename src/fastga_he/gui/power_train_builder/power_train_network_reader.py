@@ -67,10 +67,10 @@ from .power_train_network_writer import (
 _LOGGER = logging.getLogger(__name__)
 
 # KNOWN_COMPONENTS entry for each FAST-OAD component id
-# (e.g. "fastga_he.pt_component.battery_pack").
+# (e.g. "fastga_he.pt_component.battery_pack")
 _KNOWN_COMPONENT_BY_ID = {component["id"]: component for component in KNOWN_COMPONENTS}
 
-# Matches a "[name, N]" endpoint that was written as a quoted string.
+# Matches a "[name, N]" endpoint that was written as a quoted string
 _QUOTED_ENDPOINT_PATTERN = re.compile(r"^\s*\[\s*([^,\]]+?)\s*,\s*(\d+)\s*\]\s*$")
 
 # Automatic layouts are spread over the canvas area of the user's current
@@ -78,17 +78,17 @@ _QUOTED_ENDPOINT_PATTERN = re.compile(r"^\s*\[\s*([^,\]]+?)\s*,\s*(\d+)\s*\]\s*$
 # window maximized this is the maximized canvas), inset by these margins in
 # screen pixels. The top margin clears the Undo / Redo buttons (top-left) and
 # the legend (top-right). Margins never go below CANVAS_FIT_NODE_MARGIN (data
-# units), so the loaded design fits the current view without re-zooming.
+# units), so the loaded design fits the current view without re-zooming
 _LAYOUT_MARGIN_PX = {"left": 50.0, "right": 50.0, "top": 110.0, "bottom": 50.0}
 
 # Largest gap between two neighbouring components, as a fraction of the layout
 # area's width / height. Keeps small designs (e.g. two layers) compact and
-# centred instead of pushed to opposite edges of a large screen.
+# centred instead of pushed to opposite edges of a large screen
 _LAYOUT_STEP_MAX_FRACTION_X = 0.25
 _LAYOUT_STEP_MAX_FRACTION_Y = 0.30
 
 # Area assumed when the browser has not reported one (headless use / tests):
-# the 800 x 950 design world at 1 data unit per pixel.
+# the 800 x 950 design world at 1 data unit per pixel
 _DEFAULT_CANVAS_AREA = dict(
     x0=float(CANVAS_WORLD_X_RANGE[0]),
     x1=float(CANVAS_WORLD_X_RANGE[1]),
@@ -97,9 +97,38 @@ _DEFAULT_CANVAS_AREA = dict(
     per_px=1.0,
 )
 
-# Energy-storage component types used as the hierarchy reference, matching
-# the viewer's get_component_distance(["tank", "battery_pack"]).
+# Energy-storage component types or type classes used as the hierarchy
+# reference, matching the viewer's get_component_distance(["tank", "battery_pack"])
 _ENERGY_STORAGE_KEYWORDS = ("tank", "battery_pack")
+
+
+def _matching_component_types(references: tuple) -> set:
+    """
+    Component types whose type, or one of whose type classes, is in *references*.
+
+    Same matching rule as ``FASTGAHEPowerTrainConfigurator.get_component_distance``,
+    which accepts either a component type or a component type class.
+
+    :param references: Component types or component type classes to match.
+    :return: Set of matching component types.
+    """
+    matching_types = set()
+    for known_component in KNOWN_COMPONENTS:
+        type_class = known_component.get("components_type_class")
+        type_classes = type_class if isinstance(type_class, list) else [type_class]
+        if known_component["components_type"] in references or any(
+            reference in type_classes for reference in references
+        ):
+            matching_types.add(known_component["components_type"])
+    return matching_types
+
+
+# Component types counted as energy storage when computing hierarchy layers
+_ENERGY_STORAGE_COMPONENT_TYPES = _matching_component_types(_ENERGY_STORAGE_KEYWORDS)
+
+# Default of the viewer's from_propulsor argument: when True, layers are always
+# counted from the propulsors instead of first trying the energy storage
+_LAYOUT_FROM_PROPULSOR = False
 
 
 _NODE_COLUMNS = (
@@ -148,7 +177,7 @@ class PowerTrainYAMLReader:
         self.default_source_count = state.default_source_count
         self.default_target_count = state.default_target_count
         self.icon_size = icon_size
-        # Canvas area of the user's window (None until the browser reports it).
+        # Canvas area of the user's window (None until the browser reports it)
         self.canvas_area = getattr(state, "canvas_area", None) or _DEFAULT_CANVAS_AREA
         self._icon_url_cache: dict = {}
 
@@ -262,7 +291,7 @@ class PowerTrainYAMLReader:
                 symmetry_requests.append((node_index, str(component["symmetrical"])))
 
         # The writer emits "symmetrical" on only one node of each pair, but the
-        # canvas stores the link on both sides.
+        # canvas stores the link on both sides
         for node_index, peer_name in symmetry_requests:
             peer_index = name_to_index.get(peer_name)
             if peer_index is None:
@@ -327,7 +356,12 @@ class PowerTrainYAMLReader:
 
     @staticmethod
     def _layout_position(layout_entry) -> tuple:
-        """Return ``(x, y)`` from a ``canvas_layout`` entry, or ``(None, None)``."""
+        """
+        Return ``(x, y)`` from a ``canvas_layout`` entry, or ``(None, None)``.
+
+        :param layout_entry: Value stored under the component name in ``canvas_layout``.
+        :return: Tuple of canvas coordinates, or ``(None, None)`` if the entry is invalid.
+        """
         if not isinstance(layout_entry, dict):
             return None, None
         try:
@@ -336,7 +370,13 @@ class PowerTrainYAMLReader:
             return None, None
 
     def _position(self, component_type: str, file_position) -> str:
-        """Position from the file, falling back to the type's default."""
+        """
+        Position from the file, falling back to the type's default.
+
+        :param component_type: Component type key used to look up ``possible_position``.
+        :param file_position: Position string read from the YAML file, if any.
+        :return: The position string stored on the canvas node.
+        """
         if file_position:
             return str(file_position)
         choices = self.possible_position.get(component_type, [])
@@ -350,6 +390,10 @@ class PowerTrainYAMLReader:
         in the file. Only options the GUI knows (``possible_options``) are
         kept; ``number_of_*`` keys are represented by the port counts instead
         and are re-emitted by the writer on the next save.
+
+        :param component_type: Component type key used to look up ``possible_options``.
+        :param file_options: Options dictionary read from the YAML file.
+        :return: JSON string of the option names and their values.
         """
         definition = self.possible_options.get(component_type, {})
         options = {name: values[0] for name, values in definition.items() if values}
@@ -363,6 +407,11 @@ class PowerTrainYAMLReader:
         Port counts for a node: the type's defaults, except for variable-port
         components whose ``number_of_*`` options (written by
         ``PowerTrainYAML.add_component`` with the same keyword rules) override them.
+
+        :param component_type: Component type key used to look up the default port counts.
+        :param known_component: Matching entry of ``KNOWN_COMPONENTS``.
+        :param file_options: Options dictionary read from the YAML file.
+        :return: Tuple ``(n_sources, n_targets)``.
         """
         n_sources = int(self.default_source_count.get(component_type, 0))
         n_targets = int(self.default_target_count.get(component_type, 0))
@@ -389,7 +438,12 @@ class PowerTrainYAMLReader:
         return n_sources, n_targets
 
     def _icon_url(self, icon_key: str) -> str:
-        """Base64 data-URL of an icon (same encoding as ``_place_new_node``), cached."""
+        """
+        Base64 data-URL of an icon (same encoding as ``_place_new_node``), cached.
+
+        :param icon_key: Key of the icon in ``ICONS_CONFIG``.
+        :return: Base64 data URI of the icon image.
+        """
         if icon_key not in self._icon_url_cache:
             icon_path = ICONS_CONFIG[icon_key]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
@@ -408,6 +462,11 @@ class PowerTrainYAMLReader:
         panel already uses). ``xs`` / ``ys`` are placeholders; they are
         recomputed by ``_rebuild_all_ports`` / ``_rebuild_edges`` after load,
         which also drops any edge whose port index exceeds the node's count.
+
+        :param connections: List of ``{"source": ..., "target": ...}`` dictionaries.
+        :param nodes_data: Node columns built by :meth:`_build_nodes`.
+        :param name_to_index: Dictionary mapping component names to their node index.
+        :return: Dictionary of edge columns.
         """
         edges_data = {column: [] for column in _EDGE_COLUMNS}
 
@@ -459,6 +518,9 @@ def _parse_endpoint(endpoint) -> tuple[str, str] | None:
     * ``name`` -> ``(name, "1")``
 
     Port labels are strings to match ``source_port_source["label"]``.
+
+    :param endpoint: Raw ``source`` or ``target`` value of a YAML connection.
+    :return: Tuple ``(component_name, port_label)``, or ``None`` if the endpoint is malformed.
     """
     if isinstance(endpoint, (list, tuple)) and len(endpoint) == 2:
         try:
@@ -473,44 +535,88 @@ def _parse_endpoint(endpoint) -> tuple[str, str] | None:
     return None
 
 
-def _hierarchy_layers(graph: nx.DiGraph, node_types: dict, propulsor_names: set) -> dict:
+def _hierarchy_layers(
+    graph: nx.DiGraph,
+    node_types: dict,
+    propulsor_names: set,
+    from_propulsor: bool = _LAYOUT_FROM_PROPULSOR,
+) -> dict:
     """
     Assign every node a layer index (0 = top of the canvas).
 
-    Mirrors the viewer's ``GraphBuilder._get_hierarchy_layers``: layers are
-    the graph distance from energy storage (tanks / batteries), flipped so
-    storage ends up at the bottom and propulsors at the top. If that does not
-    reach every node (e.g. no storage component yet, or a disconnected part
-    of a work-in-progress design), the distance from the propulsors is used
-    instead when it covers more nodes. Nodes reached by neither go to an
-    extra bottom layer so the layout always covers the whole graph.
+    Follows the viewer's ``GraphBuilder._get_hierarchy_layers``. Layers are first
+    computed from the graph distance to energy storage (tanks / batteries),
+    flipped so storage ends up at the bottom: ``layer = max_distance - distance``.
+    This is kept only if every node farthest from storage is a propulsor, so the
+    propulsors form the top layer. Otherwise (e.g. a branch ending on a
+    component that is not a propulsor), or when *from_propulsor* is set, the
+    layers are the graph distance from the propulsors instead, which puts every
+    propulsor in the top layer.
+
+    Unlike the viewer, a work-in-progress design may have no storage, no
+    propulsor, or disconnected parts. If neither reference reaches every node,
+    the one reaching more nodes is used and the remaining nodes go to an extra
+    bottom layer, so the layout always covers the whole graph.
+
+    :param graph: NetworkX DiGraph of the powertrain.
+    :param node_types: Dictionary mapping component names to their component type.
+    :param propulsor_names: Set of component names that are propulsors.
+    :param from_propulsor: Count the layers from the propulsors straight away.
+    :return: Dictionary mapping component names to their layer index.
     """
-    undirected = graph.to_undirected()
+    # Distances ignore the edge direction, as in get_component_distance
+    undirected_graph = graph.to_undirected()
+    num_nodes = graph.number_of_nodes()
 
-    energy_nodes = [
-        name
-        for name, node_type in node_types.items()
-        if any(keyword in node_type for keyword in _ENERGY_STORAGE_KEYWORDS)
+    energy_storage_nodes = [
+        node_name
+        for node_name, node_type in node_types.items()
+        if node_type in _ENERGY_STORAGE_COMPONENT_TYPES
     ]
-    from_energy = {}
-    if energy_nodes:
-        distance = nx.multi_source_dijkstra_path_length(undirected, energy_nodes)
-        max_distance = max(distance.values())
-        from_energy = {name: max_distance - d for name, d in distance.items()}
+    layers_from_energy = {}
+    if energy_storage_nodes:
+        distance_from_energy = nx.multi_source_dijkstra_path_length(
+            undirected_graph, energy_storage_nodes
+        )
+        max_distance = max(distance_from_energy.values())
+        layers_from_energy = {
+            node_name: max_distance - distance
+            for node_name, distance in distance_from_energy.items()
+        }
 
-    from_propulsor = {}
-    if propulsor_names and len(from_energy) < graph.number_of_nodes():
-        from_propulsor = dict(nx.multi_source_dijkstra_path_length(undirected, propulsor_names))
+        # The viewer switches to the propulsor reference as soon as a node at
+        # the maximum distance from storage is not a propulsor
+        farthest_nodes = [
+            node_name
+            for node_name, distance in distance_from_energy.items()
+            if distance == max_distance
+        ]
+        if any(node_name not in propulsor_names for node_name in farthest_nodes):
+            from_propulsor = True
 
-    layers = from_energy if len(from_energy) >= len(from_propulsor) else from_propulsor
+    layers_from_propulsor = {}
+    if propulsor_names and (from_propulsor or len(layers_from_energy) < num_nodes):
+        layers_from_propulsor = dict(
+            nx.multi_source_dijkstra_path_length(undirected_graph, propulsor_names)
+        )
 
-    unreached = [name for name in graph.nodes if name not in layers]
-    if unreached:
+    if len(layers_from_energy) == num_nodes and not from_propulsor:
+        layers = layers_from_energy
+    elif len(layers_from_propulsor) == num_nodes:
+        layers = layers_from_propulsor
+    # Neither reference covers the whole graph: keep the one that covers more
+    elif len(layers_from_energy) >= len(layers_from_propulsor):
+        layers = layers_from_energy
+    else:
+        layers = layers_from_propulsor
+
+    unreached_nodes = [node_name for node_name in graph.nodes if node_name not in layers]
+    if unreached_nodes:
         extra_layer = max(layers.values()) + 1 if layers else 0
-        for name in unreached:
-            layers[name] = extra_layer
+        for node_name in unreached_nodes:
+            layers[node_name] = extra_layer
 
-    return {name: int(layer) for name, layer in layers.items()}
+    return {node_name: int(layer) for node_name, layer in layers.items()}
 
 
 def _layout_area(canvas_area: dict) -> tuple[float, float, float, float]:
@@ -527,12 +633,12 @@ def _layout_area(canvas_area: dict) -> tuple[float, float, float, float]:
     def inset(side: str) -> float:
         return max(CANVAS_FIT_NODE_MARGIN, _LAYOUT_MARGIN_PX[side] * per_px)
 
-    # Rounded inwards to the 0.1 data-unit precision of saved positions.
+    # Rounded inwards to the 0.1 data-unit precision of saved positions
     x_min = math.ceil((canvas_area["x0"] + inset("left")) * 10) / 10
     x_max = math.floor((canvas_area["x1"] - inset("right")) * 10) / 10
     y_min = math.ceil((canvas_area["y0"] + inset("bottom")) * 10) / 10
     y_max = math.floor((canvas_area["y1"] - inset("top")) * 10) / 10
-    # Degenerate (tiny window): collapse onto the centre instead of inverting.
+    # Degenerate (tiny window): collapse onto the centre instead of inverting
     if x_max < x_min:
         x_min = x_max = (canvas_area["x0"] + canvas_area["x1"]) / 2
     if y_max < y_min:
@@ -545,6 +651,12 @@ def _spread(values: list, low: float, high: float, step_max: float) -> list:
     Map abstract coordinates (evenly spaced, any origin) onto ``[low, high]``:
     as spread out as the range allows, but at most ``step_max`` per unit, and
     centred in the range.
+
+    :param values: Abstract coordinates to map.
+    :param low: Lower bound of the target range.
+    :param high: Upper bound of the target range.
+    :param step_max: Largest allowed distance between two neighbouring abstract units.
+    :return: List of mapped coordinates, in the same order as *values*.
     """
     span = max(values) - min(values)
     step = min(step_max, (high - low) / span) if span else 0.0
@@ -556,12 +668,21 @@ def _spread(values: list, low: float, high: float, step_max: float) -> list:
 
 
 def _hierarchical_canvas_positions(
-    nodes_data: dict, edges_data: dict, propulsor_names: set, area: tuple
+    nodes_data: dict,
+    edges_data: dict,
+    propulsor_names: set,
+    area: tuple,
+    from_propulsor: bool = _LAYOUT_FROM_PROPULSOR,
 ) -> dict:
     """
     Run :class:`HierarchicalLayout` on the loaded design and spread the result
     over *area* (see :func:`_layout_area`).
 
+    :param nodes_data: Node columns built by ``_build_nodes``.
+    :param edges_data: Edge columns built by ``_build_edges``.
+    :param propulsor_names: Set of component names that are propulsors.
+    :param area: Tuple ``(x_min, x_max, y_min, y_max)`` available to the layout.
+    :param from_propulsor: Count the hierarchy layers from the propulsors straight away.
     :return: ``{component_name: (x, y)}`` for every node.
     """
     names = list(nodes_data["name"])
@@ -571,10 +692,10 @@ def _hierarchical_canvas_positions(
         graph.add_edge(names[start], names[end])
 
     node_types = dict(zip(names, nodes_data["node_type"]))
-    layers = _hierarchy_layers(graph, node_types, propulsor_names)
+    layers = _hierarchy_layers(graph, node_types, propulsor_names, from_propulsor)
 
     # The viewer's layout works in abstract units: x = slot inside a layer
-    # (centred on 0, step 1), y = layer row (top row has the largest y in "TB").
+    # (centred on 0, step 1), y = layer row (top row has the largest y in "TB")
     raw_positions = HierarchicalLayout(
         graph, orientation="TB", node_layer_dict=layers, sorting=True
     ).generate_networkx_layout()
@@ -602,6 +723,10 @@ def _grid_positions(count: int, area: tuple) -> list[tuple[float, float]]:
 
     The number of columns follows the area's aspect ratio (no fixed limit),
     so the grid fills wide and tall canvases alike.
+
+    :param count: Number of positions to generate.
+    :param area: Tuple ``(x_min, x_max, y_min, y_max)`` available to the grid.
+    :return: List of ``(x, y)`` tuples.
     """
     if count <= 0:
         return []

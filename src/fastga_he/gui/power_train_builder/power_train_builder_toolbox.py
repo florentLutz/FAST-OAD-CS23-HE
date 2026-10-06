@@ -52,20 +52,20 @@ from .power_train_builder_metadata import (
 COMPONENTS_PATH = Path(__file__).resolve().parents[2] / "models" / "propulsion" / "components"
 
 # ── Load dialog ───────────────────────────────────────────────────────────────
-# Toggles browse_load_trigger to signal Python to open a tkinter open-file dialog.
+# Toggles browse_load_trigger to signal Python to open a tkinter open-file dialog
 _JS_LOAD_DIALOG = """
 browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';
 """
 
 # ── "Final version?" overlay buttons: hide it and send the mode to Python ──
 #    (__MODE__ is replaced by final / editable / cancel). The timestamp makes
-#    every click a new value, so on_change always fires.
+#    every click a new value, so on_change always fires
 _JS_SAVE_MODE_CLICK = """
 save_version_overlay_widget.visible = false;
 browse_save_trigger.value = '__MODE__:' + Date.now();
 """
 
-# Shared by the startup overlay and the "final version?" overlay buttons.
+# Shared by the startup overlay and the "final version?" overlay buttons
 _STARTUP_BUTTON_CSS = [
     """:host button {
         font-size: 1.6em;
@@ -139,11 +139,11 @@ class ComponentToolboxConfigurationTableBuilder:
 
         # ── Palette buttons (one per icon, kept in ICONS_CONFIG order) ────────
         # Header row: "Components" title + node-size slider. Both widths add up to
-        # PALETTE_WIDTH so the row never grows wider than the left panel.
-        _title_width = 140
+        # PALETTE_WIDTH so the row never grows wider than the left panel
+        _title_div_width = 140
         title_div = bkmodel.Div(
             text="<b style='color:white;font-size:16pt'>Components</b>",
-            width=_title_width,
+            width=_title_div_width,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
         )
         node_size_slider = bkmodel.Slider(
@@ -152,7 +152,7 @@ class ComponentToolboxConfigurationTableBuilder:
             end=NODE_ICON_SIZE_MAX,
             step=1,
             value=DEFAULT_NODE_ICON_SIZE,
-            width=PALETTE_WIDTH - _title_width - 20,
+            width=PALETTE_WIDTH - _title_div_width - 20,
             styles={"color": "white"},
             stylesheets=[":host .bk-slider-title { color: white; font-size: 10pt; }"],
         )
@@ -163,7 +163,7 @@ class ComponentToolboxConfigurationTableBuilder:
             styles={"background": BACKGROUND_COLOR_CODE},
         )
 
-        _btn_stylesheet = [
+        _toolbox_button_stylesheet = [
             """:host .bk-btn {
                 font-size: 12pt;
                 white-space: normal;
@@ -191,18 +191,18 @@ class ComponentToolboxConfigurationTableBuilder:
             icon_path = ICONS_CONFIG[icon_key]["icon_path"]
             file_url = "file://" + str(Path(icon_path).resolve())
             base64_url = _url_to_base64(file_url)
-            svg = (
+            icon_svg = (
                 f'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"'
                 f' viewBox="0 0 120 120">'
                 f'<image href="{base64_url}" width="120" height="120"/></svg>'
             )
             button = bkmodel.Button(
                 label=label,
-                icon=bkmodel.SVGIcon(svg=svg, size="2.75em"),
+                icon=bkmodel.SVGIcon(svg=icon_svg, size="2.75em"),
                 button_type=BUTTON_DEFAULT_COLOR_TYPE,
                 width=PALETTE_WIDTH - 10,
                 height=ROW_HEIGHT - 6,
-                stylesheets=_btn_stylesheet,
+                stylesheets=_toolbox_button_stylesheet,
             )
             buttons.append(button)
             button_by_icon_key[icon_key] = button
@@ -242,7 +242,7 @@ class ComponentToolboxConfigurationTableBuilder:
         # ``unsaved_exit_overlay`` and ``end_session_trigger`` have been constructed.
         # The CustomJS callback needs to reference all three objects (``save_button``,
         # ``unsaved_exit_overlay_widget``, and ``end_session_trigger``) as args, so the
-        # wiring must be deferred until all of them exist.
+        # wiring must be deferred until all of them exist
 
         # ── Hidden TextInput relay widgets ────────────────────────────────────
         # Bokeh's CustomJS cannot call Python directly, so each action that needs
@@ -267,14 +267,14 @@ class ComponentToolboxConfigurationTableBuilder:
         #                            already saved, or "End Anyway" confirmed).
         #   close_window_trigger   -> js_on_change CustomJS (window.close())
         #                            Flipped by Python after a Save & Exit save completes
-        #                            so the browser tab closes before the IOLoop stops.
+        #                            so the browser tab closes before the IOLoop stops
 
         browse_load_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         end_session_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         # Window-fitted canvas (see the launcher): JS -> Python view scale, and
-        # Python -> JS "re-fit the view" request after a load / New Design.
+        # Python -> JS "re-fit the view" request after a load / New Design
         view_scale_input = bkmodel.TextInput(
             value="1", width=0, height=0, visible=False, name="view_scale_input"
         )
@@ -294,7 +294,7 @@ class ComponentToolboxConfigurationTableBuilder:
         # Shown when the Save button (or Save & Exit) is clicked. The choice decides whether the GUI-only
         # canvas_layout section is written. Each button sends its mode to Python
         # inside the browse_save_trigger value itself ("<mode>:<timestamp>"), so
-        # the mode and the "go" signal arrive as one change.
+        # the mode and the "go" signal arrive as one change
         _final_version_btn = bkmodel.Button(
             label="Final Version",
             icon=bkmodel.TablerIcon(icon_name="circle-check"),
@@ -378,7 +378,7 @@ class ComponentToolboxConfigurationTableBuilder:
         # ── Unsaved-exit overlay ──────────────────────────────────────────────
         # Shown when the user clicks End Session while save_button is yellow.
         # Hidden trigger used by "Save & Exit" to flag Python that the session must
-        # end once the save (started from the "final version?" overlay) completes.
+        # end once the save (started from the "final version?" overlay) completes
         end_session_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
 
         _end_anyway_btn = bkmodel.Button(
@@ -446,7 +446,7 @@ class ComponentToolboxConfigurationTableBuilder:
         )
 
         # End Anyway: hide the overlay, flip end_session_trigger so Python stops the server,
-        # then close the browser tab.
+        # then close the browser tab
         _end_anyway_btn.js_on_click(
             bkmodel.CustomJS(
                 args=dict(
@@ -462,7 +462,7 @@ class ComponentToolboxConfigurationTableBuilder:
         )
 
         # Save & Exit: open the "final version?" overlay; the Python handler ends the
-        # session after the file is written (flagged via end_session_save_trigger).
+        # session after the file is written (flagged via end_session_save_trigger)
         _save_and_exit_btn.js_on_click(
             bkmodel.CustomJS(
                 args=dict(
@@ -698,7 +698,7 @@ class ComponentToolboxConfigurationTableBuilder:
             apply_button,
             spacing=4,
             visible=False,
-            # Scroll inside the panel instead of growing the page on short screens.
+            # Scroll inside the panel instead of growing the page on short screens
             styles={
                 "background": BACKGROUND_COLOR_CODE,
                 "padding": "10px",
@@ -797,7 +797,7 @@ class ComponentToolboxConfigurationTableBuilder:
             view_scale_input,
             fit_view_trigger,
             spacing=2,
-            # Scroll inside the panel instead of growing the page on short screens.
+            # Scroll inside the panel instead of growing the page on short screens
             styles={
                 "background": BACKGROUND_COLOR_CODE,
                 "padding": "10px",

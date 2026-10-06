@@ -70,6 +70,7 @@ class CanvasModeMixin:
         """
         self._dismiss_startup_overlay()
 
+        # Reset all data sources to empty, clearing the canvas
         self.state.placed_nodes_source.data = {
             "x": [],
             "y": [],
@@ -130,13 +131,13 @@ class CanvasModeMixin:
         self.state.watcher_file_path = ""
         self._clear_node_table()
 
-        # Clear edit history: a new design has no prior edits.
+        # Clear edit history: a new design has no prior edits
         if self.state.edit_history_stack is not None:
             self.state.edit_history_stack.clear()
         self._refresh_undo_redo_buttons()
 
         self.state.save_button.button_type = "success"
-        # Back to the default view of the empty design area.
+        # Back to the default view of the empty design area
         self._request_view_fit()
 
         _LOGGER.info("New Design started – canvas cleared.")
@@ -150,25 +151,28 @@ class CanvasModeMixin:
         Toggle delete mode on / off, updating button styling and status text.
 
         When entering delete mode any active component selection and pending
-        port connection are cleared, the config panel is hidden, the Delete
+        port (dashed) connection are cleared, the config panel is hidden, the Delete
         button turns red, and the status label prompts the user to click a
         node or edge to remove it.  Leaving delete mode restores the defaults.
         """
         self._cancel_pending_connection()
+        # Switch the delete mode flag and update the UI accordingly
         self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
+            # actions if switching *on* delete mode
             self.state.selected_component = None
             self.state.selected_node_index = None
             self._clear_temp_edges()
             self._clear_node_table()
-            for btn in self.state.buttons:
-                btn.button_type = BUTTON_DEFAULT_COLOR_TYPE
+            for toolbox_button in self.state.buttons:
+                toolbox_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
             self.state.status_div.text = (
                 "<b style='color:#FF4444;font-size:14pt'>Delete mode: "
                 "click an icon / a connection to remove it</b>"
             )
             self.state.delete_button.button_type = "danger"
         else:
+            # actions if switching *off* delete mode
             self.state.status_div.text = (
                 "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
             )
@@ -219,15 +223,19 @@ class CanvasModeMixin:
 
         self._exit_delete_mode()
 
-        # Find the previously selected button (if any) and reset its color to default.
+        # Find the previously selected button (if any) and reset its color to default
         previously_selected_button = next(
-            (btn for btn in self.state.buttons if btn.button_type == BUTTON_SELECTED_COLOR_TYPE),
+            (
+                toolbox_button
+                for toolbox_button in self.state.buttons
+                if toolbox_button.button_type == BUTTON_SELECTED_COLOR_TYPE
+            ),
             None,
         )
         if previously_selected_button is not None:
             previously_selected_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
-        # Highlight the newly selected button.
+        # Highlight the newly selected button
         self.state.buttons[component_index].button_type = BUTTON_SELECTED_COLOR_TYPE
 
         label = _string_cleanup(self.state.selected_component)

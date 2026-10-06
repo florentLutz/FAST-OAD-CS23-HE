@@ -64,7 +64,7 @@ _LOGGER = logging.getLogger(__name__)
 # The legend is pinned to the top-right corner of the canvas *in screen
 # pixels*: whenever the view changes (window resize, pan, zoom, reset),
 # _JS_PIN_LEGEND re-maps the pixel layout below into the current data ranges,
-# so the legend never moves or changes size on screen.
+# so the legend never moves or changes size on screen
 _LEGEND_ENTRIES = [
     ("fuel", "Fuel Flow", FUEL_FLOW_COLOR_CODE),
     ("mechanical", "Mechanical Power", MECHANICAL_POWER_COLOR_CODE),
@@ -79,7 +79,7 @@ _LEGEND_ICON_W_PX = 9
 _LEGEND_ICON_H_PX = 12
 
 # Client-side only. Converts the pixel layout into data coordinates of the
-# current view (Bokeh image glyphs can only be placed in data space).
+# current view (Bokeh image glyphs can only be placed in data space)
 _JS_PIN_LEGEND = """
 const fw = plot.inner_width, fh = plot.inner_height;
 if (!(fw > 0 && fh > 0)) { return; }
@@ -119,24 +119,26 @@ def _add_canvas_legend(canvas) -> None:
 
     :param canvas: The Bokeh ``Figure`` to annotate.
     """
-    entry_count = len(_LEGEND_ENTRIES)
+    num_entries = len(_LEGEND_ENTRIES)
     icon_urls = [
         _url_to_base64("file://" + str(COLOR_ICON_CONFIG[icon_key].resolve()))
         for icon_key, _, _ in _LEGEND_ENTRIES
     ]
     # Initial positions assume the original 800 x 950 canvas (about 1 data
-    # unit per pixel); _JS_PIN_LEGEND corrects them as soon as the page lays out.
+    # unit per pixel); _JS_PIN_LEGEND corrects them as soon as the page lays out
     x_end, y_end = CANVAS_WORLD_X_RANGE[1], CANVAS_WORLD_Y_RANGE[1]
-    row_y = [y_end - _LEGEND_TOP_PX - i * _LEGEND_ROW_STEP_PX for i in range(entry_count)]
+    row_y = [
+        y_end - _LEGEND_TOP_PX - row_index * _LEGEND_ROW_STEP_PX for row_index in range(num_entries)
+    ]
 
     # ── PNG icons (left) ──────────────────────────────────────────────────────
     icon_source = bkmodel.ColumnDataSource(
         data=dict(
             url=icon_urls,
-            x=[x_end - _LEGEND_ICON_FROM_RIGHT_PX] * entry_count,
+            x=[x_end - _LEGEND_ICON_FROM_RIGHT_PX] * num_entries,
             y=row_y,
-            w=[_LEGEND_ICON_W_PX] * entry_count,
-            h=[_LEGEND_ICON_H_PX] * entry_count,
+            w=[_LEGEND_ICON_W_PX] * num_entries,
+            h=[_LEGEND_ICON_H_PX] * num_entries,
         )
     )
     canvas.image_url(url="url", x="x", y="y", w="w", h="h", anchor="center", source=icon_source)
@@ -144,7 +146,7 @@ def _add_canvas_legend(canvas) -> None:
     # ── Colored text labels (right) ───────────────────────────────────────────
     label_source = bkmodel.ColumnDataSource(
         data=dict(
-            x=[x_end - _LEGEND_LABEL_FROM_RIGHT_PX] * entry_count,
+            x=[x_end - _LEGEND_LABEL_FROM_RIGHT_PX] * num_entries,
             y=row_y,
             text=[description for _, description, _ in _LEGEND_ENTRIES],
             color=[edge_color for _, _, edge_color in _LEGEND_ENTRIES],
@@ -172,7 +174,7 @@ def _add_canvas_legend(canvas) -> None:
             icon_source=icon_source,
             label_source=label_source,
             px=dict(
-                rows=list(range(entry_count)),
+                rows=list(range(num_entries)),
                 top=_LEGEND_TOP_PX,
                 row_step=_LEGEND_ROW_STEP_PX,
                 icon_from_right=_LEGEND_ICON_FROM_RIGHT_PX,
@@ -204,7 +206,7 @@ def _add_canvas_legend(canvas) -> None:
 #      Reset tool returns to. The data-per-pixel scale is sent to Python
 #      (view_scale_input) to keep screen-pixel glyphs in step with the icons,
 #      together with the area an *empty* design shows in this window (used to
-#      spread automatically generated layouts over the whole canvas).
+#      spread automatically generated layouts over the whole canvas)
 _CANVAS_BOTTOM_MARGIN_PX = 8
 
 _JS_FIT_CANVAS_SIZE = """
@@ -351,7 +353,7 @@ class PowertrainBuilderLauncher:
 
             # ── Undo / Redo buttons ───────────────────────────────────────────
             # Created here (before BuilderHandler) so they exist on the state
-            # when _wire_buttons() runs and can be wired immediately.
+            # when _wire_buttons() runs and can be wired immediately
             _undo_redo_stylesheet = [":host button { font-size: 1.25em; min-width: 90px; }"]
 
             undo_button = bkmodel.Button(
@@ -371,13 +373,13 @@ class PowertrainBuilderLauncher:
                 stylesheets=_undo_redo_stylesheet,
             )
 
-            # Store on state so BuilderHandler._wire_buttons() can reach them.
+            # Store on state so BuilderHandler._wire_buttons() can reach them
             state.undo_button = undo_button
             state.redo_button = redo_button
 
             # ── Canvas ────────────────────────────────────────────────────────
             # Initial size only: resized to the browser window on load / resize
-            # (see _make_canvas_fit_window).
+            # (see _make_canvas_fit_window)
             canvas = bkplot.figure(
                 width=800,
                 height=950,
@@ -585,16 +587,16 @@ class PowertrainBuilderLauncher:
 
             state.placed_nodes_source.on_change("data", _sync_labels)
 
-            # Hover ring, resized together with the icons by the icon-size slider.
+            # Hover ring, resized together with the icons by the icon-size slider
             state.hover_ring_renderer = scatter_glyph
 
             # ── Wire canvas interaction ───────────────────────────────────────
             # Also wires the type_select live-refresh callback and the Apply
-            # button (config panel commit) — see BuilderHandler._wire_buttons.
+            # button (config panel commit) — see BuilderHandler._wire_buttons
             handler = BuilderHandler(state, canvas, icon_size=DEFAULT_NODE_ICON_SIZE)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
-            # Size the canvas to the browser window (any aspect ratio).
+            # Size the canvas to the browser window (any aspect ratio)
             _make_canvas_fit_window(doc, canvas, state)
 
             # ── Startup overlay ───────────────────────────────────────────────
@@ -632,7 +634,7 @@ class PowertrainBuilderLauncher:
             # ── Undo / Redo toolbar row (above the canvas) ────────────────────
             # Floated in the upper-left of the canvas area via absolute positioning
             # so it does not shift the canvas itself.  z-index keeps it above the
-            # Bokeh toolbar but below the startup / save overlays (z-index 100).
+            # Bokeh toolbar but below the startup / save overlays (z-index 100)
             undo_redo_overlay = row(
                 undo_button,
                 bkmodel.Spacer(width=4),
@@ -653,11 +655,11 @@ class PowertrainBuilderLauncher:
 
             # "Final version?" overlay – floats above the canvas; created hidden in
             # ComponentToolboxConfigurationTableBuilder and shown by the Save button's
-            # (or Save & Exit's) CustomJS.
+            # (or Save & Exit's) CustomJS
             if state.save_version_overlay is not None:
                 doc.add_root(state.save_version_overlay)
             # Unsaved-exit overlay – floats above the canvas, shown when the user
-            # clicks End Session with unsaved changes (save button is yellow).
+            # clicks End Session with unsaved changes (save button is yellow)
             if state.unsaved_exit_overlay is not None:
                 doc.add_root(state.unsaved_exit_overlay)
             doc.title = "Powertrain Builder"

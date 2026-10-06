@@ -35,7 +35,7 @@ from .power_train_builder_state import copy_column_data
 _YAML_SUFFIXES = (".yml", ".yaml")
 
 # Save-mode prefixes sent by the "final version?" overlay through
-# browse_save_trigger (value = "<mode>:<timestamp>"; see the toolbox).
+# browse_save_trigger (value = "<mode>:<timestamp>"; see the toolbox)
 SAVE_MODE_FINAL = "final"
 SAVE_MODE_EDITABLE = "editable"
 SAVE_MODE_CANCEL = "cancel"
@@ -111,7 +111,7 @@ class IOMixin:
             for node_index in range(len(nodes_data.get("name", []))):
                 pt_yaml.add_component(node_index)
             pt_yaml.add_connection()
-            # Carry over a watcher_file_path that came from a loaded YAML, if any.
+            # Carry over a watcher_file_path that came from a loaded YAML, if any
             if self.state.watcher_file_path:
                 pt_yaml.set_watcher_file_path(self.state.watcher_file_path)
             pt_yaml.write(str(yaml_file))
@@ -146,8 +146,8 @@ class IOMixin:
             if input_file.suffix.lower() in _YAML_SUFFIXES:
                 canvas_state = PowerTrainYAMLReader(self.state, self.icon_size).read(input_file)
             else:
-                with open(input_file, encoding="utf-8") as f:
-                    canvas_state = json.load(f)
+                with open(input_file, encoding="utf-8") as json_file:
+                    canvas_state = json.load(json_file)
         except Exception:
             _LOGGER.exception("Load failed – could not parse %s", input_file)
             return
@@ -183,7 +183,7 @@ class IOMixin:
         edges_data = canvas_state.get("connections", {})
 
         # Ensure every expected column exists (forward-compatibility with older saves)
-        _node_defaults = {
+        node_column_defaults_dict = {
             "x": [],
             "y": [],
             "url": [],
@@ -199,8 +199,8 @@ class IOMixin:
             "symmetry_name": [],
             "symmetry_node_index": [],
         }
-        for col, default in _node_defaults.items():
-            nodes_data.setdefault(col, default)
+        for column_name, default_values in node_column_defaults_dict.items():
+            nodes_data.setdefault(column_name, default_values)
 
         # Fill the data sources with the loaded data
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
@@ -213,26 +213,26 @@ class IOMixin:
             "node_type": list(nodes_data.get("node_type", [])),
         }
 
-        # Remember the YAML's watcher_file_path (if any) so a re-save keeps it.
+        # Remember the YAML's watcher_file_path (if any) so a re-save keeps it
         self.state.watcher_file_path = str(canvas_state.get("watcher_file_path") or "")
 
         # Rebuild placed_counter so future placements continue from the right index
-        for name in nodes_data.get("name", []):
-            parts = name.rsplit("_", 1)
-            if len(parts) == 2 and parts[1].isdigit():
-                key = parts[0]
-                self.state.placed_counter[key] = max(
-                    self.state.placed_counter.get(key, 0), int(parts[1])
+        for node_name in nodes_data.get("name", []):
+            name_parts = node_name.rsplit("_", 1)
+            if len(name_parts) == 2 and name_parts[1].isdigit():
+                icon_key = name_parts[0]
+                self.state.placed_counter[icon_key] = max(
+                    self.state.placed_counter.get(icon_key, 0), int(name_parts[1])
                 )
 
-        # Show restored nodes at the slider's current size (legacy JSON stores w/h).
+        # Show restored nodes at the slider's current size (legacy JSON stores w/h)
         self._apply_node_icon_size()
 
-        # Make the browser re-fit the view so every loaded component is visible.
+        # Make the browser re-fit the view so every loaded component is visible
         self._request_view_fit()
 
         # Redraw ports from the restored nodes; this also recomputes every
-        # edge's xs / ys and drops edges pointing at non-existent ports.
+        # edge's xs / ys and drops edges pointing at non-existent ports
         self._rebuild_all_ports()
 
         self.state.save_button.button_type = "success"
@@ -261,7 +261,7 @@ class IOMixin:
 
         Triggered by the hidden ``browse_load_trigger`` TextInput toggling.
         """
-        path = self._open_tkinter_dialog(
+        selected_file_path = self._open_tkinter_dialog(
             filedialog.askopenfilename,
             title="Load powertrain design",
             filetypes=[
@@ -270,28 +270,28 @@ class IOMixin:
                 ("All files", "*.*"),
             ],
         )
-        if not path:
+        if not selected_file_path:
             return
         self._dismiss_startup_overlay()
-        self._load_canvas_state(path)
+        self._load_canvas_state(selected_file_path)
 
     @staticmethod
-    def _open_tkinter_dialog(func, **kwargs):
+    def _open_tkinter_dialog(dialog_function, **kwargs):
         """
         Run a tkinter file dialog on the calling thread and return the result.
 
-        :param func: The ``filedialog`` function to call
+        :param dialog_function: The ``filedialog`` function to call
             (e.g. ``filedialog.asksaveasfilename``).
-        :param kwargs: Keyword arguments forwarded to *func*.
+        :param kwargs: Keyword arguments forwarded to *dialog_function*.
         :return: The chosen path string, or ``""`` if the user cancelled.
         """
-        root = tk.Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
+        tk_root = tk.Tk()
+        tk_root.withdraw()
+        tk_root.attributes("-topmost", True)
         try:
-            result = func(parent=root, **kwargs)
+            result = dialog_function(parent=tk_root, **kwargs)
         finally:
-            root.destroy()
+            tk_root.destroy()
         return result or ""
 
     # -----------------------------------------------------------------------
@@ -350,7 +350,7 @@ class IOMixin:
         self.state.placed_counter.update(snapshot.get("placed_counter", {}))
 
         # The icon size is a display setting, not part of the undo history:
-        # keep the slider's current size even if the snapshot predates it.
+        # keep the slider's current size even if the snapshot predates it
         self._apply_node_icon_size()
         self._rebuild_all_ports()
 
@@ -371,7 +371,7 @@ class IOMixin:
         if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_undo:
             return
 
-        # Save the current state for redo before wiping it.
+        # Save the current state for redo before wiping it
         current_snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_redo(current_snapshot)
 
@@ -399,7 +399,7 @@ class IOMixin:
             return
 
         # Capture current state onto the undo stack directly (bypassing push_undo()
-        # which would wipe the redo stack).
+        # which would wipe the redo stack)
         current_snapshot = make_snapshot(self.state)
         self.state.edit_history_stack._undo.append(current_snapshot)
 
@@ -534,11 +534,11 @@ class IOMixin:
             # Flip close_window_trigger BEFORE stopping the IOLoop so Bokeh can
             # push the value change to the browser (which fires window.close() via
             # js_on_change).  _end_session() calls IOLoop.stop(), after which no
-            # further document updates can be delivered to the client.
+            # further document updates can be delivered to the client
             if self.state.close_window_trigger is not None:
                 self.state.close_window_trigger.value = (
                     "0" if self.state.close_window_trigger.value == "1" else "1"
                 )
             # Defer the actual IOLoop stop by one tick so Bokeh has time to flush
-            # the trigger update to the WebSocket before the server shuts down.
+            # the trigger update to the WebSocket before the server shuts down
             IOLoop.current().call_later(0.3, self._end_session)

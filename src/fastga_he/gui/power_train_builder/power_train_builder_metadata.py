@@ -28,7 +28,6 @@ from pathlib import Path
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
-
 # ============================================================================
 # Icon mapping
 # ============================================================================
@@ -153,7 +152,7 @@ def _read_constant_from_ast(constants_file_path: Path, variable_name: str):
     except (OSError, SyntaxError):
         return None, False
     # Walk through each variable assignment in the AST and return the value of the possible
-    # choices for the given variable name if found.
+    # choices for the given variable name if found
     for syntax_node in ast.walk(syntax_tree):
         if isinstance(syntax_node, ast.Assign) and any(
             isinstance(target_node, ast.Name) and target_node.id == variable_name
@@ -241,7 +240,7 @@ def _get_performance_component_names(
         for component in KNOWN_COMPONENTS
     }
     # Walk the components tree and parse each __init__.py to find the
-    # Performances* imports, then read the constants.py in the same folder.
+    # Performances* imports, then read the constants.py in the same folder
     for init_file_path in sorted(components_root_path.rglob("__init__.py")):
         source_code = init_file_path.read_text()
         syntax_tree = ast.parse(source_code)

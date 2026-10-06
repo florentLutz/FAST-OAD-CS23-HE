@@ -74,7 +74,7 @@ class PlacementMixin:
             self._clear_temp_edges()
             self._clear_node_table()
 
-        # Capture state before placing a new component.
+        # Capture state before placing a new component
         self._push_undo()
 
         icon_key = self.state.selected_component
@@ -126,12 +126,12 @@ class PlacementMixin:
         }
 
         if self.state.hover_source is not None:
-            hdata = self.state.hover_source.data
+            hover_data = self.state.hover_source.data
             self.state.hover_source.data = {
-                "x": list(hdata["x"]) + [x],
-                "y": list(hdata["y"]) + [y],
-                "name": list(hdata["name"]) + [node_name],
-                "node_type": list(hdata.get("node_type", [])) + [default_component_type],
+                "x": list(hover_data["x"]) + [x],
+                "y": list(hover_data["y"]) + [y],
+                "name": list(hover_data["name"]) + [node_name],
+                "node_type": list(hover_data.get("node_type", [])) + [default_component_type],
             }
 
         self._rebuild_all_ports()
@@ -164,7 +164,7 @@ class PlacementMixin:
         """
         self.icon_size = int(new)
         self._apply_node_icon_size()
-        # Port orbits depend on the icon size; this also re-routes the edges.
+        # Port orbits depend on the icon size; this also re-routes the edges
         self._rebuild_all_ports()
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
@@ -222,25 +222,25 @@ class PlacementMixin:
 
         * Icons: ``w`` / ``h`` of every placed node = ``icon_size`` (data units).
         * Hover ring, selection ring and name-label offset (screen pixels):
-          base size x ``factor``, with
-          ``factor = icon_size / DEFAULT_NODE_ICON_SIZE / state.view_scale``,
+          base size x ``size_factor``, with
+          ``size_factor = icon_size / DEFAULT_NODE_ICON_SIZE / state.view_scale``,
           so they keep hugging the icon whatever the window size.
 
         Also called after undo / redo and loading, whose node data may carry
         icon sizes from before the slider moved. Does not rebuild ports.
         """
         size = self.icon_size
-        factor = size / DEFAULT_NODE_ICON_SIZE / (self.state.view_scale or 1.0)
+        size_factor = size / DEFAULT_NODE_ICON_SIZE / (self.state.view_scale or 1.0)
 
         nodes_data = self.state.placed_nodes_source.data
-        node_count = len(nodes_data.get("x", []))
-        if node_count and (
-            list(nodes_data.get("w", [])) != [size] * node_count
-            or list(nodes_data.get("h", [])) != [size] * node_count
+        num_nodes = len(nodes_data.get("x", []))
+        if num_nodes and (
+            list(nodes_data.get("w", [])) != [size] * num_nodes
+            or list(nodes_data.get("h", [])) != [size] * num_nodes
         ):
             new_nodes_data = copy_column_data(nodes_data)
-            new_nodes_data["w"] = [size] * node_count
-            new_nodes_data["h"] = [size] * node_count
+            new_nodes_data["w"] = [size] * num_nodes
+            new_nodes_data["h"] = [size] * num_nodes
             self.state.placed_nodes_source.data = new_nodes_data
 
         for renderer, base_size in (
@@ -249,11 +249,11 @@ class PlacementMixin:
         ):
             if renderer is None:
                 continue
-            renderer.glyph.size = base_size * factor
-            # The hover ring has an explicit hover_glyph copy that must follow.
+            renderer.glyph.size = base_size * size_factor
+            # The hover ring has an explicit hover_glyph copy that must follow
             hover_glyph = getattr(renderer, "hover_glyph", None)
             if hover_glyph is not None and hasattr(hover_glyph, "size"):
-                hover_glyph.size = base_size * factor
+                hover_glyph.size = base_size * size_factor
 
         if self.state.node_label_set is not None:
-            self.state.node_label_set.y_offset = NODE_LABEL_BASE_OFFSET * factor
+            self.state.node_label_set.y_offset = NODE_LABEL_BASE_OFFSET * size_factor

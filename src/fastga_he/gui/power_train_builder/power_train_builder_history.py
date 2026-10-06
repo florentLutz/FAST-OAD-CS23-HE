@@ -20,7 +20,7 @@ A **snapshot** is a plain ``dict`` that freezes the four mutable
         "placed_counter": {key: int, …},
     }
 
-All five sub-dicts are **deep-copied** from the live data, so later mutations
+All five entries are **deep-copied** from the live data, so later mutations
 to the Bokeh sources do not affect the stored snapshot.
 
 Typical usage inside a mutating handler method::
@@ -152,7 +152,7 @@ def make_snapshot(state) -> dict:
     snapshot is cheap to pickle and safe to hold indefinitely.
 
     :param state: :class:`~.power_train_builder_state.BuilderState` instance.
-    :return: Snapshot dict suitable for :meth:`EditHistoryStack.push`.
+    :return: Snapshot dict suitable for :meth:`EditHistoryStack.push_undo`.
     """
     return {
         "nodes": copy.deepcopy(copy_column_data(state.placed_nodes_source.data)),

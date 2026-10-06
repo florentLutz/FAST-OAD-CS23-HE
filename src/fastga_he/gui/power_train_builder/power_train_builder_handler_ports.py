@@ -24,7 +24,7 @@ from .power_train_builder_state import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# Clearance between the icon edge and each port centre at the default icon size.
+# Clearance between the icon edge and each port centre at the default icon size
 _PORT_GAP = 20.0
 
 
@@ -164,7 +164,7 @@ class PortEdgeMixin:
             self._cancel_pending_connection()
             return
         # Connect source <-> target of the same energy type (colour).
-        # Push undo *before* committing the edge so the action is reversible.
+        # Push undo *before* committing the edge so the action is reversible
         if port["kind"] != pending["kind"] and port["color"] == pending["color"]:
             self._push_undo()
             self._add_edge(pending, port)
@@ -183,6 +183,14 @@ class PortEdgeMixin:
         ``(x1, y1)``–``(x2, y2)``.
 
         Used by :meth:`_find_nearest_edge` for click-to-delete on edges.
+
+        :param px: Cursor x coordinate in canvas data-units.
+        :param py: Cursor y coordinate in canvas data-units.
+        :param x1: Segment start x coordinate.
+        :param y1: Segment start y coordinate.
+        :param x2: Segment end x coordinate.
+        :param y2: Segment end y coordinate.
+        :return: Minimum distance from the cursor to the segment, in data-units.
         """
         segment_delta_x, segment_delta_y = x2 - x1, y2 - y1
         if segment_delta_x == 0 and segment_delta_y == 0:
@@ -340,9 +348,14 @@ class PortEdgeMixin:
         :param port: Port metadata dict with keys ``node_index`` and ``label``.
         """
         data["connected"] = [
-            "True"
-            if (data["node_index"][i] == port["node_index"] and data["label"][i] == port["label"])
-            else data["connected"][i]
+            (
+                "True"
+                if (
+                    data["node_index"][i] == port["node_index"]
+                    and data["label"][i] == port["label"]
+                )
+                else data["connected"][i]
+            )
             for i in range(len(data["node_index"]))
         ]
 
@@ -356,6 +369,9 @@ class PortEdgeMixin:
 
         The line is **not** registered in ``edge_source``; it becomes permanent
         only when :meth:`apply_node_configurations` is called.
+
+        :param starting_port: Metadata dict for the source-side (starting) port.
+        :param ending_port: Metadata dict for the target-side (ending) port.
         """
         if self.state.panel_preview_edge_source is None:
             return
@@ -400,7 +416,7 @@ class PortEdgeMixin:
         if not edge_data.get("starting_node_index"):
             return
         # Build a lookup: (kind, node_index, label) -> (x, y) for every port currently
-        position: dict = {}
+        port_position_dict: dict = {}
         for kind, data_source in [
             ("source", self.state.source_port_source),
             ("target", self.state.target_port_source),
@@ -408,13 +424,13 @@ class PortEdgeMixin:
             if data_source is None:
                 continue
             dataset = data_source.data
-            for i, (px, py) in enumerate(
+            for i, (port_x, port_y) in enumerate(
                 zip(list(dataset.get("x", [])), list(dataset.get("y", [])))
             ):
                 key = (kind, list(dataset["node_index"])[i], list(dataset["label"])[i])
-                position[key] = (px, py)
+                port_position_dict[key] = (port_x, port_y)
         # Walk every stored edge and look up fresh coordinates for its two endpoints
-        new_xs, new_ys, valid = [], [], []
+        new_xs, new_ys, valid_edge_indices = [], [], []
         for i in range(len(edge_data["starting_node_index"])):
             starting_port_key = (
                 edge_data["starting_port_kind"][i],
@@ -426,14 +442,14 @@ class PortEdgeMixin:
                 edge_data["ending_node_index"][i],
                 edge_data["ending_port_label"][i],
             )
-            if starting_port_key in position and ending_port_key in position:
-                starting_x, starting_y = position[starting_port_key]
-                ending_x, ending_y = position[ending_port_key]
+            if starting_port_key in port_position_dict and ending_port_key in port_position_dict:
+                starting_x, starting_y = port_position_dict[starting_port_key]
+                ending_x, ending_y = port_position_dict[ending_port_key]
                 new_xs.append([starting_x, ending_x])
                 new_ys.append([starting_y, ending_y])
-                valid.append(i)  # only keep edges whose ports still exist
+                valid_edge_indices.append(i)  # only keep edges whose ports still exist
 
-        new_edge_data = {k: [edge_data[k][j] for j in valid] for k in edge_data}
+        new_edge_data = {k: [edge_data[k][j] for j in valid_edge_indices] for k in edge_data}
         new_edge_data["xs"] = new_xs
         new_edge_data["ys"] = new_ys
         self.state.edge_source.data = new_edge_data
@@ -487,15 +503,15 @@ class PortEdgeMixin:
         if self.state.edge_source is not None:
             if override_counts:
                 if self.state.edge_preview_backup is None:
-                    # First preview tick of this session: remember the truth (backup).
+                    # First preview tick of this session: remember the truth (backup)
                     self.state.edge_preview_backup = copy_column_data(self.state.edge_source.data)
                 else:
                     # Later ticks: always prune from the truth (backup), not from
-                    # whatever the previous tick (preview) already hid.
+                    # whatever the previous tick (preview) already hid
                     self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
             elif self.state.edge_preview_backup is not None:
                 # Real rebuild after a preview: put the true edges back before
-                # this call's own (real, committed-count-based) pruning runs.
+                # this call's own (real, committed-count-based) pruning runs
                 self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
                 self.state.edge_preview_backup = None
 
@@ -503,7 +519,7 @@ class PortEdgeMixin:
         # Port positions scale with the icon-size slider: every term of the
         # orbit radius (icon radius + port radius + gap) is multiplied by
         # factor = icon_size / DEFAULT_NODE_ICON_SIZE, so each port sits at
-        # exactly `factor` times its default offset from the node centre.
+        # exactly `factor` times its default offset from the node centre
         size_factor = self.icon_size / DEFAULT_NODE_ICON_SIZE
 
         placed_nodes_data = self.state.placed_nodes_source.data
@@ -545,7 +561,7 @@ class PortEdgeMixin:
         has_selected_node = self.state.selected_node_index is not None
         selected_node_index = self.state.selected_node_index
 
-        for i, (cx, cy, icon_type, node_type, node_name) in enumerate(
+        for i, (center_x, center_y, icon_type, node_type, node_name) in enumerate(
             zip(xs, ys, icon_types, node_types, node_names)
         ):
             if i in override_counts:
@@ -562,13 +578,13 @@ class PortEdgeMixin:
                     else self.state.default_target_count.get(node_type, 0)
                 )
 
-            cfg = ICONS_CONFIG.get(icon_type, {})
-            raw_source_color = cfg.get("source_color") or DEFAULT_COLOR
-            raw_target_color = cfg.get("target_color") or DEFAULT_COLOR
+            icon_config = ICONS_CONFIG.get(icon_type, {})
+            raw_source_color = icon_config.get("source_color") or DEFAULT_COLOR
+            raw_target_color = icon_config.get("target_color") or DEFAULT_COLOR
 
             ports = self.compute_ports(
-                cx,
-                cy,
+                center_x,
+                center_y,
                 NODE_RADIUS * size_factor,
                 PORT_RADIUS * size_factor,
                 n_source,
@@ -612,9 +628,11 @@ class PortEdgeMixin:
             fill_alpha=source_fill_alpha,
             line_alpha=source_line_alpha,
             connected=[
-                "True"
-                if ("source", source_node_index[i], source_label[i]) in connected_ports
-                else "False"
+                (
+                    "True"
+                    if ("source", source_node_index[i], source_label[i]) in connected_ports
+                    else "False"
+                )
                 for i in range(len(source_x))
             ],
         )
@@ -629,15 +647,17 @@ class PortEdgeMixin:
             fill_alpha=target_fill_alpha,
             line_alpha=target_line_alpha,
             connected=[
-                "True"
-                if ("target", target_node_index[i], target_label[i]) in connected_ports
-                else "False"
+                (
+                    "True"
+                    if ("target", target_node_index[i], target_label[i]) in connected_ports
+                    else "False"
+                )
                 for i in range(len(target_x))
             ],
         )
         # Always reposition/prune edges against whatever ports were just
         # drawn (real or preview) — see the snapshot/restore logic at the
-        # top of this method for why a preview pass is still safe to reverse.
+        # top of this method for why a preview pass is still safe to reverse
         self._rebuild_edges()
 
         if self.state.selected_node_index is not None:

@@ -29,12 +29,12 @@ from .power_train_builder_state import copy_column_data
 
 _LOGGER = logging.getLogger(__name__)
 
-# Top-level YAML keys (the first four mirror FAST-OAD_CS23-HE's powertrain.py).
+# Top-level YAML keys (the first four mirror FAST-OAD_CS23-HE's powertrain.py)
 KEY_TITLE = "title"
 KEY_PT_COMPONENTS = "power_train_components"
 KEY_PT_CONNECTIONS = "component_connections"
 KEY_PT_WATCHER = "watcher_file_path"
-# GUI-only section: {component_name: {"x": float, "y": float}}.
+# GUI-only section: {component_name: {"x": float, "y": float}}
 KEY_CANVAS_LAYOUT = "canvas_layout"
 
 _CANVAS_LAYOUT_HEADER = (
@@ -43,11 +43,11 @@ _CANVAS_LAYOUT_HEADER = (
 
 # Keywords used to tell which "number_of_*" attribute of a variable-port
 # component drives its source-side vs target-side port count. Shared with the
-# reader so that save and load stay symmetric.
+# reader so that save and load stay symmetric
 SOURCE_SIDE_KEYWORDS = ("_inputs", "_tanks")
 TARGET_SIDE_KEYWORDS = ("_outputs", "_engines", "_power_sources")
 
-# Decimal places kept for canvas coordinates (sub-pixel precision is noise).
+# Decimal places kept for canvas coordinates (sub-pixel precision is noise)
 _LAYOUT_DECIMALS = 1
 
 
@@ -104,7 +104,7 @@ class PowerTrainYAML:
             KEY_PT_WATCHER: "",
             KEY_CANVAS_LAYOUT: {},
         }
-        # Fall back to copying the live sources, as documented above.
+        # Fall back to copying the live sources
         self.node_data = (
             node_data if node_data is not None else copy_column_data(state.placed_nodes_source.data)
         )
@@ -143,7 +143,7 @@ class PowerTrainYAML:
 
         For variable-port components (those whose default source count is 3),
         the current port counts are written as ``number_of_*`` option keys so
-        that FAST-OAD can reconstruct the correct topology.
+        that FAST-OAD-GA-HE can reconstruct the correct topology.
 
         The component's canvas (x, y) is also recorded under ``canvas_layout``
         so the file can be re-opened in the builder.
@@ -165,12 +165,17 @@ class PowerTrainYAML:
             else None
         )
         component_id = next(
-            (comp for comp in KNOWN_COMPONENTS if comp["components_type"] == component_type), None
+            (
+                known_component
+                for known_component in KNOWN_COMPONENTS
+                if known_component["components_type"] == component_type
+            ),
+            None,
         )["id"]
 
         # Parse the options JSON string for this node into a dict.
         # This already contains every option the user configured in the GUI,
-        # including boolean toggles (e.g. adjust_sfc) stored as booleans.
+        # including boolean toggles (e.g. adjust_sfc) stored as booleans
         raw_options_string = self.node_data["options"][node_index]
         try:
             options_dict = json.loads(raw_options_string) if raw_options_string else {}
@@ -179,7 +184,7 @@ class PowerTrainYAML:
 
         # Merge in per-component-type option defaults for any key not already
         # present in the saved JSON (covers options that were never touched in
-        # the GUI and therefore never written to placed_nodes_source["options"]).
+        # the GUI and therefore never written to placed_nodes_source["options"])
         component_option_defaults = self.possible_options.get(component_type, {})
         for option_name, option_values in component_option_defaults.items():
             if option_name not in options_dict and option_values:
@@ -192,14 +197,14 @@ class PowerTrainYAML:
         # target_port_count to the target-side attribute, mirroring the convention
         # in _build_port_count_defaults.
         # Source-side keywords: inputs, tanks.
-        # Target-side keywords: outputs, engines, power_sources.
+        # Target-side keywords: outputs, engines, power_sources
         if self.default_source_count.get(component_type, 0) == 3:
             component_attributes = (
                 next(
                     (
-                        comp
-                        for comp in KNOWN_COMPONENTS
-                        if comp["components_type"] == component_type
+                        known_component
+                        for known_component in KNOWN_COMPONENTS
+                        if known_component["components_type"] == component_type
                     ),
                     {},
                 ).get("attributes")
@@ -257,7 +262,7 @@ class PowerTrainYAML:
         """
         # Warn (but do not abort) when any port is still unconnected so the
         # user knows the saved YAML may be incomplete. The "connected" column
-        # stores the string "True" / "False", so we normalise with str().
+        # stores the string "True" / "False", so we normalise with str()
         source_has_unconnected = any(
             str(value) == "False" for value in self.source_port_data.get("connected", [])
         )
@@ -342,17 +347,17 @@ class PowerTrainYAML:
             key: value
             for key, value in self.data.items()
             if not (key == KEY_CANVAS_LAYOUT and not self.include_canvas_layout)
-            # watcher_file_path is optional for FAST-OAD: only write it when set.
+            # watcher_file_path is optional for FAST-OAD: only write it when set
             and not (key == KEY_PT_WATCHER and not value)
         }
         yaml_serialiser.dump(data_to_dump, string_buffer)
         output_string = string_buffer.getvalue()
 
-        # Remove quotes around [component_name, N] patterns.
+        # Remove quotes around [component_name, N] patterns
         output_string = re.sub(r"'(\[[^\]]+\])'", r"\1", output_string)
 
         # Fix watcher_file_path: ruamel.yaml may emit the value on the next line
-        # as a block scalar. Collapse it back to a single inline assignment.
+        # as a block scalar. Collapse it back to a single inline assignment
         output_string = re.sub(
             r"(watcher_file_path:)\s*\n\s+(\S[^\n]*)",
             r"\1 \2",
@@ -361,27 +366,27 @@ class PowerTrainYAML:
 
         # The GUI-only canvas_layout section is always dumped last (it is the
         # last key of self.data). Split it off so the spacing rules below only
-        # apply to the FAST-OAD part of the file and the layout stays compact.
+        # apply to the FAST-OAD part of the file and the layout stays compact
         layout_marker = f"\n{KEY_CANVAS_LAYOUT}:"
         fastoad_part, marker, layout_part = output_string.partition(layout_marker)
 
-        # Add a blank line before each top-level key (except the first one).
+        # Add a blank line before each top-level key (except the first one)
         top_level_keys = [KEY_TITLE, KEY_PT_COMPONENTS, KEY_PT_CONNECTIONS, KEY_PT_WATCHER]
         for key in top_level_keys[1:]:
             fastoad_part = fastoad_part.replace(f"\n{key}:", f"\n\n{key}:")
 
-        # Add a blank line between each connection entry (- source:).
+        # Add a blank line between each connection entry (- source:)
         fastoad_part = re.sub(r"\n(\s+- source:)", r"\n\n\1", fastoad_part)
 
         # Add a blank line between each component under power_train_components
-        # (2-space-indented keys).
+        # (2-space-indented keys)
         fastoad_part = re.sub(r"\n(\s{2}\w)", r"\n\n\1", fastoad_part)
 
         if not marker:
             return fastoad_part
 
         # Re-attach the layout section, preceded by a blank line and a short
-        # comment so readers of the YAML know it is GUI-only.
+        # comment so readers of the YAML know it is GUI-only
         return fastoad_part + "\n\n" + _CANVAS_LAYOUT_HEADER + marker.lstrip("\n") + layout_part
 
     def write(self, file_path: str) -> None:
