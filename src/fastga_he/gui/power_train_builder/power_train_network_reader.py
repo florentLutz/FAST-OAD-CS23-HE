@@ -69,8 +69,8 @@ _QUOTED_ENDPOINT_PATTERN = re.compile(r"^\s*\[\s*([^,\]]+?)\s*,\s*(\d+)\s*\]\s*$
 
 # Canvas area used when generating a layout (canvas data space is
 # x 0–800, y 0–950; the legend sits in the top-right corner).
-_AUTO_X_MIN, _AUTO_X_MAX = 70.0, 730.0
-_AUTO_Y_MIN, _AUTO_Y_MAX = 90.0, 860.0
+_AUTO_X_MIN, _AUTO_X_MAX = 30.0, 800.0
+_AUTO_Y_MIN, _AUTO_Y_MAX = 90.0, 890.0
 _AUTO_X_STEP_MAX, _AUTO_Y_STEP_MAX = 150.0, 170.0
 
 # Energy-storage component types used as the hierarchy reference, matching
@@ -186,13 +186,12 @@ class PowerTrainYAMLReader:
         :return: ``(nodes_data, name_to_index, nodes_without_layout, propulsor_names)``.
         """
         nodes_data = {column: [] for column in _NODE_COLUMNS}
-        name_to_index: dict = {}
-        symmetry_requests: list = []  # (node_index, peer_name)
-        nodes_without_layout: list = []
-        propulsor_names: set = set()
+        name_to_index = {}
+        symmetry_requests = []  # (node_index, peer_name)
+        nodes_without_layout = []
+        propulsor_names = set()
 
-        for raw_name, component in components.items():
-            name = str(raw_name)
+        for name, component in components.items():
             component = component or {}
 
             known_component = _KNOWN_COMPONENT_BY_ID.get(component.get("id"))

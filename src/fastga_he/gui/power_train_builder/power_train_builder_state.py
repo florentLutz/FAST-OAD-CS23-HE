@@ -34,6 +34,33 @@ ICON_SIZE = 45
 PORT_RADIUS = 8  # Radius of each port ball in data-units (approximately pixels).
 NODE_RADIUS = ICON_SIZE / 2  # Half icon size used as the orbit base.
 
+# Canvas "world": the design area that is always kept fully visible, in data
+# units. The canvas itself is sized to the browser window at runtime and its
+# view is fitted (uniform x / y scale) so this whole area — plus every placed
+# component — is on screen. Positions saved in YAML files use these units.
+CANVAS_WORLD_X_RANGE = (0, 800)
+CANVAS_WORLD_Y_RANGE = (0, 950)
+# Horizontal space kept free right of the canvas for the config panel (its
+# 380 px content + padding / gaps), so the page never scrolls sideways when a
+# node is selected and the panel appears.
+CONFIG_PANEL_RESERVED_WIDTH = 425
+# Approximate x (px) of the canvas' left edge: toolbox width + its padding / gaps.
+CANVAS_LEFT_OFFSET = PALETTE_WIDTH + 35
+
+# Placement shared by the floating dialogs (startup, "final version?",
+# unsaved changes): centred over the canvas area at any window size, instead
+# of fixed pixel offsets tuned for one screen.
+DIALOG_POSITION_STYLES = {
+    "position": "absolute",
+    "left": f"calc(50% + {(CANVAS_LEFT_OFFSET - CONFIG_PANEL_RESERVED_WIDTH) // 2}px)",
+    "top": "50%",
+    "transform": "translate(-50%, -50%)",
+}
+
+# Smallest canvas size (px) used when the window is very small.
+CANVAS_MIN_WIDTH = 480
+CANVAS_MIN_HEIGHT = 420
+
 # Node icon size (canvas data units) and the range offered by the size slider
 # in the toolbox header. Everything drawn around a node (hover ring, selection
 # ring, name label, port orbit) scales by  current_size / DEFAULT_NODE_ICON_SIZE.
@@ -130,6 +157,18 @@ class BuilderState:
     hover_ring_renderer: object = field(default=None)
     selection_ring_renderer: object = field(default=None)
     node_label_set: object = field(default=None)
+
+    # ── Window-fitted canvas ─────────────────────────────────────────────────
+    # Data units per screen pixel of the current fitted view (1.0 = the
+    # original fixed 800 x 950 canvas). Sent from the browser through
+    # view_scale_input; used to keep screen-pixel glyphs (hover / selection
+    # rings, name labels) matched to the icons, which are sized in data units.
+    view_scale: float = field(default=1.0)
+    # Hidden TextInput written by the browser-side fit callback (JS -> Python).
+    view_scale_input: bkmodel.TextInput = field(default=None)
+    # Hidden TextInput flipped by Python after a load / New Design so the
+    # browser re-fits the view to the (new) components (Python -> JS).
+    fit_view_trigger: bkmodel.TextInput = field(default=None)
 
     # ── Canvas node data ─────────────────────────────────────────────────────
     # One row per placed component: position, icon URL, type, options JSON,

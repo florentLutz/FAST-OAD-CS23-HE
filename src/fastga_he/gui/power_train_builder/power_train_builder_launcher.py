@@ -21,7 +21,7 @@ import webbrowser
 
 import bokeh.models as bkmodel
 import bokeh.plotting as bkplot
-from bokeh.events import Tap
+from bokeh.events import DocumentReady, Tap
 from bokeh.layouts import column, row
 from bokeh.server.server import Server
 from tornado.ioloop import IOLoop
@@ -36,7 +36,13 @@ from fastga_he.gui.power_train_network_viewer import (
 )
 
 from .power_train_builder_state import (
+    CANVAS_MIN_HEIGHT,
+    CANVAS_MIN_WIDTH,
+    CANVAS_WORLD_X_RANGE,
+    CANVAS_WORLD_Y_RANGE,
+    CONFIG_PANEL_RESERVED_WIDTH,
     DEFAULT_NODE_ICON_SIZE,
+    DIALOG_POSITION_STYLES,
     HOVER_RING_BASE_SIZE,
     NODE_LABEL_BASE_OFFSET,
     NODE_SELECT_COLOR,
@@ -52,52 +58,46 @@ _LOGGER = logging.getLogger(__name__)
 # ── Canvas legend ─────────────────────────────────────────────────────────────
 # Mirrors the viewer's LegendBuilder._add_legend layout:
 #   [icon PNG]  [colored label text]
-# Each row: icon anchored at (x_icon, y), label left-aligned at x_label
-# and drawn in the edge color of that connection type.
+# drawn in the edge color of each connection type.
 #
-# Coordinates below are given in canvas data space at the *initial* view
-# (x_range 0–800, y_range 0–950). The legend is pinned to that screen spot:
-# whenever the view is panned / zoomed / reset, _JS_PIN_LEGEND re-maps these
-# positions into the new ranges, so the legend never moves or resizes.
+# The legend is pinned to the top-right corner of the canvas *in screen
+# pixels*: whenever the view changes (window resize, pan, zoom, reset),
+# _JS_PIN_LEGEND re-maps the pixel layout below into the current data ranges,
+# so the legend never moves or changes size on screen.
 _LEGEND_ENTRIES = [
     ("fuel", "Fuel Flow", FUEL_FLOW_COLOR_CODE),
     ("mechanical", "Mechanical Power", MECHANICAL_POWER_COLOR_CODE),
     ("electricity", "Electrical Current", ELECTRICITY_CURRENT_COLOR_CODE),
 ]
 
-_CANVAS_X_RANGE = (0, 800)
-_CANVAS_Y_RANGE = (0, 950)
+_LEGEND_ICON_FROM_RIGHT_PX = 118  # icon centre, measured from the frame's right edge
+_LEGEND_LABEL_FROM_RIGHT_PX = 107  # label left edge, measured from the frame's right edge
+_LEGEND_TOP_PX = 10  # first row centre, measured from the frame's top edge
+_LEGEND_ROW_STEP_PX = 22  # vertical spacing between rows
+_LEGEND_ICON_W_PX = 9
+_LEGEND_ICON_H_PX = 12
 
-_LEGEND_X_ICON = 680  # center-x of the PNG icon
-_LEGEND_X_LABEL = 691  # left edge of the text label (icon_center + ~11)
-_LEGEND_Y_TOP = 940  # y of the first (topmost) row
-_LEGEND_ROW_STEP = 22  # vertical spacing between rows
-_LEGEND_ICON_W = 9  # icon width  in data units (matches viewer)
-_LEGEND_ICON_H = 12  # icon height in data units (matches viewer)
-
-# Client-side only (no server round-trip). Converts the legend's initial
-# data-space layout to fractions of the initial view, then places it at the
-# same fractions of the current view; icon w/h scale with the view span so
-# they keep their on-screen size. Labels are canvas text, so their size is
-# already fixed on screen. Only the two legend sources are touched.
+# Client-side only. Converts the pixel layout into data coordinates of the
+# current view (Bokeh image glyphs can only be placed in data space).
 _JS_PIN_LEGEND = """
-const x0 = x_range.start, xspan = x_range.end - x_range.start;
-const y0 = y_range.start, yspan = y_range.end - y_range.start;
-const fx = (v) => x0 + (v - base.x_start) / base.x_span * xspan;
-const fy = (v) => y0 + (v - base.y_start) / base.y_span * yspan;
+const fw = plot.inner_width, fh = plot.inner_height;
+if (!(fw > 0 && fh > 0)) { return; }
+const per_px_x = (x_range.end - x_range.start) / fw;
+const per_px_y = (y_range.end - y_range.start) / fh;
+const row_y = px.rows.map((i) => y_range.end - (px.top + i * px.row_step) * per_px_y);
 
 icon_source.data = {
     url: icon_source.data.url,
-    x: base.icon_x.map(fx),
-    y: base.row_y.map(fy),
-    w: base.icon_x.map(() => base.icon_w * xspan / base.x_span),
-    h: base.icon_x.map(() => base.icon_h * yspan / base.y_span),
+    x: row_y.map(() => x_range.end - px.icon_from_right * per_px_x),
+    y: row_y,
+    w: row_y.map(() => px.icon_w * per_px_x),
+    h: row_y.map(() => px.icon_h * per_px_y),
 };
 label_source.data = {
     text: label_source.data.text,
     color: label_source.data.color,
-    x: base.row_y.map(() => fx(base.label_x)),
-    y: base.row_y.map(fy),
+    x: row_y.map(() => x_range.end - px.label_from_right * per_px_x),
+    y: row_y,
 };
 """
 
@@ -112,30 +112,30 @@ def _add_canvas_legend(canvas) -> None:
     electricity) on the left — loaded via :func:`_url_to_base64` — and a
     text label drawn in the edge colour of that connection type on the right.
 
-    The legend is pinned to the screen: panning, zooming and resetting the
-    canvas move the components but not the legend (see ``_JS_PIN_LEGEND``).
-    Bokeh's image glyph only accepts data coordinates, so the pinning is done
-    by re-mapping the legend's coordinates in the browser on every range change.
+    The legend is pinned to the screen: resizing the window, panning,
+    zooming and resetting the canvas move the components but not the legend
+    (see ``_JS_PIN_LEGEND``).
 
     :param canvas: The Bokeh ``Figure`` to annotate.
     """
-    row_y = [
-        _LEGEND_Y_TOP - entry_index * _LEGEND_ROW_STEP
-        for entry_index in range(len(_LEGEND_ENTRIES))
-    ]
+    entry_count = len(_LEGEND_ENTRIES)
     icon_urls = [
         _url_to_base64("file://" + str(COLOR_ICON_CONFIG[icon_key].resolve()))
         for icon_key, _, _ in _LEGEND_ENTRIES
     ]
+    # Initial positions assume the original 800 x 950 canvas (about 1 data
+    # unit per pixel); _JS_PIN_LEGEND corrects them as soon as the page lays out.
+    x_end, y_end = CANVAS_WORLD_X_RANGE[1], CANVAS_WORLD_Y_RANGE[1]
+    row_y = [y_end - _LEGEND_TOP_PX - i * _LEGEND_ROW_STEP_PX for i in range(entry_count)]
 
     # ── PNG icons (left) ──────────────────────────────────────────────────────
     icon_source = bkmodel.ColumnDataSource(
         data=dict(
             url=icon_urls,
-            x=[_LEGEND_X_ICON] * len(row_y),
+            x=[x_end - _LEGEND_ICON_FROM_RIGHT_PX] * entry_count,
             y=row_y,
-            w=[_LEGEND_ICON_W] * len(row_y),
-            h=[_LEGEND_ICON_H] * len(row_y),
+            w=[_LEGEND_ICON_W_PX] * entry_count,
+            h=[_LEGEND_ICON_H_PX] * entry_count,
         )
     )
     canvas.image_url(url="url", x="x", y="y", w="w", h="h", anchor="center", source=icon_source)
@@ -143,7 +143,7 @@ def _add_canvas_legend(canvas) -> None:
     # ── Colored text labels (right) ───────────────────────────────────────────
     label_source = bkmodel.ColumnDataSource(
         data=dict(
-            x=[_LEGEND_X_LABEL] * len(row_y),
+            x=[x_end - _LEGEND_LABEL_FROM_RIGHT_PX] * entry_count,
             y=row_y,
             text=[description for _, description, _ in _LEGEND_ENTRIES],
             color=[edge_color for _, _, edge_color in _LEGEND_ENTRIES],
@@ -165,20 +165,19 @@ def _add_canvas_legend(canvas) -> None:
     # ── Pin to the screen ─────────────────────────────────────────────────────
     pin_legend = bkmodel.CustomJS(
         args=dict(
+            plot=canvas,
             x_range=canvas.x_range,
             y_range=canvas.y_range,
             icon_source=icon_source,
             label_source=label_source,
-            base=dict(
-                x_start=_CANVAS_X_RANGE[0],
-                x_span=_CANVAS_X_RANGE[1] - _CANVAS_X_RANGE[0],
-                y_start=_CANVAS_Y_RANGE[0],
-                y_span=_CANVAS_Y_RANGE[1] - _CANVAS_Y_RANGE[0],
-                icon_x=[_LEGEND_X_ICON] * len(row_y),
-                label_x=_LEGEND_X_LABEL,
-                row_y=row_y,
-                icon_w=_LEGEND_ICON_W,
-                icon_h=_LEGEND_ICON_H,
+            px=dict(
+                rows=list(range(entry_count)),
+                top=_LEGEND_TOP_PX,
+                row_step=_LEGEND_ROW_STEP_PX,
+                icon_from_right=_LEGEND_ICON_FROM_RIGHT_PX,
+                label_from_right=_LEGEND_LABEL_FROM_RIGHT_PX,
+                icon_w=_LEGEND_ICON_W_PX,
+                icon_h=_LEGEND_ICON_H_PX,
             ),
         ),
         code=_JS_PIN_LEGEND,
@@ -186,6 +185,113 @@ def _add_canvas_legend(canvas) -> None:
     for canvas_range in (canvas.x_range, canvas.y_range):
         canvas_range.js_on_change("start", pin_legend)
         canvas_range.js_on_change("end", pin_legend)
+    canvas.js_on_change("inner_width", pin_legend)
+    canvas.js_on_change("inner_height", pin_legend)
+
+
+# ── Window-fitted canvas ──────────────────────────────────────────────────────
+# The canvas takes the space between the two side panels, whatever the
+# screen / window aspect ratio (16:9, 16:10, ...), and is refitted on resize.
+# Two client-side steps:
+#   1. _JS_FIT_CANVAS_SIZE (document ready + window resize) sets the figure's
+#      pixel width / height from the window size.
+#   2. _JS_FIT_VIEW (whenever the frame size changes, or Python flips
+#      fit_view_trigger after a load / New Design) sets the x / y ranges so that
+#      both axes use the SAME data-units-per-pixel (no stretched icons) and the
+#      design world (CANVAS_WORLD_*) plus every placed component is visible.
+#      Extra room goes to the right / bottom. The new view is also what the
+#      Reset tool returns to. The data-per-pixel scale is sent to Python
+#      (view_scale_input) to keep screen-pixel glyphs in step with the icons.
+_CANVAS_BOTTOM_MARGIN_PX = 8
+_FIT_VIEW_NODE_MARGIN = 60  # data units kept around the outermost components
+
+_JS_FIT_CANVAS_SIZE = """
+const fit_size = () => {
+    const view = Bokeh.index.find_one(plot);
+    if (view == null) { return; }
+    const rect = view.el.getBoundingClientRect();
+    const left = rect.left + window.scrollX, top = rect.top + window.scrollY;
+    const width = Math.max(min_width, Math.floor(window.innerWidth - left - right_reserved));
+    const height = Math.max(min_height, Math.floor(window.innerHeight - top - bottom_margin));
+    if (plot.width != width || plot.height != height) {
+        plot.setv({width: width, height: height});
+    }
+};
+fit_size();
+if (!window.__powertrain_builder_resize_hooked) {
+    window.__powertrain_builder_resize_hooked = true;
+    let pending = false;
+    window.addEventListener("resize", () => {
+        if (pending) { return; }
+        pending = true;
+        requestAnimationFrame(() => { pending = false; fit_size(); });
+    });
+}
+"""
+
+_JS_FIT_VIEW = """
+const fw = plot.inner_width, fh = plot.inner_height;
+if (!(fw > 0 && fh > 0)) { return; }
+let x0 = world.x0, x1 = world.x1, y0 = world.y0, y1 = world.y1;
+const xs = nodes.data.x, ys = nodes.data.y;
+for (let i = 0; i < xs.length; i++) {
+    x0 = Math.min(x0, xs[i] - margin); x1 = Math.max(x1, xs[i] + margin);
+    y0 = Math.min(y0, ys[i] - margin); y1 = Math.max(y1, ys[i] + margin);
+}
+// Same scale on both axes: the axis that needs more data per pixel wins.
+const k = Math.max((x1 - x0) / fw, (y1 - y0) / fh);
+const x_end = x0 + fw * k, y_start = y1 - fh * k;
+x_range.setv({start: x0, end: x_end, reset_start: x0, reset_end: x_end});
+y_range.setv({start: y_start, end: y1, reset_start: y_start, reset_end: y1});
+const k_text = k.toFixed(4);
+if (view_scale_input.value != k_text) { view_scale_input.value = k_text; }
+"""
+
+
+def _make_canvas_fit_window(doc, canvas, state) -> None:
+    """
+    Wire the client-side callbacks that size the canvas to the browser window
+    and fit its view (see the comment above ``_JS_FIT_CANVAS_SIZE``).
+
+    :param doc: The Bokeh document (for the ``DocumentReady`` event).
+    :param canvas: The builder ``Figure``.
+    :param state: :class:`BuilderState` providing ``placed_nodes_source``,
+        ``view_scale_input`` and ``fit_view_trigger``.
+    """
+    fit_view = bkmodel.CustomJS(
+        args=dict(
+            plot=canvas,
+            x_range=canvas.x_range,
+            y_range=canvas.y_range,
+            nodes=state.placed_nodes_source,
+            view_scale_input=state.view_scale_input,
+            margin=_FIT_VIEW_NODE_MARGIN,
+            world=dict(
+                x0=CANVAS_WORLD_X_RANGE[0],
+                x1=CANVAS_WORLD_X_RANGE[1],
+                y0=CANVAS_WORLD_Y_RANGE[0],
+                y1=CANVAS_WORLD_Y_RANGE[1],
+            ),
+        ),
+        code=_JS_FIT_VIEW,
+    )
+    canvas.js_on_change("inner_width", fit_view)
+    canvas.js_on_change("inner_height", fit_view)
+    state.fit_view_trigger.js_on_change("value", fit_view)
+
+    doc.js_on_event(
+        DocumentReady,
+        bkmodel.CustomJS(
+            args=dict(
+                plot=canvas,
+                right_reserved=CONFIG_PANEL_RESERVED_WIDTH,
+                bottom_margin=_CANVAS_BOTTOM_MARGIN_PX,
+                min_width=CANVAS_MIN_WIDTH,
+                min_height=CANVAS_MIN_HEIGHT,
+            ),
+            code=_JS_FIT_CANVAS_SIZE,
+        ),
+    )
 
 
 class PowertrainBuilderLauncher:
@@ -262,11 +368,14 @@ class PowertrainBuilderLauncher:
             state.redo_button = redo_button
 
             # ── Canvas ────────────────────────────────────────────────────────
+            # Initial size only: resized to the browser window on load / resize
+            # (see _make_canvas_fit_window).
             canvas = bkplot.figure(
                 width=800,
                 height=950,
-                x_range=_CANVAS_X_RANGE,
-                y_range=_CANVAS_Y_RANGE,
+                x_range=CANVAS_WORLD_X_RANGE,
+                y_range=CANVAS_WORLD_Y_RANGE,
+                name="builder_canvas",
                 toolbar_location="above",
                 background_fill_color=BACKGROUND_COLOR_CODE,
                 title="Powertrain Builder – click to place components",
@@ -477,6 +586,9 @@ class PowertrainBuilderLauncher:
             handler = BuilderHandler(state, canvas, icon_size=DEFAULT_NODE_ICON_SIZE)
             canvas.on_event(Tap, handler.on_canvas_tap)
 
+            # Size the canvas to the browser window (any aspect ratio).
+            _make_canvas_fit_window(doc, canvas, state)
+
             # ── Startup overlay ───────────────────────────────────────────────
             startup_overlay = column(
                 bkmodel.Div(
@@ -503,9 +615,7 @@ class PowertrainBuilderLauncher:
                     "border": "2px solid #444",
                     "border-radius": "16px",
                     "padding": "10px 40px 30px 40px",
-                    "position": "absolute",
-                    "left": f"{PALETTE_WIDTH + 150}px",
-                    "top": "340px",
+                    **DIALOG_POSITION_STYLES,
                     "z-index": "100",
                     "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
                 },

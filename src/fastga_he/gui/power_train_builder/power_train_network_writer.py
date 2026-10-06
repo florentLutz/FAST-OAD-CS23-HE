@@ -38,8 +38,7 @@ KEY_PT_WATCHER = "watcher_file_path"
 KEY_CANVAS_LAYOUT = "canvas_layout"
 
 _CANVAS_LAYOUT_HEADER = (
-    "# Canvas positions used only by the powertrain builder GUI to re-open this file.\n"
-    "# FAST-OAD_CS23-HE does not use this section.\n"
+    "# Captured canvas positions used only by the builder GUI to re-open this file.\n"
 )
 
 # Keywords used to tell which "number_of_*" attribute of a variable-port

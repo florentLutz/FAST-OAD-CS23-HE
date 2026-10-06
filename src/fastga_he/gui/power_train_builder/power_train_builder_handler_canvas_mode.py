@@ -136,6 +136,8 @@ class CanvasModeMixin:
         self._refresh_undo_redo_buttons()
 
         self.state.save_button.button_type = "success"
+        # Back to the default view of the empty design area.
+        self._request_view_fit()
 
         _LOGGER.info("New Design started – canvas cleared.")
 

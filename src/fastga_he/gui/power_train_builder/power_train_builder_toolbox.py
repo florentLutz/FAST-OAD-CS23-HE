@@ -38,6 +38,7 @@ from .power_train_builder_state import (
     ROW_HEIGHT,
     BUTTON_DEFAULT_COLOR_TYPE,
     DEFAULT_NODE_ICON_SIZE,
+    DIALOG_POSITION_STYLES,
     NODE_ICON_SIZE_MAX,
     NODE_ICON_SIZE_MIN,
     _EMPTY,
@@ -272,6 +273,12 @@ class ComponentToolboxConfigurationTableBuilder:
         browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         end_session_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        # Window-fitted canvas (see the launcher): JS -> Python view scale, and
+        # Python -> JS "re-fit the view" request after a load / New Design.
+        view_scale_input = bkmodel.TextInput(
+            value="1", width=0, height=0, visible=False, name="view_scale_input"
+        )
+        fit_view_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger.js_on_change(
             "value",
             bkmodel.CustomJS(code="window.close();"),
@@ -340,9 +347,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 "border": "2px solid #444",
                 "border-radius": "16px",
                 "padding": "10px 40px 30px 40px",
-                "position": "absolute",
-                "left": f"{PALETTE_WIDTH + 120}px",
-                "top": "340px",
+                **DIALOG_POSITION_STYLES,
                 "z-index": "100",
                 "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
             },
@@ -426,9 +431,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 "border": "2px solid #444",
                 "border-radius": "16px",
                 "padding": "10px 40px 30px 40px",
-                "position": "absolute",
-                "left": f"{PALETTE_WIDTH + 100}px",
-                "top": "340px",
+                **DIALOG_POSITION_STYLES,
                 "z-index": "100",
                 "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
             },
@@ -695,7 +698,13 @@ class ComponentToolboxConfigurationTableBuilder:
             apply_button,
             spacing=4,
             visible=False,
-            styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
+            # Scroll inside the panel instead of growing the page on short screens.
+            styles={
+                "background": BACKGROUND_COLOR_CODE,
+                "padding": "10px",
+                "max-height": "calc(100vh - 8px)",
+                "overflow-y": "auto",
+            },
         )
 
         # ── Metadata lookup tables ────────────────────────────────────────────
@@ -750,6 +759,8 @@ class ComponentToolboxConfigurationTableBuilder:
             end_session_save_trigger=end_session_save_trigger,
             end_session_trigger=end_session_trigger,
             close_window_trigger=close_window_trigger,
+            view_scale_input=view_scale_input,
+            fit_view_trigger=fit_view_trigger,
         )
 
         # ── Build tabbed toolbox sidebar ──────────────────────────────────────
@@ -783,8 +794,16 @@ class ComponentToolboxConfigurationTableBuilder:
             end_session_save_trigger,
             end_session_trigger,
             close_window_trigger,
+            view_scale_input,
+            fit_view_trigger,
             spacing=2,
-            styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
+            # Scroll inside the panel instead of growing the page on short screens.
+            styles={
+                "background": BACKGROUND_COLOR_CODE,
+                "padding": "10px",
+                "max-height": "calc(100vh - 8px)",
+                "overflow-y": "auto",
+            },
         )
 
         return toolbox_layout, config_panel_column, state

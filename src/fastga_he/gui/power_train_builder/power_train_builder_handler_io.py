@@ -228,6 +228,9 @@ class IOMixin:
         # Show restored nodes at the slider's current size (legacy JSON stores w/h).
         self._apply_node_icon_size()
 
+        # Make the browser re-fit the view so every loaded component is visible.
+        self._request_view_fit()
+
         # Redraw ports from the restored nodes; this also recomputes every
         # edge's xs / ys and drops edges pointing at non-existent ports.
         self._rebuild_all_ports()
@@ -239,6 +242,16 @@ class IOMixin:
             len(nodes_data.get("name", [])),
             len(edges_data.get("xs", [])),
         )
+
+    def _request_view_fit(self):
+        """
+        Ask the browser to re-fit the canvas view (see the launcher's
+        ``_JS_FIT_VIEW``) by changing ``fit_view_trigger``. No-op without it.
+        """
+        if self.state.fit_view_trigger is not None:
+            self.state.fit_view_trigger.value = (
+                "0" if self.state.fit_view_trigger.value == "1" else "1"
+            )
 
     def _on_browse_load(self, attr, old, new):
         """

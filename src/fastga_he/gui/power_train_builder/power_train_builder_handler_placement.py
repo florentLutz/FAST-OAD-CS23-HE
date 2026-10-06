@@ -169,19 +169,41 @@ class PlacementMixin:
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
 
+    def _on_view_scale_change(self, attr, old, new):
+        """
+        Bokeh ``on_change`` callback of the hidden ``view_scale_input``.
+
+        The browser writes the data-units-per-pixel of the window-fitted view
+        here (see the launcher's ``_JS_FIT_VIEW``). Icons are sized in data
+        units, so they shrink on screen when ``view_scale`` > 1; the rings and
+        label offset are in screen pixels and are rescaled to match.
+
+        :param new: New scale as a string (e.g. ``"1.2500"``).
+        """
+        try:
+            view_scale = float(new)
+        except (TypeError, ValueError):
+            return
+        if view_scale <= 0 or view_scale == self.state.view_scale:
+            return
+        self.state.view_scale = view_scale
+        self._apply_node_icon_size()
+
     def _apply_node_icon_size(self):
         """
         Push the current ``self.icon_size`` to the canvas.
 
-        * Icons: ``w`` / ``h`` of every placed node = ``icon_size``.
-        * Hover ring, selection ring and name-label offset: base size x factor,
-          with ``factor = icon_size / DEFAULT_NODE_ICON_SIZE``.
+        * Icons: ``w`` / ``h`` of every placed node = ``icon_size`` (data units).
+        * Hover ring, selection ring and name-label offset (screen pixels):
+          base size x ``factor``, with
+          ``factor = icon_size / DEFAULT_NODE_ICON_SIZE / state.view_scale``,
+          so they keep hugging the icon whatever the window size.
 
         Also called after undo / redo and loading, whose node data may carry
         icon sizes from before the slider moved. Does not rebuild ports.
         """
         size = self.icon_size
-        factor = size / DEFAULT_NODE_ICON_SIZE
+        factor = size / DEFAULT_NODE_ICON_SIZE / (self.state.view_scale or 1.0)
 
         nodes_data = self.state.placed_nodes_source.data
         node_count = len(nodes_data.get("x", []))

@@ -98,6 +98,8 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         * The browse_save_trigger -> ``_on_browse_save`` (tkinter save-file dialog).
         * The icon-size slider -> ``_on_node_size_slider_change`` (rescales
           icons, hover / selection rings, labels and port orbits).
+        * The view_scale_input -> ``_on_view_scale_change`` (window-fitted
+          canvas scale, keeps rings / labels matched to the icons).
         * The Undo button -> ``_on_undo``.
         * The Redo button -> ``_on_redo``.
         * The type_select -> ``_on_type_select_change`` (refreshes
@@ -131,6 +133,10 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         if self.state.node_size_slider is not None:
             self.state.node_size_slider.value = self.icon_size
             self.state.node_size_slider.on_change("value", self._on_node_size_slider_change)
+
+        # View scale of the window-fitted canvas, reported by the browser.
+        if self.state.view_scale_input is not None:
+            self.state.view_scale_input.on_change("value", self._on_view_scale_change)
 
         # Undo / redo buttons (created by the launcher and stored in state)
         self.state.undo_button.on_click(self._on_undo)
