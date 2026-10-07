@@ -37,9 +37,7 @@ KEY_PT_WATCHER = "watcher_file_path"
 # GUI-only section: {component_name: {"x": float, "y": float}}
 KEY_CANVAS_LAYOUT = "canvas_layout"
 
-_CANVAS_LAYOUT_HEADER = (
-    "# Captured canvas positions used only by the builder GUI to re-open this file.\n"
-)
+_CANVAS_LAYOUT_HEADER = "# Captured canvas positions used only by the builder GUI to reconstruct.\n"
 
 # Keywords used to tell which "number_of_*" attribute of a variable-port
 # component drives its source-side vs target-side port count. Shared with the
@@ -222,17 +220,6 @@ class PowerTrainYAMLWriter:
         Emits a warning to the logger if any port is still unconnected so
         the user is aware that the saved YAML may be incomplete.
         """
-        # Warn (but do not abort) when any port is still unconnected so the
-        # user knows the saved YAML may be incomplete. The "connected" column
-        # stores the string "True" / "False", so we normalise with str()
-        source_has_unconnected = any(
-            str(value) == "False" for value in self.source_port_data.get("connected", [])
-        )
-        target_has_unconnected = any(
-            str(value) == "False" for value in self.target_port_data.get("connected", [])
-        )
-        if source_has_unconnected or target_has_unconnected:
-            _LOGGER.warning("At least one port is not connected; the saved YAML may be incomplete.")
 
         for connection_index in range(len(self.edge_data["starting_node_index"])):
             starting_node_name = self.node_data["name"][
