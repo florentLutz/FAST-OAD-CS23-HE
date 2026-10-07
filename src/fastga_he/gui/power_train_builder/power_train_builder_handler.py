@@ -104,6 +104,10 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         * The New Design button -> ``_on_new_design``.
         * The browse_load_trigger -> ``_on_browse_load`` (tkinter open-file dialog).
         * The browse_save_trigger -> ``_on_browse_save`` (tkinter save-file dialog).
+        * The browse_watcher_trigger -> ``_on_browse_watcher`` (tkinter dialog for
+          the watcher CSV path).
+        * The watcher_path_input -> ``_on_watcher_path_change`` (stores the path
+          written as watcher_file_path in the saved YAML).
         * The icon-size slider -> ``_on_node_size_slider_change`` (rescales
           icons, hover / selection rings, labels and port orbits).
         * The view_scale_input -> ``_on_view_scale_change`` (window-fitted
@@ -134,6 +138,12 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.state.browse_load_trigger.on_change("value", self._on_browse_load)
 
         self.state.browse_save_trigger.on_change("value", self._on_browse_save)
+
+        # Watcher CSV path: Browse dialog and direct edits of the field
+        if self.state.browse_watcher_trigger is not None:
+            self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
+        if self.state.watcher_path_input is not None:
+            self.state.watcher_path_input.on_change("value", self._on_watcher_path_change)
 
         self.state.end_session_save_trigger.on_change("value", self._on_end_session_save_trigger)
 

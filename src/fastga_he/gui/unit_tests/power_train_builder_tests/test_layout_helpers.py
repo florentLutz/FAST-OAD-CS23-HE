@@ -7,7 +7,7 @@
 import networkx as nx
 import pytest
 
-from fastga_he.gui.power_train_builder.power_train_network_reader import (
+from ..power_train_network_reader import (
     _grid_positions,
     _hierarchy_layers,
     _layout_area,

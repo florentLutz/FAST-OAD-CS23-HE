@@ -65,10 +65,24 @@ _JS_LOAD_DIALOG = """
 browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';
 """
 
+# Watcher CSV dialog
+# Toggles browse_watcher_trigger to signal Python to open a tkinter save-file dialog
+_JS_WATCHER_DIALOG = """
+browse_watcher_trigger.value = browse_watcher_trigger.value === '1' ? '0' : '1';
+"""
+
 # "Final version?" overlay buttons: hide it and send the mode to Python
 #    (__MODE__ is replaced by final / editable / cancel). The timestamp makes
-#    every click a new value, so on_change always fires
+#    every click a new value, so on_change always fires. Final Version and Edit
+#    Later first commit a watcher path still being typed (value_input holds the
+#    keystrokes, value only changes on Enter / blur), so Python stores it
+#    before the save starts
 _JS_SAVE_MODE_CLICK = """
+save_version_overlay_widget.visible = false;
+watcher_path_input.value = watcher_path_input.value_input;
+browse_save_trigger.value = '__MODE__:' + Date.now();
+"""
+_JS_SAVE_CANCEL_CLICK = """
 save_version_overlay_widget.visible = false;
 browse_save_trigger.value = '__MODE__:' + Date.now();
 """
@@ -264,6 +278,10 @@ class ComponentToolboxConfigurationTableBuilder:
         #   browse_load_trigger    -> IOMixin._on_browse_load
         #                            Opens a tkinter open-file dialog; restores the
         #                            canvas from the chosen powertrain YAML.
+        #   browse_watcher_trigger -> IOMixin._on_browse_watcher
+        #                            Set by the Browse button of the "final version?"
+        #                            overlay. Opens a tkinter save-file dialog; writes
+        #                            the chosen watcher CSV path into watcher_path_input.
         #   browse_save_trigger    -> IOMixin._on_browse_save
         #                            Set by the "final version?" overlay to
         #                            "<final|editable|cancel>:<timestamp>". Opens a
@@ -279,6 +297,7 @@ class ComponentToolboxConfigurationTableBuilder:
 
         browse_load_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         browse_save_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
+        browse_watcher_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         end_session_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         close_window_trigger = bkmodel.TextInput(value="0", width=0, height=0, visible=False)
         # Window-fitted canvas (see the launcher): JS -> Python view scale, and
@@ -300,7 +319,7 @@ class ComponentToolboxConfigurationTableBuilder:
 
         # "Final version?" overlay
         # Shown when the Save button (or Save & Exit) is clicked. The choice decides whether the GUI-only
-        # canvas_layout section is written. Each button sends its mode to Python
+        # canvas_layout section is written; the watcher CSV path is set here too. Each button sends its mode to Python
         # inside the browse_save_trigger value itself ("<mode>:<timestamp>"), so
         # the mode and the "go" signal arrive as one change
         _final_version_btn = bkmodel.Button(
@@ -325,6 +344,40 @@ class ComponentToolboxConfigurationTableBuilder:
             width=100,
             height=40,
         )
+
+        # Watcher CSV: the path written as watcher_file_path in the saved YAML,
+        # typed in directly or picked with the Browse button. Optional: an empty
+        # field leaves the key out of the file
+        watcher_title_div = bkmodel.Div(
+            text=(
+                "<div style='color:white;font-size:13pt;font-weight:bold;'>"
+                "Watcher CSV <span style='color:#aaa;font-weight:normal;'>(optional)</span>"
+                "</div>"
+            ),
+            width=560,
+        )
+        watcher_path_input = bkmodel.TextInput(
+            value="",
+            placeholder="No watcher file (not written to the YAML)",
+            width=440,
+            height=34,
+            align="center",
+            styles={"font-size": "11pt"},
+        )
+        watcher_browse_button = bkmodel.Button(
+            label="Browse",
+            icon=bkmodel.TablerIcon(icon_name="folder-open"),
+            button_type=BUTTON_DEFAULT_COLOR_TYPE,
+            width=110,
+            height=34,
+            align="center",
+        )
+        watcher_browse_button.js_on_click(
+            bkmodel.CustomJS(
+                args=dict(browse_watcher_trigger=browse_watcher_trigger),
+                code=_JS_WATCHER_DIALOG,
+            )
+        )
         save_version_overlay = column(
             bkmodel.Div(
                 text=(
@@ -341,6 +394,9 @@ class ComponentToolboxConfigurationTableBuilder:
                 ),
                 width=560,
             ),
+            watcher_title_div,
+            row(watcher_path_input, watcher_browse_button, spacing=8),
+            bkmodel.Spacer(height=22),
             row(
                 _final_version_btn,
                 bkmodel.Div(text="", width=30),
@@ -360,18 +416,19 @@ class ComponentToolboxConfigurationTableBuilder:
                 "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
             },
         )
-        for mode_button, save_mode in (
-            (_final_version_btn, SAVE_MODE_FINAL),
-            (_editable_version_btn, SAVE_MODE_EDITABLE),
-            (_cancel_version_btn, SAVE_MODE_CANCEL),
+        for mode_button, save_mode, mode_click_code in (
+            (_final_version_btn, SAVE_MODE_FINAL, _JS_SAVE_MODE_CLICK),
+            (_editable_version_btn, SAVE_MODE_EDITABLE, _JS_SAVE_MODE_CLICK),
+            (_cancel_version_btn, SAVE_MODE_CANCEL, _JS_SAVE_CANCEL_CLICK),
         ):
             mode_button.js_on_click(
                 bkmodel.CustomJS(
                     args=dict(
                         save_version_overlay_widget=save_version_overlay,
                         browse_save_trigger=browse_save_trigger,
+                        watcher_path_input=watcher_path_input,
                     ),
-                    code=_JS_SAVE_MODE_CLICK.replace("__MODE__", save_mode),
+                    code=mode_click_code.replace("__MODE__", save_mode),
                 )
             )
 
@@ -705,6 +762,8 @@ class ComponentToolboxConfigurationTableBuilder:
             possible_options=possible_options_map,
             browse_load_trigger=browse_load_trigger,
             browse_save_trigger=browse_save_trigger,
+            browse_watcher_trigger=browse_watcher_trigger,
+            watcher_path_input=watcher_path_input,
             save_version_overlay=save_version_overlay,
             new_design_button=new_design_button,
             load_design_button=load_design_button,
@@ -744,6 +803,7 @@ class ComponentToolboxConfigurationTableBuilder:
             end_session_button,
             browse_load_trigger,
             browse_save_trigger,
+            browse_watcher_trigger,
             end_session_save_trigger,
             end_session_trigger,
             close_window_trigger,

@@ -6,10 +6,7 @@
 
 from types import SimpleNamespace
 
-from fastga_he.gui.power_train_builder.power_train_builder_history import (
-    EditHistoryStack,
-    make_snapshot,
-)
+from ..power_train_builder_history import EditHistoryStack, make_snapshot
 
 
 def test_undo_then_redo_returns_snapshots_in_order():

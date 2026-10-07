@@ -6,7 +6,7 @@
 
 import pytest
 
-from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
+from ..power_train_builder_handler_config_panel import (
     PRIMARY_PORT_LABEL_COLOR,
     PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
     PRIMARY_TARGET_PORT_TYPE_KEYWORDS,

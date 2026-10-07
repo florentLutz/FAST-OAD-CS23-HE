@@ -15,9 +15,7 @@ import pytest
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
-from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
-    PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
-)
+from ..power_train_builder_handler_config_panel import PRIMARY_SOURCE_PORT_TYPE_KEYWORDS
 from .conftest import default_component_type, icon_with_options, icon_with_several_types
 
 
@@ -340,12 +338,12 @@ def test_selecting_a_node_never_clears_its_connections(chain, canvas):
 
 
 def test_selecting_a_node_with_an_unlisted_type_keeps_its_connections(chain, canvas):
-    # A node whose saved type is not offered for its icon (e.g. an older file):
+    # A node whose saved type is not offered for its icon (e.g. a hand-edited file):
     # filling the panel falls back to the first choice, which must not count as
     # a user switching the type
     nodes_data = dict(canvas.state.placed_nodes_source.data)
     nodes_data["node_type"] = list(nodes_data["node_type"])
-    nodes_data["node_type"][chain["motor"]] = "legacy_motor"
+    nodes_data["node_type"][chain["motor"]] = "unlisted_motor"
     canvas.state.placed_nodes_source.data = nodes_data
 
     canvas.select(chain["motor"])

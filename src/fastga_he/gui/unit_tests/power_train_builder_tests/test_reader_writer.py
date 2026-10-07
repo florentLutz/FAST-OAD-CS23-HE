@@ -15,8 +15,8 @@ from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
-from fastga_he.gui.power_train_builder.power_train_network_reader import PowerTrainYAMLReader
-from fastga_he.gui.power_train_builder.power_train_network_writer import SOURCE_SIDE_KEYWORDS
+from ..power_train_network_reader import PowerTrainYAMLReader
+from ..power_train_network_writer import SOURCE_SIDE_KEYWORDS
 from .conftest import icon_with_options
 
 
@@ -239,3 +239,14 @@ def test_missing_file_is_reported_in_the_status_line(canvas, tmp_path):
     canvas.handler._load_canvas_state(str(tmp_path / "missing.yml"))
 
     assert "file not found" in canvas.state.status_div.text
+
+
+def test_non_yaml_file_is_refused_and_keeps_the_canvas(canvas, tmp_path):
+    canvas.place("battery", 100, 100)
+    json_path = tmp_path / "old_backup.json"
+    json_path.write_text('{"components": {}, "connections": {}}')
+
+    canvas.handler._load_canvas_state(str(json_path))
+
+    assert "not a YAML file" in canvas.state.status_div.text
+    assert canvas.node_column("name") == ["battery_1"]

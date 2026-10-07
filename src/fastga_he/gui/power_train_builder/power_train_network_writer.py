@@ -13,8 +13,8 @@ Unless the design is saved as a final version, the file also carries a
 GUI-only ``canvas_layout`` section that stores the canvas (x, y) of every
 component, so the same YAML can be re-opened in the builder for later edits
 with the exact same arrangement (see :mod:`.power_train_network_reader`).
-This replaces the former JSON canvas backup. FAST-OAD_CS23-HE ignores unknown top-level keys
-(it only logs a warning), so the section does not affect the analysis.
+FAST-OAD_CS23-HE ignores unknown top-level keys (it only logs a warning), so
+the section does not affect the analysis.
 """
 
 import json

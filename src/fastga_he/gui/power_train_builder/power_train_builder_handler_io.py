@@ -10,16 +10,13 @@ configuration, plus (unless the user saves it as a final version) a GUI-only
 ``canvas_layout`` section holding the canvas position of each component.
 Loading that YAML restores the canvas (see
 :class:`~.power_train_network_reader.PowerTrainYAMLReader`); without the
-section, the components are arranged automatically. JSON canvas
-backups written by older versions can still be loaded, but are no longer
-written.
+section, the components are arranged automatically.
 
 Mixin class :class:`IOMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import html
-import json
 import logging
 from pathlib import Path
 from tkinter import filedialog
@@ -32,7 +29,6 @@ from .power_train_network_writer import PowerTrainYAMLWriter
 from .power_train_network_reader import PowerTrainYAMLReader
 from .power_train_builder_history import make_snapshot
 from .power_train_builder_state import (
-    NODE_COLUMNS,
     SAVE_MODE_CANCEL,
     SAVE_MODE_FINAL,
     copy_column_data,
@@ -49,8 +45,8 @@ if TYPE_CHECKING:
 
 class IOMixin:
     """
-    Handles YAML serialisation / de-serialisation (plus legacy JSON loading),
-    session termination, and snapshot-based undo / redo.
+    Handles YAML serialisation / de-serialisation, session termination, and
+    snapshot-based undo / redo.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) being set by
     the concrete class before any method is called.
@@ -111,7 +107,7 @@ class IOMixin:
             for node_index in range(len(nodes_data.get("name", []))):
                 pt_yaml.add_component(node_index)
             pt_yaml.add_connection()
-            # Carry over a watcher_file_path that came from a loaded YAML, if any
+            # Watcher CSV path from the toolbox field (or the loaded YAML), if any
             if self.state.watcher_file_path:
                 pt_yaml.set_watcher_file_path(self.state.watcher_file_path)
             pt_yaml.write(str(yaml_file))
@@ -132,9 +128,8 @@ class IOMixin:
         """
         Restore the canvas from a saved design.
 
-        ``.yml`` / ``.yaml`` files are read with
-        :class:`~.power_train_network_reader.PowerTrainYAMLReader`; any other
-        extension is treated as a legacy JSON canvas backup.
+        Only ``.yml`` / ``.yaml`` files are accepted; they are read with
+        :class:`~.power_train_network_reader.PowerTrainYAMLReader`.
 
         :param file_path: Path to the file chosen by the user.
         """
@@ -144,12 +139,13 @@ class IOMixin:
             self._show_status_error(f"Could not load {input_file.name}: file not found.")
             return
 
+        if input_file.suffix.lower() not in _YAML_SUFFIXES:
+            _LOGGER.error("Load failed – not a YAML file: %s", input_file)
+            self._show_status_error(f"Could not load {input_file.name}: not a YAML file.")
+            return
+
         try:
-            if input_file.suffix.lower() in _YAML_SUFFIXES:
-                canvas_state = PowerTrainYAMLReader(self.state, self.icon_size).read(input_file)
-            else:
-                with open(input_file, encoding="utf-8") as json_file:
-                    canvas_state = json.load(json_file)
+            canvas_state = PowerTrainYAMLReader(self.state, self.icon_size).read(input_file)
         except Exception:
             _LOGGER.exception("Load failed – could not parse %s", input_file)
             self._show_status_error(f"Could not load {input_file.name}; see the log for details.")
@@ -174,17 +170,16 @@ class IOMixin:
 
     def _restore_canvas_from_dict(self, canvas_state: dict):
         """
-        Shared canvas-restoration logic used by both load paths (YAML and
-        legacy JSON).
+        Replace the canvas with the design read from a YAML file.
 
         Clears the current canvas entirely, then replays every node and edge.
         Port balls (and edge coordinates) are always recomputed from the nodes
         by ``_rebuild_all_ports``, so they do not need to be in the file.
 
-        :param canvas_state: Dict with keys ``"components"`` (node columns) and
-            ``"connections"`` (edge columns), plus an optional
-            ``"watcher_file_path"`` (YAML only). Port keys found in legacy JSON
-            backups are ignored.
+        :param canvas_state: Dict returned by
+            :meth:`~.power_train_network_reader.PowerTrainYAMLReader.read`, with
+            keys ``"components"`` (every node column), ``"connections"`` (edge
+            columns) and ``"watcher_file_path"``.
         """
         # Since the toolbox buttons are still active while loading, reset is required
         self.state.selected_node_index = None
@@ -199,10 +194,6 @@ class IOMixin:
         nodes_data = canvas_state.get("components", {})
         edges_data = canvas_state.get("connections", {})
 
-        # Ensure every expected column exists (forward-compatibility with older saves)
-        for column_name in NODE_COLUMNS:
-            nodes_data.setdefault(column_name, [])
-
         # Fill the data sources with the loaded data
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
         self.state.edge_source.data = copy_column_data(edges_data)
@@ -214,8 +205,8 @@ class IOMixin:
             "node_type": list(nodes_data.get("node_type", [])),
         }
 
-        # Remember the YAML's watcher_file_path (if any) so a re-save keeps it
-        self.state.watcher_file_path = str(canvas_state.get("watcher_file_path") or "")
+        # Show the YAML's watcher_file_path (if any) so a re-save keeps it
+        self._set_watcher_path(str(canvas_state.get("watcher_file_path") or ""))
 
         # Rebuild placed_counter so future placements continue from the right index
         for node_name in nodes_data.get("name", []):
@@ -226,7 +217,7 @@ class IOMixin:
                     self.state.placed_counter.get(icon_key, 0), int(name_parts[1])
                 )
 
-        # Show restored nodes at the slider's current size (legacy JSON stores w/h)
+        # Size the hover / selection rings and labels for the restored nodes
         self._apply_node_icon_size()
 
         # Make the browser re-fit the view so every loaded component is visible
@@ -257,8 +248,7 @@ class IOMixin:
     def _on_browse_load(self, attr, old, new):
         """
         Open a native OS open-file dialog (tkinter) for loading a saved
-        powertrain YAML (or a legacy JSON canvas backup), then restore the
-        canvas from the chosen file.
+        powertrain YAML, then restore the canvas from the chosen file.
 
         Triggered by the hidden ``browse_load_trigger`` TextInput toggling.
         """
@@ -267,7 +257,6 @@ class IOMixin:
             title="Load powertrain design",
             filetypes=[
                 ("Powertrain YAML", "*.yml *.yaml"),
-                ("Legacy JSON canvas backup", "*.json"),
                 ("All files", "*.*"),
             ],
         )
@@ -275,6 +264,61 @@ class IOMixin:
             return
         self._dismiss_startup_overlay()
         self._load_canvas_state(selected_file_path)
+
+    def _on_browse_watcher(self, attr, old, new):
+        """
+        Open a native OS save-file dialog (tkinter) to choose the watcher CSV path.
+
+        The chosen path goes into ``state.watcher_path_input``; its change
+        callback (:meth:`_on_watcher_path_change`) stores it as the
+        ``watcher_file_path`` written into the YAML on the next save.
+
+        Triggered by the hidden ``browse_watcher_trigger`` TextInput toggling.
+
+        :param attr: Bokeh attribute name (unused, required by protocol).
+        :param old: Previous trigger value (unused).
+        :param new: New trigger value (unused).
+        """
+        watcher_csv_path = self._open_tkinter_dialog(
+            filedialog.asksaveasfilename,
+            title="Choose watcher CSV file",
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
+        )
+        if watcher_csv_path and self.state.watcher_path_input is not None:
+            self.state.watcher_path_input.value = watcher_csv_path
+            _LOGGER.info("Watcher CSV path set to: %s", watcher_csv_path)
+
+    def _on_watcher_path_change(self, attr, old, new):
+        """
+        Store the watcher CSV path edited in ``state.watcher_path_input``.
+
+        The path is saved as ``watcher_file_path`` in the YAML (an empty field
+        leaves it out). A real change marks the design as unsaved; the value
+        set by a load or New Design matches the stored path, so it does not.
+
+        :param attr: Bokeh attribute name (unused, required by protocol).
+        :param old: Previous field value (unused).
+        :param new: New field value.
+        """
+        watcher_csv_path = (new or "").strip()
+        if watcher_csv_path == self.state.watcher_file_path:
+            return
+        self.state.watcher_file_path = watcher_csv_path
+        self._mark_unsaved()
+
+    def _set_watcher_path(self, watcher_csv_path: str):
+        """
+        Set the watcher CSV path without marking the design as unsaved.
+
+        Used by load and New Design: the stored path is updated first, so the
+        field's change callback sees no change.
+
+        :param watcher_csv_path: Path to show and save, or an empty string.
+        """
+        self.state.watcher_file_path = watcher_csv_path
+        if self.state.watcher_path_input is not None:
+            self.state.watcher_path_input.value = watcher_csv_path
 
     @staticmethod
     def _open_tkinter_dialog(dialog_function, **kwargs):
@@ -495,6 +539,10 @@ class IOMixin:
           toggle) -> configuration + ``canvas_layout`` for later edits.
         * ``"cancel"`` -> no dialog, nothing saved; also aborts a pending
           Save & Exit so a later ordinary save does not close the session.
+
+        Final Version and Edit Later first commit the watcher CSV field of the
+        overlay, so ``state.watcher_file_path`` is up to date when the file is
+        written (see :meth:`_on_watcher_path_change`).
 
         If ``_pending_exit_after_save`` is ``True`` (set by
         ``_on_end_session_save_trigger``), the session is ended automatically

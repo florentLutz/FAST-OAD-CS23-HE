@@ -515,9 +515,7 @@ class PortEdgeMixin:
                 list(placed_nodes_data.get("icon_type", [])),
                 list(placed_nodes_data.get("node_type", [])),
                 list(placed_nodes_data.get("name", [])),
-                # Columns missing from an older save are empty: draw no ports
-                # rather than fail
-                strict=False,
+                strict=True,
             )
         ):
             n_source, n_target = override_counts.get(i) or (

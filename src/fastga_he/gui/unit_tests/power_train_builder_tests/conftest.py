@@ -19,10 +19,8 @@ import pytest
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
-from fastga_he.gui.power_train_builder.power_train_builder_handler import BuilderHandler
-from fastga_he.gui.power_train_builder.power_train_builder_toolbox import (
-    ComponentToolboxConfigurationTableBuilder,
-)
+from ..power_train_builder_handler import BuilderHandler
+from ..power_train_builder_toolbox import ComponentToolboxConfigurationTableBuilder
 
 
 class CanvasDriver:

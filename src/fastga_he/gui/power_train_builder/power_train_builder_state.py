@@ -441,15 +441,18 @@ class BuilderState:
     # Save & Exit). "Final Version" saves without the GUI-only canvas_layout
     # section; "Edit Later" keeps it (see IOMixin._on_browse_save)
     save_version_overlay: object = field(default=None)
-    # watcher_file_path found in the last loaded YAML (empty if none). There
-    # is no UI for it; it is only carried over so re-saving a loaded design
-    # does not silently drop a path the user set by hand in the file
+    # Path of the powertrain watcher CSV, written as watcher_file_path in the
+    # saved YAML (empty: not written). Edited through watcher_path_input or its
+    # Browse button, and filled from the file on load (see IOMixin)
     watcher_file_path: str = field(default="")
+    # Text field showing / editing watcher_file_path in the "final version?" overlay
+    watcher_path_input: bkmodel.TextInput = field(default=None)
     # Toggle triggers: JS changes the value of these hidden TextInputs to fire
     # the corresponding Python on_change callback (used to bridge JS-driven
     # UI actions, like a native OS file dialog, back into Python)
     browse_load_trigger: bkmodel.TextInput = field(default=None)
     browse_save_trigger: bkmodel.TextInput = field(default=None)
+    browse_watcher_trigger: bkmodel.TextInput = field(default=None)
 
     # Startup overlay
     new_design_button: bkmodel.Button = field(default=None)
