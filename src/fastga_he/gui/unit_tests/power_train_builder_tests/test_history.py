@@ -6,10 +6,16 @@
 
 from types import SimpleNamespace
 
-from ..power_train_builder_history import EditHistoryStack, make_snapshot
+from fastga_he.gui.power_train_builder.power_train_builder_history import (
+    EditHistoryStack,
+    make_snapshot,
+)
 
 
 def test_undo_then_redo_returns_snapshots_in_order():
+    """
+    Test that if the history stack is stack with the right order with push_undo
+    """
     history_stack = EditHistoryStack()
     history_stack.push_undo({"step": 1})
     history_stack.push_undo({"step": 2})
@@ -24,9 +30,11 @@ def test_undo_then_redo_returns_snapshots_in_order():
 
 def test_new_push_clears_redo_stack():
     history_stack = EditHistoryStack()
+    # Make an edit, the undo stack store this step
     history_stack.push_undo({"step": 1})
+    # Restore the previous step, the redo stack store
     history_stack.push_redo({"step": 2})
-
+    # MAke a new edit, the redo stack should be cleared
     history_stack.push_undo({"step": 3})
 
     assert not history_stack.can_redo
@@ -61,6 +69,7 @@ def test_clear_empties_both_stacks():
 
 
 def test_snapshot_is_independent_of_live_data():
+    # Set up a dummy state with some data
     nodes_data = {"name": ["battery_1"], "x": [1.0]}
     state = SimpleNamespace(
         placed_nodes_source=SimpleNamespace(data=nodes_data),
@@ -70,6 +79,7 @@ def test_snapshot_is_independent_of_live_data():
         placed_counter={"battery": 1},
     )
 
+    # Create a snapshot and modify the live data
     snapshot = make_snapshot(state)
     nodes_data["name"].append("cable_1")
     state.edge_source.data["xs"][0].append(2.0)
@@ -82,8 +92,9 @@ def test_snapshot_is_independent_of_live_data():
 
 def test_push_undo_keep_redo_leaves_redo_steps_available():
     history_stack = EditHistoryStack()
+    # click undo
     history_stack.push_redo({"step": 2})
-
+    # New edit, but keep redo steps available
     history_stack.push_undo_keep_redo({"step": 1})
 
     assert history_stack.can_undo and history_stack.can_redo

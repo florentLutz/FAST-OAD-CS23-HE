@@ -15,13 +15,17 @@ import pytest
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
-from ..power_train_builder_handler_config_panel import PRIMARY_SOURCE_PORT_TYPE_KEYWORDS
+from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
+    PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
+)
 from .conftest import default_component_type, icon_with_options, icon_with_several_types
 
 
 @pytest.fixture
 def chain(canvas):
-    """Battery -> cable -> motor -> propeller, fully connected."""
+    """
+    Battery -> cable -> motor -> propeller, fully connected, shared between the tests below.
+    """
     nodes = {
         "battery": canvas.place("battery", 100, 100),
         "cable": canvas.place("cable", 100, 300),
@@ -44,9 +48,11 @@ def _edge(first_end: tuple, second_end: tuple) -> tuple:
 
 
 def test_placed_nodes_get_type_defaults_and_unique_names(canvas):
+    # Add two motor node
     canvas.place("e_motor", 100, 100)
     canvas.place("e_motor", 300, 100)
 
+    # Get the expected type, positions, and options for the default component type of "e_motor"
     expected_type = default_component_type(canvas.state, "e_motor")
     expected_positions = canvas.state.possible_position.get(expected_type) or [""]
     expected_options = {
@@ -56,6 +62,7 @@ def test_placed_nodes_get_type_defaults_and_unique_names(canvas):
         ).items()
         if option_values
     }
+
     assert canvas.node_column("name") == ["e_motor_1", "e_motor_2"]
     assert canvas.node_column("node_type") == [expected_type, expected_type]
     assert canvas.node_column("position") == [expected_positions[0]] * 2
@@ -124,20 +131,30 @@ def test_tapping_the_selected_node_again_deselects_it(chain, canvas):
 
 
 def test_clearing_a_dropdown_disconnects_immediately_and_is_undoable(chain, canvas):
+    """
+    Test that clearing a dropdown in the Connections panel disconnects the corresponding edge
+    immediately, and that the action is recorded in the undo stack.
+    """
     canvas.select(chain["motor"])
     num_undo_steps = len(canvas.state.edit_history_stack)
 
-    # Row 0 is the motor's source port, connected to the cable
+    # break the connection with selecting the empty string in the dropdown
     canvas.state.connections_rows_column.children[0].children[1].value = ""
 
+    # Check the edge is removed
     assert _edge((chain["cable"], "target", "1"), (chain["motor"], "source", "1")) not in (
         canvas.edges()
     )
+    # Check the port is now free
     assert canvas.connected_flags("source", chain["motor"]) == {"1": False}
+    # Check that the action is recorded in the undo stack
     assert len(canvas.state.edit_history_stack) == num_undo_steps + 1
 
 
 def test_connection_picked_in_panel_is_committed_on_apply(canvas):
+    """
+    This test check the pending connection will not register until the user click on Apply button.
+    """
     battery = canvas.place("battery", 100, 100)
     cable = canvas.place("cable", 100, 300)
     canvas.select(cable)
@@ -228,6 +245,7 @@ def test_apply_writes_name_position_and_options(canvas):
         .value
     )
 
+    # Change the name, position, and one option value, then Apply
     canvas.state.name_input.value = "renamed_node"
     if position_choices:
         canvas.state.position_select.value = position_choices[-1]
@@ -262,9 +280,11 @@ def test_symmetry_is_stored_on_both_nodes_and_moves_with_a_new_peer(canvas):
 
 def test_apply_is_a_single_undo_step(chain, canvas):
     canvas.select(chain["motor"])
+    # Change the name and apply
     canvas.state.name_input.value = "front_motor"
     canvas.handler.apply_node_configurations()
 
+    # Undo the change
     canvas.handler._on_undo()
 
     assert canvas.node_column("name")[chain["motor"]] == "e_motor_1"
@@ -278,9 +298,10 @@ def test_variable_port_count_is_committed_on_apply_and_prunes_edges(canvas):
     canvas.select(bus)
 
     canvas.state.target_count_spinner.value = 2
+    # The bus has 3 (default) target ports
     assert len(canvas.node_column("n_targets")) and canvas.node_column("n_targets")[bus] == 3
     canvas.handler.apply_node_configurations()
-
+    # After applying, the bus should have only 2 target ports
     assert canvas.node_column("n_targets")[bus] == 2
     assert len(canvas.edges()) == 2
 
@@ -299,6 +320,7 @@ def test_type_switch_clears_connections_and_symmetry_in_one_undo_step(canvas):
     canvas.place("propeller", 500, 500)
     canvas.place("fuel_tank", 500, 700)
     canvas.select(switched_node)
+    # Fill up symmetry and connections
     canvas.state.symmetry_select.value = f"{icon_key}_2"
     for row_widget in canvas.state.connections_rows_column.children:
         free_choices = [choice for choice in row_widget.children[1].options if choice]
@@ -309,6 +331,8 @@ def test_type_switch_clears_connections_and_symmetry_in_one_undo_step(canvas):
     assert len(canvas.edges()) == 1
     num_undo_steps = len(canvas.state.edit_history_stack)
     saved_type = canvas.node_column("node_type")[switched_node]
+
+    # Pick a different type for the same icon
     other_type = next(
         component_type
         for component_type in canvas.state.type_select.options
@@ -316,7 +340,8 @@ def test_type_switch_clears_connections_and_symmetry_in_one_undo_step(canvas):
     )
 
     canvas.state.type_select.value = other_type
-
+    # Check that the type switch clears the connections and symmetry, but does not commit the new
+    # type yet
     assert canvas.edges() == []
     assert set(canvas.node_column("symmetry_name")) == {""}
     assert canvas.state.symmetry_select.value == ""

@@ -15,8 +15,8 @@ from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
-from ..power_train_network_reader import PowerTrainYAMLReader
-from ..power_train_network_writer import SOURCE_SIDE_KEYWORDS
+from fastga_he.gui.power_train_builder.power_train_network_reader import PowerTrainYAMLReader
+from fastga_he.gui.power_train_builder.power_train_network_writer import SOURCE_SIDE_KEYWORDS
 from .conftest import icon_with_options
 
 
@@ -94,6 +94,9 @@ def _apply_symmetry(canvas, node_index: int, peer_name: str):
 
 
 def test_round_trip_keeps_components_connections_and_layout(canvas, tmp_path):
+    """
+    Test that a design saved to YAML and loaded back has the same components, connections, and layout.
+    """
     nodes = _build_electric_chain(canvas)
     _apply_symmetry(canvas, nodes["motor"], "e_motor_2")
     expected_columns = {column: canvas.node_column(column) for column in _ROUND_TRIP_COLUMNS}
@@ -101,9 +104,12 @@ def test_round_trip_keeps_components_connections_and_layout(canvas, tmp_path):
     expected_edges = sorted(canvas.edges())
     yaml_path = tmp_path / "design.yml"
 
+    # save
     assert canvas.handler._save_canvas_state(str(yaml_path))
+    # restart a new session
     canvas.handler._on_new_design()
     assert canvas.node_column("name") == []
+    # load design
     canvas.handler._load_canvas_state(str(yaml_path))
 
     for column, expected_values in expected_columns.items():
@@ -113,6 +119,9 @@ def test_round_trip_keeps_components_connections_and_layout(canvas, tmp_path):
 
 
 def test_round_trip_keeps_options(canvas, tmp_path):
+    """
+    Test that a design saved to YAML and loaded back has the same options.
+    """
     motor = canvas.place(icon_with_options(canvas.state), 100, 500)
     canvas.select(motor)
     options_before = json.loads(canvas.node_column("options")[motor])
@@ -128,8 +137,9 @@ def test_round_trip_keeps_options(canvas, tmp_path):
 def test_saved_file_has_fast_oad_sections_and_port_indices(canvas, tmp_path):
     _build_electric_chain(canvas)
     yaml_path = tmp_path / "design.yml"
-
+    # save the design to a YAML file
     canvas.handler._save_canvas_state(str(yaml_path))
+    # reload the yml file
     saved = YAML(typ="safe").load(yaml_path.read_text())
 
     assert set(saved["power_train_components"]) == set(canvas.node_column("name"))

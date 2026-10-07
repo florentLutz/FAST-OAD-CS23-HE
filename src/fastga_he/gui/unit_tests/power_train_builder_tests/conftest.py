@@ -19,8 +19,10 @@ import pytest
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
-from ..power_train_builder_handler import BuilderHandler
-from ..power_train_builder_toolbox import ComponentToolboxConfigurationTableBuilder
+from fastga_he.gui.power_train_builder.power_train_builder_handler import BuilderHandler
+from fastga_he.gui.power_train_builder.power_train_builder_toolbox import (
+    ComponentToolboxConfigurationTableBuilder,
+)
 
 
 class CanvasDriver:
@@ -28,7 +30,7 @@ class CanvasDriver:
     Thin test driver around a :class:`BuilderHandler`.
 
     Every action goes through a public GUI entry point (tap, toolbox click,
-    widget value change, Apply), so assertions reflect what a user would get.
+    widget value change, Apply).
     """
 
     def __init__(self, handler: BuilderHandler):
@@ -101,8 +103,13 @@ class CanvasDriver:
         """
         Edges as sorted ``((node, kind, label), (node, kind, label))`` pairs.
 
-        An edge is stored with whichever port was clicked first as its start,
-        so both ends are sorted to compare connections regardless of direction.
+        The inner sort ensures that the two ends of each edge are always
+        in the same order, so that tests can compare connections regardless
+        of which end was clicked first. The list of edges is sorted by
+        the outer sort, so the order in which edges were created does not
+         matter.
+
+        :return: Sorted list of edges, each a sorted pair of port ends.
         """
         edge_data = self.state.edge_source.data
         return sorted(

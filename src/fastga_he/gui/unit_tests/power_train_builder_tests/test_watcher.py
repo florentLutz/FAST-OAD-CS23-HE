@@ -11,7 +11,10 @@ the overlay buttons start it: by changing ``browse_save_trigger``.
 
 from ruamel.yaml import YAML
 
-from ..power_train_builder_state import SAVE_MODE_EDITABLE, SAVE_MODE_FINAL
+from fastga_he.gui.power_train_builder.power_train_builder_state import (
+    SAVE_MODE_EDITABLE,
+    SAVE_MODE_FINAL,
+)
 
 
 def _save_through_overlay(canvas, monkeypatch, yaml_path, save_mode=SAVE_MODE_EDITABLE):

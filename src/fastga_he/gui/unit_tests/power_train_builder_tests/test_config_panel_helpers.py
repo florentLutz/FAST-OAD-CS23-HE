@@ -6,7 +6,7 @@
 
 import pytest
 
-from ..power_train_builder_handler_config_panel import (
+from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
     PRIMARY_PORT_LABEL_COLOR,
     PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
     PRIMARY_TARGET_PORT_TYPE_KEYWORDS,
@@ -18,6 +18,10 @@ from ..power_train_builder_handler_config_panel import (
 
 @pytest.mark.parametrize("value", [True, False, 3, 2.5, "percent_split"])
 def test_option_value_round_trips_through_display_string(value):
+    """
+    Test that the all options values can be converted to a display string and back to the same
+    value.
+    """
     display_string = _option_values_to_strings(value)
 
     assert isinstance(display_string, str)
