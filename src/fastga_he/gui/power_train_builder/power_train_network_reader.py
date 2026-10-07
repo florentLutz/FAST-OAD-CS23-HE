@@ -37,11 +37,11 @@ port counts once the data is loaded.
 
 import json
 import logging
-import math
 import re
 from pathlib import Path
 
 import networkx as nx
+import numpy as np
 from ruamel.yaml import YAML
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR, _url_to_base64
@@ -615,10 +615,10 @@ def _layout_area(canvas_area: dict) -> tuple[float, float, float, float]:
         return max(CANVAS_FIT_NODE_MARGIN, _LAYOUT_MARGIN_PX[side] * per_px)
 
     # Rounded inwards to the 0.1 data-unit precision of saved positions
-    x_min = math.ceil((canvas_area["x0"] + inset("left")) * 10) / 10
-    x_max = math.floor((canvas_area["x1"] - inset("right")) * 10) / 10
-    y_min = math.ceil((canvas_area["y0"] + inset("bottom")) * 10) / 10
-    y_max = math.floor((canvas_area["y1"] - inset("top")) * 10) / 10
+    x_min = float(np.ceil((canvas_area["x0"] + inset("left")) * 10) / 10)
+    x_max = float(np.floor((canvas_area["x1"] - inset("right")) * 10) / 10)
+    y_min = float(np.ceil((canvas_area["y0"] + inset("bottom")) * 10) / 10)
+    y_max = float(np.floor((canvas_area["y1"] - inset("top")) * 10) / 10)
     # Degenerate (tiny window): collapse onto the centre instead of inverting
     if x_max < x_min:
         x_min = x_max = (canvas_area["x0"] + canvas_area["x1"]) / 2
@@ -716,8 +716,8 @@ def _grid_positions(count: int, area: tuple) -> list[tuple[float, float]]:
     x_min, x_max, y_min, y_max = area
     width, height = x_max - x_min, y_max - y_min
     aspect = width / height if height > 0 else 1.0
-    columns = min(count, max(1, round(math.sqrt(count * aspect))))
-    rows = math.ceil(count / columns)
+    columns = min(count, max(1, int(np.round(np.sqrt(count * aspect)))))
+    rows = int(np.ceil(count / columns))
 
     column_xs = _spread(list(range(columns)), x_min, x_max, _LAYOUT_STEP_MAX_FRACTION_X * width)
     row_ys = _spread(
