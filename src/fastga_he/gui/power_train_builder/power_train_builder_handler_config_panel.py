@@ -67,19 +67,11 @@ class ConfigPanelMixin:
         """
         placed_node_data = self.state.placed_nodes_source.data
 
-        node_name = list(placed_node_data.get("name", []))[index]
-        node_type = list(placed_node_data.get("node_type", []))[index]
-        icon_key = list(placed_node_data.get("icon_type", []))[index]
-        position = (
-            list(placed_node_data.get("position", []))[index]
-            if placed_node_data.get("position")
-            else _EMPTY
-        )
-        saved_options_json = (
-            list(placed_node_data.get("options", []))[index]
-            if placed_node_data.get("options")
-            else "{}"
-        )
+        node_name = placed_node_data["name"][index]
+        node_type = placed_node_data["node_type"][index]
+        icon_key = placed_node_data["icon_type"][index]
+        position = placed_node_data["position"][index]
+        saved_options_json = placed_node_data["options"][index] or "{}"
 
         # Show the config panel and the options table if there is any options
         self.state.options_table.visible = saved_options_json != "{}"
@@ -110,7 +102,7 @@ class ConfigPanelMixin:
 
         saved_options: dict = {}
         try:
-            saved_options = json.loads(saved_options_json) if saved_options_json else {}
+            saved_options = json.loads(saved_options_json)
         except (json.JSONDecodeError, TypeError):
             pass
 
@@ -122,16 +114,8 @@ class ConfigPanelMixin:
         source_ports_are_editable = default_source_port_count == 3
         target_ports_are_editable = default_target_port_count == 3
 
-        current_source_port_count = (
-            list(placed_node_data.get("n_sources", []))[index]
-            if placed_node_data.get("n_sources")
-            else default_source_port_count
-        )
-        current_target_port_count = (
-            list(placed_node_data.get("n_targets", []))[index]
-            if placed_node_data.get("n_targets")
-            else default_target_port_count
-        )
+        current_source_port_count = placed_node_data["n_sources"][index]
+        current_target_port_count = placed_node_data["n_targets"][index]
 
         self.state.source_count_spinner.visible = source_ports_are_editable
         if source_ports_are_editable:
@@ -147,8 +131,8 @@ class ConfigPanelMixin:
 
         if self.state.selected_node_overlay_source is not None:
             self.state.selected_node_overlay_source.data = dict(
-                x=[list(placed_node_data["x"])[index]],
-                y=[list(placed_node_data["y"])[index]],
+                x=[placed_node_data["x"][index]],
+                y=[placed_node_data["y"][index]],
             )
         self._rebuild_all_ports()
         self._refresh_connections_table(index)
@@ -216,16 +200,8 @@ class ConfigPanelMixin:
             return
 
         placed_nodes_data = self.state.placed_nodes_source.data
-        committed_n_sources = (
-            int(placed_nodes_data["n_sources"][node_index])
-            if node_index < len(placed_nodes_data.get("n_sources", []))
-            else 0
-        )
-        committed_n_targets = (
-            int(placed_nodes_data["n_targets"][node_index])
-            if node_index < len(placed_nodes_data.get("n_targets", []))
-            else 0
-        )
+        committed_n_sources = int(placed_nodes_data["n_sources"][node_index])
+        committed_n_targets = int(placed_nodes_data["n_targets"][node_index])
 
         # Only a spinner that is currently visible represents an in-progress
         # edit; a hidden spinner's stale value must not override the
@@ -349,9 +325,8 @@ class ConfigPanelMixin:
             return
 
         placed_nodes_data = self.state.placed_nodes_source.data
-        node_names = list(placed_nodes_data.get("name", []))
-        node_types = list(placed_nodes_data.get("node_type", []))
-        saved_symmetry = list(placed_nodes_data.get("symmetry_name", []))
+        node_names = placed_nodes_data["name"]
+        node_types = placed_nodes_data["node_type"]
 
         # Build a list of names of all other nodes that share the same node type
         symmetry_candidates = [
@@ -363,11 +338,7 @@ class ConfigPanelMixin:
         choices = [_EMPTY] + symmetry_candidates
         self.state.symmetry_select.options = choices
 
-        current_symmetry_component = (
-            saved_symmetry[current_node_index]
-            if current_node_index < len(saved_symmetry)
-            else _EMPTY
-        )
+        current_symmetry_component = placed_nodes_data["symmetry_name"][current_node_index]
         self.state.symmetry_select.value = (
             current_symmetry_component if current_symmetry_component in choices else _EMPTY
         )
@@ -808,15 +779,13 @@ class ConfigPanelMixin:
         current_selected_node_index_for_type = self.state.selected_node_index
         saved_options = {}
         if current_selected_node_index_for_type is not None:
-            saved_options_json_list = list(self.state.placed_nodes_source.data.get("options", []))
-            if current_selected_node_index_for_type < len(saved_options_json_list):
-                try:
-                    saved_options = (
-                        json.loads(saved_options_json_list[current_selected_node_index_for_type])
-                        or {}
-                    )
-                except (json.JSONDecodeError, TypeError):
-                    pass
+            saved_options_json = self.state.placed_nodes_source.data["options"][
+                current_selected_node_index_for_type
+            ]
+            try:
+                saved_options = json.loads(saved_options_json or "{}")
+            except (json.JSONDecodeError, TypeError):
+                pass
         self._refresh_options_table(new, saved_options)
         self.state.options_table.visible = bool(self.state.possible_options.get(new, {}))
 
@@ -825,12 +794,9 @@ class ConfigPanelMixin:
 
         # Only a user switch to another type clears the node, not the panel being
         # filled for a newly selected node or a switch back to the saved type
-        saved_node_types = list(self.state.placed_nodes_source.data.get("node_type", []))
-        saved_node_type = (
-            saved_node_types[current_selected_node_index_for_type]
-            if current_selected_node_index_for_type < len(saved_node_types)
-            else None
-        )
+        saved_node_type = self.state.placed_nodes_source.data["node_type"][
+            current_selected_node_index_for_type
+        ]
         if not self._is_populating_node_table and new != saved_node_type:
             self._clear_node_connections_and_symmetry(current_selected_node_index_for_type)
 
