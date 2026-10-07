@@ -140,21 +140,17 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.state.browse_save_trigger.on_change("value", self._on_browse_save)
 
         # Watcher CSV path: Browse dialog and direct edits of the field
-        if self.state.browse_watcher_trigger is not None:
-            self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
-        if self.state.watcher_path_input is not None:
-            self.state.watcher_path_input.on_change("value", self._on_watcher_path_change)
+        self.state.browse_watcher_trigger.on_change("value", self._on_browse_watcher)
+        self.state.watcher_path_input.on_change("value", self._on_watcher_path_change)
 
         self.state.end_session_save_trigger.on_change("value", self._on_end_session_save_trigger)
 
         # Icon-size slider in the toolbox header
-        if self.state.node_size_slider is not None:
-            self.state.node_size_slider.value = self.icon_size
-            self.state.node_size_slider.on_change("value", self._on_node_size_slider_change)
+        self.state.node_size_slider.value = self.icon_size
+        self.state.node_size_slider.on_change("value", self._on_node_size_slider_change)
 
         # View scale of the window-fitted canvas, reported by the browser
-        if self.state.view_scale_input is not None:
-            self.state.view_scale_input.on_change("value", self._on_view_scale_change)
+        self.state.view_scale_input.on_change("value", self._on_view_scale_change)
 
         # Undo / redo buttons (created by the launcher and stored in state)
         self.state.undo_button.on_click(self._on_undo)
@@ -235,7 +231,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
             return
 
         edge_index = self._find_nearest_edge(x, y)
-        if edge_index is not None and self.state.edge_source is not None:
+        if edge_index is not None:
             self._delete_edge(edge_index)
 
         if self.state.selected_node_index is not None:
@@ -261,26 +257,23 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         _reindex_symmetry_after_deletion(new_nodes_data, node_index)
         self.state.placed_nodes_source.data = new_nodes_data
 
-        if self.state.hover_source is not None:
-            hover_data = copy_column_data(self.state.hover_source.data)
-            for column_name in hover_data:
-                if node_index < len(hover_data[column_name]):
-                    hover_data[column_name].pop(node_index)
-            self.state.hover_source.data = hover_data
+        hover_data = copy_column_data(self.state.hover_source.data)
+        for column_name in hover_data:
+            if node_index < len(hover_data[column_name]):
+                hover_data[column_name].pop(node_index)
+        self.state.hover_source.data = hover_data
 
         # Remove any edges connected to the deleted node and adjust indices of remaining edges
-        if self.state.edge_source is not None:
-            edge_data = copy_column_data(self.state.edge_source.data)
-            new_edge_data = select_edges(
-                edge_data, edge_indices_not_touching_node(edge_data, node_index)
-            )
-            # Nodes after the deleted one move up by one index
-            for column_name in ("starting_node_index", "ending_node_index"):
-                new_edge_data[column_name] = [
-                    index - 1 if index > node_index else index
-                    for index in new_edge_data[column_name]
-                ]
-            self.state.edge_source.data = new_edge_data
+        edge_data = copy_column_data(self.state.edge_source.data)
+        new_edge_data = select_edges(
+            edge_data, edge_indices_not_touching_node(edge_data, node_index)
+        )
+        # Nodes after the deleted one move up by one index
+        for column_name in ("starting_node_index", "ending_node_index"):
+            new_edge_data[column_name] = [
+                index - 1 if index > node_index else index for index in new_edge_data[column_name]
+            ]
+        self.state.edge_source.data = new_edge_data
 
         self._rebuild_all_ports()
 
@@ -297,7 +290,6 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         ):
             self.state.selected_node_index -= 1
 
-        _LOGGER.info("Deleted node at index %d", node_index)
         self._mark_unsaved()
 
     def _delete_edge(self, edge_index: int):
@@ -317,7 +309,6 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         # Recompute the ports so the freed ports are no longer flagged connected
         self._rebuild_all_ports()
         self._mark_unsaved()
-        _LOGGER.info("Deleted edge at index %d", edge_index)
 
     def _select_at(self, x: float, y: float):
         """
@@ -329,12 +320,9 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         :param x: Tap x coordinate in canvas data-units.
         :param y: Tap y coordinate in canvas data-units.
         """
-        best_node_index, best_node_distance, _ = self._best_possible_node(x, y)
+        best_node_index, _, _ = self._best_possible_node(x, y)
         # Unselect port highlight and clean up the pending array
         self._cancel_pending_connection()
-
-        if best_node_index is None and best_node_distance is None:
-            return
         self._clear_temp_edges()
         if best_node_index is None or self.state.selected_node_index == best_node_index:
             # Deselect the node if the tap is not on any node or if the tap is on the

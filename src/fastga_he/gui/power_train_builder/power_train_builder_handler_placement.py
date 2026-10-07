@@ -94,11 +94,7 @@ class PlacementMixin:
 
         options_definition = self.state.possible_options.get(default_component_type, {})
         default_options = {
-            option_key: (
-                True
-                if option_values[0] is True
-                else (False if option_values[0] is False else option_values[0])
-            )
+            option_key: option_values[0]
             for option_key, option_values in options_definition.items()
             if option_values
         }
