@@ -225,7 +225,7 @@ class ConfigPanelMixin:
     # Options table
     # -----------------------------------------------------------------------
 
-    def _refresh_options_table(self, node_type: str, overrides: dict | None = None):
+    def _refresh_options_table(self, node_type: str, overrides: dict):
         """
         Rebuild the Options section of the config panel for a given node type.
 
@@ -244,7 +244,6 @@ class ConfigPanelMixin:
         new_row_widgets = []
         value_selects = []
 
-        overrides = overrides or {}
         for option_name, value_list in options_definition.items():
             current_values = (
                 overrides[option_name]
@@ -574,18 +573,17 @@ class ConfigPanelMixin:
         """
         Return a Bokeh ``on_change`` callback bound to a specific port row.
 
-        Wraps :meth:`_on_port_select_change` via :func:`functools.partial`,
-        pre-filling every port-specific argument so Bokeh receives a plain
-        ``(attr, old, new)`` callable with no inner function required.
+        Wraps :meth:`_on_port_select_change` via :func:`functools.partial`, pre-filling every
+        port-specific argument so Bokeh receives a plain ``(attr, old, new)`` callable with no
+        inner function required.
 
-        * When ``_own_kind == "source"``:  own port = starting_port,
-          far port = ending_port (target kind).
-        * When ``_own_kind == "target"``:  own port = ending_port,
-          far port = starting_port (source kind).
+        * When ``_own_kind == "source"``:  own port = starting_port, far port = ending_port (
+        target kind).
+        * When ``_own_kind == "target"``:  own port = ending_port, far port = starting_port (
+        source kind).
 
-        The edge is always stored as source -> target regardless of which
-        direction was clicked, so ``starting_port`` is always source-kind
-        and ``ending_port`` is always target-kind.
+        The edge is always stored as source -> target regardless of which direction was clicked,
+        so ``starting_port`` is always source-kind and ``ending_port`` is always target-kind.
 
         :param _own_kind: ``"source"`` or ``"target"``.
         :param _own_label: Port label of the own port (e.g. ``"1"``).
@@ -593,8 +591,8 @@ class ConfigPanelMixin:
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x of the own port at callback-build time.
         :param _own_y: Snapshot y of the own port at callback-build time.
-        :param _candidates: Pre-built list of ``(node_index, label, kind,
-            display_str)`` tuples for the far end.
+        :param _candidates: Pre-built list of ``(node_index, label, kind, display_str)`` tuples
+        for the far end.
         """
         return functools.partial(
             self._on_port_select_change,
@@ -628,11 +626,10 @@ class ConfigPanelMixin:
         Implements the three-phase logic shared by source and target port rows:
 
         1. **Prune** the pending preview-edge list for the own port.
-        2. **Disconnect** (if *new_value* is empty): remove the permanent edge
-           that involves the own port and refresh the canvas.
-        3. **Connect** (otherwise): resolve the chosen far-end port, re-fetch
-           live coordinates for both ends, build source->target port dicts, and
-           register a new preview edge.
+        2. **Disconnect** (if *new_value* is empty): remove the permanent edge that involves the
+        own port and refresh the canvas.
+        3. **Connect** (otherwise): resolve the chosen far-end port, re-fetch live coordinates
+        for both ends, build source->target port dicts, and register a new preview edge.
 
         :param attr: Bokeh change attribute name (unused, required by protocol).
         :param old: Previous widget value (unused).
@@ -643,8 +640,8 @@ class ConfigPanelMixin:
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x coordinate captured when the row was built.
         :param _own_y: Snapshot y coordinate captured when the row was built.
-        :param _candidates: Candidate ``(node_index, label, kind, display_str)``
-            tuples for the far end, built when the row was rendered.
+        :param _candidates: Candidate ``(node_index, label, kind, display_str)`` tuples for the
+        far end, built when the row was rendered.
         """
         # Drop any pending preview edge that already uses the own port. Pending
         # connections are stored as (source port, target port) pairs
