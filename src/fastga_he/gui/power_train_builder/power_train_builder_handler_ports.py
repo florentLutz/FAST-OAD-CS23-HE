@@ -251,10 +251,16 @@ class PortEdgeMixin:
         the edge silently if either check fails.
 
         .. note::
-            This method does **not** push an undo snapshot. Callers that
-            invoke ``_add_edge`` directly (e.g. Apply, see
+            This method only writes ``edge_source``. Callers (the canvas
+            two-click workflow, :meth:`_handle_port_tap`, and Apply, see
             :meth:`~.power_train_builder_handler_config_panel.ConfigPanelMixin.apply_node_configurations`)
-            are responsible for calling :meth:`_push_undo` beforehand.
+            are responsible for:
+
+            * calling :meth:`_push_undo` **before**, so the edge is undoable;
+            * calling :meth:`_rebuild_all_ports` **after**, which recomputes
+              every port's ``connected`` flag from ``edge_source`` and
+              refreshes the Connections panel of the selected node. Apply
+              adds several edges in a row, so it does this once at the end.
 
         :param starting_port: Metadata dict for the source-side (starting) port.
         :param ending_port: Metadata dict for the target-side (ending) port.
@@ -298,10 +304,6 @@ class PortEdgeMixin:
             edge_data[column_name].append(new_edge_row[column_name])
         self.state.edge_source.data = edge_data
 
-        if self.state.selected_node_index in node_pair:
-            self._mark_ports_connected(starting_port, ending_port)
-            self._refresh_connections_table(self.state.selected_node_index)
-
         self._mark_unsaved()
         _LOGGER.info(
             "Edge: %s port %s (node %d) <-> %s port %s (node %d)",
@@ -312,42 +314,6 @@ class PortEdgeMixin:
             ending_port["label"],
             ending_port["node_index"],
         )
-
-    def _mark_ports_connected(self, *ports: dict):
-        """
-        Flag each port in *ports* as connected in its port data source.
-
-        :param ports: Port metadata dicts with keys ``kind``, ``node_index`` and ``label``.
-        """
-        source_data = copy_column_data(self.state.source_port_source.data)
-        target_data = copy_column_data(self.state.target_port_source.data)
-        for port in ports:
-            self._mark_connected(source_data if port["kind"] == "source" else target_data, port)
-        self.state.source_port_source.data = source_data
-        self.state.target_port_source.data = target_data
-
-    @staticmethod
-    def _mark_connected(data: dict, port: dict) -> None:
-        """
-        Mark the port matching *port* as connected in the *data* snapshot.
-
-        Mutates ``data["connected"]`` in-place within the caller's local copy;
-        the caller is responsible for writing the result back to the data source.
-
-        :param data: Snapshot dict of a port data source (source or target).
-        :param port: Port metadata dict with keys ``node_index`` and ``label``.
-        """
-        data["connected"] = [
-            (
-                "True"
-                if (
-                    data["node_index"][i] == port["node_index"]
-                    and data["label"][i] == port["label"]
-                )
-                else data["connected"][i]
-            )
-            for i in range(len(data["node_index"]))
-        ]
 
     # -----------------------------------------------------------------------
     # Temporary / preview edges
