@@ -10,7 +10,6 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import logging
-from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -24,6 +23,7 @@ from .power_train_builder_state import (
     copy_column_data,
     empty_columns,
     select_edges,
+    BuilderState,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,11 +34,6 @@ _PORT_GAP = 20.0
 # Fill and outline opacity of the port balls of the selected node (others are hidden)
 _SELECTED_PORT_FILL_ALPHA = 0.3
 _SELECTED_PORT_LINE_ALPHA = 0.5
-
-
-# For IDE type-checking only
-if TYPE_CHECKING:
-    from .power_train_builder_state import BuilderState
 
 
 class PortEdgeMixin:

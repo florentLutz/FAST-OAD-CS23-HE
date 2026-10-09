@@ -17,7 +17,6 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base64
 
@@ -31,13 +30,10 @@ from .power_train_builder_state import (
     _EMPTY,
     _NO_SYMMETRY_PEER,
     copy_column_data,
+    BuilderState,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-# For IDE type-checking only
-if TYPE_CHECKING:
-    from .power_train_builder_state import BuilderState
 
 
 class PlacementMixin:

@@ -15,7 +15,6 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import logging
-from typing import TYPE_CHECKING
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _string_cleanup
 from .power_train_builder_state import (
@@ -26,13 +25,10 @@ from .power_train_builder_state import (
     NODE_COLUMNS,
     PORT_COLUMNS,
     empty_columns,
+    BuilderState,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-# For IDE type-checking only
-if TYPE_CHECKING:
-    from .power_train_builder_state import BuilderState
 
 
 class CanvasModeMixin:

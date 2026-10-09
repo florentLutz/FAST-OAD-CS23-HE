@@ -21,7 +21,6 @@ import logging
 from pathlib import Path
 from tkinter import filedialog
 import tkinter as tk
-from typing import TYPE_CHECKING
 
 from tornado.ioloop import IOLoop
 
@@ -32,15 +31,12 @@ from .power_train_builder_state import (
     SAVE_MODE_CANCEL,
     SAVE_MODE_FINAL,
     copy_column_data,
+    BuilderState,
 )
 
 _YAML_SUFFIXES = (".yml", ".yaml")
 
 _LOGGER = logging.getLogger(__name__)
-
-# For IDE type-checking only
-if TYPE_CHECKING:
-    from .power_train_builder_state import BuilderState
 
 
 class IOMixin:
