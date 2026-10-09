@@ -23,7 +23,6 @@ from .power_train_builder_state import (
     EDGE_COLUMNS,
     HOVER_COLUMNS,
     NODE_COLUMNS,
-    PORT_COLUMNS,
     empty_columns,
     BuilderState,
 )
@@ -74,8 +73,8 @@ class CanvasModeMixin:
         self.state.placed_nodes_source.data = empty_columns(NODE_COLUMNS)
         self.state.hover_source.data = empty_columns(HOVER_COLUMNS)
         self.state.edge_source.data = empty_columns(EDGE_COLUMNS)
-        self.state.source_port_source.data = empty_columns(PORT_COLUMNS)
-        self.state.target_port_source.data = empty_columns(PORT_COLUMNS)
+        # The port sources are emptied by the _rebuild_all_ports call in
+        # _clear_node_table below, as there are no nodes left
         self._clear_temp_edges()
         self.state.placed_counter.clear()
         self.state.selected_node_index = None

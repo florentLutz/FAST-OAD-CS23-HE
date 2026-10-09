@@ -85,8 +85,6 @@ class IOMixin:
 
         nodes_data = copy_column_data(self.state.placed_nodes_source.data)
         edges_data = copy_column_data(self.state.edge_source.data)
-        source_port_data = copy_column_data(self.state.source_port_source.data)
-        target_port_data = copy_column_data(self.state.target_port_source.data)
 
         yaml_file = Path(yaml_path)
         try:
@@ -95,8 +93,6 @@ class IOMixin:
                 self.state,
                 node_data=nodes_data,
                 edge_data=edges_data,
-                source_port_data=source_port_data,
-                target_port_data=target_port_data,
                 include_canvas_layout=include_canvas_layout,
             )
             pt_yaml.set_title(yaml_file.stem)
@@ -282,7 +278,7 @@ class IOMixin:
             filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
         )
         if watcher_csv_path and self.state.watcher_path_input is not None:
-            self.state.watcher_path_input.value = watcher_csv_path
+            _set_text_input(self.state.watcher_path_input, watcher_csv_path)
             _LOGGER.info("Watcher CSV path set to: %s", watcher_csv_path)
 
     def _on_watcher_path_change(self, attr, old, new):
@@ -314,7 +310,7 @@ class IOMixin:
         """
         self.state.watcher_file_path = watcher_csv_path
         if self.state.watcher_path_input is not None:
-            self.state.watcher_path_input.value = watcher_csv_path
+            _set_text_input(self.state.watcher_path_input, watcher_csv_path)
 
     @staticmethod
     def _open_tkinter_dialog(dialog_function, **kwargs):
@@ -343,9 +339,10 @@ class IOMixin:
         """
         Capture the current canvas state onto the undo stack.
 
-        Call this **before** every action that mutates ``placed_nodes_source``,
-        ``edge_source``, ``source_port_source``, or ``target_port_source`` so
-        that the snapshot reflects the state the user wants to return to.
+        Call this **before** every action that mutates ``placed_nodes_source``
+        or ``edge_source`` so that the snapshot reflects the state the user
+        wants to return to. The port sources are derived from these two and
+        are rebuilt on restore, so they are not captured.
         """
         if self.state.edit_history_stack is None:
             return
@@ -357,9 +354,10 @@ class IOMixin:
         """
         Apply a previously captured snapshot to the live canvas.
 
-        Restores nodes, edges, ports, and the placed-counter from *snapshot*,
-        then redraws all ports and edges.  The configurator panel is cleared to
-        avoid stale references to nodes that may no longer exist.
+        Restores nodes, edges and the placed-counter from *snapshot*, then
+        rebuilds the ports (and edge coordinates) from them with
+        ``_rebuild_all_ports``. The configurator panel is cleared to avoid
+        stale references to nodes that may no longer exist.
 
         :param snapshot: Dict produced by :func:`~.power_train_builder_history.make_snapshot`.
         """
@@ -372,13 +370,9 @@ class IOMixin:
 
         nodes_data = snapshot.get("nodes", {})
         edges_data = snapshot.get("edges", {})
-        source_data = snapshot.get("source_ports", {})
-        target_data = snapshot.get("target_ports", {})
 
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
         self.state.edge_source.data = copy_column_data(edges_data)
-        self.state.source_port_source.data = copy_column_data(source_data)
-        self.state.target_port_source.data = copy_column_data(target_data)
 
         self.state.hover_source.data = {
             "x": list(nodes_data.get("x", [])),
@@ -586,3 +580,24 @@ class IOMixin:
             # Defer the actual IOLoop stop by one tick so Bokeh has time to flush
             # the trigger update to the WebSocket before the server shuts down
             IOLoop.current().call_later(0.3, self._end_session)
+
+
+def _set_text_input(text_input, text: str) -> None:
+    """
+    Set the text of a Bokeh ``TextInput`` from Python, in both of its properties.
+
+    BokehJS keeps two properties in step with the browser field: ``value``
+    (updated on Enter / blur) and ``value_input`` (updated on every keystroke).
+    Setting ``value`` alone from Python shows the new text but leaves
+    ``value_input`` stale, and the "final version?" overlay buttons commit
+    ``value_input`` back into ``value`` before saving (see the toolbox's
+    ``_JS_SAVE_MODE_CLICK``), which would wipe the new text. Both are set here.
+
+    ``value_input`` is set first: only ``value`` has a Python callback, and it
+    then sees the field already in its final state.
+
+    :param text_input: The ``TextInput`` widget to update.
+    :param text: New text of the field.
+    """
+    text_input.value_input = text
+    text_input.value = text

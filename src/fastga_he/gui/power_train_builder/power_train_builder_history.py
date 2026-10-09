@@ -9,19 +9,21 @@ Snapshot-based undo / redo stack for the powertrain builder.
 :class:`BuilderHandler`.  It keeps a bounded list of canvas snapshots and
 a separate *redo* stack that is populated whenever the user undoes an action.
 
-A **snapshot** is a plain ``dict`` that freezes the four mutable
-``ColumnDataSource`` data dicts at the moment a mutating action begins::
+A **snapshot** is a plain ``dict`` that freezes the editable canvas state at
+the moment a mutating action begins::
 
     {
-        "nodes":        {col: [values], …},
-        "edges":        {col: [values], …},
-        "source_ports": {col: [values], …},
-        "target_ports": {col: [values], …},
+        "nodes":          {col: [values], …},
+        "edges":          {col: [values], …},
         "placed_counter": {key: int, …},
     }
 
-All five entries are **deep-copied** from the live data, so later mutations
+All three entries are **deep-copied** from the live data, so later mutations
 to the Bokeh sources do not affect the stored snapshot.
+
+The port sources (``source_port_source`` / ``target_port_source``) are not
+stored: they are derived from the nodes and edges, and are rebuilt by
+``_rebuild_all_ports`` after every restore.
 
 Typical usage inside a mutating handler method::
 
@@ -162,8 +164,9 @@ def make_snapshot(state) -> dict:
     """
     Capture a deep-copy snapshot of all mutable canvas state.
 
-    Reads the four live ``ColumnDataSource`` data dicts and the
-    ``placed_counter`` from *state* and returns an independent copy.  No
+    Reads the live node and edge ``ColumnDataSource`` data dicts and the
+    ``placed_counter`` from *state* and returns an independent copy. Port
+    data is derived from these and is not captured.  No
     Bokeh objects are stored — only plain Python dicts and lists — so the
     snapshot is cheap to pickle and safe to hold indefinitely.
 
@@ -173,7 +176,5 @@ def make_snapshot(state) -> dict:
     return {
         "nodes": copy.deepcopy(copy_column_data(state.placed_nodes_source.data)),
         "edges": copy.deepcopy(copy_column_data(state.edge_source.data)),
-        "source_ports": copy.deepcopy(copy_column_data(state.source_port_source.data)),
-        "target_ports": copy.deepcopy(copy_column_data(state.target_port_source.data)),
         "placed_counter": copy.deepcopy(state.placed_counter),
     }
