@@ -15,13 +15,12 @@ from fastga_he.gui.power_train_builder.power_train_network_reader import (
     _spread,
 )
 
-
-def _chain_graph(*names) -> nx.DiGraph:
-    graph = nx.DiGraph()
-    graph.add_nodes_from(names)
-    for start, end in zip(names, names[1:], strict=False):
-        graph.add_edge(start, end)
-    return graph
+_CHAIN_TYPES = {
+    "battery": "battery_pack",
+    "cable": "dc_line",
+    "motor": "pmsm",
+    "propeller": "propeller",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -29,76 +28,85 @@ def _chain_graph(*names) -> nx.DiGraph:
 # ---------------------------------------------------------------------------
 
 
-def test_layers_count_from_storage_when_propulsors_are_farthest():
-    graph = _chain_graph("battery", "cable", "motor", "propeller")
-    node_types = {
-        "battery": "battery_pack",
-        "cable": "dc_line",
-        "motor": "pmsm",
-        "propeller": "propeller",
-    }
+@pytest.mark.parametrize(
+    "edges, node_types, propulsors, from_propulsor, expected",
+    [
+        pytest.param(
+            [("battery", "cable"), ("cable", "motor"), ("motor", "propeller")],
+            _CHAIN_TYPES,
+            {"propeller"},
+            False,
+            {"propeller": 0, "motor": 1, "cable": 2, "battery": 3},
+            id="counted_from_storage_when_propulsors_are_farthest",
+        ),
+        pytest.param(
+            # The dangling load is as far from the battery as the propeller is
+            [
+                ("battery", "bus"),
+                ("bus", "motor"),
+                ("motor", "propeller"),
+                ("bus", "cable"),
+                ("cable", "load"),
+            ],
+            {
+                "battery": "battery_pack",
+                "bus": "dc_bus",
+                "motor": "pmsm",
+                "propeller": "propeller",
+                "cable": "dc_line",
+                "load": "dc_load",
+            },
+            {"propeller"},
+            False,
+            {"propeller": 0, "motor": 1, "bus": 2, "battery": 3, "cable": 3, "load": 4},
+            id="switches_to_propulsors_when_another_branch_is_farther",
+        ),
+        pytest.param(
+            [("battery", "motor"), ("motor", "propeller")],
+            {"battery": "battery_pack", "motor": "pmsm", "propeller": "propeller"},
+            {"propeller"},
+            True,
+            {"propeller": 0, "motor": 1, "battery": 2},
+            id="from_propulsor_flag_forces_the_propulsor_reference",
+        ),
+        pytest.param(
+            [("battery", "motor"), ("motor", "propeller")],
+            {
+                "battery": "battery_pack",
+                "motor": "pmsm",
+                "propeller": "propeller",
+                "lonely_cable": "dc_line",
+            },
+            {"propeller"},
+            False,
+            {"propeller": 0, "motor": 1, "battery": 2, "lonely_cable": 3},
+            id="disconnected_nodes_go_to_an_extra_bottom_layer",
+        ),
+        pytest.param(
+            [("motor", "propeller")],
+            {"motor": "pmsm", "propeller": "propeller"},
+            {"propeller"},
+            False,
+            {"propeller": 0, "motor": 1},
+            id="no_storage_counted_from_propulsors",
+        ),
+        pytest.param(
+            [("motor", "propeller")],
+            {"motor": "pmsm", "propeller": "propeller"},
+            set(),
+            False,
+            {"motor": 0, "propeller": 0},
+            id="no_storage_no_propulsor_all_in_one_layer",
+        ),
+        pytest.param([], {}, set(), False, {}, id="empty_graph"),
+    ],
+)
+def test_hierarchy_layers(edges, node_types, propulsors, from_propulsor, expected):
+    graph = nx.DiGraph()
+    graph.add_nodes_from(node_types)
+    graph.add_edges_from(edges)
 
-    layers = _hierarchy_layers(graph, node_types, {"propeller"})
-
-    assert layers == {"propeller": 0, "motor": 1, "cable": 2, "battery": 3}
-
-
-def test_layers_switch_to_propulsors_when_another_branch_is_farther():
-    # The dangling load is as far from the battery as the propeller is
-    graph = _chain_graph("battery", "bus", "motor", "propeller")
-    graph.add_edges_from([("bus", "cable"), ("cable", "load")])
-    node_types = {
-        "battery": "battery_pack",
-        "bus": "dc_bus",
-        "motor": "pmsm",
-        "propeller": "propeller",
-        "cable": "dc_line",
-        "load": "dc_load",
-    }
-
-    layers = _hierarchy_layers(graph, node_types, {"propeller"})
-
-    assert layers["propeller"] == 0
-    assert layers["motor"] == 1 and layers["bus"] == 2
-
-
-def test_from_propulsor_flag_forces_propulsor_reference():
-    graph = _chain_graph("battery", "motor", "propeller")
-    node_types = {"battery": "battery_pack", "motor": "pmsm", "propeller": "propeller"}
-
-    layers = _hierarchy_layers(graph, node_types, {"propeller"}, from_propulsor=True)
-
-    assert layers == {"propeller": 0, "motor": 1, "battery": 2}
-
-
-def test_disconnected_nodes_go_to_an_extra_bottom_layer():
-    graph = _chain_graph("battery", "motor", "propeller")
-    graph.add_node("lonely_cable")
-    node_types = {
-        "battery": "battery_pack",
-        "motor": "pmsm",
-        "propeller": "propeller",
-        "lonely_cable": "dc_line",
-    }
-
-    layers = _hierarchy_layers(graph, node_types, {"propeller"})
-
-    assert layers["lonely_cable"] == max(layers.values())
-    assert layers["lonely_cable"] > layers["battery"]
-
-
-@pytest.mark.parametrize("propulsor_names", [set(), {"propeller"}])
-def test_layers_cover_every_node_without_storage(propulsor_names):
-    graph = _chain_graph("motor", "propeller")
-    node_types = {"motor": "pmsm", "propeller": "propeller"}
-
-    layers = _hierarchy_layers(graph, node_types, propulsor_names)
-
-    assert set(layers) == {"motor", "propeller"}
-
-
-def test_layers_of_empty_graph():
-    assert _hierarchy_layers(nx.DiGraph(), {}, set()) == {}
+    assert _hierarchy_layers(graph, node_types, propulsors, from_propulsor) == expected
 
 
 # ---------------------------------------------------------------------------
@@ -106,20 +114,16 @@ def test_layers_of_empty_graph():
 # ---------------------------------------------------------------------------
 
 
-def test_spread_is_centred_and_capped_by_step_max():
-    spread_values = _spread([0, 1], low=0.0, high=100.0, step_max=10.0)
-
-    assert spread_values == [45.0, 55.0]
-
-
-def test_spread_fills_range_when_step_max_allows():
-    spread_values = _spread([0, 1, 2], low=0.0, high=100.0, step_max=1000.0)
-
-    assert spread_values == [0.0, 50.0, 100.0]
-
-
-def test_spread_of_a_single_value_is_the_centre():
-    assert _spread([7], low=0.0, high=10.0, step_max=5.0) == [5.0]
+@pytest.mark.parametrize(
+    "values, low, high, step_max, expected",
+    [
+        pytest.param([0, 1], 0.0, 100.0, 10.0, [45.0, 55.0], id="centred_and_capped_by_step_max"),
+        pytest.param([0, 1, 2], 0.0, 100.0, 1000.0, [0.0, 50.0, 100.0], id="fills_the_range"),
+        pytest.param([7], 0.0, 10.0, 5.0, [5.0], id="single_value_at_the_centre"),
+    ],
+)
+def test_spread(values, low, high, step_max, expected):
+    assert _spread(values, low=low, high=high, step_max=step_max) == expected
 
 
 def test_layout_area_collapses_on_tiny_window():

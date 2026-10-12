@@ -7,16 +7,31 @@ Save / load tests: the YAML writer and reader must round-trip a design.
 
 The design is built through the GUI entry points, saved with the handler's own
 save path and loaded back with its own load path.
+
+The watcher CSV path is set in the "final version?" overlay and written to the
+YAML. There, the file dialogs are replaced by a fixed path, and the save is
+started the way the overlay buttons start it (see ``_JS_SAVE_MODE_CLICK`` in
+the toolbox): first commit the field's ``value_input`` into its ``value``, then
+change ``browse_save_trigger``. BokehJS keeps two properties for a text field:
+``value_input`` follows every keystroke, ``value`` only changes on Enter /
+blur. The tests type into the field the same way, so a path that Python sets
+in ``value`` alone (and that the commit step would then overwrite) is caught.
 """
 
+import itertools
 import json
 
+import pytest
 from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
+from fastga_he.gui.power_train_builder.power_train_builder_state import (
+    SAVE_MODE_EDITABLE,
+    SAVE_MODE_FINAL,
+)
 from fastga_he.gui.power_train_builder.power_train_network_reader import PowerTrainYAMLReader
-from fastga_he.gui.power_train_builder.power_train_network_writer import SOURCE_SIDE_KEYWORDS
+from fastga_he.gui.power_train_builder.power_train_network_writer import port_side_of
 from .conftest import icon_with_options
 
 
@@ -30,20 +45,11 @@ def _known_component(component_type: str) -> dict:
 
 def _port_count_attributes(component_type: str) -> tuple[str, str]:
     """``(source_side, target_side)`` number_of_* attributes of a variable-port type."""
-    port_attributes = [
-        attribute_name
+    attribute_by_side = {
+        port_side_of(attribute_name): attribute_name
         for attribute_name in _known_component(component_type).get("attributes") or []
-        if "number_of_" in attribute_name
-    ]
-    source_attribute = next(
-        attribute_name
-        for attribute_name in port_attributes
-        if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS)
-    )
-    target_attribute = next(
-        attribute_name for attribute_name in port_attributes if attribute_name != source_attribute
-    )
-    return source_attribute, target_attribute
+    }
+    return attribute_by_side["source"], attribute_by_side["target"]
 
 
 # Columns that must survive a save / load unchanged ("url", "w", "h" are
@@ -179,14 +185,21 @@ def test_final_version_has_no_layout_and_reloads_with_automatic_layout(canvas, t
     assert sorted(canvas.edges()) == expected_edges
 
 
-def test_empty_design_round_trip(canvas, tmp_path):
+def test_empty_design_and_empty_file_load_as_an_empty_canvas(canvas, builder_state, tmp_path):
     yaml_path = tmp_path / "empty.yml"
-
     assert canvas.handler._save_canvas_state(str(yaml_path))
     canvas.handler._load_canvas_state(str(yaml_path))
 
     assert canvas.node_column("name") == []
     assert canvas.edges() == []
+
+    # A blank file is read as an empty design, not rejected
+    blank_path = tmp_path / "blank.yml"
+    blank_path.write_text("")
+    canvas_state = PowerTrainYAMLReader(builder_state, 60).read(blank_path)
+
+    assert canvas_state["components"]["name"] == []
+    assert canvas_state["watcher_file_path"] == ""
 
 
 def test_reader_handles_hand_written_yaml(builder_state, tmp_path):
@@ -224,39 +237,155 @@ def test_reader_handles_hand_written_yaml(builder_state, tmp_path):
     assert len(canvas_state["connections"]["starting_node_index"]) == 1
 
 
-def test_reader_rejects_nothing_on_empty_file(builder_state, tmp_path):
-    yaml_path = tmp_path / "blank.yml"
-    yaml_path.write_text("")
-
-    canvas_state = PowerTrainYAMLReader(builder_state, 60).read(yaml_path)
-
-    assert canvas_state["components"]["name"] == []
-    assert canvas_state["watcher_file_path"] == ""
-
-
-def test_failed_load_is_reported_in_the_status_line_and_keeps_the_canvas(canvas, tmp_path):
+@pytest.mark.parametrize(
+    "file_name, content, message",
+    [
+        pytest.param(
+            "broken.yml",
+            "power_train_components: [unclosed\n",
+            "Could not load broken.yml",
+            id="invalid_yaml",
+        ),
+        pytest.param("missing.yml", None, "file not found", id="missing_file"),
+        pytest.param(
+            "old_backup.json",
+            '{"components": {}, "connections": {}}',
+            "not a YAML file",
+            id="not_a_yaml_file",
+        ),
+    ],
+)
+def test_unreadable_file_is_reported_and_keeps_the_canvas(
+    canvas, tmp_path, file_name, content, message
+):
     canvas.place("battery", 100, 100)
-    broken_path = tmp_path / "broken.yml"
-    broken_path.write_text("power_train_components: [unclosed\n")
+    file_path = tmp_path / file_name
+    if content is not None:
+        file_path.write_text(content)
 
-    canvas.handler._load_canvas_state(str(broken_path))
+    canvas.handler._load_canvas_state(str(file_path))
 
-    assert "Could not load broken.yml" in canvas.state.status_div.text
+    assert message in canvas.state.status_div.text
     assert canvas.node_column("name") == ["battery_1"]
 
 
-def test_missing_file_is_reported_in_the_status_line(canvas, tmp_path):
-    canvas.handler._load_canvas_state(str(tmp_path / "missing.yml"))
+# ---------------------------------------------------------------------------
+# Watcher CSV path
+# ---------------------------------------------------------------------------
 
-    assert "file not found" in canvas.state.status_div.text
+WATCHER_PATH = "results/pt_watcher.csv"
+
+# Stands in for the Date.now() of the overlay's JS: every save is a new trigger value
+_click_stamps = itertools.count()
 
 
-def test_non_yaml_file_is_refused_and_keeps_the_canvas(canvas, tmp_path):
+def _type_in_watcher_field(canvas, text: str, commit: bool = False):
+    """
+    Type *text* in the watcher field, as the browser reports it.
+
+    :param commit: ``True`` to also press Enter / leave the field, which copies
+        the typed text into ``value``.
+    """
+    canvas.state.watcher_path_input.value_input = text
+    if commit:
+        canvas.state.watcher_path_input.value = text
+
+
+def _save_through_overlay(canvas, monkeypatch, yaml_path, save_mode=SAVE_MODE_EDITABLE):
+    """Save as the overlay buttons do, with the save dialog answering *yaml_path*."""
+    monkeypatch.setattr(
+        canvas.handler, "_open_tkinter_dialog", lambda *args, **kwargs: str(yaml_path)
+    )
+    watcher_path_input = canvas.state.watcher_path_input
+    # Same steps as _JS_SAVE_MODE_CLICK
+    watcher_path_input.value = watcher_path_input.value_input
+    canvas.state.browse_save_trigger.value = f"{save_mode}:{next(_click_stamps)}"
+    return YAML(typ="safe").load(yaml_path.read_text())
+
+
+def _browse_watcher(canvas, monkeypatch, chosen_path: str):
+    """Pick *chosen_path* with the overlay's Browse button."""
+    monkeypatch.setattr(canvas.handler, "_open_tkinter_dialog", lambda *args, **kwargs: chosen_path)
+    canvas.state.browse_watcher_trigger.value = str(next(_click_stamps))
+
+
+def _watcher_field(canvas) -> tuple[str, str]:
+    """``(value, value_input)`` of the watcher field."""
+    return canvas.state.watcher_path_input.value, canvas.state.watcher_path_input.value_input
+
+
+def test_watcher_widgets_are_in_the_save_overlay(canvas):
+    overlay_children = []
+    pending = [canvas.state.save_version_overlay]
+    while pending:
+        layout = pending.pop()
+        overlay_children.append(layout)
+        pending.extend(getattr(layout, "children", []))
+
+    assert canvas.state.watcher_path_input in overlay_children
+
+
+@pytest.mark.parametrize(
+    "typing, save_mode, expected",
+    [
+        pytest.param("committed", SAVE_MODE_EDITABLE, WATCHER_PATH, id="typed"),
+        # No Enter / blur before clicking the save button: only value_input holds the text
+        pytest.param("still_typing", SAVE_MODE_EDITABLE, WATCHER_PATH, id="still_being_typed"),
+        pytest.param("committed", SAVE_MODE_FINAL, WATCHER_PATH, id="final_version"),
+        pytest.param("empty", SAVE_MODE_EDITABLE, None, id="empty_field_leaves_the_key_out"),
+    ],
+)
+def test_watcher_path_in_the_field_is_written_to_the_yaml(
+    canvas, monkeypatch, tmp_path, typing, save_mode, expected
+):
     canvas.place("battery", 100, 100)
-    json_path = tmp_path / "old_backup.json"
-    json_path.write_text('{"components": {}, "connections": {}}')
+    if typing != "empty":
+        _type_in_watcher_field(canvas, WATCHER_PATH, commit=typing == "committed")
 
-    canvas.handler._load_canvas_state(str(json_path))
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml", save_mode)
 
-    assert "not a YAML file" in canvas.state.status_div.text
-    assert canvas.node_column("name") == ["battery_1"]
+    assert saved.get("watcher_file_path") == expected
+    assert ("canvas_layout" in saved) == (save_mode != SAVE_MODE_FINAL)
+    assert canvas.state.save_button.button_type == "success"
+
+
+def test_editing_the_watcher_path_marks_the_design_unsaved(canvas, monkeypatch, tmp_path):
+    _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml")
+    assert canvas.state.save_button.button_type == "success"
+
+    _type_in_watcher_field(canvas, WATCHER_PATH, commit=True)
+
+    assert canvas.state.save_button.button_type == "warning"
+
+
+def test_browsed_watcher_path_is_saved_until_typed_over(canvas, monkeypatch, tmp_path):
+    canvas.place("battery", 100, 100)
+
+    _browse_watcher(canvas, monkeypatch, "/data/pt_watcher.csv")
+    # The overlay buttons commit value_input, so it must hold the path too
+    assert _watcher_field(canvas) == ("/data/pt_watcher.csv", "/data/pt_watcher.csv")
+    assert canvas.state.watcher_file_path == "/data/pt_watcher.csv"
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "browsed.yml")
+    assert saved["watcher_file_path"] == "/data/pt_watcher.csv"
+
+    _type_in_watcher_field(canvas, WATCHER_PATH)
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "typed.yml")
+    assert saved["watcher_file_path"] == WATCHER_PATH
+
+
+def test_loaded_watcher_path_is_shown_and_kept_on_resave(canvas, monkeypatch, tmp_path):
+    canvas.place("battery", 100, 100)
+    _type_in_watcher_field(canvas, WATCHER_PATH, commit=True)
+    yaml_path = tmp_path / "design.yml"
+    _save_through_overlay(canvas, monkeypatch, yaml_path)
+    canvas.handler._on_new_design()
+    assert _watcher_field(canvas) == ("", "")
+
+    canvas.handler._load_canvas_state(str(yaml_path))
+
+    # Shown without marking the design unsaved
+    assert _watcher_field(canvas) == (WATCHER_PATH, WATCHER_PATH)
+    assert canvas.state.save_button.button_type == "success"
+    # Saved again without touching the field
+    resaved = _save_through_overlay(canvas, monkeypatch, tmp_path / "resaved.yml")
+    assert resaved["watcher_file_path"] == WATCHER_PATH

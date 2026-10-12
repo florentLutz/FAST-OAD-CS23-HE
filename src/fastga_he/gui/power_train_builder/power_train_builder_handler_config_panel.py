@@ -17,12 +17,17 @@ from bokeh.layouts import row
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 from .power_train_builder_state import (
+    VARIABLE_PORT_DEFAULT,
     _EMPTY,
     _NO_SYMMETRY_PEER,
     copy_column_data,
+    default_position,
+    edge_end_ports,
     edge_indices_not_touching_node,
     edge_indices_not_touching_port,
+    link_symmetry,
     select_edges,
+    unlink_symmetry,
     BuilderState,
 )
 
@@ -54,6 +59,11 @@ class ConfigPanelMixin:
     # True while _populate_node_table fills the widgets, so the type_select
     # callback can tell a programmatic update from a user switching the type
     _is_populating_node_table: bool = False
+
+    # Option names and their value dropdowns, in the same order, as built by
+    # _refresh_options_table for the selected node; Apply reads the values here
+    _options_names: tuple = ()
+    _options_value_selects: tuple = ()
 
     # -----------------------------------------------------------------------
     # Node table population / clearing
@@ -93,12 +103,9 @@ class ConfigPanelMixin:
         # extract possible component position in aircraft based on default/selected node type
         position_choices = self.state.possible_position.get(node_type, [])
         self.state.position_select.options = position_choices
-        if position_choices:
-            self.state.position_select.value = (
-                position if position in position_choices else position_choices[0]
-            )
-        else:
-            self.state.position_select.value = ""
+        self.state.position_select.value = (
+            position if position in position_choices else default_position(position_choices)
+        )
 
         saved_options: dict = {}
         try:
@@ -111,8 +118,8 @@ class ConfigPanelMixin:
         # Show or hide the port-count spinners based on the default counts for this node type.
         default_source_port_count = self.state.default_source_count.get(node_type, 0)
         default_target_port_count = self.state.default_target_count.get(node_type, 0)
-        source_ports_are_editable = default_source_port_count == 3
-        target_ports_are_editable = default_target_port_count == 3
+        source_ports_are_editable = default_source_port_count == VARIABLE_PORT_DEFAULT
+        target_ports_are_editable = default_target_port_count == VARIABLE_PORT_DEFAULT
 
         current_source_port_count = placed_node_data["n_sources"][index]
         current_target_port_count = placed_node_data["n_targets"][index]
@@ -148,7 +155,8 @@ class ConfigPanelMixin:
         self.state.type_select.value = _EMPTY
         self.state.position_select.options = []
         self.state.position_select.value = _EMPTY
-        self.state.options_source.data = dict(options=[], value=[])
+        self._options_names = ()
+        self._options_value_selects = ()
 
         self.state.port_count_section.visible = False
         self.state.source_count_spinner.visible = False
@@ -176,8 +184,8 @@ class ConfigPanelMixin:
         values so the canvas updates as the user spins, and hides any edge
         that a shrunk count would drop — all without writing anything to
         ``placed_nodes_source`` and without permanently losing an edge from
-        ``edge_source`` (see the ``override_counts`` docstring on
-        :meth:`~.power_train_builder_handler_ports.PortEdgeMixin._rebuild_all_ports`
+        ``edge_source`` (see
+        :meth:`~.power_train_builder_handler_ports.PortEdgeMixin._sync_edge_preview_backup`
         for the snapshot/restore mechanism that makes this reversible). The
         change only becomes permanent when :meth:`apply_node_configurations`
         reads the same spinner values and commits them; simply navigating
@@ -230,8 +238,8 @@ class ConfigPanelMixin:
         Rebuild the Options section of the config panel for a given node type.
 
         Creates one row per option (a disabled TextInput label + a Select for
-        the value) and wires a shared callback so that ``options_source`` stays
-        in sync with the user's current selections.
+        the value). The Selects are kept in ``self._options_value_selects``, in
+        the order of ``self._options_names``, for Apply to read.
 
         :param node_type: Component type key used to look up ``possible_options``.
         :param overrides: Optional ``{option_name: current_value}`` mapping used
@@ -240,7 +248,6 @@ class ConfigPanelMixin:
 
         options_definition = self.state.possible_options.get(node_type, {})
         option_names = list(options_definition.keys())
-        option_value_strings = []
         new_row_widgets = []
         value_selects = []
 
@@ -273,38 +280,12 @@ class ConfigPanelMixin:
                 styles={"color": "white", "font-size": "14px"},
             )
             new_row_widgets.append(row(label_input, value_select, spacing=4))
-            option_value_strings.append(current_value_string)
             value_selects.append(value_select)
 
-        self._options_value_selects = value_selects
-        self._options_names = option_names
+        self._options_value_selects = tuple(value_selects)
+        self._options_names = tuple(option_names)
 
         self.state.options_rows_column.children = new_row_widgets
-        # Fill the options_source
-        self.state.options_source.data = dict(options=option_names, value=option_value_strings)
-        # Wire the shared callback to every Select in the options table
-        for value_select_widget in value_selects:
-            value_select_widget.on_change("value", self._sync_options)
-
-    def _sync_options(self, attr, old, new):
-        """
-        Bokeh ``on_change`` callback: keep ``options_source`` in sync with the
-        options-table Select widgets.
-
-        Wired to every Select in the options table by
-        :meth:`_refresh_options_table`.  Reads the current value of each widget
-        from ``self._options_value_selects`` (populated by that method) so that
-        a single shared callback works regardless of which Select was changed.
-
-        :param attr: Bokeh attribute name (unused, required by protocol).
-        :param old: Previous widget value (unused).
-        :param new: New widget value (unused; individual widget values are read
-            directly from the stored Select references).
-        """
-        self.state.options_source.data = dict(
-            options=self._options_names,
-            value=[value_select.value for value_select in self._options_value_selects],
-        )
 
     # -----------------------------------------------------------------------
     # Symmetry select
@@ -370,7 +351,14 @@ class ConfigPanelMixin:
         node_data = copy_column_data(self.state.placed_nodes_source.data)
         edge_data = copy_column_data(self.state.edge_source.data)
 
-        connected_source, connected_target = _connected_far_ports(edge_data, node_index)
+        # The far port each row shows: the committed connection, unless a pick
+        # waiting for Apply replaces it
+        shown_source, shown_target = _connected_far_ports(edge_data, node_index)
+        pending_source, pending_target = _pending_far_ports(
+            self.state.panel_pending_connections, node_index
+        )
+        shown_source.update(pending_source)
+        shown_target.update(pending_target)
 
         # Only free ports of the matching energy type (colour) can be offered
         icon_config = ICONS_CONFIG.get(node_data["icon_type"][node_index], {})
@@ -389,8 +377,8 @@ class ConfigPanelMixin:
         # label and a dropdown of the free ports on the opposite side. Sources are
         # listed first, then targets
         port_sides = (
-            (source_data, "source", free_targets, connected_source),
-            (target_data, "target", free_sources, connected_target),
+            (source_data, "source", free_targets, shown_source),
+            (target_data, "target", free_sources, shown_target),
         )
         new_row_widgets = [
             self._build_port_row(
@@ -399,10 +387,10 @@ class ConfigPanelMixin:
                 own_kind,
                 selected_node_type,
                 free_far_ports,
-                connected_ports,
+                shown_far_ports,
                 node_data,
             )
-            for port_data, own_kind, free_far_ports, connected_ports in port_sides
+            for port_data, own_kind, free_far_ports, shown_far_ports in port_sides
             for port_position in range(len(port_data.get("node_index", [])))
             if port_data["node_index"][port_position] == node_index
         ]
@@ -447,7 +435,7 @@ class ConfigPanelMixin:
         own_kind: str,
         node_type: str,
         free_far_ports: list,
-        connected_ports: dict,
+        shown_far_ports: dict,
         node_data: dict,
     ):
         """
@@ -459,8 +447,9 @@ class ConfigPanelMixin:
         :param node_type: Component type of the selected node.
         :param free_far_ports: Free candidates on the opposite side
             (see :meth:`_free_port_candidates`).
-        :param connected_ports: ``{own_label: (far_node_index, far_label)}`` for the
-            node's connected ports on this side.
+        :param shown_far_ports: ``{own_label: (far_node_index, far_label)}`` of
+            the far port each dropdown shows on this side: the pick waiting for
+            Apply if there is one, else the committed connection.
         :param node_data: Snapshot of ``placed_nodes_source.data``.
         :return: Bokeh ``row`` holding the label and the dropdown.
         """
@@ -472,7 +461,6 @@ class ConfigPanelMixin:
         )
         node_index = port_data["node_index"][port_position]
         own_label = port_data["label"][port_position]
-        is_connected = port_data["connected"][port_position] == "True"
 
         label_input = bkmodel.TextInput(
             value=f"{own_kind}:{own_label}",
@@ -484,11 +472,11 @@ class ConfigPanelMixin:
 
         candidates = free_far_ports
         current_string = _EMPTY
-        if is_connected and own_label in connected_ports:
-            # Add the connected far port to the candidates list so that it shows up in
+        if own_label in shown_far_ports:
+            # Add the shown far port to the candidates list so that it shows up in
             # the dropdown even though it is not free. "Far" means the port on the
             # opposite side that this port of the node is (or could be) connected to
-            far_node_index, far_label = connected_ports[own_label]
+            far_node_index, far_label = shown_far_ports[own_label]
             current_string = self._far_string(node_data, far_node_index, far_label, far_kind)
             candidates = [
                 candidate
@@ -708,37 +696,6 @@ class ConfigPanelMixin:
         self._rebuild_all_ports()
         self._mark_unsaved()
 
-    def _live_port(self, port_kind: str, node_index: int, port_label: str) -> dict | None:
-        """
-        Current metadata of one port ball, read from its port data source.
-
-        :param port_kind: ``"source"`` or ``"target"``.
-        :param node_index: Zero-based index of the node that owns the port.
-        :param port_label: Port label (``"1"``, ``"2"``, ...).
-        :return: Dict with keys ``kind``, ``node_index``, ``label``, ``x``, ``y``
-            and ``color``, or ``None`` if the port does not exist.
-        """
-        port_source = (
-            self.state.source_port_source
-            if port_kind == "source"
-            else self.state.target_port_source
-        )
-        port_data = port_source.data
-        for port_position in range(len(port_data.get("node_index", []))):
-            if (
-                port_data["node_index"][port_position] == node_index
-                and port_data["label"][port_position] == port_label
-            ):
-                return {
-                    "kind": port_kind,
-                    "node_index": node_index,
-                    "label": port_label,
-                    "x": port_data["x"][port_position],
-                    "y": port_data["y"][port_position],
-                    "color": port_data["color"][port_position],
-                }
-        return None
-
     # -----------------------------------------------------------------------
     # Type-select live refresh
     # -----------------------------------------------------------------------
@@ -771,7 +728,7 @@ class ConfigPanelMixin:
         """
         position_choices = self.state.possible_position.get(new, [])
         self.state.position_select.options = position_choices
-        self.state.position_select.value = position_choices[0] if position_choices else _EMPTY
+        self.state.position_select.value = default_position(position_choices)
 
         current_selected_node_index_for_type = self.state.selected_node_index
         saved_options = {}
@@ -813,9 +770,7 @@ class ConfigPanelMixin:
         """
         # Previews belong to the old type's ports: drop them before editing
         self._clear_temp_edges()
-        if self.state.edge_preview_backup is not None:
-            self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
-            self.state.edge_preview_backup = None
+        self._end_edge_preview()
 
         edge_data = (
             copy_column_data(self.state.edge_source.data)
@@ -853,7 +808,7 @@ class ConfigPanelMixin:
             self.state.edge_source.data = select_edges(edge_data, kept_edge_indices)
 
         if symmetry_positions_to_clear:
-            _unlink_symmetry(symmetry_names, symmetry_indices, symmetry_positions_to_clear)
+            unlink_symmetry(symmetry_names, symmetry_indices, symmetry_positions_to_clear)
             placed_nodes_data["symmetry_name"] = symmetry_names
             placed_nodes_data["symmetry_node_index"] = symmetry_indices
             self.state.placed_nodes_source.data = placed_nodes_data
@@ -898,7 +853,6 @@ class ConfigPanelMixin:
         self._write_node_fields(placed_nodes_data, current_selected_node_index)
         self._write_symmetry(placed_nodes_data, current_selected_node_index)
         self.state.placed_nodes_source.data = placed_nodes_data
-        self._sync_hover_source(placed_nodes_data, current_selected_node_index)
 
         # Commit the connections picked in the Connections panel
         for starting_port, ending_port in list(self.state.panel_pending_connections):
@@ -930,11 +884,12 @@ class ConfigPanelMixin:
         # Place empty dict if there is no options entry for this node yet
         if "options" not in placed_nodes_data:
             placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
-        option_names = list(self.state.options_source.data.get("options", []))
-        option_values = list(self.state.options_source.data.get("value", []))
+        # Current value of each option dropdown of the panel
         option_values_dict = {
-            option_name: _strings_to_option_values(option_value)
-            for option_name, option_value in zip(option_names, option_values, strict=True)
+            option_name: _strings_to_option_values(value_select.value)
+            for option_name, value_select in zip(
+                self._options_names, self._options_value_selects, strict=True
+            )
         }
         # Stored as a JSON string in the ColumnDataSource
         _set_cell(placed_nodes_data, "options", node_index, json.dumps(option_values_dict))
@@ -1005,36 +960,18 @@ class ConfigPanelMixin:
             )
             if node_position not in nodes_getting_fresh_write
         ]
-        _unlink_symmetry(symmetry_names, symmetry_indices, stale_positions)
+        unlink_symmetry(symmetry_names, symmetry_indices, stale_positions)
 
-        # Write the current node's new symmetry entry
-        symmetry_names[node_index] = new_symmetry_name
-        symmetry_indices[node_index] = new_peer_index
-
-        # Write the new peer's back-reference (if a peer was chosen)
+        # Link the two nodes both ways, or leave the current node unpaired
         if new_peer_index != _NO_SYMMETRY_PEER:
-            symmetry_names[new_peer_index] = current_node_name
-            symmetry_indices[new_peer_index] = node_index
+            link_symmetry(
+                symmetry_names, symmetry_indices, all_node_names, node_index, new_peer_index
+            )
+        else:
+            unlink_symmetry(symmetry_names, symmetry_indices, [node_index])
 
         placed_nodes_data["symmetry_name"] = symmetry_names
         placed_nodes_data["symmetry_node_index"] = symmetry_indices
-
-    def _sync_hover_source(self, placed_nodes_data: dict, node_index: int):
-        """
-        Copy the applied name and type of node *node_index* into ``hover_source``.
-
-        :param placed_nodes_data: Node columns after the Apply.
-        :param node_index: Zero-based index of the node being applied.
-        """
-        if self.state.hover_source is None:
-            return
-        hover_data = copy_column_data(self.state.hover_source.data)
-        for column_name in ("name", "node_type"):
-            if node_index < len(placed_nodes_data.get(column_name, [])):
-                _set_cell(
-                    hover_data, column_name, node_index, placed_nodes_data[column_name][node_index]
-                )
-        self.state.hover_source.data = hover_data
 
 
 def _set_cell(column_data: dict, column_name: str, row_index: int, value) -> bool:
@@ -1084,22 +1021,34 @@ def _connected_far_ports(edge_data: dict, node_index: int) -> tuple[dict, dict]:
         mapping the node's own port label to ``(far_node_index, far_label)``.
     """
     connected_ports = {"source": {}, "target": {}}
-    for edge_position in range(len(edge_data.get("starting_node_index", []))):
-        starting_end = (
-            edge_data["starting_node_index"][edge_position],
-            edge_data["starting_port_label"][edge_position],
-            edge_data["starting_port_kind"][edge_position],
-        )
-        ending_end = (
-            edge_data["ending_node_index"][edge_position],
-            edge_data["ending_port_label"][edge_position],
-            edge_data["ending_port_kind"][edge_position],
-        )
-        for own_end, far_end in ((starting_end, ending_end), (ending_end, starting_end)):
-            own_node_index, own_label, own_kind = own_end
+    for starting_port, ending_port in edge_end_ports(edge_data):
+        for own_port, far_port in ((starting_port, ending_port), (ending_port, starting_port)):
+            own_kind, own_node_index, own_label = own_port
             if own_node_index == node_index and own_kind in connected_ports:
-                connected_ports[own_kind][own_label] = far_end[:2]
+                _, far_node_index, far_label = far_port
+                connected_ports[own_kind][own_label] = (far_node_index, far_label)
     return connected_ports["source"], connected_ports["target"]
+
+
+def _pending_far_ports(pending_connections: list, node_index: int) -> tuple[dict, dict]:
+    """
+    Far end of every Connections panel pick of node *node_index*, split by the node's port side.
+
+    Picks are stored as ``(source port, target port)`` pairs.
+
+    :param pending_connections: ``state.panel_pending_connections``.
+    :param node_index: Zero-based index of the node.
+    :return: Tuple ``(pending_source, pending_target)`` of dictionaries mapping
+        the node's own port label to ``(far_node_index, far_label)``.
+    """
+    pending_source: dict = {}
+    pending_target: dict = {}
+    for source_port, target_port in pending_connections:
+        if source_port["node_index"] == node_index:
+            pending_source[source_port["label"]] = (target_port["node_index"], target_port["label"])
+        if target_port["node_index"] == node_index:
+            pending_target[target_port["label"]] = (source_port["node_index"], source_port["label"])
+    return pending_source, pending_target
 
 
 def _padded_symmetry_columns(placed_nodes_data: dict) -> tuple[list, list]:
@@ -1140,19 +1089,6 @@ def _positions_linked_to(
         )
         if peer_index in node_indices or peer_name in peer_names
     ]
-
-
-def _unlink_symmetry(symmetry_names: list, symmetry_indices: list, node_positions: list) -> None:
-    """
-    Reset the symmetry entries at *node_positions*, in place.
-
-    :param symmetry_names: ``symmetry_name`` column, edited in place.
-    :param symmetry_indices: ``symmetry_node_index`` column, edited in place.
-    :param node_positions: Positions of the nodes to unlink.
-    """
-    for node_position in node_positions:
-        symmetry_names[node_position] = _EMPTY
-        symmetry_indices[node_position] = _NO_SYMMETRY_PEER
 
 
 def _port_label_stylesheets(node_type: str, port_label: str, primary_type_keywords: tuple) -> list:

@@ -7,8 +7,8 @@ Node-placement and node-size logic for the powertrain builder.
 
 This is the module that actually creates a new component on the canvas:
 computing its default type / position / options / port counts, building the
-icon URL, appending the new row to ``placed_nodes_source`` and
-``hover_source``, and rebuilding the ports that hang off it.
+icon URL, appending the new row to ``placed_nodes_source``, and rebuilding
+the ports that hang off it.
 
 Mixin class :class:`PlacementMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
@@ -16,20 +16,22 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 
 import json
 import logging
-from pathlib import Path
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _url_to_base64
+from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
+from .power_train_builder_metadata import icon_data_url
 from .power_train_builder_state import (
     DEFAULT_NODE_ICON_SIZE,
-    HOVER_COLUMNS,
     HOVER_RING_BASE_SIZE,
     NODE_COLUMNS,
     NODE_LABEL_BASE_OFFSET,
     SELECTION_RING_BASE_SIZE,
     _EMPTY,
     _NO_SYMMETRY_PEER,
+    append_row,
     copy_column_data,
+    default_options,
+    default_position,
     BuilderState,
 )
 
@@ -60,8 +62,8 @@ class PlacementMixin:
         computes the new node's default component type, position, options,
         and port counts (from the shared per-type defaults on ``self.state``),
         builds its icon URL, and appends the resulting row to
-        ``placed_nodes_source`` (and ``hover_source``). Finally rebuilds every
-        port so the new component's port balls appear immediately.
+        ``placed_nodes_source``. Finally rebuilds every port so the new
+        component's port balls appear immediately.
 
         :param x: Canvas x coordinate (data-units) where the component is placed.
         :param y: Canvas y coordinate (data-units) where the component is placed.
@@ -80,21 +82,11 @@ class PlacementMixin:
         self.state.placed_counter[icon_key] = placement_count
         node_name = f"{icon_key}_{placement_count}"
 
-        icon_path = ICONS_CONFIG[icon_key]["icon_path"]
-        file_url = "file://" + str(Path(icon_path).resolve())
-        base64_url = _url_to_base64(file_url)
-
         default_component_type = self.state.icon_to_component_types.get(icon_key, icon_key)[0]
-        position_choices = self.state.possible_position.get(default_component_type, [])
-        default_position = position_choices[0] if position_choices else _EMPTY
-
-        options_definition = self.state.possible_options.get(default_component_type, {})
-        default_options = {
-            option_key: option_values[0]
-            for option_key, option_values in options_definition.items()
-            if option_values
-        }
-        default_options_json = json.dumps(default_options)
+        position = default_position(self.state.possible_position.get(default_component_type, []))
+        options_json = json.dumps(
+            default_options(self.state.possible_options.get(default_component_type, {}))
+        )
 
         default_source_port_count = self.state.default_source_count.get(default_component_type, 0)
         default_target_port_count = self.state.default_target_count.get(default_component_type, 0)
@@ -103,31 +95,22 @@ class PlacementMixin:
         new_node_row = {
             "x": x,
             "y": y,
-            "url": base64_url,
+            "url": icon_data_url(ICONS_CONFIG[icon_key]["icon_path"]),
             "w": self.icon_size,
             "h": self.icon_size,
             "name": node_name,
             "node_type": default_component_type,
             "icon_type": icon_key,
-            "position": default_position,
-            "options": default_options_json,
+            "position": position,
+            "options": options_json,
             "n_sources": default_source_port_count,
             "n_targets": default_target_port_count,
             "symmetry_name": _EMPTY,
             "symmetry_node_index": _NO_SYMMETRY_PEER,
         }
-        nodes_data = self.state.placed_nodes_source.data
-        self.state.placed_nodes_source.data = {
-            column_name: list(nodes_data.get(column_name, [])) + [new_node_row[column_name]]
-            for column_name in NODE_COLUMNS
-        }
-
-        if self.state.hover_source is not None:
-            hover_data = self.state.hover_source.data
-            self.state.hover_source.data = {
-                column_name: list(hover_data.get(column_name, [])) + [new_node_row[column_name]]
-                for column_name in HOVER_COLUMNS
-            }
+        self.state.placed_nodes_source.data = append_row(
+            self.state.placed_nodes_source.data, NODE_COLUMNS, new_node_row
+        )
 
         self._rebuild_all_ports()
         self._mark_unsaved()
@@ -135,7 +118,7 @@ class PlacementMixin:
             "Placed %s (node_type=%s, position=%s) at (%.1f, %.1f)",
             node_name,
             default_component_type,
-            default_position,
+            position,
             x,
             y,
         )

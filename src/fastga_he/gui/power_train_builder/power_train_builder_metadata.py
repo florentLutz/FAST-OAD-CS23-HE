@@ -24,9 +24,13 @@ Three groups of functions are provided:
 
 import sys
 import ast
+from functools import lru_cache
 from pathlib import Path
 
+from fastga_he.gui.power_train_network_viewer import _url_to_base64
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
+
+from .power_train_builder_state import VARIABLE_PORT_DEFAULT
 
 # ============================================================================
 # Icon mapping
@@ -54,6 +58,34 @@ def _map_possible_component_types_to_icons() -> dict:
     return icon_key_to_component_type_map
 
 
+def component_type_classes(known_component: dict) -> list:
+    """
+    Type classes of a ``KNOWN_COMPONENTS`` entry, always as a list.
+
+    ``components_type_class`` holds either one class name or a list of them.
+
+    :param known_component: One entry of :data:`KNOWN_COMPONENTS`.
+    :return: List of type class names.
+    """
+    type_class = known_component.get("components_type_class")
+    return list(type_class) if isinstance(type_class, list) else [type_class]
+
+
+@lru_cache(maxsize=None)
+def icon_data_url(icon_path) -> str:
+    """
+    Base64 data URL of an icon file, read and encoded once per path.
+
+    Used for every icon the builder draws: toolbox buttons, placed nodes,
+    loaded designs and the canvas legend.
+
+    :param icon_path: Path of the icon file (``ICONS_CONFIG[...]["icon_path"]``
+        or a ``COLOR_ICON_CONFIG`` value).
+    :return: The ``data:`` URL, or the ``file://`` URL if the file cannot be read.
+    """
+    return _url_to_base64("file://" + str(Path(icon_path).resolve()))
+
+
 # ============================================================================
 # Port-count defaults
 # ============================================================================
@@ -66,8 +98,8 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
     Iterates over :data:`KNOWN_COMPONENTS` and applies the following rules in
     priority order:
 
-    * Any attribute containing ``"number_of_"`` -> 3 sources, 3 targets
-      (variable-count component).
+    * Any attribute containing ``"number_of_"`` -> ``VARIABLE_PORT_DEFAULT``
+      sources and targets (variable-count component).
     * Any attribute containing ``"_mode"`` -> 2 sources, 1 target.
     * ``"gearbox"`` -> 1 source, 2 targets.
     * ``"propeller"`` or ``"aux_load"`` -> 1 source, 0 targets.
@@ -99,8 +131,8 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
             default_target_count[component_type] = 1
             for attribute_name in component_attribute:
                 if "number_of_" in attribute_name:
-                    default_source_count[component_type] = 3
-                    default_target_count[component_type] = 3
+                    default_source_count[component_type] = VARIABLE_PORT_DEFAULT
+                    default_target_count[component_type] = VARIABLE_PORT_DEFAULT
                     break
                 elif "_mode" in attribute_name:
                     default_source_count[component_type] = 2

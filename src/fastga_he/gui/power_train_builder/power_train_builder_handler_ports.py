@@ -20,7 +20,9 @@ from .power_train_builder_state import (
     NODE_RADIUS,
     PORT_COLUMNS,
     PORT_RADIUS,
+    append_row,
     copy_column_data,
+    edge_end_ports,
     empty_columns,
     select_edges,
     BuilderState,
@@ -105,28 +107,51 @@ class PortEdgeMixin:
         """
         snap = PORT_RADIUS * 2.5
         nearest_port, nearest_port_distance = None, snap
-        for kind, port_source in [
-            ("source", self.state.source_port_source),
-            ("target", self.state.target_port_source),
-        ]:
-            if port_source is None:
-                continue
-            data = port_source.data
-            for i, (port_x, port_y) in enumerate(
-                zip(list(data.get("x", [])), list(data.get("y", [])), strict=True)
+        for kind, port_data in self._port_data_by_kind():
+            for port_position, (port_x, port_y) in enumerate(
+                zip(port_data.get("x", []), port_data.get("y", []), strict=True)
             ):
                 distance = ((x - port_x) ** 2 + (y - port_y) ** 2) ** 0.5
                 if distance < nearest_port_distance:
                     nearest_port_distance = distance
-                    nearest_port = {
-                        "kind": kind,
-                        "x": port_x,
-                        "y": port_y,
-                        "color": list(data["color"])[i],
-                        "label": list(data["label"])[i],
-                        "node_index": list(data["node_index"])[i],
-                    }
+                    nearest_port = _port_dict(kind, port_data, port_position)
         return nearest_port
+
+    def _live_port(self, port_kind: str, node_index: int, port_label: str) -> dict | None:
+        """
+        Current metadata of one port ball, read from its port data source.
+
+        :param port_kind: ``"source"`` or ``"target"``.
+        :param node_index: Zero-based index of the node that owns the port.
+        :param port_label: Port label (``"1"``, ``"2"``, ...).
+        :return: Dict with keys ``kind``, ``node_index``, ``label``, ``x``, ``y``
+            and ``color``, or ``None`` if the port does not exist.
+        """
+        for kind, port_data in self._port_data_by_kind():
+            if kind != port_kind:
+                continue
+            for port_position, (owner_index, label) in enumerate(
+                zip(port_data.get("node_index", []), port_data.get("label", []), strict=True)
+            ):
+                if owner_index == node_index and label == port_label:
+                    return _port_dict(kind, port_data, port_position)
+        return None
+
+    def _port_data_by_kind(self) -> list[tuple[str, dict]]:
+        """
+        ``(kind, data)`` of the two port data sources that exist.
+
+        :return: ``[("source", source_port_source.data), ("target", target_port_source.data)]``,
+            leaving out a source that is not set (headless use).
+        """
+        return [
+            (kind, port_source.data)
+            for kind, port_source in (
+                ("source", self.state.source_port_source),
+                ("target", self.state.target_port_source),
+            )
+            if port_source is not None
+        ]
 
     def _cancel_pending_connection(self):
         """Cancel any port selection waiting for a second click."""
@@ -300,9 +325,7 @@ class PortEdgeMixin:
             new_edge_row[f"{end}_node_index"] = port["node_index"]
             new_edge_row[f"{end}_port_label"] = port["label"]
             new_edge_row[f"{end}_port_kind"] = port["kind"]
-        for column_name in EDGE_COLUMNS:
-            edge_data[column_name].append(new_edge_row[column_name])
-        self.state.edge_source.data = edge_data
+        self.state.edge_source.data = append_row(edge_data, EDGE_COLUMNS, new_edge_row)
 
         self._mark_unsaved()
         _LOGGER.info(
@@ -371,33 +394,10 @@ class PortEdgeMixin:
         edge_data = copy_column_data(self.state.edge_source.data)
         if not edge_data.get("starting_node_index"):
             return
-        # Build a lookup: (kind, node_index, label) -> (x, y) for every port currently
-        port_position_dict: dict = {}
-        for kind, data_source in [
-            ("source", self.state.source_port_source),
-            ("target", self.state.target_port_source),
-        ]:
-            if data_source is None:
-                continue
-            dataset = data_source.data
-            for i, (port_x, port_y) in enumerate(
-                zip(list(dataset.get("x", [])), list(dataset.get("y", [])), strict=True)
-            ):
-                key = (kind, list(dataset["node_index"])[i], list(dataset["label"])[i])
-                port_position_dict[key] = (port_x, port_y)
+        port_position_dict = self._port_positions()
         # Walk every stored edge and look up fresh coordinates for its two endpoints
         new_xs, new_ys, valid_edge_indices = [], [], []
-        for i in range(len(edge_data["starting_node_index"])):
-            starting_port_key = (
-                edge_data["starting_port_kind"][i],
-                edge_data["starting_node_index"][i],
-                edge_data["starting_port_label"][i],
-            )
-            ending_port_key = (
-                edge_data["ending_port_kind"][i],
-                edge_data["ending_node_index"][i],
-                edge_data["ending_port_label"][i],
-            )
+        for i, (starting_port_key, ending_port_key) in enumerate(edge_end_ports(edge_data)):
             if starting_port_key in port_position_dict and ending_port_key in port_position_dict:
                 starting_x, starting_y = port_position_dict[starting_port_key]
                 ending_x, ending_y = port_position_dict[ending_port_key]
@@ -416,47 +416,46 @@ class PortEdgeMixin:
 
     def _rebuild_all_ports(self, override_counts: dict = None):
         """
-        Recompute every port ball position from the current placed-nodes data
-        and push the result into ``source_port_source`` / ``target_port_source``,
-        then reposition/prune ``edge_source`` to match via :meth:`_rebuild_edges`.
+        Redraw every port ball from the node data, then bring everything that
+        hangs off the ports back in line with them.
 
-        Called whenever nodes are added, moved, or deleted, and after every
-        *committed* port-count change (i.e. after Apply writes the new
-        ``n_sources`` / ``n_targets`` into ``placed_nodes_source``).
+        Called whenever nodes are added, moved, deleted or edited, after every
+        committed port-count change (Apply), and on every port-count preview
+        tick. Three steps:
+
+        1. :meth:`_sync_edge_preview_backup` keeps the true edge list safe
+           while a port-count preview hides edges (see there).
+        2. :meth:`_draw_ports` recomputes ``source_port_source`` /
+           ``target_port_source``.
+        3. :meth:`_sync_edges_to_ports` re-routes / prunes the edges, the
+           dashed panel previews and the Connections table to those ports.
 
         :param override_counts: Optional ``{node_index: (n_source, n_target)}``
-            used **only** for this call's rendering — it never writes back
-            into ``placed_nodes_source``. This is how the port-count spinners
-            get a live visual preview (see
-            :meth:`~.power_train_builder_handler_config_panel.ConfigPanelMixin._on_port_count_spinner_change`)
-            while the change stays uncommitted until Apply.
-
-            Passing a non-empty ``override_counts`` still runs the normal
-            :meth:`_rebuild_edges` pass — so an edge attached to a port that
-            the preview count removes disappears from the canvas immediately,
-            matching what Apply would actually do — but it is preceded by a
-            snapshot/restore step so nothing is lost if the preview is
-            cancelled:
-
-            * The *first* preview call in a session snapshots the current
-              ``edge_source.data`` into ``self.state.edge_preview_backup``.
-            * Every subsequent preview call restores that snapshot into
-              ``edge_source`` **before** recomputing, so each tick prunes
-              against the true, last-committed edge list rather than the
-              previous tick's already-pruned one — spinning the count back
-              up brings a hidden edge straight back.
-            * The next *real* (``override_counts`` falsy) call restores the
-              snapshot and clears it, so navigating away without clicking
-              Apply — reselecting, deleting, placing a new node, opening
-              Delete mode — leaves ``edge_source`` exactly as it was before
-              the preview ever started.
+            used **only** for this call's drawing — never written back into
+            ``placed_nodes_source``. This is how the port-count spinners get a
+            live, reversible preview (see
+            :meth:`~.power_train_builder_handler_config_panel.ConfigPanelMixin._on_port_count_spinner_change`).
         """
         if self.state.source_port_source is None or self.state.target_port_source is None:
             return
 
         override_counts = override_counts or {}
         self._sync_edge_preview_backup(is_preview=bool(override_counts))
+        self._draw_ports(override_counts)
+        self._sync_edges_to_ports()
 
+    def _draw_ports(self, override_counts: dict):
+        """
+        Recompute every port ball and push them into the two port data sources.
+
+        Each node gets its source ports fanned around its top and its target
+        ports around its bottom (:meth:`compute_ports`), on an orbit that
+        scales with the icon-size slider. Only the selected node's balls are
+        visible, and every port is flagged ``connected`` from ``edge_source``.
+
+        :param override_counts: ``{node_index: (n_source, n_target)}`` replacing
+            the stored port counts of those nodes for this drawing only.
+        """
         # Port positions scale with the icon-size slider: every term of the
         # orbit radius (icon radius + port radius + gap) is multiplied by
         # size_factor = icon_size / DEFAULT_NODE_ICON_SIZE, so each port sits at
@@ -469,7 +468,7 @@ class PortEdgeMixin:
         source_ports = empty_columns(PORT_COLUMNS)
         target_ports = empty_columns(PORT_COLUMNS)
 
-        for i, (center_x, center_y, icon_type, node_type, node_name) in enumerate(
+        for node_index, (center_x, center_y, icon_type, node_type, node_name) in enumerate(
             zip(
                 list(placed_nodes_data.get("x", [])),
                 list(placed_nodes_data.get("y", [])),
@@ -479,11 +478,14 @@ class PortEdgeMixin:
                 strict=True,
             )
         ):
-            n_source, n_target = override_counts.get(i) or (
-                _stored_port_count(n_sources_list, i, self.state.default_source_count, node_type),
-                _stored_port_count(n_targets_list, i, self.state.default_target_count, node_type),
+            n_source, n_target = override_counts.get(node_index) or (
+                _stored_port_count(
+                    n_sources_list, node_index, self.state.default_source_count, node_type
+                ),
+                _stored_port_count(
+                    n_targets_list, node_index, self.state.default_target_count, node_type
+                ),
             )
-
             ports = self.compute_ports(
                 center_x,
                 center_y,
@@ -494,9 +496,9 @@ class PortEdgeMixin:
                 gap_pixels=_PORT_GAP * size_factor,
             )
             # Port balls are only visible on the selected node
-            is_selected = i == self.state.selected_node_index
+            is_selected = node_index == self.state.selected_node_index
             node_row = {
-                "node_index": i,
+                "node_index": node_index,
                 "node_name": [node_name],
                 "node_type": [node_type],
                 "fill_alpha": _SELECTED_PORT_FILL_ALPHA if is_selected else 0.0,
@@ -513,29 +515,99 @@ class PortEdgeMixin:
         connected_port_keys = _connected_port_keys(
             self.state.edge_source.data if self.state.edge_source is not None else {}
         )
-        for kind, port_columns in (("source", source_ports), ("target", target_ports)):
-            port_columns["connected"] = [
-                "True" if (kind, node_index, label) in connected_port_keys else "False"
-                for node_index, label in zip(
-                    port_columns["node_index"], port_columns["label"], strict=True
-                )
-            ]
+        _set_connected_flags(source_ports, "source", connected_port_keys)
+        _set_connected_flags(target_ports, "target", connected_port_keys)
         self.state.source_port_source.data = source_ports
         self.state.target_port_source.data = target_ports
 
-        # Always reposition/prune edges against whatever ports were just
-        # drawn (real or preview) — see the snapshot/restore logic at the
-        # top of this method for why a preview pass is still safe to reverse
+    def _sync_edges_to_ports(self):
+        """
+        Bring everything drawn between or from ports in line with the port balls.
+
+        * Edges are re-routed to their ports, and dropped if a port no longer
+          exists (:meth:`_rebuild_edges`). During a port-count preview this
+          prunes only the canvas copy; the true edges stay in the backup.
+        * The dashed previews of the Connections panel picks follow their
+          ports (:meth:`_redraw_panel_previews`).
+        * The Connections table of the selected node is rebuilt, as its
+          ports, free candidates and connections may all have changed.
+        """
         self._rebuild_edges()
+        self._redraw_panel_previews()
 
         if self.state.selected_node_index is not None:
             self._refresh_connections_table(self.state.selected_node_index)
+
+    def _port_positions(self) -> dict:
+        """
+        ``(kind, node_index, label) -> (x, y)`` of every port ball currently drawn.
+
+        :return: Dictionary of port positions in canvas data units.
+        """
+        port_positions: dict = {}
+        for kind, port_data in self._port_data_by_kind():
+            for node_index, label, port_x, port_y in zip(
+                port_data.get("node_index", []),
+                port_data.get("label", []),
+                port_data.get("x", []),
+                port_data.get("y", []),
+                strict=True,
+            ):
+                port_positions[(kind, node_index, label)] = (port_x, port_y)
+        return port_positions
+
+    def _redraw_panel_previews(self):
+        """
+        Redraw the dashed preview of every Connections panel pick at the current
+        port positions.
+
+        The stored port coordinates of each pick are updated too, so Apply
+        commits an edge drawn where the ports are now. A pick whose port is not
+        drawn right now (hidden by a port-count preview) is kept, but not drawn.
+        """
+        if self.state.panel_preview_edge_source is None:
+            return
+        pending_connections = self.state.panel_pending_connections
+        if not pending_connections and not self.state.panel_preview_edge_source.data["xs"]:
+            return
+        port_positions = self._port_positions()
+        preview_data = dict(xs=[], ys=[], color=[])
+        for starting_port, ending_port in pending_connections:
+            end_positions = [
+                port_positions.get((port["kind"], port["node_index"], port["label"]))
+                for port in (starting_port, ending_port)
+            ]
+            if None in end_positions:
+                continue
+            for port, (port_x, port_y) in zip(
+                (starting_port, ending_port), end_positions, strict=True
+            ):
+                port["x"], port["y"] = port_x, port_y
+            preview_data["xs"].append([starting_port["x"], ending_port["x"]])
+            preview_data["ys"].append([starting_port["y"], ending_port["y"]])
+            preview_data["color"].append(starting_port["color"])
+        self.state.panel_preview_edge_source.data = preview_data
 
     def _sync_edge_preview_backup(self, is_preview: bool):
         """
         Keep the true edge list safe while a port-count preview hides edges.
 
-        See :meth:`_rebuild_all_ports` for the full snapshot / restore protocol.
+        A preview rebuild still prunes ``edge_source`` (in
+        :meth:`_sync_edges_to_ports`), so an edge attached to a port the
+        preview count removes disappears from the canvas straight away,
+        matching what Apply would do. This snapshot / restore step makes that
+        reversible:
+
+        * The *first* preview rebuild snapshots ``edge_source.data`` into
+          ``state.edge_preview_backup``.
+        * Every later preview rebuild restores that snapshot **before** pruning,
+          so each tick prunes the true, last-committed edge list rather than
+          the previous tick's already-pruned one: spinning the count back up
+          brings a hidden edge straight back.
+        * The next *real* rebuild (or real edit, see :meth:`_end_edge_preview`)
+          restores the snapshot and clears it, so leaving without Apply —
+          reselecting, deleting, placing a node, opening Delete mode — leaves
+          ``edge_source`` exactly as it was before the preview started.
 
         :param is_preview: ``True`` when the current rebuild is a port-count preview.
         """
@@ -549,11 +621,25 @@ class PortEdgeMixin:
                 # Later ticks: always prune from the truth (backup), not from
                 # whatever the previous tick (preview) already hid
                 self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
-        elif self.state.edge_preview_backup is not None:
+        else:
             # Real rebuild after a preview: put the true edges back before
             # this call's own (real, committed-count-based) pruning runs
-            self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
-            self.state.edge_preview_backup = None
+            self._end_edge_preview()
+
+    def _end_edge_preview(self):
+        """
+        End a port-count preview: put back the true edges it hid, if any.
+
+        Called by every real rebuild, and before every real edit records its
+        undo step (:meth:`_push_undo`, undo and redo). Otherwise the edit would
+        work on, and the history record, the edge list the preview pruned, and
+        the next real rebuild would replace the edit's own edges with the
+        backup taken before it.
+        """
+        if self.state.edge_source is None or self.state.edge_preview_backup is None:
+            return
+        self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
+        self.state.edge_preview_backup = None
 
     # -----------------------------------------------------------------------
     # Port placement
@@ -637,6 +723,25 @@ class PortEdgeMixin:
         return {"outputs": output_ports, "inputs": input_ports}
 
 
+def _port_dict(kind: str, port_data: dict, port_position: int) -> dict:
+    """
+    One port ball as the port dict used by connections and edges.
+
+    :param kind: ``"source"`` or ``"target"``, the side *port_data* holds.
+    :param port_data: ``source_port_source.data`` or ``target_port_source.data``.
+    :param port_position: Row of the port in *port_data*.
+    :return: Dict with keys ``kind``, ``node_index``, ``label``, ``x``, ``y`` and ``color``.
+    """
+    return {
+        "kind": kind,
+        "node_index": port_data["node_index"][port_position],
+        "label": port_data["label"][port_position],
+        "x": port_data["x"][port_position],
+        "y": port_data["y"][port_position],
+        "color": port_data["color"][port_position],
+    }
+
+
 def _append_port_row(port_columns: dict, port: dict, color: str, node_row: dict) -> None:
     """
     Append one port ball to port data built with :data:`PORT_COLUMNS`.
@@ -657,6 +762,20 @@ def _append_port_row(port_columns: dict, port: dict, color: str, node_row: dict)
         port_columns[column_name].append(value)
 
 
+def _set_connected_flags(port_columns: dict, kind: str, connected_port_keys: set) -> None:
+    """
+    Fill the ``connected`` column of port data built with :data:`PORT_COLUMNS`.
+
+    :param port_columns: Port data being built, edited in place.
+    :param kind: ``"source"`` or ``"target"``, the side *port_columns* holds.
+    :param connected_port_keys: ``(kind, node_index, label)`` of every port with an edge.
+    """
+    port_columns["connected"] = [
+        "True" if (kind, node_index, label) in connected_port_keys else "False"
+        for node_index, label in zip(port_columns["node_index"], port_columns["label"], strict=True)
+    ]
+
+
 def _connected_port_keys(edge_data: dict) -> set:
     """
     ``(kind, node_index, label)`` of every port that has an edge.
@@ -664,17 +783,7 @@ def _connected_port_keys(edge_data: dict) -> set:
     :param edge_data: ``edge_source.data`` (or a copy of it).
     :return: Set of port keys.
     """
-    connected_port_keys: set = set()
-    for edge_position in range(len(edge_data.get("starting_node_index", []))):
-        for end in ("starting", "ending"):
-            connected_port_keys.add(
-                (
-                    edge_data[f"{end}_port_kind"][edge_position],
-                    edge_data[f"{end}_node_index"][edge_position],
-                    edge_data[f"{end}_port_label"][edge_position],
-                )
-            )
-    return connected_port_keys
+    return {port_key for end_ports in edge_end_ports(edge_data) for port_key in end_ports}
 
 
 def _stored_port_count(port_counts: list, node_index: int, default_counts: dict, node_type: str):

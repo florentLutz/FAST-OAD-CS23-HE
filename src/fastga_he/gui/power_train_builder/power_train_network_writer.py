@@ -25,7 +25,12 @@ from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
-from .power_train_builder_state import copy_column_data
+from .power_train_builder_state import (
+    VARIABLE_PORT_DEFAULT,
+    copy_column_data,
+    default_options,
+    edge_end_ports,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,7 +131,8 @@ class PowerTrainYAMLWriter:
         options with per-type defaults, and writes the resulting dict into the
         YAML data structure.
 
-        For variable-port components (those whose default source count is 3),
+        For variable-port components (default source count
+        ``VARIABLE_PORT_DEFAULT``),
         the current port counts are written as ``number_of_*`` option keys so
         that FAST-OAD can reconstruct the correct topology.
 
@@ -161,17 +167,17 @@ class PowerTrainYAMLWriter:
         except (json.JSONDecodeError, TypeError):
             options_dict = {}
 
-        # Merge in per-component-type option defaults for any key not already
+        # Fill in the per-component-type default of any option not already
         # present in the saved JSON (covers options that were never touched in
         # the GUI and therefore never written to placed_nodes_source["options"])
-        component_option_defaults = self.possible_options.get(component_type, {})
-        for option_name, option_values in component_option_defaults.items():
-            if option_name not in options_dict and option_values:
-                options_dict[option_name] = option_values[0]
+        for option_name, default_value in default_options(
+            self.possible_options.get(component_type, {})
+        ).items():
+            options_dict.setdefault(option_name, default_value)
 
-        # Variable-port components (default count == 3) store their port counts
-        # as number_of_* options, which FAST-OAD reads to build the topology
-        if self.default_source_count.get(component_type, 0) == 3:
+        # Variable-port components store their port counts as number_of_*
+        # options, which FAST-OAD reads to build the topology
+        if self.default_source_count.get(component_type, 0) == VARIABLE_PORT_DEFAULT:
             options_dict.update(
                 _variable_port_options(
                     known_component.get("attributes") or [], source_port_count, target_port_count
@@ -198,48 +204,36 @@ class PowerTrainYAMLWriter:
         For components with more than one port on a given side the port
         index is appended to the name using the list syntax ``[name, N]``
         as expected by FAST-OAD_CS23-HE.
-
-        Emits a warning to the logger if any port is still unconnected so
-        the user is aware that the saved YAML may be incomplete.
         """
+        for starting_port, ending_port in edge_end_ports(self.edge_data):
+            # An edge starts at whichever port was clicked first: write it source -> target
+            source_port, target_port = (
+                (starting_port, ending_port)
+                if starting_port[0] == "source"
+                else (ending_port, starting_port)
+            )
+            self.data[KEY_PT_CONNECTIONS].append(
+                {
+                    "source": self._connection_endpoint(source_port, "n_sources"),
+                    "target": self._connection_endpoint(target_port, "n_targets"),
+                }
+            )
 
-        for connection_index in range(len(self.edge_data["starting_node_index"])):
-            starting_node_name = self.node_data["name"][
-                self.edge_data["starting_node_index"][connection_index]
-            ]
-            ending_node_name = self.node_data["name"][
-                self.edge_data["ending_node_index"][connection_index]
-            ]
+    def _connection_endpoint(self, port: tuple, port_count_column: str):
+        """
+        One end of a connection as FAST-OAD_CS23-HE expects it.
 
-            if self.edge_data["starting_port_kind"][connection_index] == "source":
-                source_name = starting_node_name
-                source_port_count = self.node_data["n_sources"][
-                    self.edge_data["starting_node_index"][connection_index]
-                ]
-                target_name = ending_node_name
-                target_port_count = self.node_data["n_targets"][
-                    self.edge_data["ending_node_index"][connection_index]
-                ]
-                if source_port_count > 1:
-                    source_name = f"[{source_name}, {int(self.edge_data['starting_port_label'][connection_index])}]"
-                if target_port_count > 1:
-                    target_name = f"[{target_name}, {int(self.edge_data['ending_port_label'][connection_index])}]"
-
-            else:
-                source_name = ending_node_name
-                source_port_count = self.node_data["n_sources"][
-                    self.edge_data["ending_node_index"][connection_index]
-                ]
-                target_name = starting_node_name
-                target_port_count = self.node_data["n_targets"][
-                    self.edge_data["starting_node_index"][connection_index]
-                ]
-                if source_port_count > 1:
-                    source_name = f"[{source_name}, {int(self.edge_data['ending_port_label'][connection_index])}]"
-                if target_port_count > 1:
-                    target_name = f"[{target_name}, {int(self.edge_data['starting_port_label'][connection_index])}]"
-
-            self.data[KEY_PT_CONNECTIONS].append({"source": source_name, "target": target_name})
+        :param port: ``(kind, node_index, label)`` key of the port.
+        :param port_count_column: ``"n_sources"`` or ``"n_targets"``, the port
+            count of the port's side.
+        :return: The component name, or ``"[name, N]"`` when the component has
+            several ports on that side.
+        """
+        _, node_index, port_label = port
+        component_name = self.node_data["name"][node_index]
+        if self.node_data[port_count_column][node_index] > 1:
+            return f"[{component_name}, {int(port_label)}]"
+        return component_name
 
     def set_watcher_file_path(self, watcher_path: str) -> None:
         """
@@ -345,22 +339,39 @@ def _variable_port_options(
     ``number_of_*`` options of a variable-port component, from its port counts.
 
     Each such component has exactly two ``number_of_`` attributes in
-    ``KNOWN_COMPONENTS``: one for the source side (keywords in
-    :data:`SOURCE_SIDE_KEYWORDS`, e.g. inputs, tanks) and one for the target
-    side (:data:`TARGET_SIDE_KEYWORDS`, e.g. outputs, engines, power_sources),
-    mirroring the convention in ``_build_port_count_defaults``.
+    ``KNOWN_COMPONENTS``, one per side (see :func:`port_side_of`).
 
     :param component_attributes: ``attributes`` of the component's ``KNOWN_COMPONENTS`` entry.
     :param source_port_count: Number of source ports on the canvas.
     :param target_port_count: Number of target ports on the canvas.
     :return: Dictionary mapping each ``number_of_*`` attribute to its port count.
     """
-    port_options = {}
-    for attribute_name in component_attributes:
-        if "number_of_" not in attribute_name:
-            continue
-        if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS):
-            port_options[attribute_name] = source_port_count
-        elif any(keyword in attribute_name for keyword in TARGET_SIDE_KEYWORDS):
-            port_options[attribute_name] = target_port_count
-    return port_options
+    port_counts = {"source": source_port_count, "target": target_port_count}
+    return {
+        attribute_name: port_counts[port_side_of(attribute_name)]
+        for attribute_name in component_attributes
+        if port_side_of(attribute_name) is not None
+    }
+
+
+def port_side_of(attribute_name: str) -> str | None:
+    """
+    Port side whose count a variable-port attribute holds.
+
+    The single rule shared by save (:func:`_variable_port_options`) and load
+    (``PowerTrainYAMLReader._port_counts``), so both always agree: a
+    ``number_of_*`` attribute with a keyword of :data:`SOURCE_SIDE_KEYWORDS`
+    (e.g. inputs, tanks) counts the source ports, one with a keyword of
+    :data:`TARGET_SIDE_KEYWORDS` (e.g. outputs, engines, power_sources) the
+    target ports.
+
+    :param attribute_name: An attribute name of a ``KNOWN_COMPONENTS`` entry.
+    :return: ``"source"``, ``"target"``, or ``None`` for any other attribute.
+    """
+    if "number_of_" not in attribute_name:
+        return None
+    if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS):
+        return "source"
+    if any(keyword in attribute_name for keyword in TARGET_SIDE_KEYWORDS):
+        return "target"
+    return None

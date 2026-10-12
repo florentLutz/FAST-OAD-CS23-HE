@@ -56,6 +56,20 @@ DIALOG_POSITION_STYLES = {
     "top": "50%",
     "transform": "translate(-50%, -50%)",
 }
+# Full look of those dialogs: a dark rounded panel above the canvas (and below
+# nothing: z-index 100 is the top layer of the page)
+DIALOG_STYLES = {
+    "background": "rgba(30,30,40,0.97)",
+    "border": "2px solid #444",
+    "border-radius": "16px",
+    "padding": "10px 40px 30px 40px",
+    **DIALOG_POSITION_STYLES,
+    "z-index": "100",
+    "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
+}
+
+# Status line under the toolbox when no component is armed and delete mode is off
+STATUS_IDLE_HTML = "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
 
 # Data units kept between the outermost components and the edge of the fitted
 # view. Also the minimum edge margin of generated layouts, so loading a design
@@ -86,6 +100,11 @@ _EMPTY = ""
 # Sentinel stored in placed_nodes_source["symmetry_node_index"] for a node
 # that has no symmetry peer selected
 _NO_SYMMETRY_PEER = -1
+
+# Default port count of a variable-port component (one with "number_of_*"
+# attributes) on each side. It also marks such a component: its port counts
+# are editable in the config panel and saved as number_of_* options
+VARIABLE_PORT_DEFAULT = 3
 
 # Save modes sent by the "final version?" overlay through browse_save_trigger
 # (value = "<mode>:<timestamp>"): a final file has no canvas_layout section
@@ -172,19 +191,75 @@ PORT_COLUMNS = (
     "connected",
 )
 
-# Columns of hover_source, the node subset shown in the hover tooltip
-HOVER_COLUMNS = ("x", "y", "name", "node_type")
-
 
 def empty_columns(column_names: tuple) -> dict:
     """
     Return ``ColumnDataSource.data`` with every column in *column_names* empty.
 
-    :param column_names: One of :data:`NODE_COLUMNS`, :data:`EDGE_COLUMNS`,
-        :data:`PORT_COLUMNS` or :data:`HOVER_COLUMNS`.
+    :param column_names: One of :data:`NODE_COLUMNS`, :data:`EDGE_COLUMNS` or
+        :data:`PORT_COLUMNS`.
     :return: Dictionary mapping each column name to a new empty list.
     """
     return {column_name: [] for column_name in column_names}
+
+
+def append_row(column_data: dict, column_names: tuple, row: dict) -> dict:
+    """
+    Return a copy of *column_data* with one more row at the end.
+
+    :param column_data: ``ColumnDataSource.data`` (or a copy of it).
+    :param column_names: Columns of the result, e.g. :data:`NODE_COLUMNS`.
+    :param row: One value per column in *column_names*.
+    :return: New column data; *column_data* itself is not changed.
+    """
+    return {
+        column_name: list(column_data.get(column_name, [])) + [row[column_name]]
+        for column_name in column_names
+    }
+
+
+def drop_row(column_data: dict, row_index: int) -> dict:
+    """
+    Return a copy of *column_data* without the row at *row_index*.
+
+    :param column_data: ``ColumnDataSource.data`` (or a copy of it).
+    :param row_index: Zero-based row to leave out.
+    :return: New column data; *column_data* itself is not changed.
+    """
+    return {
+        column_name: [value for position, value in enumerate(values) if position != row_index]
+        for column_name, values in column_data.items()
+    }
+
+
+# ============================================================================
+# Per-type defaults of a new component
+# ============================================================================
+
+
+def default_options(options_definition: dict) -> dict:
+    """
+    Default value of every option of a component type: the first possible value.
+
+    :param options_definition: ``possible_options[component_type]``, i.e.
+        ``{option_name: [possible values, …]}``.
+    :return: ``{option_name: first value}``; options without values are left out.
+    """
+    return {
+        option_name: option_values[0]
+        for option_name, option_values in options_definition.items()
+        if option_values
+    }
+
+
+def default_position(position_choices: list) -> str:
+    """
+    Default position of a component type: the first possible position, or ``""``.
+
+    :param position_choices: ``possible_position[component_type]``.
+    :return: The default position string.
+    """
+    return position_choices[0] if position_choices else _EMPTY
 
 
 # ============================================================================
@@ -204,6 +279,30 @@ def select_edges(edge_data: dict, kept_edge_indices: list) -> dict:
         column_name: [column_values[edge_position] for edge_position in kept_edge_indices]
         for column_name, column_values in edge_data.items()
     }
+
+
+def edge_end_ports(edge_data: dict) -> list[tuple[tuple, tuple]]:
+    """
+    The two ports of every edge, as ``(starting_port, ending_port)`` pairs.
+
+    Each port is a ``(kind, node_index, label)`` key, the same key the port
+    data sources are indexed by. An edge starts at whichever port was clicked
+    first, so the starting port can be a source or a target.
+
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :return: One pair per edge, in edge order.
+    """
+    return [
+        tuple(
+            (
+                edge_data[f"{end}_port_kind"][edge_position],
+                edge_data[f"{end}_node_index"][edge_position],
+                edge_data[f"{end}_port_label"][edge_position],
+            )
+            for end in ("starting", "ending")
+        )
+        for edge_position in range(len(edge_data.get("starting_node_index", [])))
+    ]
 
 
 def edge_indices_not_touching_node(edge_data: dict, node_index: int) -> list:
@@ -239,24 +338,50 @@ def edge_indices_not_touching_port(
     :param port_kind: ``"source"`` or ``"target"``.
     :return: List of edge positions, in order.
     """
-    port_key = (node_index, port_label, port_kind)
+    port_key = (port_kind, node_index, port_label)
     return [
         edge_position
-        for edge_position in range(len(edge_data.get("starting_node_index", [])))
-        if port_key
-        not in (
-            (
-                edge_data["starting_node_index"][edge_position],
-                edge_data["starting_port_label"][edge_position],
-                edge_data["starting_port_kind"][edge_position],
-            ),
-            (
-                edge_data["ending_node_index"][edge_position],
-                edge_data["ending_port_label"][edge_position],
-                edge_data["ending_port_kind"][edge_position],
-            ),
-        )
+        for edge_position, end_ports in enumerate(edge_end_ports(edge_data))
+        if port_key not in end_ports
     ]
+
+
+# ============================================================================
+# Symmetry link helpers
+# ============================================================================
+
+
+def link_symmetry(
+    symmetry_names: list, symmetry_indices: list, node_names: list, first: int, second: int
+) -> None:
+    """
+    Make nodes *first* and *second* each other's symmetry peer, in place.
+
+    :param symmetry_names: ``symmetry_name`` column, edited in place.
+    :param symmetry_indices: ``symmetry_node_index`` column, edited in place.
+    :param node_names: ``name`` column, giving the peer names to store.
+    :param first: Zero-based index of one node of the pair.
+    :param second: Zero-based index of the other node.
+    """
+    for node_position, peer_position in ((first, second), (second, first)):
+        symmetry_names[node_position] = node_names[peer_position]
+        symmetry_indices[node_position] = peer_position
+
+
+def unlink_symmetry(symmetry_names: list, symmetry_indices: list, node_positions) -> None:
+    """
+    Reset the symmetry entries at *node_positions*, in place.
+
+    Only the given nodes are reset; their peers keep pointing at them unless
+    they are listed too.
+
+    :param symmetry_names: ``symmetry_name`` column, edited in place.
+    :param symmetry_indices: ``symmetry_node_index`` column, edited in place.
+    :param node_positions: Positions of the nodes to unlink.
+    """
+    for node_position in node_positions:
+        symmetry_names[node_position] = _EMPTY
+        symmetry_indices[node_position] = _NO_SYMMETRY_PEER
 
 
 # ============================================================================
@@ -329,13 +454,9 @@ class BuilderState:
 
     # Canvas node data
     # One row per placed component: position, icon URL, type, options JSON,
-    # port counts, and symmetry link. The primary data source driving the
-    # canvas's image_url glyph
+    # port counts, and symmetry link. Drives every per-node glyph of the
+    # canvas: the icons, the hover ring and its tooltip, and the name labels
     placed_nodes_source: bkmodel.ColumnDataSource = field(default=None)
-    # Invisible glyph source used only to drive Bokeh HoverTool tooltips
-    # (name / node_type) over each placed node; kept in lockstep with
-    # placed_nodes_source but is not itself rendered
-    hover_source: bkmodel.ColumnDataSource = field(default=None)
     # Semi-transparent highlight glyph drawn under the currently selected node
     selected_node_overlay_source: bkmodel.ColumnDataSource = field(default=None)
     # Row index into placed_nodes_source of the node currently open in the
@@ -350,8 +471,8 @@ class BuilderState:
     source_port_source: bkmodel.ColumnDataSource = field(default=None)
     target_port_source: bkmodel.ColumnDataSource = field(default=None)
     # Spinners for editable port counts; only shown for components whose
-    # default source/target count is 3 (the "variable port count" rule in
-    # power_train_builder_metadata._build_port_count_defaults)
+    # default source/target count is VARIABLE_PORT_DEFAULT (the "variable
+    # port count" rule in power_train_builder_metadata._build_port_count_defaults)
     source_count_spinner: bkmodel.Spinner = field(default=None)
     target_count_spinner: bkmodel.Spinner = field(default=None)
     # Column section wrapping the two spinners above; visible only when the
@@ -372,8 +493,8 @@ class BuilderState:
     edge_source: bkmodel.ColumnDataSource = field(default=None)
     # Snapshot of edge_source.data taken by the FIRST port-count-spinner
     # preview tick of an edit session (see
-    # PortEdgeMixin._rebuild_all_ports's override_counts parameter). The
-    # next *real* (non-preview) rebuild restores this and clears it, so an
+    # PortEdgeMixin._sync_edge_preview_backup). The next *real* (non-preview)
+    # rebuild, or real edit, restores this and clears it, so an
     # edge hidden while previewing a reduced port count comes back exactly
     # as it was if the user never clicks Apply. None when no preview is
     # currently in progress
@@ -394,18 +515,15 @@ class BuilderState:
     # header + options_rows_column); options_rows_column is the dynamic
     # Column whose children (one TextInput label + Select value per option)
     # are rebuilt by ConfigPanelMixin._refresh_options_table() every time the
-    # selected node's type changes; options_source is the backing CDS kept in
-    # sync with those widgets so their current values can be read back in bulk
+    # selected node's type changes. Apply reads the values straight from
+    # those Select widgets
     options_table: object = field(default=None)
     options_rows_column: object = field(default=None)
-    options_source: bkmodel.ColumnDataSource = field(default=None)
 
-    # Connections sub-section: connections_table_widget is the static
-    # wrapper column; connections_rows_column is the dynamic Column of
-    # per-connection rows rebuilt by
+    # Connections sub-section: the dynamic Column of per-port rows rebuilt by
     # ConfigPanelMixin._refresh_connections_table() for the selected node.
     # There is no backing CDS here — rows are read directly from edge_source
-    connections_table_widget: bkmodel.ColumnDataSource = field(default=None)
+    # and panel_pending_connections
     connections_rows_column: object = field(default=None)
 
     # Dashed preview edges drawn while a connection is queued in the config

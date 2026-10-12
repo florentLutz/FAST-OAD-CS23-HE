@@ -44,7 +44,7 @@ import networkx as nx
 import numpy as np
 from ruamel.yaml import YAML
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR, _url_to_base64
+from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 from ..layout_generation import HierarchicalLayout
@@ -54,17 +54,21 @@ from .power_train_builder_state import (
     CANVAS_WORLD_Y_RANGE,
     EDGE_COLUMNS,
     NODE_COLUMNS,
+    VARIABLE_PORT_DEFAULT,
     _EMPTY,
     _NO_SYMMETRY_PEER,
+    default_options,
+    default_position,
     empty_columns,
+    link_symmetry,
 )
+from .power_train_builder_metadata import component_type_classes, icon_data_url
 from .power_train_network_writer import (
     KEY_CANVAS_LAYOUT,
     KEY_PT_COMPONENTS,
     KEY_PT_CONNECTIONS,
     KEY_PT_WATCHER,
-    SOURCE_SIDE_KEYWORDS,
-    TARGET_SIDE_KEYWORDS,
+    port_side_of,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -117,10 +121,8 @@ def _matching_component_types(references: tuple) -> set:
     """
     matching_types = set()
     for known_component in KNOWN_COMPONENTS:
-        type_class = known_component.get("components_type_class")
-        type_classes = type_class if isinstance(type_class, list) else [type_class]
         if known_component["components_type"] in references or any(
-            reference in type_classes for reference in references
+            reference in component_type_classes(known_component) for reference in references
         ):
             matching_types.add(known_component["components_type"])
     return matching_types
@@ -159,7 +161,6 @@ class PowerTrainYAMLReader:
         self.icon_size = icon_size
         # Canvas area of the user's window (None until the browser reports it)
         self.canvas_area = getattr(state, "canvas_area", None) or _DEFAULT_CANVAS_AREA
-        self._icon_url_cache: dict = {}
 
     # -----------------------------------------------------------------------
     # Public API
@@ -247,14 +248,12 @@ class PowerTrainYAMLReader:
                 nodes_without_layout.append(node_index)
                 x, y = 0.0, 0.0  # replaced by _place_nodes_without_layout
 
-            type_class = known_component.get("components_type_class")
-            type_classes = type_class if isinstance(type_class, list) else [type_class]
-            if "propulsor" in type_classes:
+            if "propulsor" in component_type_classes(known_component):
                 propulsor_names.add(name)
 
             nodes_data["x"].append(x)
             nodes_data["y"].append(y)
-            nodes_data["url"].append(self._icon_url(icon_key))
+            nodes_data["url"].append(icon_data_url(ICONS_CONFIG[icon_key]["icon_path"]))
             nodes_data["w"].append(self.icon_size)
             nodes_data["h"].append(self.icon_size)
             nodes_data["name"].append(name)
@@ -281,10 +280,13 @@ class PowerTrainYAMLReader:
                     nodes_data["name"][node_index],
                 )
                 continue
-            nodes_data["symmetry_name"][node_index] = peer_name
-            nodes_data["symmetry_node_index"][node_index] = peer_index
-            nodes_data["symmetry_name"][peer_index] = nodes_data["name"][node_index]
-            nodes_data["symmetry_node_index"][peer_index] = node_index
+            link_symmetry(
+                nodes_data["symmetry_name"],
+                nodes_data["symmetry_node_index"],
+                nodes_data["name"],
+                node_index,
+                peer_index,
+            )
 
         return nodes_data, name_to_index, nodes_without_layout, propulsor_names
 
@@ -359,8 +361,7 @@ class PowerTrainYAMLReader:
         """
         if file_position:
             return str(file_position)
-        choices = self.possible_position.get(component_type, [])
-        return choices[0] if choices else _EMPTY
+        return default_position(self.possible_position.get(component_type, []))
 
     def _options_json(self, component_type: str, file_options: dict) -> str:
         """
@@ -376,7 +377,7 @@ class PowerTrainYAMLReader:
         :return: JSON string of the option names and their values.
         """
         definition = self.possible_options.get(component_type, {})
-        options = {name: values[0] for name, values in definition.items() if values}
+        options = default_options(definition)
         options.update({name: value for name, value in file_options.items() if name in definition})
         return json.dumps(options)
 
@@ -396,7 +397,7 @@ class PowerTrainYAMLReader:
         n_sources = int(self.default_source_count.get(component_type, 0))
         n_targets = int(self.default_target_count.get(component_type, 0))
 
-        if n_sources != 3:  # same "variable-port" test as the writer
+        if n_sources != VARIABLE_PORT_DEFAULT:  # same "variable-port" test as the writer
             return n_sources, n_targets
 
         attributes = known_component.get("attributes")
@@ -410,25 +411,13 @@ class PowerTrainYAMLReader:
                 count = int(file_options[attribute_name])
             except (TypeError, ValueError):
                 continue
-            if any(keyword in attribute_name for keyword in SOURCE_SIDE_KEYWORDS):
+            port_side = port_side_of(attribute_name)
+            if port_side == "source":
                 n_sources = count
-            elif any(keyword in attribute_name for keyword in TARGET_SIDE_KEYWORDS):
+            elif port_side == "target":
                 n_targets = count
 
         return n_sources, n_targets
-
-    def _icon_url(self, icon_key: str) -> str:
-        """
-        Base64 data-URL of an icon (same encoding as ``_place_new_node``), cached.
-
-        :param icon_key: Key of the icon in ``ICONS_CONFIG``.
-        :return: Base64 data URI of the icon image.
-        """
-        if icon_key not in self._icon_url_cache:
-            icon_path = ICONS_CONFIG[icon_key]["icon_path"]
-            file_url = "file://" + str(Path(icon_path).resolve())
-            self._icon_url_cache[icon_key] = _url_to_base64(file_url)
-        return self._icon_url_cache[icon_key]
 
     # -----------------------------------------------------------------------
     # Edges

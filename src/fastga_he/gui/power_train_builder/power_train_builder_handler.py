@@ -39,11 +39,11 @@ import logging
 from .power_train_builder_state import (
     BuilderState,
     DEFAULT_NODE_ICON_SIZE,
-    _EMPTY,
-    _NO_SYMMETRY_PEER,
     copy_column_data,
+    drop_row,
     edge_indices_not_touching_node,
     select_edges,
+    unlink_symmetry,
 )
 from .power_train_builder_history import EditHistoryStack
 from .power_train_builder_handler_canvas_mode import CanvasModeMixin
@@ -250,18 +250,10 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         # Push the state into the history stack before deleting the node
         self._push_undo()
 
-        # Remove the node from the placed_nodes_source and hover_source (if it exists)
-        new_nodes_data = copy_column_data(nodes_data)
-        for column_name in new_nodes_data:
-            new_nodes_data[column_name].pop(node_index)
+        # Remove the node from placed_nodes_source
+        new_nodes_data = drop_row(nodes_data, node_index)
         _reindex_symmetry_after_deletion(new_nodes_data, node_index)
         self.state.placed_nodes_source.data = new_nodes_data
-
-        hover_data = copy_column_data(self.state.hover_source.data)
-        for column_name in hover_data:
-            if node_index < len(hover_data[column_name]):
-                hover_data[column_name].pop(node_index)
-        self.state.hover_source.data = hover_data
 
         # Remove any edges connected to the deleted node and adjust indices of remaining edges
         edge_data = copy_column_data(self.state.edge_source.data)
@@ -302,10 +294,7 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self._push_undo()
 
         # Remove the edge from the edge_source data
-        edge_data = copy_column_data(self.state.edge_source.data)
-        for column_name in edge_data:
-            edge_data[column_name].pop(edge_index)
-        self.state.edge_source.data = edge_data
+        self.state.edge_source.data = drop_row(self.state.edge_source.data, edge_index)
         # Recompute the ports so the freed ports are no longer flagged connected
         self._rebuild_all_ports()
         self._mark_unsaved()
@@ -351,7 +340,6 @@ def _reindex_symmetry_after_deletion(nodes_data: dict, deleted_node_index: int) 
     symmetry_indices = nodes_data.get("symmetry_node_index", [])
     for node_position, peer_index in enumerate(symmetry_indices):
         if peer_index == deleted_node_index:
-            symmetry_names[node_position] = _EMPTY
-            symmetry_indices[node_position] = _NO_SYMMETRY_PEER
+            unlink_symmetry(symmetry_names, symmetry_indices, [node_position])
         elif peer_index > deleted_node_index:
             symmetry_indices[node_position] = peer_index - 1

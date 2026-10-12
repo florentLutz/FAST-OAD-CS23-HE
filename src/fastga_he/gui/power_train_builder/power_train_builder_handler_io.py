@@ -173,14 +173,10 @@ class IOMixin:
             keys ``"components"`` (every node column), ``"connections"`` (edge
             columns) and ``"watcher_file_path"``.
         """
-        # Since the toolbox buttons are still active while loading, reset is required
-        self.state.selected_node_index = None
-        self.state.selected_component = None
-        self.state.delete_mode = False
-        self.state.panel_pending_connections.clear()
+        # Selection, pending clicks / picks, armed component and delete mode all
+        # refer to the canvas being replaced
+        self._reset_interaction_state()
         self.state.placed_counter.clear()
-        self._clear_node_table()
-        self._clear_temp_edges()
 
         # Defaulting to empty dicts if keys are missing
         nodes_data = canvas_state.get("components", {})
@@ -189,13 +185,6 @@ class IOMixin:
         # Fill the data sources with the loaded data
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
         self.state.edge_source.data = copy_column_data(edges_data)
-
-        self.state.hover_source.data = {
-            "x": list(nodes_data.get("x", [])),
-            "y": list(nodes_data.get("y", [])),
-            "name": list(nodes_data.get("name", [])),
-            "node_type": list(nodes_data.get("node_type", [])),
-        }
 
         # Show the YAML's watcher_file_path (if any) so a re-save keeps it
         self._set_watcher_path(str(canvas_state.get("watcher_file_path") or ""))
@@ -233,9 +222,7 @@ class IOMixin:
         ``_JS_FIT_VIEW``) by changing ``fit_view_trigger``. No-op without it.
         """
         if self.state.fit_view_trigger is not None:
-            self.state.fit_view_trigger.value = (
-                "0" if self.state.fit_view_trigger.value == "1" else "1"
-            )
+            _flip_trigger(self.state.fit_view_trigger)
 
     def _on_browse_load(self, attr, old, new):
         """
@@ -343,9 +330,13 @@ class IOMixin:
         or ``edge_source`` so that the snapshot reflects the state the user
         wants to return to. The port sources are derived from these two and
         are rebuilt on restore, so they are not captured.
+
+        A port-count preview still in progress is ended first, so the edit and
+        its snapshot start from the true edges, not the ones the preview hid.
         """
         if self.state.edit_history_stack is None:
             return
+        self._end_edge_preview()
         snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_undo(snapshot)
         self._refresh_undo_redo_buttons()
@@ -361,25 +352,15 @@ class IOMixin:
 
         :param snapshot: Dict produced by :func:`~.power_train_builder_history.make_snapshot`.
         """
-        self.state.selected_node_index = None
-        self.state.selected_component = None
-        self._exit_delete_mode()
-        self.state.panel_pending_connections.clear()
-        self._clear_node_table()
-        self._clear_temp_edges()
+        # Selection, pending clicks / picks, armed component and delete mode all
+        # refer to the canvas being replaced (a node index may now be another node)
+        self._reset_interaction_state()
 
         nodes_data = snapshot.get("nodes", {})
         edges_data = snapshot.get("edges", {})
 
         self.state.placed_nodes_source.data = copy_column_data(nodes_data)
         self.state.edge_source.data = copy_column_data(edges_data)
-
-        self.state.hover_source.data = {
-            "x": list(nodes_data.get("x", [])),
-            "y": list(nodes_data.get("y", [])),
-            "name": list(nodes_data.get("name", [])),
-            "node_type": list(nodes_data.get("node_type", [])),
-        }
 
         self.state.placed_counter.clear()
         self.state.placed_counter.update(snapshot.get("placed_counter", {}))
@@ -406,7 +387,9 @@ class IOMixin:
         if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_undo:
             return
 
-        # Save the current state for redo before wiping it
+        # Save the current state for redo before wiping it (with the true
+        # edges, not the ones a port-count preview may be hiding)
+        self._end_edge_preview()
         current_snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_redo(current_snapshot)
 
@@ -414,7 +397,6 @@ class IOMixin:
         if snapshot is None:
             return
 
-        self._exit_delete_mode()
         self._restore_from_snapshot(snapshot)
         self._mark_unsaved()
         _LOGGER.info(
@@ -434,6 +416,8 @@ class IOMixin:
             return
 
         # Save the current state for undo, keeping the remaining redo steps
+        # (with the true edges, as for undo)
+        self._end_edge_preview()
         current_snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_undo_keep_redo(current_snapshot)
 
@@ -441,7 +425,6 @@ class IOMixin:
         if snapshot is None:
             return
 
-        self._exit_delete_mode()
         self._restore_from_snapshot(snapshot)
         self._mark_unsaved()
         _LOGGER.info(
@@ -574,12 +557,22 @@ class IOMixin:
             # js_on_change).  _end_session() calls IOLoop.stop(), after which no
             # further document updates can be delivered to the client
             if self.state.close_window_trigger is not None:
-                self.state.close_window_trigger.value = (
-                    "0" if self.state.close_window_trigger.value == "1" else "1"
-                )
+                _flip_trigger(self.state.close_window_trigger)
             # Defer the actual IOLoop stop by one tick so Bokeh has time to flush
             # the trigger update to the WebSocket before the server shuts down
             IOLoop.current().call_later(0.3, self._end_session)
+
+
+def _flip_trigger(trigger) -> None:
+    """
+    Flip a hidden trigger TextInput between ``"0"`` and ``"1"``.
+
+    Python-side twin of the toolbox's ``_js_flip``: every flip is a value
+    change, so the trigger's ``js_on_change`` callback always runs.
+
+    :param trigger: The trigger ``TextInput``.
+    """
+    trigger.value = "0" if trigger.value == "1" else "1"
 
 
 def _set_text_input(text_input, text: str) -> None:

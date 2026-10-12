@@ -28,7 +28,6 @@ from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
     ICONS_CONFIG,
     _string_cleanup,
-    _url_to_base64,
 )
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
@@ -38,16 +37,16 @@ from .power_train_builder_state import (
     ROW_HEIGHT,
     BUTTON_DEFAULT_COLOR_TYPE,
     DEFAULT_NODE_ICON_SIZE,
-    DIALOG_POSITION_STYLES,
+    DIALOG_STYLES,
     NODE_ICON_SIZE_MAX,
     NODE_ICON_SIZE_MIN,
     EDGE_COLUMNS,
-    HOVER_COLUMNS,
     NODE_COLUMNS,
     PORT_COLUMNS,
     SAVE_MODE_CANCEL,
     SAVE_MODE_EDITABLE,
     SAVE_MODE_FINAL,
+    STATUS_IDLE_HTML,
     _EMPTY,
     empty_columns,
 )
@@ -55,21 +54,34 @@ from .power_train_builder_metadata import (
     _build_port_count_defaults,
     _map_possible_component_types_to_icons,
     _get_performance_component_names,
+    component_type_classes,
+    icon_data_url,
 )
 
 COMPONENTS_PATH = Path(__file__).resolve().parents[2] / "models" / "propulsion" / "components"
 
+
+def _js_flip(trigger_name: str) -> str:
+    """
+    JS statement flipping a hidden trigger TextInput between ``'0'`` and ``'1'``.
+
+    Every flip is a value change, so the Python ``on_change`` callback of the
+    trigger fires on every click (see the "Hidden TextInput relay widgets"
+    comment in :meth:`ComponentToolboxConfigurationTableBuilder.build`).
+
+    :param trigger_name: Name the trigger has in the ``CustomJS`` args.
+    :return: One line of JS.
+    """
+    return f"{trigger_name}.value = {trigger_name}.value === '1' ? '0' : '1';"
+
+
 # Load dialog
 # Toggles browse_load_trigger to signal Python to open a tkinter open-file dialog
-_JS_LOAD_DIALOG = """
-browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';
-"""
+_JS_LOAD_DIALOG = _js_flip("browse_load_trigger")
 
 # Watcher CSV dialog
 # Toggles browse_watcher_trigger to signal Python to open a tkinter save-file dialog
-_JS_WATCHER_DIALOG = """
-browse_watcher_trigger.value = browse_watcher_trigger.value === '1' ? '0' : '1';
-"""
+_JS_WATCHER_DIALOG = _js_flip("browse_watcher_trigger")
 
 # "Final version?" overlay buttons: hide it and send the mode to Python
 #    (__MODE__ is replaced by final / editable / cancel). The timestamp makes
@@ -100,14 +112,71 @@ _STARTUP_BUTTON_CSS = [
 
 # End Session click: show unsaved-exit overlay if save_button is yellow,
 #    otherwise flip end_session_trigger so Python stops the server cleanly. ──
-_JS_END_SESSION_CLICK = """
-if (save_button_widget.button_type === 'warning') {
+_JS_END_SESSION_CLICK = f"""
+if (save_button_widget.button_type === 'warning') {{
     unsaved_exit_overlay_widget.visible = true;
-} else {
-    end_session_trigger.value = end_session_trigger.value === '1' ? '0' : '1';
+}} else {{
+    {_js_flip("end_session_trigger")}
     window.close();
-}
+}}
 """
+
+
+def _group_icons_by_tab(known_components: list) -> dict:
+    """
+    Toolbox tab of every component icon, from the components' type classes.
+
+    Each type class is a tab, in the order the classes are first met. A
+    component that is only a ``"propulsive_load"`` goes to the ``"load"`` tab;
+    in a list of classes, ``"propulsive_load"`` adds no tab of its own. An icon
+    is listed once per tab even if several components share it.
+
+    :param known_components: Entries of ``KNOWN_COMPONENTS``.
+    :return: ``{tab_name: [icon_key, …]}``.
+    """
+    icons_by_tab: dict = {}
+    for component in known_components:
+        icon_key = component["icon_for_network_graph"]
+        if component["components_type_class"] == "propulsive_load":
+            tab_names = ["load"]
+        else:
+            tab_names = [
+                type_class
+                for type_class in component_type_classes(component)
+                if type_class != "propulsive_load"
+            ]
+        for tab_name in tab_names:
+            tab_icon_keys = icons_by_tab.setdefault(tab_name, [])
+            if icon_key not in tab_icon_keys:
+                tab_icon_keys.append(icon_key)
+    return icons_by_tab
+
+
+def _build_toolbox_tabs(icons_by_tab: dict, button_by_icon_key: dict):
+    """
+    One toolbox tab per group of :func:`_group_icons_by_tab`, holding its buttons.
+
+    Icons without a button (not in ``ICONS_CONFIG``) are left out, and a tab
+    left empty is not shown.
+
+    :param icons_by_tab: ``{tab_name: [icon_key, …]}``.
+    :param button_by_icon_key: Toolbox button of every icon key.
+    :return: The Bokeh ``Tabs`` widget.
+    """
+    tab_panels = []
+    for tab_name, icon_keys in icons_by_tab.items():
+        tab_buttons = [
+            button_by_icon_key[icon_key] for icon_key in icon_keys if icon_key in button_by_icon_key
+        ]
+        if not tab_buttons:
+            continue
+        tab_column = column(
+            *tab_buttons,
+            spacing=2,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
+        )
+        tab_panels.append(bkmodel.TabPanel(child=tab_column, title=tab_name.capitalize()))
+    return bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
 
 
 class ComponentToolboxConfigurationTableBuilder:
@@ -135,26 +204,7 @@ class ComponentToolboxConfigurationTableBuilder:
         """
         # Categorise icons into tab groups
         component_icon_keys = list(ICONS_CONFIG.keys())
-        category_to_icon_keys: dict = {}
-        for component in KNOWN_COMPONENTS:
-            icon_key = component["icon_for_network_graph"]
-            component_type_class = component["components_type_class"]
-            if isinstance(component_type_class, list):
-                for type_class in component_type_class:
-                    if type_class == "propulsive_load":
-                        continue
-                    elif type_class not in category_to_icon_keys:
-                        category_to_icon_keys[type_class] = [icon_key]
-                    elif icon_key not in category_to_icon_keys[type_class]:
-                        category_to_icon_keys[type_class].append(icon_key)
-            elif component_type_class == "propulsive_load":
-                category_to_icon_keys.setdefault("load", [])
-                if icon_key not in category_to_icon_keys["load"]:
-                    category_to_icon_keys["load"].append(icon_key)
-            elif component_type_class not in category_to_icon_keys:
-                category_to_icon_keys[component_type_class] = [icon_key]
-            elif icon_key not in category_to_icon_keys[component_type_class]:
-                category_to_icon_keys[component_type_class].append(icon_key)
+        category_to_icon_keys = _group_icons_by_tab(KNOWN_COMPONENTS)
 
         # Shared stylesheet for action buttons (Delete, Save, End Session)
         _action_stylesheet = [":host button { font-size: 1.4em; }"]
@@ -210,9 +260,7 @@ class ComponentToolboxConfigurationTableBuilder:
         button_by_icon_key: dict = {}
         for icon_key in component_icon_keys:
             label = _string_cleanup(icon_key)
-            icon_path = ICONS_CONFIG[icon_key]["icon_path"]
-            file_url = "file://" + str(Path(icon_path).resolve())
-            base64_url = _url_to_base64(file_url)
+            base64_url = icon_data_url(ICONS_CONFIG[icon_key]["icon_path"])
             icon_svg = (
                 f'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"'
                 f' viewBox="0 0 120 120">'
@@ -230,7 +278,7 @@ class ComponentToolboxConfigurationTableBuilder:
             button_by_icon_key[icon_key] = button
 
         status_div = bkmodel.Div(
-            text="<i style='color:#aaa;font-size:14pt'>Select a component</i>",
+            text=STATUS_IDLE_HTML,
             width=PALETTE_WIDTH,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "14px"},
         )
@@ -406,15 +454,7 @@ class ComponentToolboxConfigurationTableBuilder:
             bkmodel.Spacer(height=14),
             row(_cancel_version_btn, styles={"justify-content": "center"}),
             visible=False,
-            styles={
-                "background": "rgba(30,30,40,0.97)",
-                "border": "2px solid #444",
-                "border-radius": "16px",
-                "padding": "10px 40px 30px 40px",
-                **DIALOG_POSITION_STYLES,
-                "z-index": "100",
-                "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
-            },
+            styles=dict(DIALOG_STYLES),
         )
         for mode_button, save_mode, mode_click_code in (
             (_final_version_btn, SAVE_MODE_FINAL, _JS_SAVE_MODE_CLICK),
@@ -491,15 +531,7 @@ class ComponentToolboxConfigurationTableBuilder:
             ),
             end_session_save_trigger,
             visible=False,
-            styles={
-                "background": "rgba(30,30,40,0.97)",
-                "border": "2px solid #444",
-                "border-radius": "16px",
-                "padding": "10px 40px 30px 40px",
-                **DIALOG_POSITION_STYLES,
-                "z-index": "100",
-                "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
-            },
+            styles=dict(DIALOG_STYLES),
         )
 
         # Cancel: just hide the overlay
@@ -520,7 +552,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 ),
                 code=(
                     "unsaved_exit_overlay_widget.visible = false; "
-                    "end_session_trigger.value = end_session_trigger.value === '1' ? '0' : '1'; "
+                    f"{_js_flip('end_session_trigger')} "
                     "window.close();"
                 ),
             )
@@ -538,8 +570,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 code=(
                     "unsaved_exit_overlay_widget.visible = false; "
                     "save_version_overlay_widget.visible = true; "
-                    "end_session_save_trigger.value = "
-                    "    end_session_save_trigger.value === '1' ? '0' : '1';"
+                    f"{_js_flip('end_session_save_trigger')}"
                 ),
             )
         )
@@ -577,11 +608,9 @@ class ComponentToolboxConfigurationTableBuilder:
 
         # Canvas data sources
         placed_nodes_source = bkmodel.ColumnDataSource(data=empty_columns(NODE_COLUMNS))
-        hover_source = bkmodel.ColumnDataSource(data=empty_columns(HOVER_COLUMNS))
         source_port_source = bkmodel.ColumnDataSource(data=empty_columns(PORT_COLUMNS))
         target_port_source = bkmodel.ColumnDataSource(data=empty_columns(PORT_COLUMNS))
         selected_node_overlay_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[]))
-        options_table_source = bkmodel.ColumnDataSource(data=dict(options=[], value=[]))
         edge_source = bkmodel.ColumnDataSource(data=empty_columns(EDGE_COLUMNS))
         awaiting_second_port_click_source = bkmodel.ColumnDataSource(
             data=dict(x=[], y=[], color=[])
@@ -733,7 +762,6 @@ class ComponentToolboxConfigurationTableBuilder:
             delete_button=delete_button,
             save_button=save_button,
             end_session_button=end_session_button,
-            hover_source=hover_source,
             source_port_source=source_port_source,
             target_port_source=target_port_source,
             source_count_spinner=source_count_spinner,
@@ -741,7 +769,6 @@ class ComponentToolboxConfigurationTableBuilder:
             port_count_section=port_count_section,
             options_table=options_table,
             options_rows_column=options_rows_column,
-            options_source=options_table_source,
             name_input=name_input,
             type_select=type_select,
             position_select=position_select,
@@ -750,7 +777,6 @@ class ComponentToolboxConfigurationTableBuilder:
             selected_node_overlay_source=selected_node_overlay_source,
             edge_source=edge_source,
             awaiting_second_port_click_source=awaiting_second_port_click_source,
-            connections_table_widget=connections_table_widget,
             connections_rows_column=connections_rows_column,
             panel_preview_edge_source=panel_preview_edge_source,
             panel_pending_connections=[],
@@ -776,23 +802,7 @@ class ComponentToolboxConfigurationTableBuilder:
         )
 
         # Build tabbed toolbox sidebar
-        tab_panels = []
-        for category, keys_in_category in category_to_icon_keys.items():
-            category_buttons = [
-                button_by_icon_key[icon_key]
-                for icon_key in keys_in_category
-                if icon_key in button_by_icon_key
-            ]
-            if not category_buttons:
-                continue
-            tab_column = column(
-                *category_buttons,
-                spacing=2,
-                styles={"background": BACKGROUND_COLOR_CODE, "padding": "10px"},
-            )
-            tab_panels.append(bkmodel.TabPanel(child=tab_column, title=category.capitalize()))
-
-        tabs = bkmodel.Tabs(tabs=tab_panels, width=PALETTE_WIDTH)
+        tabs = _build_toolbox_tabs(category_to_icon_keys, button_by_icon_key)
 
         toolbox_layout = column(
             toolbox_header,

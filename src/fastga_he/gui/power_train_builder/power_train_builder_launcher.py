@@ -32,7 +32,6 @@ from fastga_he.gui.power_train_network_viewer import (
     ELECTRICITY_CURRENT_COLOR_CODE,
     FUEL_FLOW_COLOR_CODE,
     MECHANICAL_POWER_COLOR_CODE,
-    _url_to_base64,
 )
 
 from .power_train_builder_state import (
@@ -43,7 +42,7 @@ from .power_train_builder_state import (
     CANVAS_WORLD_Y_RANGE,
     CONFIG_PANEL_RESERVED_WIDTH,
     DEFAULT_NODE_ICON_SIZE,
-    DIALOG_POSITION_STYLES,
+    DIALOG_STYLES,
     HOVER_RING_BASE_SIZE,
     NODE_LABEL_BASE_OFFSET,
     NODE_SELECT_COLOR,
@@ -51,6 +50,7 @@ from .power_train_builder_state import (
     PALETTE_WIDTH,
     PORT_RADIUS,
 )
+from .power_train_builder_metadata import icon_data_url
 from .power_train_builder_toolbox import ComponentToolboxConfigurationTableBuilder
 from .power_train_builder_handler import BuilderHandler
 
@@ -110,7 +110,7 @@ def _add_canvas_legend(canvas) -> None:
     :meth:`LegendBuilder._add_legend`.
 
     Each row contains a small colour PNG icon (fuel, mechanical, or
-    electricity) on the left — loaded via :func:`_url_to_base64` — and a
+    electricity) on the left — loaded via :func:`icon_data_url` — and a
     text label drawn in the edge colour of that connection type on the right.
 
     The legend is pinned to the screen: resizing the window, panning,
@@ -120,10 +120,7 @@ def _add_canvas_legend(canvas) -> None:
     :param canvas: The Bokeh ``Figure`` to annotate.
     """
     num_entries = len(_LEGEND_ENTRIES)
-    icon_urls = [
-        _url_to_base64("file://" + str(COLOR_ICON_CONFIG[icon_key].resolve()))
-        for icon_key, _, _ in _LEGEND_ENTRIES
-    ]
+    icon_urls = [icon_data_url(COLOR_ICON_CONFIG[icon_key]) for icon_key, _, _ in _LEGEND_ENTRIES]
     # Initial positions assume the original 800 x 950 canvas (about 1 data
     # unit per pixel); _JS_PIN_LEGEND corrects them as soon as the page lays out
     x_end, y_end = CANVAS_WORLD_X_RANGE[1], CANVAS_WORLD_Y_RANGE[1]
@@ -453,12 +450,13 @@ class PowertrainBuilderLauncher:
                 line_dash="dashed",
             )
 
-            # Hover glyphs
+            # Hover ring around each icon; its tooltip reads name / node_type
+            # straight from the node data
             scatter_glyph = canvas.scatter(
                 x="x",
                 y="y",
                 size=HOVER_RING_BASE_SIZE,
-                source=state.hover_source,
+                source=state.placed_nodes_source,
                 fill_alpha=0,
                 line_alpha=0,
                 hover_fill_alpha=0.1,
@@ -563,13 +561,12 @@ class PowertrainBuilderLauncher:
                 ),
             )
 
-            # Node-name labels
-            placed_label_source = bkmodel.ColumnDataSource(data=dict(x=[], y=[], text=[]))
+            # Node-name labels, read straight from the node data
             state.node_label_set = bkmodel.LabelSet(
                 x="x",
                 y="y",
-                text="text",
-                source=placed_label_source,
+                text="name",
+                source=state.placed_nodes_source,
                 text_color="white",
                 text_font_size="8pt",
                 text_align="center",
@@ -577,16 +574,6 @@ class PowertrainBuilderLauncher:
                 y_offset=NODE_LABEL_BASE_OFFSET,
             )
             canvas.add_layout(state.node_label_set)
-
-            def _sync_labels(attr, old, new_data):
-                """Keep the canvas name labels on the placed nodes' positions and names."""
-                placed_label_source.data = dict(
-                    x=list(new_data.get("x", [])),
-                    y=list(new_data.get("y", [])),
-                    text=list(new_data.get("name", [])),
-                )
-
-            state.placed_nodes_source.on_change("data", _sync_labels)
 
             # Hover ring, resized together with the icons by the icon-size slider
             state.hover_ring_renderer = scatter_glyph
@@ -621,15 +608,7 @@ class PowertrainBuilderLauncher:
                     state.load_design_button,
                     styles={"justify-content": "center"},
                 ),
-                styles={
-                    "background": "rgba(30,30,40,0.97)",
-                    "border": "2px solid #444",
-                    "border-radius": "16px",
-                    "padding": "10px 40px 30px 40px",
-                    **DIALOG_POSITION_STYLES,
-                    "z-index": "100",
-                    "box-shadow": "0 8px 32px rgba(0,0,0,0.6)",
-                },
+                styles=dict(DIALOG_STYLES),
             )
 
             # Undo / Redo toolbar row (above the canvas)

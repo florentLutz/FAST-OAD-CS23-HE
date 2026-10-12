@@ -21,8 +21,8 @@ from .power_train_builder_state import (
     BUTTON_DEFAULT_COLOR_TYPE,
     BUTTON_SELECTED_COLOR_TYPE,
     EDGE_COLUMNS,
-    HOVER_COLUMNS,
     NODE_COLUMNS,
+    STATUS_IDLE_HTML,
     empty_columns,
     BuilderState,
 )
@@ -69,19 +69,14 @@ class CanvasModeMixin:
         history is also cleared so a new session starts with a clean stack.
         """
         self._dismiss_startup_overlay()
+        self._reset_interaction_state()
 
         self.state.placed_nodes_source.data = empty_columns(NODE_COLUMNS)
-        self.state.hover_source.data = empty_columns(HOVER_COLUMNS)
         self.state.edge_source.data = empty_columns(EDGE_COLUMNS)
-        # The port sources are emptied by the _rebuild_all_ports call in
-        # _clear_node_table below, as there are no nodes left
-        self._clear_temp_edges()
         self.state.placed_counter.clear()
-        self.state.selected_node_index = None
-        self.state.selected_component = None
-        self.state.delete_mode = False
         self._set_watcher_path("")
-        self._clear_node_table()
+        # No nodes left: this empties the port sources
+        self._rebuild_all_ports()
 
         # Clear edit history: a new design has no prior edits
         if self.state.edit_history_stack is not None:
@@ -95,6 +90,39 @@ class CanvasModeMixin:
         _LOGGER.info("New Design started – canvas cleared.")
 
     # -----------------------------------------------------------------------
+    # Interaction state
+    # -----------------------------------------------------------------------
+
+    def _reset_interaction_state(self):
+        """
+        Return the canvas to idle: nothing selected, armed, pending or previewed.
+
+        Clears the port clicked once on the canvas, the Connections panel picks
+        and their dashed previews, the node selection (hiding the config panel),
+        the armed toolbox component (button highlight and status line) and
+        delete mode.
+
+        Called before the canvas content is replaced (New Design, load, undo /
+        redo) and when entering delete mode, as every one of these refers to
+        node indices of the current canvas. The data sources themselves are
+        left to the caller.
+        """
+        self._cancel_pending_connection()
+        # Also clears panel_pending_connections
+        self._clear_temp_edges()
+        self.state.selected_node_index = None
+        self._clear_node_table()
+        self._disarm_toolbox()
+        self._exit_delete_mode()
+
+    def _disarm_toolbox(self):
+        """Deselect the armed toolbox component, if any: reset its button and the status line."""
+        self.state.selected_component = None
+        for toolbox_button in self.state.buttons:
+            toolbox_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+        self.state.status_div.text = STATUS_IDLE_HTML
+
+    # -----------------------------------------------------------------------
     # Delete mode
     # -----------------------------------------------------------------------
 
@@ -102,30 +130,22 @@ class CanvasModeMixin:
         """
         Toggle delete mode on / off, updating button styling and status text.
 
-        When entering delete mode any active component selection and pending
-        port connection are cleared, the config panel is hidden, the Delete
-        button turns red, and the status label prompts the user to click a
-        node or edge to remove it.  Leaving delete mode restores the defaults.
+        Entering delete mode first returns the canvas to idle (see
+        :meth:`_reset_interaction_state`), then the Delete button turns red and
+        the status label prompts the user to click a node or edge to remove
+        it. Leaving delete mode restores the defaults.
         """
-        self._cancel_pending_connection()
-        self.state.delete_mode = not self.state.delete_mode
         if self.state.delete_mode:
-            self.state.selected_component = None
-            self.state.selected_node_index = None
-            self._clear_temp_edges()
-            self._clear_node_table()
-            for toolbox_button in self.state.buttons:
-                toolbox_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
-            self.state.status_div.text = (
-                "<b style='color:#FF4444;font-size:14pt'>Delete mode: "
-                "click an icon / a connection to remove it</b>"
-            )
-            self.state.delete_button.button_type = "danger"
-        else:
-            self.state.status_div.text = (
-                "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
-            )
-            self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+            self._exit_delete_mode()
+            return
+
+        self._reset_interaction_state()
+        self.state.delete_mode = True
+        self.state.status_div.text = (
+            "<b style='color:#FF4444;font-size:14pt'>Delete mode: "
+            "click an icon / a connection to remove it</b>"
+        )
+        self.state.delete_button.button_type = "danger"
 
     def _exit_delete_mode(self):
         """
@@ -138,7 +158,7 @@ class CanvasModeMixin:
         if not self.state.delete_mode:
             return
         self.state.delete_mode = False
-        self.state.status_div.text = "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
+        self.state.status_div.text = STATUS_IDLE_HTML
         self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
     # -----------------------------------------------------------------------
@@ -163,9 +183,7 @@ class CanvasModeMixin:
         if self.state.selected_component == icon_keys[component_index]:
             self.state.selected_component = None
             self.state.buttons[component_index].button_type = BUTTON_DEFAULT_COLOR_TYPE
-            self.state.status_div.text = (
-                "<i style='color:#aaa;font-size:14pt'>Select a component</i>"
-            )
+            self.state.status_div.text = STATUS_IDLE_HTML
             return
 
         # If the user clicks a different component, cancel any pending connection and select the
