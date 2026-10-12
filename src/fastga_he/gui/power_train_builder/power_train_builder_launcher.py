@@ -51,7 +51,7 @@ from .power_train_builder_state import (
     PORT_RADIUS,
 )
 from .power_train_builder_metadata import icon_data_url
-from .power_train_builder_toolbox import ComponentToolboxConfigurationTableBuilder
+from .power_train_builder_toolbox_config_table import ComponentToolboxConfigurationTableBuilder
 from .power_train_builder_handler import BuilderHandler
 
 _LOGGER = logging.getLogger(__name__)

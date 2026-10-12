@@ -15,7 +15,6 @@ import logging
 import bokeh.models as bkmodel
 from bokeh.layouts import row
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 from .power_train_builder_state import (
     VARIABLE_PORT_DEFAULT,
     _EMPTY,
@@ -25,7 +24,10 @@ from .power_train_builder_state import (
     edge_end_ports,
     edge_indices_not_touching_node,
     edge_indices_not_touching_port,
+    is_unknown_node,
     link_symmetry,
+    node_port_colors,
+    ports_compatible,
     select_edges,
     unlink_symmetry,
     BuilderState,
@@ -73,22 +75,49 @@ class ConfigPanelMixin:
         """
         Fill the config panel widgets with the stored values of node *index*.
 
+        An unknown component gets free-text widgets instead of the selects
+        (see :meth:`~.power_train_builder_handler_unknown.UnknownComponentMixin._populate_unknown_fields`).
+
+        :param index: Zero-based index into ``placed_nodes_source`` data arrays.
+        """
+        placed_node_data = self.state.placed_nodes_source.data
+        self.state.name_input.value = placed_node_data["name"][index]
+
+        is_unknown = is_unknown_node(placed_node_data, index)
+        self._show_unknown_widgets(is_unknown)
+        if is_unknown:
+            self._populate_unknown_fields(index)
+        else:
+            self._populate_known_fields(index)
+
+        if self.state.selected_node_overlay_source is not None:
+            self.state.selected_node_overlay_source.data = dict(
+                x=[placed_node_data["x"][index]],
+                y=[placed_node_data["y"][index]],
+            )
+        self._rebuild_all_ports()
+        self._refresh_connections_table(index)
+        if not is_unknown:
+            self._refresh_symmetry_select(index, placed_node_data["node_type"][index])
+
+    def _populate_known_fields(self, index: int):
+        """
+        Fill the type, position, options and port-count widgets of a known component.
+
         :param index: Zero-based index into ``placed_nodes_source`` data arrays.
         """
         placed_node_data = self.state.placed_nodes_source.data
 
-        node_name = placed_node_data["name"][index]
         node_type = placed_node_data["node_type"][index]
         icon_key = placed_node_data["icon_type"][index]
         position = placed_node_data["position"][index]
         saved_options_json = placed_node_data["options"][index] or "{}"
 
-        # Show the config panel and the options table if there is any options
+        # Show the options table if there is any options
         self.state.options_table.visible = saved_options_json != "{}"
-        self.state.name_input.value = node_name
 
         # extract possible component type of the icon
-        type_choices = self.state.icon_to_component_types.get(icon_key, icon_key)
+        type_choices = self.state.icon_to_component_types.get(icon_key, [icon_key])
         self.state.type_select.options = type_choices
         # Setting the value fires _on_type_select_change; flag it as programmatic so
         # selecting a node never clears its connections or symmetry
@@ -124,6 +153,10 @@ class ConfigPanelMixin:
         current_source_port_count = placed_node_data["n_sources"][index]
         current_target_port_count = placed_node_data["n_targets"][index]
 
+        # A variable-port component keeps at least one port per side
+        self.state.source_count_spinner.low = 1
+        self.state.target_count_spinner.low = 1
+
         self.state.source_count_spinner.visible = source_ports_are_editable
         if source_ports_are_editable:
             self.state.source_count_spinner.value = int(current_source_port_count)
@@ -135,15 +168,6 @@ class ConfigPanelMixin:
         self.state.port_count_section.visible = (
             source_ports_are_editable or target_ports_are_editable
         )
-
-        if self.state.selected_node_overlay_source is not None:
-            self.state.selected_node_overlay_source.data = dict(
-                x=[placed_node_data["x"][index]],
-                y=[placed_node_data["y"][index]],
-            )
-        self._rebuild_all_ports()
-        self._refresh_connections_table(index)
-        self._refresh_symmetry_select(index, node_type)
 
     def _clear_node_table(self):
         """
@@ -157,6 +181,7 @@ class ConfigPanelMixin:
         self.state.position_select.value = _EMPTY
         self._options_names = ()
         self._options_value_selects = ()
+        self._clear_unknown_fields()
 
         self.state.port_count_section.visible = False
         self.state.source_count_spinner.visible = False
@@ -316,9 +341,13 @@ class ConfigPanelMixin:
         ]
 
         choices = [_EMPTY] + symmetry_candidates
+        # A peer of another type (an unknown component may name any node) is
+        # still offered, so selecting this node and applying keeps the link
+        current_symmetry_component = placed_nodes_data["symmetry_name"][current_node_index]
+        if current_symmetry_component and current_symmetry_component not in choices:
+            choices.append(current_symmetry_component)
         self.state.symmetry_select.options = choices
 
-        current_symmetry_component = placed_nodes_data["symmetry_name"][current_node_index]
         self.state.symmetry_select.value = (
             current_symmetry_component if current_symmetry_component in choices else _EMPTY
         )
@@ -360,13 +389,13 @@ class ConfigPanelMixin:
         shown_source.update(pending_source)
         shown_target.update(pending_target)
 
-        # Only free ports of the matching energy type (colour) can be offered
-        icon_config = ICONS_CONFIG.get(node_data["icon_type"][node_index], {})
+        # Only free ports of a compatible energy type (colour) can be offered
+        source_color, target_color = node_port_colors(node_data, node_index)
         free_targets = self._free_port_candidates(
-            target_data, "target", node_index, icon_config.get("source_color", ""), node_data
+            target_data, "target", node_index, source_color, node_data
         )
         free_sources = self._free_port_candidates(
-            source_data, "source", node_index, icon_config.get("target_color", ""), node_data
+            source_data, "source", node_index, target_color, node_data
         )
 
         # Component type of the selected node, used to highlight its primary port
@@ -401,12 +430,13 @@ class ConfigPanelMixin:
         self, port_data: dict, kind: str, node_index: int, color: str, node_data: dict
     ) -> list:
         """
-        Unconnected ports of other nodes that match the energy type *color*.
+        Unconnected ports of other nodes compatible with the energy type *color*.
 
         :param port_data: ``source_port_source.data`` or ``target_port_source.data``.
         :param kind: ``"source"`` or ``"target"``, the side *port_data* holds.
         :param node_index: Selected node, whose own ports are excluded.
-        :param color: Energy-type colour the port must have.
+        :param color: Energy-type colour the port must be compatible with
+            (see :func:`~.power_train_builder_state.ports_compatible`).
         :param node_data: Snapshot of ``placed_nodes_source.data``.
         :return: List of ``(node_index, label, kind, display_string)`` candidates.
         """
@@ -425,7 +455,7 @@ class ConfigPanelMixin:
             for port_position in range(len(port_data.get("node_index", [])))
             if port_data["connected"][port_position] == "False"
             and port_data["node_index"][port_position] != node_index
-            and port_data["color"][port_position] == color
+            and ports_compatible(port_data["color"][port_position], color)
         ]
 
     def _build_port_row(
@@ -470,32 +500,21 @@ class ConfigPanelMixin:
             stylesheets=_port_label_stylesheets(node_type, own_label, primary_type_keywords),
         )
 
-        candidates = free_far_ports
-        current_string = _EMPTY
+        # The far port this row shows ("far": the port on the opposite side that
+        # this port of the node is, or could be, connected to)
+        shown_candidate = None
         if own_label in shown_far_ports:
-            # Add the shown far port to the candidates list so that it shows up in
-            # the dropdown even though it is not free. "Far" means the port on the
-            # opposite side that this port of the node is (or could be) connected to
             far_node_index, far_label = shown_far_ports[own_label]
-            current_string = self._far_string(node_data, far_node_index, far_label, far_kind)
-            candidates = [
-                candidate
-                for candidate in candidates
-                if not (candidate[0] == far_node_index and candidate[1] == far_label)
-            ] + [(far_node_index, far_label, far_kind, current_string)]
-
-        # Index 3 is the display string, used for the dropdown entries; the current
-        # string is excluded here so it is not listed twice
-        choices = [_EMPTY] + [
-            candidate[3] for candidate in candidates if candidate[3] != current_string
-        ]
-
-        # Add the current string to the choices if it is not already present
-        if current_string and current_string not in choices:
-            choices = [current_string] + choices
+            shown_candidate = (
+                far_node_index,
+                far_label,
+                far_kind,
+                self._far_string(node_data, far_node_index, far_label, far_kind),
+            )
+        candidates, choices = _dropdown_entries(free_far_ports, shown_candidate)
 
         value_select = bkmodel.Select(
-            value=current_string if current_string else _EMPTY,
+            value=shown_candidate[3] if shown_candidate else _EMPTY,
             options=choices,
             width=180,
             styles={"color": "white", "font-size": "12px"},
@@ -722,10 +741,17 @@ class ConfigPanelMixin:
         ``placed_nodes_source`` here — that happens when the user clicks Apply
         (see :meth:`apply_node_configurations`).
 
+        Ignored while an unknown component is selected: its type is free text.
+
         :param attr: Bokeh attribute name (unused, required by protocol).
         :param old: Previous ``type_select`` value (unused).
         :param new: Newly selected component type.
         """
+        selected_node_index = self.state.selected_node_index
+        if selected_node_index is not None and is_unknown_node(
+            self.state.placed_nodes_source.data, selected_node_index
+        ):
+            return
         position_choices = self.state.possible_position.get(new, [])
         self.state.position_select.options = position_choices
         self.state.position_select.value = default_position(position_choices)
@@ -784,17 +810,9 @@ class ConfigPanelMixin:
         node_names = list(placed_nodes_data.get("name", []))
         node_name = node_names[node_index] if node_index < len(node_names) else None
         symmetry_names, symmetry_indices = _padded_symmetry_columns(placed_nodes_data)
-
-        # The node itself plus any node pointing back at it
-        symmetry_positions_to_clear = _positions_linked_to(
-            symmetry_names, symmetry_indices, {node_index}, {node_name}
+        symmetry_positions_to_clear = _symmetry_positions_to_clear(
+            symmetry_names, symmetry_indices, node_index, node_name
         )
-        node_has_link = node_index < len(symmetry_names) and (
-            symmetry_names[node_index] not in (_EMPTY, None)
-            or symmetry_indices[node_index] != _NO_SYMMETRY_PEER
-        )
-        if node_has_link and node_index not in symmetry_positions_to_clear:
-            symmetry_positions_to_clear.append(node_index)
 
         has_edges_to_remove = len(kept_edge_indices) < num_edges
         if not has_edges_to_remove and not symmetry_positions_to_clear:
@@ -869,9 +887,14 @@ class ConfigPanelMixin:
         :param placed_nodes_data: Copy of ``placed_nodes_source.data``, edited in place.
         :param node_index: Zero-based index of the node being applied.
         """
-        new_node_type = self.state.type_select.value
+        panel_fields = (
+            self._unknown_panel_fields()
+            if is_unknown_node(placed_nodes_data, node_index)
+            else self._known_panel_fields()
+        )
+        new_node_type = panel_fields["node_type"]
         _set_cell(placed_nodes_data, "name", node_index, self.state.name_input.value)
-        _set_cell(placed_nodes_data, "position", node_index, self.state.position_select.value)
+        _set_cell(placed_nodes_data, "position", node_index, panel_fields["position"])
 
         type_is_written = _set_cell(placed_nodes_data, "node_type", node_index, new_node_type)
         # Reset port counts to defaults when the type changes and spinners are hidden
@@ -884,17 +907,11 @@ class ConfigPanelMixin:
         # Place empty dict if there is no options entry for this node yet
         if "options" not in placed_nodes_data:
             placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
-        # Current value of each option dropdown of the panel
-        option_values_dict = {
-            option_name: _strings_to_option_values(value_select.value)
-            for option_name, value_select in zip(
-                self._options_names, self._options_value_selects, strict=True
-            )
-        }
         # Stored as a JSON string in the ColumnDataSource
-        _set_cell(placed_nodes_data, "options", node_index, json.dumps(option_values_dict))
+        _set_cell(placed_nodes_data, "options", node_index, json.dumps(panel_fields["options"]))
 
         # These two spinners show only if the node type supports multiple ports
+        # (always for an unknown component)
         if self.state.source_count_spinner.visible:
             new_source_port_count = int(self.state.source_count_spinner.value)
             _set_cell(placed_nodes_data, "n_sources", node_index, new_source_port_count)
@@ -902,12 +919,32 @@ class ConfigPanelMixin:
             new_target_port_count = int(self.state.target_count_spinner.value)
             _set_cell(placed_nodes_data, "n_targets", node_index, new_target_port_count)
 
+    def _known_panel_fields(self) -> dict:
+        """
+        Type, position and options chosen in the panel's selects, as Apply writes them.
+
+        :return: ``{"node_type": str, "position": str, "options": dict}``.
+        """
+        return {
+            "node_type": self.state.type_select.value,
+            "position": self.state.position_select.value,
+            "options": {
+                option_name: _strings_to_option_values(value_select.value)
+                for option_name, value_select in zip(
+                    self._options_names, self._options_value_selects, strict=True
+                )
+            },
+        }
+
     def _write_symmetry(self, placed_nodes_data: dict, node_index: int):
         """
         Link node *node_index* with the peer chosen in ``symmetry_select``.
 
         Both nodes point at each other afterwards, and any older link to either
-        of them is removed.
+        of them is removed. An unknown component names its peer in free text:
+        a name of a node on the canvas links the two nodes like the select
+        does, any other name is kept as it is (written to the YAML, without a
+        peer on the canvas).
 
         :param placed_nodes_data: Copy of ``placed_nodes_source.data`` whose name
             column already holds the applied name; edited in place.
@@ -915,22 +952,18 @@ class ConfigPanelMixin:
         """
         all_node_names = placed_nodes_data.get("name", [])
         current_node_name = all_node_names[node_index]
-        new_symmetry_name = self.state.symmetry_select.value
+        is_unknown = is_unknown_node(placed_nodes_data, node_index)
+        new_symmetry_name = (
+            self.state.unknown_symmetry_input.value.strip()
+            if is_unknown
+            else self.state.symmetry_select.value
+        )
 
         # Ensure symmetry columns exist and are fully sized (handles newly added nodes)
         symmetry_names, symmetry_indices = _padded_symmetry_columns(placed_nodes_data)
 
         # Resolve the newly chosen peer index
-        new_peer_index = _NO_SYMMETRY_PEER
-        if new_symmetry_name and new_symmetry_name != _EMPTY:
-            new_peer_index = next(
-                (
-                    node_position
-                    for node_position, node_name in enumerate(all_node_names)
-                    if node_name == new_symmetry_name
-                ),
-                _NO_SYMMETRY_PEER,
-            )
+        new_peer_index = _node_position(all_node_names, new_symmetry_name)
 
         # Clear stale references on both sides before writing
         #
@@ -962,16 +995,57 @@ class ConfigPanelMixin:
         ]
         unlink_symmetry(symmetry_names, symmetry_indices, stale_positions)
 
-        # Link the two nodes both ways, or leave the current node unpaired
-        if new_peer_index != _NO_SYMMETRY_PEER:
-            link_symmetry(
-                symmetry_names, symmetry_indices, all_node_names, node_index, new_peer_index
-            )
-        else:
-            unlink_symmetry(symmetry_names, symmetry_indices, [node_index])
+        # Link the two nodes both ways, keep an unknown component's free-text
+        # peer that is not on the canvas, or leave the current node unpaired
+        _write_symmetry_entry(
+            (symmetry_names, symmetry_indices),
+            all_node_names,
+            node_index,
+            new_peer_index,
+            new_symmetry_name if is_unknown else _EMPTY,
+        )
 
         placed_nodes_data["symmetry_name"] = symmetry_names
         placed_nodes_data["symmetry_node_index"] = symmetry_indices
+
+
+def _node_position(node_names: list, node_name: str) -> int:
+    """
+    Position of the node called *node_name*.
+
+    :param node_names: ``name`` column.
+    :param node_name: Name to look for; empty for no node.
+    :return: Zero-based position, or ``_NO_SYMMETRY_PEER`` if no node has that name.
+    """
+    if not node_name:
+        return _NO_SYMMETRY_PEER
+    return next(
+        (position for position, name in enumerate(node_names) if name == node_name),
+        _NO_SYMMETRY_PEER,
+    )
+
+
+def _write_symmetry_entry(
+    symmetry_columns: tuple, node_names: list, node_index: int, peer_index: int, kept_name: str
+) -> None:
+    """
+    Write the new symmetry entry of node *node_index*, in place.
+
+    :param symmetry_columns: ``(symmetry_names, symmetry_indices)``, edited in place.
+    :param node_names: ``name`` column, giving the peer names to store.
+    :param node_index: Zero-based index of the node being applied.
+    :param peer_index: Its new peer on the canvas, or ``_NO_SYMMETRY_PEER``.
+    :param kept_name: Peer name to keep when there is no peer on the canvas
+        (an unknown component's free text); empty to unpair the node.
+    """
+    symmetry_names, symmetry_indices = symmetry_columns
+    if peer_index != _NO_SYMMETRY_PEER:
+        link_symmetry(symmetry_names, symmetry_indices, node_names, node_index, peer_index)
+    elif kept_name:
+        symmetry_names[node_index] = kept_name
+        symmetry_indices[node_index] = _NO_SYMMETRY_PEER
+    else:
+        unlink_symmetry(symmetry_names, symmetry_indices, [node_index])
 
 
 def _set_cell(column_data: dict, column_name: str, row_index: int, value) -> bool:
@@ -1049,6 +1123,61 @@ def _pending_far_ports(pending_connections: list, node_index: int) -> tuple[dict
         if target_port["node_index"] == node_index:
             pending_target[target_port["label"]] = (source_port["node_index"], source_port["label"])
     return pending_source, pending_target
+
+
+def _dropdown_entries(free_far_ports: list, shown_candidate: tuple | None) -> tuple[list, list]:
+    """
+    Candidates and choices of one Connections panel dropdown.
+
+    The shown far port (its committed connection or pending pick) is not free,
+    so it is added to the candidates, once, and listed first in the choices,
+    before the empty "no connection" choice.
+
+    :param free_far_ports: Free candidate ports, as
+        ``(node_index, label, kind, display_string)`` tuples.
+    :param shown_candidate: Same tuple for the far port the dropdown shows,
+        or ``None`` when it shows no connection.
+    :return: ``(candidates, choices)``: the tuples the dropdown can resolve,
+        and its display strings in order.
+    """
+    if shown_candidate is None:
+        return free_far_ports, [_EMPTY] + [candidate[3] for candidate in free_far_ports]
+
+    shown_node_index, shown_label, _, shown_string = shown_candidate
+    candidates = [
+        candidate
+        for candidate in free_far_ports
+        if (candidate[0], candidate[1]) != (shown_node_index, shown_label)
+    ] + [shown_candidate]
+    choices = [shown_string, _EMPTY] + [
+        candidate[3] for candidate in candidates if candidate[3] != shown_string
+    ]
+    return candidates, choices
+
+
+def _symmetry_positions_to_clear(
+    symmetry_names: list, symmetry_indices: list, node_index: int, node_name
+) -> list:
+    """
+    Nodes whose symmetry entry must be reset to unlink node *node_index*.
+
+    That is every node pointing at it (by index or by name), plus the node
+    itself if it has a link of its own.
+
+    :param symmetry_names: ``symmetry_name`` column, padded to one entry per node.
+    :param symmetry_indices: ``symmetry_node_index`` column, padded the same way.
+    :param node_index: Zero-based index of the node to unlink.
+    :param node_name: Its name, or ``None`` if unknown.
+    :return: List of node positions, without duplicates.
+    """
+    positions = _positions_linked_to(symmetry_names, symmetry_indices, {node_index}, {node_name})
+    node_has_link = node_index < len(symmetry_names) and (
+        symmetry_names[node_index] not in (_EMPTY, None)
+        or symmetry_indices[node_index] != _NO_SYMMETRY_PEER
+    )
+    if node_has_link and node_index not in positions:
+        positions.append(node_index)
+    return positions
 
 
 def _padded_symmetry_columns(placed_nodes_data: dict) -> tuple[list, list]:

@@ -22,6 +22,14 @@ from dataclasses import dataclass, field
 
 import bokeh.models as bkmodel
 
+from fastga_he.gui.power_train_network_viewer import (
+    ELECTRICITY_CURRENT_COLOR_CODE,
+    FUEL_FLOW_COLOR_CODE,
+    ICON_FOLDER_PATH,
+    ICONS_CONFIG,
+    MECHANICAL_POWER_COLOR_CODE,
+)
+
 # ============================================================================
 # Layout constants
 # ============================================================================
@@ -145,8 +153,11 @@ def copy_column_data(data: dict) -> dict:
 
 # Columns of placed_nodes_source, one row per placed component. "options" is a
 # JSON-encoded dict of option_name -> value, "n_sources" / "n_targets" the
-# current port counts, and "symmetry_name" / "symmetry_node_index" the
-# symmetry peer (_EMPTY / _NO_SYMMETRY_PEER when there is none)
+# current port counts, "symmetry_name" / "symmetry_node_index" the
+# symmetry peer (_EMPTY / _NO_SYMMETRY_PEER when there is none), and
+# "source_port_type" / "target_port_type" the energy type of each port side of
+# an unknown component (a PORT_TYPE_COLORS key; _EMPTY for known components,
+# whose port colours come from their icon)
 NODE_COLUMNS = (
     "x",
     "y",
@@ -162,7 +173,103 @@ NODE_COLUMNS = (
     "n_targets",
     "symmetry_name",
     "symmetry_node_index",
+    "source_port_type",
+    "target_port_type",
 )
+
+# ============================================================================
+# Unknown component
+# ============================================================================
+
+# A component the builder has no definition for (not in KNOWN_COMPONENTS):
+# placed from the toolbox or loaded from a file, and configured by hand in the
+# config panel. It is recognised by its icon, so whatever the user types as
+# its component type never makes it pick up a known type's options or ports
+UNKNOWN_ICON_KEY = "unknown"
+UNKNOWN_COMPONENT_TYPE = "unknown"  # default type of a new unknown component
+# Toolbox tabs the unknown component is listed in, always last
+UNKNOWN_COMPONENT_TABS = ("connector", "propulsor", "load", "tank", "source")
+# Default port counts of a new unknown component (each side configurable, 0 allowed)
+UNKNOWN_DEFAULT_PORT_COUNT = 1
+
+# Energy type of each port side of an unknown component, chosen in the config
+# panel. "undefined" ports are drawn in the gray of unknown.png and cannot be
+# connected until an energy type is chosen for them
+UNDEFINED_PORT_TYPE = "undefined"
+UNDEFINED_PORT_COLOR = "#666666"
+PORT_TYPE_COLORS = {
+    UNDEFINED_PORT_TYPE: UNDEFINED_PORT_COLOR,
+    "electricity": ELECTRICITY_CURRENT_COLOR_CODE,
+    "mechanical": MECHANICAL_POWER_COLOR_CODE,
+    "fuel": FUEL_FLOW_COLOR_CODE,
+}
+# (value, label) choices of the port-type selects, labelled as in the legend
+PORT_TYPE_CHOICES = [
+    (UNDEFINED_PORT_TYPE, "Undefined"),
+    ("electricity", "Electrical Current"),
+    ("mechanical", "Mechanical Power"),
+    ("fuel", "Fuel Flow"),
+]
+
+# Icons of the builder: every icon of the network viewer, then the unknown
+# component. Its port colours are per node (see node_port_colors), so it has
+# none here
+BUILDER_ICONS_CONFIG = {
+    **ICONS_CONFIG,
+    UNKNOWN_ICON_KEY: {
+        "icon_path": ICON_FOLDER_PATH / "unknown.png",
+        "source_color": None,
+        "target_color": None,
+    },
+}
+
+
+def is_unknown_node(nodes_data: dict, node_index: int) -> bool:
+    """
+    Whether node *node_index* is an unknown component.
+
+    :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
+    :param node_index: Zero-based index of the node.
+    :return: ``True`` for an unknown component.
+    """
+    return nodes_data["icon_type"][node_index] == UNKNOWN_ICON_KEY
+
+
+def node_port_colors(nodes_data: dict, node_index: int) -> tuple[str | None, str | None]:
+    """
+    Energy-type colour of the source ports and of the target ports of a node.
+
+    A known component takes the colours of its icon; an unknown component the
+    port types chosen in its config panel.
+
+    :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
+    :param node_index: Zero-based index of the node.
+    :return: ``(source_color, target_color)``; ``None`` for a side of a known
+        component that has no ports.
+    """
+    if is_unknown_node(nodes_data, node_index):
+        return tuple(
+            PORT_TYPE_COLORS.get(nodes_data[column][node_index], UNDEFINED_PORT_COLOR)
+            for column in ("source_port_type", "target_port_type")
+        )
+    icon_config = BUILDER_ICONS_CONFIG.get(nodes_data["icon_type"][node_index], {})
+    # None on a side the component has no ports on
+    return icon_config.get("source_color"), icon_config.get("target_color")
+
+
+def ports_compatible(first_color: str, second_color: str) -> bool:
+    """
+    Whether two ports of these colours may be connected.
+
+    Ports connect when they carry the same, defined energy type: an undefined
+    port of an unknown component connects to nothing until a type is chosen.
+
+    :param first_color: Colour of one port.
+    :param second_color: Colour of the other port.
+    :return: ``True`` if they may be connected.
+    """
+    return first_color == second_color and UNDEFINED_PORT_COLOR not in (first_color, second_color)
+
 
 # Columns of edge_source, one row per connection between two ports
 EDGE_COLUMNS = (
@@ -472,11 +579,17 @@ class BuilderState:
     target_port_source: bkmodel.ColumnDataSource = field(default=None)
     # Spinners for editable port counts; only shown for components whose
     # default source/target count is VARIABLE_PORT_DEFAULT (the "variable
-    # port count" rule in power_train_builder_metadata._build_port_count_defaults)
+    # port count" rule in power_train_builder_metadata._build_port_count_defaults),
+    # and for unknown components
     source_count_spinner: bkmodel.Spinner = field(default=None)
     target_count_spinner: bkmodel.Spinner = field(default=None)
-    # Column section wrapping the two spinners above; visible only when the
-    # selected node's ports are editable
+    # Energy type of the source / target ports of an unknown component (shown
+    # for unknown components only). Unlike the other panel fields, a change
+    # applies at once, without Apply
+    source_port_type_select: bkmodel.Select = field(default=None)
+    target_port_type_select: bkmodel.Select = field(default=None)
+    # Column section wrapping the spinners and port-type selects above;
+    # visible only when the selected node's ports are editable
     port_count_section: object = field(default=None)
     # First port clicked in the two-click canvas port-connection workflow
     # (see PortEdgeMixin._handle_port_tap); None if no click is pending
@@ -510,15 +623,24 @@ class BuilderState:
     position_select: bkmodel.Select = field(default=None)
     symmetry_select: bkmodel.Select = field(default=None)
     apply_button: bkmodel.Button = field(default=None)
+    # Free-text counterparts of type_select, position_select and
+    # symmetry_select, shown instead of them for an unknown component (which
+    # has no list of possible values); committed on Apply like the selects
+    unknown_type_input: bkmodel.TextInput = field(default=None)
+    unknown_position_input: bkmodel.TextInput = field(default=None)
+    unknown_symmetry_input: bkmodel.TextInput = field(default=None)
 
     # Options sub-section: options_table is the static wrapper (section
     # header + options_rows_column); options_rows_column is the dynamic
     # Column whose children (one TextInput label + Select value per option)
     # are rebuilt by ConfigPanelMixin._refresh_options_table() every time the
     # selected node's type changes. Apply reads the values straight from
-    # those Select widgets
+    # those Select widgets. For an unknown component both the option name and
+    # its value are TextInputs, and add_option_button (shown for unknown
+    # components only) adds an empty row
     options_table: object = field(default=None)
     options_rows_column: object = field(default=None)
+    add_option_button: bkmodel.Button = field(default=None)
 
     # Connections sub-section: the dynamic Column of per-port rows rebuilt by
     # ConfigPanelMixin._refresh_connections_table() for the selected node.

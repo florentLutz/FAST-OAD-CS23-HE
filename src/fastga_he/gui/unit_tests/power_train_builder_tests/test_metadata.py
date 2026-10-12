@@ -17,7 +17,10 @@ from fastga_he.powertrain_builder.resources.registered_components import KNOWN_C
 from fastga_he.gui.power_train_builder.power_train_builder_metadata import (
     _get_performance_component_names,
 )
-from fastga_he.gui.power_train_builder.power_train_builder_toolbox import _group_icons_by_tab
+from fastga_he.gui.power_train_builder.power_train_builder_toolbox_config_table import (
+    _group_icons_by_tab,
+    _with_unknown_component,
+)
 
 FIRST_COMPONENT = KNOWN_COMPONENTS[0]
 SECOND_COMPONENT = next(
@@ -149,3 +152,28 @@ def _component(icon, type_class):
 )
 def test_toolbox_tabs(components, expected):
     assert _group_icons_by_tab(components) == expected
+
+
+def test_unknown_component_closes_its_tabs():
+    icons_by_tab = {
+        "source": ["battery"],
+        "connector": ["cable"],
+        "propulsor_driver": ["e_motor"],
+        "propulsor": ["propeller"],
+        "tank": ["fuel_tank"],
+        "load": ["dc_load"],
+    }
+
+    tabs = _with_unknown_component(icons_by_tab)
+
+    # Last in the connector, propulsor, load, tank and source tabs, nowhere else
+    assert tabs == {
+        "source": ["battery", "unknown"],
+        "connector": ["cable", "unknown"],
+        "propulsor_driver": ["e_motor"],
+        "propulsor": ["propeller", "unknown"],
+        "tank": ["fuel_tank", "unknown"],
+        "load": ["dc_load", "unknown"],
+    }
+    # A tab is never created for the unknown component alone
+    assert _with_unknown_component({"source": ["battery"]}) == {"source": ["battery", "unknown"]}

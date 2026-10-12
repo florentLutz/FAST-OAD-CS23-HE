@@ -10,7 +10,7 @@ the appropriate action: placing a component on the canvas, selecting a node
 for editing, deleting a node or edge, managing port connections, and saving
 or loading the canvas state.
 
-The class is assembled from five single-responsibility mixins:
+The class is assembled from six single-responsibility mixins:
 
 * :class:`~.power_train_builder_handler_canvas_mode.CanvasModeMixin` –
   startup overlay, new-design reset, delete mode, toolbox selection. These
@@ -26,6 +26,9 @@ The class is assembled from five single-responsibility mixins:
   node / port / edge hit-testing, edge add / remove / rebuild.
 * :class:`~.power_train_builder_handler_config_panel.ConfigPanelMixin` –
   node-table, options table, connections table, symmetry select.
+* :class:`~.power_train_builder_handler_unknown.UnknownComponentMixin` –
+  the config panel of an unknown component: free-text type / position /
+  options / symmetry, "Add option" button, and port-type selects.
 
 Typical usage::
 
@@ -34,6 +37,7 @@ Typical usage::
     canvas.on_event(Tap, handler.on_canvas_tap)
 """
 
+import functools
 import logging
 
 from .power_train_builder_state import (
@@ -51,11 +55,19 @@ from .power_train_builder_handler_placement import PlacementMixin
 from .power_train_builder_handler_io import IOMixin
 from .power_train_builder_handler_ports import PortEdgeMixin
 from .power_train_builder_handler_config_panel import ConfigPanelMixin
+from .power_train_builder_handler_unknown import UnknownComponentMixin
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, ConfigPanelMixin):
+class BuilderHandler(
+    CanvasModeMixin,
+    PlacementMixin,
+    IOMixin,
+    PortEdgeMixin,
+    ConfigPanelMixin,
+    UnknownComponentMixin,
+):
     """
     Wires toolbox button events to canvas placement and interaction events.
 
@@ -122,6 +134,9 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
           ``_on_port_count_spinner_change`` (live visual preview only;
           the new counts are committed on Apply, same as every other
           config-panel field).
+        * The "Add option" button -> ``_on_add_option`` (unknown component).
+        * The source/target port-type selects -> ``_on_port_type_change``
+          (unknown component; applies at once, without Apply).
         """
         # End Session is handled entirely via JS + end_session_trigger to avoid the
         # Python on_click firing unconditionally (before JS can gate on save state)
@@ -168,11 +183,21 @@ class BuilderHandler(CanvasModeMixin, PlacementMixin, IOMixin, PortEdgeMixin, Co
         self.state.source_count_spinner.on_change("value", self._on_port_count_spinner_change)
         self.state.target_count_spinner.on_change("value", self._on_port_count_spinner_change)
 
+        # Unknown component: add an option row, and port types applied at once
+        self.state.add_option_button.on_click(self._on_add_option)
+        for side, port_type_select in (
+            ("source", self.state.source_port_type_select),
+            ("target", self.state.target_port_type_select),
+        ):
+            port_type_select.on_change(
+                "value", functools.partial(self._on_port_type_change, side=side)
+            )
+
     def _make_select_callback(self, button_index: int):
         """
         Return a zero-argument closure that selects the component at *button_index*.
 
-        :param button_index: Zero-based index into ``list(ICONS_CONFIG.keys())``.
+        :param button_index: Zero-based index into ``list(BUILDER_ICONS_CONFIG)``.
         :return: Callback function suitable for wiring to a toolbox button.
         """
         return lambda: self.on_toolbox_select(button_index)

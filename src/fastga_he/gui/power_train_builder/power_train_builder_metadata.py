@@ -240,6 +240,56 @@ def _read_constant_via_cached_import(
 # ============================================================================
 
 
+def _performances_component_types(init_file_path: Path, openmdao_name_to_component_type: dict):
+    """
+    Component types whose ``Performances*`` class an ``__init__.py`` imports.
+
+    ``from .x import PerformancesBatteryPack`` names the OpenMDAO component
+    ``BatteryPack``; other imports, and names unknown to ``KNOWN_COMPONENTS``,
+    are skipped.
+
+    :param init_file_path: Path of the ``__init__.py`` to parse (not imported).
+    :param openmdao_name_to_component_type: ``OM_components_name -> components_type``.
+    :return: List of component types, in import order.
+    """
+    syntax_tree = ast.parse(init_file_path.read_text())
+    imported_names = [
+        import_alias.name
+        for syntax_node in ast.walk(syntax_tree)
+        if isinstance(syntax_node, ast.ImportFrom)
+        for import_alias in syntax_node.names
+    ]
+    component_types = [
+        openmdao_name_to_component_type.get(imported_name.removeprefix("Performances"))
+        for imported_name in imported_names
+        if imported_name.startswith("Performances")
+    ]
+    return [component_type for component_type in component_types if component_type is not None]
+
+
+def _read_possible_constant(
+    constants_file_path: Path, components_root_path: Path, variable_name: str
+):
+    """
+    Read one ``POSSIBLE_*`` constant of a component, without importing it.
+
+    The AST read (:func:`_read_constant_from_ast`) is tried first; a value it
+    finds but cannot evaluate (e.g. enum references) is taken from the module
+    if it is already imported (:func:`_read_constant_via_cached_import`).
+
+    :param constants_file_path: Path of the component's ``constants.py``.
+    :param components_root_path: Root of the components tree.
+    :param variable_name: ``"POSSIBLE_POSITION"`` or ``"POSSIBLE_OPTION"``.
+    :return: The value, or ``None`` if it is missing or cannot be read.
+    """
+    value, found = _read_constant_from_ast(constants_file_path, variable_name)
+    if value is None and found:
+        value = _read_constant_via_cached_import(
+            constants_file_path, components_root_path, variable_name
+        )
+    return value
+
+
 def _get_performance_component_names(components_root_path: str | Path) -> tuple[dict, dict]:
     """
     Scan the components tree and return per-component-type possible positions
@@ -269,41 +319,22 @@ def _get_performance_component_names(components_root_path: str | Path) -> tuple[
     # Walk the components tree and parse each __init__.py to find the
     # Performances* imports, then read the constants.py in the same folder
     for init_file_path in sorted(components_root_path.rglob("__init__.py")):
-        source_code = init_file_path.read_text()
-        syntax_tree = ast.parse(source_code)
-
-        for syntax_node in ast.walk(syntax_tree):
-            if isinstance(syntax_node, ast.ImportFrom):
-                for import_alias in syntax_node.names:
-                    if not import_alias.name.startswith("Performances"):
-                        continue
-
-                    stripped_class_name = import_alias.name.removeprefix("Performances")
-                    component_type = openmdao_name_to_component_type.get(stripped_class_name)
-                    if component_type is None:
-                        continue
-
-                    constants_file_path = init_file_path.parent / "constants.py"
-
-                    # POSSIBLE_POSITION
-                    position_value, position_found = _read_constant_from_ast(
-                        constants_file_path, "POSSIBLE_POSITION"
-                    )
-                    if position_value is None and position_found:
-                        position_value = _read_constant_via_cached_import(
-                            constants_file_path, components_root_path, "POSSIBLE_POSITION"
-                        )
-                    position_results[component_type] = position_value or []
-
-                    # POSSIBLE_OPTION
-                    option_value, option_found = _read_constant_from_ast(
-                        constants_file_path, "POSSIBLE_OPTION"
-                    )
-                    if option_value is None and option_found:
-                        option_value = _read_constant_via_cached_import(
-                            constants_file_path, components_root_path, "POSSIBLE_OPTION"
-                        )
-                    option_results[component_type] = option_value or {}
+        constants_file_path = init_file_path.parent / "constants.py"
+        for component_type in _performances_component_types(
+            init_file_path, openmdao_name_to_component_type
+        ):
+            position_results[component_type] = (
+                _read_possible_constant(
+                    constants_file_path, components_root_path, "POSSIBLE_POSITION"
+                )
+                or []
+            )
+            option_results[component_type] = (
+                _read_possible_constant(
+                    constants_file_path, components_root_path, "POSSIBLE_OPTION"
+                )
+                or {}
+            )
 
     # Fill in any known components not found during the scan
     for component in KNOWN_COMPONENTS:

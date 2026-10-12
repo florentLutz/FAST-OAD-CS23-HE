@@ -13,7 +13,6 @@ import logging
 
 import numpy as np
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, DEFAULT_COLOR
 from .power_train_builder_state import (
     DEFAULT_NODE_ICON_SIZE,
     EDGE_COLUMNS,
@@ -24,6 +23,8 @@ from .power_train_builder_state import (
     copy_column_data,
     edge_end_ports,
     empty_columns,
+    node_port_colors,
+    ports_compatible,
     select_edges,
     BuilderState,
 )
@@ -164,7 +165,9 @@ class PortEdgeMixin:
         Manage the two-click port-connection workflow.
 
         First click stores the port as pending; second click on a compatible
-        port (opposite kind, same energy colour) draws a permanent edge.
+        port of another component (opposite kind, same defined energy colour)
+        draws a permanent edge. A component is never connected to itself, and
+        an undefined port of an unknown component is never connected.
         Tapping the same port again cancels the pending selection.
 
         An undo snapshot is pushed **before** the permanent edge is committed
@@ -191,9 +194,15 @@ class PortEdgeMixin:
         ):
             self._cancel_pending_connection()
             return
-        # Connect source <-> target of the same energy type (colour).
-        # Push undo *before* committing the edge so the action is reversible
-        if port["kind"] != pending["kind"] and port["color"] == pending["color"]:
+        # Connect source <-> target of compatible energy types (colours), on two
+        # different components. Push undo *before* committing the edge so the
+        # action is reversible
+        # Rejections are checked first, so a refused connection leaves no undo step
+        if (
+            port["kind"] != pending["kind"]
+            and ports_compatible(port["color"], pending["color"])
+            and _edge_rejection(pending, port, self.state.edge_source.data) is None
+        ):
             self._push_undo()
             self._add_edge(pending, port)
             self._rebuild_all_ports()
@@ -272,8 +281,9 @@ class PortEdgeMixin:
         """
         Append a permanent edge between two ports to ``edge_source``.
 
-        Guards against already-occupied ports and loop connections; rejects
-        the edge silently if either check fails.
+        Guards against a component connected to itself, already-occupied ports
+        and a second edge between the same two components; rejects the edge
+        silently (logged) if any check fails.
 
         .. note::
             This method only writes ``edge_source``. Callers (the canvas
@@ -294,25 +304,9 @@ class PortEdgeMixin:
             return
         edge_data = copy_column_data(self.state.edge_source.data)
 
-        connected_port_keys = _connected_port_keys(edge_data)
-        if any(
-            (port["kind"], port["node_index"], port["label"]) in connected_port_keys
-            for port in (starting_port, ending_port)
-        ):
-            _LOGGER.info("Port already connected; edge rejected.")
-            return
-
-        # A second edge between the same two nodes, in either direction
-        node_pair = {starting_port["node_index"], ending_port["node_index"]}
-        if any(
-            {starting_node_index, ending_node_index} == node_pair
-            for starting_node_index, ending_node_index in zip(
-                edge_data.get("starting_node_index", []),
-                edge_data.get("ending_node_index", []),
-                strict=True,
-            )
-        ):
-            _LOGGER.info("Loop connection detected; edge rejected.")
+        rejection = _edge_rejection(starting_port, ending_port, edge_data)
+        if rejection is not None:
+            _LOGGER.info("%s; edge rejected.", rejection)
             return
 
         # Update the local copy of the edge data and push it back to the Bokeh source
@@ -387,7 +381,9 @@ class PortEdgeMixin:
 
         Called at the end of :meth:`_rebuild_all_ports` so edges track port
         states after port-count spinner changes.  Edges whose ports no
-        longer exist (e.g. port count reduced) are silently dropped.
+        longer exist (e.g. port count reduced) are silently dropped. Colours
+        are kept: both ends of an edge always carry its energy type, and a
+        port-type change of an unknown component drops the edges of that side.
         """
         if self.state.edge_source is None:
             return
@@ -468,11 +464,10 @@ class PortEdgeMixin:
         source_ports = empty_columns(PORT_COLUMNS)
         target_ports = empty_columns(PORT_COLUMNS)
 
-        for node_index, (center_x, center_y, icon_type, node_type, node_name) in enumerate(
+        for node_index, (center_x, center_y, node_type, node_name) in enumerate(
             zip(
                 list(placed_nodes_data.get("x", [])),
                 list(placed_nodes_data.get("y", [])),
-                list(placed_nodes_data.get("icon_type", [])),
                 list(placed_nodes_data.get("node_type", [])),
                 list(placed_nodes_data.get("name", [])),
                 strict=True,
@@ -504,13 +499,13 @@ class PortEdgeMixin:
                 "fill_alpha": _SELECTED_PORT_FILL_ALPHA if is_selected else 0.0,
                 "line_alpha": _SELECTED_PORT_LINE_ALPHA if is_selected else 0.0,
             }
-            icon_config = ICONS_CONFIG.get(icon_type, {})
+            source_color, target_color = node_port_colors(placed_nodes_data, node_index)
             for port_columns, side_ports, color in (
-                (source_ports, ports["outputs"], icon_config.get("source_color")),
-                (target_ports, ports["inputs"], icon_config.get("target_color")),
+                (source_ports, ports["outputs"], source_color),
+                (target_ports, ports["inputs"], target_color),
             ):
                 for port in side_ports:
-                    _append_port_row(port_columns, port, color or DEFAULT_COLOR, node_row)
+                    _append_port_row(port_columns, port, color, node_row)
 
         connected_port_keys = _connected_port_keys(
             self.state.edge_source.data if self.state.edge_source is not None else {}
@@ -561,9 +556,10 @@ class PortEdgeMixin:
         Redraw the dashed preview of every Connections panel pick at the current
         port positions.
 
-        The stored port coordinates of each pick are updated too, so Apply
-        commits an edge drawn where the ports are now. A pick whose port is not
-        drawn right now (hidden by a port-count preview) is kept, but not drawn.
+        The stored port coordinates and colours of each pick are updated too,
+        so Apply commits an edge drawn where the ports are now. A pick whose
+        port is not drawn right now (hidden by a port-count preview) is kept,
+        but not drawn.
         """
         if self.state.panel_preview_edge_source is None:
             return
@@ -774,6 +770,42 @@ def _set_connected_flags(port_columns: dict, kind: str, connected_port_keys: set
         "True" if (kind, node_index, label) in connected_port_keys else "False"
         for node_index, label in zip(port_columns["node_index"], port_columns["label"], strict=True)
     ]
+
+
+def _edge_rejection(starting_port: dict, ending_port: dict, edge_data: dict) -> str | None:
+    """
+    Why an edge between two ports may not be added, if it may not.
+
+    Shared by :meth:`PortEdgeMixin._add_edge`, which refuses such an edge, and
+    by the canvas tap workflow, which checks before pushing an undo step.
+
+    :param starting_port: Port dict (``kind``, ``node_index``, ``label``) of one end.
+    :param ending_port: Port dict of the other end.
+    :param edge_data: ``edge_source.data`` (or a copy of it).
+    :return: The reason, or ``None`` if the edge may be added.
+    """
+    if starting_port["node_index"] == ending_port["node_index"]:
+        return "A component cannot be connected to itself"
+
+    connected_port_keys = _connected_port_keys(edge_data)
+    if any(
+        (port["kind"], port["node_index"], port["label"]) in connected_port_keys
+        for port in (starting_port, ending_port)
+    ):
+        return "Port already connected"
+
+    # A second edge between the same two nodes, in either direction
+    node_pair = {starting_port["node_index"], ending_port["node_index"]}
+    if any(
+        {starting_node_index, ending_node_index} == node_pair
+        for starting_node_index, ending_node_index in zip(
+            edge_data.get("starting_node_index", []),
+            edge_data.get("ending_node_index", []),
+            strict=True,
+        )
+    ):
+        return "These two components are already connected"
+    return None
 
 
 def _connected_port_keys(edge_data: dict) -> set:

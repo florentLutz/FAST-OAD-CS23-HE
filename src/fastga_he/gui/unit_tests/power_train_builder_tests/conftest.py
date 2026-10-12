@@ -17,10 +17,9 @@ import bokeh.models as bkmodel
 import bokeh.plotting as bkplot
 import pytest
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
-
 from fastga_he.gui.power_train_builder.power_train_builder_handler import BuilderHandler
-from fastga_he.gui.power_train_builder.power_train_builder_toolbox import (
+from fastga_he.gui.power_train_builder.power_train_builder_state import BUILDER_ICONS_CONFIG
+from fastga_he.gui.power_train_builder.power_train_builder_toolbox_config_table import (
     ComponentToolboxConfigurationTableBuilder,
 )
 
@@ -47,12 +46,13 @@ class CanvasDriver:
         """
         Place a component with the toolbox and return its node index.
 
-        :param icon_key: Key of the icon in ``ICONS_CONFIG``.
+        :param icon_key: Key of the icon in ``BUILDER_ICONS_CONFIG`` (``"unknown"``
+            for the unknown component).
         :param x: Canvas x coordinate of the new component.
         :param y: Canvas y coordinate of the new component.
         :return: Zero-based node index of the placed component.
         """
-        component_index = list(ICONS_CONFIG).index(icon_key)
+        component_index = list(BUILDER_ICONS_CONFIG).index(icon_key)
         self.handler.on_toolbox_select(component_index)
         self.tap(x, y)
         # Deselect the toolbox button so later taps select instead of place
@@ -167,7 +167,7 @@ def icon_with_options(state) -> str:
 
     Skips the calling test when the component registry has none.
     """
-    for icon_key in ICONS_CONFIG:
+    for icon_key in BUILDER_ICONS_CONFIG:
         option_definitions = state.possible_options.get(default_component_type(state, icon_key))
         if any(len(option_values) >= 2 for option_values in (option_definitions or {}).values()):
             return icon_key
@@ -177,7 +177,7 @@ def icon_with_options(state) -> str:
 def icon_with_several_types(state) -> str:
     """An icon offering at least two component types; skips the test if there is none."""
     for icon_key, component_types in state.icon_to_component_types.items():
-        if icon_key in ICONS_CONFIG and len(component_types) >= 2:
+        if icon_key in BUILDER_ICONS_CONFIG and len(component_types) >= 2:
             return icon_key
     pytest.skip("No icon with several component types in this registry")
 

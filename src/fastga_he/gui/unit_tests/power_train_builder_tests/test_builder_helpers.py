@@ -37,6 +37,8 @@ from fastga_he.gui.power_train_builder.power_train_builder_state import (
     DIALOG_POSITION_STYLES,
     DIALOG_STYLES,
     EDGE_COLUMNS,
+    PORT_TYPE_COLORS,
+    UNDEFINED_PORT_COLOR,
     _EMPTY,
     _NO_SYMMETRY_PEER,
     append_row,
@@ -47,10 +49,15 @@ from fastga_he.gui.power_train_builder.power_train_builder_state import (
     edge_indices_not_touching_port,
     empty_columns,
     link_symmetry,
+    ports_compatible,
     unlink_symmetry,
 )
-from fastga_he.gui.power_train_builder.power_train_builder_toolbox import _js_flip
-from fastga_he.gui.power_train_builder.power_train_network_writer import port_side_of
+from fastga_he.gui.power_train_builder.power_train_builder_toolbox_config_table import _js_flip
+from fastga_he.gui.power_train_builder.power_train_network_writer import (
+    port_side_of,
+    unknown_component_id,
+    unknown_component_type,
+)
 
 
 def _edges(*end_pairs) -> dict:
@@ -146,6 +153,24 @@ def test_link_then_unlink_symmetry():
 )
 def test_port_side_of(attribute_name, expected):
     assert port_side_of(attribute_name) == expected
+
+
+def test_unknown_component_helpers():
+    electric, mechanical = PORT_TYPE_COLORS["electricity"], PORT_TYPE_COLORS["mechanical"]
+
+    # Ports connect only on the same, defined energy type
+    assert ports_compatible(electric, electric)
+    assert not ports_compatible(electric, mechanical)
+    assert not ports_compatible(UNDEFINED_PORT_COLOR, mechanical)
+    assert not ports_compatible(UNDEFINED_PORT_COLOR, UNDEFINED_PORT_COLOR)
+
+    # A typed type gets the FAST-OAD_CS23-HE prefix, a full id is kept, and reading undoes both
+    assert unknown_component_id("my_part") == "fastga_he.pt_component.my_part"
+    assert unknown_component_id("other.pt_component.part") == "other.pt_component.part"
+    assert unknown_component_id("") == "fastga_he.pt_component.unknown"
+    for component_type in ("my_part", "other.pt_component.part"):
+        assert unknown_component_type(unknown_component_id(component_type)) == component_type
+    assert unknown_component_type(None) == "unknown"
 
 
 # ---------------------------------------------------------------------------

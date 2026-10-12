@@ -16,10 +16,11 @@ it is composed into :class:`BuilderHandler` via multiple inheritance.
 
 import logging
 
-from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG, _string_cleanup
+from fastga_he.gui.power_train_network_viewer import _string_cleanup
 from .power_train_builder_state import (
     BUTTON_DEFAULT_COLOR_TYPE,
     BUTTON_SELECTED_COLOR_TYPE,
+    BUILDER_ICONS_CONFIG,
     EDGE_COLUMNS,
     NODE_COLUMNS,
     STATUS_IDLE_HTML,
@@ -167,15 +168,15 @@ class CanvasModeMixin:
 
     def on_toolbox_select(self, component_index: int):
         """
-        Select the component at position *component_index* in :data:`ICONS_CONFIG`.
+        Select the component at position *component_index* in :data:`BUILDER_ICONS_CONFIG`.
 
         A second click on the same button deselects it. Updates button styling
         and the status label accordingly. Can be called programmatically in
         tests without a running server.
 
-        :param component_index: Zero-based index into ``list(ICONS_CONFIG.keys())``.
+        :param component_index: Zero-based index into ``list(BUILDER_ICONS_CONFIG)``.
         """
-        icon_keys = list(ICONS_CONFIG.keys())
+        icon_keys = list(BUILDER_ICONS_CONFIG)
         if component_index < 0 or component_index >= len(icon_keys):
             return
 

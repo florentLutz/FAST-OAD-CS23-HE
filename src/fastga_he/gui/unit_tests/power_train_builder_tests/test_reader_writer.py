@@ -219,22 +219,36 @@ def test_reader_handles_hand_written_yaml(builder_state, tmp_path):
         f"      {target_attribute}: 2\n"
         "  mystery_1:\n"
         "    id: fastga_he.pt_component.does_not_exist\n"
+        "  mystery_2:\n"
+        "    id: fastga_he.pt_component.does_not_exist\n"
         "component_connections:\n"
+        # Listed before mystery_1 is typed: kept once the bus has typed it
+        "  - source: mystery_2\n"
+        "    target: '[mystery_1, 2]'\n"
         "  - source: bus_1\n"
         "    target: battery_1\n"
         "  - source: '[bus_1, 2]'\n"
         "    target: mystery_1\n"
+        # Dropped: a component connected to itself, and a battery side without ports
+        "  - source: bus_1\n"
+        "    target: '[bus_1, 2]'\n"
+        "  - source: battery_1\n"
+        "    target: bus_1\n"
     )
 
     canvas_state = PowerTrainYAMLReader(builder_state, 60).read(yaml_path)
 
     nodes_data = canvas_state["components"]
-    # Unknown component ids are skipped, not fatal
-    assert nodes_data["name"] == ["battery_1", "bus_1"]
+    # An unregistered component id is shown as an unknown component, not dropped
+    assert nodes_data["name"] == ["battery_1", "bus_1", "mystery_1", "mystery_2"]
+    assert nodes_data["icon_type"][2] == "unknown"
+    assert nodes_data["node_type"][2] == "does_not_exist"
     # Variable-port components read their port counts from the number_of_* options
     assert nodes_data["n_sources"][1] == 1 and nodes_data["n_targets"][1] == 2
-    # The connection to the skipped component is dropped
-    assert len(canvas_state["connections"]["starting_node_index"]) == 1
+    # Its connections are kept too, undefined ports typed through the chain from the bus
+    assert len(canvas_state["connections"]["starting_node_index"]) == 3
+    assert nodes_data["target_port_type"][2] == nodes_data["source_port_type"][3] == "electricity"
+    assert nodes_data["source_port_type"][2] == "undefined"
 
 
 @pytest.mark.parametrize(
@@ -267,6 +281,61 @@ def test_unreadable_file_is_reported_and_keeps_the_canvas(
 
     assert message in canvas.state.status_div.text
     assert canvas.node_column("name") == ["battery_1"]
+
+
+def test_unknown_component_round_trip(canvas, tmp_path):
+    """
+    An unknown component is saved with the id built from its type and exactly its
+    options; the editable file also keeps its port counts and port types, the final
+    version sizes its ports from its connections.
+    """
+    battery = canvas.place("battery", 100, 100)
+    unknown = canvas.place("unknown", 300, 300)
+    canvas.select(unknown)
+    state = canvas.state
+    state.unknown_type_input.value = "my_part"
+    state.unknown_position_input.value = "in_the_nose"
+    canvas.handler._on_add_option()
+    name_input, value_input = canvas.handler._unknown_option_rows[-1]
+    name_input.value, value_input.value = "efficiency", "0.95"
+    state.source_count_spinner.value = 2
+    state.unknown_symmetry_input.value = "right_part"
+    canvas.handler.apply_node_configurations()
+    state.source_port_type_select.value = "electricity"
+    canvas.connect(("source", unknown, "2"), ("target", battery, "1"))
+    expected_columns = {
+        column: canvas.node_column(column)
+        for column in _ROUND_TRIP_COLUMNS + ("options", "source_port_type", "target_port_type")
+    }
+
+    yaml_path = tmp_path / "design.yml"
+    assert canvas.handler._save_canvas_state(str(yaml_path))
+    saved = YAML(typ="safe").load(yaml_path.read_text())
+    assert saved["power_train_components"]["unknown_1"] == {
+        "id": "fastga_he.pt_component.my_part",
+        "options": {"efficiency": 0.95},
+        "position": "in_the_nose",
+        "symmetrical": "right_part",
+    }
+    assert {"source": ["unknown_1", 2], "target": "battery_1"} in saved["component_connections"]
+
+    canvas.handler._on_new_design()
+    canvas.handler._load_canvas_state(str(yaml_path))
+    for column, expected_values in expected_columns.items():
+        assert canvas.node_column(column) == expected_values, column
+    assert canvas.edges() == [((battery, "target", "1"), (unknown, "source", "2"))]
+
+    # A final version has no canvas_layout: the port types come from the
+    # connections (none on the target side), and the source side gets as many
+    # ports as its connections use
+    final_path = tmp_path / "final.yml"
+    canvas.handler._save_canvas_state(str(final_path), include_canvas_layout=False)
+    canvas.handler._load_canvas_state(str(final_path))
+    assert canvas.edges() == [((battery, "target", "1"), (unknown, "source", "2"))]
+    assert canvas.node_column("source_port_type")[unknown] == "electricity"
+    assert canvas.node_column("target_port_type")[unknown] == "undefined"
+    assert canvas.node_column("n_sources")[unknown] == 2
+    assert canvas.node_column("n_targets")[unknown] == 1
 
 
 # ---------------------------------------------------------------------------

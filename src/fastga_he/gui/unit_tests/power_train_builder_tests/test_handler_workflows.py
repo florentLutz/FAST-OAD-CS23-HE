@@ -16,11 +16,17 @@ or an armed toolbox / delete mode when the whole canvas is replaced.
 import json
 
 import pytest
+from bokeh.events import ButtonClick
 
 from fastga_he.gui.power_train_network_viewer import ICONS_CONFIG
 
 from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
     PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
+)
+from fastga_he.gui.power_train_builder.power_train_builder_state import (
+    BUILDER_ICONS_CONFIG,
+    PORT_TYPE_COLORS,
+    UNDEFINED_PORT_COLOR,
 )
 from .conftest import default_component_type, icon_with_options, icon_with_several_types
 
@@ -114,7 +120,9 @@ def test_connecting_two_compatible_ports_draws_one_edge(chain, canvas):
 def test_invalid_port_taps_make_no_edge(chain, canvas):
     extra_cable = canvas.place("cable", 400, 300)
     free_motor = canvas.place("e_motor", 400, 500)
+    unknown = canvas.place("unknown", 600, 300)
     num_edges_before = len(canvas.edges())
+    num_undo_steps_before = len(canvas.state.edit_history_stack)
 
     # Battery port 1 is already used
     canvas.connect(("target", chain["battery"], "1"), ("source", extra_cable, "1"))
@@ -124,9 +132,20 @@ def test_invalid_port_taps_make_no_edge(chain, canvas):
     canvas.connect(("source", extra_cable, "1"), ("source", chain["motor"], "1"))
     # The same port tapped twice cancels the pending connection
     canvas.connect(("source", extra_cable, "1"), ("source", extra_cable, "1"))
+    # A component is never connected to itself, even when its two sides carry the
+    # same energy type (cable) or accept any (unknown component's undefined ports)
+    canvas.connect(("source", extra_cable, "1"), ("target", extra_cable, "1"))
+    canvas.connect(("target", unknown, "1"), ("source", unknown, "1"))
+    # not even when a connection is committed without the canvas taps (e.g. Apply)
+    canvas.handler._add_edge(
+        canvas.handler._live_port("source", unknown, "1"),
+        canvas.handler._live_port("target", unknown, "1"),
+    )
 
     assert len(canvas.edges()) == num_edges_before
     assert canvas.state.awaiting_second_port_click is None
+    # A refused connection leaves nothing to undo
+    assert len(canvas.state.edit_history_stack) == num_undo_steps_before
 
 
 def test_pending_port_click_never_wires_a_node_that_was_not_tapped(canvas):
@@ -649,3 +668,158 @@ def test_new_view_scale_resizes_the_rings_and_labels(canvas):
     # Screen-pixel offsets shrink as each pixel covers more data units
     assert offset_at_2 is not None
     assert canvas.state.node_label_set.y_offset == pytest.approx(2 * offset_at_2)
+
+
+# ---------------------------------------------------------------------------
+# Unknown component
+# ---------------------------------------------------------------------------
+
+
+def _port_colors(canvas, kind: str, node_index: int) -> set:
+    port_source = (
+        canvas.state.source_port_source if kind == "source" else canvas.state.target_port_source
+    )
+    data = port_source.data
+    return {
+        color
+        for owner_index, color in zip(data["node_index"], data["color"], strict=True)
+        if owner_index == node_index
+    }
+
+
+def _edge_color(canvas, first_end: tuple, second_end: tuple) -> str:
+    edge_data = canvas.state.edge_source.data
+    for edge_position in range(len(edge_data["starting_node_index"])):
+        ends = _edge(
+            tuple(edge_data[f"starting_{key}"][edge_position] for key in _END_KEYS),
+            tuple(edge_data[f"ending_{key}"][edge_position] for key in _END_KEYS),
+        )
+        if ends == _edge(first_end, second_end):
+            return edge_data["color"][edge_position]
+    raise AssertionError(f"No edge {first_end} - {second_end}")
+
+
+_END_KEYS = ("node_index", "port_kind", "port_label")
+
+
+def test_unknown_component_is_placed_with_one_undefined_port_per_side(canvas):
+    # The unknown component is the last button of the toolbox
+    assert list(BUILDER_ICONS_CONFIG)[-1] == "unknown"
+
+    unknown = canvas.place("unknown", 300, 300)
+
+    assert canvas.node_column("name") == ["unknown_1"]
+    assert canvas.node_column("node_type") == ["unknown"]
+    assert (canvas.node_column("n_sources"), canvas.node_column("n_targets")) == ([1], [1])
+    assert _port_colors(canvas, "source", unknown) == {UNDEFINED_PORT_COLOR}
+    assert _port_colors(canvas, "target", unknown) == {UNDEFINED_PORT_COLOR}
+
+
+def test_undefined_ports_connect_only_once_typed(canvas):
+    battery = canvas.place("battery", 100, 100)
+    unknown = canvas.place("unknown", 300, 300)
+    canvas.place("unknown", 500, 300)
+    num_undo_steps = len(canvas.state.edit_history_stack)
+
+    # Undefined ports connect to nothing: not on the canvas, not in the panel
+    canvas.connect(("source", unknown, "1"), ("target", battery, "1"))
+    canvas.connect(("source", unknown, "1"), ("target", 2, "1"))
+    canvas.select(unknown)
+    assert _row_dropdown(canvas, "source:1").options == [""]
+    assert canvas.edges() == []
+    assert len(canvas.state.edit_history_stack) == num_undo_steps
+
+    # Once typed, they connect to that energy type
+    canvas.state.source_port_type_select.value = "electricity"
+    assert "battery_1 (target:1)" in _row_dropdown(canvas, "source:1").options
+    canvas.connect(("source", unknown, "1"), ("target", battery, "1"))
+    assert canvas.edges() == [_edge((unknown, "source", "1"), (battery, "target", "1"))]
+    assert (
+        _edge_color(canvas, (unknown, "source", "1"), (battery, "target", "1"))
+        == PORT_TYPE_COLORS["electricity"]
+    )
+
+
+def test_unknown_config_panel_uses_text_boxes_committed_on_apply(canvas):
+    battery = canvas.place("battery", 100, 100)
+    unknown = canvas.place("unknown", 300, 300)
+    state = canvas.state
+    canvas.select(unknown)
+
+    # Free-text widgets instead of the selects, and every port setting editable
+    assert state.unknown_type_input.visible and not state.type_select.visible
+    assert state.unknown_position_input.visible and not state.position_select.visible
+    assert state.unknown_symmetry_input.visible and not state.symmetry_select.visible
+    assert state.options_table.visible and state.add_option_button.visible
+    assert state.source_count_spinner.visible and state.target_count_spinner.visible
+    assert state.source_count_spinner.low == 0
+    assert state.source_port_type_select.visible and state.target_port_type_select.visible
+
+    state.unknown_type_input.value = "my_part"
+    state.unknown_position_input.value = "in_the_nose"
+    for option_name, option_value in (
+        ("efficiency", "0.95"),
+        ("adjust_sfc", "True"),
+        ("voltages", "[400, 800]"),
+        ("mode", "percent_split"),
+        ("", "ignored: no name"),
+    ):
+        # The click the browser sends, through the button's wiring
+        state.add_option_button._trigger_event(ButtonClick(state.add_option_button))
+        name_input, value_input = canvas.handler._unknown_option_rows[-1]
+        name_input.value, value_input.value = option_name, option_value
+    state.source_count_spinner.value = 2
+    state.target_count_spinner.value = 0
+    state.unknown_symmetry_input.value = "unknown_9"  # not on the canvas
+    canvas.handler.apply_node_configurations()
+
+    assert canvas.node_column("node_type")[unknown] == "my_part"
+    assert canvas.node_column("position")[unknown] == "in_the_nose"
+    assert json.loads(canvas.node_column("options")[unknown]) == {
+        "efficiency": 0.95,
+        "adjust_sfc": True,
+        "voltages": [400, 800],
+        "mode": "percent_split",
+    }
+    assert (canvas.node_column("n_sources")[unknown], canvas.node_column("n_targets")[unknown]) == (
+        2,
+        0,
+    )
+    # A peer name that is not on the canvas is kept, without a peer index
+    assert canvas.node_column("symmetry_name")[unknown] == "unknown_9"
+    assert canvas.node_column("symmetry_node_index")[unknown] == -1
+
+    # A known component gets its selects back
+    canvas.select(battery)
+    assert state.type_select.visible and not state.unknown_type_input.visible
+    assert not state.add_option_button.visible and not state.source_port_type_select.visible
+
+
+def test_port_type_change_applies_at_once_and_drops_unfitting_connections(canvas):
+    battery = canvas.place("battery", 100, 100)
+    unknown = canvas.place("unknown", 300, 300)
+    propeller = canvas.place("propeller", 300, 500)
+    canvas.select(unknown)
+    canvas.state.source_port_type_select.value = "electricity"
+    canvas.state.target_port_type_select.value = "mechanical"
+    canvas.connect(("source", unknown, "1"), ("target", battery, "1"))
+    canvas.connect(("source", propeller, "1"), ("target", unknown, "1"))
+    assert len(canvas.edges()) == 2
+    num_undo_steps = len(canvas.state.edit_history_stack)
+
+    # Electric target ports no longer fit the propeller's mechanical source
+    canvas.state.target_port_type_select.value = "electricity"
+    assert canvas.edges() == [_edge((unknown, "source", "1"), (battery, "target", "1"))]
+    assert _port_colors(canvas, "target", unknown) == {PORT_TYPE_COLORS["electricity"]}
+    # Back to undefined: that side keeps no connection
+    canvas.state.source_port_type_select.value = "undefined"
+    assert canvas.edges() == []
+    assert _port_colors(canvas, "source", unknown) == {UNDEFINED_PORT_COLOR}
+    # Applied at once, no Apply needed: one undo step per change
+    assert canvas.node_column("target_port_type")[unknown] == "electricity"
+    assert len(canvas.state.edit_history_stack) == num_undo_steps + 2
+
+    canvas.handler._on_undo()
+    canvas.handler._on_undo()
+    assert len(canvas.edges()) == 2
+    assert _port_colors(canvas, "target", unknown) == {PORT_TYPE_COLORS["mechanical"]}

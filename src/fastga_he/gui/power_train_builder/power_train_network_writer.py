@@ -26,10 +26,12 @@ from ruamel.yaml import YAML
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 from .power_train_builder_state import (
+    UNKNOWN_COMPONENT_TYPE,
     VARIABLE_PORT_DEFAULT,
     copy_column_data,
     default_options,
     edge_end_ports,
+    is_unknown_node,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -52,6 +54,14 @@ TARGET_SIDE_KEYWORDS = ("_outputs", "_engines", "_power_sources")
 
 # Decimal places kept for canvas coordinates (sub-pixel precision is noise)
 _LAYOUT_DECIMALS = 1
+
+# Prefix of FAST-OAD_CS23-HE component ids. An unknown component's type is
+# written as "<prefix><type>", unless it is already a full id (has a dot)
+COMPONENT_ID_PREFIX = "fastga_he.pt_component."
+
+# Extra canvas_layout keys of an unknown component: GUI-only settings that its
+# FAST-OAD entry cannot hold, kept so that an editable file re-opens as saved
+UNKNOWN_LAYOUT_KEYS = ("n_sources", "n_targets", "source_port_type", "target_port_type")
 
 # KNOWN_COMPONENTS entry for each component type (the first one, if several share it)
 _KNOWN_COMPONENT_BY_TYPE: dict = {}
@@ -136,36 +146,85 @@ class PowerTrainYAMLWriter:
         the current port counts are written as ``number_of_*`` option keys so
         that FAST-OAD can reconstruct the correct topology.
 
+        An unknown component is written with the id built from its type (see
+        :func:`unknown_component_id`) and exactly the options typed for it.
+
         The component's canvas (x, y) is also recorded under ``canvas_layout``
-        so the file can be re-opened in the builder.
+        so the file can be re-opened in the builder, with an unknown
+        component's port counts and port types (:data:`UNKNOWN_LAYOUT_KEYS`).
 
         :param node_index: Zero-based row index into the snapshotted node data arrays.
         """
         component_name = self.node_data["name"][node_index]
-        self.data[KEY_CANVAS_LAYOUT][component_name] = {
-            "x": round(float(self.node_data["x"][node_index]), _LAYOUT_DECIMALS),
-            "y": round(float(self.node_data["y"][node_index]), _LAYOUT_DECIMALS),
-        }
-        component_type = self.node_data["node_type"][node_index]
-        source_port_count = self.node_data["n_sources"][node_index]
-        target_port_count = self.node_data["n_targets"][node_index]
+        self.data[KEY_CANVAS_LAYOUT][component_name] = self._layout_entry(node_index)
         symmetry_node_index = self.node_data["symmetry_node_index"][node_index]
+        # Written on one node of each pair only; an unknown component's peer
+        # that is not on the canvas (index -1) is always written
         symmetry_component_name = (
             self.node_data["symmetry_name"][node_index]
             if symmetry_node_index < node_index
             else None
         )
-        known_component = _KNOWN_COMPONENT_BY_TYPE.get(component_type, {})
-        component_id = known_component["id"]
+        if is_unknown_node(self.node_data, node_index):
+            component_id = unknown_component_id(self.node_data["node_type"][node_index])
+            options_dict = self._saved_options(node_index)
+        else:
+            component_id, options_dict = self._known_id_and_options(node_index)
 
-        # Parse the options JSON string for this node into a dict.
-        # This already contains every option the user configured in the GUI,
-        # including boolean toggles (e.g. adjust_sfc) stored as booleans
+        # Keys in the order FAST-OAD files use: id, options, position, symmetrical
+        component_entry = {"id": component_id}
+        if options_dict:
+            component_entry["options"] = options_dict
+        component_entry["position"] = self.node_data["position"][node_index]
+        if symmetry_component_name:
+            component_entry["symmetrical"] = symmetry_component_name
+        self.data[KEY_PT_COMPONENTS][component_name] = component_entry
+
+    def _layout_entry(self, node_index: int) -> dict:
+        """
+        ``canvas_layout`` entry of a node: its canvas (x, y), plus the
+        :data:`UNKNOWN_LAYOUT_KEYS` of an unknown component.
+
+        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :return: The entry.
+        """
+        entry = {
+            "x": round(float(self.node_data["x"][node_index]), _LAYOUT_DECIMALS),
+            "y": round(float(self.node_data["y"][node_index]), _LAYOUT_DECIMALS),
+        }
+        if is_unknown_node(self.node_data, node_index):
+            entry.update({key: self.node_data[key][node_index] for key in UNKNOWN_LAYOUT_KEYS})
+        return entry
+
+    def _saved_options(self, node_index: int) -> dict:
+        """
+        Options stored on the node, decoded from their JSON string.
+
+        This already contains every option the user configured in the GUI,
+        including boolean toggles (e.g. adjust_sfc) stored as booleans.
+
+        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :return: ``{option_name: value}``; empty if the JSON cannot be read.
+        """
         raw_options_string = self.node_data["options"][node_index]
         try:
-            options_dict = json.loads(raw_options_string) if raw_options_string else {}
+            return json.loads(raw_options_string) if raw_options_string else {}
         except (json.JSONDecodeError, TypeError):
-            options_dict = {}
+            return {}
+
+    def _known_id_and_options(self, node_index: int) -> tuple[str, dict]:
+        """
+        Component id and options of a known component, as FAST-OAD reads them.
+
+        Options never touched in the GUI get their type's default, and a
+        variable-port component gets its port counts as ``number_of_*`` options.
+
+        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :return: ``(component_id, options)``.
+        """
+        component_type = self.node_data["node_type"][node_index]
+        known_component = _KNOWN_COMPONENT_BY_TYPE.get(component_type, {})
+        options_dict = self._saved_options(node_index)
 
         # Fill in the per-component-type default of any option not already
         # present in the saved JSON (covers options that were never touched in
@@ -180,18 +239,12 @@ class PowerTrainYAMLWriter:
         if self.default_source_count.get(component_type, 0) == VARIABLE_PORT_DEFAULT:
             options_dict.update(
                 _variable_port_options(
-                    known_component.get("attributes") or [], source_port_count, target_port_count
+                    known_component.get("attributes") or [],
+                    self.node_data["n_sources"][node_index],
+                    self.node_data["n_targets"][node_index],
                 )
             )
-
-        # Keys in the order FAST-OAD files use: id, options, position, symmetrical
-        component_entry = {"id": component_id}
-        if options_dict:
-            component_entry["options"] = options_dict
-        component_entry["position"] = self.node_data["position"][node_index]
-        if symmetry_component_name:
-            component_entry["symmetrical"] = symmetry_component_name
-        self.data[KEY_PT_COMPONENTS][component_name] = component_entry
+        return known_component["id"], options_dict
 
     def add_connection(self) -> None:
         """
@@ -352,6 +405,32 @@ def _variable_port_options(
         for attribute_name in component_attributes
         if port_side_of(attribute_name) is not None
     }
+
+
+def unknown_component_id(component_type: str) -> str:
+    """
+    FAST-OAD id written for an unknown component of type *component_type*.
+
+    :param component_type: Type typed in the config panel, e.g. ``"my_part"``,
+        or a full id such as ``"my_package.pt_component.my_part"``.
+    :return: ``"fastga_he.pt_component.my_part"``, or the full id unchanged.
+    """
+    component_type = component_type or UNKNOWN_COMPONENT_TYPE
+    return component_type if "." in component_type else COMPONENT_ID_PREFIX + component_type
+
+
+def unknown_component_type(component_id) -> str:
+    """
+    Type shown for an unknown component read with id *component_id*.
+
+    The inverse of :func:`unknown_component_id`: the FAST-OAD_CS23-HE prefix is
+    dropped, any other id is kept whole.
+
+    :param component_id: ``id`` of the component in the file (may be missing).
+    :return: The component type to show and edit.
+    """
+    component_id = str(component_id or UNKNOWN_COMPONENT_TYPE)
+    return component_id.removeprefix(COMPONENT_ID_PREFIX) or UNKNOWN_COMPONENT_TYPE
 
 
 def port_side_of(attribute_name: str) -> str | None:

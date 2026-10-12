@@ -26,7 +26,6 @@ from bokeh.layouts import column, row
 
 from fastga_he.gui.power_train_network_viewer import (
     BACKGROUND_COLOR_CODE,
-    ICONS_CONFIG,
     _string_cleanup,
 )
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
@@ -47,6 +46,11 @@ from .power_train_builder_state import (
     SAVE_MODE_EDITABLE,
     SAVE_MODE_FINAL,
     STATUS_IDLE_HTML,
+    BUILDER_ICONS_CONFIG,
+    PORT_TYPE_CHOICES,
+    UNDEFINED_PORT_TYPE,
+    UNKNOWN_COMPONENT_TABS,
+    UNKNOWN_ICON_KEY,
     _EMPTY,
     empty_columns,
 )
@@ -152,11 +156,76 @@ def _group_icons_by_tab(known_components: list) -> dict:
     return icons_by_tab
 
 
+def _with_unknown_component(icons_by_tab: dict) -> dict:
+    """
+    Add the unknown component, last, to each of the :data:`UNKNOWN_COMPONENT_TABS`.
+
+    Only tabs that exist get it: a tab is never created for it alone.
+
+    :param icons_by_tab: ``{tab_name: [icon_key, …]}`` from :func:`_group_icons_by_tab`.
+    :return: The same mapping, with the unknown icon appended where it belongs.
+    """
+    return {
+        tab_name: (
+            icon_keys + [UNKNOWN_ICON_KEY] if tab_name in UNKNOWN_COMPONENT_TABS else icon_keys
+        )
+        for tab_name, icon_keys in icons_by_tab.items()
+    }
+
+
+def _build_unknown_component_widgets() -> dict:
+    """
+    Config-panel widgets used only for an unknown component.
+
+    The text inputs replace the type, position and symmetry selects (an
+    unknown component has no list of possible values), the "+" button adds an
+    option row, and the two port-type selects set the energy type of its
+    source and target ports. All start hidden.
+
+    :return: ``{BuilderState field name: widget}``.
+    """
+    text_style = {"color": "white", "font-size": "18px"}
+
+    def port_type_select(title: str):
+        return bkmodel.Select(
+            title=title,
+            value=UNDEFINED_PORT_TYPE,
+            options=PORT_TYPE_CHOICES,
+            width=180,
+            visible=False,
+            styles={"color": "white", "font-size": "14px"},
+        )
+
+    return {
+        "unknown_type_input": bkmodel.TextInput(
+            title="Component Type:", width=380, visible=False, styles=text_style
+        ),
+        "unknown_position_input": bkmodel.TextInput(
+            title="Position:", width=380, visible=False, styles=text_style
+        ),
+        "unknown_symmetry_input": bkmodel.TextInput(
+            placeholder="Name of the symmetrical component",
+            width=380,
+            visible=False,
+            styles=text_style,
+        ),
+        "add_option_button": bkmodel.Button(
+            label="Add option",
+            icon=bkmodel.TablerIcon(icon_name="plus"),
+            button_type=BUTTON_DEFAULT_COLOR_TYPE,
+            width=180,
+            visible=False,
+        ),
+        "source_port_type_select": port_type_select("Source port type:"),
+        "target_port_type_select": port_type_select("Target port type:"),
+    }
+
+
 def _build_toolbox_tabs(icons_by_tab: dict, button_by_icon_key: dict):
     """
     One toolbox tab per group of :func:`_group_icons_by_tab`, holding its buttons.
 
-    Icons without a button (not in ``ICONS_CONFIG``) are left out, and a tab
+    Icons without a button (not in ``BUILDER_ICONS_CONFIG``) are left out, and a tab
     left empty is not shown.
 
     :param icons_by_tab: ``{tab_name: [icon_key, …]}``.
@@ -202,14 +271,14 @@ class ComponentToolboxConfigurationTableBuilder:
             * :class:`BuilderState` holds references to every shared widget
               and data source.
         """
-        # Categorise icons into tab groups
-        component_icon_keys = list(ICONS_CONFIG.keys())
-        category_to_icon_keys = _group_icons_by_tab(KNOWN_COMPONENTS)
+        # Categorise icons into tab groups; the unknown component closes several tabs
+        component_icon_keys = list(BUILDER_ICONS_CONFIG.keys())
+        category_to_icon_keys = _with_unknown_component(_group_icons_by_tab(KNOWN_COMPONENTS))
 
         # Shared stylesheet for action buttons (Delete, Save, End Session)
         _action_stylesheet = [":host button { font-size: 1.4em; }"]
 
-        # Palette buttons (one per icon, kept in ICONS_CONFIG order)
+        # Palette buttons (one per icon, kept in BUILDER_ICONS_CONFIG order)
         # Header row: "Components" title + node-size slider. Both widths add up to
         # PALETTE_WIDTH so the row never grows wider than the left panel
         _title_div_width = 140
@@ -260,7 +329,7 @@ class ComponentToolboxConfigurationTableBuilder:
         button_by_icon_key: dict = {}
         for icon_key in component_icon_keys:
             label = _string_cleanup(icon_key)
-            base64_url = icon_data_url(ICONS_CONFIG[icon_key]["icon_path"])
+            base64_url = icon_data_url(BUILDER_ICONS_CONFIG[icon_key]["icon_path"])
             icon_svg = (
                 f'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"'
                 f' viewBox="0 0 120 120">'
@@ -679,13 +748,19 @@ class ComponentToolboxConfigurationTableBuilder:
             visible=False,
             styles={"color": "white", "font-size": "14px"},
         )
+        unknown_widgets = _build_unknown_component_widgets()
+
         port_count_section = column(
             bkmodel.Div(
-                text="<b style='color:white;font-size:16pt'>Port Counts</b>",
+                text="<b style='color:white;font-size:16pt'>Ports</b>",
                 width=380,
                 styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
             ),
             row(source_count_spinner, target_count_spinner),
+            row(
+                unknown_widgets["source_port_type_select"],
+                unknown_widgets["target_port_type_select"],
+            ),
             visible=False,
             styles={"background": BACKGROUND_COLOR_CODE, "padding": "4px"},
         )
@@ -697,6 +772,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 styles={"background": BACKGROUND_COLOR_CODE},
             ),
             options_rows_column,
+            unknown_widgets["add_option_button"],
             visible=False,
             styles={"background": BACKGROUND_COLOR_CODE},
         )
@@ -714,6 +790,7 @@ class ComponentToolboxConfigurationTableBuilder:
             ),
             name_input,
             type_select,
+            unknown_widgets["unknown_type_input"],
             port_count_section,
             bkmodel.Div(
                 text="<b style='color:white;font-size:16pt'>Position &amp; Options</b>",
@@ -721,6 +798,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
             ),
             position_select,
+            unknown_widgets["unknown_position_input"],
             options_table,
             bkmodel.Div(
                 text="<b style='color:white;font-size:16pt'>Connections</b>",
@@ -734,6 +812,7 @@ class ComponentToolboxConfigurationTableBuilder:
                 styles={"background": BACKGROUND_COLOR_CODE, "padding": "6px 4px 2px 4px"},
             ),
             symmetry_select,
+            unknown_widgets["unknown_symmetry_input"],
             apply_button,
             spacing=4,
             visible=False,
@@ -781,6 +860,7 @@ class ComponentToolboxConfigurationTableBuilder:
             panel_preview_edge_source=panel_preview_edge_source,
             panel_pending_connections=[],
             symmetry_select=symmetry_select,
+            **unknown_widgets,
             default_source_count=default_source_port_count,
             default_target_count=default_target_port_count,
             icon_to_component_types=icon_to_component_types_map,
