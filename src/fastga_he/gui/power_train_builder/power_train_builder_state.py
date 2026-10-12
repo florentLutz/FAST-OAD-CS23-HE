@@ -501,12 +501,23 @@ class BuilderState:
     """
     Holds references to all Bokeh widgets and data sources of the powertrain builder.
 
-    Passed by reference between :class:`ComponentPaletteConfigurationTableBuilder`,
+    Passed by reference between :class:`ComponentToolboxConfigurationTableBuilder`,
     :class:`BuilderHandler`, and :class:`PowertrainBuilderLauncher` so that
     all parties share the same widget instances.
 
-    Fields are grouped below by the part of the UI they belong to. Two
-    naming conventions recur throughout and are worth knowing up front:
+    Fields are grouped in five sections, from the data that matters most to
+    the widgets that only show it:
+
+    1. Design data: the powertrain itself, saved to YAML and snapshotted for undo.
+    2. Derived and temporary canvas data: rebuilt from the design data, or
+       only drawn while an interaction is in progress.
+    3. Interaction and session values: plain Python values the handlers keep
+       between two callbacks.
+    4. Widgets: toolbox and canvas, config panel, unknown-component fields,
+       overlays and hidden triggers.
+    5. Registry lookups: read-only tables built once at startup.
+
+    Two naming conventions recur throughout and are worth knowing up front:
 
     * Any field ending in ``_source`` is a Bokeh ``ColumnDataSource`` and
       **must** be mutated via the copy -> mutate -> reassign pattern
@@ -518,92 +529,70 @@ class BuilderState:
       ``"battery_pack"``), *not* the toolbox icon key.
     """
 
-    # Toolbox / palette
-    # One Button per entry in ICONS_CONFIG, in the same order
-    buttons: list = field(default_factory=list)
-    # icon_key of the toolbox button currently armed for placement, or None
-    selected_component: str = field(default=None)
-    # icon_key -> count of components of that icon placed so far, used to
-    # generate unique default names ("battery_pack_1", "battery_pack_2", …)
-    placed_counter: dict = field(default_factory=dict)
-    delete_button: bkmodel.Button = field(default=None)
-    delete_mode: bool = field(default=False)
-    save_button: bkmodel.Button = field(default=None)
-    end_session_button: bkmodel.Button = field(default=None)
-    status_div: bkmodel.Div = field(default=None)
-    # Slider next to the "Components" title that resizes every node icon
-    # (see PlacementMixin._on_node_size_slider_change)
-    node_size_slider: bkmodel.Slider = field(default=None)
-    # Canvas renderers / annotation resized together with the icons; set by
-    # the launcher once the canvas is built (None in headless use / tests)
-    hover_ring_renderer: object = field(default=None)
-    selection_ring_renderer: object = field(default=None)
-    node_label_set: object = field(default=None)
+    # ========================================================================
+    # Design data: what is saved to YAML and snapshotted for undo / redo
+    # ========================================================================
 
-    # Window-fitted canvas
-    # Data units per screen pixel of the current fitted view (1.0 = the
-    # original fixed 800 x 950 canvas). Sent from the browser through
-    # view_scale_input; used to keep screen-pixel glyphs (hover / selection
-    # rings, name labels) matched to the icons, which are sized in data units
-    view_scale: float = field(default=1.0)
-    # Visible canvas area of the current browser window, in data units, when
-    # showing an empty design: {"x0", "x1", "y0", "y1", "per_px"}. Reported by
-    # the browser with view_scale; None until then (headless use / tests), in
-    # which case the 800 x 950 world at 1 unit / px is assumed. Automatic
-    # layouts (YAML without canvas_layout) are spread over this area
-    canvas_area: dict = field(default=None)
-    # Hidden TextInput written by the browser-side fit callback (JS -> Python),
-    # as JSON: {"k": view_scale, "area": [x0, x1, y0, y1], "area_k": per_px}
-    view_scale_input: bkmodel.TextInput = field(default=None)
-    # Hidden TextInput flipped by Python after a load / New Design so the
-    # browser re-fits the view to the (new) components (Python -> JS)
-    fit_view_trigger: bkmodel.TextInput = field(default=None)
-
-    # Canvas node data
     # One row per placed component: position, icon URL, type, options JSON,
     # port counts, and symmetry link. Drives every per-node glyph of the
     # canvas: the icons, the hover ring and its tooltip, and the name labels
     placed_nodes_source: bkmodel.ColumnDataSource = field(default=None)
-    # Semi-transparent highlight glyph drawn under the currently selected node
-    selected_node_overlay_source: bkmodel.ColumnDataSource = field(default=None)
-    # Row index into placed_nodes_source of the node currently open in the
-    # config panel, or None if nothing is selected
-    selected_node_index: int = field(default=None)
 
-    # Ports
+    # One row per committed connection between a source port and a target
+    # port. Unlike the port sources, edges persist across
+    # _rebuild_all_ports() calls (their xs/ys are recomputed in place by
+    # PortEdgeMixin._rebuild_edges(), not rebuilt from scratch)
+    edge_source: bkmodel.ColumnDataSource = field(default=None)
+
+    # icon_key -> count of components of that icon placed so far, used to
+    # generate unique default names ("battery_pack_1", "battery_pack_2", …)
+    placed_counter: dict = field(default_factory=dict)
+
+    # ========================================================================
+    # Derived and temporary canvas data: rebuilt from the design data, or only
+    # drawn while an interaction is in progress
+    # ========================================================================
+
     # One row per port ball currently drawn on the canvas, keyed by
     # node_index (matching a row in placed_nodes_source) + label. Rebuilt
     # from scratch by PortEdgeMixin._rebuild_all_ports() on every node
     # add / move / delete / port-count change
     source_port_source: bkmodel.ColumnDataSource = field(default=None)
     target_port_source: bkmodel.ColumnDataSource = field(default=None)
-    # Spinners for editable port counts; only shown for components whose
-    # default source/target count is VARIABLE_PORT_DEFAULT (the "variable
-    # port count" rule in power_train_builder_metadata._build_port_count_defaults),
-    # and for unknown components
-    source_count_spinner: bkmodel.Spinner = field(default=None)
-    target_count_spinner: bkmodel.Spinner = field(default=None)
-    # Energy type of the source / target ports of an unknown component (shown
-    # for unknown components only). Unlike the other panel fields, a change
-    # applies at once, without Apply
-    source_port_type_select: bkmodel.Select = field(default=None)
-    target_port_type_select: bkmodel.Select = field(default=None)
-    # Column section wrapping the spinners and port-type selects above;
-    # visible only when the selected node's ports are editable
-    port_count_section: object = field(default=None)
-    # First port clicked in the two-click canvas port-connection workflow
-    # (see PortEdgeMixin._handle_port_tap); None if no click is pending
-    awaiting_second_port_click: dict = field(default=None)
+
+    # Semi-transparent highlight glyph drawn under the currently selected node
+    selected_node_overlay_source: bkmodel.ColumnDataSource = field(default=None)
+
     # Single-point glyph source that highlights the port stored in
     # awaiting_second_port_click while the second click is awaited
     awaiting_second_port_click_source: bkmodel.ColumnDataSource = field(default=None)
 
-    # Edges (permanent connections)
-    # One row per committed connection between a source port and a target
-    # port. Unlike the port sources, edges persist across
-    # _rebuild_all_ports() calls (their xs/ys are recomputed in place by
-    # PortEdgeMixin._rebuild_edges(), not rebuilt from scratch)
-    edge_source: bkmodel.ColumnDataSource = field(default=None)
+    # Dashed preview edges drawn while a connection is queued in the config
+    # panel but not yet committed via Apply (distinct from the two-click
+    # canvas workflow, which writes straight to edge_source)
+    panel_preview_edge_source: bkmodel.ColumnDataSource = field(default=None)
+
+    # ========================================================================
+    # Interaction and session values
+    # ========================================================================
+
+    # icon_key of the toolbox button currently armed for placement, or None
+    selected_component: str = field(default=None)
+    delete_mode: bool = field(default=False)
+
+    # Row index into placed_nodes_source of the node currently open in the
+    # config panel, or None if nothing is selected
+    selected_node_index: int = field(default=None)
+
+    # First port clicked in the two-click canvas port-connection workflow
+    # (see PortEdgeMixin._handle_port_tap); None if no click is pending
+    awaiting_second_port_click: dict = field(default=None)
+
+    # (starting_port_dict, ending_port_dict) pairs queued in the config
+    # panel; flushed into edge_source, and this list cleared, by
+    # ConfigPanelMixin.apply_node_configurations()
+    panel_pending_connections: list = field(default_factory=list)
+
     # Snapshot of edge_source.data taken by the FIRST port-count-spinner
     # preview tick of an edit session (see
     # PortEdgeMixin._sync_edge_preview_backup). The next *real* (non-preview)
@@ -613,7 +602,54 @@ class BuilderState:
     # currently in progress
     edge_preview_backup: dict = field(default=None)
 
-    # Config / edit panel
+    # Data units per screen pixel of the current fitted view (1.0 = the
+    # original fixed 800 x 950 canvas). Sent from the browser through
+    # view_scale_input; used to keep screen-pixel glyphs (hover / selection
+    # rings, name labels) matched to the icons, which are sized in data units
+    view_scale: float = field(default=1.0)
+
+    # Visible canvas area of the current browser window, in data units, when
+    # showing an empty design: {"x0", "x1", "y0", "y1", "per_px"}. Reported by
+    # the browser with view_scale; None until then (headless use / tests), in
+    # which case the 800 x 950 world at 1 unit / px is assumed. Automatic
+    # layouts (YAML without canvas_layout) are spread over this area
+    canvas_area: dict = field(default=None)
+
+    # Path of the powertrain watcher CSV, written as watcher_file_path in the
+    # saved YAML (empty: not written). Edited through watcher_path_input or its
+    # Browse button, and filled from the file on load (see IOMixin)
+    watcher_file_path: str = field(default="")
+
+    # EditHistoryStack instance (set by BuilderHandler.__init__)
+    edit_history_stack: object = field(default=None)
+
+    # ========================================================================
+    # Widgets
+    # ========================================================================
+
+    # --- Toolbox and canvas ---
+    # One Button per entry in BUILDER_ICONS_CONFIG, in the same order
+    buttons: list = field(default_factory=list)
+
+    # Slider next to the "Components" title that resizes every node icon
+    # (see PlacementMixin._on_node_size_slider_change)
+    node_size_slider: bkmodel.Slider = field(default=None)
+    delete_button: bkmodel.Button = field(default=None)
+    save_button: bkmodel.Button = field(default=None)
+    end_session_button: bkmodel.Button = field(default=None)
+    status_div: bkmodel.Div = field(default=None)
+
+    # Bokeh Button widgets for Undo and Redo, placed above the canvas
+    undo_button: bkmodel.Button = field(default=None)
+    redo_button: bkmodel.Button = field(default=None)
+
+    # Canvas renderers / annotation resized together with the icons; set by
+    # the launcher once the canvas is built (None in headless use / tests)
+    hover_ring_renderer: object = field(default=None)
+    selection_ring_renderer: object = field(default=None)
+    node_label_set: object = field(default=None)
+
+    # --- Config panel ---
     # The whole config panel column (name, type, position, options,
     # connections, symmetry, Apply button) — toggled visible when a node is
     # selected on the canvas, hidden otherwise
@@ -623,12 +659,17 @@ class BuilderState:
     position_select: bkmodel.Select = field(default=None)
     symmetry_select: bkmodel.Select = field(default=None)
     apply_button: bkmodel.Button = field(default=None)
-    # Free-text counterparts of type_select, position_select and
-    # symmetry_select, shown instead of them for an unknown component (which
-    # has no list of possible values); committed on Apply like the selects
-    unknown_type_input: bkmodel.TextInput = field(default=None)
-    unknown_position_input: bkmodel.TextInput = field(default=None)
-    unknown_symmetry_input: bkmodel.TextInput = field(default=None)
+
+    # Spinners for editable port counts; only shown for components whose
+    # default source/target count is VARIABLE_PORT_DEFAULT (the "variable
+    # port count" rule in power_train_builder_metadata._build_port_count_defaults),
+    # and for unknown components
+    source_count_spinner: bkmodel.Spinner = field(default=None)
+    target_count_spinner: bkmodel.Spinner = field(default=None)
+
+    # Column section wrapping the port-count spinners and the port-type selects;
+    # visible only when the selected node's ports are editable
+    port_count_section: object = field(default=None)
 
     # Options sub-section: options_table is the static wrapper (section
     # header + options_rows_column); options_rows_column is the dynamic
@@ -640,7 +681,6 @@ class BuilderState:
     # components only) adds an empty row
     options_table: object = field(default=None)
     options_rows_column: object = field(default=None)
-    add_option_button: bkmodel.Button = field(default=None)
 
     # Connections sub-section: the dynamic Column of per-port rows rebuilt by
     # ConfigPanelMixin._refresh_connections_table() for the selected node.
@@ -648,45 +688,37 @@ class BuilderState:
     # and panel_pending_connections
     connections_rows_column: object = field(default=None)
 
-    # Dashed preview edges drawn while a connection is queued in the config
-    # panel but not yet committed via Apply (distinct from the two-click
-    # canvas workflow above, which writes straight to edge_source)
-    panel_preview_edge_source: bkmodel.ColumnDataSource = field(default=None)
-    # (starting_port_dict, ending_port_dict) pairs queued in the config
-    # panel; flushed into edge_source, and this list cleared, by
-    # ConfigPanelMixin.apply_node_configurations()
-    panel_pending_connections: list = field(default_factory=list)
+    # --- Config panel, unknown component only ---
+    # Free-text counterparts of type_select, position_select and
+    # symmetry_select, shown instead of them for an unknown component (which
+    # has no list of possible values); committed on Apply like the selects
+    unknown_type_input: bkmodel.TextInput = field(default=None)
+    unknown_position_input: bkmodel.TextInput = field(default=None)
+    unknown_symmetry_input: bkmodel.TextInput = field(default=None)
 
-    # Per-component-type metadata (built once at startup)
-    # All four dicts below are keyed by components_type string (see class
-    # docstring), built once by ComponentPaletteBuilder.build() from
-    # KNOWN_COMPONENTS / each component's constants.py, and treated as
-    # read-only lookup tables afterwards
-    default_source_count: dict = field(default_factory=dict)
-    """components_type -> default number of source ports for that type."""
-    default_target_count: dict = field(default_factory=dict)
-    """components_type -> default number of target ports for that type."""
-    possible_position: dict = field(default_factory=dict)
-    """components_type -> ordered list of valid POSSIBLE_POSITION strings (first = default)."""
-    possible_options: dict = field(default_factory=dict)
-    """components_type -> {option_name: [possible values, …]} (first value = default)."""
-    # icon_key -> list of components_type strings that use that icon; index
-    # [0] is treated as "the" default component type for a freshly placed
-    # icon (see PlacementMixin._place_new_node). Keyed the OPPOSITE way round
-    # from the four dicts above — read the name carefully
-    icon_to_component_types: dict = field(default_factory=dict)
+    # Energy type of the source / target ports of an unknown component (shown
+    # for unknown components only). Unlike the other panel fields, a change
+    # applies at once, without Apply
+    source_port_type_select: bkmodel.Select = field(default=None)
+    target_port_type_select: bkmodel.Select = field(default=None)
 
-    # Save / load
+    # "Add option" button under the options, adding an empty name / value row
+    add_option_button: bkmodel.Button = field(default=None)
+
+    # --- Overlays and hidden browser <-> Python triggers ---
+    # The whole startup overlay column — hidden (not just its two buttons) on dismiss
+    startup_overlay: object = field(default=None)
+    new_design_button: bkmodel.Button = field(default=None)
+    load_design_button: bkmodel.Button = field(default=None)
+
     # "Is this the final version?" overlay — shown by the Save button (and by
     # Save & Exit). "Final Version" saves without the GUI-only canvas_layout
     # section; "Edit Later" keeps it (see IOMixin._on_browse_save)
     save_version_overlay: object = field(default=None)
-    # Path of the powertrain watcher CSV, written as watcher_file_path in the
-    # saved YAML (empty: not written). Edited through watcher_path_input or its
-    # Browse button, and filled from the file on load (see IOMixin)
-    watcher_file_path: str = field(default="")
+
     # Text field showing / editing watcher_file_path in the "final version?" overlay
     watcher_path_input: bkmodel.TextInput = field(default=None)
+
     # Toggle triggers: JS changes the value of these hidden TextInputs to fire
     # the corresponding Python on_change callback (used to bridge JS-driven
     # UI actions, like a native OS file dialog, back into Python)
@@ -694,32 +726,55 @@ class BuilderState:
     browse_save_trigger: bkmodel.TextInput = field(default=None)
     browse_watcher_trigger: bkmodel.TextInput = field(default=None)
 
-    # Startup overlay
-    new_design_button: bkmodel.Button = field(default=None)
-    load_design_button: bkmodel.Button = field(default=None)
-    # The whole startup overlay column — hidden (not just its two buttons) on dismiss
-    startup_overlay: object = field(default=None)
-
-    # End-session flow
     # "Unsaved changes" confirmation overlay — shown by End Session when
     # save_button is yellow (i.e. there are unsaved edits)
     unsaved_exit_overlay: object = field(default=None)
+
     # Toggle trigger used by the overlay's "Save & Exit" button to open the
     # save flow before exiting
     end_session_save_trigger: bkmodel.TextInput = field(default=None)
+
     # Toggle trigger fired by JS when it is safe to actually stop the server.
     # Using a trigger (instead of on_click) means Python only runs
     # _end_session when JS has already decided it is appropriate — the
     # Python on_click callback on end_session_button is never registered,
     # avoiding unconditional firing
     end_session_trigger: bkmodel.TextInput = field(default=None)
+
     # Trigger flipped by Python to make the browser call window.close().
     # Uses js_on_change so the JS callback runs when the server pushes the value
     close_window_trigger: bkmodel.TextInput = field(default=None)
 
-    # Undo / redo
-    # EditHistoryStack instance (set by BuilderHandler.__init__)
-    edit_history_stack: object = field(default=None)
-    # Bokeh Button widgets for Undo and Redo, placed above the canvas
-    undo_button: bkmodel.Button = field(default=None)
-    redo_button: bkmodel.Button = field(default=None)
+    # Hidden TextInput written by the browser-side fit callback (JS -> Python),
+    # as JSON: {"k": view_scale, "area": [x0, x1, y0, y1], "area_k": per_px}
+    view_scale_input: bkmodel.TextInput = field(default=None)
+
+    # Hidden TextInput flipped by Python after a load / New Design so the
+    # browser re-fits the view to the (new) components (Python -> JS)
+    fit_view_trigger: bkmodel.TextInput = field(default=None)
+
+    # ========================================================================
+    # Registry lookups: per-component-type metadata, built once at startup
+    # ========================================================================
+
+    # All four dicts below are keyed by components_type string (see class
+    # docstring), built once by ComponentToolboxConfigurationTableBuilder.build()
+    # from KNOWN_COMPONENTS / each component's constants.py, and treated as
+    # read-only lookup tables afterwards
+    default_source_count: dict = field(default_factory=dict)
+    """components_type -> default number of source ports for that type."""
+
+    default_target_count: dict = field(default_factory=dict)
+    """components_type -> default number of target ports for that type."""
+
+    possible_position: dict = field(default_factory=dict)
+    """components_type -> ordered list of valid POSSIBLE_POSITION strings (first = default)."""
+
+    possible_options: dict = field(default_factory=dict)
+    """components_type -> {option_name: [possible values, …]} (first value = default)."""
+
+    # icon_key -> list of components_type strings that use that icon; index
+    # [0] is treated as "the" default component type for a freshly placed
+    # icon (see PlacementMixin._place_new_node). Keyed the OPPOSITE way round
+    # from the four dicts above — read the name carefully
+    icon_to_component_types: dict = field(default_factory=dict)
