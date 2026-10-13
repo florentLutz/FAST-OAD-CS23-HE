@@ -7,3 +7,4 @@ SUBMODEL_CONSTRAINTS_TURBOSHAFT_RATED_POWER = (
 )
 
 POSSIBLE_POSITION = ["on_the_wing", "in_the_front", "in_the_back"]
+POSSIBLE_OPTION = {"adjust_sfc": [True, False]}
