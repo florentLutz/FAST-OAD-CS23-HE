@@ -140,25 +140,19 @@ class PortEdgeMixin:
 
     def _port_data_by_kind(self) -> list[tuple[str, dict]]:
         """
-        ``(kind, data)`` of the two port data sources that exist.
+        ``(kind, data)`` of the two port data sources.
 
-        :return: ``[("source", source_port_source.data), ("target", target_port_source.data)]``,
-            leaving out a source that is not set (headless use).
+        :return: ``[("source", source_port_source.data), ("target", target_port_source.data)]``.
         """
         return [
-            (kind, port_source.data)
-            for kind, port_source in (
-                ("source", self.state.source_port_source),
-                ("target", self.state.target_port_source),
-            )
-            if port_source is not None
+            ("source", self.state.source_port_source.data),
+            ("target", self.state.target_port_source.data),
         ]
 
     def _cancel_pending_connection(self):
         """Cancel any port selection waiting for a second click."""
         self.state.awaiting_second_port_click = None
-        if self.state.awaiting_second_port_click_source is not None:
-            self.state.awaiting_second_port_click_source.data = dict(x=[], y=[], color=[])
+        self.state.awaiting_second_port_click_source.data = dict(x=[], y=[], color=[])
 
     def _handle_port_tap(self, port: dict):
         """
@@ -181,10 +175,9 @@ class PortEdgeMixin:
         pending = self.state.awaiting_second_port_click
         if pending is None:
             self.state.awaiting_second_port_click = port
-            if self.state.awaiting_second_port_click_source is not None:
-                self.state.awaiting_second_port_click_source.data = dict(
-                    x=[port["x"]], y=[port["y"]], color=[port["color"]]
-                )
+            self.state.awaiting_second_port_click_source.data = dict(
+                x=[port["x"]], y=[port["y"]], color=[port["color"]]
+            )
             return
         # Same port tapped again -> cancel
         if (
@@ -257,9 +250,6 @@ class PortEdgeMixin:
 
         :return: Zero-based row index into ``edge_source``, or ``None``.
         """
-        if self.state.edge_source is None:
-            return None
-
         edge_data = self.state.edge_source.data
         best_index, best_distance = None, snap
         for i, (xs, ys) in enumerate(
@@ -300,8 +290,6 @@ class PortEdgeMixin:
         :param starting_port: Metadata dict for the source-side (starting) port.
         :param ending_port: Metadata dict for the target-side (ending) port.
         """
-        if self.state.edge_source is None:
-            return
         edge_data = copy_column_data(self.state.edge_source.data)
 
         rejection = _edge_rejection(starting_port, ending_port, edge_data)
@@ -346,8 +334,6 @@ class PortEdgeMixin:
         :param starting_port: Metadata dict for the source-side (starting) port.
         :param ending_port: Metadata dict for the target-side (ending) port.
         """
-        if self.state.panel_preview_edge_source is None:
-            return
         temp_edge_data = copy_column_data(self.state.panel_preview_edge_source.data)
         # Update the temp edge data with the new edge coordinates and color
         temp_edge_data["xs"].append([starting_port["x"], ending_port["x"]])
@@ -370,8 +356,7 @@ class PortEdgeMixin:
 
     def _clear_temp_edge_visuals(self):
         """Clear only the canvas dashed lines, leave panel_pending_connections intact."""
-        if self.state.panel_preview_edge_source is not None:
-            self.state.panel_preview_edge_source.data = dict(xs=[], ys=[], color=[])
+        self.state.panel_preview_edge_source.data = dict(xs=[], ys=[], color=[])
 
     def _rebuild_edges(self):
         """
@@ -385,8 +370,6 @@ class PortEdgeMixin:
         are kept: both ends of an edge always carry its energy type, and a
         port-type change of an unknown component drops the edges of that side.
         """
-        if self.state.edge_source is None:
-            return
         edge_data = copy_column_data(self.state.edge_source.data)
         if not edge_data.get("starting_node_index"):
             return
@@ -432,9 +415,6 @@ class PortEdgeMixin:
             live, reversible preview (see
             :meth:`~.power_train_builder_handler_config_panel.ConfigPanelMixin._on_port_count_spinner_change`).
         """
-        if self.state.source_port_source is None or self.state.target_port_source is None:
-            return
-
         override_counts = override_counts or {}
         self._sync_edge_preview_backup(is_preview=bool(override_counts))
         self._draw_ports(override_counts)
@@ -507,9 +487,7 @@ class PortEdgeMixin:
                 for port in side_ports:
                     _append_port_row(port_columns, port, color, node_row)
 
-        connected_port_keys = _connected_port_keys(
-            self.state.edge_source.data if self.state.edge_source is not None else {}
-        )
+        connected_port_keys = _connected_port_keys(self.state.edge_source.data)
         _set_connected_flags(source_ports, "source", connected_port_keys)
         _set_connected_flags(target_ports, "target", connected_port_keys)
         self.state.source_port_source.data = source_ports
@@ -561,8 +539,6 @@ class PortEdgeMixin:
         port is not drawn right now (hidden by a port-count preview) is kept,
         but not drawn.
         """
-        if self.state.panel_preview_edge_source is None:
-            return
         pending_connections = self.state.panel_pending_connections
         if not pending_connections and not self.state.panel_preview_edge_source.data["xs"]:
             return
@@ -607,8 +583,6 @@ class PortEdgeMixin:
 
         :param is_preview: ``True`` when the current rebuild is a port-count preview.
         """
-        if self.state.edge_source is None:
-            return
         if is_preview:
             if self.state.edge_preview_backup is None:
                 # First preview tick of this session: remember the truth (backup)
@@ -632,7 +606,7 @@ class PortEdgeMixin:
         the next real rebuild would replace the edit's own edges with the
         backup taken before it.
         """
-        if self.state.edge_source is None or self.state.edge_preview_backup is None:
+        if self.state.edge_preview_backup is None:
             return
         self.state.edge_source.data = copy_column_data(self.state.edge_preview_backup)
         self.state.edge_preview_backup = None

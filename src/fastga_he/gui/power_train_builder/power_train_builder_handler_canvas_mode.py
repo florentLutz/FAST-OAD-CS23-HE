@@ -80,8 +80,7 @@ class CanvasModeMixin:
         self._rebuild_all_ports()
 
         # Clear edit history: a new design has no prior edits
-        if self.state.edit_history_stack is not None:
-            self.state.edit_history_stack.clear()
+        self.state.edit_history_stack.clear()
         self._refresh_undo_redo_buttons()
 
         self.state.save_button.button_type = "success"

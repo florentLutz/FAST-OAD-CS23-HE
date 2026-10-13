@@ -155,10 +155,9 @@ class IOMixin:
 
         :param message: Plain-text message (HTML special characters are escaped).
         """
-        if self.state.status_div is not None:
-            self.state.status_div.text = (
-                f"<b style='color:#FF4444;font-size:14pt'>{html.escape(message)}</b>"
-            )
+        self.state.status_div.text = (
+            f"<b style='color:#FF4444;font-size:14pt'>{html.escape(message)}</b>"
+        )
 
     def _restore_canvas_from_dict(self, canvas_state: dict):
         """
@@ -219,10 +218,9 @@ class IOMixin:
     def _request_view_fit(self):
         """
         Ask the browser to re-fit the canvas view (see the launcher's
-        ``_JS_FIT_VIEW``) by changing ``fit_view_trigger``. No-op without it.
+        ``_JS_FIT_VIEW``) by changing ``fit_view_trigger``.
         """
-        if self.state.fit_view_trigger is not None:
-            _flip_trigger(self.state.fit_view_trigger)
+        _flip_trigger(self.state.fit_view_trigger)
 
     def _on_browse_load(self, attr, old, new):
         """
@@ -264,7 +262,7 @@ class IOMixin:
             defaultextension=".csv",
             filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
         )
-        if watcher_csv_path and self.state.watcher_path_input is not None:
+        if watcher_csv_path:
             _set_text_input(self.state.watcher_path_input, watcher_csv_path)
             _LOGGER.info("Watcher CSV path set to: %s", watcher_csv_path)
 
@@ -296,8 +294,7 @@ class IOMixin:
         :param watcher_csv_path: Path to show and save, or an empty string.
         """
         self.state.watcher_file_path = watcher_csv_path
-        if self.state.watcher_path_input is not None:
-            _set_text_input(self.state.watcher_path_input, watcher_csv_path)
+        _set_text_input(self.state.watcher_path_input, watcher_csv_path)
 
     @staticmethod
     def _open_tkinter_dialog(dialog_function, **kwargs):
@@ -334,8 +331,6 @@ class IOMixin:
         A port-count preview still in progress is ended first, so the edit and
         its snapshot start from the true edges, not the ones the preview hid.
         """
-        if self.state.edit_history_stack is None:
-            return
         self._end_edge_preview()
         snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_undo(snapshot)
@@ -384,7 +379,7 @@ class IOMixin:
         the most recent undo snapshot.  The save button turns yellow because
         the canvas is now different from the last saved state.
         """
-        if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_undo:
+        if not self.state.edit_history_stack.can_undo:
             return
 
         # Save the current state for redo before wiping it (with the true
@@ -393,11 +388,7 @@ class IOMixin:
         current_snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_redo(current_snapshot)
 
-        snapshot = self.state.edit_history_stack.undo()
-        if snapshot is None:
-            return
-
-        self._restore_from_snapshot(snapshot)
+        self._restore_from_snapshot(self.state.edit_history_stack.undo())
         self._mark_unsaved()
         _LOGGER.info(
             "Undo applied; undo depth now %d.",
@@ -412,7 +403,7 @@ class IOMixin:
         the top redo snapshot.  The save button turns yellow because the canvas
         is now different from the last saved state.
         """
-        if self.state.edit_history_stack is None or not self.state.edit_history_stack.can_redo:
+        if not self.state.edit_history_stack.can_redo:
             return
 
         # Save the current state for undo, keeping the remaining redo steps
@@ -421,11 +412,7 @@ class IOMixin:
         current_snapshot = make_snapshot(self.state)
         self.state.edit_history_stack.push_undo_keep_redo(current_snapshot)
 
-        snapshot = self.state.edit_history_stack.redo()
-        if snapshot is None:
-            return
-
-        self._restore_from_snapshot(snapshot)
+        self._restore_from_snapshot(self.state.edit_history_stack.redo())
         self._mark_unsaved()
         _LOGGER.info(
             "Redo applied; undo depth now %d.",
@@ -440,9 +427,6 @@ class IOMixin:
         Uses ``"primary"`` when active and ``"default"`` (dimmed) when the
         corresponding stack is empty.
         """
-        if self.state.edit_history_stack is None:
-            return
-
         self.state.undo_button.button_type = (
             "primary" if self.state.edit_history_stack.can_undo else "default"
         )
@@ -556,8 +540,7 @@ class IOMixin:
             # push the value change to the browser (which fires window.close() via
             # js_on_change).  _end_session() calls IOLoop.stop(), after which no
             # further document updates can be delivered to the client
-            if self.state.close_window_trigger is not None:
-                _flip_trigger(self.state.close_window_trigger)
+            _flip_trigger(self.state.close_window_trigger)
             # Defer the actual IOLoop stop by one tick so Bokeh has time to flush
             # the trigger update to the WebSocket before the server shuts down
             IOLoop.current().call_later(0.3, self._end_session)

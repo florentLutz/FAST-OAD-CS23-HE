@@ -90,11 +90,10 @@ class ConfigPanelMixin:
         else:
             self._populate_known_fields(index)
 
-        if self.state.selected_node_overlay_source is not None:
-            self.state.selected_node_overlay_source.data = dict(
-                x=[placed_node_data["x"][index]],
-                y=[placed_node_data["y"][index]],
-            )
+        self.state.selected_node_overlay_source.data = dict(
+            x=[placed_node_data["x"][index]],
+            y=[placed_node_data["y"][index]],
+        )
         self._rebuild_all_ports()
         self._refresh_connections_table(index)
         if not is_unknown:
@@ -189,8 +188,7 @@ class ConfigPanelMixin:
 
         self.state.config_panel_column.visible = False
 
-        if self.state.selected_node_overlay_source is not None:
-            self.state.selected_node_overlay_source.data = dict(x=[], y=[])
+        self.state.selected_node_overlay_source.data = dict(x=[], y=[])
         self.state.connections_rows_column.children = []
 
         self.state.symmetry_select.options = [_EMPTY]
@@ -326,9 +324,6 @@ class ConfigPanelMixin:
             the node's currently saved type, or the type currently selected
             in ``type_select`` if the user hasn't applied their change yet.
         """
-        if self.state.symmetry_select is None:
-            return
-
         placed_nodes_data = self.state.placed_nodes_source.data
         node_names = placed_nodes_data["name"]
         node_types = placed_nodes_data["node_type"]
@@ -367,14 +362,6 @@ class ConfigPanelMixin:
 
         :param node_index: Zero-based index of the node to show connections for.
         """
-        if (
-            self.state.connections_rows_column is None
-            or self.state.edge_source is None
-            or self.state.source_port_source is None
-            or self.state.target_port_source is None
-        ):
-            return
-
         source_data = copy_column_data(self.state.source_port_source.data)
         target_data = copy_column_data(self.state.target_port_source.data)
         node_data = copy_column_data(self.state.placed_nodes_source.data)
@@ -705,8 +692,6 @@ class ConfigPanelMixin:
         :param node_index: Zero-based index of the node that owns the port.
         :param port_label: Port label (``"1"``, ``"2"``, ...).
         """
-        if self.state.edge_source is None:
-            return
         self._push_undo()
         edge_data = copy_column_data(self.state.edge_source.data)
         self.state.edge_source.data = select_edges(
@@ -798,11 +783,7 @@ class ConfigPanelMixin:
         self._clear_temp_edges()
         self._end_edge_preview()
 
-        edge_data = (
-            copy_column_data(self.state.edge_source.data)
-            if self.state.edge_source is not None
-            else {}
-        )
+        edge_data = copy_column_data(self.state.edge_source.data)
         num_edges = len(edge_data.get("starting_node_index", []))
         kept_edge_indices = edge_indices_not_touching_node(edge_data, node_index)
 
