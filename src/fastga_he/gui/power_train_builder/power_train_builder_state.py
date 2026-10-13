@@ -399,17 +399,16 @@ def edge_end_ports(edge_data: dict) -> list[tuple[tuple, tuple]]:
     :param edge_data: ``edge_source.data`` (or a copy of it).
     :return: One pair per edge, in edge order.
     """
-    return [
-        tuple(
-            (
-                edge_data[f"{end}_port_kind"][edge_position],
-                edge_data[f"{end}_node_index"][edge_position],
-                edge_data[f"{end}_port_label"][edge_position],
-            )
-            for end in ("starting", "ending")
+
+    def end_ports(end: str):
+        return zip(
+            edge_data.get(f"{end}_port_kind", []),
+            edge_data.get(f"{end}_node_index", []),
+            edge_data.get(f"{end}_port_label", []),
+            strict=True,
         )
-        for edge_position in range(len(edge_data.get("starting_node_index", [])))
-    ]
+
+    return list(zip(end_ports("starting"), end_ports("ending"), strict=True))
 
 
 def edge_indices_not_touching_node(edge_data: dict, node_index: int) -> list:

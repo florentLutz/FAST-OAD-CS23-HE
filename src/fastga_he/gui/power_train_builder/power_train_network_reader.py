@@ -324,8 +324,8 @@ class PowerTrainYAMLReader:
         if positions is None:
             grid = _grid_positions(len(nodes_without_layout), area)
             positions = {
-                nodes_data["name"][node_index]: grid[i]
-                for i, node_index in enumerate(nodes_without_layout)
+                nodes_data["name"][node_index]: position
+                for node_index, position in zip(nodes_without_layout, grid, strict=True)
             }
             method = "grid"
 

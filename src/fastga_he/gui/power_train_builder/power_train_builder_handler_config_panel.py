@@ -330,9 +330,9 @@ class ConfigPanelMixin:
 
         # Build a list of names of all other nodes that share the same node type
         symmetry_candidates = [
-            node_names[node_position]
-            for node_position in range(len(node_names))
-            if node_position != current_node_index and node_types[node_position] == node_type
+            name
+            for node_position, (name, type_of_node) in enumerate(zip(node_names, node_types))
+            if node_position != current_node_index and type_of_node == node_type
         ]
 
         choices = [_EMPTY] + symmetry_candidates
@@ -407,8 +407,8 @@ class ConfigPanelMixin:
                 node_data,
             )
             for port_data, own_kind, free_far_ports, shown_far_ports in port_sides
-            for port_position in range(len(port_data.get("node_index", [])))
-            if port_data["node_index"][port_position] == node_index
+            for port_position, owner_index in enumerate(port_data["node_index"])
+            if owner_index == node_index
         ]
 
         self.state.connections_rows_column.children = new_row_widgets
@@ -428,21 +428,17 @@ class ConfigPanelMixin:
         :return: List of ``(node_index, label, kind, display_string)`` candidates.
         """
         return [
-            (
-                port_data["node_index"][port_position],
-                port_data["label"][port_position],
-                kind,
-                self._far_string(
-                    node_data,
-                    port_data["node_index"][port_position],
-                    port_data["label"][port_position],
-                    kind,
-                ),
+            (owner_index, label, kind, self._far_string(node_data, owner_index, label, kind))
+            for owner_index, label, connected, port_color in zip(
+                port_data["node_index"],
+                port_data["label"],
+                port_data["connected"],
+                port_data["color"],
+                strict=True,
             )
-            for port_position in range(len(port_data.get("node_index", [])))
-            if port_data["connected"][port_position] == "False"
-            and port_data["node_index"][port_position] != node_index
-            and ports_compatible(port_data["color"][port_position], color)
+            if connected == "False"
+            and owner_index != node_index
+            and ports_compatible(port_color, color)
         ]
 
     def _build_port_row(
