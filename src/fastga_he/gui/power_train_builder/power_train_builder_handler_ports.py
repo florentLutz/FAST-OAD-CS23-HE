@@ -517,7 +517,7 @@ class PortEdgeMixin:
 
         :return: Dictionary of port positions in canvas data units.
         """
-        port_positions: dict = {}
+        port_positions = {}
         for kind, port_data in self._port_data_by_kind():
             for node_index, label, port_x, port_y in zip(
                 port_data.get("node_index", []),
