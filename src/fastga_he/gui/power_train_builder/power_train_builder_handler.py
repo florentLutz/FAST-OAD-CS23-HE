@@ -250,7 +250,7 @@ class BuilderHandler(
         :param x: Tap x coordinate in canvas data-units.
         :param y: Tap y coordinate in canvas data-units.
         """
-        best_node_index, _, nodes_data = self._best_possible_node(x, y)
+        best_node_index, _, nodes_data = self._find_nearest_node(x, y)
         if best_node_index is not None:
             self._delete_node(best_node_index, nodes_data)
             return
@@ -334,7 +334,7 @@ class BuilderHandler(
         :param x: Tap x coordinate in canvas data-units.
         :param y: Tap y coordinate in canvas data-units.
         """
-        best_node_index, _, _ = self._best_possible_node(x, y)
+        best_node_index, _, _ = self._find_nearest_node(x, y)
         # Unselect port highlight and clean up the pending array
         self._cancel_pending_connection()
         self._clear_temp_edges()

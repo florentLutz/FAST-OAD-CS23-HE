@@ -58,7 +58,7 @@ class PortEdgeMixin:
     # Nearest-node helper
     # -----------------------------------------------------------------------
 
-    def _best_possible_node(self, x: float, y: float):
+    def _find_nearest_node(self, x: float, y: float):
         """
         Find the nearest placed node to canvas coordinates ``(x, y)``.
 
