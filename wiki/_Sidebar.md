@@ -4,26 +4,26 @@
 
 ## Project setup
 
-- [Development environment](https://github.com/fast-aircraft-design/FAST-OAD/wiki/Development-environment)
+- [Development environment](https://github.com/supaero-aircraft-design/FAST-GA/wiki/Development-environment)
 - [Installing and using Poetry](https://github.com/fast-aircraft-design/FAST-OAD/wiki/Installing-and-using-Poetry)
 - [Usage of Ruff](https://github.com/fast-aircraft-design/FAST-OAD/wiki/Usage-of-Ruff)
 
-## OpenMDAO disciplines
+## OpenMDAO model groups
 
-- [Aerodynamics](../models/aerodynamics_index)
-- [Geometry](../models/geometry_index)
-- [Weight](../models/weight_index)
-- [Load analysis](../models/load_analysis_index)
-- [Loops](../models/loops_index)
-- [Performance](../models/performance_index)
-- [propulsion](../models/propulsion_index)
-- [Environmental impact](../models/environmental_impact_index)
-- [Cost](../models/cost_index)
-- [RTA variables](../models/rta_variables_index)
+- [Aerodynamics](../models/aerodynamics)
+- [Geometry](../models/geometry)
+- [Weight](../models/weight)
+- [Load analysis](../models/load_analysis)
+- [Loops](../models/loops)
+- [Performance](../models/performance)
+- [propulsion](../models/propulsion)
+- [Environmental impact](../models/environmental_impact)
+- [Cost](../models/cost)
+- [RTA variables](../models/rta_variables)
 
 ## Pre-processing and post-processing services
 
-- [General analysis](../gui/general_analysis_index)
+- [General analysis](../gui/general_analysis)
 - [Payload range](../gui/payload_range)
 - [Powertrain weight breakdown](../gui/weight_breakdown)
 - [Performance viewer](../gui/performance_viewer)
@@ -34,9 +34,9 @@
 
 ## Powertrain builder
 
-- [Registered components](../pt_builder/registered_component_index)
-- [Configurator helpers](../pt_builder/configurator_index)
-- [Error messages](../pt_builder/errors_index)
+- [Registered components](../pt_builder/registered_components)
+- [Configurator helpers](../pt_builder/configurator)
+- [Error messages](../pt_builder/errors)
 
 ## Development process
 

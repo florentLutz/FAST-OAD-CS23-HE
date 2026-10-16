@@ -2,7 +2,13 @@ name: Sync wiki
 on:
   push:
     branches: [main]
-    paths: ['wiki/**']
+    paths:
+      - 'wiki/**'
+      - '.github/workflows/sync_wiki.yml'
+
+concurrency:
+  group: sync-wiki
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -11,8 +17,5 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: Andrew-Chen-Wang/github-wiki-action@v4
-        with:
-          path: wiki/
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v7
+      - uses: Andrew-Chen-Wang/github-wiki-action@v5
