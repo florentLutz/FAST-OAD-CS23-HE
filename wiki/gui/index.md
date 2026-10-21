@@ -20,4 +20,4 @@ Each service is described in detail in its own page, which can be accessed by cl
 
 - [Powertrain network viewer](powertrain_network_viewer)
 
-- [Powertrain editor](powertrain_editor)
+- [Powertrain builder](powertrain_builder/powertrain_builder)

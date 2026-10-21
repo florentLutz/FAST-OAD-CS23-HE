@@ -290,7 +290,9 @@ class PowerTrainYAMLWriter:
 
     def set_watcher_file_path(self, watcher_path: str) -> None:
         """
-        Set the ``watcher_file_path`` field of the YAML output.
+        Set the ``watcher_file_path`` field of the YAML output. The watcher file csv shows
+        the changes of specified performance parameters for defined powertrain components during
+        each time step of the flight mission.
 
         :param watcher_path: Filesystem path to the watcher CSV file, or an
             empty string to omit the field from the output.
