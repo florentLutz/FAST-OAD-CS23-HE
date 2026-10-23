@@ -14,8 +14,8 @@ Module `power_train_builder_state.py`. It defines `BuilderState`, the single sha
 |---|---|---|
 | `PALETTE_WIDTH` | 300 | Width of the toolbox (px) |
 | `ROW_HEIGHT` | 52 | Height of a toolbox row (px) |
-| `ICON_SIZE` | 45 | Reference icon size for rings and labels |
-| `PORT_RADIUS` | 8 | Radius of a port ball |
+| `ICON_SIZE` | 45 | Size from which `NODE_RADIUS` and the ring and label base sizes are derived; not the icon size on the canvas (`DEFAULT_NODE_ICON_SIZE`) |
+| `PORT_RADIUS` | 8 | Radius of a port ball (data units) |
 | `NODE_RADIUS` | 22.5 | `ICON_SIZE / 2`, base of the port orbit |
 | `CANVAS_WORLD_X_RANGE`, `CANVAS_WORLD_Y_RANGE` | (0, 800), (0, 950) | Design area always kept visible (data units) |
 | `CONFIG_PANEL_RESERVED_WIDTH` | 425 | Space kept right of the canvas (px) |
@@ -101,7 +101,7 @@ It is created once by [`ComponentToolboxConfigurationTableBuilder.build`](powert
 - **edge_preview_backup** : *dict or None* — true edges while a port-count preview hides some (see [`_sync_edge_preview_backup`](powertrain_builder_ports_edges#_sync_edge_preview_backup)).
 - **view_scale** : *float* — data units per screen pixel of the fitted view (default 1.0).
 - **canvas_area** : *dict or None* — area an empty design shows in this window, `{"x0", "x1", "y0", "y1", "per_px"}`.
-- **watcher_file_path** : *str* — watcher CSV path written to the YAML (empty: not written).
+- **watcher_file_path** : *str* — path of the watcher CSV, the per-time-step performance parameters of the powertrain components, written to the YAML (empty: not written).
 - **edit_history_stack** : *EditHistoryStack* — set by `BuilderHandler`.
 
 #### 4. Widgets
@@ -116,7 +116,7 @@ It is created once by [`ComponentToolboxConfigurationTableBuilder.build`](powert
 - **default_source_count**, **default_target_count** : *dict* — `components_type -> int`.
 - **possible_position** : *dict* — `components_type -> [position, ...]`, first = default.
 - **possible_options** : *dict* — `components_type -> {option: [values, ...]}`, first value = default.
-- **icon_to_component_types** : *dict* — `icon_key -> [components_type, ...]`, first = default type of a new component. Note the reversed key compared with the four tables above.
+- **icon_to_component_types** : *dict* — `icon_key -> [components_type, ...]`, first = default type of a new component. Keyed by icon, unlike the four tables above, which are keyed by component type.
 
 ---
 
@@ -157,7 +157,7 @@ Return an independent copy of a `ColumnDataSource.data` dictionary, with a new l
 
 ### Notes
 
-Bokeh only sends a change to the browser when a whole column or the whole `.data` is reassigned. Editing a column list in place (`append`, `pop`, index assignment) changes the Python data but leaves the browser showing the old data. Every edit in the builder therefore copies the data with this function, edits the copy, and reassigns `source.data` once.
+Bokeh only updates the browser when `.data` or a whole column is reassigned, so every edit copies the data, edits the copy and reassigns it (see the conventions on the [overview page](powertrain_builder#conventions-used-throughout-the-code)).
 
 ---
 
@@ -177,9 +177,7 @@ state.edge_source.data = new_data
 is_unknown_node(nodes_data, node_index)
 ```
 
-Return whether a node is an unknown component, i.e. whether its `icon_type` is `"unknown"`.
-
-The test uses the icon and not the type, so typing a known type for an unknown component never makes it pick up that type's options or ports.
+Return a boolean that shows whether a node is an unknown component, i.e. whether its `icon_type` is `"unknown"`.
 
 ---
 
@@ -209,7 +207,8 @@ node_port_colors(nodes_data, node_index)
 
 Return the energy-type colour of the source ports and of the target ports of a node.
 
-A known component takes the colours of its icon in `BUILDER_ICONS_CONFIG`. An unknown component takes the colours of the port types chosen in its panel (gray `#666666` when undefined).
+A known component takes the colours of its icon in `BUILDER_ICONS_CONFIG`. An unknown component takes the colours of 
+the port types chosen in its panel (grey `#666666` when undefined).
 
 ---
 
@@ -239,7 +238,7 @@ A known component takes the colours of its icon in `BUILDER_ICONS_CONFIG`. An un
 ports_compatible(first_color, second_color)
 ```
 
-Return whether two ports of these colours may be connected: same colour, and neither is the undefined gray.
+Return whether two ports of these colours may be connected: same colour, and neither is the undefined grey.
 
 ---
 
@@ -353,7 +352,8 @@ Return a copy of *column_data* without the row at *row_index*. The input is not 
 default_options(options_definition)
 ```
 
-Return the default value of every option of a component type: the first possible value. Options without any possible value are left out.
+Return the default value of every option of a component type: the first possible value. Options without any possible 
+value are left out.
 
 ---
 

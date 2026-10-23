@@ -2,7 +2,9 @@
 
 [<- Powertrain builder](powertrain_builder)
 
-Module `power_train_builder_handler.py`. It defines `BuilderHandler`, the object that wires every Python callback of the builder and dispatches canvas taps. Its behaviour comes from six mixins, one per responsibility, all working on the shared [`BuilderState`](powertrain_builder_state#builderstate).
+Module `power_train_builder_handler.py`. It defines `BuilderHandler`, the object that wires every Python callback of 
+the builder and dispatches canvas taps. Its behaviour comes from six mixins, one per responsibility, all working on the 
+shared [`BuilderState`](powertrain_builder_state#builderstate).
 
 | Mixin | Responsibility | Page |
 |---|---|---|
@@ -45,9 +47,9 @@ It must be created after the toolbox and the undo / redo buttons exist on the st
 
 ### Attributes
 
-- **state** : *BuilderState*
-- **main_plot** : *bokeh.plotting.figure*
-- **icon_size** : *int*
+- **state** : *BuilderState* — shared state, as given.
+- **main_plot** : *bokeh.plotting.figure* — the canvas, as given.
+- **icon_size** : *int* — current icon size, updated by the icon-size slider.
 
 ---
 
@@ -72,6 +74,7 @@ from bokeh.models import Button
 
 toolbox_layout, config_panel_column, state = ComponentToolboxConfigurationTableBuilder.build()
 state.undo_button, state.redo_button = Button(label="Undo"), Button(label="Redo")
+canvas = figure()   # the launcher builds the real canvas
 handler = BuilderHandler(state, canvas)
 canvas.on_event(Tap, handler.on_canvas_tap)
 ```
@@ -122,7 +125,8 @@ None.
 | `add_option_button` | click | `_on_add_option` |
 | `source_port_type_select` / `target_port_type_select` | value | `_on_port_type_change(side="source" / "target")` |
 
-The **End Session** button has no Python `on_click`. Its JavaScript callback decides whether it is safe to stop the server and only then flips `end_session_trigger`; a Python `on_click` would run in every case.
+The **End Session** button has no Python `on_click`. Its JavaScript callback decides whether it is safe to stop the 
+server and only then flips `end_session_trigger`; a Python `on_click` would run in every case.
 
 ---
 
@@ -217,11 +221,7 @@ None.
 
 ### Notes
 
-1. `_find_nearest_node` looks for a component within one icon size of the tap. If there is one, `_delete_node` removes it and the method returns.
-2. Otherwise `_find_nearest_edge` looks for a connection within 12 data units. If there is one, `_delete_edge` removes it.
-3. If a component is still selected, `_refresh_connections_table` updates its panel, since a freed port may now be offered again.
-
-A tap that hits neither a component nor a connection changes nothing.
+If a component is still selected afterwards, its Connections panel is refreshed.
 
 ---
 
@@ -255,13 +255,15 @@ None.
 
 ### Notes
 
-Nodes are identified by their row, so every node after the deleted one moves up by one index. The deletion is done in five steps.
+Nodes are identified by their row, so every node after the deleted one moves up by one index. The deletion is done in 
+five steps.
 
 1. Push an undo snapshot.
 2. Drop the node row and re-index the symmetry links (`_reindex_symmetry_after_deletion`).
 3. Drop every edge attached to the node, and decrement the node indices of the remaining edges that pointed after it.
 4. Rebuild the ports.
-5. Update the selection: cleared (with the panel) if the deleted node was selected, decremented if the selected node was after it.
+5. Update the selection: cleared (with the panel) if the deleted node was selected, decremented if the selected node 
+was after it.
 
 For example, deleting `B` from `[A, B, C, D]` gives `[A, C, D]`: `C` goes from index 2 to 1, `D` from 3 to 2.
 
@@ -273,7 +275,7 @@ For example, deleting `B` from `[A, B, C, D]` gives `[A, C, D]`: `C` goes from i
 _delete_edge(edge_index)
 ```
 
-Remove one connection, as a single undoable step. The ports are rebuilt so the two freed ports are no longer marked as connected.
+Remove one connection, as a single undoable step.
 
 ---
 
@@ -288,15 +290,6 @@ Remove one connection, as a single undoable step. The ports are rebuilt so the t
 ### Returns
 
 None.
-
----
-
-### Notes
-
-1. Push an undo snapshot.
-2. Drop the row with `drop_row`. Nothing needs re-indexing: no other data refers to an edge by its position.
-3. Rebuild the ports, which recomputes the `connected` flags and the Connections panel.
-4. Mark the design unsaved.
 
 ---
 
@@ -327,9 +320,11 @@ None.
 ### Notes
 
 1. `_find_nearest_node` finds the component under the tap, if any.
-2. `_cancel_pending_connection` and `_clear_temp_edges` drop the first click of a two-click connection and the panel picks waiting for Apply.
+2. `_cancel_pending_connection` and `_clear_temp_edges` drop the first click of a two-click connection and the panel 
+picks waiting for Apply.
 3. Then:
-   - no component, or the one already selected: `selected_node_index` is cleared and `_clear_node_table` hides the panel;
+   - no component, or the one already selected: `selected_node_index` is cleared and `_clear_node_table` hides 
+   the panel;
    - another component: `selected_node_index` is set, `_populate_node_table` fills the panel, and the panel is shown.
 
 ---
@@ -340,9 +335,10 @@ None.
 _reindex_symmetry_after_deletion(nodes_data, deleted_node_index)
 ```
 
-Keep the symmetry links valid after a node was removed, in place.
+Update the symmetry links, in place, after a node was removed.
 
-The peer of the deleted node loses its link, and every peer index after the deleted node is decremented, like the node rows.
+The peer of the deleted node loses its link, and every peer index after the deleted node is decremented, like the 
+node rows.
 
 ---
 

@@ -2,13 +2,16 @@
 
 [<- Powertrain builder](powertrain_builder)
 
-Modules `cli.py` and `power_train_builder_launcher.py`. They start the Bokeh server, assemble the page (toolbox, canvas, configuration panel, overlays) and draw every canvas glyph. All interaction logic is wired afterwards by [`BuilderHandler`](powertrain_builder_handler).
+Modules `cli.py` and `power_train_builder_launcher.py`. They start the Bokeh server, assemble the page (toolbox, canvas, 
+configuration panel, overlays) and draw every canvas glyph. All interaction logic is wired afterwards by 
+[`BuilderHandler`](powertrain_builder_handler).
 
 ---
 
 ## Launching
 
-The builder can be started in two ways. Both serve it at `http://<address>:<port>/`, open it in the default web browser, and block until the session ends (**End Session**, **Save & Exit**, or closing the browser tab).
+The builder can be started in two ways. Both serve it at `http://<address>:<port>/`, open it in the default web browser, 
+and block until the session ends (**End Session**, **Save & Exit**, or closing the browser tab).
 
 #### From a terminal (CLI)
 
@@ -27,7 +30,10 @@ powertrain-builder --help
 powertrain-builder = "fastga_he.gui.power_train_builder.cli:main"
 ```
 
-Installing the package creates the command in the environment's scripts folder; it runs `main` of `cli.py`, a [Click](https://click.palletsprojects.com/) command. After adding or renaming the script in `pyproject.toml`, the package must be installed again for the command to exist. The same command can also be run as a module, e.g. when the environment's scripts folder is not on the `PATH`:
+Installing the package (e.g. `poetry install` or `pip install`) creates the command in the environment's scripts folder; 
+it runs `main` of `cli.py`, a [Click](https://click.palletsprojects.com/) command. After adding or renaming the script in `pyproject.toml`, the package 
+must be installed again for the command to exist. The same command can also be run as a module, e.g. when the 
+environment's scripts folder is not on the `PATH`:
 
 ```bash
 python -m fastga_he.gui.power_train_builder.cli
@@ -39,7 +45,8 @@ python -m fastga_he.gui.power_train_builder.cli
 | `--address` | `localhost` | Address the server binds to |
 | `--help` | | Show the options and their defaults, then exit |
 
-The command only forwards its options to `PowertrainBuilderLauncher.launch` (see [`main`](#main)). To stop the server from the terminal, press `Ctrl+C`.
+The command only forwards its options to `PowertrainBuilderLauncher.launch` (see [`main`](#main)). To stop the server 
+from the terminal, press `Ctrl+C`.
 
 #### From Python or a notebook
 
@@ -49,11 +56,13 @@ from fastga_he.gui.power_train_builder.power_train_builder_launcher import Power
 PowertrainBuilderLauncher.launch(port=5007)
 ```
 
-The call blocks the Python process (or the notebook cell) until the session ends (see [`PowertrainBuilderLauncher.launch`](#powertrainbuilderlauncherlaunch)).
+The call blocks the Python process (or the notebook cell) until the session ends (see 
+[`PowertrainBuilderLauncher.launch`](#powertrainbuilderlauncherlaunch)).
 
 #### Remote use
 
-The file dialogs (Load, Save, watcher CSV) open with tkinter on the machine that runs the server. The builder is therefore meant to be launched and used on the same computer, with the default `--address localhost`.
+The file dialogs (Load, Save, watcher CSV) open with tkinter on the machine that runs the server. The builder is 
+therefore meant to be launched and used on the same computer, with the default `--address localhost`.
 
 ---
 
@@ -63,7 +72,8 @@ The file dialogs (Load, Save, watcher CSV) open with tkinter on the machine that
 main(port=5007, address='localhost')
 ```
 
-Command-line entry point, run by the `powertrain-builder` command. Launch the powertrain builder in the default web browser.
+Command-line entry point, run by the `powertrain-builder` command. Launch the powertrain builder in the default 
+web browser.
 
 It is a [Click](https://click.palletsprojects.com/) command that forwards its two options to `PowertrainBuilderLauncher.launch`.
 
@@ -105,7 +115,8 @@ PowertrainBuilderLauncher.launch(port=5007, address='localhost')
 
 Start the Bokeh server and open the builder in the default browser.
 
-The call configures logging, serves the builder document at `http://<address>:<port>/` and blocks the calling thread until the session ends.
+The call configures logging, serves the builder document at `http://<address>:<port>/` and blocks the calling thread 
+until the session ends.
 
 ---
 
@@ -140,7 +151,8 @@ The launch is done in four steps.
 
 #### 1. Logging
 
-The root logger is set to `INFO` with a timestamped format. The `bokeh` and `tornado` loggers are set to `WARNING`, so the console only shows the builder's own messages.
+The root logger is set to `INFO` with a timestamped format. The `bokeh` and `tornado` loggers are set to `WARNING`, so 
+the console only shows the builder's own messages.
 
 #### 2. Document factory
 
@@ -148,21 +160,26 @@ The root logger is set to `INFO` with a timestamped format. The `bokeh` and `tor
 
 1. Build the toolbox, the configuration panel and the `BuilderState`.
 2. Create the **Undo** / **Redo** buttons and store them on the state, so that the handler can wire them.
-3. Create the canvas figure: 800 × 950 px at first, with the ranges of the design world (`CANVAS_WORLD_X_RANGE`, `CANVAS_WORLD_Y_RANGE`) and no axes or grid. The title text has the background colour, so it is invisible.
+3. Create the canvas figure: 800 × 950 px at first, with the ranges of the design world (`CANVAS_WORLD_X_RANGE`, 
+`CANVAS_WORLD_Y_RANGE`) and no axes or grid. The title text has the background colour, so it is invisible.
 4. Add the legend (`_add_canvas_legend`) and the glyphs listed below.
 5. Create the `BuilderHandler` and connect the canvas `Tap` event to `on_canvas_tap`.
 6. Fit the canvas to the window (`_make_canvas_fit_window`).
-7. Add the roots: the main row (toolbox, canvas, panel), the startup overlay, the Undo / Redo row, the "final version?" overlay and the unsaved-exit overlay.
+7. Add the roots: the main row (toolbox, canvas, panel), the startup overlay, the Undo / Redo row, the "final version?" 
+overlay and the unsaved-exit overlay.
 
-The Undo / Redo row is absolutely positioned over the top-left corner of the canvas (`left = PALETTE_WIDTH + 38 px`, `top = 30 px`, z-index 50), below the dialogs (z-index 100).
+The Undo / Redo row is absolutely positioned over the top-left corner of the canvas (`left = PALETTE_WIDTH + 38 px`, 
+`top = 30 px`, z-index 50), so the dialogs (z-index 100) cover it.
 
 #### 3. Session tracking
 
-`make_document_with_tracking` wraps the factory and registers an `on_session_destroyed` hook that stops the IO loop. Closing the browser tab therefore also stops the server.
+`make_document_with_tracking` wraps the factory and registers an `on_session_destroyed` hook that stops the IO loop. 
+Closing the browser tab therefore also stops the server.
 
 #### 4. Server
 
-A single-process `Server` serves the factory at `/`. The browser is opened 0.1 s after the IO loop starts, then `server.io_loop.start()` blocks.
+A single-process `Server` serves the factory at `/`. The browser is opened 0.1 s after the IO loop starts, then 
+`server.io_loop.start()` blocks.
 
 #### Canvas glyphs
 
@@ -202,7 +219,8 @@ _add_canvas_legend(canvas)
 
 Draw the connection-type legend in the top-right corner of the canvas.
 
-There is one row per energy type: fuel flow, mechanical power and electrical current. Each row has a small colour icon and a label drawn in the edge colour of that type, as in the network viewer.
+There is one row per energy type: fuel flow, mechanical power and electrical current. Each row has a small colour icon 
+and a label drawn in the edge colour of that type, as in the network viewer.
 
 ---
 
@@ -222,9 +240,14 @@ None.
 
 ### Notes
 
-The legend is made of two renderers, each with its own data source and one row per entry of `_LEGEND_ENTRIES`: an `image_url` glyph for the icons (`icon_data_url` of `COLOR_ICON_CONFIG`) and a `LabelSet` for the coloured texts. A `CustomJS` callback then moves both.
+The legend is made of two renderers, each with its own data source and one row per entry of `_LEGEND_ENTRIES`: an 
+`image_url` glyph for the icons (`icon_data_url` of `COLOR_ICON_CONFIG`) and a `LabelSet` for the coloured texts. A 
+`CustomJS` callback then moves both.
 
-Bokeh can only place images in data coordinates, but the legend must stay fixed on screen when the view is panned, zoomed, reset or resized. The legend is therefore laid out in screen pixels (`_LEGEND_*_PX` constants) and converted to data coordinates in the browser by the `_JS_PIN_LEGEND` callback. The callback runs whenever the start or end of a range, or the inner width or height of the canvas, changes.
+Bokeh can only place images in data coordinates, but the legend must stay fixed on screen when the view is panned, 
+zoomed, reset or resized. The legend is therefore laid out in screen pixels (`_LEGEND_*_PX` constants) and converted to 
+data coordinates in the browser by the `_JS_PIN_LEGEND` callback. The callback runs whenever the start or end of a 
+range, or the inner width or height of the canvas, changes.
 
 | Constant | Value | Meaning |
 |---|---|---|
@@ -279,23 +302,31 @@ None.
 
 ### Notes
 
-The canvas takes the space between the two side panels, whatever the aspect ratio of the window. This is done in two steps, both in JavaScript.
+The canvas takes the space between the two side panels, whatever the aspect ratio of the window. This is done in two 
+steps, both in JavaScript.
 
 #### 1. Canvas size (`_JS_FIT_CANVAS_SIZE`)
 
-Runs when the document is ready and on every window resize (throttled to one animation frame). The width is the window width minus the canvas left position and `CONFIG_PANEL_RESERVED_WIDTH` (425 px); the height is the window height minus the canvas top position and an 8 px margin. Both are clamped to at least `CANVAS_MIN_WIDTH` × `CANVAS_MIN_HEIGHT` (480 × 420 px).
+Runs when the document is ready and on every window resize (throttled to one animation frame). The width is the window 
+width minus the canvas left position and `CONFIG_PANEL_RESERVED_WIDTH` (425 px); the height is the window height minus 
+the canvas top position and an 8 px margin. Both are clamped to at least `CANVAS_MIN_WIDTH` × `CANVAS_MIN_HEIGHT` 
+(480 × 420 px).
 
 #### 2. View (`_JS_FIT_VIEW`)
 
 Runs when the inner size of the canvas changes, and when Python flips `fit_view_trigger`.
 
-1. Take the design world (0–800 × 0–950) and extend it to every placed node plus `CANVAS_FIT_NODE_MARGIN` (60 data units).
-2. Use the same data-units-per-pixel `k` on both axes, so icons are not stretched: `k = max(width_data / width_px, height_data / height_px)`.
-3. Set the ranges from the left and top edges. Extra room goes to the right and the bottom. The ranges are also stored as the reset target of the **Reset** tool.
+1. Take the design world (0–800 × 0–950) and extend it to every placed node plus `CANVAS_FIT_NODE_MARGIN` 
+(60 data units).
+2. Use the same data-units-per-pixel `k` on both axes, so icons are not stretched: 
+`k = max(width_data / width_px, height_data / height_px)`.
+3. Anchor the ranges at the left and top edges; any extra room goes to the right and bottom. The ranges are also stored 
+as the reset target of the **Reset** tool.
 4. Write a JSON report to `view_scale_input`, for example:
 
    ```json
    {"k": 1.27, "area": [0, 1016.0, -66.5, 950], "area_k": 1.27}
    ```
 
-   `k` is the scale of the current view; `area` and `area_k` are the area and scale an *empty* design would get in this window, used to spread automatic layouts.
+   `k` is the scale of the current view; `area` and `area_k` are the area and scale an *empty* design would get in this 
+    window, used to spread automatic layouts.

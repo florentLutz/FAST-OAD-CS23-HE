@@ -2,18 +2,22 @@
 
 [<- Powertrain builder](powertrain_builder)
 
-Module `power_train_network_reader.py`. It is the inverse of the [YAML writer](powertrain_builder_yaml_writer): it reads a powertrain YAML file and rebuilds the node and edge data the canvas needs.
+Module `power_train_network_reader.py`. It is the inverse of the [YAML writer](powertrain_builder_yaml_writer): it reads a powertrain YAML file 
+and rebuilds the node and edge data the canvas needs.
 
-The YAML is the single source of truth. Everything is derived from its FAST-OAD sections:
+Everything the canvas needs comes from the file:
 
 | Section | Gives |
 |---|---|
 | `power_train_components` | Name, type (from `id`), icon, position, options, symmetry peer, port counts |
 | `component_connections` | Connections; `[name, N]` is port `N`, a plain name is port `1` |
-| `watcher_file_path` | Kept, so that saving again preserves it |
+| `watcher_file_path` | Path of the CSV of per-time-step performance parameters of the powertrain components; kept, so that saving again preserves it |
 | `canvas_layout` (optional) | Canvas `x`, `y` of each component; port counts and types of unknown components |
 
-Components without a `canvas_layout` entry (final-version files, hand-written files, older files) are placed automatically with the network viewer's `HierarchicalLayout`: energy storage at the bottom, propulsors at the top. **Any valid powertrain YAML can therefore be opened in the builder.** If that layout cannot be computed, a grid is used instead.
+Components without a `canvas_layout` entry (final-version files, hand-written files, older files) are placed 
+automatically with the network viewer's `HierarchicalLayout`: energy storage at the bottom, propulsors at the top. 
+**Any valid powertrain YAML can therefore be opened in the builder.** If that layout cannot be computed, a grid is 
+used instead.
 
 Port and edge coordinates are not computed here; `_rebuild_all_ports` computes them after loading.
 
@@ -33,7 +37,8 @@ Rebuild canvas data from a powertrain YAML file.
 
 - **state** : *BuilderState*
 
-  Only its read-only lookups are used (`possible_position`, `possible_options`, `default_source_count`, `default_target_count`) and its `canvas_area`, if the browser reported one.
+  Only its read-only lookups are used (`possible_position`, `possible_options`, `default_source_count`, 
+  `default_target_count`) and its `canvas_area`, if the browser reported one.
 
 - **icon_size** : *int*
 
@@ -69,7 +74,8 @@ Parse a powertrain YAML file and return the design it describes.
 
 - **canvas_state** : *dict*
 
-  `{"components": {column: [...]}, "connections": {column: [...]}, "watcher_file_path": str}`, ready for `_restore_canvas_from_dict`.
+  `{"components": {column: [...]}, "connections": {column: [...]}, "watcher_file_path": str}`, ready for 
+  `_restore_canvas_from_dict`.
 
 ---
 
@@ -86,11 +92,13 @@ The file is read in five steps.
 
 1. Load the YAML (safe loader).
 2. Build the nodes (`_build_nodes`).
-3. Build the edges (`_build_edges`); this also gives undefined port sides of unknown components the type of what they are connected to.
+3. Build the edges (`_build_edges`); this also gives undefined port sides of unknown components the type of what they 
+are connected to.
 4. Give unknown components without stored port counts enough ports for their connections (`_fit_unknown_port_counts`).
 5. Place the nodes without a layout entry (`_place_nodes_without_layout`).
 
-Problems in the file that do not prevent reading it (unknown component reference, incompatible connection, missing symmetry peer, ...) are logged as warnings and skipped.
+Problems in the file that do not prevent reading it (unknown component reference, incompatible connection, missing 
+symmetry peer, ...) are logged as warnings and skipped.
 
 ---
 
@@ -149,7 +157,9 @@ Build the node data from `power_train_components`.
 
 ### Notes
 
-For each component: a known component (`_drawable_known_component`) gets its row from `_known_node_row`, any other from `_unknown_node_row`. Its position, icon, size and name are added, and `symmetrical` entries are collected and linked at the end (`_link_symmetry_requests`), since the peer may come later in the file.
+For each component: a known component (`_drawable_known_component`) gets its row from `_known_node_row`, any other from 
+`_unknown_node_row`. Its position, icon, size and name are added, and `symmetrical` entries are collected and linked at 
+the end (`_link_symmetry_requests`), since the peer may come later in the file.
 
 ---
 
@@ -179,7 +189,8 @@ Return the type, icon, position, options, port counts and port types of a known 
 
 - **columns** : *dict*
 
-  `node_type`, `icon_type`, `position`, `options` (JSON), `n_sources`, `n_targets`, and empty port types (the colours come from the icon).
+  `node_type`, `icon_type`, `position`, `options` (JSON), `n_sources`, `n_targets`, and empty port types (the colours 
+  come from the icon).
 
 ---
 
@@ -222,7 +233,8 @@ None.
 ### Notes
 
 1. Compute the available area: the canvas area of the user's window, inset by margins (`_layout_area`).
-2. Lay out the **whole** graph with `HierarchicalLayout` (`_hierarchical_canvas_positions`), and keep the positions of the nodes to place only; nodes with a layout entry keep theirs.
+2. Lay out the **whole** graph with `HierarchicalLayout` (`_hierarchical_canvas_positions`), and keep the positions of 
+the nodes to place only; nodes with a layout entry keep theirs.
 3. If that fails, place the nodes on a grid over the same area (`_grid_positions`).
 
 ---
@@ -259,7 +271,7 @@ Return the position stored in a `canvas_layout` entry. Static method.
 _position(component_type, file_position)
 ```
 
-Return the position of the file, or the type's default when it is missing.
+Return the position given in the file, or the type's default when it is missing.
 
 ---
 
@@ -285,7 +297,8 @@ _options_json(component_type, file_options)
 
 Return the options of a known component as stored by the GUI: the type's defaults overridden by the values of the file.
 
-Only options known to the GUI (`possible_options`) are kept. In particular the `number_of_*` options are dropped: they are represented by the port counts and written again on the next save.
+Only options known to the GUI (`possible_options`) are kept. In particular the `number_of_*` options are dropped: they 
+are represented by the port counts and written again on the next save.
 
 ---
 
@@ -313,7 +326,8 @@ Only options known to the GUI (`possible_options`) are kept. In particular the `
 _port_counts(component_type, known_component, file_options)
 ```
 
-Return the port counts of a known component: the type's defaults, except for a variable-port component, whose `number_of_*` options give its counts.
+Return the port counts of a known component: the type's defaults, except for a variable-port component, whose 
+`number_of_*` options give its counts.
 
 ---
 
@@ -339,7 +353,8 @@ Return the port counts of a known component: the type's defaults, except for a v
 
 ### Notes
 
-The side of each `number_of_*` attribute is given by [`port_side_of`](powertrain_builder_yaml_writer#port_side_of), the same rule the writer uses. Values that are not integers are ignored.
+The side of each `number_of_*` attribute is given by [`port_side_of`](powertrain_builder_yaml_writer#port_side_of), the same rule the writer uses. Values that 
+are not integers are ignored.
 
 ---
 
@@ -381,7 +396,8 @@ Build the edge data from `component_connections`.
 
 1. Read the end points (`_connection_endpoints`).
 2. Type the undefined port sides of unknown components from their connections.
-3. Keep only connections whose ports may be connected on the canvas: the source side has ports and the two colours are the same, defined energy type. Others are logged and skipped.
+3. Keep only connections whose ports may be connected on the canvas: the source side has ports and the two colours are 
+the same, defined energy type. Others are logged and skipped.
 
 Connections to a port number above the component's port count are dropped later, when `_rebuild_all_ports` runs.
 
@@ -413,7 +429,8 @@ Return the `KNOWN_COMPONENTS` entry of a component of the file, if the canvas ca
 
 - **known_component** : *dict or None*
 
-  `None`, and the component is shown as unknown, if its `id` is not registered or its icon is not in `BUILDER_ICONS_CONFIG`.
+  `None`, and the component is shown as unknown, if its `id` is not registered or its icon is not in 
+  `BUILDER_ICONS_CONFIG`.
 
 ---
 
@@ -425,7 +442,8 @@ _connection_endpoints(connections, name_to_index)
 
 Return the node index and port label of both ends of every valid connection of the file.
 
-Malformed connections, connections to a component that is not in the file, and connections of a component to itself are logged and skipped.
+Malformed connections, connections to a component that is not in the file, and connections of a component to itself are 
+logged and skipped.
 
 ---
 
@@ -475,7 +493,10 @@ None.
 
 ### Notes
 
-A file without `canvas_layout` does not store the port types of its unknown components, but its connections imply them. The first connection to a defined port decides. The pass is repeated until nothing changes, so a chain of unknown components is typed from its known end. A side connected to nothing defined stays undefined, and its connections are then refused.
+A file without `canvas_layout` does not store the port types of its unknown components, but its connections imply them. 
+The first connection to a defined port decides. The pass is repeated until nothing changes, so a chain of unknown 
+components is typed from its known end. A side connected to nothing defined stays undefined, and its connections are 
+then refused.
 
 ---
 
@@ -511,7 +532,8 @@ Set one undefined port side of an unknown component to the energy type of *far_c
 
 - **typed** : *bool*
 
-  `True` if the side was typed; `False` if the node is known, the side is already typed, or *far_color* is not a defined energy colour.
+  `True` if the side was typed; `False` if the node is known, the side is already typed, or *far_color* is not a 
+  defined energy colour.
 
 ---
 
@@ -547,7 +569,8 @@ Return the type, icon, position, options and port settings of an unknown compone
 
 - Type: from the `id` (`unknown_component_type`).
 - Options: kept exactly as written.
-- Port counts and types: from the layout entry when the file was saved for later edits. Otherwise the types are undefined and the counts are `None`, to be set by `_fit_unknown_port_counts`.
+- Port counts and types: from the layout entry when the file was saved for later edits. Otherwise the types are 
+undefined and the counts are `None`, to be set by `_fit_unknown_port_counts`.
 
 ---
 
@@ -609,7 +632,8 @@ Return a port type stored in a `canvas_layout` entry, or `"undefined"` if missin
 _fit_unknown_port_counts(nodes_data, edges_data)
 ```
 
-Give every unknown component without stored port counts enough ports for its connections, in place: on each side, the highest port number used, and at least 1.
+Give every unknown component without stored port counts enough ports for its connections, in place: on each side, the 
+highest port number used, and at least 1.
 
 ---
 
@@ -633,10 +657,8 @@ None.
 
 ### Notes
 
-1. Scan both ends of every edge and keep, for each `(node_index, kind)`, the highest port label used.
-2. For every component whose `n_sources` or `n_targets` is still `None` (an unknown component read without a `canvas_layout` entry), set it to that label, or to `UNKNOWN_DEFAULT_PORT_COUNT` (1) if that is larger.
-
-Counts read from `canvas_layout` are kept even if a connection uses a higher port; `_rebuild_all_ports` then drops that connection.
+Only `None` counts are set: counts read from `canvas_layout` are kept even if a connection uses a higher port, and 
+`_rebuild_all_ports` then drops that connection.
 
 ---
 
@@ -648,7 +670,8 @@ _link_symmetry_requests(nodes_data, name_to_index, symmetry_requests)
 
 Link every `symmetrical` pair of the file on both components, in place.
 
-The writer puts `symmetrical` on one component of each pair only, but the canvas stores the link on both. A peer missing from the file is logged and ignored, except for an unknown component, which keeps the name without a peer on the canvas.
+The writer puts `symmetrical` on one component of each pair only, but the canvas stores the link on both. A peer missing
+from the file is logged and ignored, except for an unknown component, which keeps the name without a peer on the canvas.
 
 ---
 
@@ -715,7 +738,8 @@ _parse_endpoint(None)               # None
 _matching_component_types(references)
 ```
 
-Return the component types whose type, or one of whose type classes, is in *references*. Same rule as `FASTGAHEPowerTrainConfigurator.get_component_distance`.
+Return the component types whose type, or one of whose type classes, is in *references*. Same rule as 
+`FASTGAHEPowerTrainConfigurator.get_component_distance`.
 
 Used at import to build `_ENERGY_STORAGE_COMPONENT_TYPES` from `("tank", "battery_pack")`.
 
@@ -741,7 +765,8 @@ Used at import to build `_ENERGY_STORAGE_COMPONENT_TYPES` from `("tank", "batter
 _hierarchy_layers(graph, node_types, propulsor_names, from_propulsor=False)
 ```
 
-Give every node a layer index, 0 being the top of the canvas. Follows the network viewer's `GraphBuilder._get_hierarchy_layers`, made robust to unfinished designs.
+Give every node a layer index, 0 being the top of the canvas. Follows the network viewer's 
+`GraphBuilder._get_hierarchy_layers`, made robust to unfinished designs.
 
 ---
 
@@ -775,9 +800,13 @@ Give every node a layer index, 0 being the top of the canvas. Follows the networ
 
 Distances ignore the direction of the edges.
 
-1. **From storage:** `layer = max_distance − distance` to the nearest tank or battery, so storage is at the bottom (`_layers_from_energy_storage`).
-2. This is kept only if every node farthest from storage is a propulsor. Otherwise, or if *from_propulsor* is set, the layers are the distance **from** the propulsors, which puts every propulsor in the top layer.
-3. Unlike the viewer, a design may have no storage, no propulsor, or separate parts. If neither reference reaches every node, the one reaching more nodes is used (`_chosen_layers`) and the rest go to an extra bottom layer (`_with_unreached_nodes_at_the_bottom`).
+1. **From storage:** `layer = max_distance − distance` to the nearest tank or battery, so storage is at the bottom 
+(`_layers_from_energy_storage`).
+2. This is kept only if every node farthest from storage is a propulsor. Otherwise, or if *from_propulsor* is set, the 
+layers are the distance **from** the propulsors, which puts every propulsor in the top layer.
+3. Unlike the viewer, a design may have no storage, no propulsor, or separate parts. If neither reference reaches every 
+node, the one reaching more nodes is used (`_chosen_layers`) and the rest go to an extra bottom layer 
+(`_with_unreached_nodes_at_the_bottom`).
 
 ---
 
@@ -819,7 +848,8 @@ Return the layers counted from the energy storage.
 _chosen_layers(layers_from_energy, layers_from_propulsor, num_nodes, from_propulsor)
 ```
 
-Choose the layering: storage if it reaches every node and propulsors are not required; else propulsors if they reach every node; else whichever reaches more nodes (storage on a tie).
+Choose the layering: storage if it reaches every node and propulsors are not required; else propulsors if they reach 
+every node; else whichever reaches more nodes (storage on a tie).
 
 ---
 
@@ -895,7 +925,9 @@ Return the area available to generated layouts: the window's canvas area, inset 
 
 ### Notes
 
-The margins are 50 px left, right and bottom, and 110 px top (to clear the Undo / Redo buttons and the legend), converted to data units with `per_px`, and never less than `CANVAS_FIT_NODE_MARGIN` (60), so the loaded design fits the view without zooming out. Bounds are rounded inwards to 0.1. For a window too small, the area collapses onto its centre.
+The margins are 50 px left, right and bottom, and 110 px top (to clear the Undo / Redo buttons and the legend), 
+converted to data units with `per_px`, and never less than `CANVAS_FIT_NODE_MARGIN` (60), so the loaded design fits the 
+view without zooming out. Bounds are rounded inwards to 0.1. For a window too small, the area collapses onto its centre.
 
 With the default area (800 × 950 at 1 unit per pixel), the result is `(60.0, 740.0, 60.0, 840.0)`.
 
@@ -907,7 +939,8 @@ With the default area (800 × 950 at 1 unit per pixel), the result is `(60.0, 74
 _spread(values, low, high, step_max)
 ```
 
-Map evenly spaced abstract coordinates onto `[low, high]`: as spread out as the range allows, but at most *step_max* per unit, and centred.
+Map evenly spaced abstract coordinates onto `[low, high]`: spread as widely as the range allows, at most *step_max* 
+apart per unit, and centred.
 
 ---
 
@@ -983,7 +1016,9 @@ Run the viewer's `HierarchicalLayout` on the loaded design and spread the result
 3. Run `HierarchicalLayout` (`orientation="TB"`, `sorting=True`) with these layers.
 4. Map the abstract coordinates onto *area* with `_spread`, `x` and `y` separately.
 
-The layout works in abstract units (x = slot in the layer, y = layer row, top-to-bottom orientation with crossing reduction). They are mapped with `_spread`, with at most 25 % of the area width between neighbours in `x` and 30 % of the height in `y`, so a small design stays compact and centred on a large screen.
+The layout works in abstract units (x = slot in the layer, y = layer row, top-to-bottom orientation with crossing 
+reduction). They are mapped with `_spread`, with at most 25 % of the area width between neighbours in `x` and 30 % of 
+the height in `y`, so a small design stays compact and centred on a large screen.
 
 ---
 
@@ -1019,4 +1054,5 @@ Return evenly spaced positions over an area, row by row from the top left. Fallb
 
 ### Notes
 
-The number of columns follows the aspect ratio of the area: `round(sqrt(count × width / height))`, between 1 and *count*.
+The number of columns follows the aspect ratio of the area: `round(sqrt(count × width / height))`, between 1 and 
+*count*.

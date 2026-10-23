@@ -6,9 +6,13 @@ Module `power_train_builder_handler_io.py`, mixin `IOMixin` of [`BuilderHandler`
 
 It saves and loads designs, manages the watcher CSV path, runs undo and redo, and ends the session.
 
-A design is saved as one YAML file: the FAST-OAD_CS23-HE powertrain configuration, plus, unless saved as a final version, a GUI-only `canvas_layout` section with the canvas position of each component. See [YAML writer](powertrain_builder_yaml_writer) and [YAML reader](powertrain_builder_yaml_reader).
+A design is saved as one YAML file: the FAST-OAD_CS23-HE powertrain configuration, plus, unless saved as a 
+final version, a GUI-only `canvas_layout` section with the canvas position of each component. See [YAML writer](powertrain_builder_yaml_writer) 
+and [YAML reader](powertrain_builder_yaml_reader).
 
-**Save button colour.** Green (`"success"`) means the canvas matches the last saved or loaded file; orange (`"warning"`) means there are unsaved changes. **End Session** reads this colour to decide whether to ask before quitting.
+**Save button colour.** Green (`"success"`) means there is nothing to save: the canvas matches the last saved or loaded 
+file, or is a new blank design; orange (`"warning"`) means there are unsaved changes. **End Session** reads this colour 
+to decide whether to ask before quitting.
 
 ---
 
@@ -31,7 +35,7 @@ A design is saved as one YAML file: the FAST-OAD_CS23-HE powertrain configuratio
 |---|---|
 | Saved (green) | **End Session** -> `end_session_trigger` -> `_end_session`; the tab closes |
 | Unsaved -> **End Anyway** | `end_session_trigger` -> `_end_session`; the tab closes |
-| Unsaved -> **Save & Exit** | `end_session_save_trigger` -> `_on_end_session_save_trigger` sets a flag -> save dialog -> `_on_browse_save` saves, closes the tab, stops the server |
+| Unsaved -> **Save & Exit** | `end_session_save_trigger` -> `_on_end_session_save_trigger` sets a flag; the "final version?" dialog -> file dialog -> `_on_browse_save` saves, closes the tab, stops the server |
 | Tab closed | Session destroyed -> server stopped by the launcher |
 
 ---
@@ -42,7 +46,8 @@ A design is saved as one YAML file: the FAST-OAD_CS23-HE powertrain configuratio
 _mark_unsaved()
 ```
 
-Turn the Save button orange to signal unsaved changes, and refresh the look of the Undo and Redo buttons. Called by every method that changes the design.
+Turn the Save button orange to signal unsaved changes, and refresh the look of the Undo and Redo buttons. Called by 
+every method that changes the design.
 
 ---
 
@@ -101,7 +106,8 @@ Write the current design to a YAML file.
 3. Build the YAML: title = file name without extension, every component, every connection, and the watcher path if set.
 4. Write the file.
 
-On success, the Save button turns green. On any error, the exception is logged, an error is shown in red in the status line, and the button stays orange.
+On success, the Save button turns green. On any error, the exception is logged, an error is shown in red in the status 
+line, and the button stays orange.
 
 ---
 
@@ -131,7 +137,9 @@ None.
 
 ### Notes
 
-The file must exist and end in `.yml` or `.yaml`. It is read with [`PowerTrainYAMLReader`](powertrain_builder_yaml_reader#powertrainyamlreader) and applied with `_restore_canvas_from_dict`. Any failure (missing file, wrong extension, parse error) is logged and shown in the status line; the canvas is left unchanged.
+The file must exist and end in `.yml` or `.yaml`. It is read with [`PowerTrainYAMLReader`](powertrain_builder_yaml_reader#powertrainyamlreader) and applied with 
+`_restore_canvas_from_dict`. Any failure (missing file, wrong extension, parse error) is logged and shown in the status 
+line; the canvas is left unchanged.
 
 ---
 
@@ -141,7 +149,8 @@ The file must exist and end in `.yml` or `.yaml`. It is read with [`PowerTrainYA
 _show_status_error(message)
 ```
 
-Show an error in red in the status line. The next mode change replaces it.
+Show an error in red in the status line. It stays until the status line changes again, e.g. when a component is armed or 
+delete mode is toggled.
 
 ---
 
@@ -165,7 +174,7 @@ None.
 _restore_canvas_from_dict(canvas_state)
 ```
 
-Replace the canvas with a design read from a file.
+Replace the canvas with a design read from a YAML file, as returned by `PowerTrainYAMLReader.read`.
 
 ---
 
@@ -173,7 +182,8 @@ Replace the canvas with a design read from a file.
 
 - **canvas_state** : *dict*
 
-  Result of `PowerTrainYAMLReader.read`: keys `"components"` (node columns), `"connections"` (edge columns) and `"watcher_file_path"`.
+  Result of `PowerTrainYAMLReader.read`: keys `"components"` (node columns), `"connections"` (edge columns) and 
+  `"watcher_file_path"`.
 
 ---
 
@@ -187,13 +197,15 @@ None.
 
 1. Return the canvas to idle and clear the placement counter.
 2. Load the node and edge data and the watcher path.
-3. Rebuild the placement counter from the names, so new components continue the numbering: for each name `<key>_<n>`, the counter of `<key>` is the largest `n`.
+3. Rebuild the placement counter from the names, so new components continue the numbering: for each name `<key>_<n>`, 
+the counter of `<key>` is the largest `n`.
 4. Resize the icons, rings and labels to the current icon size.
 5. Ask the browser to refit the view so every component is visible.
 6. Rebuild the ports, which also recomputes every edge position and drops the edges pointing at ports that do not exist.
 7. Turn the Save button green.
 
-No undo step is recorded for the load, and the history is not cleared: undoing right after a load restores the snapshot of the last edit made *before* the load, not the design that was on the canvas when the file was opened.
+No undo step is recorded for the load, and the history is not cleared: undoing right after a load restores the snapshot 
+of the last edit made *before* the load, not the design that was on the canvas when the file was opened.
 
 ---
 
@@ -225,7 +237,8 @@ None.
 _on_browse_load(attr, old, new)
 ```
 
-Callback of `browse_load_trigger`: open an open-file dialog for a powertrain YAML and load the chosen file. If the dialog is cancelled, nothing happens and the startup overlay stays.
+Callback of `browse_load_trigger`: open an open-file dialog for a powertrain YAML and load the chosen file. If the 
+dialog is cancelled, nothing happens and the startup overlay stays.
 
 ---
 
@@ -243,23 +256,14 @@ None.
 
 ---
 
-### Notes
-
-1. `_open_tkinter_dialog` runs `filedialog.askopenfilename`, filtered on `*.yml` / `*.yaml`.
-2. An empty result (dialog cancelled) returns at once.
-3. Otherwise `_dismiss_startup_overlay` hides the overlay, then `_load_canvas_state` reads and applies the file.
-
-The overlay is hidden before the load, so it stays hidden even if the file then fails to load; the error is shown in the status line.
-
----
-
 ## _on_browse_watcher
 
 ```python
 _on_browse_watcher(attr, old, new)
 ```
 
-Callback of `browse_watcher_trigger`: open a save-file dialog for the watcher CSV and put the chosen path in the watcher field. The field's own callback then stores it.
+Callback of `browse_watcher_trigger`: open a save-file dialog for the watcher CSV and put the chosen path in the 
+watcher field. The field's own callback then stores it.
 
 ---
 
@@ -283,7 +287,8 @@ None.
 _on_watcher_path_change(attr, old, new)
 ```
 
-Callback of the watcher field: store the path written as `watcher_file_path` in the YAML. An empty field leaves the key out of the file.
+Callback of the watcher field: store the path written as `watcher_file_path` in the YAML. An empty field leaves the key 
+out of the file.
 
 A real change marks the design unsaved. Values set by a load or New Design match the stored path, so they do not.
 
@@ -313,7 +318,8 @@ None.
 _set_watcher_path(watcher_csv_path)
 ```
 
-Set the watcher path without marking the design unsaved. The stored path is updated first, so the field's callback sees no change.
+Set the watcher path without marking the design unsaved. The stored path is updated first, so the field's callback 
+sees no change.
 
 ---
 
@@ -339,7 +345,8 @@ _open_tkinter_dialog(dialog_function, **kwargs)
 
 Run a native file dialog with tkinter and return the chosen path. Static method.
 
-A hidden, topmost tkinter root window is created for the dialog, so it opens in front of the browser, and destroyed afterwards.
+A hidden, topmost tkinter root window is created for the dialog, so it opens in front of the browser, and 
+destroyed afterwards.
 
 ---
 
@@ -363,19 +370,14 @@ A hidden, topmost tkinter root window is created for the dialog, so it opens in 
 
 ---
 
-### Notes
-
-The dialog opens on the machine running the server. This is the user's machine when the builder is used locally, which is the intended use.
-
----
-
 ## _push_undo
 
 ```python
 _push_undo()
 ```
 
-Record the current design on the undo stack. Must be called **before** every change of `placed_nodes_source` or `edge_source`.
+Record the current design on the undo stack. Must be called **before** every change of `placed_nodes_source` or 
+`edge_source`.
 
 ---
 
@@ -399,11 +401,6 @@ None.
 
 ### Notes
 
-1. `_end_edge_preview` puts back the connections a port-count preview is hiding, so the snapshot holds the true connections.
-2. `make_snapshot` deep-copies the nodes, the edges and the placement counter.
-3. `EditHistoryStack.push_undo` stores the snapshot and clears the redo stack.
-4. `_refresh_undo_redo_buttons` shows Undo as active.
-
 It does not mark the design unsaved: the caller does, once its change is made.
 
 ---
@@ -414,7 +411,7 @@ It does not mark the design unsaved: the caller does, once its change is made.
 _restore_from_snapshot(snapshot)
 ```
 
-Replace the design with a recorded snapshot.
+Replace the design with an undo / redo snapshot.
 
 ---
 
@@ -434,8 +431,10 @@ None.
 
 ### Notes
 
-1. `_reset_interaction_state` clears the selection, pending clicks and picks, the armed component and delete mode, since a node index of the snapshot may now be another node.
-2. The node and edge data are copied into the two sources (`copy_column_data`). `placed_counter` is cleared and updated rather than replaced, so the state keeps the same dictionary.
+1. `_reset_interaction_state` clears the selection, pending clicks and picks, the armed component and delete mode, 
+since a node index of the snapshot may now be another node.
+2. The node and edge data are copied into the two sources (`copy_column_data`). `placed_counter` is cleared and updated 
+rather than replaced, so the state keeps the same dictionary.
 3. `_apply_node_icon_size` sets the icons to the current slider value, as the snapshot may hold an older size.
 4. `_rebuild_all_ports` redraws the port balls and re-routes the edges.
 
@@ -499,7 +498,8 @@ None.
 ### Notes
 
 1. Return if `can_redo` is false.
-2. `_end_edge_preview`, then `make_snapshot` of the current design, pushed on the undo stack with `push_undo_keep_redo`, which keeps the remaining redo steps.
+2. `_end_edge_preview`, then `make_snapshot` of the current design, pushed on the undo stack with `push_undo_keep_redo`, 
+which keeps the remaining redo steps.
 3. `redo()` pops the last undone snapshot, and `_restore_from_snapshot` applies it.
 4. `_mark_unsaved`, which also refreshes the Undo and Redo buttons.
 
@@ -535,7 +535,8 @@ _end_session()
 
 Stop the Bokeh IO loop, which ends the server.
 
-Never called from a button directly, only through the triggers, so the JavaScript check on unsaved changes always runs first.
+Never called from a button directly, only through the triggers, so the JavaScript check on unsaved changes always 
+runs first.
 
 ---
 
@@ -559,7 +560,8 @@ _on_end_session_trigger(attr, old, new)
 
 Callback of `end_session_trigger`: end the session.
 
-JavaScript flips this trigger in two cases only: **End Session** with a saved design, and **End Anyway** in the unsaved-changes dialog.
+JavaScript flips this trigger in two cases only: **End Session** with a saved design, and **End Anyway** in the 
+unsaved-changes dialog.
 
 ---
 
@@ -583,7 +585,8 @@ None.
 _on_end_session_save_trigger(attr, old, new)
 ```
 
-Callback of `end_session_save_trigger` (**Save & Exit**): set `_pending_exit_after_save`, so the session ends after the next successful save.
+Callback of `end_session_save_trigger` (**Save & Exit**): set `_pending_exit_after_save`, so the session ends after the 
+next successful save.
 
 ---
 
@@ -633,7 +636,8 @@ None.
 
 1. Read the mode: the text before `:` in *new*.
 2. `cancel`: clear `_pending_exit_after_save` and return.
-3. Otherwise open a save-file dialog (`_open_tkinter_dialog`, default extension `.yml`) and call `_save_canvas_state`, with `include_canvas_layout` false for `final` only. A cancelled dialog returns `""`, which `_save_canvas_state` skips.
+3. Otherwise open a save-file dialog (`_open_tkinter_dialog`, default extension `.yml`) and call `_save_canvas_state`, 
+with `include_canvas_layout` false for `final` only. A cancelled dialog returns `""`, which `_save_canvas_state` skips.
 4. If Save & Exit is pending, clear the flag and, if the file was written, end the session (see below).
 
 The modes:
@@ -659,7 +663,8 @@ If the dialog is cancelled or the write fails, the session stays open so no work
 _flip_trigger(trigger)
 ```
 
-Flip a hidden trigger between `"0"` and `"1"`, so its JavaScript callback always runs. Python counterpart of the toolbox's `_js_flip`.
+Flip a hidden trigger between `"0"` and `"1"`, so its JavaScript callback always runs. Python counterpart of the 
+toolbox's `_js_flip`.
 
 ---
 
@@ -681,7 +686,10 @@ None.
 _set_text_input(text_input, text)
 ```
 
-Set the text of a `TextInput` from Python, in both of its properties.
+Set the text of a `TextInput` from Python, in both `value_input` and `value`.
+
+Setting `value` alone would leave the old text in `value_input`, which the "final version?" buttons copy back into 
+`value` before saving.
 
 ---
 
@@ -697,8 +705,3 @@ Set the text of a `TextInput` from Python, in both of its properties.
 
 None.
 
----
-
-### Notes
-
-Bokeh keeps two properties of a text field: `value` (updated on Enter or blur) and `value_input` (updated on every keystroke). Setting `value` alone from Python shows the new text but leaves `value_input` stale. The save buttons of the "final version?" dialog copy `value_input` into `value` before saving, which would then erase the new text. Both are therefore set, `value_input` first, so the Python callback of `value` sees the field in its final state.

@@ -50,12 +50,15 @@ None.
 
 The build is done in four steps.
 
-1. **Groups needed by other groups.** The unknown-component widgets (laid out inside the panel), the hidden triggers (wired to the overlays), the "final version?" overlay and the unsaved-exit overlay (which opens the former).
-2. **State.** `BuilderState(**...)` from the canvas sources, toolbox widgets, panel widgets, unknown-component widgets, startup buttons, overlays, triggers and registry lookups.
+1. **Groups needed by other groups.** The unknown-component widgets (laid out inside the panel), the hidden triggers 
+(wired to the overlays), the "final version?" overlay and the unsaved-exit overlay (which opens the former).
+2. **State.** `BuilderState(**...)` from the canvas sources, toolbox widgets, panel widgets, unknown-component widgets, 
+startup buttons, overlays, triggers and registry lookups.
 3. **Cross-group wiring.** `_wire_toolbox_callbacks(state)`.
 4. **Layout.** `_build_toolbox_layout(state)`.
 
-Some fields are left at their default and set later: `undo_button`, `redo_button`, `startup_overlay` and the three canvas renderers by the launcher; `edit_history_stack` by `BuilderHandler`; and the interaction values at run time.
+Some fields are left at their default and set later: `undo_button`, `redo_button`, `startup_overlay` and the three 
+canvas renderers by the launcher; `edit_history_stack` by `BuilderHandler`; and the interaction values at run time.
 
 ---
 
@@ -141,7 +144,8 @@ Assign every component icon to the toolbox tab(s) of its type classes.
 _with_unknown_component(icons_by_tab)
 ```
 
-Append the unknown component, last, to each tab of `UNKNOWN_COMPONENT_TABS` (`connector`, `propulsor`, `load`, `tank`, `source`) that exists.
+Append the unknown component, last, to each tab of `UNKNOWN_COMPONENT_TABS` (`connector`, `propulsor`, `load`, `tank`, 
+`source`) that exists.
 
 No tab is created for the unknown component alone.
 
@@ -248,9 +252,11 @@ None.
 
 - **widgets** : *dict*
 
-  - `buttons`: one button per entry of `BUILDER_ICONS_CONFIG`, in the same order. Label is the cleaned-up icon key; icon is the component image wrapped in an SVG, shown right of the label.
-  - `node_size_slider`: icon size from `NODE_ICON_SIZE_MIN` to `NODE_ICON_SIZE_MAX` (20–80), starting at `DEFAULT_NODE_ICON_SIZE` (50).
-  - `delete_button`, `save_button` (green), `end_session_button` (orange).
+  - `buttons`: one button per entry of `BUILDER_ICONS_CONFIG`, in the same order. Label is the cleaned-up icon key; icon
+    is the component image wrapped in an SVG, shown right of the label.
+  - `node_size_slider`: icon size from `NODE_ICON_SIZE_MIN` to `NODE_ICON_SIZE_MAX` (20–80), starting at 
+     `DEFAULT_NODE_ICON_SIZE` (50).
+  - `delete_button`, `save_button` (green), `end_session_button` (yellow).
   - `status_div`: status line, initially `STATUS_IDLE_HTML`.
 
 ---
@@ -293,7 +299,8 @@ Create the widgets of the configuration panel and lay them out in its column.
 
 - **unknown_widgets** : *dict*
 
-  Widgets from `_build_unknown_component_widgets`. They are placed next to the widget they replace, but are returned by that function, not by this one.
+  Widgets from `_build_unknown_component_widgets`. They are placed next to the widget they replace, but are returned by 
+  that function, not by this one.
 
 ---
 
@@ -301,7 +308,9 @@ Create the widgets of the configuration panel and lay them out in its column.
 
 - **widgets** : *dict*
 
-  `config_panel_column`, `name_input`, `type_select`, `position_select`, `symmetry_select`, `apply_button`, `source_count_spinner`, `target_count_spinner`, `port_count_section`, `options_table`, `options_rows_column`, `connections_rows_column`.
+  `config_panel_column`, `name_input`, `type_select`, `position_select`, `symmetry_select`, `apply_button`, 
+  `source_count_spinner`, `target_count_spinner`, `port_count_section`, `options_table`, `options_rows_column`, 
+  `connections_rows_column`.
 
 ---
 
@@ -327,7 +336,8 @@ The panel column is hidden until a node is selected, and scrolls inside itself o
 _build_unknown_component_widgets()
 ```
 
-Create the configuration-panel widgets used only for an [unknown component](powertrain_builder_unknown). All start hidden.
+Create the configuration-panel widgets used only for an [unknown component](powertrain_builder_unknown). All start 
+hidden.
 
 ---
 
@@ -341,9 +351,11 @@ None.
 
 - **widgets** : *dict*
 
-  - `unknown_type_input`, `unknown_position_input`, `unknown_symmetry_input`: free-text counterparts of the three selects.
+  - `unknown_type_input`, `unknown_position_input`, `unknown_symmetry_input`: free-text counterparts of the three 
+    selects.
   - `add_option_button`: adds an empty option row.
-  - `source_port_type_select`, `target_port_type_select`: energy type of each port side, from `PORT_TYPE_CHOICES`, starting at `"undefined"`.
+  - `source_port_type_select`, `target_port_type_select`: energy type of each port side, from `PORT_TYPE_CHOICES`, 
+    starting at `"undefined"`.
 
 ---
 
@@ -383,7 +395,8 @@ _build_hidden_triggers()
 
 Create the hidden `TextInput` widgets that relay actions between the browser and Python.
 
-A `CustomJS` callback cannot call Python. Each action needing server-side logic changes the value of one of these inputs, and Python reacts in its `on_change` callback.
+A `CustomJS` callback cannot call Python. Each action needing server-side logic changes the value of one of these 
+inputs, and Python reacts in its `on_change` callback.
 
 ---
 
@@ -422,7 +435,8 @@ None.
 _build_startup_buttons()
 ```
 
-Create the **New Design** and **Load Design** buttons of the startup overlay. The overlay itself is laid out by the launcher.
+Create the **New Design** and **Load Design** buttons of the startup overlay. The overlay itself is laid out by the 
+launcher.
 
 ---
 
@@ -509,9 +523,12 @@ The dialog is shown by **Save** and by **Save & Exit**. It holds the watcher CSV
 | **Cancel** | Hide dialog, set `"cancel:<ms>"` | Nothing saved, Save & Exit aborted |
 | **Browse** | Flip `browse_watcher_trigger` | Watcher CSV dialog |
 
-The mode is sent in the same value change as the "go" signal, so it cannot arrive out of order, and the timestamp makes every click a new value.
+The mode is sent in the same value change as the "go" signal, so it cannot arrive out of order, and the timestamp makes 
+every click a new value.
 
-**Final Version** and **Edit Later** first copy `watcher_path_input.value_input` (updated on every keystroke) into `value` (normally only updated on Enter or blur). A path that is still being typed is therefore stored before the save starts.
+**Final Version** and **Edit Later** first copy `watcher_path_input.value_input` (updated on every keystroke) into 
+`value` (normally only updated on Enter or blur). A path that is still being typed is therefore stored before the 
+save starts.
 
 ---
 
@@ -549,7 +566,8 @@ Create the "Unsaved Changes" dialog shown when **End Session** is clicked with u
 
 - **Cancel** hides the dialog.
 - **End Anyway** hides it, flips `end_session_trigger` (Python stops the server) and closes the tab.
-- **Save & Exit** hides it, shows the "final version?" dialog and flips `end_session_save_trigger`, so Python ends the session once the file is written.
+- **Save & Exit** hides it, shows the "final version?" dialog and flips `end_session_save_trigger`, so Python ends the 
+session once the file is written.
 
 ---
 
@@ -595,7 +613,8 @@ The components tree scanned for positions and options is `COMPONENTS_PATH = fast
 _wire_toolbox_callbacks(state)
 ```
 
-Wire the browser-side callbacks that link widgets of different groups. These need the whole state, so they run after it is assembled.
+Wire the browser-side callbacks that link widgets of different groups. These need the whole state, so they run after it 
+is assembled.
 
 ---
 
@@ -616,7 +635,8 @@ None.
 ### Notes
 
 - **Save** -> show the "final version?" dialog.
-- **End Session** -> if the Save button is orange (`'warning'`, unsaved changes), show the unsaved-exit dialog; otherwise flip `end_session_trigger` and close the tab.
+- **End Session** -> if the Save button is yellow (`'warning'`, unsaved changes), show the unsaved-exit dialog; 
+otherwise flip `end_session_trigger` and close the tab.
 - **Load Design** -> flip `browse_load_trigger`.
 - `close_window_trigger` change -> close the tab.
 
@@ -630,7 +650,8 @@ _build_toolbox_layout(state)
 
 Lay out the left panel.
 
-Top to bottom: *Components* title with the icon-size slider, component tabs, status line, **Delete**, **Save**, **End Session**, then the hidden triggers (they must be in the document to work).
+Top to bottom: *Components* title with the icon-size slider, component tabs, status line, **Delete**, **Save**, 
+**End Session**, then the hidden triggers (they must be in the document to work).
 
 ---
 

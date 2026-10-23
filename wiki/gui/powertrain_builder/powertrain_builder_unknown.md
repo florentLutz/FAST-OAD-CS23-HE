@@ -4,18 +4,21 @@
 
 Module `power_train_builder_handler_unknown.py`, mixin `UnknownComponentMixin` of [`BuilderHandler`](powertrain_builder_handler).
 
-An *unknown component* is one the builder has no definition for. It is either placed from the toolbox (the **Unknown** button, last in all tabs) or loaded from a file whose component `id` is not registered. On the canvas it behaves like any other component. Only its configuration panel differs, because there is no list of possible values to choose from:
+An *unknown component* is one the builder has no definition for. It is either placed from the toolbox (the **Unknown** 
+button, last in all tabs) or loaded from a file whose component `id` is not registered. On the canvas it behaves like 
+any other component. Only its configuration panel differs, because there is no list of possible values to choose from:
 
-| Field | Known component                                            | Unknown component                                              |
-|---|------------------------------------------------------------|----------------------------------------------------------------|
-| Type, position, symmetry peer | Selects                                                    | Free text                                                      |
-| Options | Fixed names, value selects                                 | Name and value text boxes; **Add option** adds a row           |
-| Port counts | Editable only for variable-port component types, minimum 1 | Both sides editable, 0 allowed                                 |
-| Port energy type | From the icon                                              | Two selects; **applied once selected**, without clicking Apply |
+| Field | Known component| Unknown component |
+|---|--------|-----------|
+| Type, position, symmetry peer | Selects| Free text |
+| Options | Fixed names, value selects | Name and value text boxes; **Add option** adds a row |
+| Port counts | Editable only for variable-port component types, minimum 1 | Both sides editable, 0 allowed |
+| Port energy type | From the icon | Two selects; **applied once selected**, without clicking Apply |
 
-*Ports of undefined type are gray and cannot be connected until a type is chosen.*
+*Ports of undefined type are grey and cannot be connected until a type is chosen.*
 
-**Class attribute.** `_unknown_option_rows` holds the `(name TextInput, value TextInput)` pairs of the component being edited, in panel order.
+**Class attribute.** `_unknown_option_rows` holds the `(name TextInput, value TextInput)` pairs of the component being 
+edited, in panel order.
 
 ---
 
@@ -27,7 +30,8 @@ _show_unknown_widgets(is_unknown)
 
 Show the free-text widgets of an unknown component and hide the selects of a known one, or the reverse.
 
-The type, position and symmetry fields are swapped; the **Add option** button and the two port-type selects are shown for an unknown component only.
+The type, position and symmetry fields are swapped; the **Add option** button and the two port-type selects are shown 
+for an unknown component only.
 
 ---
 
@@ -73,8 +77,10 @@ None.
 
 1. Type, position and symmetry text fields.
 2. Options as editable name / value rows, always shown.
-3. Both port-count spinners shown, with a minimum of 0 (e.g. for a tank or a propeller-like component), and the *Ports* section shown.
-4. Port-type selects set to the stored types (`"undefined"` if empty). This is flagged as programmatic, so it does not trigger `_on_port_type_change`.
+3. Both port-count spinners shown, with a minimum of 0 (e.g. for a tank or a propeller-like component), and the *Ports* 
+section shown.
+4. Port-type selects set to the stored types (`"undefined"` if empty). This is flagged as programmatic, so 
+`_on_port_type_change` ignores it.
 
 ---
 
@@ -126,7 +132,7 @@ None.
 
 ### Notes
 
-`_unknown_option_rows` and the children of `options_rows_column` are emptied, then `_add_unknown_option_row` is called once per option, with the value converted to text by `_option_values_to_strings`. Every refresh therefore creates new widgets, and text typed in the old rows but not applied is lost.
+Every refresh creates new widgets, so text typed in the old rows but not applied is lost.
 
 ---
 
@@ -137,8 +143,6 @@ _add_unknown_option_row(option_name='', option_value='')
 ```
 
 Append one name / value row to the Options table.
-
-The children list of the options column is reassigned rather than extended in place, so Bokeh sends the change to the browser.
 
 ---
 
@@ -166,7 +170,8 @@ None.
 _on_add_option()
 ```
 
-Callback of the **Add option** button: add an empty row to the selected unknown component. Does nothing if no unknown component is selected.
+Callback of the **Add option** button: add an empty row to the selected unknown component. Does nothing if no unknown 
+component is selected.
 
 The option is written on Apply. A row whose name is left empty is ignored, which is also how an option is removed.
 
@@ -223,7 +228,8 @@ None.
 _on_port_type_change(attr, old, new, *, side)
 ```
 
-Callback of the source and target port-type selects. Applies at once, as one undoable step.
+Callback of the source and target port-type selects: set the energy type of that side of the unknown component at once, 
+without Apply, as one undoable step.
 
 ---
 
@@ -251,7 +257,9 @@ None.
 
 ### Notes
 
-Ignored while the panel is being filled, when no unknown component is selected, or when the type does not change. Otherwise:
+Ignored while the panel is being filled, when no unknown component is selected, or when the type does not change. 
+
+Otherwise:
 
 1. Push an undo snapshot.
 2. Store the new type in `source_port_type` / `target_port_type`.
@@ -289,11 +297,6 @@ None.
 ---
 
 ### Notes
-
-A connection is dropped when either of its ends is a port of this side of this component, i.e. its port key starts with `(side, node_index)`. The same test is applied to:
-
-- `edge_source`: the edges are read with `edge_end_ports`, and the others kept with `select_edges`;
-- `panel_pending_connections`: the two port dicts of each pick are turned into keys with `_port_key`.
 
 The ports are not rebuilt here; `_on_port_type_change` does it afterwards.
 
@@ -351,7 +354,8 @@ Convert the text of an option value box to a Python value.
 
 - **value** : *object*
 
-  The Python literal the text spells (boolean, number, list, dictionary, quoted string, ...), or the stripped text itself.
+  The Python literal the text spells (boolean, number, list, dictionary, quoted string, ...), or the stripped text 
+  itself.
 
 ---
 

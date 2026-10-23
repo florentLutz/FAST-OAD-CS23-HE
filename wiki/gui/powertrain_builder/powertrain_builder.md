@@ -31,17 +31,17 @@ The call blocks until the session ends: **End Session**, **Save & Exit**, or clo
 
 ## What the user can do
 
-| Action | How | Where it is handled                                                                                    |
-|---|---|--------------------------------------------------------------------------------------------------------|
-| Start a design | **New Design** or **Load Design** on the startup overlay | [Canvas mode](powertrain_builder_canvas_mode), [I/O](powertrain_builder_io)                            |
-| Place a component | Pick a toolbox button, then click on the canvas | [Placement](powertrain_builder_placement)                                                              |
-| Select / configure | Click a component, edit the right-hand panel, click **Apply** | [Config panel](powertrain_builder_config_panel)                                                        |
+| Action | How | Where it is handled |
+|---|---|---------------------|
+| Start a design | **New Design** or **Load Design** on the startup overlay | [Canvas mode](powertrain_builder_canvas_mode), [I/O](powertrain_builder_io) |
+| Place a component | Pick a toolbox button, then click on the canvas | [Placement](powertrain_builder_placement) |
+| Select / configure | Click a component, edit the right-hand panel, click **Apply** | [Config panel](powertrain_builder_config_panel) |
 | Connect two ports | Click a port, then a compatible port of another component; or pick a port in the **Connections** panel and **Apply** | [Ports and edges](powertrain_builder_ports_edges), [Config panel](powertrain_builder_config_panel) |
-| Define a component the builder does not know | Place the **Unknown** component and type its type, options and port types | [Unknown components](powertrain_builder_unknown)                                            |
-| Delete | **Delete** button, then click a component or a connection | [Handler](powertrain_builder_handler)                                                                  |
-| Undo / redo | Buttons above the canvas | [History](powertrain_builder_history)                                                                  |
-| Resize icons | Slider next to the *Components* title | [Placement](powertrain_builder_placement)                                                              |
-| Save | **Save**, then **Final Version** (analysis input only) or **Edit Later** (with canvas layout) | [I/O](powertrain_builder_io), [YAML writer](powertrain_builder_yaml_writer)                            |
+| Define a component the builder does not know | Place the **Unknown** component and type its type, options and port types | [Unknown components](powertrain_builder_unknown) |
+| Delete | **Delete** button, then click a component or a connection | [Handler](powertrain_builder_handler) |
+| Undo / redo | Buttons over the top-left corner of the canvas | [History](powertrain_builder_history) |
+| Resize icons | Slider next to the *Components* title | [Placement](powertrain_builder_placement) |
+| Save | **Save**, then **Final Version** (analysis input only) or **Edit Later** (with canvas layout) | [I/O](powertrain_builder_io), [YAML writer](powertrain_builder_yaml_writer) |
 
 ---
 
@@ -57,22 +57,38 @@ cli.main -> PowertrainBuilderLauncher.launch
                         + PortEdgeMixin + ConfigPanelMixin + UnknownComponentMixin
 ```
 
-- **`BuilderState`** is the single shared object. It holds every Bokeh widget, every `ColumnDataSource`, the interaction state and the per-component-type lookup tables. Every module receives it by reference.
-- **`BuilderHandler`** holds no data of its own except the icon size. It is assembled from six mixins, one per responsibility, which all work on `self.state`.
-- **The design** is two data sources: `placed_nodes_source` (one row per component) and `edge_source` (one row per connection). Everything else drawn on the canvas (port balls, previews, rings) is derived from them and rebuilt by `_rebuild_all_ports`.
-- **The file** is the FAST-OAD_CS23-HE powertrain YAML, optionally followed by a GUI-only `canvas_layout` section. FAST-OAD ignores that section.
+- **`BuilderState`** is the single shared object. It holds every Bokeh widget, every `ColumnDataSource`, the interaction
+state and the per-component-type lookup tables. Every module receives it by reference.
+- **`BuilderHandler`** holds no design data of its own: it reads and changes `self.state`. It is assembled from six 
+mixins, one per responsibility.
+- **The design** is two data sources: `placed_nodes_source` (one row per component) and `edge_source` (one row per 
+connection). Everything else drawn on the canvas (port balls, previews, rings) is derived from them and rebuilt by 
+`_rebuild_all_ports`.
+- **The file** is the FAST-OAD_CS23-HE powertrain YAML, optionally followed by a GUI-only `canvas_layout` section. 
+FAST-OAD ignores that section.
 
 ---
 
 ## Conventions used throughout the code
 
-- **Copy, mutate, reassign.** A `ColumnDataSource` is never edited in place: the data is copied with `copy_column_data`, the copy is edited, and the whole `.data` is reassigned. Otherwise the browser is not updated.
+- **Copy, mutate, reassign.** A `ColumnDataSource` is never edited in place: the data is copied with `copy_column_data`, 
+the copy is edited, and the whole `.data` is reassigned. Otherwise the browser is not updated.
 - **Undo before mutating.** Every action that changes the design calls `_push_undo()` first and `_mark_unsaved()` last.
-- **Nodes are referred to by index.** A node is its row in `placed_nodes_source`. Deleting a node shifts every later index, so edges, symmetry links and the selection are re-indexed.
-- **Port key.** A port is identified by `(kind, node_index, label)`, with `kind` in `"source"` / `"target"` and `label` a string `"1"`, `"2"`, ...
-- **Energy type = colour.** Two ports may be connected only if they have the same, defined colour (fuel, mechanical, electricity).
-- **Browser <-> Python triggers.** Actions that need Python after a JavaScript click (file dialogs, ending the session, refitting the view) go through hidden `TextInput` widgets whose value is flipped.
-- **Edits are committed by Apply.** Config-panel fields only change the design when **Apply** is clicked, except the port-type selects of an unknown component, which apply at once.
+- **Nodes are referred to by index.** A node is its row in `placed_nodes_source`. Deleting a node shifts every later 
+index, so edges, symmetry links and the selection are re-indexed.
+- **Source and target ports.** Every connection runs from a *source* port of one component to a *target* port of 
+another, as in the YAML (`source: propeller_1`, `target: motor_1`), i.e. from the propulsor side towards the energy 
+storage. Source ports are drawn below the icon, target ports above it. A propeller only has a source port, a battery 
+only has a target port.
+- **Port key.** A port is identified by `(kind, node_index, label)`, with `kind` in `"source"` / `"target"` and `label` 
+a string `"1"`, `"2"`, ...
+- **Energy type = colour.** Two ports may be connected only if they have the same, defined colour 
+(fuel, mechanical, electricity).
+- **Browser <-> Python triggers.** Actions that need Python after a JavaScript click (file dialogs, ending the session, 
+refitting the view) go through hidden `TextInput` widgets whose value is flipped.
+- **Edits are committed by Apply.** Config-panel fields only change the design when **Apply** is clicked. Three edits 
+apply at once: clearing a port in the Connections panel, changing the type of a known component (which drops its 
+connections and symmetry link), and changing a port type of an unknown component.
 
 ---
 
@@ -99,5 +115,7 @@ cli.main -> PowertrainBuilderLauncher.launch
 
 ## See also
 
-- `fastga_he.gui.power_train_network_viewer`: read-only network plot; the builder reuses its icons, colours and string helpers.
-- `fastga_he.powertrain_builder.resources.registered_components.KNOWN_COMPONENTS`: registry the toolbox, the panel and the YAML I/O are built from.
+- `fastga_he.gui.power_train_network_viewer`: read-only network plot; the builder reuses its icons, colours and 
+string helpers.
+- `fastga_he.powertrain_builder.resources.registered_components.KNOWN_COMPONENTS`: registry the toolbox, the panel and 
+the YAML I/O are built from.

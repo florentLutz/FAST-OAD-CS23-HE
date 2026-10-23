@@ -2,7 +2,8 @@
 
 [<- Powertrain builder](powertrain_builder)
 
-Module `power_train_builder_history.py`. It provides the undo / redo stack of the builder, made of snapshots of the design.
+Module `power_train_builder_history.py`. It provides the undo / redo stack of the builder, made of snapshots of 
+the design.
 
 A **snapshot** freezes the editable design just before a change:
 
@@ -14,7 +15,9 @@ A **snapshot** freezes the editable design just before a change:
 }
 ```
 
-Everything is deep-copied, so later edits of the data sources do not affect it. The port sources are not recorded: they are derived from the nodes and edges and rebuilt after every restore. Display settings (icon size, view) are not recorded either.
+Everything is deep-copied, so later edits of the data sources do not affect it. The port sources are not recorded: they 
+are derived from the nodes and edges and rebuilt after every restore. Display settings (icon size, view) are not 
+recorded either.
 
 Typical use in a method that changes the design:
 
@@ -32,7 +35,7 @@ self._mark_unsaved()
 EditHistoryStack(max_depth=50)
 ```
 
-Bounded undo stack with a separate redo stack.
+Undo stack and redo stack of design snapshots, each holding at most *max_depth* snapshots.
 
 ---
 
@@ -48,11 +51,12 @@ Bounded undo stack with a separate redo stack.
 
 - **can_undo** : *bool* — at least one undo step is available.
 - **can_redo** : *bool* — at least one redo step is available.
-- `len(stack)` — number of undo steps.
 
 ---
 
 ### Notes
+
+`len(stack)` gives the number of undo steps.
 
 How the handler uses the two stacks:
 
@@ -62,6 +66,7 @@ How the handler uses the two stacks:
 | Undo | pop the snapshot to restore | push the current design |
 | Redo | push the current design (`push_undo_keep_redo`) | pop the snapshot to restore |
 | New Design | cleared | cleared |
+| Load | unchanged | unchanged |
 
 ---
 
@@ -81,7 +86,8 @@ stack.can_undo, stack.can_redo, len(stack)   # (True, False, 1)
 push_undo(snapshot)
 ```
 
-Push a snapshot on the undo stack and clear the redo stack: a new change makes the undone steps invalid.
+Push a snapshot onto the undo stack and clear the redo stack: after a new change, the undone steps can no longer 
+be redone.
 
 ---
 
@@ -105,9 +111,10 @@ None.
 undo()
 ```
 
-Pop the most recent undo snapshot.
+Remove and return the most recent undo snapshot.
 
-The caller must push the current design on the redo stack first (`push_redo`), so the step can be redone.
+Before restoring it, the caller must push the current design onto the redo stack (`push_redo`), so the step can 
+be redone.
 
 ---
 
@@ -131,7 +138,7 @@ None.
 redo()
 ```
 
-Pop the most recently undone snapshot.
+Remove and return the most recently undone snapshot.
 
 ---
 
@@ -155,7 +162,8 @@ None.
 push_undo_keep_redo(snapshot)
 ```
 
-Push a snapshot on the undo stack **without** clearing the redo stack. Used by redo, which records the current design while the remaining redo steps stay available.
+Push a snapshot onto the undo stack **without** clearing the redo stack. Used by redo, which records the current design 
+while the remaining redo steps stay available.
 
 ---
 
@@ -177,7 +185,7 @@ None.
 push_redo(snapshot)
 ```
 
-Push a snapshot on the redo stack. Used by undo, before restoring the previous design.
+Push a snapshot onto the redo stack. Used by undo, before restoring the previous design.
 
 ---
 
@@ -223,7 +231,8 @@ make_snapshot(state)
 
 Return a deep copy of the editable design: node data, edge data and placement counter.
 
-Only plain dictionaries and lists are stored, no Bokeh objects, so a snapshot is independent of the live sources and can be kept indefinitely.
+Only plain dictionaries and lists are stored, no Bokeh objects, so a snapshot is independent of the live sources and 
+can be kept indefinitely.
 
 ---
 

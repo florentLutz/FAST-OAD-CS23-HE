@@ -4,9 +4,13 @@
 
 Module `power_train_builder_handler_ports.py`, mixin `PortEdgeMixin` of [`BuilderHandler`](powertrain_builder_handler).
 
-It handles the geometry of the canvas: finding the component, port or connection under a click; drawing the port balls around each component; adding connections; and keeping the connections and their previews attached to the ports.
+It handles the geometry of the canvas: finding the component, port or connection under a click; drawing the port balls 
+around each component; adding connections; and keeping the connections and their previews attached to the ports.
 
-**Vocabulary.** A *port* is identified by its key `(kind, node_index, label)`, where `kind` is `"source"` or `"target"` and `label` is a string `"1"`, `"2"`, .... A *port dict* adds its `x`, `y` and `color`. An *edge* is a committed connection in `edge_source`; a *preview* is a dashed line for a panel pick waiting for Apply.
+**Vocabulary.** A *port* is identified by its key `(kind, node_index, label)`, where `kind` is `"source"` or `"target"` 
+(see [source and target ports](powertrain_builder#conventions-used-throughout-the-code)) and `label` is a string `"1"`, `"2"`, .... A *port dict* adds its `x`, `y` and 
+`color`. An *edge* is a committed connection in `edge_source`; a *preview* is a dashed line for a panel pick waiting 
+for Apply.
 
 ---
 
@@ -44,14 +48,6 @@ Find the component closest to `(x, y)`, within one icon size of its centre.
 
 ---
 
-### Notes
-
-A linear scan of the `x` / `y` columns of `placed_nodes_source`: the distance from the tap to each component centre is computed, and the closest one under `icon_size` wins. The snap radius follows the icon-size slider, so larger icons are easier to hit.
-
-The live data is returned with the result, so `_delete_at` can pass it to `_delete_node` without reading it again.
-
----
-
 ## _find_nearest_port
 
 ```python
@@ -82,9 +78,7 @@ Hidden port balls (those of non-selected components) count too: they still exist
 
 ### Notes
 
-The two port sources are scanned (`_port_data_by_kind`), source ports first, and the closest ball under the snap distance is returned as a port dict (`_port_dict`). On a tie, the port met first wins, so a source port is preferred.
-
-The snap distance is fixed in data units: unlike `_find_nearest_node`, it does not follow the icon-size slider.
+Unlike `_find_nearest_node`, the snap distance does not follow the icon-size slider.
 
 ---
 
@@ -119,12 +113,6 @@ Return the current port dict of one port, read from the port sources.
 - **port** : *dict or None*
 
   Port dict, or `None` if the port does not exist.
-
----
-
-### Notes
-
-A linear scan of the port source of *port_kind* for the row whose `node_index` and `label` match, returned with `_port_dict`. The Connections panel uses it because it keeps port keys, but needs the position and colour the port has now.
 
 ---
 
@@ -211,7 +199,8 @@ Any dashed panel preview is cleared first.
 
 The rejection check runs before the snapshot, so a refused connection leaves no empty undo step.
 
-The edge is stored from the port clicked first to the second one, so on the canvas an edge can start at a target port. The panel always stores source -> target; every reader of `edge_source` handles both directions.
+The edge is stored from the port clicked first to the second one, so on the canvas an edge can start at a target port. 
+The panel always stores source -> target; every reader of `edge_source` handles both directions.
 
 ---
 
@@ -240,12 +229,6 @@ Return the shortest distance from a point to a segment. Static method.
 ### Returns
 
 - **distance** : *float*
-
----
-
-### Notes
-
-The point is projected on the segment line, and the projection parameter is clamped to `[0, 1]` so the nearest point stays on the segment. A segment of zero length gives the distance to its end point.
 
 ---
 
@@ -279,14 +262,6 @@ Find the connection closest to `(x, y)`, within *snap* data units.
 
 ---
 
-### Notes
-
-Each edge is taken as the segment between the first two points of its `xs` / `ys` (a committed edge always has exactly two); an edge with fewer points is skipped. `_cursor_to_segment_distance` gives the distance from the tap to each segment, and the closest one under *snap* wins.
-
-*snap* is in data units, so on screen the hit zone shrinks when the view is zoomed out (`k > 1`).
-
----
-
 ## _add_edge
 
 ```python
@@ -313,14 +288,11 @@ None.
 
 ### Notes
 
-1. Copy `edge_source.data` and check the connection with `_edge_rejection`. A refused connection is logged and nothing else happens.
-2. Build the row: `xs` / `ys` from the two port positions, the colour of the starting port, and the node index, label and kind of each end.
-3. Append it with `append_row`, reassign `edge_source.data`, and mark the design unsaved.
-
 This method only writes `edge_source` and marks the design unsaved. The caller must:
 
 - call `_push_undo()` **before**, so the connection is undoable;
-- call `_rebuild_all_ports()` **after**, which updates the `connected` flags and the Connections panel. Apply adds several edges in a row and rebuilds once at the end.
+- call `_rebuild_all_ports()` **after**, which updates the `connected` flags and the Connections panel. Apply adds 
+several edges in a row and rebuilds once at the end.
 
 The edge takes the colour of its starting port.
 
@@ -332,7 +304,8 @@ The edge takes the colour of its starting port.
 _add_edge_temp(starting_port, ending_port)
 ```
 
-Draw a dashed preview line between two ports in `panel_preview_edge_source`. Nothing is added to `edge_source`; the connection is committed only by Apply.
+Draw a dashed preview line between two ports in `panel_preview_edge_source`. Nothing is added to `edge_source`; the 
+connection is committed only by Apply.
 
 ---
 
@@ -400,7 +373,8 @@ None.
 _rebuild_edges()
 ```
 
-Recompute the end points of every edge from the current port positions, and drop the edges whose ports no longer exist (e.g. a port count was reduced).
+Recompute the end points of every edge from the current port positions, and drop the edges whose ports no longer exist 
+(e.g. a port count was reduced).
 
 Colours are kept: both ends of an edge always carry its energy type.
 
@@ -418,26 +392,17 @@ None.
 
 ---
 
-### Notes
-
-1. Return at once if there is no edge.
-2. `_port_positions` maps every port key drawn now to its `(x, y)`.
-3. For each edge, `edge_end_ports` gives its two port keys. If both are drawn, the new end points are recorded and the edge is kept.
-4. `select_edges` keeps those edges, in order, and the new `xs` / `ys` replace the old ones.
-
-An edge is therefore dropped exactly when one of its ports is no longer drawn.
-
----
-
 ## _rebuild_all_ports
 
 ```python
 _rebuild_all_ports(override_counts=None)
 ```
 
-Redraw every port ball from the node data, then bring everything attached to the ports back in line with them.
+Redraw every port ball from the node data, then update what depends on the ports: the edges, the dashed previews and 
+the Connections panel.
 
-Called after nearly every change: node placed, deleted or edited, Apply, undo, redo, load, icon resize, and on every tick of a port-count spinner.
+Called after nearly every change: node placed, deleted or edited, Apply, undo, redo, load, icon resize, and on every 
+tick of a port-count spinner.
 
 ---
 
@@ -445,7 +410,8 @@ Called after nearly every change: node placed, deleted or edited, Apply, undo, r
 
 - **override_counts** : *dict, optional*
 
-  `{node_index: (n_sources, n_targets)}` used **only** for this drawing, never written to `placed_nodes_source`. This is how the port-count spinners show a live, reversible preview. Default: `None`.
+  `{node_index: (n_sources, n_targets)}` used **only** for this drawing, never written to `placed_nodes_source`. This is
+  how the port-count spinners show a live, reversible preview. Default: `None`.
 
 ---
 
@@ -494,9 +460,11 @@ None.
 For each node:
 
 1. Port counts come from `override_counts`, else from `n_sources` / `n_targets`, else from the defaults of its type.
-2. Port positions come from `compute_ports`, with every length scaled by `size_factor = icon_size / DEFAULT_NODE_ICON_SIZE`.
+2. Port positions come from `compute_ports`, with every length scaled by 
+`size_factor = icon_size / DEFAULT_NODE_ICON_SIZE`.
 3. Colours come from `node_port_colors`.
-4. Only the selected node's balls are visible (fill alpha 0.3, line alpha 0.5); the others are transparent but still clickable.
+4. Only the selected node's balls are visible (fill alpha 0.3, line alpha 0.5); the others are transparent but 
+still clickable.
 
 Every port is then flagged `connected` (`"True"` / `"False"`) from `edge_source`.
 
@@ -508,7 +476,8 @@ Every port is then flagged `connected` (`"True"` / `"False"`) from `edge_source`
 _sync_edges_to_ports()
 ```
 
-Bring the edges, the dashed previews and the Connections panel in line with the port balls just drawn: `_rebuild_edges`, `_redraw_panel_previews`, then `_refresh_connections_table` of the selected node.
+Bring the edges, the dashed previews and the Connections panel in line with the port balls just drawn: 
+`_rebuild_edges`, `_redraw_panel_previews`, then `_refresh_connections_table` of the selected node.
 
 During a preview, edges are only pruned from the canvas copy; the true edges stay in the backup.
 
@@ -558,7 +527,8 @@ _redraw_panel_previews()
 
 Redraw the dashed preview of every panel pick at the current port positions.
 
-The coordinates stored in each pick are updated too, so Apply commits an edge drawn where the ports are now. A pick whose port is not drawn at the moment (hidden by a port-count preview) is kept but not drawn.
+The coordinates stored in each pick are updated too, so Apply commits an edge drawn where the ports are now. A pick 
+whose port is not drawn at the moment (hidden by a port-count preview) is kept but not drawn.
 
 ---
 
@@ -580,7 +550,7 @@ None.
 _sync_edge_preview_backup(is_preview)
 ```
 
-Keep the true edge list safe while a port-count preview hides edges.
+Keep a copy of the real connections while a port-count preview hides some of them.
 
 ---
 
@@ -600,7 +570,8 @@ None.
 
 ### Notes
 
-A preview rebuild still prunes `edge_source`, so a connection on a port the preview removes disappears at once, exactly as Apply would do. This step makes that reversible:
+A preview rebuild still prunes `edge_source`, so a connection on a port the preview removes disappears at once, exactly 
+as Apply would do. This step makes that reversible:
 
 | Rebuild | Effect |
 |---|---|
@@ -608,7 +579,8 @@ A preview rebuild still prunes `edge_source`, so a connection on a port the prev
 | Later preview ticks | Restore the backup before pruning, so each tick prunes the true list. Spinning the count back up brings a hidden edge back |
 | Real rebuild | Restore the backup and clear it (`_end_edge_preview`) |
 
-So leaving without Apply (selecting another node, deleting, placing, entering delete mode) leaves `edge_source` exactly as it was before the preview.
+So leaving without Apply (selecting another node, deleting, placing, entering delete mode) leaves `edge_source` exactly 
+as it was before the preview.
 
 ---
 
@@ -620,7 +592,7 @@ _end_edge_preview()
 
 End a port-count preview: put back the edges it hid, if any, and clear the backup.
 
-Called by every real rebuild, and before every real edit records its undo step (`_push_undo`, undo, redo). Otherwise the edit and its snapshot would start from the pruned list, and the next real rebuild would overwrite the edit's own edges with the old backup.
+Called by every real rebuild, and by `_push_undo`, undo and redo before they take a snapshot.
 
 ---
 
@@ -675,7 +647,7 @@ Place port balls evenly on a circle around a component. Static method.
 
 - **gap_pixels** : *float, optional*
 
-  Clearance between the component edge and the port centres (default: `20.0`).
+  Clearance between the component edge and the port centres, in data units despite the name (default: `20.0`).
 
 ---
 
@@ -683,7 +655,8 @@ Place port balls evenly on a circle around a component. Static method.
 
 - **ports** : *dict*
 
-  `{"outputs": [port, ...], "inputs": [port, ...]}`, each port a dict with keys `index`, `kind` (`"output"` / `"input"`), `angle_deg`, `x`, `y`.
+  `{"outputs": [port, ...], "inputs": [port, ...]}`, each port a dict with keys `index`, 
+  `kind` (`"output"` / `"input"`), `angle_deg`, `x`, `y`.
 
 ---
 
@@ -692,9 +665,12 @@ Place port balls evenly on a circle around a component. Static method.
 All ports are on a circle of radius `node_radius + port_radius + gap_pixels` (50.5 at the default size).
 
 - Source (output) ports fan around **−90°**, target (input) ports around **+90°**.
-- A single port sits at the centre angle; `n` ports are spread evenly over `spread_angle_degrees`, from `centre − spread / 2` to `centre + spread / 2`.
+- A single port sits at the centre angle; `n` ports are spread evenly over `spread_angle_degrees`, from 
+- `centre − spread / 2` to `centre + spread / 2`.
 
-The Bokeh canvas has `y` pointing up, so −90° is **below** the icon and +90° **above** it: source ports are drawn under the component, target ports over it. (The in-code docstrings say "top" and "bottom" the other way round, which holds for a `y`-down frame.) This matches the layout of the network viewer, with propulsors at the top and energy storage at the bottom.
+The Bokeh canvas has `y` pointing up, so −90° is **below** the icon and +90° **above** it: source ports are drawn under 
+the component, target ports over it. This matches the layout of the network viewer, with propulsors at the top and 
+energy storage at the bottom.
 
 ---
 
@@ -748,7 +724,8 @@ Return one port ball of a port source as a port dict.
 _append_port_row(port_columns, port, color, node_row)
 ```
 
-Append one port ball to port data being built, in place. The label is `index + 1` as a string. The `connected` column is filled afterwards.
+Append one port ball to port data being built, in place. The label is `index + 1` as a string. The `connected` column 
+is filled afterwards.
 
 ---
 
@@ -816,9 +793,10 @@ None.
 _edge_rejection(starting_port, ending_port, edge_data)
 ```
 
-Return why a connection between two ports may not be added, if it may not.
+Return the reason a connection between two ports is refused, or `None` if it is allowed.
 
-Shared by `_add_edge`, which refuses such a connection, and by the canvas workflow, which checks before pushing an undo step.
+Shared by `_add_edge`, which refuses such a connection, and by the canvas workflow, which checks before pushing an 
+undo step.
 
 ---
 
@@ -848,7 +826,8 @@ Shared by `_add_edge`, which refuses such a connection, and by the canvas workfl
 
 ### Notes
 
-The kind and colour checks are not done here: they are done by the callers (canvas workflow) or guaranteed by the choices offered (Connections panel).
+The kind and colour checks are not done here: they are done by the callers (canvas workflow) or guaranteed by the 
+choices offered (Connections panel).
 
 ---
 

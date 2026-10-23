@@ -4,7 +4,9 @@
 
 Module `power_train_builder_handler_canvas_mode.py`, mixin `CanvasModeMixin` of [`BuilderHandler`](powertrain_builder_handler).
 
-These methods set the *mode* the canvas is in: which startup choice was made, whether delete mode is on, which toolbox component is armed. They prepare what the next canvas click will do, but never place, edit or delete anything themselves (New Design excepted, which clears the canvas).
+These methods set the *mode* the canvas is in: which startup choice was made, whether delete mode is on, which toolbox 
+component is armed. They prepare what the next canvas click will do, but never place, edit or delete anything 
+themselves (except New Design, which clears the canvas).
 
 ---
 
@@ -14,7 +16,8 @@ These methods set the *mode* the canvas is in: which startup choice was made, wh
 _dismiss_startup_overlay()
 ```
 
-Hide the startup overlay and its two buttons, so the canvas is unobstructed. Called as soon as the user picks **New Design** or a file to load.
+Hide the startup overlay and its two buttons, so the canvas is unobstructed. Called as soon as the user picks 
+**New Design** or a file to load.
 
 ---
 
@@ -69,9 +72,11 @@ None.
 _reset_interaction_state()
 ```
 
-Return the canvas to idle: nothing selected, armed, pending or previewed.
+Return the canvas to idle: no component selected or armed for placement, no connection waiting for a second click or 
+for Apply, delete mode off.
 
-Called before the canvas content is replaced (New Design, load, undo, redo) and when entering delete mode, because all of these states refer to node indices of the current canvas. The data sources themselves are left to the caller.
+Called when entering delete mode, and before the canvas content is replaced (New Design, load, undo, redo): after a 
+replacement, a stored node index may point at another component. The design itself is not changed.
 
 ---
 
@@ -105,7 +110,8 @@ In order, it clears:
 _disarm_toolbox()
 ```
 
-Deselect the armed toolbox component, if any: reset every toolbox button to the default style and the status line to *Select a component*.
+Deselect the armed toolbox component, if any: reset every toolbox button to the default style and the status line to 
+*Select a component*.
 
 ---
 
@@ -129,7 +135,8 @@ _toggle_delete_mode()
 
 Turn delete mode on or off. Callback of the **Delete** button.
 
-Turning it on first returns the canvas to idle, then turns the Delete button red and shows *Delete mode: click an icon / a connection to remove it* in red. Turning it off restores both.
+Turning it on first returns the canvas to idle, then turns the Delete button red and shows *Delete mode: click an icon 
+/ a connection to remove it* in red. Turning it off restores both.
 
 ---
 
@@ -153,8 +160,6 @@ _exit_delete_mode()
 
 Turn delete mode off and restore the Delete button and the status line. Does nothing if delete mode is already off.
 
-Unlike `_toggle_delete_mode`, it never turns delete mode on.
-
 ---
 
 ### Parameters
@@ -175,7 +180,8 @@ None.
 on_toolbox_select(component_index)
 ```
 
-Arm the toolbox component at *component_index* for placement, or disarm it if it is already armed. Callback of every toolbox button.
+Arm the toolbox component at *component_index* for placement, or disarm it if it is already armed. Callback of every 
+toolbox button.
 
 ---
 
@@ -204,8 +210,6 @@ None.
   5. show *Placing: \<component\>* in gold.
 
 The selected node, if any, stays selected; it is deselected when the component is actually placed.
-
-Since it is public and takes a plain index, it can be called in tests without a running server.
 
 ---
 

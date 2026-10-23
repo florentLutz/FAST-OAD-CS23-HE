@@ -4,7 +4,9 @@
 
 Module `power_train_network_writer.py`. It converts the canvas into the powertrain YAML file read by FAST-OAD_CS23-HE.
 
-Unless the design is saved as a final version, the file also has a GUI-only `canvas_layout` section that stores the canvas position of each component, so the same file can be re-opened in the builder with the same arrangement. FAST-OAD_CS23-HE ignores unknown top-level keys (it only logs a warning), so this section does not affect the analysis.
+Unless the design is saved as a final version, the file also has a GUI-only `canvas_layout` section that stores the 
+canvas position of each component, so the same file can be re-opened in the builder with the same arrangement. 
+FAST-OAD_CS23-HE ignores unknown top-level keys (it only logs a warning), so this section does not affect the analysis.
 
 ---
 
@@ -59,10 +61,13 @@ canvas_layout:
 | `title` | File name without extension |
 | `power_train_components` | One entry per component: `id`, `options` (if any), `position`, `symmetrical` (if any), in that order |
 | `component_connections` | One `source` / `target` pair per connection; `[name, N]` when the component has several ports on that side |
-| `watcher_file_path` | Only written when set |
+| `watcher_file_path` | Path of the CSV of per-time-step performance parameters of the powertrain components; only written when set |
 | `canvas_layout` | Only in "Edit Later" files; `x`, `y`, plus port counts and types for unknown components |
 
-**Module constants.** `KEY_TITLE`, `KEY_PT_COMPONENTS`, `KEY_PT_CONNECTIONS`, `KEY_PT_WATCHER`, `KEY_CANVAS_LAYOUT` (the keys above); `SOURCE_SIDE_KEYWORDS` (`_inputs`, `_tanks`) and `TARGET_SIDE_KEYWORDS` (`_outputs`, `_engines`, `_power_sources`), shared with the reader; `COMPONENT_ID_PREFIX` (`fastga_he.pt_component.`); `UNKNOWN_LAYOUT_KEYS` (`n_sources`, `n_targets`, `source_port_type`, `target_port_type`); positions are rounded to one decimal.
+**Module constants.** `KEY_TITLE`, `KEY_PT_COMPONENTS`, `KEY_PT_CONNECTIONS`, `KEY_PT_WATCHER`, `KEY_CANVAS_LAYOUT` 
+(the keys above); `SOURCE_SIDE_KEYWORDS` (`_inputs`, `_tanks`) and `TARGET_SIDE_KEYWORDS` (`_outputs`, `_engines`, 
+`_power_sources`), shared with the reader; `COMPONENT_ID_PREFIX` (`fastga_he.pt_component.`); `UNKNOWN_LAYOUT_KEYS` 
+(`n_sources`, `n_targets`, `source_port_type`, `target_port_type`).
 
 ---
 
@@ -82,7 +87,8 @@ The node and edge data are copied at construction, so the following calls work o
 
 - **state** : *BuilderState*
 
-  Builder state. Its data sources are copied when *node_data* / *edge_data* are not given; `possible_options` and `default_source_count` are always read from it.
+  Builder state. Its data sources are copied when *node_data* / *edge_data* are not given; `possible_options` and 
+  `default_source_count` are always read from it.
 
 - **node_data** : *dict, optional*
 
@@ -169,9 +175,12 @@ None.
 
 ### Notes
 
-- **Known component:** `id` from `KNOWN_COMPONENTS`; options = stored options, completed with the type's defaults for options never touched in the GUI; for a variable-port component, its port counts as `number_of_*` options.
+- **Known component:** `id` from `KNOWN_COMPONENTS`; options = stored options, completed with the type's defaults for 
+options never touched in the GUI; for a variable-port component, its port counts as `number_of_*` options.
 - **Unknown component:** `id` built from its type (`unknown_component_id`) and exactly the options typed for it.
-- **Symmetry:** the canvas stores the link on both components, but the file has `symmetrical` on one of them only: the one whose peer has a lower index. A peer of an unknown component that is not on the canvas (index −1) is always written.
+- **Symmetry:** the canvas stores the link on both components, but the file has `symmetrical` on one of them only: the 
+one with the higher index of the pair. A peer of an unknown component that is not on the canvas (index −1) is 
+always written.
 - **Options** are omitted when empty; `position` is always written.
 
 ---
@@ -182,7 +191,8 @@ None.
 _layout_entry(node_index)
 ```
 
-Return the `canvas_layout` entry of a component: its `x` and `y` rounded to one decimal, plus `UNKNOWN_LAYOUT_KEYS` for an unknown component, whose FAST-OAD entry cannot hold them.
+Return the `canvas_layout` entry of a component: its `x` and `y` rounded to one decimal, plus `UNKNOWN_LAYOUT_KEYS` for 
+an unknown component, whose FAST-OAD entry cannot hold them.
 
 ---
 
@@ -204,7 +214,7 @@ Return the `canvas_layout` entry of a component: its `x` and `y` rounded to one 
 _saved_options(node_index)
 ```
 
-Return the options stored on a component, decoded from their JSON string. Values keep their type (e.g. booleans stay booleans).
+Return the options stored on a component, decoded from their JSON string.
 
 ---
 
@@ -254,8 +264,10 @@ Return the `id` and the options of a known component, as FAST-OAD reads them.
 
 1. Find the `KNOWN_COMPONENTS` entry of the stored type (the first one, if several entries share the type).
 2. Start from the stored options (`_saved_options`).
-3. Add the default of every missing option (`default_options` of `possible_options`); stored values are never overwritten.
-4. For a variable-port type (default source count `VARIABLE_PORT_DEFAULT`), add the port counts as `number_of_*` options (`_variable_port_options`). These overwrite any stored option of the same name.
+3. Add the default of every missing option (`default_options` of `possible_options`); stored values are never 
+overwritten.
+4. For a variable-port type (default source count `VARIABLE_PORT_DEFAULT`), add the port counts as `number_of_*` 
+options (`_variable_port_options`). These overwrite any stored option of the same name.
 
 ---
 
@@ -280,16 +292,6 @@ None.
 ### Returns
 
 None.
-
----
-
-### Notes
-
-1. `edge_end_ports` gives the two port keys of each edge.
-2. The pair is swapped when needed so that the source port comes first.
-3. Each end is written by `_connection_endpoint`, with `n_sources` for the source end and `n_targets` for the target end. That count decides between a plain name and `[name, N]`.
-
-Connections are written in edge order.
 
 ---
 
@@ -329,7 +331,8 @@ Return one end of a connection as FAST-OAD_CS23-HE expects it.
 set_watcher_file_path(watcher_path)
 ```
 
-Set `watcher_file_path`. The watcher CSV shows how the specified performance parameters of the chosen powertrain components change at each time step of the flight mission. An empty string leaves the key out of the file.
+Set `watcher_file_path`. The watcher CSV shows how the specified performance parameters of the chosen powertrain 
+components change at each time step of the flight mission. An empty string leaves the key out of the file.
 
 ---
 
@@ -371,11 +374,12 @@ None.
 
 ### Notes
 
-The data is dumped with `ruamel.yaml` (block style, indent 2 / 4 / 2), leaving out `canvas_layout` for a final version and `watcher_file_path` when empty. The text is then post-processed:
+The data is dumped with `ruamel.yaml` (block style; mapping indent 2, sequence indent 4, dash offset 2), leaving out 
+`canvas_layout` for a final version and `watcher_file_path` when empty. The text is then post-processed:
 
 1. Remove the quotes around `[name, N]`.
 2. Put a `watcher_file_path` value that was wrapped to the next line back on the key's line.
-3. Split off the `canvas_layout` section, so the spacing rules only apply to the FAST-OAD part.
+3. Split off the `canvas_layout` section, so the spacing rules only apply to the FAST-OAD_CS23-HE part.
 4. Add a blank line before every top-level key but the first, between connections, and between components.
 5. Re-attach the `canvas_layout` section, compact, after a blank line and a comment marking it as GUI-only.
 
@@ -445,7 +449,8 @@ print(buffer.getvalue())
 _variable_port_options(component_attributes, source_port_count, target_port_count)
 ```
 
-Return the `number_of_*` options of a variable-port component from its port counts. Each side is found with `port_side_of`.
+Return the `number_of_*` options of a variable-port component from its port counts. Each side is found with 
+`port_side_of`.
 
 ---
 
@@ -508,7 +513,8 @@ unknown_component_id("my_package.pt_component.part")    # 'my_package.pt_compone
 unknown_component_type(component_id)
 ```
 
-Return the type shown for an unknown component read with *component_id*. Inverse of `unknown_component_id`: the FAST-OAD_CS23-HE prefix is removed, any other id is kept whole.
+Return the type shown for an unknown component read with *component_id*. Inverse of `unknown_component_id`: the 
+FAST-OAD_CS23-HE prefix is removed, any other id is kept whole.
 
 ---
 
@@ -534,7 +540,8 @@ Return the type shown for an unknown component read with *component_id*. Inverse
 port_side_of(attribute_name)
 ```
 
-Return which port side a `number_of_*` attribute counts. This is the single rule shared by save and load, so both always agree.
+Return which port side a `number_of_*` attribute counts. This is the single rule shared by save and load, so both 
+always agree.
 
 ---
 

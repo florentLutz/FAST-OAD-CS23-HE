@@ -4,17 +4,23 @@
 
 Module `power_train_builder_handler_config_panel.py`, mixin `ConfigPanelMixin` of [`BuilderHandler`](powertrain_builder_handler).
 
-It fills, refreshes and clears the right-hand **Component Configurator** of the selected component (name, type, position, options, port counts, connections, symmetry) and commits it with **Apply**.
+It fills, refreshes and clears the right-hand **Component Configurator** of the selected component (name, type, 
+position, options, port counts, connections, symmetry) and commits it with **Apply**.
 
-Edits in the panel are **not** written to the design until Apply is clicked, with three exceptions that apply at once, each as an undoable step:
+Edits in the panel are **not** written to the design until Apply is clicked, with three exceptions that apply at once, 
+each as an undoable step:
 
 - clearing a port in the Connections panel removes its connection;
 - switching a known component to another type removes its connections and symmetry link;
 - changing a port type of an unknown component (see [Unknown components](powertrain_builder_unknown)).
 
-**Class attributes.** `_is_populating_node_table` is `True` while the panel is being filled, so that callbacks can tell a programmatic change from a user change. `_options_names` and `_options_value_selects` hold the options of the selected known component, in the same order, for Apply to read.
+**Class attributes.** `_is_populating_node_table` is `True` while the panel is being filled, so that callbacks can tell 
+a programmatic change from a user change. `_options_names` and `_options_value_selects` hold the options of the selected 
+known component, in the same order, for Apply to read.
 
-**Module constants.** `PRIMARY_PORT_LABEL_COLOR` (`#ADD8E6`, light blue), `PRIMARY_PORT_LABEL` (`"1"`), `PRIMARY_SOURCE_PORT_TYPE_KEYWORDS` (`splitter`, `gearbox`), `PRIMARY_TARGET_PORT_TYPE_KEYWORDS` (`planetary_gear`): see `_port_label_stylesheets`.
+**Module constants.** `PRIMARY_PORT_LABEL_COLOR` (`#ADD8E6`, light blue), `PRIMARY_PORT_LABEL` (`"1"`), 
+`PRIMARY_SOURCE_PORT_TYPE_KEYWORDS` (`splitter`, `gearbox`), `PRIMARY_TARGET_PORT_TYPE_KEYWORDS` (`planetary_gear`): 
+see `_port_label_stylesheets`.
 
 ---
 
@@ -45,7 +51,8 @@ None.
 ### Notes
 
 1. Set the name field.
-2. Show the selects (known component) or the free-text fields (unknown component), and fill them with `_populate_known_fields` or `_populate_unknown_fields`.
+2. Show the selects (known component) or the free-text fields (unknown component), and fill them with 
+`_populate_known_fields` or `_populate_unknown_fields`.
 3. Move the gold selection ring to the component.
 4. Rebuild the ports, which shows this component's port balls.
 5. Build the Connections panel and, for a known component, the symmetry select.
@@ -78,10 +85,12 @@ None.
 
 ### Notes
 
-- **Type:** the choices are the types sharing the component's icon (`icon_to_component_types`). Setting the value is flagged as programmatic, so selecting a component never clears its connections.
+- **Type:** the choices are the types sharing the component's icon (`icon_to_component_types`). Setting the value is 
+flagged as programmatic, so selecting a component never clears its connections.
 - **Position:** the possible positions of the stored type; the stored position, else the first one.
 - **Options:** shown only if the component has stored options; built by `_refresh_options_table` with the stored values.
-- **Port counts:** a spinner is shown only on a side whose default count is `VARIABLE_PORT_DEFAULT`, with its stored value and a minimum of 1. The *Ports* section is shown if either spinner is.
+- **Port counts:** a spinner is shown only on a side whose default count is `VARIABLE_PORT_DEFAULT`, with its stored 
+value and a minimum of 1. The *Ports* section is shown if either spinner is.
 
 ---
 
@@ -91,7 +100,8 @@ None.
 _clear_node_table()
 ```
 
-Reset every panel widget to empty and hide the panel. Also clears the selection ring, the Connections rows and the symmetry select, and rebuilds the ports, which hides the port balls of the deselected component.
+Reset every panel widget to empty and hide the panel. Also clears the selection ring, the Connections rows and the 
+symmetry select, and rebuilds the ports, which hides the port balls of the deselected component.
 
 ---
 
@@ -143,9 +153,12 @@ None.
 
 ### Notes
 
-The selected component's ports are redrawn with `override_counts`, using the value of each **visible** spinner (a hidden spinner may hold a stale value, so the stored count is used for that side). Connections on ports the new count removes disappear from the canvas, but are kept in a backup.
+The selected component's ports are redrawn with `override_counts`, using the value of each **visible** spinner (a 
+hidden spinner may hold a stale value, so the stored count is used for that side). Connections on ports the new count 
+removes disappear from the canvas, but are kept in a backup.
 
-The counts are committed only by Apply. Leaving the component any other way (selecting another one, deleting, placing, delete mode) triggers a normal rebuild that restores the stored counts and every hidden connection.
+The counts are committed only by Apply. Leaving the component any other way (selecting another one, deleting, placing, 
+delete mode) triggers a normal rebuild that restores the stored counts and every hidden connection.
 
 Does nothing if no component is selected.
 
@@ -157,9 +170,11 @@ Does nothing if no component is selected.
 _refresh_options_table(node_type, overrides)
 ```
 
-Rebuild the Options rows of a known component for a component type.
+Rebuild the Options rows of the panel for a known component type: one row per option, with a select of its 
+possible values.
 
-Each option is a row with a disabled text field (the name) and a select (the value). The selects are kept in `_options_value_selects`, in the order of `_options_names`, for Apply.
+Each option is a row with a disabled text field (the name) and a select (the value). The selects are kept in 
+`_options_value_selects`, in the order of `_options_names`, for Apply.
 
 ---
 
@@ -184,7 +199,8 @@ None.
 ### Notes
 
 - The shown value is the override if there is one, else the first possible value.
-- The choices are the possible values as strings. An option without possible values offers its current value only. A current value that is not a possible value (e.g. edited in the file) is added first, so it is not lost.
+- The choices are the possible values as strings. An option without possible values offers its current value only. 
+A current value that is not a possible value (e.g. edited in the file) is added first, so it is not lost.
 
 ---
 
@@ -218,7 +234,9 @@ None.
 
 ### Notes
 
-The choices are `""` (no peer) followed by the candidates. The current peer is added if it is not a candidate (e.g. a component of another type linked from an unknown component), so selecting this component and applying keeps the link. The current peer is pre-selected.
+The choices are `""` (no peer) followed by the candidates. The current peer is added if it is not a candidate (e.g. a 
+component of another type linked from an unknown component), so selecting this component and applying keeps the link. 
+The current peer is pre-selected.
 
 ---
 
@@ -250,19 +268,25 @@ None.
 
 The rows are built from copies of the two port sources, the node data and the edge data:
 
-1. `_connected_far_ports` gives the far end of each committed connection of the component, and `_pending_far_ports` the far end of each pick; a pick replaces the connection of the same port.
-2. `node_port_colors` gives the colour of each side, and `_free_port_candidates` lists the free ports of the opposite side with that colour.
-3. `_build_port_row` builds one row per port of the component, sources first, and the rows replace the children of `connections_rows_column`.
+1. `_connected_far_ports` gives the far end of each committed connection of the component, and `_pending_far_ports` the 
+far end of each pick; a pick replaces the connection of the same port.
+2. `node_port_colors` gives the colour of each side, and `_free_port_candidates` lists the free ports of the opposite 
+side with that colour.
+3. `_build_port_row` builds one row per port of the component, sources first, and the rows replace the children of 
+`connections_rows_column`.
 
 The result:
 
 Each row has the port label (`source:1`, `target:2`, ...) and a dropdown of the ports it can be connected to:
 
 1. **Shown value:** the pick waiting for Apply if there is one, else the committed connection, else empty.
-2. **Choices:** the free ports of *other* components, on the opposite side, compatible in energy type (`_free_port_candidates`), plus the shown port.
-3. Choosing a port draws a dashed preview; choosing the empty value removes the connection at once (`_on_port_select_change`).
+2. **Choices:** the free ports of *other* components, on the opposite side, compatible in energy type 
+(`_free_port_candidates`), plus the shown port.
+3. Choosing a port draws a dashed preview; choosing the empty value removes the connection at once 
+(`_on_port_select_change`).
 
-The primary port of a power split (port 1 of the source side of splitters and gearboxes, of the target side of planetary gears) is shown in light blue.
+The primary port of a power split is shown in light blue: source port 1 of splitters and gearboxes, target port 1 of 
+planetary gears.
 
 ---
 
@@ -360,10 +384,12 @@ The *far* port is the port at the other end of the connection, on the opposite s
 
 ### Notes
 
-1. The label is a disabled `TextInput` showing `<kind>:<label>`, styled by `_port_label_stylesheets` (light blue for a primary port).
+1. The label is a disabled `TextInput` showing `<kind>:<label>`, styled by `_port_label_stylesheets` (light blue for a 
+primary port).
 2. If *shown_far_ports* has an entry for this port, it becomes the shown candidate, with its text from `_far_string`.
 3. `_dropdown_entries` merges the shown candidate with the free ones and orders the choices.
-4. The `Select` shows the shown candidate, or empty, and its callback comes from `_make_port_callback`, which binds this port's kind, label, component, colour, position and candidates.
+4. The `Select` shows the shown candidate, or empty, and its callback comes from `_make_port_callback`, which binds 
+this port's kind, label, component, colour, position and candidates.
 
 ---
 
@@ -411,7 +437,7 @@ Format a port as shown in a dropdown: `"<component name> (<kind>:<label>)"`. Sta
 _parse_choice(choice_string, candidates)
 ```
 
-Find the port of a dropdown choice in its candidates. Static method.
+Return the port whose display text matches a dropdown choice. Static method.
 
 ---
 
@@ -441,7 +467,8 @@ Find the port of a dropdown choice in its candidates. Static method.
 _make_port_callback(_own_kind, _own_label, _own_node_index, _own_color, _own_x, _own_y, _candidates)
 ```
 
-Return the `on_change` callback of one Connections dropdown: `_on_port_select_change` with every argument of the row already bound (`functools.partial`), so Bokeh receives a plain `(attr, old, new)` callable.
+Return the `on_change` callback of one Connections dropdown: `_on_port_select_change` with the row's port and 
+candidates already bound (`functools.partial`), so Bokeh can call it with `(attr, old, new)` only.
 
 ---
 
@@ -517,8 +544,10 @@ None.
 The change is handled in three phases.
 
 1. **Prune.** Drop any pick waiting for Apply that already uses this port, and redraw the remaining previews.
-2. **Disconnect.** If the empty value was chosen, remove every committed connection of this port at once (`_disconnect_port`).
-3. **Connect.** Otherwise, find the chosen port, read the current position of both ends, order them as source -> target, store the pick in `panel_pending_connections` and draw its dashed preview.
+2. **Disconnect.** If the empty value was chosen, remove every committed connection of this port at once 
+(`_disconnect_port`).
+3. **Connect.** Otherwise, find the chosen port, read the current position of both ends, order them as source -> target, 
+store the pick in `panel_pending_connections` and draw its dashed preview.
 
 ---
 
@@ -560,7 +589,7 @@ None.
 _on_type_select_change(attr, old, new)
 ```
 
-Callback of the type select: update the panel to the type picked, before Apply.
+Callback of the type select: update the position, options and symmetry choices to the newly picked type, before Apply.
 
 Ignored while an unknown component is selected, whose type is free text.
 
@@ -588,7 +617,9 @@ None.
 
 1. Position choices -> those of the new type, first one selected.
 2. Options -> those of the new type, pre-filled with the component's stored values of the same name.
-3. If the user switched to a type other than the stored one (not while the panel is being filled), remove the component's connections and symmetry link at once (`_clear_node_connections_and_symmetry`): its ports and peer belong to the old type.
+3. If the user switched to a type other than the stored one (not while the panel is being filled), remove the 
+component's connections and symmetry link at once (`_clear_node_connections_and_symmetry`): its ports and peer belong 
+to the old type.
 4. Symmetry choices -> components of the new type.
 
 The type, position and options themselves are written only by Apply.
@@ -622,7 +653,8 @@ None.
 ### Notes
 
 1. Discard the pending panel picks and end any port-count preview, so the removal works on the real connections.
-2. Find the connections to remove and the symmetry entries to reset: the component's own link and every component pointing at it, by index or by name.
+2. Find the connections to remove and the symmetry entries to reset: the component's own link and every component 
+pointing at it, by index or by name.
 3. If there is nothing to remove, only refresh the Connections panel; no undo step is recorded.
 4. Otherwise push an undo snapshot, apply both removals, rebuild the ports and mark the design unsaved.
 
@@ -704,9 +736,11 @@ None.
 
 ### Notes
 
-- Type, position and options come from `_known_panel_fields` or, for an unknown component, `_unknown_panel_fields`. Options are stored as a JSON string.
-- If the source spinner is hidden (fixed-port type), the port counts are reset to the defaults of the written type, so changing the type also changes the ports.
-- A visible spinner writes its value as the port count of its side.
+- Type, position and options come from `_known_panel_fields` or, for an unknown component, `_unknown_panel_fields`. 
+Options are stored as a JSON string.
+- If the source-count spinner is hidden, both port counts are first reset to the defaults of the written type, so 
+changing the type also changes the ports.
+- Then each visible spinner writes its value as the port count of its side.
 
 ---
 
@@ -716,7 +750,8 @@ None.
 _known_panel_fields()
 ```
 
-Return the type, position and options picked in the selects of a known component, as Apply writes them. Option values are converted back from strings with `_strings_to_option_values`.
+Return the type, position and options picked in the selects of a known component, as Apply writes them. Option values 
+are converted back from strings with `_strings_to_option_values`.
 
 ---
 
@@ -767,7 +802,9 @@ None.
 The peer comes from the symmetry select, or from the free-text field for an unknown component.
 
 1. Find the new peer's index by name (`_NO_SYMMETRY_PEER` if none).
-2. Clear stale links: every component pointing at this component or at the new peer, except these two. This covers this component's old peer and the new peer's old partner. Links are matched by index and by name, since the name may have just changed in this same Apply.
+2. Clear stale links: every component pointing at this component or at the new peer, except these two. This covers this 
+component's old peer and the new peer's old partner. Links are matched by index and by name, since the name may have 
+just changed in this same Apply.
 3. Write the new entry (`_write_symmetry_entry`):
    - peer on the canvas -> both components point at each other;
    - unknown component naming a component not on the canvas -> the name is kept as is, without index (written to the YAML);
@@ -915,7 +952,8 @@ Return whether a port dict is the port `(port_kind, node_index, port_label)`.
 _connected_far_ports(edge_data, node_index)
 ```
 
-Return the far end of every committed connection of a component, split by the component's port side. Both ends of each edge are checked, since an edge may start at either side.
+Return the far end of every committed connection of a component, split by the component's port side. Both ends of each 
+edge are checked, since an edge may start at either side.
 
 ---
 
@@ -949,7 +987,8 @@ Return the far end of every committed connection of a component, split by the co
 _pending_far_ports(pending_connections, node_index)
 ```
 
-Return the far end of every pending panel pick of a component, split by the component's port side.
+Return, for every Connections-panel pick of a component still waiting for Apply, the port at the other end, split by 
+the component's port side.
 
 ---
 
@@ -1004,7 +1043,8 @@ Return the candidates and the displayed choices of one Connections dropdown.
 
 - **choices** : *list of str*
 
-  Displayed strings: the shown port first, then `""`, then the free ports. Without a shown port: `""` then the free ports.
+  Displayed strings: the shown port first, then `""`, then the free ports. Without a shown port: `""` then the 
+  free ports.
 
 ---
 
@@ -1014,7 +1054,8 @@ Return the candidates and the displayed choices of one Connections dropdown.
 _symmetry_positions_to_clear(symmetry_names, symmetry_indices, node_index, node_name)
 ```
 
-Return the components whose symmetry entry must be reset to unlink a component: every component pointing at it (by index or name), plus the component itself if it has a link.
+Return the components whose symmetry entry must be reset to unlink a component: every component pointing at it 
+(by index or name), plus the component itself if it has a link.
 
 ---
 
@@ -1073,7 +1114,8 @@ Return copies of the two symmetry columns padded to one entry per component (`""
 _positions_linked_to(symmetry_names, symmetry_indices, node_indices, node_names)
 ```
 
-Return the components whose symmetry peer is one of the given components. A link counts if either its index or its name matches, so a link is found even when one of the two is out of date.
+Return the components whose symmetry peer is one of the given components. A link counts if either its index or its 
+name matches, so a link is found even when one of the two is out of date.
 
 ---
 
@@ -1107,7 +1149,8 @@ Return the components whose symmetry peer is one of the given components. A link
 _port_label_stylesheets(node_type, port_label, primary_type_keywords)
 ```
 
-Return the stylesheets of a port label in the Connections panel: light blue for the primary port of a power split, none otherwise.
+Return the stylesheets of a port label in the Connections panel: light blue for the primary port of a power split, 
+none otherwise.
 
 ---
 
@@ -1135,7 +1178,8 @@ Return the stylesheets of a port label in the Connections panel: light blue for 
 
 ### Notes
 
-The colour cannot be set with `styles`, which only styles the widget's outer element: the text is in an `<input>` inside the widget's shadow DOM, coloured by Bokeh's own `.bk-input:disabled` rule. A `:host input:disabled` rule is specific enough to override it, and `-webkit-text-fill-color` is also needed because Chromium and Safari paint disabled text with it.
+The colour is set with a `:host input:disabled` stylesheet, because the text sits in an `<input>` inside the widget's 
+shadow DOM, which `styles` cannot reach.
 
 ---
 

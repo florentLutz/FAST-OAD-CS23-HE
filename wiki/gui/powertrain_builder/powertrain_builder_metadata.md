@@ -2,9 +2,12 @@
 
 [<- Powertrain builder](powertrain_builder)
 
-Module `power_train_builder_metadata.py`. It derives, once at startup, everything the builder needs to know about each registered component type from `KNOWN_COMPONENTS` and from the components' own `constants.py` files: which icon it uses, how many ports it has, and its possible positions and options.
+Module `power_train_builder_metadata.py`. It derives, once at startup, everything the builder needs to know about each 
+registered component type from `KNOWN_COMPONENTS` and from the components' own `constants.py` files: which icon it uses, 
+how many ports it has, and its possible positions and options.
 
-The `constants.py` files are read **without importing them**. Importing a component module runs FAST-OAD submodel registration, which raises *"Name … is already used"* errors when the same module is imported again.
+The `constants.py` files are read **without importing them**. Importing a component module runs FAST-OAD submodel 
+registration, which raises *"Name … is already used"* errors when the same module is imported again.
 
 ---
 
@@ -28,7 +31,8 @@ None.
 
 - **icon_to_component_types** : *dict*
 
-  `{icon_key: [components_type, ...]}`, in registry order. The first type of each list is the default type of a newly placed component.
+  `{icon_key: [components_type, ...]}`, in registry order. The first type of each list is the default type of a newly 
+  placed component.
 
 ---
 
@@ -38,7 +42,8 @@ None.
 component_type_classes(known_component)
 ```
 
-Return the type classes of a `KNOWN_COMPONENTS` entry, always as a list. `components_type_class` holds either one class name or a list of them.
+Return the type classes of a `KNOWN_COMPONENTS` entry, always as a list. `components_type_class` holds either one class 
+name or a list of them.
 
 ---
 
@@ -72,8 +77,6 @@ icon_data_url(icon_path)
 ```
 
 Return the base64 `data:` URL of an icon file. Results are cached, so each file is read and encoded once.
-
-It is used for every icon the builder draws: toolbox buttons, placed and loaded nodes, and the legend.
 
 ---
 
@@ -130,13 +133,14 @@ The first matching rule applies:
 | Type `gearbox` | 1 | 2 |
 | Type `propeller` or `aux_load` | 1 | 0 |
 | Type `fuel_tank`, `gaseous_hydrogen_tank` or `battery_pack` | 0 | 1 |
-| `attributes` is a list: the first attribute containing `number_of_` | `VARIABLE_PORT_DEFAULT` (3) | 3 |
-| ... or the first attribute containing `_mode` | 2 | 1 |
+| `attributes` is a list, and its first attribute containing `number_of_` or `_mode` contains `number_of_` | `VARIABLE_PORT_DEFAULT` (3) | `VARIABLE_PORT_DEFAULT` (3) |
+| ... contains `_mode` | 2 | 1 |
 | Anything else | 1 | 1 |
 
-The attributes are checked in their order in the registry, and the first one containing `number_of_` or `_mode` decides.
+The attributes are checked in registry order. A list with neither keyword falls through to 1 / 1.
 
-A count of `VARIABLE_PORT_DEFAULT` marks a variable-port component: its counts are editable in the panel and saved as `number_of_*` options.
+A count of `VARIABLE_PORT_DEFAULT` marks a variable-port component: its counts are editable in the panel and saved as 
+`number_of_*` options.
 
 ---
 
@@ -176,7 +180,7 @@ Read one assignment from a `constants.py` file by parsing its syntax tree, witho
 
 ### Notes
 
-The file is read as text and parsed with `ast.parse`. `ast.walk` then visits every node of the tree, and the first `Assign` whose target is a `Name` equal to *variable_name* is evaluated with `ast.literal_eval`. Since the whole tree is walked, an assignment inside a function or class body also counts.
+The first assignment to *variable_name* found anywhere in the file (`ast.walk`) is evaluated with `ast.literal_eval`.
 
 There are three outcomes:
 
@@ -194,9 +198,11 @@ There are three outcomes:
 _read_constant_via_cached_import(constants_file_path, components_root_path, variable_name)
 ```
 
-Read a variable from a `constants.py` module that is already imported. Fallback for values the syntax tree cannot evaluate.
+Read a variable from a `constants.py` module that is already imported. Fallback for values the syntax tree cannot 
+evaluate.
 
-Reading a module already in `sys.modules` runs no registration code, so it has no side effect. A module that is not imported yet is not imported.
+Reading a module already in `sys.modules` runs no registration code, so it has no side effect. A module that is not 
+imported yet is not imported.
 
 ---
 
@@ -208,7 +214,8 @@ Reading a module already in `sys.modules` runs no registration code, so it has n
 
 - **components_root_path** : *pathlib.Path*
 
-  Root of the components tree. The dotted module name is built relative to its third parent, e.g. `fastga_he.models.propulsion.components.<...>.constants`.
+  Root of the components tree. The module name is the path of the file relative to the folder that contains 
+  `fastga_he`, e.g. `fastga_he.models.propulsion.components.<...>.constants`.
 
 - **variable_name** : *str*
 
@@ -232,7 +239,8 @@ _performances_component_types(init_file_path, openmdao_name_to_component_type)
 
 Return the component types whose `Performances*` class an `__init__.py` imports. The file is parsed, not imported.
 
-`from .x import PerformancesBatteryPack` refers to the OpenMDAO component `BatteryPack`. Other imports, and names that are not in `KNOWN_COMPONENTS`, are skipped.
+`from .x import PerformancesBatteryPack` refers to the OpenMDAO component `BatteryPack`. Other imports, and names that 
+are not in `KNOWN_COMPONENTS`, are skipped.
 
 ---
 
@@ -262,7 +270,8 @@ Return the component types whose `Performances*` class an `__init__.py` imports.
 _read_possible_constant(constants_file_path, components_root_path, variable_name)
 ```
 
-Read one `POSSIBLE_*` constant of a component: syntax tree first, then the already-imported module if the value is not a literal.
+Read one `POSSIBLE_*` constant of a component: syntax tree first, then the already-imported module if the value is not 
+a literal.
 
 ---
 
@@ -324,5 +333,6 @@ Scan the components tree and return the possible positions and options of every 
 
 1. Build the map `OM_components_name -> components_type` from `KNOWN_COMPONENTS`.
 2. For every `__init__.py` under the root (sorted), find the component types it imports a `Performances*` class for.
-3. For each of them, read `POSSIBLE_POSITION` and `POSSIBLE_OPTION` from the `constants.py` in the same folder. A missing value becomes `[]` / `{}`.
+3. For each of them, read `POSSIBLE_POSITION` and `POSSIBLE_OPTION` from the `constants.py` in the same folder. A 
+missing value becomes `[]` / `{}`.
 4. Give `[]` / `{}` to every known component the scan did not find.

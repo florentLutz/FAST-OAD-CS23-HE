@@ -4,7 +4,8 @@
 
 Module `power_train_builder_handler_placement.py`, mixin `PlacementMixin` of [`BuilderHandler`](powertrain_builder_handler).
 
-It creates new components on the canvas and keeps everything drawn around them in proportion to the icon size and to the window scale.
+It creates new components on the canvas and keeps everything drawn around them in proportion to the icon size and to 
+the window scale.
 
 ---
 
@@ -43,7 +44,8 @@ None.
 
 1. Deselect the selected node, if any, and clear its panel and pending picks.
 2. Push an undo snapshot.
-3. Name the component `<icon_key>_<n>`, where `n` is the next value of `placed_counter[icon_key]` (e.g. `battery_pack_1`, then `battery_pack_2`).
+3. Name the component `<icon_key>_<n>`, where `n` is the next value of `placed_counter[icon_key]` (e.g. 
+`battery_pack_1`, then `battery_pack_2`).
 4. Build the node row: position, icon URL, icon size, name, icon key, no symmetry peer, plus the defaults of its type.
 5. Append the row to `placed_nodes_source`, rebuild the ports so the new port balls appear, and mark the design unsaved.
 
@@ -73,7 +75,8 @@ Return the type, position, options and port settings of a new component.
 
 - **columns** : *dict*
 
-  Values of the `node_type`, `position`, `options`, `n_sources`, `n_targets`, `source_port_type` and `target_port_type` columns.
+  Values of the `node_type`, `position`, `options`, `n_sources`, `n_targets`, `source_port_type` and 
+  `target_port_type` columns.
 
 ---
 
@@ -172,10 +175,14 @@ None.
 
 ### Notes
 
-The text is decoded by `_parse_view_report`; nothing happens if it is not a JSON object or number. Each part is then read by its own helper, and a malformed part is ignored without affecting the other:
+The text is decoded by `_parse_view_report`; nothing happens if it is not a JSON object or number. Each part is then 
+read by its own helper, and a malformed part is ignored without affecting the other:
 
-- `area` / `area_k` -> `_canvas_area_from_report` -> `state.canvas_area`, used to spread automatic layouts over the window when loading.
-- `k` -> `_view_scale_from_report` -> `state.view_scale`. Icons are sized in data units, so they shrink on screen when `k > 1`; the rings and the label offset are in screen pixels and are rescaled to match (`_apply_node_icon_size`), but only when `k` has changed.
+- `area` / `area_k` -> `_canvas_area_from_report` -> `state.canvas_area`, used to spread automatic layouts over the 
+window when loading.
+- `k` -> `_view_scale_from_report` -> `state.view_scale`. Icons are sized in data units, so they shrink on screen when 
+`k > 1`; the rings and the label offset are in screen pixels and are rescaled to match (`_apply_node_icon_size`), but 
+only when `k` has changed.
 
 ---
 
@@ -185,9 +192,10 @@ The text is decoded by `_parse_view_report`; nothing happens if it is not a JSON
 _apply_node_icon_size()
 ```
 
-Apply the current `self.icon_size` to the canvas.
+Resize every icon, and the rings and name labels around them, to the current `self.icon_size`.
 
-Also called after undo, redo and load, whose node data may carry icon sizes from before the slider moved. It does not rebuild the ports.
+Also called after undo, redo and load, whose node data may carry icon sizes from before the slider moved. It does not 
+rebuild the ports.
 
 ---
 
@@ -205,7 +213,8 @@ None.
 
 ### Notes
 
-- **Icons:** `w` and `h` of every node are set to `icon_size` (data units). The source is only reassigned if a value differs.
+- **Icons:** `w` and `h` of every node are set to `icon_size` (data units). The source is only reassigned if a 
+value differs.
 - **Hover ring, selection ring, name-label offset** (screen pixels): base size × `size_factor`, with
 
   ```python
@@ -213,6 +222,9 @@ None.
   ```
 
   so they keep hugging the icon whatever the window size. The hover ring's `hover_glyph` is resized too.
+
+  The port balls use a different factor, without `view_scale` (see `_draw_ports`): they are placed in data units, like 
+  the icons.
 
 Renderers that do not exist (headless use, tests) are skipped.
 
@@ -260,7 +272,7 @@ _parse_view_report('oops')         # None
 _canvas_area_from_report(report)
 ```
 
-Return the canvas area of an empty design in the user's window, from a view report.
+Return the canvas area that an empty design shows in the user's window, from a view report.
 
 ---
 
@@ -276,7 +288,8 @@ Return the canvas area of an empty design in the user's window, from a view repo
 
 - **area** : *dict or None*
 
-  `{"x0", "x1", "y0", "y1", "per_px"}` in data units, with `per_px` from `area_k`, else `k`, else 1. `None` if `area` is not four increasing numbers or the scale is not positive.
+  `{"x0", "x1", "y0", "y1", "per_px"}` in data units, with `per_px` from `area_k`, else `k`, else 1. `None` if `area` 
+  is not four increasing numbers or the scale is not positive.
 
 ---
 
