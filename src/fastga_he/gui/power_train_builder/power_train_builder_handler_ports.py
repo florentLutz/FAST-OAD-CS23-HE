@@ -41,12 +41,10 @@ _SELECTED_PORT_LINE_ALPHA = 0.5
 
 class PortEdgeMixin:
     """
-    Handles all node, port, and edge geometry: finding the nearest placed
-    node (:meth:`_best_possible_node`), the nearest port
-    (:meth:`_find_nearest_port`), and the nearest edge
-    (:meth:`_find_nearest_edge`) to a tap — a cohesive hit-testing trio used
-    by delete mode, selection, and the port-connection workflow — plus
-    adding, removing, and redrawing ports and edges on the Bokeh canvas.
+    Handles the canvas geometry: finding the node (:meth:`_find_nearest_node`),
+    port (:meth:`_find_nearest_port`) or edge (:meth:`_find_nearest_edge`) under
+    a tap, drawing the port balls, adding edges, and keeping the edges and their
+    previews attached to the ports.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) being set by
     the concrete class before any method is called.
@@ -66,9 +64,9 @@ class PortEdgeMixin:
         :param y: Tap y coordinate in canvas data-units.
 
         :return: ``(best_index, shortest_distance, nodes_data)`` where ``best_index`` is the
-            zero-based index of the closest node (``None`` if nothing is within snap
-            distance), ``shortest_distance`` is the Euclidean distance from the tap to that node
-            (``None`` if no node is, close enough), and ``nodes_data`` is the raw
+            zero-based index of the closest node (``None`` if no node centre is within
+            ``icon_size``), ``shortest_distance`` is the distance from the tap to that node
+            (``None`` if there is none), and ``nodes_data`` is the live
             ``placed_nodes_source.data`` dict.
         """
         nodes_data = self.state.placed_nodes_source.data
@@ -98,7 +96,10 @@ class PortEdgeMixin:
 
     def _find_nearest_port(self, x: float, y: float) -> dict | None:
         """
-        Return metadata for the nearest port ball within snap distance, or ``None``.
+        Return the port ball nearest to ``(x, y)`` within ``2.5 * PORT_RADIUS``, or ``None``.
+
+        Unlike :meth:`_find_nearest_node`, the snap distance does not follow the
+        icon-size slider.
 
         :param x: Tap x coordinate in canvas data-units.
         :param y: Tap y coordinate in canvas data-units.
@@ -241,7 +242,7 @@ class PortEdgeMixin:
 
     def _find_nearest_edge(self, x: float, y: float, snap: float = 12.0) -> int | None:
         """
-        Return the index of the edge closest to ``(x, y)`` within *snap* pixels,
+        Return the index of the edge closest to ``(x, y)`` within *snap* data units,
         or ``None`` if no edge is close enough.
 
         :param x: Tap x coordinate in canvas data-units.
@@ -287,8 +288,9 @@ class PortEdgeMixin:
               refreshes the Connections panel of the selected node. Apply
               adds several edges in a row, so it does this once at the end.
 
-        :param starting_port: Metadata dict for the source-side (starting) port.
-        :param ending_port: Metadata dict for the target-side (ending) port.
+        :param starting_port: Port dict of the first end (on the canvas, the port
+            clicked first, which may be a target port).
+        :param ending_port: Port dict of the other end.
         """
         edge_data = copy_column_data(self.state.edge_source.data)
 
@@ -360,15 +362,11 @@ class PortEdgeMixin:
 
     def _rebuild_edges(self):
         """
-        Recompute xs/ys in edge_source from stored port-identity columns. Here synchronise
-        the `edge_data` with the current port state in the newly configured `source_port_source`
-        and `target_port_source`.
+        Re-route every edge to the current port positions, and drop the edges
+        whose ports are no longer drawn (e.g. a port count was reduced).
 
-        Called at the end of :meth:`_rebuild_all_ports` so edges track port
-        states after port-count spinner changes.  Edges whose ports no
-        longer exist (e.g. port count reduced) are silently dropped. Colours
-        are kept: both ends of an edge always carry its energy type, and a
-        port-type change of an unknown component drops the edges of that side.
+        Called by :meth:`_rebuild_all_ports`. Colours are kept: both ends of an
+        edge always carry its energy type.
         """
         edge_data = copy_column_data(self.state.edge_source.data)
         if not edge_data.get("starting_node_index"):
@@ -424,8 +422,8 @@ class PortEdgeMixin:
         """
         Recompute every port ball and push them into the two port data sources.
 
-        Each node gets its source ports fanned around its top and its target
-        ports around its bottom (:meth:`compute_ports`), on an orbit that
+        Each node gets its source ports fanned below its icon and its target
+        ports above it (:meth:`compute_ports`), on an orbit that
         scales with the icon-size slider. Only the selected node's balls are
         visible, and every port is flagged ``connected`` from ``edge_source``.
 
@@ -598,13 +596,10 @@ class PortEdgeMixin:
 
     def _end_edge_preview(self):
         """
-        End a port-count preview: put back the true edges it hid, if any.
+        End a port-count preview: put back the real edges it hid, if any.
 
-        Called by every real rebuild, and before every real edit records its
-        undo step (:meth:`_push_undo`, undo and redo). Otherwise the edit would
-        work on, and the history record, the edge list the preview pruned, and
-        the next real rebuild would replace the edit's own edges with the
-        backup taken before it.
+        Called by every real rebuild, and by :meth:`_push_undo`, undo and redo
+        before they take a snapshot, so they work on the real edges.
         """
         if self.state.edge_preview_backup is None:
             return
@@ -627,19 +622,20 @@ class PortEdgeMixin:
         gap_pixels: float = 20.0,  # = _PORT_GAP
     ) -> dict:
         """
-        Place port balls evenly around the component node placed on canvas.
+        Place port balls evenly on a circle around a component.
 
-        Output ports fan around the top half (centred at −90°);
-        input ports fan around the bottom half (centred at +90°).
+        Output (source) ports fan around −90°, below the icon, since the canvas
+        ``y`` axis points up; input (target) ports fan around +90°, above it.
 
         :param center_x: Component node centre x in canvas coordinates.
         :param center_y: Component node centre y in canvas coordinates.
-        :param node_radius: Radius of the node circle in data-units / pixels.
-        :param port_radius: Radius of each port ball in data-units / pixels.
+        :param node_radius: Radius of the node circle, in data units.
+        :param port_radius: Radius of each port ball, in data units.
         :param number_of_outputs: Number of output (source) ports.
         :param number_of_inputs: Number of input (target) ports.
         :param spread_angle_degrees: Angular fan for each half in degrees (default 120).
-        :param gap_pixels: Clearance between the node edge and each port centre in pixels.
+        :param gap_pixels: Clearance between the node edge and each port centre, in
+            data units despite the name.
         :return: A dictionary ``{"outputs": [Port, …], "inputs": [Port, …]}`` where
             each Port is a dict with keys ``index``, ``kind``, ``angle_deg``, ``x``,
             and ``y``.

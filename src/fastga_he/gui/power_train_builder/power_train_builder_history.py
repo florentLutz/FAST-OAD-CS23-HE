@@ -5,9 +5,8 @@
 """
 Snapshot-based undo / redo stack for the powertrain builder.
 
-:class:`EditHistoryStack` is the single, self-contained history manager used by
-:class:`BuilderHandler`.  It keeps a bounded list of canvas snapshots and
-a separate *redo* stack that is populated whenever the user undoes an action.
+:class:`EditHistoryStack` holds the undo snapshots of :class:`BuilderHandler`,
+and a separate *redo* stack filled whenever the user undoes a change.
 
 A **snapshot** is a plain ``dict`` that freezes the editable canvas state at
 the moment a mutating action begins::
@@ -23,19 +22,17 @@ to the Bokeh sources do not affect the stored snapshot.
 
 The port sources (``source_port_source`` / ``target_port_source``) are not
 stored: they are derived from the nodes and edges, and are rebuilt by
-``_rebuild_all_ports`` after every restore.
+``_rebuild_all_ports`` after every restore. Display settings (icon size, view)
+are not stored either.
 
-Typical usage inside a mutating handler method::
+Typical usage inside a method that changes the design::
 
-    self._push_undo()          # capture state *before* the mutation
-    … perform mutation …
+    self._push_undo()          # record the design *before* the change
+    … change the design …
     self._mark_unsaved()
 
-Then in :meth:`_on_undo`::
-
-    snapshot = self.state.edit_history_stack.undo()
-    if snapshot is not None:
-        self._restore_from_snapshot(snapshot)
+Undo and redo push the current design onto the other stack before restoring a
+snapshot (see ``IOMixin._on_undo`` / ``IOMixin._on_redo``).
 """
 
 import copy
@@ -51,10 +48,10 @@ _DEFAULT_MAX_DEPTH = 50
 
 class EditHistoryStack:
     """
-    Bounded snapshot stack supporting undo and redo.
+    Undo stack and redo stack of design snapshots.
 
-    :param max_depth: Maximum number of undo steps to retain.  Older snapshots
-        are silently discarded when the limit is reached.
+    :param max_depth: Number of snapshots kept on each stack; the oldest ones
+        are dropped silently.
     """
 
     def __init__(self, max_depth: int = _DEFAULT_MAX_DEPTH):
@@ -74,8 +71,7 @@ class EditHistoryStack:
         """
         Push *snapshot* onto the undo stack and clear the redo stack.
 
-        The redo stack is cleared because a new mutation invalidates any
-        previously undone actions.
+        After a new change, the undone steps can no longer be redone.
 
         :param snapshot: Canvas snapshot produced by :func:`make_snapshot`.
         """
@@ -87,9 +83,8 @@ class EditHistoryStack:
         """
         Pop and return the most recent snapshot, or ``None`` if empty.
 
-        The *current* canvas state (captured by the caller just before calling
-        this method) should be pushed onto the redo stack by the caller so that
-        a subsequent :meth:`redo` can re-apply it.
+        Before restoring it, the caller must push the current design onto the
+        redo stack (:meth:`push_redo`), so the step can be redone.
 
         :return: The snapshot to restore, or ``None``.
         """
@@ -126,8 +121,9 @@ class EditHistoryStack:
 
     def push_redo(self, snapshot: dict) -> None:
         """
-        Push *snapshot* onto the redo stack (called by the undo handler before
-        restoring the previous state so the action can be re-applied).
+        Push *snapshot* onto the redo stack.
+
+        Used by the undo handler, before restoring the previous design.
 
         :param snapshot: Canvas snapshot of the state that is about to be
             replaced by the undo operation.
@@ -162,13 +158,9 @@ class EditHistoryStack:
 
 def make_snapshot(state) -> dict:
     """
-    Capture a deep-copy snapshot of all mutable canvas state.
+    Deep copy of the editable design: node data, edge data and placement counter.
 
-    Reads the live node and edge ``ColumnDataSource`` data dicts and the
-    ``placed_counter`` from *state* and returns an independent copy. Port
-    data is derived from these and is not captured.  No
-    Bokeh objects are stored — only plain Python dicts and lists — so the
-    snapshot is cheap to pickle and safe to hold indefinitely.
+    Port data is derived from these and is not recorded.
 
     :param state: :class:`~.power_train_builder_state.BuilderState` instance.
     :return: Snapshot dict suitable for :meth:`EditHistoryStack.push_undo`.

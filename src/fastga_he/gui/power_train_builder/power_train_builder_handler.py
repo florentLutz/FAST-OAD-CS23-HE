@@ -20,8 +20,7 @@ The class is assembled from six single-responsibility mixins:
   type / position / options / port counts and appending the new node.
 * :class:`~.power_train_builder_handler_io.IOMixin` –
   save / load (one YAML file incl. a canvas_layout section), tkinter file
-  dialogs, end-session triggers,
-  undo / redo snapshot management.
+  dialogs, end-session triggers, undo / redo.
 * :class:`~.power_train_builder_handler_ports.PortEdgeMixin` –
   node / port / edge hit-testing, edge add / remove / rebuild.
 * :class:`~.power_train_builder_handler_config_panel.ConfigPanelMixin` –
@@ -32,7 +31,7 @@ The class is assembled from six single-responsibility mixins:
 
 Typical usage::
 
-    toolbox_layout, config_panel_column, state = ComponentPaletteConfigurationTableBuilder.build()
+    toolbox_layout, config_panel_column, state = ComponentToolboxConfigurationTableBuilder.build()
     handler = BuilderHandler(state, canvas)
     canvas.on_event(Tap, handler.on_canvas_tap)
 """
@@ -69,18 +68,18 @@ class BuilderHandler(
     UnknownComponentMixin,
 ):
     """
-    Wires toolbox button events to canvas placement and interaction events.
+    Wires every Python callback of the builder and dispatches canvas taps.
 
-    Instantiate **after** building the toolbox; the constructor automatically
-    wires all button ``on_click`` callbacks and initialises the undo stack.
-
-    All public and private methods of this class operate exclusively on the
-    shared :class:`BuilderState` instance passed at construction time.
+    Create it **after** the toolbox and the Undo / Redo buttons exist on the
+    state. It holds no design data of its own: every mixin reads and changes
+    the shared :class:`BuilderState`.
     """
 
     def __init__(self, state: BuilderState, main_plot, icon_size: int = DEFAULT_NODE_ICON_SIZE):
         """
         Initialise the handler, set up the undo stack, and wire all button callbacks.
+
+        The canvas ``Tap`` event is wired by the launcher, to :meth:`on_canvas_tap`.
 
         :param state: Shared :class:`BuilderState` instance.
         :param main_plot: The Bokeh ``figure`` that acts as the placement canvas.
@@ -105,38 +104,11 @@ class BuilderHandler(
 
     def _wire_buttons_widgets(self):
         """
-        Attach ``on_click`` callbacks of all static Bokeh buttons/ widgets in the left toolbox
-        and the right component configuration table panel.
+        Attach the Python callbacks of every static widget. Called once by ``__init__``.
 
-        Called once from ``__init__``. Connects:
-
-        * Each component toolbox button -> ``on_toolbox_select``.
-        * The End Session button -> ``_end_session``.
-        * The Delete button -> ``_toggle_delete_mode``.
-        * The New Design button -> ``_on_new_design``.
-        * The browse_load_trigger -> ``_on_browse_load`` (tkinter open-file dialog).
-        * The browse_save_trigger -> ``_on_browse_save`` (tkinter save-file dialog).
-        * The browse_watcher_trigger -> ``_on_browse_watcher`` (tkinter dialog for
-          the watcher CSV path).
-        * The watcher_path_input -> ``_on_watcher_path_change`` (stores the path
-          written as watcher_file_path in the saved YAML).
-        * The icon-size slider -> ``_on_node_size_slider_change`` (rescales
-          icons, hover / selection rings, labels and port orbits).
-        * The view_scale_input -> ``_on_view_scale_change`` (window-fitted
-          canvas scale, keeps rings / labels matched to the icons).
-        * The Undo button -> ``_on_undo``.
-        * The Redo button -> ``_on_redo``.
-        * The type_select -> ``_on_type_select_change`` (refreshes
-          position / options / symmetry choices as the user edits).
-        * The Apply button -> ``apply_node_configurations`` (commits the
-          config panel's current values to the selected node).
-        * The source/target port-count spinners ->
-          ``_on_port_count_spinner_change`` (live visual preview only;
-          the new counts are committed on Apply, same as every other
-          config-panel field).
-        * The "Add option" button -> ``_on_add_option`` (unknown component).
-        * The source/target port-type selects -> ``_on_port_type_change``
-          (unknown component; applies at once, without Apply).
+        The End Session button has no Python callback: its JavaScript decides
+        whether the session may end, then flips ``end_session_trigger``, which
+        is wired here to :meth:`_on_end_session_trigger`.
         """
         # End Session is handled entirely via JS + end_session_trigger to avoid the
         # Python on_click firing unconditionally (before JS can gate on save state)
@@ -208,17 +180,15 @@ class BuilderHandler(
 
     def on_canvas_tap(self, event):
         """
-        Handle a tap event on the main canvas.
+        Handle a tap on the canvas, depending on the current mode.
 
-        Behaviour depends on the current interaction mode:
+        * **Delete mode** – delete the node at the tap, else the edge there.
+        * **Toolbox component armed** – place it at the tap.
+        * **Idle** – a port within reach starts or completes a two-click
+          connection (port balls overlap the icon edge, so they come first);
+          otherwise select or deselect the node at the tap.
 
-        * **Delete mode** – remove the nearest placed node or edge.
-        * **Component selected** – place a new node at the tap coordinates.
-        * **Neither** – select or deselect the nearest existing node.
-
-        An undo snapshot is pushed **before** every action that mutates the
-        canvas (node placement, node deletion, edge deletion) so the user can
-        reverse each step individually.
+        Every branch that changes the design pushes an undo snapshot first.
 
         :param event: Bokeh ``Tap`` event carrying ``x`` and ``y`` coordinates.
         """
@@ -246,6 +216,8 @@ class BuilderHandler(
     def _delete_at(self, x: float, y: float):
         """
         Delete mode: remove the node at ``(x, y)``, or else the edge there.
+
+        If a node is still selected afterwards, its Connections panel is refreshed.
 
         :param x: Tap x coordinate in canvas data-units.
         :param y: Tap y coordinate in canvas data-units.
@@ -328,6 +300,7 @@ class BuilderHandler(
         """
         Idle mode: select the node at ``(x, y)``, or deselect.
 
+        A pending two-click connection and the panel picks are cancelled first.
         Tapping empty canvas or the already selected node deselects; tapping
         another node selects it and fills the config panel.
 
@@ -353,7 +326,7 @@ class BuilderHandler(
 
 def _reindex_symmetry_after_deletion(nodes_data: dict, deleted_node_index: int) -> None:
     """
-    Keep the symmetry links of *nodes_data* valid after a node was removed.
+    Update the symmetry links of *nodes_data* after a node was removed.
 
     The peer of the deleted node loses its link, and every peer index after the
     deleted node moves up by one, like the node rows themselves.

@@ -75,7 +75,7 @@ class PowerTrainYAMLWriter:
 
     The class reads node and edge data from the live :class:`BuilderState` at
     construction time, so all subsequent calls to :meth:`add_component`,
-    :meth:`add_connection`, and :meth:`write` work on an immutable snapshot.
+    :meth:`add_connection`, and :meth:`write` work on a fixed copy of the design.
 
     Callers that have already taken their own ``copy_column_data`` snapshot
     can pass it in directly via ``node_data`` / ``edge_data`` to avoid
@@ -153,6 +153,9 @@ class PowerTrainYAMLWriter:
         so the file can be re-opened in the builder, with an unknown
         component's port counts and port types (:data:`UNKNOWN_LAYOUT_KEYS`).
 
+        ``symmetrical`` is written on one component of each pair only: the one
+        with the higher index.
+
         :param node_index: Zero-based row index into the snapshotted node data arrays.
         """
         component_name = self.node_data["name"][node_index]
@@ -199,9 +202,6 @@ class PowerTrainYAMLWriter:
     def _saved_options(self, node_index: int) -> dict:
         """
         Options stored on the node, decoded from their JSON string.
-
-        This already contains every option the user configured in the GUI,
-        including boolean toggles (e.g. adjust_sfc) stored as booleans.
 
         :param node_index: Zero-based row index into the snapshotted node data arrays.
         :return: ``{option_name: value}``; empty if the JSON cannot be read.
@@ -290,9 +290,10 @@ class PowerTrainYAMLWriter:
 
     def set_watcher_file_path(self, watcher_path: str) -> None:
         """
-        Set the ``watcher_file_path`` field of the YAML output. The watcher file csv shows
-        the changes of specified performance parameters for defined powertrain components during
-        each time step of the flight mission.
+        Set the ``watcher_file_path`` field of the YAML output.
+
+        The watcher CSV shows how the specified performance parameters of the
+        chosen powertrain components change at each time step of the flight mission.
 
         :param watcher_path: Filesystem path to the watcher CSV file, or an
             empty string to omit the field from the output.
@@ -327,7 +328,7 @@ class PowerTrainYAMLWriter:
             key: value
             for key, value in self.data.items()
             if not (key == KEY_CANVAS_LAYOUT and not self.include_canvas_layout)
-            # watcher_file_path is optional for FAST-OAD: only write it when set
+            # watcher_file_path is optional for FAST-OAD_CS23-HE: only write it when set
             and not (key == KEY_PT_WATCHER and not value)
         }
         yaml_serialiser.dump(data_to_dump, string_buffer)

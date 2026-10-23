@@ -170,8 +170,10 @@ class ConfigPanelMixin:
 
     def _clear_node_table(self):
         """
-        Reset all node configuration panel inputs to their empty defaults and
-        hide the panel.
+        Reset every panel widget and hide the panel.
+
+        Also clears the selection ring and the Connections rows, and rebuilds
+        the ports, which hides the port balls of the deselected node.
         """
         self.state.name_input.value = _EMPTY
         self.state.type_select.options = []
@@ -201,25 +203,17 @@ class ConfigPanelMixin:
 
     def _on_port_count_spinner_change(self, attr, old, new):
         """
-        Live-preview callback wired to both port-count spinners.
+        Callback of both port-count spinners: preview the new counts on the canvas.
 
-        Redraws the selected node's port balls at the spinners' *current*
-        values so the canvas updates as the user spins, and hides any edge
-        that a shrunk count would drop — all without writing anything to
-        ``placed_nodes_source`` and without permanently losing an edge from
-        ``edge_source`` (see
-        :meth:`~.power_train_builder_handler_ports.PortEdgeMixin._sync_edge_preview_backup`
-        for the snapshot/restore mechanism that makes this reversible). The
-        change only becomes permanent when :meth:`apply_node_configurations`
-        reads the same spinner values and commits them; simply navigating
-        away (reselecting, deleting, placing a new node, or opening Delete
-        mode) discards the preview for free, because every one of those
-        paths already triggers a real, non-preview call to
-        ``_rebuild_all_ports`` that restores the true edge list and reads
-        port counts straight from the last-committed values again.
+        The selected node's ports are redrawn with the value of each visible
+        spinner (a hidden spinner may hold a stale value, so the stored count
+        is used for its side). Edges on removed ports disappear but are kept
+        in a backup (see
+        :meth:`~.power_train_builder_handler_ports.PortEdgeMixin._sync_edge_preview_backup`).
+        Nothing is written to the design: Apply commits the counts, and any
+        other action (selecting, deleting, placing, delete mode) restores them.
 
-        No-op if no node is currently selected (can happen if a spinner's
-        value is programmatically reset while the panel is being cleared).
+        No-op if no node is selected.
 
         :param attr: Bokeh on_change attribute name (``"value"``); unused.
         :param old: Previous spinner value; unused.
@@ -258,11 +252,13 @@ class ConfigPanelMixin:
 
     def _refresh_options_table(self, node_type: str, overrides: dict):
         """
-        Rebuild the Options section of the config panel for a given node type.
+        Rebuild the Options rows of the panel for a known component type.
 
         Creates one row per option (a disabled TextInput label + a Select for
         the value). The Selects are kept in ``self._options_value_selects``, in
-        the order of ``self._options_names``, for Apply to read.
+        the order of ``self._options_names``, for Apply to read. A current value
+        that is not a possible value is added first to the choices, so it is
+        not lost.
 
         :param node_type: Component type key used to look up ``possible_options``.
         :param overrides: Optional ``{option_name: current_value}`` mapping used
@@ -353,12 +349,12 @@ class ConfigPanelMixin:
 
     def _refresh_connections_table(self, node_index: int):
         """
-        Populate the Connections panel for node *node_index* using dynamic rows.
+        Rebuild the Connections panel of node *node_index*: one row per port, sources first.
 
-        For every source port of the selected node a row is created with a
-        disabled label and a Select showing compatible unconnected target ports.
-        A symmetric row is created for every target port.  Selecting a new
-        value immediately draws (or removes) the corresponding preview edge.
+        Each row has the port label and a dropdown of the free, compatible ports
+        of other nodes on the opposite side. Picking a port draws a dashed
+        preview, committed by Apply; picking the empty value removes the
+        connection at once.
 
         :param node_index: Zero-based index of the node to show connections for.
         """
@@ -539,7 +535,7 @@ class ConfigPanelMixin:
     @staticmethod
     def _parse_choice(choice_string: str, candidates: list[tuple]) -> tuple | None:
         """
-        Reverse-lookup a display string in a candidates list.
+        Find the candidate whose display string is *choice_string*.
 
         :param choice_string: The string currently selected in the dropdown.
         :param candidates: List of ``(node_index, label, kind, display_str)`` tuples.
@@ -561,19 +557,11 @@ class ConfigPanelMixin:
         _candidates: list,
     ):
         """
-        Return a Bokeh ``on_change`` callback bound to a specific port row.
+        Return the ``on_change`` callback of one Connections dropdown.
 
-        Wraps :meth:`_on_port_select_change` via :func:`functools.partial`, pre-filling every
-        port-specific argument so Bokeh receives a plain ``(attr, old, new)`` callable with no
-        inner function required.
-
-        * When ``_own_kind == "source"``:  own port = starting_port, far port = ending_port (
-        target kind).
-        * When ``_own_kind == "target"``:  own port = ending_port, far port = starting_port (
-        source kind).
-
-        The edge is always stored as source -> target regardless of which direction was clicked,
-        so ``starting_port`` is always source-kind and ``ending_port`` is always target-kind.
+        It is :meth:`_on_port_select_change` with the row's port and candidates
+        bound (:func:`functools.partial`), so Bokeh can call it with
+        ``(attr, old, new)`` only.
 
         :param _own_kind: ``"source"`` or ``"target"``.
         :param _own_label: Port label of the own port (e.g. ``"1"``).
@@ -581,8 +569,8 @@ class ConfigPanelMixin:
         :param _own_color: Energy-type colour of the own port.
         :param _own_x: Snapshot x of the own port at callback-build time.
         :param _own_y: Snapshot y of the own port at callback-build time.
-        :param _candidates: Pre-built list of ``(node_index, label, kind, display_str)`` tuples
-        for the far end.
+        :param _candidates: ``(node_index, label, kind, display_str)`` tuples
+            for the far end.
         """
         return functools.partial(
             self._on_port_select_change,
@@ -702,25 +690,15 @@ class ConfigPanelMixin:
 
     def _on_type_select_change(self, attr, old, new):
         """
-        Bokeh ``on_change`` callback wired to ``state.type_select``.
+        Callback of the type select: update the panel to the type picked, before Apply.
 
-        Refreshes the choices in position select object, rebuilds the Options table
-        for the newly chosen component type (pre-populated with the selected
-        node's previously saved option values, if any), and refreshes the
-        Symmetry select so its candidate list matches ``new`` — the type
-        currently chosen in the dropdown, not the node's previously saved
-        type — so the symmetry candidates update live as the user browses
-        component types, before Apply is clicked.
-
-        When the user switches the selected node to a type other than its saved
-        one, every connection of the node and its symmetry link are cleared
-        straight away (see :meth:`_clear_node_connections_and_symmetry`), as
-        their ports and peer belong to the old type. Like a disconnect from the
-        Connections panel, this is a single undoable step.
-
-        The type, position and options themselves are not written back to
-        ``placed_nodes_source`` here — that happens when the user clicks Apply
-        (see :meth:`apply_node_configurations`).
+        The position and option choices become those of the new type (options
+        keep the node's stored values of the same name), and the symmetry
+        choices list the nodes of that type. If the user picks a type other
+        than the stored one, the node's connections and symmetry link are
+        removed at once, as one undoable step
+        (:meth:`_clear_node_connections_and_symmetry`): they belong to the old
+        type. The type, position and options themselves are written by Apply.
 
         Ignored while an unknown component is selected: its type is free text.
 
@@ -860,6 +838,10 @@ class ConfigPanelMixin:
     def _write_node_fields(self, placed_nodes_data: dict, node_index: int):
         """
         Write the panel's name, type, position, options and port counts into a node row.
+
+        If the source-count spinner is hidden, both port counts are first reset
+        to the defaults of the written type, so a type change also changes the
+        ports. Then each visible spinner writes its value for its side.
 
         :param placed_nodes_data: Copy of ``placed_nodes_source.data``, edited in place.
         :param node_index: Zero-based index of the node being applied.
@@ -1138,9 +1120,6 @@ def _symmetry_positions_to_clear(
     """
     Nodes whose symmetry entry must be reset to unlink node *node_index*.
 
-    That is every node pointing at it (by index or by name), plus the node
-    itself if it has a link of its own.
-
     :param symmetry_names: ``symmetry_name`` column, padded to one entry per node.
     :param symmetry_indices: ``symmetry_node_index`` column, padded the same way.
     :param node_index: Zero-based index of the node to unlink.
@@ -1199,15 +1178,12 @@ def _positions_linked_to(
 
 def _port_label_stylesheets(node_type: str, port_label: str, primary_type_keywords: tuple) -> list:
     """
-    Stylesheets of a port label in the Connections panel.
+    Stylesheets of a port label in the Connections panel: light blue for the
+    primary port of a power split, none otherwise.
 
-    The primary port of a power split definition is shown in light blue, every
-    other port keeps Bokeh's default text color. The color cannot go through
-    ``styles``: that only styles the widget's outer element, while the text sits
-    in an ``<input>`` inside the widget's shadow DOM, whose color Bokeh sets with
-    its own ``.bk-input:disabled`` rule. A ``:host input:disabled`` stylesheet is
-    specific enough to override it, and ``-webkit-text-fill-color`` is needed
-    because Chromium and Safari paint disabled input text with it.
+    The colour is set with a ``:host input:disabled`` stylesheet because the text
+    sits in an ``<input>`` inside the widget's shadow DOM, which ``styles``
+    cannot reach; ``-webkit-text-fill-color`` is needed for Chromium and Safari.
 
     :param node_type: Component type of the node that owns the port.
     :param port_label: Port label (``"1"``, ``"2"``, ...).

@@ -3,12 +3,12 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 """
-Startup-overlay, new-design, delete-mode, and toolbox-selection logic.
+Startup overlay, New Design, delete mode and toolbox selection.
 
-This is the "what interaction mode is the canvas in" module: every method
-here sets up state for a *future* tap (which overlay button was pressed,
-whether delete mode is on, which toolbox component is armed) rather than
-mutating the canvas itself.
+These methods set the mode the canvas is in (startup choice, delete mode,
+armed toolbox component). They prepare what the next canvas click will do, but
+never place, edit or delete a component themselves, except New Design, which
+clears the canvas.
 
 Mixin class :class:`CanvasModeMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
@@ -33,11 +33,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class CanvasModeMixin:
     """
-    Handles the startup overlay choices, toolbox button selection, and delete-mode toggling.
+    Handles the startup overlay choices, toolbox selection and delete mode.
 
-    Every method on this mixin arms or disarms a mode that a *subsequent*
-    canvas tap will act on — it never places, deletes, or edits anything on
-    the canvas itself. Actual node placement lives in
+    Placing a component is done by
     :class:`~.power_train_builder_handler_placement.PlacementMixin`.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) being set by
@@ -63,11 +61,11 @@ class CanvasModeMixin:
 
     def _on_new_design(self):
         """
-        Start with a blank canvas.
+        Start a blank design. Callback of the New Design button.
 
-        Hides the startup overlay and resets every data source to empty so the
-        user begins with a completely fresh powertrain design.  The undo / redo
-        history is also cleared so a new session starts with a clean stack.
+        Hides the startup overlay, returns the canvas to idle, empties the
+        design and the watcher path, and clears the undo / redo history. The
+        Save button turns green: there is nothing to save.
         """
         self._dismiss_startup_overlay()
         self._reset_interaction_state()
@@ -95,17 +93,12 @@ class CanvasModeMixin:
 
     def _reset_interaction_state(self):
         """
-        Return the canvas to idle: nothing selected, armed, pending or previewed.
+        Return the canvas to idle: no component selected or armed for placement,
+        no connection waiting for a second click or for Apply, delete mode off.
 
-        Clears the port clicked once on the canvas, the Connections panel picks
-        and their dashed previews, the node selection (hiding the config panel),
-        the armed toolbox component (button highlight and status line) and
-        delete mode.
-
-        Called before the canvas content is replaced (New Design, load, undo /
-        redo) and when entering delete mode, as every one of these refers to
-        node indices of the current canvas. The data sources themselves are
-        left to the caller.
+        Called when entering delete mode, and before the canvas content is
+        replaced (New Design, load, undo, redo): after a replacement, a stored
+        node index may point at another component.
         """
         self._cancel_pending_connection()
         # Also clears panel_pending_connections
@@ -116,7 +109,11 @@ class CanvasModeMixin:
         self._exit_delete_mode()
 
     def _disarm_toolbox(self):
-        """Deselect the armed toolbox component, if any: reset its button and the status line."""
+        """
+        Deselect the armed toolbox component, if any.
+
+        Resets every toolbox button and the status line.
+        """
         self.state.selected_component = None
         for toolbox_button in self.state.buttons:
             toolbox_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
@@ -132,8 +129,7 @@ class CanvasModeMixin:
 
         Entering delete mode first returns the canvas to idle (see
         :meth:`_reset_interaction_state`), then the Delete button turns red and
-        the status label prompts the user to click a node or edge to remove
-        it. Leaving delete mode restores the defaults.
+        the status label prompts the user to click a node or edge to remove it.
         """
         if self.state.delete_mode:
             self._exit_delete_mode()
@@ -149,11 +145,9 @@ class CanvasModeMixin:
 
     def _exit_delete_mode(self):
         """
-        Exit delete mode unconditionally, restoring button styling and status text.
+        Turn delete mode off and restore the Delete button and the status line.
 
-        Safe to call even when delete mode is already inactive (no-op in that case).
-        Unlike :meth:`_toggle_delete_mode`, this never flips delete mode *on* and
-        has no side-effects beyond resetting the relevant UI elements.
+        Does nothing if delete mode is already off.
         """
         if not self.state.delete_mode:
             return
@@ -167,13 +161,15 @@ class CanvasModeMixin:
 
     def on_toolbox_select(self, component_index: int):
         """
-        Select the component at position *component_index* in :data:`BUILDER_ICONS_CONFIG`.
+        Arm the toolbox component at *component_index* for placement, or disarm it.
 
-        A second click on the same button deselects it. Updates button styling
-        and the status label accordingly. Can be called programmatically in
-        tests without a running server.
+        Callback of every toolbox button: a second click on the armed button
+        disarms it. Arming another component cancels a pending two-click
+        connection and leaves delete mode; the selected node stays selected
+        until the component is placed.
 
-        :param component_index: Zero-based index into ``list(BUILDER_ICONS_CONFIG)``.
+        :param component_index: Zero-based index into ``list(BUILDER_ICONS_CONFIG)``;
+            an index out of range is ignored.
         """
         icon_keys = list(BUILDER_ICONS_CONFIG)
         if component_index < 0 or component_index >= len(icon_keys):

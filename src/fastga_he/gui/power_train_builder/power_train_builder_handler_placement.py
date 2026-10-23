@@ -3,12 +3,10 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 """
-Node-placement and node-size logic for the powertrain builder.
+New components, icon size and view scale.
 
-This is the module that actually creates a new component on the canvas:
-computing its default type / position / options / port counts, building the
-icon URL, appending the new row to ``placed_nodes_source``, and rebuilding
-the ports that hang off it.
+Creates new components on the canvas, and keeps everything drawn around them
+in proportion to the icon size and to the window scale.
 
 Mixin class :class:`PlacementMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
@@ -43,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class PlacementMixin:
     """
-    Creates new components on the canvas.
+    Creates new components on the canvas and keeps them sized to the icon-size slider.
 
     Depends on ``self.state`` (a :class:`BuilderState` instance) and
     ``self.icon_size`` being set by the concrete class before any method is
@@ -59,14 +57,12 @@ class PlacementMixin:
 
     def _place_new_node(self, x: float, y: float):
         """
-        Create a new component of the currently-selected toolbox type at ``(x, y)``.
+        Place a component of the armed toolbox type at ``(x, y)``, as one undoable step.
 
-        Deselects any previously-selected node, pushes an undo snapshot, then
-        computes the new node's default component type, position, options,
-        and port counts (from the shared per-type defaults on ``self.state``),
-        builds its icon URL, and appends the resulting row to
-        ``placed_nodes_source``. Finally rebuilds every port so the new
-        component's port balls appear immediately.
+        The selected node is deselected first. The new component is named
+        ``<icon_key>_<n>`` from ``placed_counter`` and gets the defaults of its
+        type (:meth:`_new_component_defaults`). The toolbox component stays
+        armed, so several can be placed with successive clicks.
 
         :param x: Canvas x coordinate (data-units) where the component is placed.
         :param y: Canvas y coordinate (data-units) where the component is placed.
@@ -208,13 +204,15 @@ class PlacementMixin:
 
     def _apply_node_icon_size(self):
         """
-        Push the current ``self.icon_size`` to the canvas.
+        Resize every icon, and the rings and name labels around it, to ``self.icon_size``.
 
         * Icons: ``w`` / ``h`` of every placed node = ``icon_size`` (data units).
         * Hover ring, selection ring and name-label offset (screen pixels):
           base size x ``size_factor``, with
           ``size_factor = icon_size / DEFAULT_NODE_ICON_SIZE / state.view_scale``,
-          so they keep hugging the icon whatever the window size.
+          so they keep hugging the icon whatever the window size. The port
+          balls use the same factor without ``view_scale`` (see ``_draw_ports``),
+          since they are placed in data units.
 
         Also called after undo / redo and loading, whose node data may carry
         icon sizes from before the slider moved. Does not rebuild ports.

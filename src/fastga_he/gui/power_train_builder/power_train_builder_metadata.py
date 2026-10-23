@@ -7,8 +7,8 @@ Component metadata helpers for the powertrain builder.
 
 Three groups of functions are provided:
 
-* **Icon mapping** – :func:`_map_possible_component_types_to_icons` builds a
-  reverse lookup from ``components_type`` to its icon key.
+* **Icon mapping** – :func:`_map_possible_component_types_to_icons` maps each
+  icon key to the component types that use it.
 
 * **Port-count defaults** – :func:`_build_port_count_defaults` derives the
   default source and target port counts for every known component type from
@@ -76,9 +76,6 @@ def icon_data_url(icon_path) -> str:
     """
     Base64 data URL of an icon file, read and encoded once per path.
 
-    Used for every icon the builder draws: toolbox buttons, placed nodes,
-    loaded designs and the canvas legend.
-
     :param icon_path: Path of the icon file (``ICONS_CONFIG[...]["icon_path"]``
         or a ``COLOR_ICON_CONFIG`` value).
     :return: The ``data:`` URL, or the ``file://`` URL if the file cannot be read.
@@ -95,16 +92,15 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
     """
     Derive default source and target port counts for every known component type.
 
-    Iterates over :data:`KNOWN_COMPONENTS` and applies the following rules in
-    priority order:
+    The first matching rule applies:
 
-    * Any attribute containing ``"number_of_"`` -> ``VARIABLE_PORT_DEFAULT``
-      sources and targets (variable-count component).
-    * Any attribute containing ``"_mode"`` -> 2 sources, 1 target.
     * ``"gearbox"`` -> 1 source, 2 targets.
     * ``"propeller"`` or ``"aux_load"`` -> 1 source, 0 targets.
     * ``"fuel_tank"``, ``"gaseous_hydrogen_tank"``, or ``"battery_pack"``
       -> 0 sources, 1 target.
+    * ``attributes`` is a list: its first attribute containing ``"number_of_"``
+      or ``"_mode"`` decides. ``"number_of_"`` -> ``VARIABLE_PORT_DEFAULT`` on
+      both sides (variable-port component); ``"_mode"`` -> 2 sources, 1 target.
     * Everything else -> 1 source, 1 target.
 
     :return: A two-element tuple ``(default_source_count, default_target_count)``
@@ -152,12 +148,12 @@ def _build_port_count_defaults() -> tuple[dict, dict]:
 
 def _read_constant_from_ast(constants_file_path: Path, variable_name: str):
     """
-    Extract a single module-level assignment from a ``constants.py`` file
-    using the AST, **without importing the module**.
+    Read one assignment from a ``constants.py`` file by parsing its syntax
+    tree, **without importing the module**.
 
-    This avoids triggering FAST-OAD submodel registration side-effects that
-    would raise *"Name … is already used"* errors when the same submodel
-    string is declared across multiple components.
+    Importing would run FAST-OAD submodel registration again, which raises
+    *"Name … is already used"* errors. The first assignment to *variable_name*
+    found anywhere in the file (``ast.walk``) is used.
 
     The function distinguishes three outcomes:
 
@@ -166,10 +162,11 @@ def _read_constant_from_ast(constants_file_path: Path, variable_name: str):
     * ``(None, True)``   — variable found but its value contains non-literal
       nodes (e.g. enum references). The caller may attempt a
       cached-module fallback.
-    * ``(None, False)``  — variable not present in the file at all.
+    * ``(None, False)``  — variable not found, or the file is missing or cannot
+      be parsed.
 
     :param constants_file_path: Path to the ``constants.py`` file to parse.
-    :param variable_name: Module-level name to look for (e.g.
+    :param variable_name: Name to look for (e.g.
         ``"POSSIBLE_POSITION"`` or ``"POSSIBLE_OPTION"``).
     :return: A two-element tuple ``(value_or_none, found_flag)``.
     """
@@ -295,11 +292,8 @@ def _get_performance_component_names(components_root_path: str | Path) -> tuple[
     Scan the components tree and return per-component-type possible positions
     and possible options, both read from each component's ``constants.py``.
 
-    Both values are extracted via a pure AST parse so that no module is
-    imported and no FAST-OAD submodel registration side-effects are triggered.
-    The cached-module fallback is invoked only when the variable exists in the
-    file but its value contains non-literal nodes **and** the module is
-    already present in ``sys.modules`` — so it is always side-effect-free.
+    No module is imported (see :func:`_read_possible_constant`). Known
+    components the scan does not find get ``[]`` / ``{}``.
 
     :param components_root_path: Root path of the components tree.
     :return: A two-element tuple ``(possible_position, possible_options)`` where:

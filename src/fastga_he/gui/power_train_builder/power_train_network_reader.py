@@ -11,7 +11,7 @@ YAML configuration file and rebuilds the canvas state (nodes + edges) the
 builder needs to display and edit it.
 
 The YAML is the single source of truth. Everything the canvas needs is
-derived from the FAST-OAD sections of the file:
+derived from the powertrain configurator sections of the file:
 
 * ``power_train_components`` -> node name, component type (from ``id``),
   icon, position, options, symmetry peer, and port counts (variable-port
@@ -19,7 +19,8 @@ derived from the FAST-OAD sections of the file:
   emitted; every other type uses its default count).
 * ``component_connections`` -> edges (``[name, N]`` = port ``N``; a plain
   name = port ``1``).
-* ``watcher_file_path`` -> kept so that re-saving the design preserves it.
+* ``watcher_file_path`` -> the per time step performance parameter csv for the powertrain
+components.
 
 Only the canvas (x, y) of each component is GUI-specific; it is read from the
 optional ``canvas_layout`` section. Components without a layout entry (a file

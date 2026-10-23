@@ -3,19 +3,14 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 """
-Shared state, layout constants, and port-geometry utilities for the powertrain builder.
+Shared state, layout constants, column layouts and data helpers of the powertrain builder.
 
-:class:`BuilderState` is the single source of truth for every Bokeh widget and
-data source used by the builder. All other modules receive it by reference so
-they all operate on the same objects.
+:class:`BuilderState` holds every Bokeh widget and data source used by the
+builder. All other modules receive it by reference, so they all work on the
+same objects.
 
-:func:`compute_ports` is the geometric helper that places port balls evenly
-around a circular node icon.
-
-:func:`copy_column_data` is the small helper every mutating handler method
-uses to take an independent, per-column copy of a ``ColumnDataSource.data``
-dict before mutating and reassigning it (see its docstring for why the copy
-step itself is required, not just a style preference).
+:func:`copy_column_data` is the helper every edit uses to copy a
+``ColumnDataSource.data`` dict before changing and reassigning it.
 """
 
 from dataclasses import dataclass, field
@@ -36,6 +31,8 @@ from fastga_he.gui.power_train_network_viewer import (
 
 PALETTE_WIDTH = 300
 ROW_HEIGHT = 52
+# Size from which NODE_RADIUS and the ring / label base sizes are derived;
+# not the icon size on the canvas (see DEFAULT_NODE_ICON_SIZE)
 ICON_SIZE = 45
 
 # Port appearance
@@ -128,17 +125,12 @@ SAVE_MODE_CANCEL = "cancel"
 
 def copy_column_data(data: dict) -> dict:
     """
-    Return an independent, per-column-list copy of a ``ColumnDataSource.data`` dict.
+    Return a copy of a ``ColumnDataSource.data`` dict, with a new list per column.
 
-    Bokeh's ``ColumnDataSource`` only detects changes on whole-column or
-    whole-``.data`` reassignment — it does **not** track in-place mutation of
-    a column's existing list (``.pop()``, ``.append()``, index assignment).
-    Mutating ``source.data['x']`` directly would silently desync the browser
-    from the server: the Python-side data would be correct, but the glyph on
-    screen wouldn't update. Every mutating operation in this codebase
-    therefore follows the same copy -> mutate copy -> single
-    ``source.data = new_data`` reassignment pattern, and this helper is the
-    shared "copy" half of it.
+    Bokeh only updates the browser when ``.data`` or a whole column is
+    reassigned, not when a column list is changed in place. Every edit
+    therefore copies the data with this function, edits the copy, and
+    reassigns ``source.data`` once.
 
     :param data: The live ``.data`` dict of a ``ColumnDataSource``.
     :return: A new dict with the same keys, each mapped to a new ``list``
@@ -193,7 +185,7 @@ UNKNOWN_COMPONENT_TABS = ("connector", "propulsor", "load", "tank", "source")
 UNKNOWN_DEFAULT_PORT_COUNT = 1
 
 # Energy type of each port side of an unknown component, chosen in the config
-# panel. "undefined" ports are drawn in the gray of unknown.png and cannot be
+# panel. "undefined" ports are drawn in the grey of unknown.png and cannot be
 # connected until an energy type is chosen for them
 UNDEFINED_PORT_TYPE = "undefined"
 UNDEFINED_PORT_COLOR = "#666666"
@@ -226,7 +218,8 @@ BUILDER_ICONS_CONFIG = {
 
 def is_unknown_node(nodes_data: dict, node_index: int) -> bool:
     """
-    Whether node *node_index* is an unknown component.
+    Return a boolean that shows whether a node is an unknown component, i.e.
+    whether its ``icon_type`` is ``"unknown"``.
 
     :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
     :param node_index: Zero-based index of the node.
@@ -555,7 +548,7 @@ class BuilderState:
     # One row per port ball currently drawn on the canvas, keyed by
     # node_index (matching a row in placed_nodes_source) + label. Rebuilt
     # from scratch by PortEdgeMixin._rebuild_all_ports() on every node
-    # add / move / delete / port-count change
+    # add / delete / edit and port-count change
     source_port_source: bkmodel.ColumnDataSource = field(default=None)
     target_port_source: bkmodel.ColumnDataSource = field(default=None)
 
@@ -638,7 +631,7 @@ class BuilderState:
     end_session_button: bkmodel.Button = field(default=None)
     status_div: bkmodel.Div = field(default=None)
 
-    # Bokeh Button widgets for Undo and Redo, placed above the canvas
+    # Bokeh Button widgets for Undo and Redo, over the top-left corner of the canvas
     undo_button: bkmodel.Button = field(default=None)
     redo_button: bkmodel.Button = field(default=None)
 
@@ -726,7 +719,7 @@ class BuilderState:
     browse_watcher_trigger: bkmodel.TextInput = field(default=None)
 
     # "Unsaved changes" confirmation overlay — shown by End Session when
-    # save_button is yellow (i.e. there are unsaved edits)
+    # save_button is orange (i.e. there are unsaved edits)
     unsaved_exit_overlay: object = field(default=None)
 
     # Toggle trigger used by the overlay's "Save & Exit" button to open the
@@ -773,7 +766,7 @@ class BuilderState:
     """components_type -> {option_name: [possible values, …]} (first value = default)."""
 
     # icon_key -> list of components_type strings that use that icon; index
-    # [0] is treated as "the" default component type for a freshly placed
-    # icon (see PlacementMixin._place_new_node). Keyed the OPPOSITE way round
-    # from the four dicts above — read the name carefully
+    # [0] is the default component type of a newly placed icon (see
+    # PlacementMixin._new_component_defaults). Keyed by icon, unlike the four
+    # dicts above, which are keyed by component type
     icon_to_component_types: dict = field(default_factory=dict)

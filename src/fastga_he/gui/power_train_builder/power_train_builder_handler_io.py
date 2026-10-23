@@ -5,12 +5,13 @@
 """
 Save / load, end-session, and undo / redo logic.
 
-A design is saved as a single YAML file: the FAST-OAD powertrain
-configuration, plus (unless the user saves it as a final version) a GUI-only
-``canvas_layout`` section holding the canvas position of each component.
-Loading that YAML restores the canvas (see
-:class:`~.power_train_network_reader.PowerTrainYAMLReader`); without the
-section, the components are arranged automatically.
+A design is saved as a single YAML file: the powertrain configuration, plus (unless the user
+saves it as a final version) a GUI-only ``canvas_layout`` section holding the canvas position of
+each component.
+
+Loading the PT configuration file with the layout section restores the canvas
+(see :class:`~.power_train_network_reader.PowerTrainYAMLReader`); without it, the components are
+arranged automatically with the Tutte's algorithm.
 
 Mixin class :class:`IOMixin` is not meant to be instantiated directly;
 it is composed into :class:`BuilderHandler` via multiple inheritance.
@@ -263,6 +264,7 @@ class IOMixin:
             filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
         )
         if watcher_csv_path:
+            # This is for display only
             _set_text_input(self.state.watcher_path_input, watcher_csv_path)
             _LOGGER.info("Watcher CSV path set to: %s", watcher_csv_path)
 
@@ -293,7 +295,9 @@ class IOMixin:
 
         :param watcher_csv_path: Path to show and save, or an empty string.
         """
+        # Actual read / write of the watcher CSV
         self.state.watcher_file_path = watcher_csv_path
+        # This is for display only
         _set_text_input(self.state.watcher_path_input, watcher_csv_path)
 
     @staticmethod
@@ -491,7 +495,7 @@ class IOMixin:
         every click; the mode travels in the same change, so it cannot be read
         out of order):
 
-        * ``"final"`` -> FAST-OAD configuration only, no ``canvas_layout``.
+        * ``"final"`` -> FAST-OAD configuration only, no ``canvas_layout`` section.
         * ``"editable"`` (or any other value, e.g. a legacy ``"0"`` / ``"1"``
           toggle) -> configuration + ``canvas_layout`` for later edits.
         * ``"cancel"`` -> no dialog, nothing saved; also aborts a pending
@@ -514,7 +518,7 @@ class IOMixin:
                 _LOGGER.info("Save & Exit cancelled – keeping the session open.")
             self._pending_exit_after_save = False
             return
-
+        # if not final version, include the canvas layout in the saved YAML so it can be reloaded later
         include_canvas_layout = save_mode != SAVE_MODE_FINAL
         yaml_path = self._open_tkinter_dialog(
             filedialog.asksaveasfilename,
@@ -562,15 +566,8 @@ def _set_text_input(text_input, text: str) -> None:
     """
     Set the text of a Bokeh ``TextInput`` from Python, in both of its properties.
 
-    BokehJS keeps two properties in step with the browser field: ``value``
-    (updated on Enter / blur) and ``value_input`` (updated on every keystroke).
-    Setting ``value`` alone from Python shows the new text but leaves
-    ``value_input`` stale, and the "final version?" overlay buttons commit
-    ``value_input`` back into ``value`` before saving (see the toolbox's
-    ``_JS_SAVE_MODE_CLICK``), which would wipe the new text. Both are set here.
-
-    ``value_input`` is set first: only ``value`` has a Python callback, and it
-    then sees the field already in its final state.
+    Setting ``value`` alone would leave the old text in ``value_input``, which
+    the "final version?" buttons copy back into ``value`` before saving.
 
     :param text_input: The ``TextInput`` widget to update.
     :param text: New text of the field.
