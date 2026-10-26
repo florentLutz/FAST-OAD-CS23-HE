@@ -37,10 +37,9 @@ Once loaded from existing design, the builder should look like this:
     :width: 800
     :align: center
 
-For developers, the following two links are the event flow and the structure map of the builder GUI.
+For developers, the following links show the common action flows of the builder GUI.
 
 .. raw:: html
 
-    <a href="../../../powertrain_event_flow.html" target="_blank">Powertrain builder runtime event flow</a><br>
-    <a href="../../../powertrain_structure_map.html" target="_blank">Powertrain builder structure map</a><br>
+    <a href="../../../powertrain_builder_action_flows.html" target="_blank">Powertrain builder runtime event flow</a><br>
     <p></p>
