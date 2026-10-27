@@ -184,6 +184,13 @@ UNKNOWN_COMPONENT_TABS = ("connector", "propulsor", "load", "tank", "source")
 # Default port counts of a new unknown component (each side configurable, 0 allowed)
 UNKNOWN_DEFAULT_PORT_COUNT = 1
 
+# Warning shown in the Ports section of the config panel when an unknown
+# component would have neither a source nor a target port
+UNKNOWN_NO_PORT_WARNING_HTML = (
+    "<span style='color:#FFA500;font-size:12pt'>&#9888; This component has neither a "
+    "source nor a target port: it cannot be connected to anything.</span>"
+)
+
 # Energy type of each port side of an unknown component, chosen in the config
 # panel. "undefined" ports are drawn in the grey of unknown.png and cannot be
 # connected until an energy type is chosen for them
@@ -226,6 +233,32 @@ def is_unknown_node(nodes_data: dict, node_index: int) -> bool:
     :return: ``True`` for an unknown component.
     """
     return nodes_data["icon_type"][node_index] == UNKNOWN_ICON_KEY
+
+
+def has_no_port(n_sources, n_targets) -> bool:
+    """
+    Whether a component with these port counts has neither a source nor a target port.
+
+    :param n_sources: Number of source ports (``None`` counts as 0).
+    :param n_targets: Number of target ports (``None`` counts as 0).
+    :return: ``True`` if both counts are 0.
+    """
+    return int(n_sources or 0) == 0 and int(n_targets or 0) == 0
+
+
+def unknown_nodes_without_port(nodes_data: dict) -> list:
+    """
+    Names of the unknown components that have neither a source nor a target port.
+
+    :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
+    :return: List of component names, in node order.
+    """
+    return [
+        name
+        for node_index, name in enumerate(nodes_data.get("name", []))
+        if is_unknown_node(nodes_data, node_index)
+        and has_no_port(nodes_data["n_sources"][node_index], nodes_data["n_targets"][node_index])
+    ]
 
 
 def node_port_colors(nodes_data: dict, node_index: int) -> tuple[str | None, str | None]:
@@ -696,6 +729,10 @@ class BuilderState:
 
     # "Add option" button under the options, adding an empty name / value row
     add_option_button: bkmodel.Button = field(default=None)
+
+    # Warning in the Ports section, shown while the selected unknown component
+    # has (or would have, with the spinner values) no source and no target port
+    unknown_no_port_warning_div: bkmodel.Div = field(default=None)
 
     # --- Overlays and hidden browser <-> Python triggers ---
     # The whole startup overlay column — hidden (not just its two buttons) on dismiss

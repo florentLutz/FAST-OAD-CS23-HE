@@ -213,6 +213,9 @@ class ConfigPanelMixin:
         Nothing is written to the design: Apply commits the counts, and any
         other action (selecting, deleting, placing, delete mode) restores them.
 
+        For an unknown component, the "no port" warning follows the spinners
+        (see :meth:`~.power_train_builder_handler_unknown.UnknownComponentMixin._refresh_unknown_port_warning`).
+
         No-op if no node is selected.
 
         :param attr: Bokeh on_change attribute name (``"value"``); unused.
@@ -220,6 +223,7 @@ class ConfigPanelMixin:
         :param new: New spinner value; unused — both spinners are re-read
             directly since either one may be the one that changed.
         """
+        self._refresh_unknown_port_warning()
         node_index = self.state.selected_node_index
         if node_index is None:
             return
@@ -826,6 +830,7 @@ class ConfigPanelMixin:
         self._write_node_fields(placed_nodes_data, current_selected_node_index)
         self._write_symmetry(placed_nodes_data, current_selected_node_index)
         self.state.placed_nodes_source.data = placed_nodes_data
+        self._warn_if_unknown_without_port(placed_nodes_data, current_selected_node_index)
 
         # Commit the connections picked in the Connections panel
         for starting_port, ending_port in list(self.state.panel_pending_connections):

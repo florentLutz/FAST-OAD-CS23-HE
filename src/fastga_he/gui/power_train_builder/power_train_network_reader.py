@@ -69,6 +69,7 @@ from .power_train_builder_state import (
     link_symmetry,
     node_port_colors,
     ports_compatible,
+    unknown_nodes_without_port,
 )
 from .power_train_builder_metadata import component_type_classes, icon_data_url
 from .power_train_network_writer import (
@@ -199,6 +200,12 @@ class PowerTrainYAMLReader:
             yaml_data.get(KEY_PT_CONNECTIONS) or [], nodes_data, name_to_index
         )
         _fit_unknown_port_counts(nodes_data, edges_data)
+        for name in unknown_nodes_without_port(nodes_data):
+            _LOGGER.warning(
+                "Unknown component %s has neither a source nor a target port; "
+                "it cannot be connected to anything.",
+                name,
+            )
 
         if nodes_without_layout:
             self._place_nodes_without_layout(

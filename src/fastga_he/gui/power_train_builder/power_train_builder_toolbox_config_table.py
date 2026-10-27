@@ -54,6 +54,7 @@ from .power_train_builder_state import (
     UNDEFINED_PORT_TYPE,
     UNKNOWN_COMPONENT_TABS,
     UNKNOWN_ICON_KEY,
+    UNKNOWN_NO_PORT_WARNING_HTML,
     _EMPTY,
     empty_columns,
 )
@@ -222,8 +223,9 @@ def _build_unknown_component_widgets() -> dict:
 
     The text inputs replace the type, position and symmetry selects (an
     unknown component has no list of possible values), the "+" button adds an
-    option row, and the two port-type selects set the energy type of its
-    source and target ports. All start hidden.
+    option row, the two port-type selects set the energy type of its source
+    and target ports, and the warning tells the user it has no port at all.
+    All start hidden.
 
     :return: ``{BuilderState field name: widget}``.
     """
@@ -261,6 +263,12 @@ def _build_unknown_component_widgets() -> dict:
         ),
         "source_port_type_select": port_type_select("Source port type:"),
         "target_port_type_select": port_type_select("Target port type:"),
+        "unknown_no_port_warning_div": bkmodel.Div(
+            text=UNKNOWN_NO_PORT_WARNING_HTML,
+            width=370,
+            visible=False,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "4px 2px"},
+        ),
     }
 
 
@@ -434,6 +442,7 @@ def _build_config_panel(unknown_widgets: dict) -> dict:
             unknown_widgets["source_port_type_select"],
             unknown_widgets["target_port_type_select"],
         ),
+        unknown_widgets["unknown_no_port_warning_div"],
         visible=False,
         styles={"background": BACKGROUND_COLOR_CODE, "padding": "4px"},
     )

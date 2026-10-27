@@ -14,7 +14,8 @@ choose from:
 * the component type, position and symmetry peer are free text;
 * every option is a pair of free-text boxes (name, value), and the
   "Add option" button adds an empty pair;
-* both port counts are editable (0 allowed);
+* both port counts are editable (0 allowed); a warning is shown while both
+  are 0, since such a component cannot be connected to anything;
 * two selects set the energy type of its source and target ports. Unlike
   every other panel field, a change there applies at once, without Apply.
   Ports of undefined type cannot be connected until a type is chosen.
@@ -39,6 +40,7 @@ from .power_train_builder_state import (
     _EMPTY,
     copy_column_data,
     edge_end_ports,
+    has_no_port,
     is_unknown_node,
     select_edges,
     BuilderState,
@@ -75,6 +77,8 @@ class UnknownComponentMixin:
         :param is_unknown: ``True`` when the selected node is an unknown component.
         """
         state = self.state
+        # Shown again by _refresh_unknown_port_warning once the panel is filled
+        state.unknown_no_port_warning_div.visible = False
         for known_widget, unknown_widget in (
             (state.type_select, state.unknown_type_input),
             (state.position_select, state.unknown_position_input),
@@ -124,6 +128,44 @@ class UnknownComponentMixin:
         finally:
             self._is_populating_node_table = False
 
+        # Both spinners hold the stored counts now
+        self._refresh_unknown_port_warning()
+
+    def _refresh_unknown_port_warning(self):
+        """
+        Show the "no port" warning while the selected unknown component has
+        neither a source nor a target port, and hide it otherwise.
+
+        The spinner values are read, not the stored counts, so the warning
+        follows the spinners live, before Apply.
+        """
+        node_index = self.state.selected_node_index
+        nodes_data = self.state.placed_nodes_source.data
+        self.state.unknown_no_port_warning_div.visible = (
+            node_index is not None
+            and node_index < len(nodes_data.get("name", []))
+            and is_unknown_node(nodes_data, node_index)
+            and has_no_port(
+                self.state.source_count_spinner.value, self.state.target_count_spinner.value
+            )
+        )
+
+    def _warn_if_unknown_without_port(self, nodes_data: dict, node_index: int):
+        """
+        Log a warning if node *node_index* is an unknown component without any port.
+
+        :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
+        :param node_index: Zero-based index of the node.
+        """
+        if is_unknown_node(nodes_data, node_index) and has_no_port(
+            nodes_data["n_sources"][node_index], nodes_data["n_targets"][node_index]
+        ):
+            _LOGGER.warning(
+                "Unknown component %s has neither a source nor a target port; "
+                "it cannot be connected to anything.",
+                nodes_data["name"][node_index],
+            )
+
     def _clear_unknown_fields(self):
         """Empty and hide the unknown-component widgets."""
         for text_input in (
@@ -133,6 +175,7 @@ class UnknownComponentMixin:
         ):
             text_input.value = _EMPTY
         self._unknown_option_rows = ()
+        # Also hides the "no port" warning
         self._show_unknown_widgets(False)
 
     # -----------------------------------------------------------------------
