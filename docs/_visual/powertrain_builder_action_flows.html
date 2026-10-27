@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Powertrain Builder Action Flows</title>
+<script>
+try { const t = localStorage.getItem("ptb-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: reference sheet. Action index on the left, one vertical flow chart per action on the right. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --fg: #1a2029;
+  --muted: #566170;
+  --faint: #8691a0;
+  --line: #d3d9e1;
+  --accent: #2c5aa6;
+  --wire: #9aa4b2;
+
+  --ui-f: #eceff3;  --ui-b: #75808f;  --ui-t: #2b333e;
+  --cb-f: #e5ebfa;  --cb-b: #2c5aa6;  --cb-t: #1d3d74;
+  --h-f:  #ffffff;  --h-b:  #a3acb8;  --h-t:  #1a2029;
+  --d-f:  #e2f3ed;  --d-b:  #1d7658;  --d-t:  #0f4a37;
+  --u-f:  #faefd9;  --u-b:  #96620f;  --u-t:  #5e3c06;
+  --io-f: #fbe8e3;  --io-b: #a4412a;  --io-t: #6c2514;
+
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161b; --surface: #1a2027; --fg: #e4e8ee; --muted: #a2acb9; --faint: #6d7785;
+    --line: #2d3540; --accent: #7fa3e6; --wire: #56606d;
+    --ui-f: #232a33; --ui-b: #8792a1; --ui-t: #d9dee5;
+    --cb-f: #1c2a45; --cb-b: #7fa3e6; --cb-t: #cddcfa;
+    --h-f:  #1a2027; --h-b:  #4e5865; --h-t:  #e4e8ee;
+    --d-f:  #12302a; --d-b:  #3fb38b; --d-t:  #a9e6d1;
+    --u-f:  #352708; --u-b:  #d39b3a; --u-t:  #f3d49c;
+    --io-f: #3a1a12; --io-b: #e0745a; --io-t: #f6c3b5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161b; --surface: #1a2027; --fg: #e4e8ee; --muted: #a2acb9; --faint: #6d7785;
+  --line: #2d3540; --accent: #7fa3e6; --wire: #56606d;
+  --ui-f: #232a33; --ui-b: #8792a1; --ui-t: #d9dee5;
+  --cb-f: #1c2a45; --cb-b: #7fa3e6; --cb-t: #cddcfa;
+  --h-f:  #1a2027; --h-b:  #4e5865; --h-t:  #e4e8ee;
+  --d-f:  #12302a; --d-b:  #3fb38b; --d-t:  #a9e6d1;
+  --u-f:  #352708; --u-b:  #d39b3a; --u-t:  #f3d49c;
+  --io-f: #3a1a12; --io-b: #e0745a; --io-t: #f6c3b5;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+code, .mono { font-family: var(--mono); }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+header { display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+header .eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); font-weight: 500; }
+header h1 { margin: 0; font-size: 24px; font-weight: 600; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.head-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.theme-switch { display: inline-flex; padding: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); flex-shrink: 0; }
+.theme-switch button { font: inherit; font-size: 12px; padding: 4px 10px; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; }
+.theme-switch button:hover { color: var(--fg); }
+.theme-switch button[aria-pressed="true"] { background: var(--bg); color: var(--fg); font-weight: 500; box-shadow: inset 0 0 0 1px var(--line); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; flex-shrink: 0; }
+
+.layout { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 24px; align-items: start; }
+nav.index { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 14px;
+  max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
+.group h2 { margin: 0 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); font-weight: 500; }
+.group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.group a { display: block; padding: 5px 9px; border-radius: 6px; color: var(--muted); text-decoration: none; font-size: 13.5px; }
+.group a:hover { background: var(--surface); color: var(--fg); }
+.group a[aria-current="true"] { background: var(--surface); color: var(--fg); font-weight: 500; box-shadow: inset 0 0 0 1px var(--line); }
+.group a:focus-visible, button:focus-visible, select:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.picker { display: none; }
+.picker label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+.picker select { width: 100%; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+
+main { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.sheet { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sheet-head { display: flex; flex-direction: column; gap: 8px; }
+.sheet-head h2 { margin: 0; font-size: 20px; font-weight: 600; text-wrap: balance; }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; font-size: 13px; }
+.facts dt { color: var(--faint); }
+.facts dd { margin: 0; color: var(--muted); min-width: 0; }
+.badge { display: inline-block; font-size: 11.5px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.badge.yes { border-color: var(--u-b); color: var(--u-t); background: var(--u-f); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font-family: var(--mono); font-size: 11.5px; padding: 2px 7px; border-radius: 5px; border: 1px solid; cursor: default; background: none; color: inherit; }
+
+.chart-box { overflow-x: auto; padding: 4px 2px 2px; }
+.flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; min-width: 0; }
+.chart-box > .flow { max-width: 620px; }
+.node { position: relative; border: 1.5px solid; border-radius: 8px; padding: 8px 11px 9px; display: flex; flex-direction: column; gap: 2px; transition: box-shadow .15s, opacity .15s; }
+.flow > .node + .node, .flow > .branches + .node, .flow > .node + .branches, .flow > .branches + .branches, .flow > .node + .end, .flow > .branches + .end { margin-top: 22px; }
+.flow > .node + .node::before, .flow > .branches + .node::before, .flow > .node + .end::before, .flow > .branches + .end::before {
+  content: ""; position: absolute; left: 50%; top: -22px; height: 16px; border-left: 1.5px solid var(--wire); transform: translateX(-0.75px);
+}
+.flow > .node + .node::after, .flow > .branches + .node::after, .flow > .node + .end::after, .flow > .branches + .end::after {
+  content: ""; position: absolute; left: 50%; top: -8px; transform: translateX(-5px);
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--wire);
+}
+.node .row1 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.node .fn { font-family: var(--mono); font-weight: 500; font-size: 13px; overflow-wrap: anywhere; }
+.node .mod { font-size: 11px; letter-spacing: .03em; opacity: .85; white-space: nowrap; }
+.node .note { font-size: 12.5px; color: var(--muted); }
+.node .note code, .when code, .end code, .facts code { font-size: 11.5px; background: var(--bg); padding: 0 4px; border-radius: 3px; color: var(--fg); }
+.node .sub { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+.node .sub li { font-family: var(--mono); font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--bg); color: var(--fg); }
+.node .sub li::before { content: "\2192\00a0"; color: var(--faint); }
+.node.hl { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+.chart-box.dim .node:not(.hl) { opacity: .35; }
+
+.k-ui { background: var(--ui-f); border-color: var(--ui-b); color: var(--ui-t); }
+.k-js { background: var(--ui-f); border-color: var(--ui-b); color: var(--ui-t); border-style: dashed; }
+.k-cb { background: var(--cb-f); border-color: var(--cb-b); color: var(--cb-t); }
+.k-h  { background: var(--h-f);  border-color: var(--h-b);  color: var(--h-t); }
+.k-d  { background: var(--d-f);  border-color: var(--d-b);  color: var(--d-t); }
+.k-u  { background: var(--u-f);  border-color: var(--u-b);  color: var(--u-t); }
+.k-io { background: var(--io-f); border-color: var(--io-b); color: var(--io-t); }
+
+.branches { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; padding-top: 14px; border-top: 1.5px solid var(--wire); }
+.flow > .node + .branches::before, .flow > .branches + .branches::before { content: ""; position: absolute; left: 50%; top: -22px; height: 22px; border-left: 1.5px solid var(--wire); }
+.branch { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
+.when { font-size: 12px; font-weight: 500; color: var(--fg); }
+.when::before { content: "if  "; color: var(--faint); font-family: var(--mono); font-weight: 400; }
+.when.else::before { content: ""; }
+.end { position: relative; align-self: center; font-size: 12.5px; color: var(--muted); padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); text-align: center; max-width: 100%; }
+.branch > .flow > .end { align-self: flex-start; text-align: left; border-radius: 8px; }
+.pager { display: flex; justify-content: space-between; gap: 10px; }
+.pager button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.pager button:hover:not(:disabled) { color: var(--fg); border-color: var(--wire); }
+.pager button:disabled { opacity: .4; cursor: default; }
+.link-hint { font-size: 12px; color: var(--faint); }
+
+@media (max-width: 760px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  nav.index { display: none; }
+  .picker { display: block; }
+  .sheet { padding: 16px 14px 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .node { transition: none; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="head-top">
+      <div class="eyebrow">Powertrain builder · reference</div>
+      <div class="theme-switch" role="group" aria-label="Colour theme">
+        <button type="button" data-theme-set="light">Light</button>
+        <button type="button" data-theme-set="dark">Dark</button>
+        <button type="button" data-theme-set="auto">Auto</button>
+      </div>
+    </div>
+    <h1>User action flows</h1>
+    <p>One chart per user action, read top to bottom: the browser event, the Python callback it reaches, and every helper it calls in order. Branches show where the flow splits. Hover a helper name in the list above a chart to find it in the chart.</p>
+    <div class="legend" aria-label="Legend">
+      <span><i class="sw k-ui"></i>User / browser</span>
+      <span><i class="sw k-js"></i>Browser-side JavaScript</span>
+      <span><i class="sw k-cb"></i>Python callback (entry point)</span>
+      <span><i class="sw k-h"></i>Handler helper</span>
+      <span><i class="sw k-d"></i>Data and state helper</span>
+      <span><i class="sw k-u"></i>Undo / redo history</span>
+      <span><i class="sw k-io"></i>File, dialog or session</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="index" id="index" aria-label="Actions"></nav>
+    <main>
+      <div class="picker">
+        <label for="action-picker">Action</label>
+        <select id="action-picker"></select>
+      </div>
+      <article class="sheet" id="sheet" aria-live="polite"></article>
+      <div class="pager">
+        <button type="button" id="prev">&larr; Previous action</button>
+        <button type="button" id="next">Next action &rarr;</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// Step builders: S(kind, function, module, note, sub-calls), B(branches), E(end text)
+const S = (k, f, m, n = "", sub = null) => ({ k, f, m, n, sub });
+const B = (...arms) => ({ branch: arms.map(([when, steps, isElse]) => ({ when, steps, isElse: !!isElse })) });
+const E = (text) => ({ end: text });
+
+const KIND = { ui: "user", js: "javascript", cb: "callback", h: "helper", d: "data", u: "history", io: "file / session" };
+
+const GROUPS = [
+  ["Start", [
+    { id: "new-design", t: "Start a new design", trig: "Click <b>New Design</b> on the startup overlay.", undo: "No (history cleared)",
+      res: "Empty canvas, empty history, Save button green.",
+      flow: [
+        S("ui", "New Design button", "Browser", "Python <code>on_click</code>"),
+        S("cb", "_on_new_design", "CanvasMode"),
+        S("h", "_dismiss_startup_overlay", "CanvasMode", "Hides the overlay and its two buttons."),
+        S("h", "_reset_interaction_state", "CanvasMode", "Selection, pending clicks and picks, armed component and delete mode cleared."),
+        S("d", "empty_columns", "State", "Node and edge sources emptied; <code>placed_counter</code> cleared."),
+        S("h", "_set_watcher_path", "IO", "Watcher path set to empty, without marking unsaved."),
+        S("h", "_rebuild_all_ports", "Ports", "No nodes left, so the port sources are emptied."),
+        S("u", "EditHistoryStack.clear", "History", "Undo and redo stacks discarded."),
+        S("h", "_refresh_undo_redo_buttons", "IO", "Both buttons dimmed."),
+        S("io", "_request_view_fit", "IO", "Save button set green, then <code>fit_view_trigger</code> flipped so the browser refits the view."),
+      ] },
+    { id: "load-design", t: "Load a design", trig: "Click <b>Load Design</b> on the startup overlay.", undo: "No (history kept)",
+      res: "Canvas replaced by the file's design, Save button green.",
+      flow: [
+        S("ui", "Load Design button", "Browser"),
+        S("js", "_JS_LOAD_DIALOG", "Toolbox JS", "Flips the hidden <code>browse_load_trigger</code>."),
+        S("cb", "_on_browse_load", "IO"),
+        S("io", "_open_tkinter_dialog", "IO", "Native open-file dialog, filtered on <code>*.yml</code> / <code>*.yaml</code>."),
+        B(
+          ["Dialog cancelled", [E("Nothing happens; the startup overlay stays.")]],
+          ["A file is chosen", [
+            S("h", "_dismiss_startup_overlay", "CanvasMode"),
+            S("io", "_load_canvas_state", "IO", "Checks the file exists and is YAML, then reads it.",
+              ["PowerTrainYAMLReader.read", "_build_nodes", "_build_edges", "_fit_unknown_port_counts", "_place_nodes_without_layout"]),
+            B(
+              ["Missing, not YAML, or parse error", [S("h", "_show_status_error", "IO", "Red message in the status line; canvas unchanged.")]],
+              ["File read", [
+                S("h", "_restore_canvas_from_dict", "IO"),
+                S("h", "_reset_interaction_state", "CanvasMode"),
+                S("d", "copy_column_data", "State", "Node and edge sources replaced."),
+                S("h", "_set_watcher_path", "IO", "Path from the file; Save stays green."),
+                S("d", "placed_counter", "IO", "Rebuilt from the names: largest <code>n</code> of each <code>&lt;key&gt;_&lt;n&gt;</code>."),
+                S("h", "_apply_node_icon_size", "Placement", "Icons, rings and labels set to the current slider size."),
+                S("h", "_request_view_fit", "IO", "Browser refits the view to the loaded design."),
+                S("h", "_rebuild_all_ports", "Ports", "Edges re-routed; edges to missing ports dropped."),
+              ]],
+            ),
+          ]],
+        ),
+      ] },
+  ]],
+  ["Build", [
+    { id: "arm", t: "Arm a toolbox component", trig: "Click a component button in the toolbox.", undo: "No (mode only)",
+      res: "The component is armed; the next canvas click places it.",
+      flow: [
+        S("ui", "Toolbox button", "Browser", "Python <code>on_click</code>"),
+        S("cb", "_make_select_callback", "Handler", "Lambda bound to the button's index."),
+        S("h", "on_toolbox_select", "CanvasMode", "Out-of-range index is ignored."),
+        B(
+          ["The same button is already armed", [
+            S("d", "selected_component = None", "CanvasMode", "Button and status line reset."),
+            E("Disarmed."),
+          ]],
+          ["Another component", [
+            S("h", "_cancel_pending_connection", "Ports", "Drops the first click of a two-click connection."),
+            S("d", "selected_component", "CanvasMode", "Set to the button's icon key."),
+            S("h", "_exit_delete_mode", "CanvasMode"),
+            S("d", "button_type", "CanvasMode", "Previous button reset, this one highlighted; status shows <em>Placing: &hellip;</em>"),
+          ]],
+        ),
+      ] },
+    { id: "place", t: "Place a component", trig: "Click on the canvas while a toolbox component is armed.", undo: "Yes, one step",
+      res: "New component on the canvas; it stays armed for the next click.",
+      flow: [
+        S("ui", "Canvas tap", "Browser", "Bokeh <code>Tap</code> event with <code>x</code>, <code>y</code>."),
+        S("cb", "on_canvas_tap", "Handler", "A toolbox component is armed."),
+        S("h", "_place_new_node", "Placement"),
+        S("h", "_clear_node_table", "ConfigPanel", "Only if a node was selected, after <code>_clear_temp_edges</code>."),
+        S("u", "_push_undo", "IO", "Snapshot of the design before the change.", ["_end_edge_preview", "make_snapshot", "push_undo"]),
+        S("d", "placed_counter", "Placement", "Next number for the icon: name <code>&lt;icon_key&gt;_&lt;n&gt;</code>."),
+        S("h", "_new_component_defaults", "Placement", "Type, position, options, port counts and port types.", ["default_position", "default_options"]),
+        S("d", "append_row", "State", "Row added to <code>placed_nodes_source</code>."),
+        S("h", "_rebuild_all_ports", "Ports", "The new port balls are drawn."),
+        S("h", "_mark_unsaved", "IO", "Save button orange; Undo and Redo buttons refreshed."),
+      ] },
+    { id: "select", t: "Select or deselect a component", trig: "Click a component (or empty canvas) with nothing armed and delete mode off.", undo: "No (selection only)",
+      res: "The configuration panel opens for the component, or closes.",
+      flow: [
+        S("ui", "Canvas tap", "Browser"),
+        S("cb", "on_canvas_tap", "Handler", "Idle mode."),
+        S("h", "_find_nearest_port", "Ports", "No port ball within 20 data units, so it is not a connection click."),
+        S("h", "_select_at", "Handler"),
+        S("h", "_find_nearest_node", "Ports", "Component whose centre is within one icon size."),
+        S("h", "_cancel_pending_connection", "Ports", "Then <code>_clear_temp_edges</code> drops panel picks and previews."),
+        B(
+          ["Empty canvas, or the component already selected", [
+            S("h", "_clear_node_table", "ConfigPanel", "Panel reset and hidden; ports rebuilt, so the port balls hide."),
+          ]],
+          ["Another component", [
+            S("h", "_populate_node_table", "ConfigPanel", "Fills the panel with the stored values.",
+              ["_show_unknown_widgets", "_populate_known_fields | _populate_unknown_fields"]),
+            S("d", "selected_node_overlay_source", "ConfigPanel", "Gold selection ring moved to the component."),
+            S("h", "_rebuild_all_ports", "Ports", "The component's port balls become visible."),
+            S("h", "_refresh_connections_table", "ConfigPanel", "One row per port."),
+            S("h", "_refresh_symmetry_select", "ConfigPanel", "Known components only."),
+            E("Panel shown."),
+          ]],
+        ),
+      ] },
+    { id: "connect-canvas", t: "Connect two ports on the canvas", trig: "Click a port ball, then a port ball of another component.", undo: "Yes, one step",
+      res: "A connection is drawn between the two ports.",
+      flow: [
+        S("ui", "Canvas tap on a port", "Browser"),
+        S("cb", "on_canvas_tap", "Handler", "Idle mode; ports are tested before components because they overlap the icon edge."),
+        S("h", "_find_nearest_port", "Ports", "Port ball within 20 data units.", ["_port_data_by_kind", "_port_dict"]),
+        S("h", "_handle_port_tap", "Ports", "Clears any dashed panel previews first (<code>_clear_temp_edges</code>)."),
+        B(
+          ["No port waiting", [
+            S("d", "awaiting_second_port_click", "Ports", "Port stored and highlighted with a dashed ring."),
+            E("Waits for the second click."),
+          ]],
+          ["The same port again", [S("h", "_cancel_pending_connection", "Ports"), E("Cancelled.")]],
+          ["Other kind, same colour, not refused", [
+            S("d", "ports_compatible", "State", "Same, defined energy colour."),
+            S("d", "_edge_rejection", "Ports", "Refuses self-connection, busy port, or a second edge between the same pair."),
+            S("u", "_push_undo", "IO"),
+            S("h", "_add_edge", "Ports", "Edge appended to <code>edge_source</code>, from the first port clicked.", ["append_row", "_mark_unsaved"]),
+            S("h", "_rebuild_all_ports", "Ports", "Connected flags and Connections panel updated."),
+            S("h", "_cancel_pending_connection", "Ports"),
+          ]],
+          ["Otherwise", [S("h", "_cancel_pending_connection", "Ports"), E("Nothing added, no undo step.")], true],
+        ),
+      ] },
+  ]],
+  ["Configure", [
+    { id: "panel-connection", t: "Pick or clear a connection in the panel", trig: "Choose a value in a Connections dropdown of the selected component.", undo: "Clearing: yes, at once. Picking: with Apply",
+      res: "A dashed preview waiting for Apply, or the connection removed at once.",
+      flow: [
+        S("ui", "Connections dropdown", "Browser"),
+        S("cb", "_on_port_select_change", "ConfigPanel", "Callback bound to the row by <code>_make_port_callback</code>."),
+        S("h", "_is_same_port", "ConfigPanel", "Drops any pick already using this port."),
+        S("h", "_clear_temp_edge_visuals", "Ports", "Then <code>_add_edge_temp</code> redraws the remaining picks."),
+        B(
+          ["Empty value chosen", [
+            S("h", "_disconnect_port", "ConfigPanel"),
+            S("u", "_push_undo", "IO"),
+            S("d", "edge_indices_not_touching_port", "State", "Then <code>select_edges</code> keeps the others."),
+            S("h", "_rebuild_all_ports", "Ports"),
+            S("h", "_mark_unsaved", "IO"),
+            E("Connection removed at once."),
+          ]],
+          ["A port chosen", [
+            S("h", "_parse_choice", "ConfigPanel", "Finds the candidate port from its display text."),
+            S("h", "_live_port", "Ports", "Current position of both ends."),
+            S("d", "panel_pending_connections", "ConfigPanel", "Pick stored as source &rarr; target."),
+            S("h", "_add_edge_temp", "Ports", "Dashed preview drawn."),
+            E("Committed by Apply."),
+          ]],
+        ),
+      ] },
+    { id: "port-count", t: "Change a port count", trig: "Turn a port-count spinner of a variable-port or unknown component.", undo: "With Apply",
+      res: "Ports redrawn as a preview; nothing written until Apply.",
+      flow: [
+        S("ui", "Port-count spinner", "Browser"),
+        S("cb", "_on_port_count_spinner_change", "ConfigPanel", "Reads both spinners; a hidden spinner's side keeps its stored count."),
+        S("h", "_rebuild_all_ports", "Ports", "With <code>override_counts</code> for the selected component."),
+        S("h", "_sync_edge_preview_backup", "Ports", "First tick backs up the edges; later ticks restore the backup before pruning."),
+        S("h", "_draw_ports", "Ports", "Port balls recomputed.", ["_stored_port_count", "compute_ports", "node_port_colors", "_set_connected_flags"]),
+        S("h", "_sync_edges_to_ports", "Ports", "Edges on removed ports hidden.", ["_rebuild_edges", "_redraw_panel_previews", "_refresh_connections_table"]),
+        E("Apply commits the counts; any other action restores them (<code>_end_edge_preview</code>)."),
+      ] },
+    { id: "change-type", t: "Change a component's type", trig: "Pick another type in the type select of a known component.", undo: "Connection removal: yes, at once",
+      res: "Panel shows the new type's choices; old connections and symmetry link removed.",
+      flow: [
+        S("ui", "Type select", "Browser"),
+        S("cb", "_on_type_select_change", "ConfigPanel", "Ignored while an unknown component is selected."),
+        S("d", "default_position", "State", "Position choices of the new type."),
+        S("h", "_refresh_options_table", "ConfigPanel", "Options of the new type, keeping stored values of the same name.", ["_option_values_to_strings"]),
+        B(
+          ["User picked a type other than the stored one", [
+            S("h", "_clear_node_connections_and_symmetry", "ConfigPanel", "Picks and port-count preview dropped first.", ["_clear_temp_edges", "_end_edge_preview", "_symmetry_positions_to_clear"]),
+            S("u", "_push_undo", "IO", "Only if there is something to remove."),
+            S("d", "select_edges", "State", "Then <code>unlink_symmetry</code> breaks the link on both sides."),
+            S("h", "_rebuild_all_ports", "Ports"),
+            S("h", "_mark_unsaved", "IO"),
+          ]],
+          ["Panel being filled, or back to the stored type", [E("No change to the design.")], true],
+        ),
+        S("h", "_refresh_symmetry_select", "ConfigPanel", "Components of the new type."),
+      ] },
+    { id: "apply", t: "Apply the panel", trig: "Click <b>Apply</b> in the configuration panel.", undo: "Yes, one step",
+      res: "Name, type, position, options, port counts, symmetry and picked connections written to the design.",
+      flow: [
+        S("ui", "Apply button", "Browser"),
+        S("cb", "apply_node_configurations", "ConfigPanel", "Returns if nothing is selected."),
+        S("u", "_push_undo", "IO"),
+        S("h", "_write_node_fields", "ConfigPanel", "Hidden source spinner: counts reset to the type's defaults; visible spinners write their values.",
+          ["_known_panel_fields | _unknown_panel_fields", "_strings_to_option_values", "_set_cell"]),
+        S("h", "_write_symmetry", "ConfigPanel", "Clears stale links, then links the chosen peer.",
+          ["_padded_symmetry_columns", "_node_position", "_positions_linked_to", "unlink_symmetry", "_write_symmetry_entry", "link_symmetry"]),
+        S("h", "_add_edge", "Ports", "Once per pick in <code>panel_pending_connections</code>.", ["_edge_rejection"]),
+        S("h", "_clear_temp_edges", "Ports", "Picks and dashed previews cleared."),
+        S("h", "_rebuild_all_ports", "Ports"),
+        S("h", "_mark_unsaved", "IO"),
+      ] },
+    { id: "unknown-port-type", t: "Set a port type of an unknown component", trig: "Choose an energy type in the source or target port-type select.", undo: "Yes, one step, at once",
+      res: "That side's ports take the new colour; their connections are removed.",
+      flow: [
+        S("ui", "Port-type select", "Browser"),
+        S("cb", "_on_port_type_change", "Unknown", "<code>side</code> bound with <code>functools.partial</code>."),
+        B(
+          ["Panel being filled, not an unknown component, or same type", [E("Ignored.")]],
+          ["A real change", [
+            S("u", "_push_undo", "IO"),
+            S("d", "copy_column_data", "State", "New type stored in <code>source_port_type</code> / <code>target_port_type</code>."),
+            S("h", "_drop_side_connections", "Unknown", "Edges and picks of that side removed.", ["edge_end_ports", "select_edges", "_port_key"]),
+            S("h", "_rebuild_all_ports", "Ports", "Ports redrawn in the new colour."),
+            S("h", "_mark_unsaved", "IO"),
+          ]],
+        ),
+      ] },
+    { id: "add-option", t: "Add an option to an unknown component", trig: "Click <b>Add option</b> in the panel.", undo: "With Apply",
+      res: "An empty name / value row in the Options table.",
+      flow: [
+        S("ui", "Add option button", "Browser"),
+        S("cb", "_on_add_option", "Unknown"),
+        S("d", "is_unknown_node", "State", "Returns unless an unknown component is selected."),
+        S("h", "_add_unknown_option_row", "Unknown", "Name and value text boxes added."),
+        E("Written by Apply (<code>_unknown_panel_fields</code>); a row without a name is ignored."),
+      ] },
+  ]],
+  ["Delete", [
+    { id: "delete-mode", t: "Turn delete mode on or off", trig: "Click <b>Delete</b> in the toolbox.", undo: "No (mode only)",
+      res: "Delete button red and the status line prompts for a click, or both restored.",
+      flow: [
+        S("ui", "Delete button", "Browser"),
+        S("cb", "_toggle_delete_mode", "CanvasMode"),
+        B(
+          ["Delete mode is off", [
+            S("h", "_reset_interaction_state", "CanvasMode"),
+            S("d", "delete_mode = True", "CanvasMode", "Button red; status: <em>click an icon / a connection to remove it</em>."),
+          ]],
+          ["Delete mode is on", [S("h", "_exit_delete_mode", "CanvasMode", "Button and status line restored.")]],
+        ),
+      ] },
+    { id: "delete-component", t: "Delete a component", trig: "In delete mode, click a component.", undo: "Yes, one step",
+      res: "Component and its connections removed; later indices shifted.",
+      flow: [
+        S("ui", "Canvas tap", "Browser"),
+        S("cb", "on_canvas_tap", "Handler", "Delete mode."),
+        S("h", "_delete_at", "Handler"),
+        S("h", "_find_nearest_node", "Ports", "A component is found."),
+        S("h", "_delete_node", "Handler"),
+        S("u", "_push_undo", "IO"),
+        S("d", "drop_row", "State", "Node row removed.", ["_reindex_symmetry_after_deletion"]),
+        S("d", "edge_indices_not_touching_node", "State", "Then <code>select_edges</code>; node indices after it decremented."),
+        S("h", "_rebuild_all_ports", "Ports"),
+        S("d", "selected_node_index", "Handler", "Cleared with <code>_clear_node_table</code> if it was the deleted node; minus 1 if after it."),
+        S("h", "_mark_unsaved", "IO"),
+      ] },
+    { id: "delete-connection", t: "Delete a connection", trig: "In delete mode, click a connection line.", undo: "Yes, one step",
+      res: "The connection is removed and its ports are free again.",
+      flow: [
+        S("ui", "Canvas tap", "Browser"),
+        S("cb", "on_canvas_tap", "Handler", "Delete mode."),
+        S("h", "_delete_at", "Handler"),
+        S("h", "_find_nearest_node", "Ports", "No component here."),
+        S("h", "_find_nearest_edge", "Ports", "Closest line within 12 data units.", ["_cursor_to_segment_distance"]),
+        S("h", "_delete_edge", "Handler", "", ["_push_undo", "drop_row", "_rebuild_all_ports", "_mark_unsaved"]),
+        S("h", "_refresh_connections_table", "ConfigPanel", "Only if a component is selected."),
+      ] },
+  ]],
+  ["History", [
+    { id: "undo", t: "Undo", trig: "Click <b>Undo</b> over the canvas.", undo: "Reversible with Redo",
+      res: "The design before the last change is restored.",
+      flow: [
+        S("ui", "Undo button", "Browser"),
+        S("cb", "_on_undo", "IO", "Returns if <code>can_undo</code> is false."),
+        S("h", "_end_edge_preview", "Ports", "Edges hidden by a port-count preview put back."),
+        S("u", "make_snapshot", "History", "Current design, then <code>push_redo</code>."),
+        S("u", "EditHistoryStack.undo", "History", "Pops the last snapshot."),
+        S("h", "_restore_from_snapshot", "IO", "",
+          ["_reset_interaction_state", "copy_column_data", "placed_counter", "_apply_node_icon_size", "_rebuild_all_ports"]),
+        S("h", "_mark_unsaved", "IO", "Save orange; Undo and Redo buttons refreshed."),
+      ] },
+    { id: "redo", t: "Redo", trig: "Click <b>Redo</b> over the canvas.", undo: "Reversible with Undo",
+      res: "The last undone change is applied again.",
+      flow: [
+        S("ui", "Redo button", "Browser"),
+        S("cb", "_on_redo", "IO", "Returns if <code>can_redo</code> is false."),
+        S("h", "_end_edge_preview", "Ports"),
+        S("u", "make_snapshot", "History", "Current design, then <code>push_undo_keep_redo</code>: the other redo steps stay."),
+        S("u", "EditHistoryStack.redo", "History", "Pops the last undone snapshot."),
+        S("h", "_restore_from_snapshot", "IO", "",
+          ["_reset_interaction_state", "copy_column_data", "placed_counter", "_apply_node_icon_size", "_rebuild_all_ports"]),
+        S("h", "_mark_unsaved", "IO"),
+      ] },
+  ]],
+  ["View", [
+    { id: "icon-size", t: "Resize the icons", trig: "Move the icon-size slider next to <b>Components</b>.", undo: "No (display setting)",
+      res: "Icons, rings, labels and port orbits rescaled; design not marked unsaved.",
+      flow: [
+        S("ui", "Icon-size slider", "Browser"),
+        S("cb", "_on_node_size_slider_change", "Placement", "Stores <code>self.icon_size</code>."),
+        S("h", "_apply_node_icon_size", "Placement", "Icons in data units; rings and label offset in screen pixels."),
+        S("h", "_rebuild_all_ports", "Ports", "Port orbit scales with the icon size; edges re-routed."),
+        S("h", "_refresh_connections_table", "ConfigPanel", "Only if a component is selected."),
+      ] },
+    { id: "window-fit", t: "Resize the window", trig: "Resize the browser window (also runs after a load or New Design).", undo: "No (display setting)",
+      res: "Canvas fills the window; rings and labels keep matching the icons.",
+      flow: [
+        S("ui", "Window resize", "Browser"),
+        S("js", "_JS_FIT_CANVAS_SIZE", "Launcher JS", "Canvas width and height from the window, at least 480 &times; 420 px."),
+        S("js", "_JS_FIT_VIEW", "Launcher JS", "Same scale <code>k</code> on both axes; writes a JSON report into <code>view_scale_input</code>. Also run when Python flips <code>fit_view_trigger</code>."),
+        S("cb", "_on_view_scale_change", "Placement"),
+        S("d", "_parse_view_report", "Placement", "JSON object, or a bare number read as <code>k</code>."),
+        S("d", "_canvas_area_from_report", "Placement", "Sets <code>state.canvas_area</code>, used to spread automatic layouts."),
+        S("d", "_view_scale_from_report", "Placement", "Sets <code>state.view_scale</code>."),
+        S("h", "_apply_node_icon_size", "Placement", "Only when <code>k</code> has changed."),
+      ] },
+  ]],
+  ["File and session", [
+    { id: "watcher", t: "Set the watcher CSV path", trig: "Type a path in the watcher field of the save dialog, or click <b>Browse</b>.", undo: "No (marks unsaved)",
+      res: "Path stored and written as <code>watcher_file_path</code> on the next save.",
+      flow: [
+        B(
+          ["Typed in the field", [
+            S("ui", "Watcher text field", "Browser", "<code>value</code> changes on Enter or when the field loses focus."),
+          ]],
+          ["Browse clicked", [
+            S("ui", "Browse button", "Browser"),
+            S("js", "_JS_WATCHER_DIALOG", "Toolbox JS", "Flips <code>browse_watcher_trigger</code>."),
+            S("cb", "_on_browse_watcher", "IO"),
+            S("io", "_open_tkinter_dialog", "IO", "Save-file dialog for a <code>.csv</code>."),
+            S("h", "_set_text_input", "IO", "Sets <code>value_input</code> and <code>value</code> of the field."),
+          ]],
+        ),
+        S("cb", "_on_watcher_path_change", "IO", "Callback of the field's <code>value</code>."),
+        B(
+          ["Same as the stored path", [E("Nothing changes (this is how load and New Design avoid marking unsaved).")]],
+          ["A new path", [
+            S("d", "watcher_file_path", "IO", "Stored on the state."),
+            S("h", "_mark_unsaved", "IO"),
+          ]],
+        ),
+      ] },
+    { id: "save", t: "Save the design", trig: "Click <b>Save</b> in the toolbox.", undo: "Not an edit",
+      res: "YAML file written; Save button green.",
+      flow: [
+        S("ui", "Save button", "Browser"),
+        S("js", "save_version_overlay", "Toolbox JS", "Shows the <em>Is this the final version?</em> dialog."),
+        B(
+          ["Cancel", [
+            S("js", "_JS_SAVE_CANCEL_CLICK", "Toolbox JS", "Hides the dialog; sets <code>browse_save_trigger</code> to <code>cancel:&lt;ms&gt;</code>."),
+            S("cb", "_on_browse_save", "IO", "Clears a pending Save &amp; Exit."),
+            E("Nothing saved."),
+          ]],
+          ["Final Version or Edit Later", [
+            S("js", "_JS_SAVE_MODE_CLICK", "Toolbox JS", "Hides the dialog, copies the watcher field's <code>value_input</code> into <code>value</code>, sets <code>final:&lt;ms&gt;</code> or <code>editable:&lt;ms&gt;</code>."),
+            S("cb", "_on_browse_save", "IO", "<code>final</code> leaves out <code>canvas_layout</code>."),
+            S("io", "_open_tkinter_dialog", "IO", "Save-file dialog, default extension <code>.yml</code>."),
+            S("io", "_save_canvas_state", "IO", "An empty path (dialog cancelled) skips the save."),
+            S("io", "PowerTrainYAMLWriter", "Writer", "Built on copies of the node and edge data.",
+              ["set_title", "add_component (per node)", "add_connection", "set_watcher_file_path", "write", "_build_output"]),
+            B(
+              ["Written", [E("Save button green.")]],
+              ["Error", [S("h", "_show_status_error", "IO", "Red message; button stays orange.")]],
+            ),
+          ]],
+        ),
+      ] },
+    { id: "end-session", t: "End the session", trig: "Click <b>End Session</b>, or close the browser tab.", undo: "Not an edit",
+      res: "Server stopped; the tab closes.",
+      flow: [
+        B(
+          ["End Session clicked", [
+            S("ui", "End Session button", "Browser", "No Python <code>on_click</code>."),
+            S("js", "_JS_END_SESSION_CLICK", "Toolbox JS", "Reads the Save button colour."),
+            B(
+              ["Green (saved), or End Anyway in the dialog", [
+                S("js", "end_session_trigger", "Toolbox JS", "Flipped, then <code>window.close()</code>."),
+                S("cb", "_on_end_session_trigger", "IO"),
+                S("io", "_end_session", "IO", "Bokeh IO loop stopped."),
+              ]],
+              ["Orange, then Save &amp; Exit in the dialog", [
+                S("js", "end_session_save_trigger", "Toolbox JS", "Flipped; the save dialog opens."),
+                S("cb", "_on_end_session_save_trigger", "IO", "Sets <code>_pending_exit_after_save</code>."),
+                S("cb", "_on_browse_save", "IO", "Same flow as <em>Save the design</em>."),
+                S("h", "_flip_trigger", "IO", "After a successful save: <code>close_window_trigger</code>, so the browser closes the tab."),
+                S("io", "_end_session", "IO", "0.3 s later, so the change reaches the browser first."),
+              ]],
+              ["Orange, then Cancel", [E("Dialog hidden; session continues.")]],
+            ),
+          ]],
+          ["Browser tab closed", [
+            S("ui", "Session destroyed", "Browser"),
+            S("io", "on_destroy", "Launcher", "Registered by <code>make_document_with_tracking</code>; stops the IO loop."),
+          ]],
+        ),
+      ] },
+  ]],
+];
+
+const ACTIONS = GROUPS.flatMap(([, list]) => list);
+const byId = Object.fromEntries(ACTIONS.map((a) => [a.id, a]));
+
+function esc(s) { return s; } // content above is authored HTML
+
+function collectHelpers(steps, out = new Map()) {
+  for (const s of steps) {
+    if (s.branch) s.branch.forEach((b) => collectHelpers(b.steps, out));
+    else if (s.f && s.k !== "ui") {
+      if (!out.has(s.f)) out.set(s.f, s.k);
+      (s.sub || []).forEach((n) => n.split(" | ").forEach((p) => { const name = p.replace(/ \(.*\)$/, ""); if (!out.has(name)) out.set(name, s.k === "cb" ? "h" : s.k); }));
+    }
+  }
+  return out;
+}
+
+function renderSteps(steps) {
+  const flow = document.createElement("div");
+  flow.className = "flow";
+  for (const s of steps) {
+    if (s.branch) {
+      const wrap = document.createElement("div");
+      wrap.className = "branches";
+      for (const b of s.branch) {
+        const col = document.createElement("div");
+        col.className = "branch";
+        const w = document.createElement("div");
+        w.className = "when" + (b.isElse ? " else" : "");
+        w.innerHTML = b.when;
+        col.append(w, renderSteps(b.steps));
+        wrap.append(col);
+      }
+      flow.append(wrap);
+    } else if (s.end !== undefined) {
+      const e = document.createElement("div");
+      e.className = "end";
+      e.innerHTML = s.end;
+      flow.append(e);
+    } else {
+      const n = document.createElement("div");
+      n.className = "node k-" + s.k;
+      n.dataset.fn = s.f;
+      n.dataset.sub = (s.sub || []).join(",");
+      const sub = s.sub ? `<ul class="sub">${s.sub.map((x) => `<li>${x}</li>`).join("")}</ul>` : "";
+      n.innerHTML = `<div class="row1"><span class="fn">${s.f}</span><span class="mod">${s.m} · ${KIND[s.k]}</span></div>` +
+        (s.n ? `<div class="note">${s.n}</div>` : "") + sub;
+      flow.append(n);
+    }
+  }
+  return flow;
+}
+
+const sheet = document.getElementById("sheet");
+const index = document.getElementById("index");
+const picker = document.getElementById("action-picker");
+
+function buildIndex() {
+  for (const [name, list] of GROUPS) {
+    const g = document.createElement("div");
+    g.className = "group";
+    g.innerHTML = `<h2>${name}</h2><ul>${list.map((a) => `<li><a href="#${a.id}" data-id="${a.id}">${a.t}</a></li>`).join("")}</ul>`;
+    index.append(g);
+    const og = document.createElement("optgroup");
+    og.label = name;
+    list.forEach((a) => { const o = document.createElement("option"); o.value = a.id; o.textContent = a.t; og.append(o); });
+    picker.append(og);
+  }
+  index.addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-id]");
+    if (!a) return;
+    e.preventDefault();
+    show(a.dataset.id, true);
+  });
+  picker.addEventListener("change", () => show(picker.value, true));
+}
+
+function show(id, push) {
+  const a = byId[id] || ACTIONS[0];
+  const helpers = collectHelpers(a.flow);
+  const undoClass = /^Yes/.test(a.undo) ? "badge yes" : "badge";
+  sheet.innerHTML = `
+    <div class="sheet-head">
+      <h2>${a.t}</h2>
+      <dl class="facts">
+        <dt>Trigger</dt><dd>${a.trig}</dd>
+        <dt>Result</dt><dd>${a.res}</dd>
+        <dt>Undo</dt><dd><span class="${undoClass}">${a.undo}</span></dd>
+        <dt>Helpers</dt><dd><div class="chips" id="chips"></div></dd>
+      </dl>
+    </div>
+    <div class="chart-box" id="chart"></div>
+    <div class="link-hint">Link to this chart: add <code class="mono">#${a.id}</code> to the page address.</div>`;
+  const chips = sheet.querySelector("#chips");
+  for (const [fn, k] of helpers) {
+    const c = document.createElement("button");
+    c.type = "button";
+    c.className = "chip k-" + k;
+    c.textContent = fn;
+    c.dataset.fn = fn;
+    chips.append(c);
+  }
+  const chart = sheet.querySelector("#chart");
+  chart.append(renderSteps(a.flow));
+  const highlight = (fn) => {
+    chart.classList.toggle("dim", !!fn);
+    chart.querySelectorAll(".node").forEach((n) => {
+      const hit = fn && (n.dataset.fn === fn || n.dataset.sub.split(/,| \| /).map((x) => x.replace(/ \(.*\)$/, "")).includes(fn));
+      n.classList.toggle("hl", !!hit);
+    });
+  };
+  chips.addEventListener("mouseover", (e) => { const c = e.target.closest(".chip"); if (c) highlight(c.dataset.fn); });
+  chips.addEventListener("focusin", (e) => { const c = e.target.closest(".chip"); if (c) highlight(c.dataset.fn); });
+  chips.addEventListener("mouseleave", () => highlight(null));
+  chips.addEventListener("focusout", () => highlight(null));
+
+  index.querySelectorAll("a[data-id]").forEach((l) => l.setAttribute("aria-current", l.dataset.id === a.id ? "true" : "false"));
+  picker.value = a.id;
+  const i = ACTIONS.indexOf(a);
+  document.getElementById("prev").disabled = i === 0;
+  document.getElementById("next").disabled = i === ACTIONS.length - 1;
+  document.getElementById("prev").onclick = () => show(ACTIONS[i - 1].id, true);
+  document.getElementById("next").onclick = () => show(ACTIONS[i + 1].id, true);
+  if (push) { try { history.replaceState(null, "", "#" + a.id); } catch (e) {} }
+}
+
+function applyTheme(t) {
+  const root = document.documentElement;
+  if (t === "light" || t === "dark") root.dataset.theme = t; else delete root.dataset.theme;
+  try { t === "auto" ? localStorage.removeItem("ptb-theme") : localStorage.setItem("ptb-theme", t); } catch (e) {}
+  document.querySelectorAll("[data-theme-set]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.themeSet === t ? "true" : "false"));
+}
+document.querySelectorAll("[data-theme-set]").forEach((b) => b.addEventListener("click", () => applyTheme(b.dataset.themeSet)));
+applyTheme(document.documentElement.dataset.theme || "auto");
+
+buildIndex();
+show((location.hash || "").slice(1) in byId ? location.hash.slice(1) : ACTIONS[0].id, false);
+window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id in byId) show(id, false); });
+</script>
+
+</body>
+</html>

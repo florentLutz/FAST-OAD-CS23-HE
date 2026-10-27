@@ -5,3 +5,4 @@
 SUBMODEL_CONSTRAINTS_PLANETARY_GEAR_TORQUE = "submodel.propulsion.constraints.planetary_gear.torque"
 
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]
+POSSIBLE_OPTION = {"gear_mode": ["percent_split", "power_share"]}
