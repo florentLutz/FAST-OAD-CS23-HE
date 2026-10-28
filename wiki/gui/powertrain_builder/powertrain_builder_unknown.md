@@ -366,7 +366,7 @@ _text_to_option_value("True")      # True
 _text_to_option_value(" 2.5 ")     # 2.5
 _text_to_option_value("[1, 2]")    # [1, 2]
 _text_to_option_value("'abc'")     # 'abc'
-_text_to_option_value("li_ion")    # 'li_ion'
+_text_to_option_value("analytical")    # 'analytical'
 ```
 
 ---

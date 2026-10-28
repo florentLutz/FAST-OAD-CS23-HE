@@ -32,3 +32,8 @@ placement mode, click the component button again or click on the delete button t
 
 To switch between different components, simply navigate through the component type class tabs and click on the desired
 component button. The placement mode will remain active until the user clicks the highlighted component button again.
+
+Placing Unknown components on the canvas
+========================================
+The unknown component button is located at the button of each group, which produces a customizable component. This
+component behaves the same as other components for canvas placement interactions.
