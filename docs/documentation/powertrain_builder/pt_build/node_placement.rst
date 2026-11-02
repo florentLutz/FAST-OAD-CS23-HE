@@ -23,8 +23,10 @@ left panel to switch between different component type classes.
 Placing components on the canvas
 ================================
 By clicking the component button on the left panel, the component button will turn blue to indicate that the placement
-mode is activated. In this mode, the user can place any component on the canvas by left-clicking on it. To exit the
-placement mode, click the component button again or click on the delete button to switch to the delete mode.
+mode is activated. In this mode, the user can place any component on the canvas by left-clicking on it. The unknown
+component button is located at the button of each group, which produces a customizable component. This component behaves
+the same as other components for canvas placement interactions. To exit the placement mode, click the component button
+again or click on the delete button to switch to the delete mode.
 
 .. image:: ../../../img/node_on_canvas.gif
     :width: 600px
@@ -32,8 +34,3 @@ placement mode, click the component button again or click on the delete button t
 
 To switch between different components, simply navigate through the component type class tabs and click on the desired
 component button. The placement mode will remain active until the user clicks the highlighted component button again.
-
-Placing Unknown components on the canvas
-========================================
-The unknown component button is located at the button of each group, which produces a customizable component. This
-component behaves the same as other components for canvas placement interactions.

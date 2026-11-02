@@ -22,8 +22,7 @@ the saving process, click on the ``cancel`` to abort the process.
     :align: center
 
 In case the reminder pop-up window appears while ending a session with unsaved changes, the saving
-process is identical to the ordinary saving process. However, once goes through all the file saving dialog windows,
-the session will be ended, and the window will be closed, even if both file save dialogs are cancelled.
+process is identical to the ordinary saving process.
 
 .. image:: ../../../img/unsaved_pop.gif
     :width: 600px

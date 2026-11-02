@@ -15,7 +15,6 @@ in YAML format, which can be used in later aircraft sizing or optimization.
     Delete, undo and redo <undo_redo_delete>
     Node properties configuration <node_properties>
     Save & reload design <save_load>
-    End Session <end_session>
 
 To launch the builder, add the following code snippet to your Python script:
 
@@ -35,6 +34,16 @@ Once loaded from existing design, the builder should look like this:
 
 .. image:: ../../../img/start_up_page.svg
     :width: 800
+    :align: center
+
+To end the session simply click on the ``End Session`` button located in the bottom of the left panel. If the changes
+are saved, (save button in green color), the session will be ended and the window will be closed. If the changes are not
+saved (save button in yellow color), a pop-up window will appear asking if you want to save the changes before ending
+the session. Select ``End Anyway`` to exit without saving, ``Save & End`` to save your changes and exit, or
+``Cancel`` to continue editing.
+
+.. image:: ../../../img/unsaved_changes.svg
+    :width: 700px
     :align: center
 
 For developers, the following links show the common action flows of the builder GUI.
