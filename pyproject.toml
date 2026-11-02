@@ -76,6 +76,9 @@ ruff = "0.5.4"
 [tool.poetry.extras]
 lca = ["lca-modeller"]
 
+[tool.poetry.scripts]
+powertrain-builder = "fastga_he.gui.power_train_builder.cli:main"
+
 [tool.poetry.plugins."fastoad.plugins"]
 "cs23_he_plugin" = "fastga_he"
 

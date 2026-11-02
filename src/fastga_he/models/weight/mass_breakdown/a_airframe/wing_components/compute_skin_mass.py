@@ -22,7 +22,7 @@ import fastoad.api as oad
 
 from stdatm import Atmosphere
 
-from scipy.interpolate import interp1d
+from scipy.interpolate import make_interp_spline
 
 from ..constants import SUBMODEL_WING_SKIN_MASS
 
@@ -140,9 +140,7 @@ class ComputeSkinMass(om.ExplicitComponent):
         for mach in mach_interp:
             v_interp.append(mach * atm.speed_of_sound.item())
         cl_alpha_interp = inputs["data:aerodynamics:aircraft:mach_interpolation:CL_alpha_vector"]
-        cl_alpha_fct = interp1d(
-            v_interp, cl_alpha_interp, fill_value="extrapolate", kind="quadratic"
-        )
+        cl_alpha_fct = make_interp_spline(v_interp, cl_alpha_interp, k=2)
 
         cl_alpha_ac = cl_alpha_fct(atm.true_airspeed)
 

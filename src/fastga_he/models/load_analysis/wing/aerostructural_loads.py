@@ -18,7 +18,6 @@ Computes the aerostructural loads on the wing of the aircraft.
 import numpy as np
 import openmdao.api as om
 from scipy.integrate import trapezoid
-from scipy.interpolate import interp1d
 
 from stdatm import Atmosphere
 import fastoad.api as oad
@@ -470,13 +469,9 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         pressure will give you the actual lift distribution
         """
 
-        # We create the interpolation function
-        cl_inter = interp1d(y_vector_cl_orig, cl_list)
-        chord_inter = interp1d(y_vector_chord_orig, chord_list)
-
         # We compute the new lift coefficient and
-        cl_fin = cl_inter(y_vector)
-        chord_fin = chord_inter(y_vector)
+        cl_fin = np.interp(y_vector, y_vector_cl_orig, cl_list)
+        chord_fin = np.interp(y_vector, y_vector_chord_orig, chord_list)
         lift_chord = np.multiply(cl_fin, chord_fin)
 
         return lift_chord
@@ -740,8 +735,6 @@ class AerostructuralLoadHE(om.ExplicitComponent):
         # AMPLITUDE
 
         fake_point_mass_array = np.zeros(len(point_mass_array))
-        present_mass_interp = interp1d(y_vector, point_mass_array)
-        present_chord_interp = interp1d(y_vector, chord_vector)
 
         # STEP 3/XX - WE ALSO STOCK WHERE WE ADD THE Y STATION SINCE IT'LL BE LATER NECESSARY TO
         # READJUST THE AMPLITUDE
@@ -758,26 +751,30 @@ class AerostructuralLoadHE(om.ExplicitComponent):
             y_current = y_point_mass + (i - nb_point_side) * interval_len
             if (y_current >= 0.0) and (y_current <= semi_span):
                 y_added.append(y_current)
+                new_chord = np.interp(y_current, y_vector, chord_vector)
+                new_mass = np.interp(y_current, y_vector, point_mass_array)
                 y_vector, idx = AerostructuralLoadHE.insert_in_sorted_array(y_vector, y_current)
                 index = int(float(idx[0]))
-                chord_vector = np.insert(chord_vector, index, present_chord_interp(y_current))
-                point_mass_array = np.insert(
-                    point_mass_array, index, present_mass_interp(y_current)
-                )
+                chord_vector = np.insert(chord_vector, index, new_chord)
+                point_mass_array = np.insert(point_mass_array, index, new_mass)
                 fake_point_mass_array = np.insert(fake_point_mass_array, index, 0.0)
 
         y_min = min(y_added) - 1e-3
+        chord_y_min = np.interp(y_min, y_vector, chord_vector)
+        mass_y_min = np.interp(y_min, y_vector, point_mass_array)
         y_vector, idx = AerostructuralLoadHE.insert_in_sorted_array(y_vector, y_min)
         index = int(float(idx[0]))
-        chord_vector = np.insert(chord_vector, index, present_chord_interp(y_min))
-        point_mass_array = np.insert(point_mass_array, index, present_mass_interp(y_min))
+        chord_vector = np.insert(chord_vector, index, chord_y_min)
+        point_mass_array = np.insert(point_mass_array, index, mass_y_min)
         fake_point_mass_array = np.insert(fake_point_mass_array, index, 0.0)
 
         y_max = max(y_added) + 1e-3
+        chord_y_max = np.interp(y_max, y_vector, chord_vector)
+        mass_y_max = np.interp(y_max, y_vector, point_mass_array)
         y_vector, idx = AerostructuralLoadHE.insert_in_sorted_array(y_vector, y_max)
         index = int(float(idx[0]))
-        chord_vector = np.insert(chord_vector, index, present_chord_interp(y_max))
-        point_mass_array = np.insert(point_mass_array, index, present_mass_interp(y_max))
+        chord_vector = np.insert(chord_vector, index, chord_y_max)
+        point_mass_array = np.insert(point_mass_array, index, mass_y_max)
         fake_point_mass_array = np.insert(fake_point_mass_array, index, 0.0)
 
         # STEP 5/XX - WE NOW HAVE THE RIGHT WE JUST NEED TO SCALE IT PROPERLY WHICH IS THE POINT
