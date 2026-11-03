@@ -8,9 +8,10 @@ import openmdao.api as om
 
 class LCCMSP(om.ExplicitComponent):
     """
-    Computation of the aircraft manufacturer suggested price (MSP). The profit margin is
-    set to 10% based on :cite:`marciello:2024`. A 35% gross margin is assumed based on
-    :cite:`trainelli:2020`. The spare parts factor of 1.1 is used in :cite:`trainelli:2020` .
+    Computation of the aircraft manufacturer suggested price (MSP). A 35% gross margin is assumed
+    based on :cite:`trainelli:2020`. The spare parts factor of 1.1 is used in
+    :cite:`trainelli:2020`. The margin is set to 10% based on :cite:`marciello:2024` for all the
+    test aircraft models and its variants (TBM 900, Pipistrel Velis Electro).
     """
 
     def setup(self):
@@ -21,10 +22,12 @@ class LCCMSP(om.ExplicitComponent):
         )
         self.add_input(
             "data:cost:production:gross_margin",
+            units="unitless",
             val=0.35,
         )
         self.add_input(
             "data:cost:production:spare_parts_factor",
+            units="unitless",
             val=1.1,
         )
 

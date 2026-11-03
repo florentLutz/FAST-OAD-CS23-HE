@@ -465,7 +465,7 @@ def test_aircraft_MSP():
     )
 
     assert problem.get_val("data:cost:msp_per_unit", units="USD") == pytest.approx(
-        4277445.133, rel=1e-3
+        5716805.42, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)

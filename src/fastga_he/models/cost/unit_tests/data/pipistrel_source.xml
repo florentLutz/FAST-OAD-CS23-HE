@@ -21,6 +21,8 @@
         <composite_fraction>1.0</composite_fraction>
         <discount_rate>0.12<!--NPV discount rate based on USAF research--></discount_rate>
         <annual_delivery_target>16<!--Delivery target set by manufacturer--></annual_delivery_target>
+        <spare_parts_factor unit="unitless">1.0</spare_parts_factor>
+        <gross_margin unit="unitless">0.1111</gross_margin>
       </production>
       <operation>
         <loan_principal units="USD">18000</loan_principal>
