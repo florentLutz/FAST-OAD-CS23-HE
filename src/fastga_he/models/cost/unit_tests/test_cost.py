@@ -48,8 +48,8 @@ from ..lcc_annual_energy_cost import LCCAnnualEnergyCost
 from ..lcc_operational_cost_sum import LCCSumOperationalCost
 from ..lcc_operational_cost import LCCOperationalCost
 from ..lcc_learning_curve_discount import LCCLearningCurveDiscount
-from ..lcc_project_total_non_recursive_cost import LCCTotalNonRecursiveProjectCost
-from ..lcc_recursive_cost_per_unit import LCCRecursiveCost
+from ..lcc_project_total_non_recursing_cost import LCCTotalNonRecursingProjectCost
+from ..lcc_recursing_cost_per_unit import LCCRecursingCost
 from ..lcc_project_development_cost_distribution import LCCProjectDevelopmentCostDistribution
 from ..lcc_annual_sales_gross_profit import LCCAnnualSalesGrossProfit
 from ..lcc_annual_delivery_count import LCCAnnualDeliveryCount
@@ -454,7 +454,7 @@ def test_cost_sum():
     problem.check_partials(compact_print=True)
 
 
-def test_aircraft_MSP():
+def test_aircraft_msp():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:production_cost_per_unit", units="USD", val=3849700.62)
 
@@ -1192,30 +1192,30 @@ def test_cost_pipistrel():
     om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
-def test_non_recursive_project_cost():
+def test_non_recursing_project_cost():
     ivc = get_indep_var_comp(
-        list_inputs(LCCTotalNonRecursiveProjectCost()),
+        list_inputs(LCCTotalNonRecursingProjectCost()),
         __file__,
         XML_FILE,
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCTotalNonRecursiveProjectCost(),
+        LCCTotalNonRecursingProjectCost(),
         ivc,
     )
 
     assert problem.get_val(
-        "data:cost:production:total_non_recursive_project_cost", units="USD"
+        "data:cost:production:total_non_recursing_project_cost", units="USD"
     ) == pytest.approx(1.66032181e08, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
 
-def test_recursive_project_cost_per_unit():
+def test_recursing_project_cost_per_unit():
     ivc = get_indep_var_comp(
         list_inputs(
-            LCCRecursiveCost(
+            LCCRecursingCost(
                 cost_components_type=["propeller", "turboshaft", "fuel_tank", "fuel_tank"],
                 cost_components_name=["propeller_1", "turboshaft_1", "fuel_tank_1", "fuel_tank_2"],
             )
@@ -1226,7 +1226,7 @@ def test_recursive_project_cost_per_unit():
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCRecursiveCost(
+        LCCRecursingCost(
             cost_components_type=["propeller", "turboshaft", "fuel_tank", "fuel_tank"],
             cost_components_name=["propeller_1", "turboshaft_1", "fuel_tank_1", "fuel_tank_2"],
         ),
@@ -1234,7 +1234,7 @@ def test_recursive_project_cost_per_unit():
     )
 
     assert problem.get_val(
-        "data:cost:production:recursive_cost_per_unit", units="USD"
+        "data:cost:production:recursing_cost_per_unit", units="USD"
     ) == pytest.approx(1793666.08, rel=1e-3)
 
     problem.check_partials(compact_print=True)
@@ -1243,7 +1243,7 @@ def test_recursive_project_cost_per_unit():
 def test_project_cost_distribution():
     ivc = om.IndepVarComp()
 
-    ivc.add_output("data:cost:production:total_non_recursive_project_cost", units="USD", val=10000)
+    ivc.add_output("data:cost:production:total_non_recursing_project_cost", units="USD", val=10000)
 
     problem = run_system(
         LCCProjectDevelopmentCostDistribution(years_of_development=TEST_DEVELOPMENT_YEARS),
@@ -1268,7 +1268,7 @@ def test_annual_sales_gross_profit():
     ivc = om.IndepVarComp()
 
     ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
-    ivc.add_output("data:cost:production:recursive_cost_per_unit", units="USD", val=1793666.08)
+    ivc.add_output("data:cost:production:recursing_cost_per_unit", units="USD", val=1793666.08)
     ivc.add_output(
         "data:cost:production:maturity_discount", val=[1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902]
     )
@@ -1462,9 +1462,9 @@ def test_production_profitability():
     ivc.add_output("data:cost:production:discount_rate", val=0.12)
     ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
     ivc.add_output(
-        "data:cost:production:total_non_recursive_project_cost", units="USD", val=1.66032181e08
+        "data:cost:production:total_non_recursing_project_cost", units="USD", val=1.66032181e08
     )
-    ivc.add_output("data:cost:production:recursive_cost_per_unit", units="USD", val=1793666.08)
+    ivc.add_output("data:cost:production:recursing_cost_per_unit", units="USD", val=1793666.08)
 
     problem = run_system(
         LCCProductionProfitability(

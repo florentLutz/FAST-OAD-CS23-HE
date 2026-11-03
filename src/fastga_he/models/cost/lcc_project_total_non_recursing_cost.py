@@ -6,9 +6,9 @@ import numpy as np
 import openmdao.api as om
 
 
-class LCCTotalNonRecursiveProjectCost(om.ExplicitComponent):
+class LCCTotalNonRecursingProjectCost(om.ExplicitComponent):
     """
-    Computation of summing all the non-recursive costs and reductions for production phase.
+    Computation of summing all the non-recursing costs and reductions for production phase.
     """
 
     def setup(self):
@@ -49,7 +49,7 @@ class LCCTotalNonRecursiveProjectCost(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:production:total_non_recursive_project_cost", units="USD", val=0.0
+            "data:cost:production:total_non_recursing_project_cost", units="USD", val=0.0
         )
 
     def setup_partials(self):
@@ -63,7 +63,7 @@ class LCCTotalNonRecursiveProjectCost(om.ExplicitComponent):
         dev_support_cost_per_unit = inputs["data:cost:production:dev_support_cost_per_unit"]
         certification_cost_per_unit = inputs["data:cost:production:certification_cost_per_unit"]
 
-        outputs["data:cost:production:total_non_recursive_project_cost"] = (
+        outputs["data:cost:production:total_non_recursing_project_cost"] = (
             number_aircraft_5_years
             * (
                 engineering_cost_per_unit
@@ -83,7 +83,7 @@ class LCCTotalNonRecursiveProjectCost(om.ExplicitComponent):
         certification_cost_per_unit = inputs["data:cost:production:certification_cost_per_unit"]
 
         partials[
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             "data:cost:production:number_aircraft_5_years",
         ] = (
             engineering_cost_per_unit
@@ -94,26 +94,26 @@ class LCCTotalNonRecursiveProjectCost(om.ExplicitComponent):
         )
 
         partials[
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             "data:cost:production:engineering_cost_per_unit",
         ] = number_aircraft_5_years
 
         partials[
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             "data:cost:production:tooling_cost_per_unit",
         ] = number_aircraft_5_years
 
         partials[
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             "data:cost:production:flight_test_cost_per_unit",
         ] = number_aircraft_5_years
 
         partials[
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             "data:cost:production:dev_support_cost_per_unit",
         ] = number_aircraft_5_years
 
         partials[
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             "data:cost:production:certification_cost_per_unit",
         ] = number_aircraft_5_years

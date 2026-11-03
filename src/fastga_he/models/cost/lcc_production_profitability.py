@@ -89,7 +89,7 @@ class LCCProductionProfitability(om.Group):
             name="production_profitability_index",
             subsys=LCCProfitabilityIndex(duration_in_years=years_of_program),
             promotes=[
-                ("initial_investment", "data:cost:production:total_non_recursive_project_cost"),
+                ("initial_investment", "data:cost:production:total_non_recursing_project_cost"),
                 ("net_present_value", "data:cost:production:net_present_value"),
                 ("profitability_index", "data:cost:production:profitability_index"),
             ],

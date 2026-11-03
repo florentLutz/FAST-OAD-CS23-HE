@@ -54,10 +54,10 @@ class _CumulativeProjectDevelopmentCostDistribution(om.ExplicitComponent):
         years_of_development = self.options["years_of_development"]
 
         self.add_input(
-            "data:cost:production:total_non_recursive_project_cost",
+            "data:cost:production:total_non_recursing_project_cost",
             val=np.nan,
             units="USD",
-            desc="Total non-recursive project cost for the aircraft development",
+            desc="Total non-recursing project cost for the aircraft development",
         )
 
         self.add_output(
@@ -87,7 +87,7 @@ class _CumulativeProjectDevelopmentCostDistribution(om.ExplicitComponent):
 
         outputs["data:cost:project_development_cost_cumulative_distribution"] = (
             (1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97
-        ) * inputs["data:cost:production:total_non_recursive_project_cost"]
+        ) * inputs["data:cost:production:total_non_recursing_project_cost"]
 
 
 class _DevelopmentCostDistribution(om.ExplicitComponent):

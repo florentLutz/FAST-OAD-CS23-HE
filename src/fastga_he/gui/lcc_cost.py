@@ -3,51 +3,84 @@
 # Copyright (C) 2026 ISAE-SUPAERO
 
 """
-Sunburst breakdowns of the aircraft Life Cycle Cost (LCC), mirroring the style of the LCA
-sunburst in ``lcc_cost.py`` but built on the cost tree instead of a colon-encoded LCA variable
-naming convention (cost variables are flat, so the hierarchy is declared explicitly below).
+Comparison bar charts of the aircraft Life Cycle Cost (LCC), mirroring the style of
+``lca_impact.lca_impacts_bar_chart_simple``.
 
-Two independent sunbursts are provided:
+- :func:`lcc_production_cost_bar_chart_simple`: compares every item of the production cost per
+  aircraft (manufacturing, quality control, material, avionics, engineering, tooling, flight
+  test, development support, certification, powertrain, MSP, and the purchase cost of every
+  power train component).
+- :func:`lcc_operation_cost_bar_chart_simple`: compares every item of the annual operating cost
+  per aircraft (insurance, loan, maintenance, fuel, electricity, crew, airport, ..., and the
+  operational cost of every power train component).
 
-- :func:`lcc_production_cost_sun_breakdown`: splits the production cost per aircraft into a
-  **recursive** cost branch (cost that recurs at every unit built: manufacturing, quality
-  control, material, avionics, landing gear design, and the purchase cost of every power train
-  component) and a **non-recursive** cost branch (one-time development-type cost, amortized
-  over the units produced: engineering, tooling, flight test, development support,
-  certification).
-- :func:`lcc_operation_cost_sun_breakdown`: splits the annual operating cost per aircraft into a
-  **fixed annual** cost branch (depreciation, insurance, loan, maintenance, miscellaneous, fuel,
-  electricity, and any other yearly cost that doesn't scale with individual flights) and a
-  **mission-based** cost branch (crew and airport costs, which scale with the number of flights
-  performed).
+Cost variables are flat, so the items shown in each chart are declared explicitly in
+``_PRODUCTION_SPEC`` and ``_OPERATION_SPEC``.
 """
 
 import pathlib
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
-import numpy as np
-
-import plotly
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 import fastoad.api as oad
 
-COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
-
 PRODUCTION_PREFIX = "data:cost:production:"
 OPERATION_PREFIX = "data:cost:operation:"
+_POWER_TRAIN_PREFIX = "data:propulsion:he_power_train:"
 
 
 # ---------------------------------------------------------------------------------------------
-# Small generic helpers, shared with the philosophy of lcc_cost.py's LCA sunburst
+# Cost items: specs and data extraction
 # ---------------------------------------------------------------------------------------------
 
+# Each spec describes the items plotted in one bar chart:
+# - "leaves": dict mapping {variable_name: display_label}
+# - "discover_suffix": every data:propulsion:he_power_train:<type>:<name><suffix> variable found
+#   in the datafile is added automatically (this mirrors the dynamic ``cost_components_type`` /
+#   ``cost_components_name`` options of LCCRecursiveCost and LCCSumOperationalCost, without
+#   requiring the caller to know the architecture in advance).
 
-def _round_value(value: float) -> float:
-    # Rounding to the nearest integer no longer risks a value vanishing to 0.0 (that was only
-    # a concern with the old magnitude-scaled decimal rounding), so no special-casing needed.
-    return round(value)
+_PRODUCTION_SPEC = {
+    "leaves": {
+        # Recursing costs (every unit built)
+        PRODUCTION_PREFIX + "manufacturing_cost_per_unit": "Manufacturing",
+        PRODUCTION_PREFIX + "quality_control_cost_per_unit": "Quality control",
+        PRODUCTION_PREFIX + "material_cost_per_unit": "Material",
+        PRODUCTION_PREFIX + "avionics_cost_per_unit": "Avionics",
+        # A *reduction* (negative), left out automatically since only positive items are shown.
+        PRODUCTION_PREFIX + "landing_gear_cost_reduction": "Landing gear reduction",
+        # Adjust the variable names below if they differ from your actual output variables.
+        PRODUCTION_PREFIX + "powertrain_cost_per_unit": "Powertrain",
+        "data:cost:msp_per_unit": "MSP",
+        # Non-recursing costs (one-time, amortized per unit over the production run)
+        PRODUCTION_PREFIX + "engineering_cost_per_unit": "Engineering",
+        PRODUCTION_PREFIX + "tooling_cost_per_unit": "Tooling",
+        PRODUCTION_PREFIX + "flight_test_cost_per_unit": "Flight test",
+        PRODUCTION_PREFIX + "dev_support_cost_per_unit": "Development support",
+        PRODUCTION_PREFIX + "certification_cost_per_unit": "Certification",
+    },
+    "discover_suffix": ":purchase_cost",
+}
+
+_OPERATION_SPEC = {
+    "leaves": {
+        # Note: annual_depreciation_cost is intentionally NOT included here. It does not feed
+        # into data:cost:operation:annual_cost_per_unit (it is used elsewhere, e.g. cash flow /
+        # NPV), so including it would make the total not reconcile with that output.
+        OPERATION_PREFIX + "annual_insurance_cost": "Insurance",
+        OPERATION_PREFIX + "annual_loan_cost": "Loan",
+        OPERATION_PREFIX + "additional_cost": "Additional",
+        OPERATION_PREFIX + "maintenance_cost": "Maintenance",
+        OPERATION_PREFIX + "miscellaneous_cost": "Miscellaneous",
+        OPERATION_PREFIX + "annual_overhaul_deposit": "Overhaul Deposit",
+        OPERATION_PREFIX + "annual_fuel_cost": "Fuel",
+        OPERATION_PREFIX + "annual_electricity_cost": "Electricity",
+        OPERATION_PREFIX + "annual_crew_cost": "Crew",
+        OPERATION_PREFIX + "annual_airport_cost": "Airport",
+    },
+    "discover_suffix": ":operational_cost",
+}
 
 
 def _get_value(datafile: oad.DataFile, name: str, default: float = 0.0) -> float:
@@ -59,21 +92,10 @@ def _get_value(datafile: oad.DataFile, name: str, default: float = 0.0) -> float
         return default
 
 
-def _label(display_name: str, value: float, unit_suffix: str = "USD") -> str:
-    return display_name + "<br> " + f"{_round_value(value):,}" + " " + unit_suffix
-
-
-_POWER_TRAIN_PREFIX = "data:propulsion:he_power_train:"
-
-
 def _discover_power_train_variables(datafile: oad.DataFile, suffix: str) -> Dict[str, str]:
     """
     Auto-discovers every ``data:propulsion:he_power_train:<type>:<name><suffix>`` variable
-    available in the datafile (this mirrors the dynamic ``cost_components_type`` /
-    ``cost_components_name`` options of :class:`LCCRecursiveCost` and
-    :class:`LCCSumOperationalCost`, without requiring the caller to know the architecture in
-    advance). Used with ``suffix=":purchase_cost"`` for the production cost sunburst and
-    ``suffix=":operational_cost"`` for the operation cost sunburst.
+    available in the datafile.
 
     :return: a dict mapping the variable name to a human-readable label built from the
     component type and name, e.g. "SM_PMSM<br>motor_1".
@@ -89,28 +111,12 @@ def _discover_power_train_variables(datafile: oad.DataFile, suffix: str) -> Dict
     return discovered_vars
 
 
-def _get_color(category_key: str, color_dict: dict) -> str:
-    """Every leaf belonging to the same top-level category shares the same color."""
-
-    if category_key in color_dict:
-        return color_dict[category_key]
-
-    color = COLS[len(color_dict) % len(COLS)]
-    color_dict[category_key] = color
-    return color
-
-
-# ---------------------------------------------------------------------------------------------
-# Generic two-level (root -> category -> leaf) sunburst builder
-# ---------------------------------------------------------------------------------------------
-
-
 def _leaf_aliases(var_name: str, disp_label: str) -> List[str]:
     """
-    Every string that should be accepted as a way to refer to a given leaf in
+    Every string that should be accepted as a way to refer to a given item in
     ``item_filter_list``: its display label (e.g. "Fuel"), its full variable name, and, for the
-    named (non-discovered) leaves, the tail of the variable name after the ``data:cost:...:``
-    prefix (e.g. "annual_fuel_cost") since that's how the leaves are declared in
+    named (non-discovered) items, the tail of the variable name after the ``data:cost:...:``
+    prefix (e.g. "annual_fuel_cost") since that's how the items are declared in
     ``_PRODUCTION_SPEC``/``_OPERATION_SPEC`` and how callers are likely to refer to them.
     """
 
@@ -122,263 +128,40 @@ def _leaf_aliases(var_name: str, disp_label: str) -> List[str]:
     return aliases
 
 
-def _compute_category_values(
-    datafile: oad.DataFile, categories: List[Dict], include_bar_only: bool = False
-) -> Tuple[Dict[str, Dict[str, float]], Dict[str, float], Dict[str, str]]:
-    """
-    Computes, for each category, the (positive) value of every leaf and the category subtotal.
-    Shared between the sunburst builder and the comparison bar chart so both stay consistent
-    on what counts as a displayable leaf.
-
-    :param datafile: the FAST-OAD output datafile.
-    :param categories: resolved categories, see :func:`_make_categories`.
-    :param include_bar_only: if True, also includes each category's ``bar_only_leaves`` (see
-    :func:`_make_categories`) alongside its regular ``leaves``. The sunburst builder leaves
-    this False so those items stay out of the sunburst; the bar chart's :func:`_get_cost_dict`
-    passes True so they show up there.
-
-    :return: a tuple ``(category_leaf_values, category_totals, leaf_aliases)`` where
-    ``category_leaf_values`` maps ``{category_key: {leaf_label: value}}``, ``category_totals``
-    maps ``{category_key: subtotal}``, and ``leaf_aliases`` maps every accepted alias (see
-    :func:`_leaf_aliases`) of a leaf to its display label.
-    """
-
-    category_totals = {}
-    category_leaf_values = {}
-    leaf_aliases = {}
-
-    for category in categories:
-        divisor = 1.0
-        if category.get("divide_by"):
-            divisor = _get_value(datafile, category["divide_by"], default=1.0) or 1.0
-
-        leaves = dict(category["leaves"])
-        if include_bar_only and category.get("bar_only_leaves"):
-            leaves.update(category["bar_only_leaves"])
-
-        leaf_values = {}
-        for var_name, disp_label in leaves.items():
-            value = _get_value(datafile, var_name) / divisor
-            # Cost reductions (negative leaves) and zero/absent costs are not representable in
-            # a "branchvalues=total" sunburst, nor meaningfully comparable in a relative bar
-            # chart; they are simply left out.
-            if value > 0.0:
-                leaf_values[disp_label] = value
-                for alias in _leaf_aliases(var_name, disp_label):
-                    leaf_aliases[alias] = disp_label
-
-        category_leaf_values[category["key"]] = leaf_values
-        category_totals[category["key"]] = sum(leaf_values.values())
-
-    return category_leaf_values, category_totals, leaf_aliases
-
-
 def _get_cost_dict(
-    aircraft_file_path: Union[str, pathlib.Path], spec: List[Dict]
+    aircraft_file_path: Union[str, pathlib.Path], spec: Dict
 ) -> Tuple[Dict[str, float], Dict[str, str]]:
     """
-    Returns a flat dict mapping every leaf's display label (across all categories of ``spec``,
-    e.g. "Manufacturing", "Engineering", or an auto-discovered power train component) to its
-    value, for a single aircraft. Mirrors ``lca_impact._get_impact_dict`` so
-    :func:`_cost_bar_chart_simple` can follow the same logic as
-    ``lca_impacts_bar_chart_simple``.
+    Returns a flat dict mapping every cost item's display label (e.g. "Manufacturing",
+    "Engineering", or an auto-discovered power train component) to its value, for a single
+    aircraft. Mirrors ``lca_impact._get_impact_dict`` so :func:`_cost_bar_chart_simple` can
+    follow the same logic as ``lca_impacts_bar_chart_simple``.
+
+    Cost reductions (negative values) and zero/absent costs are left out.
 
     :param aircraft_file_path: path to the FAST-OAD output file containing the cost results.
     :param spec: either ``_PRODUCTION_SPEC`` or ``_OPERATION_SPEC``.
 
-    :return: a tuple ``(cost_dict, leaf_aliases)``, see :func:`_compute_category_values`.
+    :return: a tuple ``(cost_dict, leaf_aliases)`` where ``leaf_aliases`` maps every accepted
+    alias (see :func:`_leaf_aliases`) of an item to its display label.
     """
 
     datafile = oad.DataFile(aircraft_file_path)
-    categories = _make_categories(datafile, spec)
-    category_leaf_values, _, leaf_aliases = _compute_category_values(
-        datafile, categories, include_bar_only=True
-    )
+
+    leaves = dict(spec["leaves"])
+    if spec.get("discover_suffix"):
+        leaves.update(_discover_power_train_variables(datafile, spec["discover_suffix"]))
 
     cost_dict = {}
-    for leaf_values in category_leaf_values.values():
-        cost_dict.update(leaf_values)
+    leaf_aliases = {}
+    for var_name, disp_label in leaves.items():
+        value = _get_value(datafile, var_name)
+        if value > 0.0:
+            cost_dict[disp_label] = value
+            for alias in _leaf_aliases(var_name, disp_label):
+                leaf_aliases[alias] = disp_label
 
     return cost_dict, leaf_aliases
-
-
-def _build_cost_sunburst(
-    datafile: oad.DataFile,
-    root_label: str,
-    categories: List[Dict],
-    rel: str = "absolute",
-) -> go.Sunburst:
-    """
-    Builds a cost sunburst with one root, N categories, and their leaves.
-
-    :param datafile: the FAST-OAD output datafile.
-    :param root_label: display name of the root node (e.g. "Production cost per unit").
-    :param categories: a list of dicts, each with the keys:
-        - "key": short unique id for the category (used for coloring)
-        - "label": display name of the category
-        - "leaves": dict mapping {variable_name: display_label}
-        - "divide_by" (optional): variable name whose value every leaf in this category is
-          divided by (used to bring non-recursive project totals back to a per-unit basis)
-    :param rel: "absolute" for raw USD values, "total" for percentage of the root total,
-    "parent" for percentage of the immediate parent category.
-    """
-
-    figure_labels = []
-    figure_parents = []
-    figure_values = []
-    figure_color = [None]
-    color_dict = {}
-
-    # First pass: compute every leaf's (positive) value and each category's subtotal.
-    category_leaf_values, category_totals, _ = _compute_category_values(datafile, categories)
-
-    root_value = sum(category_totals.values())
-
-    def _scaled(value: float, denom: float) -> float:
-        if rel in ("total", "parent") and denom:
-            return value / denom * 100.0
-        return value
-
-    # Root node
-    figure_labels.append(root_label)
-    figure_parents.append("")
-    figure_values.append(100.0 if rel in ("total", "parent") else root_value)
-
-    # Unit shown in every label: raw dollar amounts in "absolute" mode, a percentage sign
-    # otherwise. Note this is about what the *text* says, independently of what the sunburst
-    # arc *size* represents (which is always driven by _scaled(), further below).
-    unit_suffix = "%" if rel in ("total", "parent") else "USD"
-
-    # Category + leaf nodes
-    for category in categories:
-        cat_total = category_totals[category["key"]]
-        if cat_total <= 0.0:
-            continue
-
-        cat_denom = root_value
-        cat_display_value = _scaled(cat_total, cat_denom)
-        category_label = _label(category["label"], cat_display_value, unit_suffix)
-        figure_labels.append(category_label)
-        figure_parents.append(root_label)
-        figure_values.append(cat_display_value)
-        figure_color.append(_get_color(category["key"], color_dict))
-
-        parent_denom = cat_total if rel == "parent" else root_value
-        for disp_label, value in category_leaf_values[category["key"]].items():
-            leaf_display_value = _scaled(value, parent_denom)
-            figure_labels.append(_label(disp_label, leaf_display_value, unit_suffix))
-            figure_parents.append(category_label)
-            figure_values.append(leaf_display_value)
-            figure_color.append(_get_color(category["key"], color_dict))
-
-    return go.Sunburst(
-        labels=figure_labels,
-        parents=figure_parents,
-        values=figure_values,
-        branchvalues="total",
-        sort=False,
-        marker={"colors": figure_color},
-    )
-
-
-# ---------------------------------------------------------------------------------------------
-# Wrappers, mirroring lca_impacts_sun_breakdown's single/multi-aircraft handling
-# ---------------------------------------------------------------------------------------------
-
-
-def _make_categories(
-    datafile: oad.DataFile,
-    spec: List[Dict],
-) -> List[Dict]:
-    """Resolves any dynamic leaf discovery (e.g. power train purchase costs) in the spec."""
-
-    resolved = []
-    for category in spec:
-        leaves = dict(category["leaves"])
-        if category.get("discover_suffix"):
-            leaves.update(_discover_power_train_variables(datafile, category["discover_suffix"]))
-
-        resolved.append(
-            {
-                "key": category["key"],
-                "label": category["label"],
-                "leaves": leaves,
-                # Leaves that should only appear in the comparison bar chart, not in the
-                # sunburst (see "bar_only_leaves" in the spec and "include_bar_only" in
-                # _compute_category_values).
-                "bar_only_leaves": dict(category.get("bar_only_leaves", {})),
-                "divide_by": category.get("divide_by"),
-            }
-        )
-
-    return resolved
-
-
-def _sun_breakdown(
-    aircraft_file_path: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
-    root_label: str,
-    spec: List[Dict],
-    title_text: str,
-    full_burst: bool = False,
-    name_aircraft: Union[str, List[str]] = None,
-    rel: str = "absolute",
-) -> go.FigureWidget:
-    if rel == "total":
-        title_text += "<br>expressed as a percentage of the total cost"
-    elif rel == "parent":
-        title_text += "<br>expressed as a percentage of parent category"
-
-    def _one_sunburst(path):
-        datafile = oad.DataFile(path)
-        categories = _make_categories(datafile, spec)
-        return _build_cost_sunburst(datafile, root_label, categories, rel=rel)
-
-    if isinstance(aircraft_file_path, (str, pathlib.Path)):
-        fig = go.Figure()
-        fig.add_trace(_one_sunburst(aircraft_file_path))
-
-        if name_aircraft:
-            fig.update_layout(title_text=name_aircraft + " " + title_text, title_x=0.5)
-        else:
-            fig.update_layout(title_text=title_text, title_x=0.5)
-
-    elif len(aircraft_file_path) == 1:
-        fig = go.Figure()
-        fig.add_trace(_one_sunburst(aircraft_file_path[0]))
-
-        if name_aircraft and name_aircraft[0]:
-            fig.update_layout(title_text=name_aircraft[0] + " " + title_text, title_x=0.5)
-        else:
-            fig.update_layout(title_text=title_text, title_x=0.5)
-
-    else:
-        fig = make_subplots(
-            1,
-            cols=len(aircraft_file_path),
-            specs=[[{"type": "domain"}] * len(aircraft_file_path)],
-            subplot_titles=name_aircraft,
-        )
-
-        for idx, curr_aircraft_file_path in enumerate(aircraft_file_path):
-            fig.add_trace(_one_sunburst(curr_aircraft_file_path), 1, idx + 1)
-            if name_aircraft:
-                fig.update_traces(row=1, col=idx + 1, name=name_aircraft[idx])
-
-        fig.update_layout(title_text=title_text, title_x=0.5)
-
-    if full_burst:
-        fig.update_traces(selector=dict(type="sunburst"))
-    else:
-        # Root + category only, hiding individual leaf items.
-        fig.update_traces(maxdepth=2, selector=dict(type="sunburst"))
-
-    # Default sizing: the sunburst has several nested rings with fairly long labels
-    # (component names + cost values), so the default 700x450 layout renders far too
-    # cramped/small (e.g. in a notebook cell) without this.
-    fig.update_layout(width=800, height=800)
-    fig.update_layout(font=dict(size=16))
-
-    return go.FigureWidget(fig)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -389,7 +172,7 @@ def _sun_breakdown(
 def _cost_bar_chart_simple(
     aircraft_file_paths: List[Union[str, pathlib.Path]],
     names_aircraft: List[str],
-    spec: List[Dict],
+    spec: Dict,
     default_comparison_label: str,
     graph_title: str = None,
     item_filter_list: list = None,
@@ -397,9 +180,8 @@ def _cost_bar_chart_simple(
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiple aircraft designs across all the cost items of
-    ``spec`` (e.g. every leaf of the production or operation cost breakdown), plotted as raw
-    USD values (all items already share the same unit, so no normalisation is needed). Can be
-    used with only one design.
+    ``spec``, plotted as raw USD values (all items already share the same unit, so no
+    normalisation is needed). Can be used with only one design.
 
     :param aircraft_file_paths: paths to the output files that contain the cost results.
     :param names_aircraft: names of the aircraft.
@@ -489,82 +271,8 @@ def _cost_bar_chart_simple(
 
 
 # ---------------------------------------------------------------------------------------------
-# Production cost sunburst: Recursive vs Non-recursive
+# Public bar charts
 # ---------------------------------------------------------------------------------------------
-
-_PRODUCTION_SPEC = [
-    {
-        "key": "recursive",
-        "label": "Recursive cost",
-        "leaves": {
-            PRODUCTION_PREFIX + "manufacturing_cost_per_unit": "Manufacturing",
-            PRODUCTION_PREFIX + "quality_control_cost_per_unit": "Quality control",
-            PRODUCTION_PREFIX + "material_cost_per_unit": "Material",
-            PRODUCTION_PREFIX + "avionics_cost_per_unit": "Avionics",
-            # landing_gear_cost_reduction is a *reduction* (negative) and is filtered out of
-            # the breakdown automatically since only positive leaves are displayed.
-            PRODUCTION_PREFIX + "landing_gear_cost_reduction": "Landing gear reduction",
-        },
-        # Every data:propulsion:he_power_train:<type>:<name>:purchase_cost variable found in
-        # the datafile is added here automatically (battery, motor, inverter, turboshaft, ...).
-        "discover_suffix": ":purchase_cost",
-        # Shown only in lcc_production_cost_bar_chart_simple, not in the sunburst: it would
-        # double-count against the individual power train component purchase costs above.
-        # Adjust the variable name below if it differs from your actual output variable.
-        "bar_only_leaves": {
-            PRODUCTION_PREFIX + "powertrain_cost_per_unit": "Powertrain",
-            "data:cost:msp_per_unit": "MSP",
-        },
-    },
-    {
-        "key": "non_recursive",
-        "label": "Non-recursive cost",
-        "leaves": {
-            PRODUCTION_PREFIX + "engineering_cost_per_unit": "Engineering",
-            PRODUCTION_PREFIX + "tooling_cost_per_unit": "Tooling",
-            PRODUCTION_PREFIX + "flight_test_cost_per_unit": "Flight test",
-            PRODUCTION_PREFIX + "dev_support_cost_per_unit": "Development support",
-            PRODUCTION_PREFIX + "certification_cost_per_unit": "Certification",
-        },
-        # These variables, once summed and multiplied by number_aircraft_5_years, give the
-        # *total* non-recursive project cost. Dividing back by number_aircraft_5_years brings
-        # them onto the same per-unit basis as the recursive cost branch.
-        "divide_by": None,
-    },
-]
-
-
-def lcc_production_cost_sun_breakdown(
-    aircraft_file_path: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
-    full_burst: bool = False,
-    name_aircraft: Union[str, List[str]] = None,
-    rel: str = "absolute",
-) -> go.FigureWidget:
-    """
-    Give a breakdown of the aircraft production cost per unit under the form of a sunburst,
-    split into a recursive cost branch (manufacturing, quality control, material, avionics,
-    and the purchase cost of every power train component) and a non-recursive cost branch
-    (engineering, tooling, flight test, development support, certification, amortized per
-    unit over the planned production run).
-
-    :param aircraft_file_path: path (or list of paths) to the FAST-OAD output file(s)
-    containing the cost results.
-    :param full_burst: if True, show the individual cost items; otherwise only show the
-    recursive / non-recursive split.
-    :param name_aircraft: name (or list of names) of the aircraft, used as chart title(s).
-    :param rel: "absolute" for raw USD values, "total" for percentage of the production cost
-    per unit, "parent" for percentage of the recursive/non-recursive subtotal.
-    """
-
-    return _sun_breakdown(
-        aircraft_file_path=aircraft_file_path,
-        root_label="Production cost per unit",
-        spec=_PRODUCTION_SPEC,
-        title_text="Production cost breakdown",
-        full_burst=full_burst,
-        name_aircraft=name_aircraft,
-        rel=rel,
-    )
 
 
 def lcc_production_cost_bar_chart_simple(
@@ -576,9 +284,9 @@ def lcc_production_cost_bar_chart_simple(
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiple aircraft designs across all the items of the
-    production cost breakdown (manufacturing, quality control, material, avionics, engineering,
-    tooling, flight test, development support, certification, and every power train component
-    purchase cost). This comparison is done relative to the first design given in the inputs.
+    production cost per unit (manufacturing, quality control, material, avionics, engineering,
+    tooling, flight test, development support, certification, powertrain, MSP, and every power
+    train component purchase cost), in USD.
 
     :param aircraft_file_paths: paths to the output files that contain the cost results.
     :param names_aircraft: names of the aircraft.
@@ -601,81 +309,6 @@ def lcc_production_cost_bar_chart_simple(
     )
 
 
-# ---------------------------------------------------------------------------------------------
-# Operation cost sunburst: Fixed annual vs Mission-based
-# ---------------------------------------------------------------------------------------------
-
-_OPERATION_SPEC = [
-    {
-        "key": "fixed",
-        "label": "Fixed annual cost",
-        "leaves": {
-            # Note: annual_depreciation_cost is intentionally NOT included here. It is not
-            # part of LCCSumOperationalCost's inputs, i.e. it does not feed into
-            # data:cost:operation:annual_cost_per_unit - it is used elsewhere (e.g. cash flow /
-            # NPV), so including it here would make this sunburst's root not reconcile with
-            # the actual annual_cost_per_unit output.
-            OPERATION_PREFIX + "annual_insurance_cost": "Insurance",
-            OPERATION_PREFIX + "annual_loan_cost": "Loan",
-            OPERATION_PREFIX + "additional_cost": "Additional",
-            OPERATION_PREFIX + "maintenance_cost": "Maintenance",
-            OPERATION_PREFIX + "miscellaneous_cost": "Miscellaneous",
-        },
-        # Every data:propulsion:he_power_train:<type>:<name>:operational_cost variable found in
-        # the datafile is added here automatically (e.g. turboshaft or PEMFC stack upkeep).
-        # These are yearly per-component costs, not tied to the number of flights, so they
-        # belong in the fixed branch rather than the mission-based one.
-        "discover_suffix": ":operational_cost",
-        "bar_only_leaves": {
-            OPERATION_PREFIX + "annual_overhaul_deposit": "Overhaul Deposit",
-        },
-    },
-    {
-        "key": "mission",
-        "label": "Mission-based cost",
-        "leaves": {
-            OPERATION_PREFIX + "annual_fuel_cost": "Fuel",
-            OPERATION_PREFIX + "annual_electricity_cost": "Electricity",
-            OPERATION_PREFIX + "annual_crew_cost": "Crew",
-            OPERATION_PREFIX + "annual_airport_cost": "Airport",
-        },
-    },
-]
-
-
-def lcc_operation_cost_sun_breakdown(
-    aircraft_file_path: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
-    full_burst: bool = False,
-    name_aircraft: Union[str, List[str]] = None,
-    rel: str = "absolute",
-) -> go.FigureWidget:
-    """
-    Give a breakdown of the aircraft annual operating cost under the form of a sunburst, split
-    into a fixed annual cost branch (depreciation, insurance, loan, maintenance, miscellaneous,
-    fuel, electricity, and any other yearly cost that doesn't scale with the number of flights)
-    and a mission-based cost branch (crew and airport cost, which scale with the number of
-    flights performed per year).
-
-    :param aircraft_file_path: path (or list of paths) to the FAST-OAD output file(s)
-    containing the cost results.
-    :param full_burst: if True, show the individual cost items; otherwise only show the
-    fixed / mission-based split.
-    :param name_aircraft: name (or list of names) of the aircraft, used as chart title(s).
-    :param rel: "absolute" for raw USD/year values, "total" for percentage of the annual
-    operating cost, "parent" for percentage of the fixed/mission-based subtotal.
-    """
-
-    return _sun_breakdown(
-        aircraft_file_path=aircraft_file_path,
-        root_label="Annual operating cost per unit",
-        spec=_OPERATION_SPEC,
-        title_text="Operating cost breakdown",
-        full_burst=full_burst,
-        name_aircraft=name_aircraft,
-        rel=rel,
-    )
-
-
 def lcc_operation_cost_bar_chart_simple(
     aircraft_file_paths: List[Union[str, pathlib.Path]],
     names_aircraft: List[str],
@@ -685,9 +318,9 @@ def lcc_operation_cost_bar_chart_simple(
 ) -> go.FigureWidget:
     """
     Give a bar chart that compares multiple aircraft designs across all the items of the
-    annual operating cost breakdown (insurance, loan, additional, maintenance, miscellaneous,
-    fuel, electricity, crew, airport, and every power train component operational cost). This
-    comparison is done relative to the first design given in the inputs.
+    annual operating cost (insurance, loan, additional, maintenance, miscellaneous, overhaul
+    deposit, fuel, electricity, crew, airport, and every power train component operational
+    cost), in USD per year.
 
     :param aircraft_file_paths: paths to the output files that contain the cost results.
     :param names_aircraft: names of the aircraft.

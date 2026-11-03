@@ -35,7 +35,7 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
             val=np.nan,
             desc="Manufacturer suggested price of the aircraft",
         )
-        self.add_input("data:cost:production:recursive_cost_per_unit", units="USD", val=np.nan)
+        self.add_input("data:cost:production:recursing_cost_per_unit", units="USD", val=np.nan)
         self.add_input(
             "data:cost:production:maturity_discount",
             val=np.nan,
@@ -75,7 +75,7 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
             of="*",
             wrt=[
                 "data:cost:msp_per_unit",
-                "data:cost:production:recursive_cost_per_unit",
+                "data:cost:production:recursing_cost_per_unit",
             ],
             method="exact",
             rows=np.arange(years_of_program - years_of_development + 1),
@@ -84,7 +84,7 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         aircraft_msp = inputs["data:cost:msp_per_unit"]
-        aircraft_cost = inputs["data:cost:production:recursive_cost_per_unit"]
+        aircraft_cost = inputs["data:cost:production:recursing_cost_per_unit"]
         annual_delivery_count = inputs["data:cost:production:annual_delivery_count"]
         maturity_discount = inputs["data:cost:production:maturity_discount"]
 
@@ -94,7 +94,7 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         aircraft_msp = inputs["data:cost:msp_per_unit"]
-        aircraft_cost = inputs["data:cost:production:recursive_cost_per_unit"]
+        aircraft_cost = inputs["data:cost:production:recursing_cost_per_unit"]
         annual_delivery_count = inputs["data:cost:production:annual_delivery_count"]
         maturity_discount = inputs["data:cost:production:maturity_discount"]
 
@@ -104,7 +104,7 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
 
         partials[
             "data:cost:production:annual_gross_profit",
-            "data:cost:production:recursive_cost_per_unit",
+            "data:cost:production:recursing_cost_per_unit",
         ] = -annual_delivery_count * maturity_discount
 
         partials[
