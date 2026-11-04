@@ -216,6 +216,13 @@ def _read_array(variables, variable_name: str, period_array: np.ndarray, file_pa
     """
 
     array = np.asarray(variables[variable_name].value, dtype=float).flatten()
+
+    # Fill with zeros if the variable is delivery_count related, since there is no delivery
+    # during development phase
+    if "delivery_count" in variable_name:
+        zero_deliveries = np.zeros(period_array.shape[0] - array.shape[0])
+        array = np.append(zero_deliveries, array)
+
     if len(array) != len(period_array):
         raise ValueError(
             f"Variable '{variable_name}' in '{file_path}' has {len(array)} values but the period "
