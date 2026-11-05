@@ -28,53 +28,39 @@ def financial_performance_curve(
     fill_color: Optional[Union[str, Sequence[str]]] = None,
     line_color: Optional[Union[str, Sequence[str]]] = None,
     fill: bool = True,
-) -> go.Figure:
+) -> go.FigureWidget:
     """
-    Returns a figure plot of a financial performance curve against time periods (years), with
-    an optional second y-axis for any other quantity (financial or not, e.g. number of aircraft
-    delivered). The area between the main curve and zero is optionally shaded. Multiple designs
-    can be plotted at once by passing a list of file paths (and, optionally, a matching list of
-    names/colors), or superposed one at a time by calling this function repeatedly with an
-    existing fig.
+    Plots a financial performance curve against time (years), with an optional secondary
+    y-axis for another quantity (e.g. aircraft delivered). The area between the main curve and
+    zero can be shaded. Several designs can be plotted at once by passing lists of file paths
+    (with matching names/colors), or added one by one by passing an existing ``fig``.
 
-    The x-axis is always the time period array (0, 1, ..., period).
+    The x-axis is the period array (0, 1, ..., period). At most two y variables are plotted,
+    collected in this order: ``data:cost:{discipline}:{financial_parameter}`` first, then the
+    full names in ``y_variable``. The first goes on the main (left) axis, the second on the
+    secondary (right) axis. Within each group, the user's order is kept.
 
-    Y variables are collected in this order and at most two are allowed:
-    1. the variable(s) defined by ``discipline`` and ``financial_parameter``, i.e.
-       ``data:cost:{discipline}:{financial_parameter}``,
-    2. the variable(s) given by full name in ``y_variable``.
-    The first one is plotted on the main (left) y-axis, the second one on the secondary (right)
-    y-axis. So a financial parameter always takes the main axis over a ``y_variable``, and when
-    both are defined the same way (two financial parameters, or two ``y_variable`` names with
-    ``financial_parameter=None``), the order given by the user decides.
-
-    :param aircraft_file_path: path of data file, or a list/tuple of paths to plot several
-    designs on the same figure
-    :param name: name (or list of names, matching aircraft_file_path) to give to the trace(s)
-    added to the figure
+    :param aircraft_file_path: path of the data file, or list of paths for several designs
+    :param name: trace name, or list of names matching aircraft_file_path
     :param plot_title: title of the figure
-    :param fig: existing figure to which add the plot(s)
-    :param file_formatter: the formatter that defines the format of data file. If not provided,
-    default format will be assumed.
-    :param period: number of periods (years) of the x-axis (0, 1, ..., period)
-    :param zero_reference_value: value of the horizontal reference line (e.g. break-even) on the
-    main y-axis. Set to None to draw no reference line.
-    :param discipline: discipline of the life cycle cost (production or operation). A single
-    value is reused for every financial parameter, or give one per financial parameter.
-    :param financial_parameter: name (or list of names) of the financial parameter(s). Set to
-    None to define the y variables only with y_variable.
+    :param fig: existing figure to add the plot(s) to
+    :param file_formatter: formatter of the data file; default format if not provided
+    :param period: number of periods (years) on the x-axis
+    :param zero_reference_value: y value of the horizontal reference line (e.g. break-even) on
+    the main axis; None for no line
+    :param discipline: life cycle cost discipline (production or operation), as one value for
+    all financial parameters or one per parameter
+    :param financial_parameter: financial parameter name(s); None to use y_variable only
     :param financial_parameter_axis_label: label of the main y-axis
-    :param y_variable: full variable name (or list of names) of extra quantity(ies) to plot, e.g.
-    "data:cost:production:aircraft_delivered". Usually plotted on the secondary y-axis.
+    :param y_variable: full name(s) of extra variables to plot, e.g.
+    "data:cost:production:aircraft_delivered"
     :param y2_axis_label: label of the secondary y-axis
-    :param fill_color: RGBA color (or list of colors, matching aircraft_file_path) used to shade
-    the area between each main curve and zero. If not provided, colors are auto-assigned from
-    the default Plotly qualitative palette.
-    :param line_color: RGBA color (or list of colors, matching aircraft_file_path) used for each
-    design's lines and markers (the secondary curve is dashed with the same color). If not
-    provided, colors are auto-assigned from the default Plotly qualitative palette.
+    :param fill_color: RGBA fill color, as one for all designs or one per design; defaults to
+    the Plotly qualitative palette
+    :param line_color: RGBA line and marker color, as one for all designs or one per design
+    (the secondary curve is dashed in the same color); defaults to the Plotly palette
     :param fill: whether to shade the area between each main curve and zero
-    :return: financial performance curve figure.
+    :return: financial performance curve figure
     """
 
     y_variable_names = _resolve_y_variables(discipline, financial_parameter, y_variable)

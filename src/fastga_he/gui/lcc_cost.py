@@ -35,7 +35,7 @@ PURCHASE_COST_SUFFIX = ":purchase_cost"
 OPERATIONAL_COST_SUFFIX = ":operational_cost"
 
 # Same color and hatch cycles as lca_impact.
-COLORS = plotly.colors.DEFAULT_PLOTLY_COLORS
+COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
 HASH = ["/", "x", "-", "|", "+", ".", "", "\\"]
 
 
@@ -211,8 +211,8 @@ def lcc_cost_bar_chart_simple(
     names_aircraft: List[str],
     cost_type: str = "production",
     graph_title: str = None,
-    item_filter_list: list = None,
-    color_list: List[str] = None,
+    item_filter_list: list = [],
+    color_list: List[str] = [],
 ) -> go.FigureWidget:
     """
     Cost items of several aircraft, as grouped bars.
@@ -254,7 +254,7 @@ def lcc_cost_bar_chart_simple(
             filtered_item_names = item_names
             filtered_item_values = item_values
 
-        marker_color = color_list[i] if color_list and i < len(color_list) else None
+        marker_color = color_list[i] if i < len(color_list) else None
 
         bar_chart = go.Bar(
             name=name_aircraft,
@@ -320,74 +320,72 @@ def _get_power_train_costs(datafile: oad.DataFile, suffix: str) -> List[Tuple[st
 
 
 def _group_power_train_costs(
-    costs: List[Tuple[str, str, float]], group_by: str = "component", exclude_list: list = None
+    costs: List[Tuple[str, str, float]],
+    groups: Dict[str, List[str]],
+    group_by: str = "component",
+    exclude_list: list = [],
 ) -> Dict[str, float]:
     """
     Non-zero power train costs, by component id or by type, without the excluded components.
 
     :param costs: output of :func:`_get_power_train_costs`.
     :param group_by: "component" (one key per id) or "type" (ids of a type summed).
-    :param exclude_list: types, ids or "<type>:<id>" to leave out, applied before grouping.
+    :param exclude_list: types or ids to leave out, applied before grouping.
+    :param groups: {group name: types or ids}. A matching component is summed
+    under the group name instead of its id or type; the first matching group wins.
     """
 
     if group_by not in ("component", "type"):
         raise ValueError('group_by must be either "component" or "type", got: ' + str(group_by))
 
-    exclude_set = set(exclude_list or [])
+    exclude_set = set(exclude_list)
 
     cost_dict = {}
     for component_type, component_name, value in costs:
-        if value == 0.0 or exclude_set & _power_train_names(component_type, component_name):
+        # A component is referred to by its type ("PEMFC_stack") or its unique id
+        names = {component_type, component_name}
+        if value == 0.0 or exclude_set & names:
             continue
+
         key = component_name if group_by == "component" else component_type
+        # A component listed in a group goes into that group, whatever group_by is
+        for group_name, members in groups.items():
+            if names.intersection(members):
+                key = group_name
+                break
+
         cost_dict[key] = cost_dict.get(key, 0.0) + value
 
     return cost_dict
 
 
-def _get_power_train_cost_dict(
-    aircraft_file_path: Union[str, pathlib.Path],
-    suffix: str,
-    group_by: str = "component",
-    exclude_list: list = None,
-) -> Dict[str, float]:
-    """Non-zero power train costs of one aircraft, see :func:`_group_power_train_costs`."""
+def _normalise_groups(
+    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
+) -> Dict[str, List[str]]:
+    """{group name: list of names}, a single name being turned into a list."""
 
-    costs = _get_power_train_costs(oad.DataFile(aircraft_file_path), suffix)
-    return _group_power_train_costs(costs, group_by=group_by, exclude_list=exclude_list)
+    return {
+        group_name: [members] if isinstance(members, str) else list(members)
+        for group_name, members in aggregate_and_sort_contributor.items()
+    }
 
 
-def _power_train_names(component_type: str, component_name: str) -> set:
+def _get_valid_names(
+    aircraft_file_paths: List[Union[str, pathlib.Path]], suffix: str, spec: Dict = {}
+) -> Tuple[set, set]:
     """
-    Names that refer to a component in ``exclude_list``: its type ("PEMFC_stack"), its id
-    ("pemfc_stack_1") and "<type>:<id>", each also with spaces instead of underscores.
+    Names accepted in ``exclude_list`` and ``aggregate_and_sort_contributor``: the power train
+    component types and ids found in the files and, when ``spec`` is given, the names of its
+    cost items and "Powertrain".
+
+    :return: (every accepted name, short list of them for error messages).
     """
-
-    names = {component_type, component_name, component_type + ":" + component_name}
-    return names | {name.replace("_", " ") for name in names}
-
-
-def _check_exclude_list(
-    exclude_list: list,
-    aircraft_file_paths: List[Union[str, pathlib.Path]],
-    suffix: str,
-    spec: Dict = None,
-):
-    """
-    Raises a ValueError if an entry of ``exclude_list`` matches nothing in any file (most likely
-    a typo). Valid entries are the power train component types and ids found in the files and,
-    when ``spec`` is given, the names of its cost items and "Powertrain".
-    """
-
-    if not exclude_list:
-        return
 
     valid_names = set()
-    # Short list of the valid names, for the error message
     suggestions = set()
     if spec:
         for var_name, disp_label in spec["leaves"].items():
-            if var_name == spec.get("power_train_total"):
+            if var_name == spec["power_train_total"]:
                 disp_label = _POWER_TRAIN_LABEL
             valid_names.update(_leaf_aliases(var_name, disp_label))
             suggestions.add(disp_label)
@@ -397,13 +395,20 @@ def _check_exclude_list(
         for component_type, component_name, _ in _get_power_train_costs(
             oad.DataFile(aircraft_file_path), suffix
         ):
-            valid_names |= _power_train_names(component_type, component_name)
+            valid_names.update((component_type, component_name))
             suggestions.update((component_type, component_name))
 
-    unknown = [entry for entry in exclude_list if entry not in valid_names]
+    return valid_names, suggestions
+
+
+def _check_names(entries: list, argument_name: str, valid_names: set, suggestions: set):
+    """Raises a ValueError naming the entries that match nothing in any file (likely typos)."""
+
+    unknown = [entry for entry in entries if entry not in valid_names]
     if unknown:
         raise ValueError(
-            "exclude_list entries not found in any file: "
+            argument_name
+            + " entries not found in any file: "
             + ", ".join(str(entry) for entry in unknown)
             + ". Valid entries include: "
             + ", ".join(sorted(suggestions, key=str.lower))
@@ -413,7 +418,7 @@ def _check_exclude_list(
 def _aggregate_and_sort_contributors(
     contribution_on_each_aircraft: Dict[str, Dict[str, float]],
     names_aircraft: List[str],
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = None,
+    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
     cutoff_criteria: float = None,
     sort_by_size: bool = True,
 ) -> Dict[str, Dict[str, float]]:
@@ -424,26 +429,20 @@ def _aggregate_and_sort_contributors(
     into "Others", on top.
     """
 
-    def _blank():
-        return {aircraft: 0.0 for aircraft in names_aircraft}
-
     ordered = {}
     unsorted = {}
 
-    if aggregate_and_sort_contributor:
-        for new_name in aggregate_and_sort_contributor:
-            ordered[new_name] = _blank()
+    # Initialize the ordered dict
+    for new_name in aggregate_and_sort_contributor:
+        ordered[new_name] = dict.fromkeys(names_aircraft, 0.0)
 
     for contributor, contribution in contribution_on_each_aircraft.items():
         target = None
         # Aggregate contributors into a group if requested
-        if aggregate_and_sort_contributor:
-            for new_name, old_names in aggregate_and_sort_contributor.items():
-                if isinstance(old_names, str):
-                    old_names = [old_names]
-                if contributor in old_names:
-                    target = new_name
-                    break
+        for new_name, old_names in aggregate_and_sort_contributor.items():
+            if contributor in old_names:
+                target = new_name
+                break
 
         if target is None:
             unsorted[contributor] = contribution
@@ -454,13 +453,13 @@ def _aggregate_and_sort_contributors(
     # Drop empty groups
     ordered = {name: c for name, c in ordered.items() if any(v != 0.0 for v in c.values())}
 
-    totals = _blank()
+    totals = dict.fromkeys(names_aircraft, 0.0)
     for contribution in contribution_on_each_aircraft.values():
         for aircraft, cost in contribution.items():
             totals[aircraft] += cost
 
     # Sorted lookup list of the contributor names (biggest first, or as given)
-    others = _blank()
+    others = dict.fromkeys(names_aircraft, 0.0)
     if sort_by_size:
         contributors = sorted(unsorted, key=lambda c: abs(sum(unsorted[c].values())), reverse=True)
     else:
@@ -470,6 +469,7 @@ def _aggregate_and_sort_contributors(
     for contributor in contributors:
         contribution = unsorted[contributor]
         if cutoff_criteria and sum(contribution.values()) > 0.0:
+            # Max share of this contributor on across all aircraft, in percent of the total cost
             max_share = max(
                 (
                     contribution.get(aircraft, 0.0) / totals[aircraft] * 100.0
@@ -496,12 +496,12 @@ def _stacked_cost_bar_chart(
     names_aircraft: List[str],
     title: str,
     y_axis_title: str,
-    kept_names: List[str] = None,
-    legend_rename: Dict[str, str] = None,
+    kept_names: List[str] = [],
+    legend_rename: Dict[str, str] = {},
     show_total: bool = True,
     reference_value: float = None,
     reference_label: str = "Reference",
-    color_dict: Dict[str, str] = None,
+    color_dict: Dict[str, str] = {},
     value_unit: str = "USD",
     share_label: str = "of the total",
 ) -> go.FigureWidget:
@@ -513,11 +513,9 @@ def _stacked_cost_bar_chart(
     :param share_label: end of the hover text giving each item's share.
     """
 
-    kept_names = kept_names or []
-
-    totals = {aircraft: 0.0 for aircraft in names_aircraft}
-    positive_heights = {aircraft: 0.0 for aircraft in names_aircraft}
-    negative_heights = {aircraft: 0.0 for aircraft in names_aircraft}
+    totals = dict.fromkeys(names_aircraft, 0.0)
+    positive_heights = dict.fromkeys(names_aircraft, 0.0)
+    negative_heights = dict.fromkeys(names_aircraft, 0.0)
     for contribution in ordered_contributors.values():
         for aircraft, cost in contribution.items():
             totals[aircraft] += cost
@@ -534,7 +532,7 @@ def _stacked_cost_bar_chart(
             display_name = contributor
         else:
             display_name = contributor.replace("_", " ")
-        if legend_rename and display_name in legend_rename:
+        if display_name in legend_rename:
             display_name = legend_rename[display_name]
 
         values = [contribution.get(aircraft, 0.0) for aircraft in names_aircraft]
@@ -543,12 +541,12 @@ def _stacked_cost_bar_chart(
             for value, aircraft in zip(values, names_aircraft)
         ]
 
-        if color_dict and contributor in color_dict:
+        if contributor in color_dict:
             color = color_dict[contributor]
-        elif color_dict and display_name in color_dict:
+        elif display_name in color_dict:
             color = color_dict[display_name]
         else:
-            color = COLORS[idx % len(COLORS)]
+            color = COLS[idx % len(COLS)]
 
         fig.add_trace(
             go.Bar(
@@ -561,7 +559,7 @@ def _stacked_cost_bar_chart(
                     "%{customdata:.1f} % " + share_label + "<extra></extra>"
                 ),
                 marker=dict(
-                    pattern_shape=HASH[(idx // len(COLORS)) % len(HASH)],
+                    pattern_shape=HASH[(idx // len(COLS)) % len(HASH)],
                     color=color,
                 ),
             )
@@ -653,15 +651,15 @@ def lcc_power_train_cost_breakdown(
     names_aircraft: Union[str, List[str]],
     cost_type: str = "production",
     group_by: str = "component",
-    exclude_list: list = None,
+    exclude_list: list = [],
     graph_title: str = None,
-    legend_rename: Dict[str, str] = None,
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = None,
+    legend_rename: Dict[str, str] = {},
+    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
     cutoff_criteria: float = None,
     show_total: bool = True,
     reference_value: float = None,
     reference_label: str = "Reference",
-    color_dict: Dict[str, str] = None,
+    color_dict: Dict[str, str] = {},
 ) -> go.FigureWidget:
     """
     Power train cost, one stacked bar per aircraft, one segment per component: purchase cost
@@ -672,12 +670,14 @@ def lcc_power_train_cost_breakdown(
     :param cost_type: "production" (cost per unit, USD) or "operation" (annual cost, USD/yr).
     :param group_by: "component" (one segment per id, e.g. "motor_1") or "type" (ids of the
     same type class summed, e.g. "PMSM").
-    :param exclude_list: components to leave out, by type ("PEMFC_stack"), id ("pemfc_stack_1")
-    or "<type>:<id>". Works with either ``group_by``. Raises a ValueError for an unknown entry.
+    :param exclude_list: components to leave out, by type ("PEMFC_stack") or id
+    ("pemfc_stack_1"). Works with either ``group_by``. Raises a ValueError for an unknown entry.
     :param graph_title: title, a default one is used if None.
     :param legend_rename: {legend name: new name}.
-    :param aggregate_and_sort_contributor: {new name: item or list of items} to sum. Groups are
-    stacked first, from the bottom, in the given order.
+    :param aggregate_and_sort_contributor: {new name: name or list of names} to sum. Names can
+    mix types and ids, whatever ``group_by`` is; a component listed in two groups
+    goes into the first. Groups are stacked first, from the bottom, in the given order. Raises a
+    ValueError for an unknown name.
     :param cutoff_criteria: items under this % of the total on every aircraft go into "Others".
     :param show_total: writes the total above each bar.
     :param reference_value: draws a dashed line at this value (e.g. a budget or the revenue).
@@ -703,24 +703,36 @@ def lcc_power_train_cost_breakdown(
             + str(len(names_aircraft))
         )
 
-    _check_exclude_list(exclude_list, aircraft_file_paths, suffix)
+    groups = _normalise_groups(aggregate_and_sort_contributor)
 
-    # {contributor: {aircraft_name: cost}}
+    # Check the names before any chart work
+    if exclude_list or groups:
+        valid_names, suggestions = _get_valid_names(aircraft_file_paths, suffix)
+        _check_names(exclude_list, "exclude_list", valid_names, suggestions)
+        _check_names(
+            [name for members in groups.values() for name in members],
+            "aggregate_and_sort_contributor",
+            valid_names,
+            suggestions,
+        )
+
+    # {contributor: {aircraft_name: cost}}, components already summed into their groups
     contribution_on_each_aircraft = {}
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
-        cost_dict = _get_power_train_cost_dict(
-            aircraft_file_path,
-            suffix,
+        cost_dict = _group_power_train_costs(
+            _get_power_train_costs(oad.DataFile(aircraft_file_path), suffix),
             group_by=group_by,
             exclude_list=exclude_list,
+            groups=groups,
         )
         for contributor, cost in cost_dict.items():
             contribution_on_each_aircraft.setdefault(contributor, {})[name_aircraft] = cost
 
+    # The groups are already summed, this only stacks them first, in the given order
     ordered_contributors = _aggregate_and_sort_contributors(
         contribution_on_each_aircraft,
         names_aircraft,
-        aggregate_and_sort_contributor=aggregate_and_sort_contributor,
+        aggregate_and_sort_contributor={group_name: [group_name] for group_name in groups},
         cutoff_criteria=cutoff_criteria,
     )
 
@@ -729,7 +741,7 @@ def lcc_power_train_cost_breakdown(
         names_aircraft,
         title=graph_title if graph_title else default_title,
         y_axis_title=y_axis_title,
-        kept_names=list(aggregate_and_sort_contributor or {}),
+        kept_names=list(groups),
         legend_rename=legend_rename,
         show_total=show_total,
         reference_value=reference_value,
@@ -753,8 +765,9 @@ _RECONCILIATION_TOLERANCE = 0.01
 def _get_cost_contributions(
     aircraft_file_path: Union[str, pathlib.Path],
     spec: Dict,
+    groups: Dict[str, List[str]],
     power_train_detail: str = "component",
-    exclude_list: list = None,
+    exclude_list: list = [],
 ) -> Tuple[Dict[str, float], Dict[str, str]]:
     """
     Non-zero cost items of one aircraft, ready to stack: ``power_train_total`` is replaced by
@@ -764,6 +777,8 @@ def _get_cost_contributions(
     :param power_train_detail: "component", "type" or "aggregate" (one "Powertrain" item).
     :param exclude_list: item names or component types/ids, "Powertrain" for the whole power
     train.
+    :param groups: {group name: names}, components listed in a group are summed under its name
+    (see :func:`_group_power_train_costs`). Cost items are grouped later, by the caller.
     :return: ({item: cost}, {alias: item}).
     """
 
@@ -777,12 +792,12 @@ def _get_cost_contributions(
 
     datafile = oad.DataFile(aircraft_file_path)
 
-    power_train_total_name = spec.get("power_train_total")
-    not_stacked = set(spec.get("not_stacked") or [])
+    power_train_total_name = spec["power_train_total"]
+    not_stacked = set(spec["not_stacked"])
 
     contributions = {}
     aliases = {}
-    exclude_set = set(exclude_list or [])
+    exclude_set = set(exclude_list)
 
     for var_name, disp_label in spec["leaves"].items():
         # Skip the not_stacked and the total cost of the powertrain
@@ -805,6 +820,7 @@ def _get_cost_contributions(
         all_component_costs,
         group_by="type" if power_train_detail == "type" else "component",
         exclude_list=exclude_list,
+        groups=groups,
     )
 
     power_train_total = (
@@ -837,12 +853,21 @@ def _get_cost_contributions(
         # The whole power train is excluded
         pass
     elif power_train_detail != "aggregate" and components:
-        contributions.update(components)
-        for key in components:
+        for key, value in components.items():
+            # Added, not overwritten, in case a group has the name of a cost item
+            contributions[key] = contributions.get(key, 0.0) + value
             aliases[key] = key
-            aliases[key.replace("_", " ")] = key
     else:
-        value = components_sum if components_found else power_train_total
+        # Components assigned to a group stay apart, the others form "Powertrain"
+        grouped = {key: value for key, value in components.items() if key in groups}
+        for key, value in grouped.items():
+            contributions[key] = contributions.get(key, 0.0) + value
+            aliases[key] = key
+
+        if components_found:
+            value = components_sum - sum(grouped.values())
+        else:
+            value = power_train_total
         if value != 0.0:
             contributions[_POWER_TRAIN_LABEL] = value
             for alias in power_train_aliases:
@@ -856,20 +881,20 @@ def lcc_cost_bar_chart_advanced(
     names_aircraft: Union[str, List[str]],
     cost_type: str = "production",
     power_train_detail: str = "component",
-    item_filter_list: list = None,
-    exclude_list: list = None,
-    normalisation_factors: List[float] = None,
+    item_filter_list: list = [],
+    exclude_list: list = [],
+    normalisation_factors: List[float] = [],
     graph_title: str = None,
     y_axis_title: str = None,
     value_unit: str = None,
-    legend_rename: Dict[str, str] = None,
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = None,
+    legend_rename: Dict[str, str] = {},
+    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
     cutoff_criteria: float = None,
     sort_by_size: bool = True,
     show_total: bool = True,
     reference_value: float = None,
     reference_label: str = "Reference",
-    color_dict: Dict[str, str] = None,
+    color_dict: Dict[str, str] = {},
 ) -> go.FigureWidget:
     """
     All cost items, one stacked bar per aircraft, one segment per item. The power train total
@@ -886,15 +911,17 @@ def lcc_cost_bar_chart_advanced(
     :param power_train_detail: "component" (one segment per id), "type" (per type class) or
     "aggregate" (one "Powertrain" segment).
     :param item_filter_list: items to keep. Everything by default.
-    :param exclude_list: items to leave out, or component types ("PEMFC_stack") and
-    "<type>:<id>". Raises a ValueError for an unknown entry.
+    :param exclude_list: items to leave out, including component types ("PEMFC_stack") and
+    ids. Raises a ValueError for an unknown entry.
     :param normalisation_factors: one divisor per aircraft (e.g. for a cost per seat).
     :param y_axis_title: y-axis title, a default one is used if None.
     :param value_unit: unit of the totals, hover and reference line (USD or USD/yr by default).
     :param graph_title: title, a default one is used if None.
     :param legend_rename: {legend name: new name}.
-    :param aggregate_and_sort_contributor: {new name: item or list of items} to sum. Groups are
-    stacked first, from the bottom, in the given order.
+    :param aggregate_and_sort_contributor: {new name: name or list of names} to sum. Names can
+    mix cost items, component types and ids, whatever ``power_train_detail`` is;
+    a component listed in two groups goes into the first. Groups are stacked first, from the
+    bottom, in the given order. Raises a ValueError for an unknown name.
     :param cutoff_criteria: items under this % of the total on every aircraft go into "Others".
     :param show_total: writes the total above each bar.
     :param reference_value: draws a dashed line at this value (e.g. a budget or the revenue).
@@ -922,10 +949,23 @@ def lcc_cost_bar_chart_advanced(
             + " and "
             + str(len(names_aircraft))
         )
-    if normalisation_factors is not None and len(normalisation_factors) != len(names_aircraft):
+    if normalisation_factors and len(normalisation_factors) != len(names_aircraft):
         raise ValueError("normalisation_factors must give one factor per aircraft")
 
-    _check_exclude_list(exclude_list, aircraft_file_paths, spec["discover_suffix"], spec)
+    groups = _normalise_groups(aggregate_and_sort_contributor)
+
+    # Check the names before any chart work
+    if exclude_list or groups:
+        valid_names, suggestions = _get_valid_names(
+            aircraft_file_paths, spec["discover_suffix"], spec
+        )
+        _check_names(exclude_list, "exclude_list", valid_names, suggestions)
+        _check_names(
+            [name for members in groups.values() for name in members],
+            "aggregate_and_sort_contributor",
+            valid_names,
+            suggestions,
+        )
 
     contribution_on_each_aircraft = {}
     all_aliases = {}
@@ -938,6 +978,7 @@ def lcc_cost_bar_chart_advanced(
             spec,
             power_train_detail=power_train_detail,
             exclude_list=exclude_list,
+            groups=groups,
         )
         all_aliases.update(aliases)
 
@@ -945,18 +986,16 @@ def lcc_cost_bar_chart_advanced(
             wanted = {aliases.get(item, item) for item in item_filter_list}
             contributions = {k: v for k, v in contributions.items() if k in wanted}
 
-        factor = normalisation_factors[idx] if normalisation_factors is not None else 1.0
+        factor = normalisation_factors[idx] if normalisation_factors else 1.0
         for contributor, cost in contributions.items():
             contribution_on_each_aircraft.setdefault(contributor, {})[name_aircraft] = cost / factor
 
-    # Accept any alias in aggregate_and_sort_contributor
-    resolved_aggregation = None
-    if aggregate_and_sort_contributor:
-        resolved_aggregation = {}
-        for new_name, old_names in aggregate_and_sort_contributor.items():
-            if isinstance(old_names, str):
-                old_names = [old_names]
-            resolved_aggregation[new_name] = [all_aliases.get(name, name) for name in old_names]
+    # Components are already summed under their group name; cost items are added to the
+    # groups here, under any of their names
+    resolved_aggregation = {
+        group_name: [group_name] + [all_aliases.get(name, name) for name in members]
+        for group_name, members in groups.items()
+    }
 
     ordered_contributors = _aggregate_and_sort_contributors(
         contribution_on_each_aircraft,
@@ -971,7 +1010,7 @@ def lcc_cost_bar_chart_advanced(
         names_aircraft,
         title=graph_title if graph_title else default_title,
         y_axis_title=y_axis_title if y_axis_title else default_y_axis_title,
-        kept_names=list(resolved_aggregation or {}) + [_POWER_TRAIN_LABEL],
+        kept_names=list(resolved_aggregation) + [_POWER_TRAIN_LABEL],
         legend_rename=legend_rename,
         show_total=show_total,
         reference_value=reference_value,
