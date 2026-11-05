@@ -35,7 +35,7 @@ PURCHASE_COST_SUFFIX = ":purchase_cost"
 OPERATIONAL_COST_SUFFIX = ":operational_cost"
 
 # Same color and hatch cycles as lca_impact.
-COLS = plotly.colors.DEFAULT_PLOTLY_COLORS
+COLORS = plotly.colors.DEFAULT_PLOTLY_COLORS
 HASH = ["/", "x", "-", "|", "+", ".", "", "\\"]
 
 
@@ -548,7 +548,7 @@ def _stacked_cost_bar_chart(
         elif color_dict and display_name in color_dict:
             color = color_dict[display_name]
         else:
-            color = COLS[idx % len(COLS)]
+            color = COLORS[idx % len(COLORS)]
 
         fig.add_trace(
             go.Bar(
@@ -561,7 +561,7 @@ def _stacked_cost_bar_chart(
                     "%{customdata:.1f} % " + share_label + "<extra></extra>"
                 ),
                 marker=dict(
-                    pattern_shape=HASH[(idx // len(COLS)) % len(HASH)],
+                    pattern_shape=HASH[(idx // len(COLORS)) % len(HASH)],
                     color=color,
                 ),
             )
