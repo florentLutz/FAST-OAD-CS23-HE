@@ -288,10 +288,13 @@
         <tooling_cost_per_hour unit="USD/h">83.97</tooling_cost_per_hour>
         <manufacturing_cost_per_hour unit="USD/h">72.97</manufacturing_cost_per_hour>
         <fixed_landing_gear>0.0</fixed_landing_gear>
+        <spare_parts_factor unit="unitless">1.0</spare_parts_factor>
+        <gross_margin unit="unitless">0.1111</gross_margin>
       </production>
       <operation>
         <number_of_pilot>1.0</number_of_pilot>
         <loan_principal unit="USD">42000.0</loan_principal>
+        <passenger_per_flight_baseline>3</passenger_per_flight_baseline>
       </operation>
     </cost>
     <loads>
