@@ -41,21 +41,6 @@ the cost is simply calculated by multiplying the number of man-hours (:math:`H_{
 5-year period, :math:`V_H` maximum cruise true airspeed in knots, :math:`Q_m` is the estimated aircraft production
 rate per month, and :math:`F` is the combination of factors based on aircraft design specifications detailed in :cite:`gudmundsson:2013`.
 
-Learning curve reduction
-************************
-As the manufacturing process matures with increasing production volume, both manufacturing and tooling man-hours are
-reduced. This reduction is modeled using a learning curve, characterized by a learning curve factor (:math:`x`) and a
-resulting man-hour reduction factor (:math:`\phi`). The learning curve factor is derived from the learning curve
-percentage (:math:`\theta`), which typically ranges between 90\% and 80\% in aircraft production, as noted by
-:cite:`bongers:2017`.
-
-.. math::
-
-    x = -5.64 + 1.44 \ln(\theta) \\
-    \phi = \left( \frac{N_{\text{made}}}{N} \right)^{x - 1}
-
-:math:`N_{\text{made}}` represents the number of similar aircraft already produced by the manufacturer.
-
 Cost of development support
 ***************************
 The indirect development labor cost, provided by :cite:`gudmundsson:2013`, includes items such as overheads, administration,
@@ -208,6 +193,69 @@ the maximum current (:math:`I_{max}`), and a price adjustement factor (:math:`k_
 
     C_{\text{SSPC (\$)}} = k_{\text{SSPC}} (1.21 \cdot I_{max} + 83.8)
 
+***********************************
+Production profitability assessment
+***********************************
+With the recurring manufacturing-related cost and non-recurring project development cost estimated from the previous
+sections, the production yearly profitability can be assessed by utilizing a cumulative development cost expenditure
+curve, a learning curve discount for the recurring cost, and an aircraft delivery scheduling surrogate model The
+aircraft listed price is derived from the sum of the recurring cost and the share of the non-recurring cost factoring
+the fixed gross profit margin target and a fixed spare part revenue factor.
+
+
+Listed price of the aircraft
+============================
+The listed price of the aircraft is derived from the sum of the cost factoring the fixed gross profit margin target and
+a fixed spare part revenue factor.
+
+
+.. math::
+
+    Price = (C_{\text{recurring}} + C_{\text{non-recurring}}) \cdot (1 + f_{\text{gross_margin}}) \cdot f_{\text{spare_part}}
+
+
+Expenditure and delivery schedule
+=================================
+
+NASA 60/40 cumulative distribution development cost model
+*********************************************************
+The NASA 60/40 cumulative distribution model is used to estimate the non-recurring development cost expenditure over the
+project development period. The 60 \% of the total development cost is assumed to be spent in the first half of the
+development period, and the remaining 40 \% is spent in the second half of the development period. The cumulative
+development cost expenditure is modeled based on the formula given in :cite:`brown:2015`.
+
+.. math::
+
+    \phi_{exp}(t) = \frac {1 - e^{-3.52 \cdot (\frac {t} {T_{dev}}) ^2}} {0.97}
+
+
+:math:`t` is the time steps since the start of the development period and :math:`T_{dev}` is the total development period.
+
+Learning curve for recurring cost
+*********************************
+As the manufacturing process matures with increasing production volume, both in-house manufactured and outsourced
+components costs are reduced. This is modeled using a learning curve with a :math:`95 \%` learning curve discount rate
+suggested by the Eastlake model in :cite:`gudmundsson:2013`, which is higher than typically ranges (between 90\% and 80\%)
+in aircraft production, as noted by :cite:`bongers:2017`.
+
+.. math::
+
+    \text{Maturity discount} = N_{\text{cumulated}}^{\log_2(0.95) - 1}
+
+:math:`N_{\text{cumulated}}` is the annual cumulative number of aircraft delivered.
+
+Aircraft delivery schedule
+**************************
+The aircraft delivery schedule is a logistic curve surrogate model based on the annual delivery target, the number of
+aircraft produced in a 5-year period, and the delivery count at launch.
+
+.. math::
+
+    N_{\text{delivered}}(t) = N_0 + (N_{target} - N_0) \left(1 - e^{-g\,t}\right)
+
+:math:`N_0` is the number of aircraft delivered at launch, :math:`N_{target}` is the annual delivery target, and
+:math:`g` is the production growth factor.
+
 **********************
 Operational cost model
 **********************
@@ -216,8 +264,12 @@ As the maintenance cost at aircraft level already includes the cost of the stora
 their individual costs are not calculated separately. For all electronics, motors, and battery, the operational
 costs are estimated as an annual fraction of their purchase price.
 
+Fixed operating cost
+====================
+
 Annual maintenance & miscellaneous cost
 ***************************************
+
 These cost models are based on a regression derived from data from
 `Guardianjet <https://www.guardianjet.com/jet-aircraft-online-tools>`_ and `PLANEPHD <https://planephd.com/wizard/>`_.
 
@@ -240,6 +292,7 @@ payback period.
 
 Annual insurance cost
 *********************
+
 The yearly insurance cost estimation as provided by :cite:`gudmundsson:2013`, a slight value adjustments is applied
 using values from `Sunset aviation insurance <https://sunsetais.com/aircraft-hull-liability/>`_.
 
@@ -249,8 +302,12 @@ using values from `Sunset aviation insurance <https://sunsetais.com/aircraft-hul
 
 :math:`Price` is the purchase price of the aircraft
 
+Flight hour operating cost
+==========================
+
 Landing / Parking cost
 **********************
+
 The aircraft landing and parking cost before VAT are obtained from
 `Toulouse Blagnac airport <https://www.toulouse.aeroport.fr/sites/default/files/2023-03/2023_03_23_Redevances_A_EN_v1.pdf>`_.
 
@@ -275,6 +332,7 @@ MTOW (Tons)                    Daily parking cost (€)            Landing cost 
 
 Fuel cost
 *********
+
 Fuel cost estimations are obtained from :cite:`sens:2024` and `Orleans loire-valley airport <https://orleans.aeroport.fr>`_.
 
 .. raw:: html
@@ -296,6 +354,7 @@ Pressurized Hydrogen                6.1
 
 Propeller / Engine maintenance cost
 ***********************************
+
 The maintenance cost of the propeller, turboshaft, and internal combustion engine (ICE) is calculated as the annual
 portion of the overhaul cost, based on their time between overhaul and flight hours per year. The overhaul cost of
 propeller is provided by
@@ -324,6 +383,50 @@ Constant-speed with turboshaft          4000 - 6800
 
 :math:`V_{\text{disp}}` is the ICE piston displacement volume and :math:`P_{\text{cont}}` is the maximum continuous
 power of the turboshaft engine at sea level.
+
+************************************
+Operational profitability assessment
+************************************
+
+The operational profitability assessment is based on the annual operating cost and the annual revenue. The annual
+operating cost is the sum of all the annual operating cost described in the previous sections with considering the
+energy growth adjustments. The annual revenue is based on the gross profit margin given by the 2025 IATA report
+:cite:`iata:2025`.
+
+Revenue per Persone Kilometer (RPK)
+===================================
+
+The annual RPK is calculated by the gross revenue defined previously divided by the product of the mission per
+year (:math:`N_{\text{mission,year}}`), design mission range (:math:`R_{\text{mission}}`), and the number of passengers
+on board (:math:`N_{\text{passenger}}`). The number of passenger on board is defined by the passenger loading factor
+(70 \%) and the design passenger capacity of the aircraft.
+
+.. math::
+
+    RPK = \frac{Revenue}{N_{\text{mission,year}} \cdot R_{\text{mission}} \cdot N_{\text{passenger}}}
+
+
+
+Energy growth adjustment
+========================
+
+The energy pricing adjustment is based on the cumulative annual growth rates derived from either the unit pricing or
+pricing index historical data obtained from `Eurostat <https://ec.europa.eu/eurostat/databrowser/explore/all/envir?sort=category&lang=en&subtheme=nrg.nrg_prc.nrg_prc_e&display=list>`_,
+`BUSINESSanalytiQ <https://businessanalytiq.com/index/>`_, and `FRED <https://fred.stlouisfed.org/categories/32455>`_.
+
+.. image:: ../../../img/energy_cagr.svg
+    :width: 600
+    :align: center
+
+Airfare price adjustment
+========================
+
+The airfare price adjustment is based on the cumulative annual growth rates derived from the average airfare pricing
+histrorical data obtained from `FRED <https://fred.stlouisfed.org/categories/32455>`_.
+
+.. image:: ../../../img/airfare_cagr.svg
+    :width: 600
+    :align: center
 
 *********************
 Cost model structure
