@@ -10,6 +10,7 @@ from .lcc_landing_cost import LCCLandingCost
 from .lcc_annual_insurance_cost import LCCAnnualInsuranceCost
 from .lcc_daily_parking_cost import LCCDailyParkingCost
 from .lcc_annual_airport_cost import LCCAnnualAirportCost
+from .lcc_purchase_loan_principal import LCCPurchaseLoanPrincipal
 from .lcc_annual_loan_cost import LCCAnnualLoanCost
 from .lcc_annual_depreciation import LCCAnnualDepreciation
 from .lcc_maintenance_cost import LCCMaintenanceCost
@@ -19,6 +20,7 @@ from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_annual_energy_cost import LCCAnnualEnergyCost
 from .lcc_operational_cost_sum import LCCSumOperationalCost
+from .lcc_overhaul_replacement_deposit import LCCOverhaulReplacementDeposit
 
 
 class LCCOperationalCost(om.Group):
@@ -44,10 +46,19 @@ class LCCOperationalCost(om.Group):
             types=bool,
             desc="True if loan is taken for financing the aircraft",
         )
+        self.options.declare(
+            name="delivery_method",
+            default="flight",
+            desc="Method with which the aircraft will be brought from the assembly plant to the "
+            "end user. Can be either flown or carried by train",
+            allow_none=False,
+            values=["flight", "train"],
+        )
 
     def setup(self):
         self.configurator.load(self.options["power_train_file_path"])
         loan = self.options["loan"]
+        delivery_method = self.options["delivery_method"]
 
         self.add_subsystem(
             name="landing_cost_per_operation",
@@ -74,6 +85,9 @@ class LCCOperationalCost(om.Group):
         )
 
         if loan:
+            self.add_subsystem(
+                name="loan_principal", subsys=LCCPurchaseLoanPrincipal(), promotes=["*"]
+            )
             self.add_subsystem(name="annual_loan_cost", subsys=LCCAnnualLoanCost(), promotes=["*"])
 
         self.add_subsystem(
@@ -129,19 +143,23 @@ class LCCOperationalCost(om.Group):
 
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
 
-        self.add_subsystem(
-            name="fuel_cost",
-            subsys=LCCFuelCost(tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types),
-            promotes=["*"],
-        )
-        self.add_subsystem(
-            name="electricity_cost",
-            subsys=LCCElectricityCost(
-                electricity_components_types=electricity_components_types,
-                electricity_components_names=electricity_components_names,
-            ),
-            promotes=["*"],
-        )
+        if delivery_method != "flight":
+            self.add_subsystem(
+                name="fuel_cost",
+                subsys=LCCFuelCost(
+                    tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types
+                ),
+                promotes=["*"],
+            )
+            self.add_subsystem(
+                name="electricity_cost",
+                subsys=LCCElectricityCost(
+                    electricity_components_types=electricity_components_types,
+                    electricity_components_names=electricity_components_names,
+                ),
+                promotes=["*"],
+            )
+
         self.add_subsystem(
             name="annual_energy_cost",
             subsys=LCCAnnualEnergyCost(),
@@ -150,6 +168,14 @@ class LCCOperationalCost(om.Group):
         self.add_subsystem(
             name="operational_cost_sum",
             subsys=LCCSumOperationalCost(
+                cost_components_type=cost_components_type,
+                cost_components_name=cost_components_name,
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="overhaul_replacement_deposit",
+            subsys=LCCOverhaulReplacementDeposit(
                 cost_components_type=cost_components_type,
                 cost_components_name=cost_components_name,
             ),

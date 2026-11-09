@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -25,7 +25,9 @@ from .lcc_fuel_cost import LCCFuelCost
 from .lcc_electricity_cost import LCCElectricityCost
 from .lcc_delivery_cost import LCCDeliveryCost
 from .lcc_delivery_duration_ratio import LCCDeliveryDurationRatio
-from .lcc_learning_curve_discount import LCCLearningCurveDiscount
+from .lcc_project_total_non_recursing_cost import LCCTotalNonRecursingProjectCost
+from .lcc_recursing_cost_per_unit import LCCRecursingCost
+from .lcc_powertrain_cost import LCCPowertrainCost
 
 from .constants import SERVICE_COST_CERTIFICATION
 
@@ -48,12 +50,6 @@ class LCCProductionCost(om.Group):
             "end user. Can be either flown or carried by train",
             allow_none=False,
             values=["flight", "train"],
-        )
-        self.options.declare(
-            name="learning_curve",
-            default=False,
-            desc="Learning curve for providing the discount rate of the manufacturing and tooling "
-            "man hours.",
         )
         self.options.declare(
             name="power_train_file_path",
@@ -81,13 +77,6 @@ class LCCProductionCost(om.Group):
             subsys=LCCManufacturingManHours(),
             promotes=["*"],
         )
-
-        if self.options["learning_curve"]:
-            self.add_subsystem(
-                name="learning_curve_discount",
-                subsys=LCCLearningCurveDiscount(),
-                promotes=["*"],
-            )
 
         # Calculate cost
         self.add_subsystem(
@@ -206,5 +195,24 @@ class LCCProductionCost(om.Group):
         self.add_subsystem(
             name="delivery_cost",
             subsys=LCCDeliveryCost(delivery_method=self.options["delivery_method"]),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="total_non_recursing_cost",
+            subsys=LCCTotalNonRecursingProjectCost(),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="recursing_cost_per_unit",
+            subsys=LCCRecursingCost(
+                cost_components_type=cost_components_type, cost_components_name=cost_components_name
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="powertrain_cost",
+            subsys=LCCPowertrainCost(
+                cost_components_type=cost_components_type, cost_components_name=cost_components_name
+            ),
             promotes=["*"],
         )

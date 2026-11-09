@@ -53,10 +53,12 @@ class LCCElectricityCost(om.ExplicitComponent):
         electricity_components_types = self.options["electricity_components_types"]
         electricity_components_names = self.options["electricity_components_names"]
 
+        electricity_cost = 0.0
+
         for electricity_storage_type, electricity_storage_id in zip(
             electricity_components_types, electricity_components_names
         ):
-            outputs["data:cost:electricity_cost"] += (
+            electricity_cost += (
                 inputs["data:cost:operation:electricity_unit_price"]
                 * inputs[
                     "data:propulsion:he_power_train:"
@@ -66,6 +68,8 @@ class LCCElectricityCost(om.ExplicitComponent):
                     + ":energy_consumed_main_route"
                 ]
             )
+
+        outputs["data:cost:electricity_cost"] = electricity_cost
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         electricity_components_types = self.options["electricity_components_types"]
@@ -83,12 +87,12 @@ class LCCElectricityCost(om.ExplicitComponent):
                 + ":energy_consumed_main_route",
             ] = inputs["data:cost:operation:electricity_unit_price"]
 
-            partials[
-                "data:cost:electricity_cost", "data:cost:operation:electricity_unit_price"
-            ] += inputs[
-                "data:propulsion:he_power_train:"
-                + electricity_storage_type
-                + ":"
-                + electricity_storage_id
-                + ":energy_consumed_main_route"
-            ]
+            partials["data:cost:electricity_cost", "data:cost:operation:electricity_unit_price"] = (
+                inputs[
+                    "data:propulsion:he_power_train:"
+                    + electricity_storage_type
+                    + ":"
+                    + electricity_storage_id
+                    + ":energy_consumed_main_route"
+                ]
+            )
