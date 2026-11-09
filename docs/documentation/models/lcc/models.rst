@@ -3,12 +3,26 @@
 ======================
 Life Cycle Cost models
 ======================
-.. image:: ../../../img/cost_computation_structure.svg
+.. image:: ../../../img/lcc_structure.svg
     :width: 800
     :align: center
 
-The Direct Operating Cost (DOC) of an aircraft can be broken in two main cost categories: the production cost and the operational cost.
+The life cycle cost of an aircraft can be broken in two main cost categories: the production cost and the operational cost.
 The contents of those two categories are detailed in the following descriptions.
+
+The profitability assessment derived from the production and operational cost models are also presented in the following
+sections, with using the annual net present value (NPV) and profitability index (PI) as the main metrics.
+
+.. math::
+
+    NPV = \sum_{t=0}^{T} \frac{R_t - C_t}{(1 + r)^t} \\
+    PI = 1 + \frac{NPV}{C_0}
+
+:math:`C_t` is the total cost at year :math:`t`, :math:`R_t` is the total revenue at year :math:`t`, :math:`r` is the
+discount rate, and :math:`T` is the total number of years in the project. The initial investment cost is represented
+by :math:`C_0`. The discount rate :math:`r` can also be replace with WACC (Weighted Average Cost of Capital), which is
+wildly applied in the aircraft industry.
+
 
 .. contents::
 
@@ -435,5 +449,5 @@ The following diagrams present the structure of the LCC model using the TBM-900 
 
 .. raw:: html
 
-   <a href="../../../n2_tbm_900_lcc.html" target="_blank">LCC N2 diagram with TBM 900</a><br>
    <a href="../../../n2_pipistrel_electro_lcc.html" target="_blank">LCC N2 diagram with Pipistrel Velis Electro</a><br>
+   <a href="../../../n2_tbm_900_lcc_profitability.html" target="_blank">LCC N2 diagram with TBM 900 (Including profitability analysis)</a><br>

@@ -1754,3 +1754,5 @@ def test_lcc_with_profitability_tbm_900():
     )
 
     problem.check_partials(compact_print=True)
+
+    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

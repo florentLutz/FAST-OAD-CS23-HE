@@ -85,6 +85,23 @@ class LCC(om.Group):
         )
 
         if self.options["profitability_analysis"]:
+            years_of_development = self.options["years_of_development"]
+            years_of_program = self.options["years_of_program"]
+            years_of_service = self.options["years_of_service"]
+
+            if years_of_program < years_of_development:
+                raise ValueError(
+                    f"Years of program ({years_of_program}) cannot be less than years of "
+                    f"development ({years_of_development})."
+                )
+
+            if years_of_program <= 0 or years_of_development <= 0 or years_of_service <= 0:
+                raise ValueError(
+                    f"Development, program, and service years must be positive. Got: development"
+                    f"={years_of_development}, program={years_of_program}, service"
+                    f"={years_of_service}."
+                )
+
             self.add_subsystem(
                 name="production_profitability",
                 subsys=LCCProductionProfitability(
