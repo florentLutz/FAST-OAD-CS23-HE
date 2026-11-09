@@ -1714,3 +1714,43 @@ def test_operational_profitability():
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_lcc_with_profitability_tbm_900():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCC(
+                power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+                delivery_method="train",
+                profitability_analysis=True,
+                years_of_development=TEST_DEVELOPMENT_YEARS,
+                years_of_program=TEST_PROGAM_YEARS,
+                years_of_service=TEST_PROGAM_YEARS,
+            )
+        ),
+        __file__,
+        XML_FILE,
+    )
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCC(
+            power_train_file_path=DATA_FOLDER_PATH / "turboshaft_propulsion_tbm_900.yml",
+            delivery_method="train",
+            profitability_analysis=True,
+            years_of_development=TEST_DEVELOPMENT_YEARS,
+            years_of_program=TEST_PROGAM_YEARS,
+            years_of_service=TEST_PROGAM_YEARS,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:production:profitability_index") == pytest.approx(
+        [1.0, 0.879, 0.633, 0.422, 0.3063, 0.271, 0.361, 0.485, 0.613, 0.741, 0.858], rel=1e-2
+    )
+
+    assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
+        [0.85, 0.864, 0.882, 0.904, 0.93, 0.958, 0.989, 1.021, 1.056, 1.091, 1.128], rel=1e-2
+    )
+
+    problem.check_partials(compact_print=True)

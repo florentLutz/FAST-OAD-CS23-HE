@@ -57,6 +57,12 @@ class LCC(om.Group):
             default=30,
             desc="The total service life of the aircraft in years.",
         )
+        self.options.declare(
+            "profitability_analysis",
+            types=bool,
+            default=False,
+            desc="True if the profitability analysis is required, False if only the cost analysis is required.",
+        )
 
     def setup(self):
         self.add_subsystem(
@@ -78,19 +84,20 @@ class LCC(om.Group):
             promotes=["*"],
         )
 
-        self.add_subsystem(
-            name="production_profitability",
-            subsys=LCCProductionProfitability(
-                years_of_development=self.options["years_of_development"],
-                years_of_program=self.options["years_of_program"],
-            ),
-            promotes=["*"],
-        )
+        if self.options["profitability_analysis"]:
+            self.add_subsystem(
+                name="production_profitability",
+                subsys=LCCProductionProfitability(
+                    years_of_development=self.options["years_of_development"],
+                    years_of_program=self.options["years_of_program"],
+                ),
+                promotes=["*"],
+            )
 
-        self.add_subsystem(
-            name="operational_profitability",
-            subsys=LCCOperationalProfitability(
-                years_of_service=self.options["years_of_service"], loan=self.options["loan"]
-            ),
-            promotes=["*"],
-        )
+            self.add_subsystem(
+                name="operational_profitability",
+                subsys=LCCOperationalProfitability(
+                    years_of_service=self.options["years_of_service"], loan=self.options["loan"]
+                ),
+                promotes=["*"],
+            )
