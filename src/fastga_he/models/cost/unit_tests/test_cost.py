@@ -1304,11 +1304,11 @@ def test_annual_delivery_count():
     )
 
     assert problem.get_val("data:cost:production:annual_delivery_count") == pytest.approx(
-        [3, 13, 19, 23, 26, 27], rel=1e-3
+        [3, 17, 23, 27, 28, 29], rel=1e-3
     )
     assert problem.get_val(
         "data:cost:production:cumulative_annual_delivery_count"
-    ) == pytest.approx([3, 16, 35, 58, 84, 111], rel=1e-3)
+    ) == pytest.approx([3, 20, 43, 70, 98, 127], rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1476,22 +1476,22 @@ def test_production_profitability():
     assert problem.get_val("data:cost:production:net_present_value", units="USD") == pytest.approx(
         [
             0.0,
-            -2.00719478e07,
-            -6.09095851e07,
-            -9.59689898e07,
-            -1.15170214e08,
-            -1.17633730e08,
-            -9.75229189e07,
-            -7.05727578e07,
-            -4.09744214e07,
-            -1.07636609e07,
-            1.74770137e07,
+            -20071947.8,
+            -60909585.1,
+            -95968989.8,
+            -115170214.0,
+            -117633730.0,
+            -91128906.8,
+            -58288173.3,
+            -23342147.2,
+            9340512.4,
+            39790282.0,
         ],
         rel=1e-3,
     )
 
     assert problem.get_val("data:cost:production:profitability_index") == pytest.approx(
-        [1.00, 0.879, 0.633, 0.422, 0.3063, 0.2915, 0.413, 0.575, 0.753, 0.935, 1.105],
+        [1.00, 0.879, 0.633, 0.422, 0.3063, 0.2915, 0.451, 0.649, 0.859, 1.056, 1.24],
         rel=1e-3,
     )
 
@@ -1746,7 +1746,7 @@ def test_lcc_with_profitability_tbm_900():
     )
 
     assert problem.get_val("data:cost:production:profitability_index") == pytest.approx(
-        [1.0, 0.879, 0.633, 0.422, 0.3063, 0.271, 0.361, 0.485, 0.613, 0.741, 0.858], rel=1e-2
+        [1.0, 0.879, 0.633, 0.422, 0.3063, 0.271, 0.408, 0.558, 0.702, 0.831, 0.954], rel=1e-2
     )
 
     assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(

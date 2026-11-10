@@ -4,7 +4,7 @@
 
 import numpy as np
 import openmdao.api as om
-import scipy
+from scipy.optimize import brentq
 
 
 class LCCAnnualDeliveryCount(om.Group):
@@ -127,10 +127,44 @@ class _ProductionFractionFactor(om.ExplicitComponent):
         ) / common_denominator**2.0
 
 
+def _solve_decay_ratio(production_fraction_factor):
+    """
+    Solve 1 + q + q^2 + q^3 + q^4 = 5 * f for q = exp(-k) in (0, 1).
+
+    This is the condition for the annual delivery counts sampled at years 0 to 4 to sum to
+    number_aircraft_5_years. The left-hand side is strictly increasing from 1 (q = 0) to 5
+    (q = 1), so a unique root exists if and only if 0.2 < f < 1, i.e.
+    5 * launch_aircraft_count < number_aircraft_5_years
+    < launch_aircraft_count + 4 * annual_delivery_target.
+    """
+    f = production_fraction_factor.item()
+    target = 5.0 * f
+
+    if not 1.0 < target < 5.0:
+        raise om.AnalysisError(
+            "No delivery ramp-up matches the inputs: number_aircraft_5_years must lie strictly "
+            "between 5 * launch_aircraft_count and launch_aircraft_count + "
+            "4 * annual_delivery_target (production_fraction_factor = %g, must be in (0.2, 1))." % f
+        )
+
+    return brentq(
+        lambda q: 1.0 + q + q**2.0 + q**3.0 + q**4.0 - target,
+        0.0,
+        1.0,
+        xtol=1e-14,
+        rtol=1e-14,
+    )
+
+
 class _ProductionGrowthFactor(om.ExplicitComponent):
     """
     Computation of the production growth factor of the aircraft. This factor is used to derive
     the annual delivery count of aircraft.
+
+    The growth factor k is calibrated so that the annual delivery counts sampled at years 0 to 4
+    (as computed in _LCCAnnualDeliveryCount) sum exactly to number_aircraft_5_years. With
+    q = exp(-k), this reduces to the polynomial 1 + q + q^2 + q^3 + q^4 = 5 * f, where f is the
+    production fraction factor, which is solved numerically.
     """
 
     def setup(self):
@@ -150,21 +184,18 @@ class _ProductionGrowthFactor(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        u = 1.0 / inputs["production_fraction_factor"]
+        q = _solve_decay_ratio(inputs["production_fraction_factor"])
 
-        w = scipy.special.lambertw(-u * np.exp(-u), k=0).real
-
-        outputs["production_growth_factor"] = 0.2 * (u + w)
+        outputs["production_growth_factor"] = -np.log(q)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        u = 1.0 / inputs["production_fraction_factor"]
+        q = _solve_decay_ratio(inputs["production_fraction_factor"])
 
-        w = scipy.special.lambertw(-u * np.exp(-u), k=0).real
-        f = 0.2 * (u + w)
+        # Implicit differentiation of S(q) = 5 * f gives dq/df = 5 / S'(q), and k = -ln(q)
+        # gives dk/dq = -1 / q.
+        d_sum_d_q = 1.0 + 2.0 * q + 3.0 * q**2.0 + 4.0 * q**3.0
 
-        partials["production_growth_factor", "production_fraction_factor"] = -f / (
-            inputs["production_fraction_factor"] * (1.0 + w)
-        )
+        partials["production_growth_factor", "production_fraction_factor"] = -5.0 / (q * d_sum_d_q)
 
 
 class _LCCAnnualDeliveryCount(om.ExplicitComponent):
@@ -274,7 +305,11 @@ class _LCCAnnualDeliveryCount(om.ExplicitComponent):
 
 class _RoundDown(om.ExplicitComponent):
     """
-    Round down the annual delivery count to the nearest integer.
+    Over the first five years (the production growing window), each annual count is floored. The
+    window stays non-decreasing and year 0 keeps the launch aircraft count. From year five
+    onward, each annual count is rounded to the nearest integer on its own. As the
+    continuous schedule is increasing, this keeps the integer schedule non-decreasing and lets it
+    reach the annual delivery target.
     """
 
     def initialize(self):
@@ -311,8 +346,16 @@ class _RoundDown(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:production:annual_delivery_count"] = np.floor(
-            inputs["original_annual_delivery_count"]
+        original_annual_delivery_count = inputs["original_annual_delivery_count"]
+
+        # production growing window: adjust the first five years to whole aircraft
+        annual_delivery_growing_count = np.floor(original_annual_delivery_count[:5] + 1e-9)
+
+        # After the window: round each year independently, never below the last window year.
+        annual_delivery_count_after = np.round(original_annual_delivery_count[5:])
+
+        outputs["data:cost:production:annual_delivery_count"] = np.concatenate(
+            (annual_delivery_growing_count, annual_delivery_count_after)
         )
 
 
