@@ -5,11 +5,13 @@
 import openmdao.api as om
 
 from .lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
+from .lcc_operational_aircraft_residual_value import LCCOperationalAircraftResidualValue
 from .lcc_passenger_per_flight import LCCOperationalPassengerPerFlight
 from .lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from .lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
 from .lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
 from .lcc_npv_discount_factor import LCCNPVDiscountFactor
+from .lcc_operational_initial_investment import LCCOperationalInitialInvestment
 from .lcc_net_present_value import LCCNetPresentValue
 from .lcc_profidibility_index import LCCProfitabilityIndex
 
@@ -38,6 +40,11 @@ class LCCOperationalProfitability(om.Group):
         loan = self.options["loan"]
 
         self.add_subsystem(
+            name="residual_value",
+            subsys=LCCOperationalAircraftResidualValue(years_of_service=years_of_service),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             name="passenger_per_flight",
             subsys=LCCOperationalPassengerPerFlight(),
             promotes=["*"],
@@ -55,6 +62,11 @@ class LCCOperationalProfitability(om.Group):
         self.add_subsystem(
             name="annual_energy_cost_projection",
             subsys=LCCOperationalAnnualEnergyCostProjection(years_of_service=years_of_service),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            name="initial_investment",
+            subsys=LCCOperationalInitialInvestment(),
             promotes=["*"],
         )
         self.add_subsystem(

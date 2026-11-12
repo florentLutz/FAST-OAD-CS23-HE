@@ -61,6 +61,8 @@ from ..lcc_passenger_per_flight import LCCOperationalPassengerPerFlight
 from ..lcc_operational_annual_revenue import LCCOperationalAnnualRevenue
 from ..lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from ..lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
+from ..lcc_operational_aircraft_residual_value import LCCOperationalAircraftResidualValue
+from ..lcc_operational_initial_investment import LCCOperationalInitialInvestment
 from ..lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
 from ..lcc_operational_profitability import LCCOperationalProfitability
 from ..lcc_profidibility_index import LCCProfitabilityIndex
@@ -1453,6 +1455,26 @@ def test_profitability_index():
     problem.check_partials(compact_print=True)
 
 
+def test_operational_initial_investment():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
+    ivc.add_output("data:cost:operation:loan_principal", units="USD", val=1.0e6)
+    ivc.add_output("data:cost:operation:other_upfront_costs", units="USD", val=5.0e4)
+    ivc.add_output("data:cost:operation:other_financial_support", units="USD", val=5.0e5)
+
+    problem = run_system(
+        LCCOperationalInitialInvestment(),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:initial_investment", units="USD") == pytest.approx(
+        3064427.18, rel=1e-3
+    )
+
+    problem.check_partials(compact_print=True)
+
+
 def test_production_profitability():
     ivc = om.IndepVarComp()
 
@@ -1600,6 +1622,38 @@ def test_energy_cost_projection():
             163760.98,
             164650.20,
         ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+
+def test_residual_value():
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=412758.77)
+
+    problem = run_system(
+        LCCOperationalAircraftResidualValue(years_of_service=TEST_PROGAM_YEARS),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:residual_value", units="USD") == pytest.approx(
+        np.array(
+            [
+                412758.77,
+                397758.77,
+                382758.77,
+                367758.775,
+                352758.77,
+                337758.77,
+                322758.77,
+                307758.77,
+                292758.77,
+                277758.77,
+                262758.77,
+            ]
+        ),
         rel=1e-3,
     )
 

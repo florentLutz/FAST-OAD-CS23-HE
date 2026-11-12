@@ -19,30 +19,15 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             default=30,
             desc="The total service life of the aircraft in years for NPV calculation.",
         )
-        self.options.declare(
-            name="loan",
-            default=True,
-            types=bool,
-            desc="True if loan is taken for financing the aircraft",
-        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
-        loan = self.options["loan"]
-
-        if loan:
-            self.add_input(
-                "data:cost:operation:loan_principal",
-                val=np.nan,
-                units="USD",
-                desc="The loan principal paid by the operator for the aircraft purchase.",
-            )
 
         self.add_input(
-            "data:cost:msp_per_unit",
-            units="USD",
+            "data:cost:operation:initial_investment",
             val=np.nan,
-            desc="The manufacturing suggested price of the aircraft.",
+            units="USD",
+            desc="Initial investment of the aircraft",
         )
         self.add_input(
             "data:cost:operation:annual_cost_per_unit",
@@ -82,25 +67,14 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
 
     def setup_partials(self):
         years_of_service = self.options["years_of_service"]
-        loan = self.options["loan"]
-
-        if loan:
-            self.declare_partials(
-                "data:cost:operation:annual_cash_flow",
-                "data:cost:operation:loan_principal",
-                rows=np.array([0]),
-                cols=np.array([0]),
-                method="exact",
-                val=1.0,
-            )
 
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
-            "data:cost:msp_per_unit",
+            "data:cost:operation:initial_investment",
             rows=np.array([0]),
             cols=np.array([0]),
             method="exact",
-            val=-1.0,
+            val=1.0,
         )
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
@@ -139,20 +113,13 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        loan = self.options["loan"]
-
         annual_cost = inputs["data:cost:operation:annual_cost_per_unit"]
         annual_fuel_cost = inputs["data:cost:operation:annual_fuel_cost"]
         annual_electricity_cost = inputs["data:cost:operation:annual_electricity_cost"]
         annual_energy_cost_projection = inputs["data:cost:operation:annual_energy_cost_projection"]
         annual_revenue = inputs["data:cost:operation:annual_revenue_projection"]
 
-        if loan:
-            first_payment = (
-                inputs["data:cost:msp_per_unit"] - inputs["data:cost:operation:loan_principal"]
-            )
-        else:
-            first_payment = inputs["data:cost:msp_per_unit"]
+        first_payment = inputs["data:cost:operation:initial_investment"]
 
         recurring_part = (
             annual_revenue

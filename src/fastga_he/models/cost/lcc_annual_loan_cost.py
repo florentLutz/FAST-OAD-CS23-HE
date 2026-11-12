@@ -13,6 +13,14 @@ class LCCAnnualLoanCost(om.ExplicitComponent):
     10-20% and a good credit record.
     """
 
+    def initialize(self):
+        self.options.declare(
+            "years_of_service",
+            types=int,
+            default=30,
+            desc="The total service life of the aircraft in years for NPV calculation.",
+        )
+
     def setup(self):
         self.add_input(
             "data:cost:operation:loan_principal",
