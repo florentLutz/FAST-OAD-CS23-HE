@@ -10,6 +10,7 @@ from .lcc_passenger_per_flight import LCCOperationalPassengerPerFlight
 from .lcc_operational_revenue_per_rpk import LCCOperationalRevenuePerRPK
 from .lcc_annual_energy_cost_projection import LCCOperationalAnnualEnergyCostProjection
 from .lcc_operation_annual_cash_flow import LCCOperationAnnualCashFlow
+from .lcc_annual_loan_cost import LCCAnnualLoanCost
 from .lcc_npv_discount_factor import LCCNPVDiscountFactor
 from .lcc_operational_initial_investment import LCCOperationalInitialInvestment
 from .lcc_net_present_value import LCCNetPresentValue
@@ -38,6 +39,13 @@ class LCCOperationalProfitability(om.Group):
     def setup(self):
         years_of_service = self.options["years_of_service"]
         loan = self.options["loan"]
+
+        if loan:
+            self.add_subsystem(
+                name="annual_loan_cost",
+                subsys=LCCAnnualLoanCost(years_of_service=years_of_service),
+                promotes=["data:*"],
+            )
 
         self.add_subsystem(
             name="residual_value",

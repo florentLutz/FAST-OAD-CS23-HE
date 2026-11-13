@@ -19,9 +19,25 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             default=30,
             desc="The total service life of the aircraft in years for NPV calculation.",
         )
+        self.options.declare(
+            name="loan",
+            default=True,
+            types=bool,
+            desc="True if loan is taken for financing the aircraft",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
+        loan = self.options["loan"]
+
+        if loan:
+            self.add_input(
+                "data:cost:operation:annual_loan_cost",
+                val=np.nan,
+                units="USD/yr",
+                desc="Annual loan cost for the aircraft",
+                shape=years_of_service,
+            )
 
         self.add_input(
             "data:cost:operation:initial_investment",
@@ -74,11 +90,14 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             rows=np.array([0]),
             cols=np.array([0]),
             method="exact",
-            val=1.0,
+            val=-1.0,
         )
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
-            "data:cost:operation:annual_energy_cost_projection",
+            [
+                "data:cost:operation:annual_energy_cost_projection",
+                "data:cost:operation:annual_loan_cost",
+            ],
             rows=np.arange(1, years_of_service + 1),
             cols=np.arange(years_of_service),
             method="exact",
@@ -118,6 +137,7 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         annual_electricity_cost = inputs["data:cost:operation:annual_electricity_cost"]
         annual_energy_cost_projection = inputs["data:cost:operation:annual_energy_cost_projection"]
         annual_revenue = inputs["data:cost:operation:annual_revenue_projection"]
+        annual_loan_cost = inputs["data:cost:operation:annual_loan_cost"]
 
         first_payment = inputs["data:cost:operation:initial_investment"]
 
@@ -127,6 +147,7 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             + annual_fuel_cost
             + annual_electricity_cost
             - annual_energy_cost_projection
+            - annual_loan_cost
         )
 
         outputs["data:cost:operation:annual_cash_flow"] = np.insert(

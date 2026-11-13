@@ -765,15 +765,17 @@ def test_annual_loan_cost():
     ivc = om.IndepVarComp()
 
     ivc.add_output("data:cost:operation:loan_principal", units="USD", val=1.0e6)
+    ivc.add_output("data:cost:operation:pay_period", units="yr", val=5)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCAnnualLoanCost(),
+        LCCAnnualLoanCost(years_of_service=TEST_PROGAM_YEARS),
         ivc,
     )
 
     assert problem.get_val("data:cost:operation:annual_loan_cost", units="USD/yr") == pytest.approx(
-        109794.62, rel=1e-3
+        np.array([142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0]),
+        rel=1e-3,
     )
 
     problem.check_partials(compact_print=True)
@@ -1022,7 +1024,7 @@ def test_operational_cost_hydrogen():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(71380.75, rel=1e-3)
+    ) == pytest.approx(32859.86, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1063,7 +1065,7 @@ def test_operational_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(878315.99, rel=1e-3)
+    ) == pytest.approx(487237.95, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1144,7 +1146,7 @@ def test_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(911788.40, rel=1e-3)
+    ) == pytest.approx(490477.01, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1187,7 +1189,7 @@ def test_cost_pipistrel():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(88677.69, rel=1e-3)
+    ) == pytest.approx(33817.68, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1664,7 +1666,7 @@ def test_operational_annual_cash_flow():
     ivc = om.IndepVarComp()
 
     ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
-    ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
+    ivc.add_output("data:cost:operation:initial_investment", units="USD", val=3064427.18)
     ivc.add_output("data:cost:operation:loan_principal", units="USD", val=3837263.1)
     ivc.add_output("data:cost:operation:annual_fuel_cost", units="USD/yr", val=156817.93)
     ivc.add_output(
@@ -1699,6 +1701,11 @@ def test_operational_annual_cash_flow():
             645612.6,
         ],
     )
+    ivc.add_output(
+        "data:cost:operation:annual_loan_cost",
+        units="USD/yr",
+        val=[142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0],
+    )
 
     problem = run_system(
         LCCOperationAnnualCashFlow(years_of_service=TEST_PROGAM_YEARS),
@@ -1707,12 +1714,12 @@ def test_operational_annual_cash_flow():
 
     assert problem.get_val("data:cost:operation:annual_cash_flow", units="USD") == pytest.approx(
         [
-            -677164.08,
-            34697.17,
-            48616.73,
-            62971.84,
-            77775.6,
-            93041.49,
+            -3064427.18,
+            -107680.33,
+            -93760.77,
+            -79405.66,
+            -64601.9,
+            -1451887.71,
             108783.39,
             125015.62,
             141752.88,
