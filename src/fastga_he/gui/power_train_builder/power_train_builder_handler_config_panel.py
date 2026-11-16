@@ -842,7 +842,7 @@ class ConfigPanelMixin:
 
     def _write_node_fields(self, placed_nodes_data: dict, node_index: int):
         """
-        Write the panel's name, type, position, options and port counts into a node row.
+        Write the panel's name, type, position, options and port counts into a node entry.
 
         If the source-count spinner is hidden, both port counts are first reset
         to the defaults of the written type, so a type change also changes the
@@ -857,31 +857,31 @@ class ConfigPanelMixin:
             else self._known_panel_fields()
         )
         new_node_type = panel_fields["node_type"]
-        _set_cell(placed_nodes_data, "name", node_index, self.state.name_input.value)
-        _set_cell(placed_nodes_data, "position", node_index, panel_fields["position"])
+        _set_entry_value(placed_nodes_data, "name", node_index, self.state.name_input.value)
+        _set_entry_value(placed_nodes_data, "position", node_index, panel_fields["position"])
 
-        type_is_written = _set_cell(placed_nodes_data, "node_type", node_index, new_node_type)
+        type_is_written = _set_entry_value(placed_nodes_data, "node_type", node_index, new_node_type)
         # Reset port counts to defaults when the type changes and spinners are hidden
         if type_is_written and not self.state.source_count_spinner.visible:
             default_source_port_count = int(self.state.default_source_count.get(new_node_type, 0))
             default_target_port_count = int(self.state.default_target_count.get(new_node_type, 0))
-            _set_cell(placed_nodes_data, "n_sources", node_index, default_source_port_count)
-            _set_cell(placed_nodes_data, "n_targets", node_index, default_target_port_count)
+            _set_entry_value(placed_nodes_data, "n_sources", node_index, default_source_port_count)
+            _set_entry_value(placed_nodes_data, "n_targets", node_index, default_target_port_count)
 
         # Place empty dict if there is no options entry for this node yet
         if "options" not in placed_nodes_data:
             placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
         # Stored as a JSON string in the ColumnDataSource
-        _set_cell(placed_nodes_data, "options", node_index, json.dumps(panel_fields["options"]))
+        _set_entry_value(placed_nodes_data, "options", node_index, json.dumps(panel_fields["options"]))
 
         # These two spinners show only if the node type supports multiple ports
         # (always for an unknown component)
         if self.state.source_count_spinner.visible:
             new_source_port_count = int(self.state.source_count_spinner.value)
-            _set_cell(placed_nodes_data, "n_sources", node_index, new_source_port_count)
+            _set_entry_value(placed_nodes_data, "n_sources", node_index, new_source_port_count)
         if self.state.target_count_spinner.visible:
             new_target_port_count = int(self.state.target_count_spinner.value)
-            _set_cell(placed_nodes_data, "n_targets", node_index, new_target_port_count)
+            _set_entry_value(placed_nodes_data, "n_targets", node_index, new_target_port_count)
 
     def _known_panel_fields(self) -> dict:
         """
@@ -1012,20 +1012,20 @@ def _write_symmetry_entry(
         unlink_symmetry(symmetry_names, symmetry_indices, [node_index])
 
 
-def _set_cell(column_data: dict, column_name: str, row_index: int, value) -> bool:
+def _set_entry_value(column_data: dict, column_name: str, entry_index: int, value) -> bool:
     """
-    Set one cell of column data if the column exists and the row is in range.
+    Set one entry value of column data if the column exists and the entry is in range.
 
     :param column_data: ``ColumnDataSource.data`` copy, edited in place.
     :param column_name: Column to write.
-    :param row_index: Zero-based row to write.
-    :param value: New value of the cell.
-    :return: ``True`` if the cell was written.
+    :param entry_index: Zero-based entry to write.
+    :param value: New value of the entry.
+    :return: ``True`` if the value was written.
     """
     column_values = column_data.get(column_name)
-    if column_values is None or row_index >= len(column_values):
+    if column_values is None or entry_index >= len(column_values):
         return False
-    column_values[row_index] = value
+    column_values[entry_index] = value
     return True
 
 

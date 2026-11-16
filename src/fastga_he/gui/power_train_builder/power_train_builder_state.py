@@ -143,7 +143,7 @@ def copy_column_data(data: dict) -> dict:
 # Column layouts of the canvas data sources
 # ============================================================================
 
-# Columns of placed_nodes_source, one row per placed component. "options" is a
+# Columns of placed_nodes_source, one entry per placed component. "options" is a
 # JSON-encoded dict of option_name -> value, "n_sources" / "n_targets" the
 # current port counts, "symmetry_name" / "symmetry_node_index" the
 # symmetry peer (_EMPTY / _NO_SYMMETRY_PEER when there is none), and
@@ -297,7 +297,7 @@ def ports_compatible(first_color: str, second_color: str) -> bool:
     return first_color == second_color and UNDEFINED_PORT_COLOR not in (first_color, second_color)
 
 
-# Columns of edge_source, one row per connection between two ports
+# Columns of edge_source, one entry per connection between two ports
 EDGE_COLUMNS = (
     "xs",
     "ys",
@@ -310,7 +310,7 @@ EDGE_COLUMNS = (
     "ending_port_kind",
 )
 
-# Columns of source_port_source and target_port_source, one row per port ball
+# Columns of source_port_source and target_port_source, one entry per port ball
 PORT_COLUMNS = (
     "x",
     "y",
@@ -336,31 +336,31 @@ def empty_columns(column_names: tuple) -> dict:
     return {column_name: [] for column_name in column_names}
 
 
-def append_row(column_data: dict, column_names: tuple, row: dict) -> dict:
+def append_entry(column_data: dict, column_names: tuple, entry: dict) -> dict:
     """
-    Return a copy of *column_data* with one more row at the end.
+    Return a copy of *column_data* with one more entry at the end.
 
     :param column_data: ``ColumnDataSource.data`` (or a copy of it).
     :param column_names: Columns of the result, e.g. :data:`NODE_COLUMNS`.
-    :param row: One value per column in *column_names*.
+    :param entry: One value per column in *column_names*.
     :return: New column data; *column_data* itself is not changed.
     """
     return {
-        column_name: list(column_data.get(column_name, [])) + [row[column_name]]
+        column_name: list(column_data.get(column_name, [])) + [entry[column_name]]
         for column_name in column_names
     }
 
 
-def drop_row(column_data: dict, row_index: int) -> dict:
+def drop_entry(column_data: dict, entry_index: int) -> dict:
     """
-    Return a copy of *column_data* without the row at *row_index*.
+    Return a copy of *column_data* without the entry at *entry_index*.
 
     :param column_data: ``ColumnDataSource.data`` (or a copy of it).
-    :param row_index: Zero-based row to leave out.
+    :param entry_index: Zero-based entry to leave out.
     :return: New column data; *column_data* itself is not changed.
     """
     return {
-        column_name: [value for position, value in enumerate(values) if position != row_index]
+        column_name: [value for position, value in enumerate(values) if position != entry_index]
         for column_name, values in column_data.items()
     }
 
@@ -558,12 +558,12 @@ class BuilderState:
     # Design data: what is saved to YAML and snapshotted for undo / redo
     # ========================================================================
 
-    # One row per placed component: position, icon URL, type, options JSON,
+    # One entry per placed component: position, icon URL, type, options JSON,
     # port counts, and symmetry link. Drives every per-node glyph of the
     # canvas: the icons, the hover ring and its tooltip, and the name labels
     placed_nodes_source: bkmodel.ColumnDataSource = field(default=None)
 
-    # One row per committed connection between a source port and a target
+    # One entry per committed connection between a source port and a target
     # port. Unlike the port sources, edges persist across
     # _rebuild_all_ports() calls (their xs/ys are recomputed in place by
     # PortEdgeMixin._rebuild_edges(), not rebuilt from scratch)
@@ -578,8 +578,8 @@ class BuilderState:
     # drawn while an interaction is in progress
     # ========================================================================
 
-    # One row per port ball currently drawn on the canvas, keyed by
-    # node_index (matching a row in placed_nodes_source) + label. Rebuilt
+    # One entry per port ball currently drawn on the canvas, keyed by
+    # node_index (matching an entry in placed_nodes_source) + label. Rebuilt
     # from scratch by PortEdgeMixin._rebuild_all_ports() on every node
     # add / delete / edit and port-count change
     source_port_source: bkmodel.ColumnDataSource = field(default=None)
@@ -605,7 +605,7 @@ class BuilderState:
     selected_component: str = field(default=None)
     delete_mode: bool = field(default=False)
 
-    # Row index into placed_nodes_source of the node currently open in the
+    # Entry index into placed_nodes_source of the node currently open in the
     # config panel, or None if nothing is selected
     selected_node_index: int = field(default=None)
 

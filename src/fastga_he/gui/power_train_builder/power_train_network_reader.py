@@ -246,9 +246,9 @@ class PowerTrainYAMLReader:
 
             known_component = _drawable_known_component(name, component)
             if known_component is None:
-                node_row = _unknown_node_row(component, layout_entry)
+                node_entry = _unknown_node_entry(component, layout_entry)
             else:
-                node_row = self._known_node_row(component, known_component)
+                node_entry = self._known_node_entry(component, known_component)
                 if "propulsor" in component_type_classes(known_component):
                     propulsor_names.add(name)
 
@@ -260,10 +260,10 @@ class PowerTrainYAMLReader:
                 nodes_without_layout.append(node_index)
                 x, y = 0.0, 0.0  # replaced by _place_nodes_without_layout
 
-            node_row.update(
+            node_entry.update(
                 x=x,
                 y=y,
-                url=icon_data_url(BUILDER_ICONS_CONFIG[node_row["icon_type"]]["icon_path"]),
+                url=icon_data_url(BUILDER_ICONS_CONFIG[node_entry["icon_type"]]["icon_path"]),
                 w=self.icon_size,
                 h=self.icon_size,
                 name=name,
@@ -271,7 +271,7 @@ class PowerTrainYAMLReader:
                 symmetry_node_index=_NO_SYMMETRY_PEER,
             )
             for column_name in NODE_COLUMNS:
-                nodes_data[column_name].append(node_row[column_name])
+                nodes_data[column_name].append(node_entry[column_name])
 
             if component.get("symmetrical"):
                 symmetry_requests.append((node_index, str(component["symmetrical"])))
@@ -280,13 +280,13 @@ class PowerTrainYAMLReader:
 
         return nodes_data, name_to_index, nodes_without_layout, propulsor_names
 
-    def _known_node_row(self, component: dict, known_component: dict) -> dict:
+    def _known_node_entry(self, component: dict, known_component: dict) -> dict:
         """
         Type, icon, position, options and port counts of a known component of the file.
 
         :param component: Its entry under ``power_train_components``.
         :param known_component: Its ``KNOWN_COMPONENTS`` entry.
-        :return: Those columns of its ``placed_nodes_source`` row.
+        :return: Those columns of its ``placed_nodes_source`` entry.
         """
         component_type = known_component["components_type"]
         file_options = component.get("options") or {}
@@ -494,7 +494,7 @@ def _drawable_known_component(name: str, component: dict) -> dict | None:
     ``KNOWN_COMPONENTS`` entry of a component of the file, if the canvas can draw it.
 
     A component with an unregistered ``id``, or whose icon the builder does not
-    have, is shown as an unknown component (see :func:`_unknown_node_row`).
+    have, is shown as an unknown component (see :func:`_unknown_node_entry`).
 
     :param name: Component name in the file.
     :param component: Its entry under ``power_train_components``.
@@ -599,7 +599,7 @@ def _type_undefined_side(nodes_data: dict, node_index: int, side: str, far_color
     return True
 
 
-def _unknown_node_row(component: dict, layout_entry) -> dict:
+def _unknown_node_entry(component: dict, layout_entry) -> dict:
     """
     Type, icon, position, options and port settings of an unknown component of the file.
 
@@ -610,7 +610,7 @@ def _unknown_node_row(component: dict, layout_entry) -> dict:
 
     :param component: Its entry under ``power_train_components``.
     :param layout_entry: Its ``canvas_layout`` entry, if any.
-    :return: Those columns of its ``placed_nodes_source`` row.
+    :return: Those columns of its ``placed_nodes_source`` entry.
     """
     layout_entry = layout_entry if isinstance(layout_entry, dict) else {}
     return {

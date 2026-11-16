@@ -156,7 +156,7 @@ class PowerTrainYAMLWriter:
         ``symmetrical`` is written on one component of each pair only: the one
         with the higher index.
 
-        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :param node_index: Zero-based entry index into the snapshotted node data arrays.
         """
         component_name = self.node_data["name"][node_index]
         self.data[KEY_CANVAS_LAYOUT][component_name] = self._layout_entry(node_index)
@@ -188,7 +188,7 @@ class PowerTrainYAMLWriter:
         ``canvas_layout`` entry of a node: its canvas (x, y), plus the
         :data:`UNKNOWN_LAYOUT_KEYS` of an unknown component.
 
-        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :param node_index: Zero-based entry index into the snapshotted node data arrays.
         :return: The entry.
         """
         entry = {
@@ -203,7 +203,7 @@ class PowerTrainYAMLWriter:
         """
         Options stored on the node, decoded from their JSON string.
 
-        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :param node_index: Zero-based entry index into the snapshotted node data arrays.
         :return: ``{option_name: value}``; empty if the JSON cannot be read.
         """
         raw_options_string = self.node_data["options"][node_index]
@@ -219,7 +219,7 @@ class PowerTrainYAMLWriter:
         Options never touched in the GUI get their type's default, and a
         variable-port component gets its port counts as ``number_of_*`` options.
 
-        :param node_index: Zero-based row index into the snapshotted node data arrays.
+        :param node_index: Zero-based entry index into the snapshotted node data arrays.
         :return: ``(component_id, options)``.
         """
         component_type = self.node_data["node_type"][node_index]

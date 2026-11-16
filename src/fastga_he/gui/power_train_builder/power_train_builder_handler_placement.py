@@ -29,7 +29,7 @@ from .power_train_builder_state import (
     UNKNOWN_COMPONENT_TYPE,
     UNKNOWN_DEFAULT_PORT_COUNT,
     UNKNOWN_ICON_KEY,
-    append_row,
+    append_entry,
     copy_column_data,
     default_options,
     default_position,
@@ -82,7 +82,7 @@ class PlacementMixin:
         node_name = f"{icon_key}_{placement_count}"
 
         # One value per column of placed_nodes_source for the new component
-        new_node_row = {
+        new_node_entry = {
             "x": x,
             "y": y,
             "url": icon_data_url(BUILDER_ICONS_CONFIG[icon_key]["icon_path"]),
@@ -94,8 +94,8 @@ class PlacementMixin:
             "symmetry_node_index": _NO_SYMMETRY_PEER,
             **self._new_component_defaults(icon_key),
         }
-        self.state.placed_nodes_source.data = append_row(
-            self.state.placed_nodes_source.data, NODE_COLUMNS, new_node_row
+        self.state.placed_nodes_source.data = append_entry(
+            self.state.placed_nodes_source.data, NODE_COLUMNS, new_node_entry
         )
 
         self._rebuild_all_ports()
@@ -103,8 +103,8 @@ class PlacementMixin:
         _LOGGER.info(
             "Placed %s (node_type=%s, position=%s) at (%.1f, %.1f)",
             node_name,
-            new_node_row["node_type"],
-            new_node_row["position"],
+            new_node_entry["node_type"],
+            new_node_entry["position"],
             x,
             y,
         )
@@ -119,7 +119,7 @@ class PlacementMixin:
         undefined energy type.
 
         :param icon_key: Toolbox icon of the new component.
-        :return: Those columns of the new ``placed_nodes_source`` row.
+        :return: Those columns of the new ``placed_nodes_source`` entry.
         """
         if icon_key == UNKNOWN_ICON_KEY:
             return {

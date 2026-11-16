@@ -19,7 +19,7 @@ from .power_train_builder_state import (
     NODE_RADIUS,
     PORT_COLUMNS,
     PORT_RADIUS,
-    append_row,
+    append_entry,
     copy_column_data,
     edge_end_ports,
     empty_columns,
@@ -249,7 +249,7 @@ class PortEdgeMixin:
         :param y: Tap y coordinate in canvas data-units.
         :param snap: Maximum allowed distance (data-units) for a hit.
 
-        :return: Zero-based row index into ``edge_source``, or ``None``.
+        :return: Zero-based entry index into ``edge_source``, or ``None``.
         """
         edge_data = self.state.edge_source.data
         best_index, best_distance = None, snap
@@ -300,16 +300,16 @@ class PortEdgeMixin:
             return
 
         # Update the local copy of the edge data and push it back to the Bokeh source
-        new_edge_row = {
+        new_edge_entry = {
             "xs": [starting_port["x"], ending_port["x"]],
             "ys": [starting_port["y"], ending_port["y"]],
             "color": starting_port["color"],
         }
         for end, port in (("starting", starting_port), ("ending", ending_port)):
-            new_edge_row[f"{end}_node_index"] = port["node_index"]
-            new_edge_row[f"{end}_port_label"] = port["label"]
-            new_edge_row[f"{end}_port_kind"] = port["kind"]
-        self.state.edge_source.data = append_row(edge_data, EDGE_COLUMNS, new_edge_row)
+            new_edge_entry[f"{end}_node_index"] = port["node_index"]
+            new_edge_entry[f"{end}_port_label"] = port["label"]
+            new_edge_entry[f"{end}_port_kind"] = port["kind"]
+        self.state.edge_source.data = append_entry(edge_data, EDGE_COLUMNS, new_edge_entry)
 
         self._mark_unsaved()
         _LOGGER.info(
@@ -470,7 +470,7 @@ class PortEdgeMixin:
             )
             # Port balls are only visible on the selected node
             is_selected = node_index == self.state.selected_node_index
-            node_row = {
+            node_entry = {
                 "node_index": node_index,
                 "node_name": [node_name],
                 "node_type": [node_type],
@@ -483,7 +483,7 @@ class PortEdgeMixin:
                 (target_ports, ports["inputs"], target_color),
             ):
                 for port in side_ports:
-                    _append_port_row(port_columns, port, color, node_row)
+                    _append_port_entry(port_columns, port, color, node_entry)
 
         connected_port_keys = _connected_port_keys(self.state.edge_source.data)
         _set_connected_flags(source_ports, "source", connected_port_keys)
@@ -695,7 +695,7 @@ def _port_dict(kind: str, port_data: dict, port_position: int) -> dict:
 
     :param kind: ``"source"`` or ``"target"``, the side *port_data* holds.
     :param port_data: ``source_port_source.data`` or ``target_port_source.data``.
-    :param port_position: Row of the port in *port_data*.
+    :param port_position: Entry index of the port in *port_data*.
     :return: Dict with keys ``kind``, ``node_index``, ``label``, ``x``, ``y`` and ``color``.
     """
     return {
@@ -708,7 +708,7 @@ def _port_dict(kind: str, port_data: dict, port_position: int) -> dict:
     }
 
 
-def _append_port_row(port_columns: dict, port: dict, color: str, node_row: dict) -> None:
+def _append_port_entry(port_columns: dict, port: dict, color: str, node_entry: dict) -> None:
     """
     Append one port ball to port data built with :data:`PORT_COLUMNS`.
 
@@ -717,14 +717,14 @@ def _append_port_row(port_columns: dict, port: dict, color: str, node_row: dict)
     :param port_columns: Port data being built, edited in place.
     :param port: Port from :meth:`PortEdgeMixin.compute_ports` (``x``, ``y``, ``index``).
     :param color: Energy-type colour of the port.
-    :param node_row: Values shared by every port of the node (``node_index``,
+    :param node_entry: Values shared by every port of the node (``node_index``,
         ``node_name``, ``node_type``, ``fill_alpha``, ``line_alpha``).
     """
     port_columns["x"].append(port["x"])
     port_columns["y"].append(port["y"])
     port_columns["color"].append(color)
     port_columns["label"].append(str(port["index"] + 1))
-    for column_name, value in node_row.items():
+    for column_name, value in node_entry.items():
         port_columns[column_name].append(value)
 
 

@@ -43,7 +43,7 @@ from .power_train_builder_state import (
     BuilderState,
     DEFAULT_NODE_ICON_SIZE,
     copy_column_data,
-    drop_row,
+    drop_entry,
     edge_indices_not_touching_node,
     select_edges,
     unlink_symmetry,
@@ -248,7 +248,7 @@ class BuilderHandler(
         self._push_undo()
 
         # Remove the node from placed_nodes_source
-        new_nodes_data = drop_row(nodes_data, node_index)
+        new_nodes_data = drop_entry(nodes_data, node_index)
         _reindex_symmetry_after_deletion(new_nodes_data, node_index)
         self.state.placed_nodes_source.data = new_nodes_data
 
@@ -291,7 +291,7 @@ class BuilderHandler(
         self._push_undo()
 
         # Remove the edge from the edge_source data
-        self.state.edge_source.data = drop_row(self.state.edge_source.data, edge_index)
+        self.state.edge_source.data = drop_entry(self.state.edge_source.data, edge_index)
         # Recompute the ports so the freed ports are no longer flagged connected
         self._rebuild_all_ports()
         self._mark_unsaved()
@@ -329,9 +329,9 @@ def _reindex_symmetry_after_deletion(nodes_data: dict, deleted_node_index: int) 
     Update the symmetry links of *nodes_data* after a node was removed.
 
     The peer of the deleted node loses its link, and every peer index after the
-    deleted node moves up by one, like the node rows themselves.
+    deleted node moves up by one, like the node entries themselves.
 
-    :param nodes_data: Node columns with the deleted row already removed; edited in place.
+    :param nodes_data: Node columns with the deleted entry already removed; edited in place.
     :param deleted_node_index: Index the deleted node had before its removal.
     """
     symmetry_names = nodes_data.get("symmetry_name", [])
