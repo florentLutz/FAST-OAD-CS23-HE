@@ -3,8 +3,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'wiki/**'
-      - '.github/workflows/sync_wiki.yml'
+      - wiki/**
+      - .github/workflows/sync_wiki.yml
 
 concurrency:
   group: sync-wiki
