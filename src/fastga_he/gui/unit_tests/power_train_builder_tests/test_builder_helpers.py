@@ -41,10 +41,10 @@ from fastga_he.gui.power_train_builder.power_train_builder_state import (
     UNDEFINED_PORT_COLOR,
     _EMPTY,
     _NO_SYMMETRY_PEER,
-    append_row,
+    append_entry,
     default_options,
     default_position,
-    drop_row,
+    drop_entry,
     edge_end_ports,
     edge_indices_not_touching_port,
     empty_columns,
@@ -64,7 +64,7 @@ def _edges(*end_pairs) -> dict:
     """Edge data from ``((kind, node, label), (kind, node, label))`` pairs."""
     edge_data = empty_columns(EDGE_COLUMNS)
     for starting_port, ending_port in end_pairs:
-        edge_data = append_row(
+        edge_data = append_entry(
             edge_data,
             EDGE_COLUMNS,
             {
@@ -88,17 +88,17 @@ def _edges(*end_pairs) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def test_append_and_drop_row_return_new_column_data():
+def test_append_and_drop_entry_return_new_column_data():
     column_data = {"name": ["a", "b"], "x": [1.0, 2.0]}
 
-    appended = append_row(column_data, ("name", "x"), {"name": "c", "x": 3.0})
-    dropped = drop_row(column_data, 0)
+    appended = append_entry(column_data, ("name", "x"), {"name": "c", "x": 3.0})
+    dropped = drop_entry(column_data, 0)
 
     assert appended == {"name": ["a", "b", "c"], "x": [1.0, 2.0, 3.0]}
     assert dropped == {"name": ["b"], "x": [2.0]}
     # The input is never changed, and a column missing from it is started
     assert column_data == {"name": ["a", "b"], "x": [1.0, 2.0]}
-    assert append_row({}, ("name",), {"name": "a"}) == {"name": ["a"]}
+    assert append_entry({}, ("name",), {"name": "a"}) == {"name": ["a"]}
 
 
 def test_defaults_of_a_new_component_are_the_first_choices():

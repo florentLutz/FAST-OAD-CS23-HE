@@ -860,7 +860,9 @@ class ConfigPanelMixin:
         _set_entry_value(placed_nodes_data, "name", node_index, self.state.name_input.value)
         _set_entry_value(placed_nodes_data, "position", node_index, panel_fields["position"])
 
-        type_is_written = _set_entry_value(placed_nodes_data, "node_type", node_index, new_node_type)
+        type_is_written = _set_entry_value(
+            placed_nodes_data, "node_type", node_index, new_node_type
+        )
         # Reset port counts to defaults when the type changes and spinners are hidden
         if type_is_written and not self.state.source_count_spinner.visible:
             default_source_port_count = int(self.state.default_source_count.get(new_node_type, 0))
@@ -872,7 +874,9 @@ class ConfigPanelMixin:
         if "options" not in placed_nodes_data:
             placed_nodes_data["options"] = ["{}"] * len(placed_nodes_data.get("name", []))
         # Stored as a JSON string in the ColumnDataSource
-        _set_entry_value(placed_nodes_data, "options", node_index, json.dumps(panel_fields["options"]))
+        _set_entry_value(
+            placed_nodes_data, "options", node_index, json.dumps(panel_fields["options"])
+        )
 
         # These two spinners show only if the node type supports multiple ports
         # (always for an unknown component)

@@ -426,15 +426,22 @@ def edge_end_ports(edge_data: dict) -> list[tuple[tuple, tuple]]:
     :return: One pair per edge, in edge order.
     """
 
-    def end_ports(end: str):
-        return zip(
-            edge_data.get(f"{end}_port_kind", []),
-            edge_data.get(f"{end}_node_index", []),
-            edge_data.get(f"{end}_port_label", []),
-            strict=True,
-        )
+    end_port_pairs = []
 
-    return list(zip(end_ports("starting"), end_ports("ending"), strict=True))
+    for edge_index in range(len(edge_data["starting_node_index"])):
+        starting_port = (
+            edge_data["starting_port_kind"][edge_index],
+            edge_data["starting_node_index"][edge_index],
+            edge_data["starting_port_label"][edge_index],
+        )
+        ending_port = (
+            edge_data["ending_port_kind"][edge_index],
+            edge_data["ending_node_index"][edge_index],
+            edge_data["ending_port_label"][edge_index],
+        )
+        end_port_pairs.append((starting_port, ending_port))
+
+    return end_port_pairs
 
 
 def edge_indices_not_touching_node(edge_data: dict, node_index: int) -> list:
@@ -445,17 +452,16 @@ def edge_indices_not_touching_node(edge_data: dict, node_index: int) -> list:
     :param node_index: Zero-based index of the node in ``placed_nodes_source``.
     :return: List of edge positions, in order.
     """
-    return [
-        edge_position
-        for edge_position, (starting_node_index, ending_node_index) in enumerate(
-            zip(
-                edge_data.get("starting_node_index", []),
-                edge_data.get("ending_node_index", []),
-                strict=True,
-            )
-        )
-        if node_index not in (starting_node_index, ending_node_index)
-    ]
+    kept_edge_indices = []
+
+    for edge_index in range(len(edge_data["starting_node_index"])):
+        starting_node_index = edge_data["starting_node_index"][edge_index]
+        ending_node_index = edge_data["ending_node_index"][edge_index]
+
+        if node_index not in (starting_node_index, ending_node_index):
+            kept_edge_indices.append(edge_index)
+
+    return kept_edge_indices
 
 
 def edge_indices_not_touching_port(
