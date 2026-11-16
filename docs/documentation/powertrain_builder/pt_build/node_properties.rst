@@ -24,7 +24,7 @@ component type if needed. To apply the changes, click on the blue ``Apply`` butt
     :align: center
 
 The unknown component, representing a not-yet-defined component, has different approach to configure the component ID
-and its type.Same as to configuring the component ID, the component type can be defined in the editable text box. To
+and its type. Similarly to the configuration of the component ID, the component type can be defined in the editable text box. To
 apply the changes, click on the blue ``Apply`` button at the bottom of the right panel.
 
 Port counts

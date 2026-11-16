@@ -24,7 +24,7 @@ To launch the builder, add the following code snippet to your Python script:
 
     PowertrainBuilderLauncher.launch()
 
-Or run the following command in the terminal:
+Alternatively, the following command can be run in the terminal:
 
 .. code:: commandline
 
@@ -37,8 +37,8 @@ Once loaded from existing design, the builder should look like this:
     :align: center
 
 To end the session simply click on the ``End Session`` button located in the bottom of the left panel. If the changes
-are saved, (save button in green color), the session will be ended and the window will be closed. If the changes are not
-saved (save button in yellow color), a pop-up window will appear asking if you want to save the changes before ending
+are saved, (save button in green), the session will be ended and the window will be closed. If the changes are not
+saved (save button in yellow), a pop-up window will appear asking if you want to save the changes before ending
 the session. Select ``End Anyway`` to exit without saving, ``Save & End`` to save your changes and exit, or
 ``Cancel`` to continue editing.
 
