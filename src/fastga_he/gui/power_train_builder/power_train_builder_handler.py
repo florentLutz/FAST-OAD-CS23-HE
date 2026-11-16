@@ -336,8 +336,8 @@ def _reindex_symmetry_after_deletion(nodes_data: dict, deleted_node_index: int) 
     """
     symmetry_names = nodes_data.get("symmetry_name", [])
     symmetry_indices = nodes_data.get("symmetry_node_index", [])
-    for node_position, peer_index in enumerate(symmetry_indices):
+    for node_index, peer_index in enumerate(symmetry_indices):
         if peer_index == deleted_node_index:
-            unlink_symmetry(symmetry_names, symmetry_indices, [node_position])
+            unlink_symmetry(symmetry_names, symmetry_indices, [node_index])
         elif peer_index > deleted_node_index:
-            symmetry_indices[node_position] = peer_index - 1
+            symmetry_indices[node_index] = peer_index - 1

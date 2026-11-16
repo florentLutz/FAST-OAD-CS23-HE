@@ -331,8 +331,8 @@ class ConfigPanelMixin:
         # Build a list of names of all other nodes that share the same node type
         symmetry_candidates = [
             name
-            for node_position, (name, type_of_node) in enumerate(zip(node_names, node_types))
-            if node_position != current_node_index and type_of_node == node_type
+            for other_node_index, (name, type_of_node) in enumerate(zip(node_names, node_types))
+            if other_node_index != current_node_index and type_of_node == node_type
         ]
 
         choices = [_EMPTY] + symmetry_candidates
@@ -427,19 +427,23 @@ class ConfigPanelMixin:
         :param node_data: Snapshot of ``placed_nodes_source.data``.
         :return: List of ``(node_index, label, kind, display_string)`` candidates.
         """
-        return [
-            (owner_index, label, kind, self._far_string(node_data, owner_index, label, kind))
-            for owner_index, label, connected, port_color in zip(
-                port_data["node_index"],
-                port_data["label"],
-                port_data["connected"],
-                port_data["color"],
-                strict=True,
-            )
-            if connected == "False"
-            and owner_index != node_index
-            and ports_compatible(port_color, color)
-        ]
+        candidates = []
+
+        for port_index in range(len(port_data["node_index"])):
+            owner_index = port_data["node_index"][port_index]
+            label = port_data["label"][port_index]
+            connected = port_data["connected"][port_index]
+            port_color = port_data["color"][port_index]
+
+            if (
+                connected == "False"
+                and owner_index != node_index
+                and ports_compatible(port_color, color)
+            ):
+                far_string = self._far_string(node_data, owner_index, label, kind)
+                candidates.append((owner_index, label, kind, far_string))
+
+        return candidates
 
     def _build_port_row(
         self,
@@ -769,12 +773,12 @@ class ConfigPanelMixin:
         node_names = list(placed_nodes_data.get("name", []))
         node_name = node_names[node_index] if node_index < len(node_names) else None
         symmetry_names, symmetry_indices = _padded_symmetry_columns(placed_nodes_data)
-        symmetry_positions_to_clear = _symmetry_positions_to_clear(
+        symmetry_indices_to_clear = _symmetry_indices_to_clear(
             symmetry_names, symmetry_indices, node_index, node_name
         )
 
         has_edges_to_remove = len(kept_edge_indices) < num_edges
-        if not has_edges_to_remove and not symmetry_positions_to_clear:
+        if not has_edges_to_remove and not symmetry_indices_to_clear:
             self._refresh_connections_table(node_index)
             return
 
@@ -784,8 +788,8 @@ class ConfigPanelMixin:
         if has_edges_to_remove:
             self.state.edge_source.data = select_edges(edge_data, kept_edge_indices)
 
-        if symmetry_positions_to_clear:
-            unlink_symmetry(symmetry_names, symmetry_indices, symmetry_positions_to_clear)
+        if symmetry_indices_to_clear:
+            unlink_symmetry(symmetry_names, symmetry_indices, symmetry_indices_to_clear)
             placed_nodes_data["symmetry_name"] = symmetry_names
             placed_nodes_data["symmetry_node_index"] = symmetry_indices
             self.state.placed_nodes_source.data = placed_nodes_data
@@ -796,7 +800,7 @@ class ConfigPanelMixin:
             "Type switch on %s: removed %d connection(s) and %d symmetry link(s).",
             node_name,
             num_edges - len(kept_edge_indices),
-            len(symmetry_positions_to_clear),
+            len(symmetry_indices_to_clear),
         )
 
     # -----------------------------------------------------------------------
@@ -931,7 +935,7 @@ class ConfigPanelMixin:
         symmetry_names, symmetry_indices = _padded_symmetry_columns(placed_nodes_data)
 
         # Resolve the newly chosen peer index
-        new_peer_index = _node_position(all_node_names, new_symmetry_name)
+        new_peer_index = _find_node_index(all_node_names, new_symmetry_name)
 
         # Clear stale references on both sides before writing
         #
@@ -954,14 +958,14 @@ class ConfigPanelMixin:
             linked_node_indices.add(new_peer_index)
             linked_node_names.add(new_symmetry_name)
 
-        stale_positions = [
-            node_position
-            for node_position in _positions_linked_to(
+        stale_node_indices = [
+            linked_node_index
+            for linked_node_index in _node_indices_linked_to(
                 symmetry_names, symmetry_indices, linked_node_indices, linked_node_names
             )
-            if node_position not in nodes_getting_fresh_write
+            if linked_node_index not in nodes_getting_fresh_write
         ]
-        unlink_symmetry(symmetry_names, symmetry_indices, stale_positions)
+        unlink_symmetry(symmetry_names, symmetry_indices, stale_node_indices)
 
         # Link the two nodes both ways, keep an unknown component's free-text
         # peer that is not on the canvas, or leave the current node unpaired
@@ -977,18 +981,18 @@ class ConfigPanelMixin:
         placed_nodes_data["symmetry_node_index"] = symmetry_indices
 
 
-def _node_position(node_names: list, node_name: str) -> int:
+def _find_node_index(node_names: list, node_name: str) -> int:
     """
-    Position of the node called *node_name*.
+    Index of the node called *node_name*.
 
     :param node_names: ``name`` column.
     :param node_name: Name to look for; empty for no node.
-    :return: Zero-based position, or ``_NO_SYMMETRY_PEER`` if no node has that name.
+    :return: Zero-based index, or ``_NO_SYMMETRY_PEER`` if no node has that name.
     """
     if not node_name:
         return _NO_SYMMETRY_PEER
     return next(
-        (position for position, name in enumerate(node_names) if name == node_name),
+        (node_index for node_index, name in enumerate(node_names) if name == node_name),
         _NO_SYMMETRY_PEER,
     )
 
@@ -1123,7 +1127,7 @@ def _dropdown_entries(free_far_ports: list, shown_candidate: tuple | None) -> tu
     return candidates, choices
 
 
-def _symmetry_positions_to_clear(
+def _symmetry_indices_to_clear(
     symmetry_names: list, symmetry_indices: list, node_index: int, node_name
 ) -> list:
     """
@@ -1133,16 +1137,18 @@ def _symmetry_positions_to_clear(
     :param symmetry_indices: ``symmetry_node_index`` column, padded the same way.
     :param node_index: Zero-based index of the node to unlink.
     :param node_name: Its name, or ``None`` if unknown.
-    :return: List of node positions, without duplicates.
+    :return: List of node indices, without duplicates.
     """
-    positions = _positions_linked_to(symmetry_names, symmetry_indices, {node_index}, {node_name})
+    node_indices = _node_indices_linked_to(
+        symmetry_names, symmetry_indices, {node_index}, {node_name}
+    )
     node_has_link = node_index < len(symmetry_names) and (
         symmetry_names[node_index] not in (_EMPTY, None)
         or symmetry_indices[node_index] != _NO_SYMMETRY_PEER
     )
-    if node_has_link and node_index not in positions:
-        positions.append(node_index)
-    return positions
+    if node_has_link and node_index not in node_indices:
+        node_indices.append(node_index)
+    return node_indices
 
 
 def _padded_symmetry_columns(placed_nodes_data: dict) -> tuple[list, list]:
@@ -1160,11 +1166,11 @@ def _padded_symmetry_columns(placed_nodes_data: dict) -> tuple[list, list]:
     return symmetry_names, symmetry_indices
 
 
-def _positions_linked_to(
+def _node_indices_linked_to(
     symmetry_names: list, symmetry_indices: list, node_indices: set, node_names: set
 ) -> list:
     """
-    Positions of the nodes whose symmetry peer is one of the given nodes.
+    Indices of the nodes whose symmetry peer is one of the given nodes.
 
     A link counts if it matches either the peer index or the peer name, so a
     link is still found when one of the two is out of date.
@@ -1173,12 +1179,12 @@ def _positions_linked_to(
     :param symmetry_indices: ``symmetry_node_index`` column.
     :param node_indices: Indices of the nodes whose incoming links are wanted.
     :param node_names: Names of the same nodes.
-    :return: List of node positions, in order.
+    :return: List of node indices, in order.
     """
     peer_names = {node_name for node_name in node_names if node_name not in (_EMPTY, None)}
     return [
-        node_position
-        for node_position, (peer_name, peer_index) in enumerate(
+        linked_node_index
+        for linked_node_index, (peer_name, peer_index) in enumerate(
             zip(symmetry_names, symmetry_indices, strict=True)
         )
         if peer_index in node_indices or peer_name in peer_names

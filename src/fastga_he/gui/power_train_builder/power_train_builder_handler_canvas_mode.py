@@ -149,11 +149,10 @@ class CanvasModeMixin:
 
         Does nothing if delete mode is already off.
         """
-        if not self.state.delete_mode:
-            return
-        self.state.delete_mode = False
-        self.state.status_div.text = STATUS_IDLE_HTML
-        self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
+        if self.state.delete_mode:
+            self.state.delete_mode = False
+            self.state.status_div.text = STATUS_IDLE_HTML
+            self.state.delete_button.button_type = BUTTON_DEFAULT_COLOR_TYPE
 
     # -----------------------------------------------------------------------
     # Toolbox component selection

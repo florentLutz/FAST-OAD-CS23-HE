@@ -425,7 +425,6 @@ def edge_end_ports(edge_data: dict) -> list[tuple[tuple, tuple]]:
     :param edge_data: ``edge_source.data`` (or a copy of it).
     :return: One pair per edge, in edge order.
     """
-
     end_port_pairs = []
 
     for edge_index in range(len(edge_data["starting_node_index"])):
@@ -501,25 +500,25 @@ def link_symmetry(
     :param first: Zero-based index of one node of the pair.
     :param second: Zero-based index of the other node.
     """
-    for node_position, peer_position in ((first, second), (second, first)):
-        symmetry_names[node_position] = node_names[peer_position]
-        symmetry_indices[node_position] = peer_position
+    for node_index, peer_index in ((first, second), (second, first)):
+        symmetry_names[node_index] = node_names[peer_index]
+        symmetry_indices[node_index] = peer_index
 
 
-def unlink_symmetry(symmetry_names: list, symmetry_indices: list, node_positions) -> None:
+def unlink_symmetry(symmetry_names: list, symmetry_indices: list, node_indices) -> None:
     """
-    Reset the symmetry entries at *node_positions*, in place.
+    Reset the symmetry entries at *node_indices*, in place.
 
     Only the given nodes are reset; their peers keep pointing at them unless
     they are listed too.
 
     :param symmetry_names: ``symmetry_name`` column, edited in place.
     :param symmetry_indices: ``symmetry_node_index`` column, edited in place.
-    :param node_positions: Positions of the nodes to unlink.
+    :param node_indices: Indices of the nodes to unlink.
     """
-    for node_position in node_positions:
-        symmetry_names[node_position] = _EMPTY
-        symmetry_indices[node_position] = _NO_SYMMETRY_PEER
+    for node_index in node_indices:
+        symmetry_names[node_index] = _EMPTY
+        symmetry_indices[node_index] = _NO_SYMMETRY_PEER
 
 
 # ============================================================================
