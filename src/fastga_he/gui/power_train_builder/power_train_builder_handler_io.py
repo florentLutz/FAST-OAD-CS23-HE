@@ -281,10 +281,9 @@ class IOMixin:
         :param new: New field value.
         """
         watcher_csv_path = (new or "").strip()
-        if watcher_csv_path == self.state.watcher_file_path:
-            return
-        self.state.watcher_file_path = watcher_csv_path
-        self._mark_unsaved()
+        if watcher_csv_path != self.state.watcher_file_path:
+            self.state.watcher_file_path = watcher_csv_path
+            self._mark_unsaved()
 
     def _set_watcher_path(self, watcher_csv_path: str):
         """
