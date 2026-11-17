@@ -24,13 +24,16 @@ Three groups of functions are provided:
 
 import sys
 import ast
-from functools import lru_cache
 from pathlib import Path
 
 from fastga_he.gui.power_train_network_viewer import _url_to_base64
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 from .power_train_builder_state import VARIABLE_PORT_DEFAULT
+
+# Data URL of every icon file already read: resolved path -> data URL. Each
+# icon file is read and encoded once per session; later calls reuse the result
+_ICON_DATA_URLS: dict = {}
 
 # ============================================================================
 # Icon mapping
@@ -71,16 +74,22 @@ def component_type_classes(known_component: dict) -> list:
     return list(type_class) if isinstance(type_class, list) else [type_class]
 
 
-@lru_cache(maxsize=None)
 def icon_data_url(icon_path) -> str:
     """
-    Base64 data URL of an icon file, read and encoded once per path.
+    Base64 data URL of an icon file, read and encoded once per file.
+
+    The path is resolved first, so every way of naming the same file (``str``
+    or ``Path``, relative or absolute, with ``..``) shares one entry of
+    :data:`_ICON_DATA_URLS`.
 
     :param icon_path: Path of the icon file (``ICONS_CONFIG[...]["icon_path"]``
         or a ``COLOR_ICON_CONFIG`` value).
     :return: The ``data:`` URL, or the ``file://`` URL if the file cannot be read.
     """
-    return _url_to_base64("file://" + str(Path(icon_path).resolve()))
+    resolved_icon_path = Path(icon_path).resolve()
+    if resolved_icon_path not in _ICON_DATA_URLS:
+        _ICON_DATA_URLS[resolved_icon_path] = _url_to_base64("file://" + str(resolved_icon_path))
+    return _ICON_DATA_URLS[resolved_icon_path]
 
 
 # ============================================================================

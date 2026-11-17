@@ -199,13 +199,13 @@ def test_icon_data_url_reads_each_icon_once(monkeypatch, tmp_path):
         encoded_urls.append(url)
         return "data:image/png;base64,AAAA"
 
+    # Replace the real function with a fake that records the URL
     monkeypatch.setattr(metadata, "_url_to_base64", fake_url_to_base64)
-    icon_data_url.cache_clear()
-    try:
-        first = icon_data_url(icon_path)
-        second = icon_data_url(icon_path)
-    finally:
-        icon_data_url.cache_clear()
+    # Empty icon cache for this test; monkeypatch restores the real one afterwards
+    monkeypatch.setattr(metadata, "_ICON_DATA_URLS", {})
+
+    first = icon_data_url(icon_path)
+    second = icon_data_url(icon_path)
 
     assert first == second == "data:image/png;base64,AAAA"
     assert encoded_urls == ["file://" + str(icon_path.resolve())]
