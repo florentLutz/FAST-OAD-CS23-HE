@@ -28,7 +28,7 @@ def fastga_he_cli():
     """
 
 
-@fastga_he_cli.command(name="powertrain_builder")
+@fastga_he_cli.command(name="powertrain-builder")
 @click.option("--port", default=5007, show_default=True, help="TCP port of the Bokeh server.")
 @click.option("--address", default="localhost", show_default=True, help="Server bind address.")
 def powertrain_builder(port, address):

@@ -764,7 +764,7 @@ def _edge_rejection(starting_port: dict, ending_port: dict, edge_data: dict) -> 
     ):
         return "Port already connected"
 
-    # A second edge between the same two nodes, in either direction
+    # A second edge between the same two nodes (parallel connections), in either direction
     node_pair = {starting_port["node_index"], ending_port["node_index"]}
     if any(
         {starting_node_index, ending_node_index} == node_pair
