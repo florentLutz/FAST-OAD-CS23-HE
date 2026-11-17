@@ -24,7 +24,12 @@ from io import StringIO
 from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
-
+from fastga_he.powertrain_builder.powertrain import (
+    KEY_TITLE,
+    KEY_PT_COMPONENTS,
+    KEY_PT_CONNECTIONS,
+    KEY_PT_WATCHER,
+)
 from .power_train_builder_state import (
     UNKNOWN_COMPONENT_TYPE,
     VARIABLE_PORT_DEFAULT,
@@ -36,11 +41,7 @@ from .power_train_builder_state import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# Top-level YAML keys (the first four mirror FAST-OAD_CS23-HE's powertrain.py)
-KEY_TITLE = "title"
-KEY_PT_COMPONENTS = "power_train_components"
-KEY_PT_CONNECTIONS = "component_connections"
-KEY_PT_WATCHER = "watcher_file_path"
+
 # GUI-only section: {component_name: {"x": float, "y": float}}
 KEY_CANVAS_LAYOUT = "canvas_layout"
 

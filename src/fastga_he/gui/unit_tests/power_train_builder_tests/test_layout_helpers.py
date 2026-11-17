@@ -8,12 +8,19 @@ import networkx as nx
 import pytest
 
 from fastga_he.gui.power_train_builder.power_train_network_reader import (
+    _LAYOUT_STEP_MIN_ICONS_X,
+    _LAYOUT_STEP_MIN_ICONS_Y,
+    _centered_slots,
     _grid_positions,
     _hierarchy_layers,
     _layout_area,
+    _order_rows_by_ports,
     _parse_endpoint,
+    _port_offset,
     _spread,
 )
+
+_ICON_SIZE = 50
 
 _CHAIN_TYPES = {
     "battery": "battery_pack",
@@ -115,15 +122,59 @@ def test_hierarchy_layers(edges, node_types, propulsors, from_propulsor, expecte
 
 
 @pytest.mark.parametrize(
-    "values, low, high, step_max, expected",
+    "values, low, high, step_min, step_max, anchor, expected",
     [
-        pytest.param([0, 1], 0.0, 100.0, 10.0, [45.0, 55.0], id="centred_and_capped_by_step_max"),
-        pytest.param([0, 1, 2], 0.0, 100.0, 1000.0, [0.0, 50.0, 100.0], id="fills_the_range"),
-        pytest.param([7], 0.0, 10.0, 5.0, [5.0], id="single_value_at_the_centre"),
+        pytest.param(
+            [0, 1],
+            0.0,
+            100.0,
+            0.0,
+            10.0,
+            "center",
+            [45.0, 55.0],
+            id="centered_and_capped_by_step_max",
+        ),
+        pytest.param(
+            [0, 1, 2], 0.0, 100.0, 0.0, 1000.0, "center", [0.0, 50.0, 100.0], id="fills_the_range"
+        ),
+        pytest.param([7], 0.0, 10.0, 0.0, 5.0, "center", [5.0], id="single_value_at_the_center"),
+        pytest.param(
+            [0, 1], 0.0, 100.0, 30.0, 10.0, "center", [35.0, 65.0], id="step_min_wins_over_step_max"
+        ),
+        pytest.param(
+            [0, 1, 2],
+            0.0,
+            100.0,
+            80.0,
+            1000.0,
+            "center",
+            [-30.0, 50.0, 130.0],
+            id="too_wide_goes_past_both_ends",
+        ),
+        pytest.param(
+            [0, 1, 2],
+            0.0,
+            100.0,
+            80.0,
+            1000.0,
+            "high",
+            [-60.0, 20.0, 100.0],
+            id="too_wide_keeps_the_highest_value_at_high",
+        ),
     ],
 )
-def test_spread(values, low, high, step_max, expected):
-    assert _spread(values, low=low, high=high, step_max=step_max) == expected
+def test_spread(values, low, high, step_min, step_max, anchor, expected):
+    assert (
+        _spread(
+            values,
+            low=low,
+            high=high,
+            step_min=step_min,
+            step_max=step_max,
+            anchor=anchor,
+        )
+        == expected
+    )
 
 
 def test_layout_area_collapses_on_tiny_window():
@@ -139,11 +190,138 @@ def test_layout_area_collapses_on_tiny_window():
 def test_grid_positions_are_unique_and_inside_area(num_positions):
     area = (0.0, 800.0, 0.0, 600.0)
 
-    positions = _grid_positions(num_positions, area)
+    positions = _grid_positions(num_positions, area, _ICON_SIZE)
 
     assert len(positions) == num_positions
     assert len(set(positions)) == num_positions
     assert all(0.0 <= x <= 800.0 and 0.0 <= y <= 600.0 for x, y in positions)
+
+
+def test_grid_positions_keep_the_minimum_spacing_and_grow_downward():
+    area = (0.0, 800.0, 0.0, 600.0)
+
+    positions = _grid_positions(100, area, _ICON_SIZE)
+
+    xs = sorted({x for x, _ in positions})
+    ys = sorted({y for _, y in positions}, reverse=True)
+    # Too many to fit: the minimum steps are used, in both directions
+    assert min(b - a for a, b in zip(xs, xs[1:])) == pytest.approx(
+        _LAYOUT_STEP_MIN_ICONS_X * _ICON_SIZE
+    )
+    assert min(a - b for a, b in zip(ys, ys[1:])) == pytest.approx(
+        _LAYOUT_STEP_MIN_ICONS_Y * _ICON_SIZE
+    )
+    # The top row stays at the top of the area; the rows that do not fit go below it
+    assert ys[0] == 600.0
+    assert ys[-1] < 0.0
+
+
+# ---------------------------------------------------------------------------
+# _centered_slots, _port_offset, _order_rows_by_ports
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "count, expected",
+    [(0, []), (1, [0.0]), (2, [-0.5, 0.5]), (3, [-1.0, 0.0, 1.0])],
+)
+def test_centered_slots(count, expected):
+    assert _centered_slots(count) == expected
+
+
+@pytest.mark.parametrize(
+    "port_label, port_count, port_kind, expected",
+    [
+        pytest.param("1", 1, "source", 0.0, id="single_port_on_the_component"),
+        pytest.param("1", 3, "source", -0.25, id="source_port_1_on_the_left"),
+        pytest.param("3", 3, "source", 0.25, id="last_source_port_on_the_right"),
+        pytest.param("1", 3, "target", 0.25, id="target_port_1_on_the_right"),
+        pytest.param("3", 3, "target", -0.25, id="last_target_port_on_the_left"),
+    ],
+)
+def test_port_offset(port_label, port_count, port_kind, expected):
+    assert _port_offset(port_label, port_count, port_kind) == expected
+
+
+def _two_row_design(n_sources: dict, n_targets: dict, edges: list) -> tuple[dict, dict]:
+    """
+    Node and edge columns of a small design, as the reader builds them.
+
+    :param n_sources: Source port count of every component, by name.
+    :param n_targets: Target port count of every component, by name.
+    :param edges: ``((name, kind, label), (name, kind, label))`` per edge.
+    :return: ``(nodes_data, edges_data)``.
+    """
+    names = list(n_sources)
+    nodes_data = {
+        "name": names,
+        "n_sources": [n_sources[name] for name in names],
+        "n_targets": [n_targets[name] for name in names],
+    }
+    edges_data = {
+        f"{end}_{column}": []
+        for end in ("starting", "ending")
+        for column in ("node_index", "port_kind", "port_label")
+    }
+    for edge in edges:
+        for end, (name, kind, label) in zip(("starting", "ending"), edge):
+            edges_data[f"{end}_node_index"].append(names.index(name))
+            edges_data[f"{end}_port_kind"].append(kind)
+            edges_data[f"{end}_port_label"].append(label)
+    return nodes_data, edges_data
+
+
+def test_order_rows_by_ports_leaves_a_layout_without_crossings_unchanged():
+    # Source port 1 of "gear" (on the left) goes to "left", port 2 to "right"
+    nodes_data, edges_data = _two_row_design(
+        n_sources={"gear": 2, "left": 0, "right": 0},
+        n_targets={"gear": 0, "left": 1, "right": 1},
+        edges=[
+            (("gear", "source", "1"), ("left", "target", "1")),
+            (("gear", "source", "2"), ("right", "target", "1")),
+        ],
+    )
+    raw_positions = {"gear": (0.0, 1), "left": (-0.5, 0), "right": (0.5, 0)}
+
+    assert _order_rows_by_ports(raw_positions, nodes_data, edges_data) is raw_positions
+
+
+def test_order_rows_by_ports_swaps_components_whose_edges_cross_at_source_ports():
+    # Source port 1 of "gear" is on its left but leads to the component placed on the right
+    nodes_data, edges_data = _two_row_design(
+        n_sources={"gear": 2, "a": 0, "b": 0},
+        n_targets={"gear": 0, "a": 1, "b": 1},
+        edges=[
+            (("gear", "source", "1"), ("b", "target", "1")),
+            (("gear", "source", "2"), ("a", "target", "1")),
+        ],
+    )
+    raw_positions = {"gear": (0.0, 1), "a": (-0.5, 0), "b": (0.5, 0)}
+
+    assert _order_rows_by_ports(raw_positions, nodes_data, edges_data) == {
+        "gear": (0.0, 1),
+        "a": (0.5, 0),
+        "b": (-0.5, 0),
+    }
+
+
+def test_order_rows_by_ports_swaps_components_whose_edges_cross_at_target_ports():
+    # Target port 1 of "bus" is on its right but comes from the component placed on the left
+    nodes_data, edges_data = _two_row_design(
+        n_sources={"a": 1, "b": 1, "bus": 0},
+        n_targets={"a": 0, "b": 0, "bus": 2},
+        edges=[
+            (("a", "source", "1"), ("bus", "target", "1")),
+            (("b", "source", "1"), ("bus", "target", "2")),
+        ],
+    )
+    raw_positions = {"a": (-0.5, 1), "b": (0.5, 1), "bus": (0.0, 0)}
+
+    assert _order_rows_by_ports(raw_positions, nodes_data, edges_data) == {
+        "a": (0.5, 1),
+        "b": (-0.5, 1),
+        "bus": (0.0, 0),
+    }
 
 
 # ---------------------------------------------------------------------------
