@@ -2,12 +2,12 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-"""Unit tests for the reader's automatic-layout helpers."""
+"""Unit tests for the automatic-layout helpers and the reader's connection helpers."""
 
 import networkx as nx
 import pytest
 
-from fastga_he.gui.power_train_builder.power_train_network_reader import (
+from fastga_he.gui.power_train_builder.power_train_network_layout import (
     _LAYOUT_STEP_MIN_ICONS_X,
     _LAYOUT_STEP_MIN_ICONS_Y,
     _centered_slots,
@@ -15,9 +15,11 @@ from fastga_he.gui.power_train_builder.power_train_network_reader import (
     _hierarchy_layers,
     _layout_area,
     _order_rows_by_ports,
-    _parse_endpoint,
     _port_offset,
     _spread,
+)
+from fastga_he.gui.power_train_builder.power_train_network_reader import (
+    _parse_endpoint,
     _type_unknown_ports_from_connections,
 )
 
