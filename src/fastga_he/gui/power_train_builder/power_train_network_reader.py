@@ -1276,8 +1276,9 @@ def _row_crossings(component_row_index: dict, component_slot: dict, edge_end_pai
     :param edge_end_pairs: From :func:`_edge_end_pairs`.
     :return: The number of crossings.
     """
-    # (upper port position, lower port position) of the edges below each row
-    row_edge_ports: dict = {}
+    # Port connections in the gap below each row, as
+    # (upper port position, lower port position)
+    row_port_connection_edges: dict = {}
     for first_end, second_end in edge_end_pairs:
         first_row_index = component_row_index[first_end.component]
         second_row_index = component_row_index[second_end.component]
@@ -1292,25 +1293,28 @@ def _row_crossings(component_row_index: dict, component_slot: dict, edge_end_pai
         else:
             upper_end, lower_end, upper_row_index = second_end, first_end, second_row_index
 
-        row_edge_ports.setdefault(upper_row_index, []).append(
+        row_port_connection_edges.setdefault(upper_row_index, []).append(
             (
                 _port_position(upper_end, component_slot),
                 _port_position(lower_end, component_slot),
             )
         )
 
-    # Compare each pair of edges in the same gap once: the second edge always
-    # comes after the first, so (A, B) is not counted again as (B, A)
     crossings = 0
-    for edge_ports in row_edge_ports.values():
-        for first_index in range(len(edge_ports)):
-            for second_index in range(first_index + 1, len(edge_ports)):
-                if _edges_cross(edge_ports[first_index], edge_ports[second_index]):
+    # Each gap between two neighboring rows: only connections in the same gap can cross
+    for port_connection_edges in row_port_connection_edges.values():
+        # Each connection of the gap...
+        for first_index in range(len(port_connection_edges)):
+            # ...against each connection after it, so (A, B) is not counted again as (B, A)
+            for second_index in range(first_index + 1, len(port_connection_edges)):
+                if _edges_cross(
+                    port_connection_edges[first_index], port_connection_edges[second_index]
+                ):
                     crossings += 1
     return crossings
 
 
-def _edges_cross(first_edge_ports: tuple, second_edge_ports: tuple) -> bool:
+def _edges_cross(first_port_connection_edge: tuple, second_port_connection_edge: tuple) -> bool:
     """
     Whether two edges between the same two rows cross.
 
@@ -1318,11 +1322,12 @@ def _edges_cross(first_edge_ports: tuple, second_edge_ports: tuple) -> bool:
     first is left of the second in the upper row but right of it in the lower
     row, or the reverse. Edges that meet at the same port do not cross.
 
-    :param first_edge_ports: ``(upper port position, lower port position)`` of one edge.
-    :param second_edge_ports: The same for the other edge.
+    :param first_port_connection_edge: ``(upper port position, lower port position)`` of one edge.
+    :param second_port_connection_edge: The same for the other edge.
     :return: ``True`` if they cross.
     """
-    (first_upper, first_lower), (second_upper, second_lower) = first_edge_ports, second_edge_ports
+    first_upper, first_lower = first_port_connection_edge
+    second_upper, second_lower = second_port_connection_edge
     return (first_upper - second_upper) * (first_lower - second_lower) < 0
 
 
