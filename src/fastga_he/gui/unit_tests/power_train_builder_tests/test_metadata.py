@@ -10,8 +10,6 @@ named after real ``KNOWN_COMPONENTS`` entries, so the tests do not depend on
 the contents of the real tree.
 """
 
-import pytest
-
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
 from fastga_he.gui.power_train_builder.power_train_builder_metadata import (
@@ -88,26 +86,35 @@ def test_scanner_reads_the_constants_of_every_registered_component(tmp_path):
         assert positions[missing_type] == [] and options[missing_type] == {}
 
 
-@pytest.mark.parametrize(
-    "constants_source",
-    [
-        pytest.param(None, id="no_constants_file"),
-        pytest.param("", id="constants_not_defined"),
-        # An enum reference cannot be evaluated without importing the module, and
-        # the module is not in sys.modules: the entry stays empty instead of failing
-        pytest.param(
-            "POSSIBLE_POSITION = [Position.FRONT]\nPOSSIBLE_OPTION = {'mode': Mode.ALL}\n",
-            id="non_literal_constants_of_a_module_not_imported",
-        ),
-    ],
-)
-def test_scanner_falls_back_to_empty_entries(tmp_path, constants_source):
+def _scan_first_component(tmp_path, constants_source) -> tuple:
+    """
+    Scan a tree holding only the first registered component.
+
+    :param constants_source: Text of its ``constants.py``, or ``None`` for no such file.
+    :return: ``(possible positions, possible options)`` found for it.
+    """
     _component_folder(tmp_path, "first", _performances_import(FIRST_COMPONENT), constants_source)
-
     positions, options = _get_performance_component_names(tmp_path)
+    first_type = FIRST_COMPONENT["components_type"]
+    return positions[first_type], options[first_type]
 
-    assert positions[FIRST_COMPONENT["components_type"]] == []
-    assert options[FIRST_COMPONENT["components_type"]] == {}
+
+def test_scanner_without_constants_file_gives_empty_entries(tmp_path):
+    assert _scan_first_component(tmp_path, None) == ([], {})
+
+
+def test_scanner_without_constants_defined_gives_empty_entries(tmp_path):
+    assert _scan_first_component(tmp_path, "") == ([], {})
+
+
+def test_scanner_with_non_literal_constants_gives_empty_entries(tmp_path):
+    # An enum reference cannot be evaluated without importing the module, and
+    # the module is not in sys.modules: the entry stays empty instead of failing
+    constants_source = (
+        "POSSIBLE_POSITION = [Position.FRONT]\nPOSSIBLE_OPTION = {'mode': Mode.ALL}\n"
+    )
+
+    assert _scan_first_component(tmp_path, constants_source) == ([], {})
 
 
 # ---------------------------------------------------------------------------
@@ -119,46 +126,48 @@ def _component(icon, type_class):
     return {"icon_for_network_graph": icon, "components_type_class": type_class}
 
 
-@pytest.mark.parametrize(
-    "components, expected",
-    [
-        pytest.param(
-            [
-                _component("battery", "source"),
-                _component("cable", ["connector", "source"]),
-                _component("bus_bar", "connector"),
-            ],
-            {"source": ["battery", "cable"], "connector": ["cable", "bus_bar"]},
-            id="one_tab_per_type_class_in_order",
-        ),
-        pytest.param(
-            [
-                _component("dc_load", "propulsive_load"),
-                # In a list, propulsive_load adds no tab of its own
-                _component("propeller", ["propulsor", "propulsive_load"]),
-            ],
-            {"load": ["dc_load"], "propulsor": ["propeller"]},
-            id="propulsive_load_alone_goes_to_the_load_tab",
-        ),
-        pytest.param(
-            [
-                _component("e_motor", "propulsor_driver"),
-                _component("e_motor", "propulsor_driver"),
-            ],
-            {"propulsor_driver": ["e_motor"]},
-            id="an_icon_is_listed_once_per_tab",
-        ),
-    ],
-)
-def test_toolbox_tabs(components, expected):
-    assert _group_icons_by_tab(components) == expected
+def test_toolbox_has_one_tab_per_type_class_in_order():
+    components = [
+        _component("battery", "source"),
+        # Made-up: a cable is only a connector, but this shows a component in two tabs
+        _component("cable", ["connector", "source"]),
+        _component("bus_bar", "connector"),
+    ]
+
+    assert _group_icons_by_tab(components) == {
+        "source": ["battery", "cable"],
+        "connector": ["cable", "bus_bar"],
+    }
+
+
+def test_toolbox_puts_propulsive_load_alone_in_the_load_tab():
+    components = [
+        # An electric motor (PMSM, SM_PMSM)
+        _component("e_motor", "propulsive_load"),
+        # In a list (ICE, turboshaft), propulsive_load adds no tab of its own
+        _component("ice", ["source", "propulsive_load"]),
+    ]
+
+    assert _group_icons_by_tab(components) == {"load": ["e_motor"], "source": ["ice"]}
+
+
+def test_toolbox_lists_an_icon_once_per_tab():
+    # PMSM and SM_PMSM share the e_motor icon
+    components = [
+        _component("e_motor", "propulsive_load"),
+        _component("e_motor", "propulsive_load"),
+    ]
+
+    assert _group_icons_by_tab(components) == {"load": ["e_motor"]}
 
 
 def test_unknown_component_closes_its_tabs():
     icons_by_tab = {
         "source": ["battery"],
         "connector": ["cable"],
-        "propulsor_driver": ["e_motor"],
+        # Made-up: every real tab gets the unknown component, so a fake one
+        # shows that the other tabs do not
+        "other_class": ["other_icon"],
         "propulsor": ["propeller"],
         "tank": ["fuel_tank"],
         "load": ["dc_load"],
@@ -170,7 +179,7 @@ def test_unknown_component_closes_its_tabs():
     assert tabs == {
         "source": ["battery", "unknown"],
         "connector": ["cable", "unknown"],
-        "propulsor_driver": ["e_motor"],
+        "other_class": ["other_icon"],
         "propulsor": ["propeller", "unknown"],
         "tank": ["fuel_tank", "unknown"],
         "load": ["dc_load", "unknown"],

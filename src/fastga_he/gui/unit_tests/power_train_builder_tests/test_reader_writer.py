@@ -21,7 +21,6 @@ in ``value`` alone (and that the commit step would then overwrite) is caught.
 import itertools
 import json
 
-import pytest
 from ruamel.yaml import YAML
 
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
@@ -32,7 +31,7 @@ from fastga_he.gui.power_train_builder.power_train_builder_state import (
 )
 from fastga_he.gui.power_train_builder.power_train_network_reader import PowerTrainYAMLReader
 from fastga_he.gui.power_train_builder.power_train_network_writer import port_side_of
-from .conftest import icon_with_options
+from .conftest import find_icon_with_options
 
 
 def _known_component(component_type: str) -> dict:
@@ -96,55 +95,53 @@ def _build_electric_chain(canvas) -> dict:
 def _apply_symmetry(canvas, node_index: int, peer_name: str):
     canvas.select(node_index)
     canvas.state.symmetry_select.value = peer_name
-    canvas.handler.apply_node_configurations()
+    canvas.apply()
 
 
-def test_round_trip_keeps_components_connections_and_layout(canvas, tmp_path):
+def _options_of_every_node(canvas) -> list[dict]:
+    """Options of every node, decoded from their JSON strings."""
+    return [json.loads(options) for options in canvas.node_column("options")]
+
+
+def test_round_trip_keeps_components_connections_options_and_layout(canvas, tmp_path):
     """
-    Test that a design saved to YAML and loaded back has the same components, connections, and layout.
+    A design saved to YAML and loaded back has the same components, connections,
+    options and layout.
     """
     nodes = _build_electric_chain(canvas)
     _apply_symmetry(canvas, nodes["motor"], "e_motor_2")
+    # Plus a component with options to choose from, if the registry has one
+    icon_key = find_icon_with_options(canvas.state)
+    if icon_key is not None:
+        with_options = canvas.place(icon_key, 700, 100)
+        assert _options_of_every_node(canvas)[with_options]
+
     expected_columns = {column: canvas.node_column(column) for column in _ROUND_TRIP_COLUMNS}
+    expected_options = _options_of_every_node(canvas)
     expected_xy = list(zip(canvas.node_column("x"), canvas.node_column("y"), strict=True))
     expected_edges = sorted(canvas.edges())
     yaml_path = tmp_path / "design.yml"
 
     # save
-    assert canvas.handler._save_canvas_state(str(yaml_path))
+    assert canvas.save(yaml_path)
     # restart a new session
-    canvas.handler._on_new_design()
+    canvas.new_design()
     assert canvas.node_column("name") == []
     # load design
-    canvas.handler._load_canvas_state(str(yaml_path))
+    canvas.load(yaml_path)
 
     for column, expected_values in expected_columns.items():
         assert canvas.node_column(column) == expected_values, column
+    assert _options_of_every_node(canvas) == expected_options
     assert list(zip(canvas.node_column("x"), canvas.node_column("y"), strict=True)) == expected_xy
     assert sorted(canvas.edges()) == expected_edges
-
-
-def test_round_trip_keeps_options(canvas, tmp_path):
-    """
-    Test that a design saved to YAML and loaded back has the same options.
-    """
-    motor = canvas.place(icon_with_options(canvas.state), 100, 500)
-    canvas.select(motor)
-    options_before = json.loads(canvas.node_column("options")[motor])
-    assert options_before
-    yaml_path = tmp_path / "design.yml"
-
-    canvas.handler._save_canvas_state(str(yaml_path))
-    canvas.handler._load_canvas_state(str(yaml_path))
-
-    assert json.loads(canvas.node_column("options")[motor]) == options_before
 
 
 def test_saved_file_has_fast_oad_sections_and_port_indices(canvas, tmp_path):
     _build_electric_chain(canvas)
     yaml_path = tmp_path / "design.yml"
     # save the design to a YAML file
-    canvas.handler._save_canvas_state(str(yaml_path))
+    canvas.save(yaml_path)
     # reload the yml file
     saved = YAML(typ="safe").load(yaml_path.read_text())
 
@@ -171,9 +168,9 @@ def test_final_version_has_no_layout_and_reloads_with_automatic_layout(canvas, t
     expected_edges = sorted(canvas.edges())
     yaml_path = tmp_path / "final.yml"
 
-    canvas.handler._save_canvas_state(str(yaml_path), include_canvas_layout=False)
+    canvas.save(yaml_path, final=True)
     assert "canvas_layout" not in YAML(typ="safe").load(yaml_path.read_text())
-    canvas.handler._load_canvas_state(str(yaml_path))
+    canvas.load(yaml_path)
 
     names = canvas.node_column("name")
     y_by_name = dict(zip(names, canvas.node_column("y"), strict=True))
@@ -187,8 +184,8 @@ def test_final_version_has_no_layout_and_reloads_with_automatic_layout(canvas, t
 
 def test_empty_design_and_empty_file_load_as_an_empty_canvas(canvas, builder_state, tmp_path):
     yaml_path = tmp_path / "empty.yml"
-    assert canvas.handler._save_canvas_state(str(yaml_path))
-    canvas.handler._load_canvas_state(str(yaml_path))
+    assert canvas.save(yaml_path)
+    canvas.load(yaml_path)
 
     assert canvas.node_column("name") == []
     assert canvas.edges() == []
@@ -251,35 +248,36 @@ def test_reader_handles_hand_written_yaml(builder_state, tmp_path):
     assert nodes_data["source_port_type"][2] == "undefined"
 
 
-@pytest.mark.parametrize(
-    "file_name, content, message",
-    [
-        pytest.param(
-            "broken.yml",
-            "power_train_components: [unclosed\n",
-            "Could not load broken.yml",
-            id="invalid_yaml",
-        ),
-        pytest.param("missing.yml", None, "file not found", id="missing_file"),
-        pytest.param(
-            "old_backup.json",
-            '{"components": {}, "connections": {}}',
-            "not a YAML file",
-            id="not_a_yaml_file",
-        ),
-    ],
-)
-def test_unreadable_file_is_reported_and_keeps_the_canvas(
-    canvas, tmp_path, file_name, content, message
-):
+def _load_into_a_one_battery_design(canvas, file_path):
+    """Place a battery, then try to load *file_path* over it."""
     canvas.place("battery", 100, 100)
-    file_path = tmp_path / file_name
-    if content is not None:
-        file_path.write_text(content)
+    canvas.load(file_path)
 
-    canvas.handler._load_canvas_state(str(file_path))
 
-    assert message in canvas.state.status_div.text
+def test_invalid_yaml_is_reported_and_keeps_the_canvas(canvas, tmp_path):
+    file_path = tmp_path / "broken.yml"
+    file_path.write_text("power_train_components: [unclosed\n")
+
+    _load_into_a_one_battery_design(canvas, file_path)
+
+    assert "Could not load broken.yml" in canvas.state.status_div.text
+    assert canvas.node_column("name") == ["battery_1"]
+
+
+def test_missing_file_is_reported_and_keeps_the_canvas(canvas, tmp_path):
+    _load_into_a_one_battery_design(canvas, tmp_path / "missing.yml")
+
+    assert "file not found" in canvas.state.status_div.text
+    assert canvas.node_column("name") == ["battery_1"]
+
+
+def test_file_that_is_not_yaml_is_reported_and_keeps_the_canvas(canvas, tmp_path):
+    file_path = tmp_path / "old_backup.json"
+    file_path.write_text('{"components": {}, "connections": {}}')
+
+    _load_into_a_one_battery_design(canvas, file_path)
+
+    assert "not a YAML file" in canvas.state.status_div.text
     assert canvas.node_column("name") == ["battery_1"]
 
 
@@ -295,12 +293,10 @@ def test_unknown_component_round_trip(canvas, tmp_path):
     state = canvas.state
     state.unknown_type_input.value = "my_part"
     state.unknown_position_input.value = "in_the_nose"
-    canvas.handler._on_add_option()
-    name_input, value_input = canvas.handler._unknown_option_rows[-1]
-    name_input.value, value_input.value = "efficiency", "0.95"
+    canvas.add_unknown_option("efficiency", "0.95")
     state.source_count_spinner.value = 2
     state.unknown_symmetry_input.value = "right_part"
-    canvas.handler.apply_node_configurations()
+    canvas.apply()
     state.source_port_type_select.value = "electricity"
     canvas.connect(("source", unknown, "2"), ("target", battery, "1"))
     expected_columns = {
@@ -309,7 +305,7 @@ def test_unknown_component_round_trip(canvas, tmp_path):
     }
 
     yaml_path = tmp_path / "design.yml"
-    assert canvas.handler._save_canvas_state(str(yaml_path))
+    assert canvas.save(yaml_path)
     saved = YAML(typ="safe").load(yaml_path.read_text())
     assert saved["power_train_components"]["unknown_1"] == {
         "id": "fastga_he.pt_component.my_part",
@@ -319,8 +315,8 @@ def test_unknown_component_round_trip(canvas, tmp_path):
     }
     assert {"source": ["unknown_1", 2], "target": "battery_1"} in saved["component_connections"]
 
-    canvas.handler._on_new_design()
-    canvas.handler._load_canvas_state(str(yaml_path))
+    canvas.new_design()
+    canvas.load(yaml_path)
     for column, expected_values in expected_columns.items():
         assert canvas.node_column(column) == expected_values, column
     assert canvas.edges() == [((battery, "target", "1"), (unknown, "source", "2"))]
@@ -329,8 +325,8 @@ def test_unknown_component_round_trip(canvas, tmp_path):
     # connections (none on the target side), and the source side gets as many
     # ports as its connections use
     final_path = tmp_path / "final.yml"
-    canvas.handler._save_canvas_state(str(final_path), include_canvas_layout=False)
-    canvas.handler._load_canvas_state(str(final_path))
+    canvas.save(final_path, final=True)
+    canvas.load(final_path)
     assert canvas.edges() == [((battery, "target", "1"), (unknown, "source", "2"))]
     assert canvas.node_column("source_port_type")[unknown] == "electricity"
     assert canvas.node_column("target_port_type")[unknown] == "undefined"
@@ -384,37 +380,58 @@ def _watcher_field(canvas) -> tuple[str, str]:
 
 
 def test_watcher_widgets_are_in_the_save_overlay(canvas):
-    overlay_children = []
-    pending = [canvas.state.save_version_overlay]
-    while pending:
-        layout = pending.pop()
-        overlay_children.append(layout)
-        pending.extend(getattr(layout, "children", []))
+    # The overlay and every widget laid out inside it, at any depth: the loop
+    # also visits the children appended to the list while it runs. Only
+    # "children" is followed, not references(), which would also find widgets
+    # merely passed to a CustomJS callback
+    overlay_widgets = [canvas.state.save_version_overlay]
+    for widget in overlay_widgets:
+        overlay_widgets.extend(getattr(widget, "children", []))
 
-    assert canvas.state.watcher_path_input in overlay_children
+    assert canvas.state.watcher_path_input in overlay_widgets
 
 
-@pytest.mark.parametrize(
-    "typing, save_mode, expected",
-    [
-        pytest.param("committed", SAVE_MODE_EDITABLE, WATCHER_PATH, id="typed"),
-        # No Enter / blur before clicking the save button: only value_input holds the text
-        pytest.param("still_typing", SAVE_MODE_EDITABLE, WATCHER_PATH, id="still_being_typed"),
-        pytest.param("committed", SAVE_MODE_FINAL, WATCHER_PATH, id="final_version"),
-        pytest.param("empty", SAVE_MODE_EDITABLE, None, id="empty_field_leaves_the_key_out"),
-    ],
-)
-def test_watcher_path_in_the_field_is_written_to_the_yaml(
-    canvas, monkeypatch, tmp_path, typing, save_mode, expected
-):
+def test_typed_watcher_path_is_written_to_the_yaml(canvas, monkeypatch, tmp_path):
     canvas.place("battery", 100, 100)
-    if typing != "empty":
-        _type_in_watcher_field(canvas, WATCHER_PATH, commit=typing == "committed")
+    _type_in_watcher_field(canvas, WATCHER_PATH, commit=True)
 
-    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml", save_mode)
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml")
 
-    assert saved.get("watcher_file_path") == expected
-    assert ("canvas_layout" in saved) == (save_mode != SAVE_MODE_FINAL)
+    assert saved["watcher_file_path"] == WATCHER_PATH
+    assert "canvas_layout" in saved
+    assert canvas.state.save_button.button_type == "success"
+
+
+def test_watcher_path_still_being_typed_is_written_to_the_yaml(canvas, monkeypatch, tmp_path):
+    canvas.place("battery", 100, 100)
+    # No Enter / blur before clicking the save button: only value_input holds the text
+    _type_in_watcher_field(canvas, WATCHER_PATH, commit=False)
+
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml")
+
+    assert saved["watcher_file_path"] == WATCHER_PATH
+    assert "canvas_layout" in saved
+    assert canvas.state.save_button.button_type == "success"
+
+
+def test_watcher_path_is_written_to_a_final_version(canvas, monkeypatch, tmp_path):
+    canvas.place("battery", 100, 100)
+    _type_in_watcher_field(canvas, WATCHER_PATH, commit=True)
+
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml", SAVE_MODE_FINAL)
+
+    assert saved["watcher_file_path"] == WATCHER_PATH
+    assert "canvas_layout" not in saved
+    assert canvas.state.save_button.button_type == "success"
+
+
+def test_empty_watcher_field_leaves_the_key_out_of_the_yaml(canvas, monkeypatch, tmp_path):
+    canvas.place("battery", 100, 100)
+
+    saved = _save_through_overlay(canvas, monkeypatch, tmp_path / "design.yml")
+
+    assert "watcher_file_path" not in saved
+    assert "canvas_layout" in saved
     assert canvas.state.save_button.button_type == "success"
 
 
@@ -447,10 +464,10 @@ def test_loaded_watcher_path_is_shown_and_kept_on_resave(canvas, monkeypatch, tm
     _type_in_watcher_field(canvas, WATCHER_PATH, commit=True)
     yaml_path = tmp_path / "design.yml"
     _save_through_overlay(canvas, monkeypatch, yaml_path)
-    canvas.handler._on_new_design()
+    canvas.new_design()
     assert _watcher_field(canvas) == ("", "")
 
-    canvas.handler._load_canvas_state(str(yaml_path))
+    canvas.load(yaml_path)
 
     # Shown without marking the design unsaved
     assert _watcher_field(canvas) == (WATCHER_PATH, WATCHER_PATH)

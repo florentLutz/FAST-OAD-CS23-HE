@@ -13,7 +13,6 @@ places, so these tests pin down the single behaviour every caller relies on.
 from types import SimpleNamespace
 
 import bokeh.models as bkmodel
-import pytest
 
 from fastga_he.gui.power_train_builder import power_train_builder_metadata as metadata
 from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
@@ -139,20 +138,21 @@ def test_link_then_unlink_symmetry():
     assert indices == [_NO_SYMMETRY_PEER, _NO_SYMMETRY_PEER, 0]
 
 
-@pytest.mark.parametrize(
-    "attribute_name, expected",
-    [
-        ("number_of_inputs", "source"),
-        ("number_of_tanks", "source"),
-        ("number_of_outputs", "target"),
-        ("number_of_engines", "target"),
-        ("number_of_power_sources", "target"),
-        ("number_of_cells", None),  # number_of_, but no side keyword
-        ("voltage_inputs", None),  # side keyword, but not number_of_
-    ],
-)
-def test_port_side_of(attribute_name, expected):
-    assert port_side_of(attribute_name) == expected
+def test_port_side_of_number_of_attributes():
+    # Inputs and tanks count the source ports
+    assert port_side_of("number_of_inputs") == "source"
+    assert port_side_of("number_of_tanks") == "source"
+    # Outputs, engines and power sources count the target ports
+    assert port_side_of("number_of_outputs") == "target"
+    assert port_side_of("number_of_engines") == "target"
+    assert port_side_of("number_of_power_sources") == "target"
+
+
+def test_port_side_of_other_attributes():
+    # number_of_, but no side keyword
+    assert port_side_of("number_of_cells") is None
+    # Side keyword, but not number_of_
+    assert port_side_of("voltage_inputs") is None
 
 
 def test_unknown_component_helpers():
@@ -178,16 +178,20 @@ def test_unknown_component_helpers():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "type_class, expected",
-    [("propulsor", ["propulsor"]), (["source", "connector"], ["source", "connector"])],
-)
-def test_component_type_classes_is_always_a_list(type_class, expected):
-    known_component = {"components_type_class": type_class}
+def test_component_type_classes_wraps_a_single_class_in_a_list():
+    known_component = {"components_type_class": "propulsor"}
 
-    assert component_type_classes(known_component) == expected
+    assert component_type_classes(known_component) == ["propulsor"]
     # The entry itself is not changed
-    assert known_component["components_type_class"] == type_class
+    assert known_component["components_type_class"] == "propulsor"
+
+
+def test_component_type_classes_keeps_a_list_of_classes():
+    known_component = {"components_type_class": ["source", "connector"]}
+
+    assert component_type_classes(known_component) == ["source", "connector"]
+    # The entry itself is not changed
+    assert known_component["components_type_class"] == ["source", "connector"]
 
 
 def test_icon_data_url_reads_each_icon_once(monkeypatch, tmp_path):
@@ -216,34 +220,58 @@ def test_icon_data_url_reads_each_icon_once(monkeypatch, tmp_path):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("value", [True, False, 3, 2.5, "percent_split"])
-def test_option_value_round_trips_through_display_string(value):
-    """Every option value survives the trip to its display string and back, type included."""
+def _round_trip(value):
+    """An option value turned into its display string, then read back."""
     display_string = _option_values_to_strings(value)
-
     assert isinstance(display_string, str)
-    assert _strings_to_option_values(display_string) == value
-    assert type(_strings_to_option_values(display_string)) is type(value)
+    return _strings_to_option_values(display_string)
 
 
-@pytest.mark.parametrize(
-    "node_type, port_label, keywords, is_primary",
-    [
-        ("dc_splitter", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS, True),
-        ("gearbox", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS, True),
-        ("planetary_gear", "1", PRIMARY_TARGET_PORT_TYPE_KEYWORDS, True),
-        ("dc_splitter", "2", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS, False),
-        ("dc_splitter", "1", PRIMARY_TARGET_PORT_TYPE_KEYWORDS, False),
-        ("planetary_gear", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS, False),
-        ("pmsm", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS, False),
-    ],
-)
-def test_only_the_primary_port_label_is_highlighted(node_type, port_label, keywords, is_primary):
+def test_option_values_round_trip_through_display_strings():
+    """Every option value survives the trip to its display string and back, type included."""
+    # "is" checks the type too: True must not come back as 1
+    assert _round_trip(True) is True
+    assert _round_trip(False) is False
+
+    integer = _round_trip(3)
+    assert integer == 3 and type(integer) is int
+
+    floating_point = _round_trip(2.5)
+    assert floating_point == 2.5 and type(floating_point) is float
+
+    assert _round_trip("percent_split") == "percent_split"
+
+
+def _is_highlighted(node_type: str, port_label: str, keywords) -> bool:
+    """
+    Whether a port label of the Connections panel is highlighted as the primary port.
+
+    The primary port gets exactly one stylesheet, with the highlight colour;
+    every other port keeps the default style (no stylesheet).
+    """
     stylesheets = _port_label_stylesheets(node_type, port_label, keywords)
+    is_highlighted = len(stylesheets) == 1
+    assert len(stylesheets) <= 1
+    assert (PRIMARY_PORT_LABEL_COLOR in "".join(stylesheets)) is is_highlighted
+    return is_highlighted
 
-    # The primary port gets one stylesheet with the highlight colour; others keep the default style
-    assert len(stylesheets) == int(is_primary)
-    assert (PRIMARY_PORT_LABEL_COLOR in "".join(stylesheets)) is is_primary
+
+def test_primary_port_labels_are_highlighted():
+    # Source port 1 of a splitter or a gearbox
+    assert _is_highlighted("dc_splitter", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    assert _is_highlighted("gearbox", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    # Target port 1 of a planetary gear
+    assert _is_highlighted("planetary_gear", "1", PRIMARY_TARGET_PORT_TYPE_KEYWORDS)
+
+
+def test_other_port_labels_keep_the_default_style():
+    # Another port number
+    assert not _is_highlighted("dc_splitter", "2", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    # The other side
+    assert not _is_highlighted("dc_splitter", "1", PRIMARY_TARGET_PORT_TYPE_KEYWORDS)
+    assert not _is_highlighted("planetary_gear", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    # A component without a primary port
+    assert not _is_highlighted("pmsm", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
 
 
 # ---------------------------------------------------------------------------

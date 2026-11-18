@@ -38,85 +38,98 @@ _CHAIN_TYPES = {
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "edges, node_types, propulsors, from_propulsor, expected",
-    [
-        pytest.param(
-            [("battery", "cable"), ("cable", "motor"), ("motor", "propeller")],
-            _CHAIN_TYPES,
-            {"propeller"},
-            False,
-            {"propeller": 0, "motor": 1, "cable": 2, "battery": 3},
-            id="counted_from_storage_when_propulsors_are_farthest",
-        ),
-        pytest.param(
-            # The dangling load is as far from the battery as the propeller is
-            [
-                ("battery", "bus"),
-                ("bus", "motor"),
-                ("motor", "propeller"),
-                ("bus", "cable"),
-                ("cable", "load"),
-            ],
-            {
-                "battery": "battery_pack",
-                "bus": "dc_bus",
-                "motor": "pmsm",
-                "propeller": "propeller",
-                "cable": "dc_line",
-                "load": "dc_load",
-            },
-            {"propeller"},
-            False,
-            {"propeller": 0, "motor": 1, "bus": 2, "battery": 3, "cable": 3, "load": 4},
-            id="switches_to_propulsors_when_another_branch_is_farther",
-        ),
-        pytest.param(
-            [("battery", "motor"), ("motor", "propeller")],
-            {"battery": "battery_pack", "motor": "pmsm", "propeller": "propeller"},
-            {"propeller"},
-            True,
-            {"propeller": 0, "motor": 1, "battery": 2},
-            id="from_propulsor_flag_forces_the_propulsor_reference",
-        ),
-        pytest.param(
-            [("battery", "motor"), ("motor", "propeller")],
-            {
-                "battery": "battery_pack",
-                "motor": "pmsm",
-                "propeller": "propeller",
-                "lonely_cable": "dc_line",
-            },
-            {"propeller"},
-            False,
-            {"propeller": 0, "motor": 1, "battery": 2, "lonely_cable": 3},
-            id="disconnected_nodes_go_to_an_extra_bottom_layer",
-        ),
-        pytest.param(
-            [("motor", "propeller")],
-            {"motor": "pmsm", "propeller": "propeller"},
-            {"propeller"},
-            False,
-            {"propeller": 0, "motor": 1},
-            id="no_storage_counted_from_propulsors",
-        ),
-        pytest.param(
-            [("motor", "propeller")],
-            {"motor": "pmsm", "propeller": "propeller"},
-            set(),
-            False,
-            {"motor": 0, "propeller": 0},
-            id="no_storage_no_propulsor_all_in_one_layer",
-        ),
-        pytest.param([], {}, set(), False, {}, id="empty_graph"),
-    ],
-)
-def test_hierarchy_layers(edges, node_types, propulsors, from_propulsor, expected):
+def _layers(edges: list, node_types: dict, propulsors: set, from_propulsor: bool = False) -> dict:
+    """Hierarchy layers of the graph with *node_types* as nodes and *edges* as edges."""
     graph = nx.DiGraph()
     graph.add_nodes_from(node_types)
     graph.add_edges_from(edges)
+    return _hierarchy_layers(graph, node_types, propulsors, from_propulsor)
 
-    assert _hierarchy_layers(graph, node_types, propulsors, from_propulsor) == expected
+
+def test_hierarchy_layers_counted_from_storage_when_propulsors_are_farthest():
+    edges = [("battery", "cable"), ("cable", "motor"), ("motor", "propeller")]
+
+    assert _layers(edges, _CHAIN_TYPES, {"propeller"}) == {
+        "propeller": 0,
+        "motor": 1,
+        "cable": 2,
+        "battery": 3,
+    }
+
+
+def test_hierarchy_layers_switch_to_propulsors_when_another_branch_is_farther():
+    # The dangling load is as far from the battery as the propeller is
+    edges = [
+        ("battery", "bus"),
+        ("bus", "motor"),
+        ("motor", "propeller"),
+        ("bus", "cable"),
+        ("cable", "load"),
+    ]
+    node_types = {
+        "battery": "battery_pack",
+        "bus": "dc_bus",
+        "motor": "pmsm",
+        "propeller": "propeller",
+        "cable": "dc_line",
+        "load": "dc_load",
+    }
+
+    assert _layers(edges, node_types, {"propeller"}) == {
+        "propeller": 0,
+        "motor": 1,
+        "bus": 2,
+        "battery": 3,
+        "cable": 3,
+        "load": 4,
+    }
+
+
+def test_hierarchy_layers_from_propulsor_flag_forces_the_propulsor_reference():
+    edges = [("battery", "motor"), ("motor", "propeller")]
+    node_types = {"battery": "battery_pack", "motor": "pmsm", "propeller": "propeller"}
+
+    assert _layers(edges, node_types, {"propeller"}, from_propulsor=True) == {
+        "propeller": 0,
+        "motor": 1,
+        "battery": 2,
+    }
+
+
+def test_hierarchy_layers_put_disconnected_nodes_in_an_extra_bottom_layer():
+    edges = [("battery", "motor"), ("motor", "propeller")]
+    node_types = {
+        "battery": "battery_pack",
+        "motor": "pmsm",
+        "propeller": "propeller",
+        "lonely_cable": "dc_line",
+    }
+
+    assert _layers(edges, node_types, {"propeller"}) == {
+        "propeller": 0,
+        "motor": 1,
+        "battery": 2,
+        "lonely_cable": 3,
+    }
+
+
+def test_hierarchy_layers_without_storage_are_counted_from_propulsors():
+    node_types = {"motor": "pmsm", "propeller": "propeller"}
+
+    assert _layers([("motor", "propeller")], node_types, {"propeller"}) == {
+        "propeller": 0,
+        "motor": 1,
+    }
+
+
+def test_hierarchy_layers_without_storage_or_propulsor_are_all_one_layer():
+    node_types = {"motor": "pmsm", "propeller": "propeller"}
+
+    assert _layers([("motor", "propeller")], node_types, set()) == {"motor": 0, "propeller": 0}
+
+
+def test_hierarchy_layers_of_an_empty_graph():
+    assert _layers([], {}, set()) == {}
 
 
 # ---------------------------------------------------------------------------
@@ -124,60 +137,38 @@ def test_hierarchy_layers(edges, node_types, propulsors, from_propulsor, expecte
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "values, low, high, step_min, step_max, anchor, expected",
-    [
-        pytest.param(
-            [0, 1],
-            0.0,
-            100.0,
-            0.0,
-            10.0,
-            "center",
-            [45.0, 55.0],
-            id="centered_and_capped_by_step_max",
-        ),
-        pytest.param(
-            [0, 1, 2], 0.0, 100.0, 0.0, 1000.0, "center", [0.0, 50.0, 100.0], id="fills_the_range"
-        ),
-        pytest.param([7], 0.0, 10.0, 0.0, 5.0, "center", [5.0], id="single_value_at_the_center"),
-        pytest.param(
-            [0, 1], 0.0, 100.0, 30.0, 10.0, "center", [35.0, 65.0], id="step_min_wins_over_step_max"
-        ),
-        pytest.param(
-            [0, 1, 2],
-            0.0,
-            100.0,
-            80.0,
-            1000.0,
-            "center",
-            [-30.0, 50.0, 130.0],
-            id="too_wide_goes_past_both_ends",
-        ),
-        pytest.param(
-            [0, 1, 2],
-            0.0,
-            100.0,
-            80.0,
-            1000.0,
-            "high",
-            [-60.0, 20.0, 100.0],
-            id="too_wide_keeps_the_highest_value_at_high",
-        ),
-    ],
-)
-def test_spread(values, low, high, step_min, step_max, anchor, expected):
-    assert (
-        _spread(
-            values,
-            low=low,
-            high=high,
-            step_min=step_min,
-            step_max=step_max,
-            anchor=anchor,
-        )
-        == expected
-    )
+def test_spread_is_centered_and_capped_by_step_max():
+    assert _spread([0, 1], low=0.0, high=100.0, step_min=0.0, step_max=10.0) == [45.0, 55.0]
+
+
+def test_spread_fills_the_range():
+    assert _spread([0, 1, 2], low=0.0, high=100.0, step_min=0.0, step_max=1000.0) == [
+        0.0,
+        50.0,
+        100.0,
+    ]
+
+
+def test_spread_puts_a_single_value_at_the_center():
+    assert _spread([7], low=0.0, high=10.0, step_min=0.0, step_max=5.0) == [5.0]
+
+
+def test_spread_step_min_wins_over_step_max():
+    assert _spread([0, 1], low=0.0, high=100.0, step_min=30.0, step_max=10.0) == [35.0, 65.0]
+
+
+def test_spread_too_wide_goes_past_both_ends():
+    assert _spread([0, 1, 2], low=0.0, high=100.0, step_min=80.0, step_max=1000.0) == [
+        -30.0,
+        50.0,
+        130.0,
+    ]
+
+
+def test_spread_too_wide_with_high_anchor_keeps_the_highest_value_at_high():
+    assert _spread(
+        [0, 1, 2], low=0.0, high=100.0, step_min=80.0, step_max=1000.0, anchor="high"
+    ) == [-60.0, 20.0, 100.0]
 
 
 def test_layout_area_collapses_on_tiny_window():
@@ -189,15 +180,15 @@ def test_layout_area_collapses_on_tiny_window():
     assert y_min == y_max == 5.0
 
 
-@pytest.mark.parametrize("num_positions", [0, 1, 7, 30])
-def test_grid_positions_are_unique_and_inside_area(num_positions):
+def test_grid_positions_are_unique_and_inside_area():
     area = (0.0, 800.0, 0.0, 600.0)
 
-    positions = _grid_positions(num_positions, area, _ICON_SIZE)
+    for num_positions in (0, 1, 7, 30):
+        positions = _grid_positions(num_positions, area, _ICON_SIZE)
 
-    assert len(positions) == num_positions
-    assert len(set(positions)) == num_positions
-    assert all(0.0 <= x <= 800.0 and 0.0 <= y <= 600.0 for x, y in positions)
+        assert len(positions) == num_positions
+        assert len(set(positions)) == num_positions
+        assert all(0.0 <= x <= 800.0 and 0.0 <= y <= 600.0 for x, y in positions)
 
 
 def test_grid_positions_keep_the_minimum_spacing_and_grow_downward():
@@ -224,26 +215,22 @@ def test_grid_positions_keep_the_minimum_spacing_and_grow_downward():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "count, expected",
-    [(0, []), (1, [0.0]), (2, [-0.5, 0.5]), (3, [-1.0, 0.0, 1.0])],
-)
-def test_centered_slots(count, expected):
-    assert _centered_slots(count) == expected
+def test_centered_slots():
+    assert _centered_slots(0) == []
+    assert _centered_slots(1) == [0.0]
+    assert _centered_slots(2) == [-0.5, 0.5]
+    assert _centered_slots(3) == [-1.0, 0.0, 1.0]
 
 
-@pytest.mark.parametrize(
-    "port_label, port_count, port_kind, expected",
-    [
-        pytest.param("1", 1, "source", 0.0, id="single_port_on_the_component"),
-        pytest.param("1", 3, "source", -0.25, id="source_port_1_on_the_left"),
-        pytest.param("3", 3, "source", 0.25, id="last_source_port_on_the_right"),
-        pytest.param("1", 3, "target", 0.25, id="target_port_1_on_the_right"),
-        pytest.param("3", 3, "target", -0.25, id="last_target_port_on_the_left"),
-    ],
-)
-def test_port_offset(port_label, port_count, port_kind, expected):
-    assert _port_offset(port_label, port_count, port_kind) == expected
+def test_port_offset():
+    # A single port sits on the component
+    assert _port_offset("1", 1, "source") == 0.0
+    # Source ports go from left to right
+    assert _port_offset("1", 3, "source") == -0.25
+    assert _port_offset("3", 3, "source") == 0.25
+    # Target ports go from right to left
+    assert _port_offset("1", 3, "target") == 0.25
+    assert _port_offset("3", 3, "target") == -0.25
 
 
 def _two_row_design(n_sources: dict, n_targets: dict, edges: list) -> tuple[dict, dict]:
@@ -388,15 +375,14 @@ def test_type_unknown_ports_uses_the_first_connection_when_types_conflict():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "endpoint, expected",
-    [
-        ("motor_1", ("motor_1", "1")),
-        (["bus_1", 2], ("bus_1", "2")),
-        ("[bus_1, 3]", ("bus_1", "3")),
-        (["bus_1"], None),
-        (None, None),
-    ],
-)
-def test_parse_endpoint(endpoint, expected):
-    assert _parse_endpoint(endpoint) == expected
+def test_parse_endpoint():
+    # A plain name is port 1
+    assert _parse_endpoint("motor_1") == ("motor_1", "1")
+    # [name, N] as a YAML list, or as a quoted string
+    assert _parse_endpoint(["bus_1", 2]) == ("bus_1", "2")
+    assert _parse_endpoint("[bus_1, 3]") == ("bus_1", "3")
+
+
+def test_parse_endpoint_rejects_malformed_endpoints():
+    assert _parse_endpoint(["bus_1"]) is None
+    assert _parse_endpoint(None) is None
