@@ -23,7 +23,7 @@ component type if needed. To apply the changes, click on the blue ``Apply`` butt
     :width: 300px
     :align: center
 
-The unknown component, representing a not-yet-defined component, has different approach to configure the component ID
+The ``unknown`` component, representing a not-yet-defined component, has different approach to configure the component ID
 and its type. Similarly to the configuration of the component ID, the component type can be defined in the editable text box. To
 apply the changes, click on the blue ``Apply`` button at the bottom of the right panel.
 
@@ -32,7 +32,7 @@ Port counts
 This section only appears for the component nodes that have multiple target and source ports. The user can change the
 number of target and source ports by selecting the desired number in the spinner boxes. To apply the changes, click on
 the blue ``Apply`` button at the bottom of the right panel. The minimal value for the known component is 1, while the
-unknown component is allowed to have 0 ports.
+``unknown`` component is allowed to have 0 ports.
 
 .. image:: ../../../img/port_count_spinner.gif
     :width: 300px

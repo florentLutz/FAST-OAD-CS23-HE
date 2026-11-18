@@ -28,7 +28,7 @@ Alternatively, the following command can be run in the terminal:
 
 .. code:: commandline
 
-    powewtrain-builder
+    fastga-he powertrain-builder
 
 Once loaded from existing design, the builder should look like this:
 

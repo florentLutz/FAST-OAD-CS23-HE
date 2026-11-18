@@ -5,7 +5,7 @@ Save & reload design
 ====================
 The powertrain builder GUI allows users to save their current design for later aircraft design calculation or
 reload it later for further editing. This feature is achieved by saving the design in PT file in YAML format with a new
-dedicated ``canvas_layout`` section that registers the node coordinates and status for unknown components through the
+dedicated ``canvas_layout`` section that registers the node coordinates and status for ``unknown`` components through the
 standard file dialog window.
 
 Saving design
