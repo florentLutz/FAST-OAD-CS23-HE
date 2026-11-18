@@ -502,9 +502,16 @@ def _build_config_panel(unknown_widgets: dict) -> dict:
     }
 
 
-def _hidden_input(value: str = "0", **kwargs) -> bkmodel.TextInput:
-    """Invisible, zero-size TextInput used to pass a value between browser and Python."""
-    return bkmodel.TextInput(value=value, width=0, height=0, visible=False, **kwargs)
+def _hidden_input(value: str = "0", name: str | None = None) -> bkmodel.TextInput:
+    """
+    Invisible, zero-size TextInput used to pass a value between browser and Python.
+
+    :param value: Initial value.
+    :param name: Optional Bokeh model name, so the widget can be found by name
+        (e.g. ``doc.select_one({"name": ...})``); ``None`` leaves it unnamed.
+    :return: The hidden TextInput.
+    """
+    return bkmodel.TextInput(value=value, width=0, height=0, visible=False, name=name)
 
 
 def _build_hidden_triggers() -> dict:
