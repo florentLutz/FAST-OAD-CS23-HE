@@ -26,6 +26,7 @@ from .power_train_builder_state import (
     edge_indices_not_touching_port,
     is_unknown_node,
     link_symmetry,
+    node_options,
     node_port_colors,
     ports_compatible,
     select_edges,
@@ -110,10 +111,10 @@ class ConfigPanelMixin:
         node_type = placed_node_data["node_type"][index]
         icon_key = placed_node_data["icon_type"][index]
         position = placed_node_data["position"][index]
-        saved_options_json = placed_node_data["options"][index] or "{}"
+        saved_options = node_options(placed_node_data, index)
 
         # Show the options table if there is any options
-        self.state.options_table.visible = saved_options_json != "{}"
+        self.state.options_table.visible = bool(saved_options)
 
         # extract possible component type of the icon
         type_choices = self.state.icon_to_component_types.get(icon_key, [icon_key])
@@ -121,12 +122,8 @@ class ConfigPanelMixin:
         # Setting the value fires _on_type_select_change; flag it as programmatic so
         # selecting a node never clears its connections or symmetry
         self._is_populating_node_table = True
-        try:
-            self.state.type_select.value = (
-                node_type if node_type in type_choices else type_choices[0]
-            )
-        finally:
-            self._is_populating_node_table = False
+        self.state.type_select.value = node_type if node_type in type_choices else type_choices[0]
+        self._is_populating_node_table = False
 
         # extract possible component position in aircraft based on default/selected node type
         position_choices = self.state.possible_position.get(node_type, [])
@@ -134,12 +131,6 @@ class ConfigPanelMixin:
         self.state.position_select.value = (
             position if position in position_choices else default_position(position_choices)
         )
-
-        saved_options: dict = {}
-        try:
-            saved_options = json.loads(saved_options_json)
-        except (json.JSONDecodeError, TypeError):
-            pass
 
         self._refresh_options_table(node_type, saved_options)
 
@@ -724,15 +715,13 @@ class ConfigPanelMixin:
         self.state.position_select.value = default_position(position_choices)
 
         current_selected_node_index_for_type = self.state.selected_node_index
-        saved_options = {}
-        if current_selected_node_index_for_type is not None:
-            saved_options_json = self.state.placed_nodes_source.data["options"][
-                current_selected_node_index_for_type
-            ]
-            try:
-                saved_options = json.loads(saved_options_json or "{}")
-            except (json.JSONDecodeError, TypeError):
-                pass
+        saved_options = (
+            {}
+            if current_selected_node_index_for_type is None
+            else node_options(
+                self.state.placed_nodes_source.data, current_selected_node_index_for_type
+            )
+        )
         self._refresh_options_table(new, saved_options)
         self.state.options_table.visible = bool(self.state.possible_options.get(new, {}))
 

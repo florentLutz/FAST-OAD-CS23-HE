@@ -2,387 +2,380 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-"""Unit tests for the automatic-layout helpers and the reader's connection helpers."""
+"""
+Unit tests for the builder's pure helpers: the shared state helpers, component
+metadata, config-panel formatting, UI triggers and the undo / redo history.
 
-import networkx as nx
-import pytest
+Each shared helper replaced logic that used to be written out in several
+places, so these tests pin down the single behaviour every caller relies on.
+"""
 
-from fastga_he.gui.power_train_builder.power_train_network_layout import (
-    _LAYOUT_STEP_MIN_ICONS_X,
-    _LAYOUT_STEP_MIN_ICONS_Y,
-    _centered_slots,
-    _grid_positions,
-    _hierarchy_layers,
-    _layout_area,
-    _order_rows_by_ports,
-    _port_offset,
-    _spread,
+from types import SimpleNamespace
+
+import bokeh.models as bkmodel
+
+from fastga_he.gui.power_train_builder import power_train_builder_metadata as metadata
+from fastga_he.gui.power_train_builder.power_train_builder_handler_config_panel import (
+    PRIMARY_PORT_LABEL_COLOR,
+    PRIMARY_SOURCE_PORT_TYPE_KEYWORDS,
+    PRIMARY_TARGET_PORT_TYPE_KEYWORDS,
+    _option_values_to_strings,
+    _port_label_stylesheets,
+    _strings_to_option_values,
 )
-from fastga_he.gui.power_train_builder.power_train_network_reader import (
-    _parse_endpoint,
-    _type_unknown_ports_from_connections,
+from fastga_he.gui.power_train_builder.power_train_builder_handler_io import _flip_trigger
+from fastga_he.gui.power_train_builder.power_train_builder_history import (
+    EditHistoryStack,
+    make_snapshot,
+)
+from fastga_he.gui.power_train_builder.power_train_builder_metadata import (
+    component_type_classes,
+    icon_data_url,
+)
+from fastga_he.gui.power_train_builder.power_train_builder_state import (
+    DIALOG_POSITION_STYLES,
+    DIALOG_STYLES,
+    EDGE_COLUMNS,
+    PORT_TYPE_COLORS,
+    UNDEFINED_PORT_COLOR,
+    _EMPTY,
+    _NO_SYMMETRY_PEER,
+    append_entry,
+    default_options,
+    default_position,
+    drop_entry,
+    edge_end_ports,
+    edge_indices_not_touching_port,
+    empty_columns,
+    link_symmetry,
+    node_options,
+    ports_compatible,
+    unlink_symmetry,
+)
+from fastga_he.gui.power_train_builder.power_train_builder_toolbox_config_table import _js_flip
+from fastga_he.gui.power_train_builder.power_train_network_writer import (
+    port_side_of,
+    unknown_component_id,
+    unknown_component_type,
 )
 
-_ICON_SIZE = 50
 
-_CHAIN_TYPES = {
-    "battery": "battery_pack",
-    "cable": "dc_line",
-    "motor": "pmsm",
-    "propeller": "propeller",
-}
-
-
-# ---------------------------------------------------------------------------
-# _hierarchy_layers
-# ---------------------------------------------------------------------------
-
-
-def _layers(edges: list, node_types: dict, propulsors: set, from_propulsor: bool = False) -> dict:
-    """Hierarchy layers of the graph with *node_types* as nodes and *edges* as edges."""
-    graph = nx.DiGraph()
-    graph.add_nodes_from(node_types)
-    graph.add_edges_from(edges)
-    return _hierarchy_layers(graph, node_types, propulsors, from_propulsor)
-
-
-def test_hierarchy_layers_counted_from_storage_when_propulsors_are_farthest():
-    edges = [("battery", "cable"), ("cable", "motor"), ("motor", "propeller")]
-
-    assert _layers(edges, _CHAIN_TYPES, {"propeller"}) == {
-        "propeller": 0,
-        "motor": 1,
-        "cable": 2,
-        "battery": 3,
-    }
-
-
-def test_hierarchy_layers_switch_to_propulsors_when_another_branch_is_farther():
-    # The dangling load is as far from the battery as the propeller is
-    edges = [
-        ("battery", "bus"),
-        ("bus", "motor"),
-        ("motor", "propeller"),
-        ("bus", "cable"),
-        ("cable", "load"),
-    ]
-    node_types = {
-        "battery": "battery_pack",
-        "bus": "dc_bus",
-        "motor": "pmsm",
-        "propeller": "propeller",
-        "cable": "dc_line",
-        "load": "dc_load",
-    }
-
-    assert _layers(edges, node_types, {"propeller"}) == {
-        "propeller": 0,
-        "motor": 1,
-        "bus": 2,
-        "battery": 3,
-        "cable": 3,
-        "load": 4,
-    }
-
-
-def test_hierarchy_layers_from_propulsor_flag_forces_the_propulsor_reference():
-    edges = [("battery", "motor"), ("motor", "propeller")]
-    node_types = {"battery": "battery_pack", "motor": "pmsm", "propeller": "propeller"}
-
-    assert _layers(edges, node_types, {"propeller"}, from_propulsor=True) == {
-        "propeller": 0,
-        "motor": 1,
-        "battery": 2,
-    }
-
-
-def test_hierarchy_layers_put_disconnected_nodes_in_an_extra_bottom_layer():
-    edges = [("battery", "motor"), ("motor", "propeller")]
-    node_types = {
-        "battery": "battery_pack",
-        "motor": "pmsm",
-        "propeller": "propeller",
-        "lonely_cable": "dc_line",
-    }
-
-    assert _layers(edges, node_types, {"propeller"}) == {
-        "propeller": 0,
-        "motor": 1,
-        "battery": 2,
-        "lonely_cable": 3,
-    }
-
-
-def test_hierarchy_layers_without_storage_are_counted_from_propulsors():
-    node_types = {"motor": "pmsm", "propeller": "propeller"}
-
-    assert _layers([("motor", "propeller")], node_types, {"propeller"}) == {
-        "propeller": 0,
-        "motor": 1,
-    }
-
-
-def test_hierarchy_layers_without_storage_or_propulsor_are_all_one_layer():
-    node_types = {"motor": "pmsm", "propeller": "propeller"}
-
-    assert _layers([("motor", "propeller")], node_types, set()) == {"motor": 0, "propeller": 0}
-
-
-def test_hierarchy_layers_of_an_empty_graph():
-    assert _layers([], {}, set()) == {}
+def _edges(*end_pairs) -> dict:
+    """Edge data from ``((kind, node, label), (kind, node, label))`` pairs."""
+    edge_data = empty_columns(EDGE_COLUMNS)
+    for starting_port, ending_port in end_pairs:
+        edge_data = append_entry(
+            edge_data,
+            EDGE_COLUMNS,
+            {
+                "xs": [0.0, 1.0],
+                "ys": [0.0, 1.0],
+                "color": "blue",
+                **{
+                    f"{end}_{field}": value
+                    for end, port in (("starting", starting_port), ("ending", ending_port))
+                    for field, value in zip(
+                        ("port_kind", "node_index", "port_label"), port, strict=True
+                    )
+                },
+            },
+        )
+    return edge_data
 
 
 # ---------------------------------------------------------------------------
-# _spread, _layout_area, _grid_positions
+# Shared state helpers
 # ---------------------------------------------------------------------------
 
 
-def test_spread_is_centered_and_capped_by_step_max():
-    assert _spread([0, 1], low=0.0, high=100.0, step_min=0.0, step_max=10.0) == [45.0, 55.0]
+def test_append_and_drop_entry_return_new_column_data():
+    column_data = {"name": ["a", "b"], "x": [1.0, 2.0]}
+
+    appended = append_entry(column_data, ("name", "x"), {"name": "c", "x": 3.0})
+    dropped = drop_entry(column_data, 0)
+
+    assert appended == {"name": ["a", "b", "c"], "x": [1.0, 2.0, 3.0]}
+    assert dropped == {"name": ["b"], "x": [2.0]}
+    # The input is never changed, and a column missing from it is started
+    assert column_data == {"name": ["a", "b"], "x": [1.0, 2.0]}
+    assert append_entry({}, ("name",), {"name": "a"}) == {"name": ["a"]}
 
 
-def test_spread_fills_the_range():
-    assert _spread([0, 1, 2], low=0.0, high=100.0, step_min=0.0, step_max=1000.0) == [
-        0.0,
-        50.0,
-        100.0,
-    ]
+def test_defaults_of_a_new_component_are_the_first_choices():
+    definition = {"mode": ["percent_split", "power_share"], "flag": [True, False], "none": []}
+
+    # Options without any possible value are left out
+    assert default_options(definition) == {"mode": "percent_split", "flag": True}
+    assert default_position(["in_the_front", "in_the_nose"]) == "in_the_front"
+    assert default_position([]) == _EMPTY
 
 
-def test_spread_puts_a_single_value_at_the_center():
-    assert _spread([7], low=0.0, high=10.0, step_min=0.0, step_max=5.0) == [5.0]
-
-
-def test_spread_step_min_wins_over_step_max():
-    assert _spread([0, 1], low=0.0, high=100.0, step_min=30.0, step_max=10.0) == [35.0, 65.0]
-
-
-def test_spread_too_wide_goes_past_both_ends():
-    assert _spread([0, 1, 2], low=0.0, high=100.0, step_min=80.0, step_max=1000.0) == [
-        -30.0,
-        50.0,
-        130.0,
-    ]
-
-
-def test_spread_too_wide_with_high_anchor_keeps_the_highest_value_at_high():
-    assert _spread(
-        [0, 1, 2], low=0.0, high=100.0, step_min=80.0, step_max=1000.0, anchor="high"
-    ) == [-60.0, 20.0, 100.0]
-
-
-def test_layout_area_collapses_on_tiny_window():
-    tiny_area = {"x0": 0.0, "x1": 10.0, "y0": 0.0, "y1": 10.0, "per_px": 1.0}
-
-    x_min, x_max, y_min, y_max = _layout_area(tiny_area)
-
-    assert x_min == x_max == 5.0
-    assert y_min == y_max == 5.0
-
-
-def test_grid_positions_are_unique_and_inside_area():
-    area = (0.0, 800.0, 0.0, 600.0)
-
-    for num_positions in (0, 1, 7, 30):
-        positions = _grid_positions(num_positions, area, _ICON_SIZE)
-
-        assert len(positions) == num_positions
-        assert len(set(positions)) == num_positions
-        assert all(0.0 <= x <= 800.0 and 0.0 <= y <= 600.0 for x, y in positions)
-
-
-def test_grid_positions_keep_the_minimum_spacing_and_grow_downward():
-    area = (0.0, 800.0, 0.0, 600.0)
-
-    positions = _grid_positions(100, area, _ICON_SIZE)
-
-    xs = sorted({x for x, _ in positions})
-    ys = sorted({y for _, y in positions}, reverse=True)
-    # Too many to fit: the minimum steps are used, in both directions
-    assert min(b - a for a, b in zip(xs, xs[1:])) == pytest.approx(
-        _LAYOUT_STEP_MIN_ICONS_X * _ICON_SIZE
+def test_edges_are_read_end_by_end():
+    edge_data = _edges(
+        (("source", 1, "1"), ("target", 0, "1")),
+        (("target", 0, "1"), ("source", 2, "1")),  # target port clicked first
+        (("source", 1, "2"), ("target", 3, "1")),
     )
-    assert min(a - b for a, b in zip(ys, ys[1:])) == pytest.approx(
-        _LAYOUT_STEP_MIN_ICONS_Y * _ICON_SIZE
-    )
-    # The top row stays at the top of the area; the rows that do not fit go below it
-    assert ys[0] == 600.0
-    assert ys[-1] < 0.0
+
+    # Each edge keeps the order its ports were clicked in
+    assert edge_end_ports(edge_data)[1] == (("target", 0, "1"), ("source", 2, "1"))
+    assert edge_end_ports(empty_columns(EDGE_COLUMNS)) == []
+    # A port is found at either end: target port 1 of node 0 ends edge 0 and starts edge 1
+    assert edge_indices_not_touching_port(edge_data, 0, "1", "target") == [2]
+    # Same node and label on the other side touches nothing
+    assert edge_indices_not_touching_port(edge_data, 0, "1", "source") == [0, 1, 2]
+
+
+def test_node_options_decodes_the_stored_json():
+    nodes_data = {"options": ['{"mode": "a", "flag": true}', "", None, "not json", "[1, 2]"]}
+
+    assert node_options(nodes_data, 0) == {"mode": "a", "flag": True}
+    # Missing, unreadable, or not an object: no options
+    assert node_options(nodes_data, 1) == {}
+    assert node_options(nodes_data, 2) == {}
+    assert node_options(nodes_data, 3) == {}
+    assert node_options(nodes_data, 4) == {}
+
+
+def test_link_then_unlink_symmetry():
+    names, indices = [_EMPTY] * 3, [_NO_SYMMETRY_PEER] * 3
+
+    link_symmetry(names, indices, ["motor_1", "motor_2", "motor_3"], 0, 2)
+    assert names == ["motor_3", _EMPTY, "motor_1"]
+    assert indices == [2, _NO_SYMMETRY_PEER, 0]
+
+    # Only the listed node is reset; its peer still points at it
+    unlink_symmetry(names, indices, [0])
+    assert names == [_EMPTY, _EMPTY, "motor_1"]
+    assert indices == [_NO_SYMMETRY_PEER, _NO_SYMMETRY_PEER, 0]
+
+
+def test_port_side_of_number_of_attributes():
+    # Inputs and tanks count the source ports
+    assert port_side_of("number_of_inputs") == "source"
+    assert port_side_of("number_of_tanks") == "source"
+    # Outputs, engines and power sources count the target ports
+    assert port_side_of("number_of_outputs") == "target"
+    assert port_side_of("number_of_engines") == "target"
+    assert port_side_of("number_of_power_sources") == "target"
+
+
+def test_port_side_of_other_attributes():
+    # number_of_, but no side keyword
+    assert port_side_of("number_of_cells") is None
+    # Side keyword, but not number_of_
+    assert port_side_of("voltage_inputs") is None
+
+
+def test_unknown_component_helpers():
+    electric, mechanical = PORT_TYPE_COLORS["electricity"], PORT_TYPE_COLORS["mechanical"]
+
+    # Ports connect only on the same, defined energy type
+    assert ports_compatible(electric, electric)
+    assert not ports_compatible(electric, mechanical)
+    assert not ports_compatible(UNDEFINED_PORT_COLOR, mechanical)
+    assert not ports_compatible(UNDEFINED_PORT_COLOR, UNDEFINED_PORT_COLOR)
+
+    # A typed type gets the FAST-OAD_CS23-HE prefix, a full id is kept, and reading undoes both
+    assert unknown_component_id("my_part") == "fastga_he.pt_component.my_part"
+    assert unknown_component_id("other.pt_component.part") == "other.pt_component.part"
+    assert unknown_component_id("") == "fastga_he.pt_component.unknown"
+    for component_type in ("my_part", "other.pt_component.part"):
+        assert unknown_component_type(unknown_component_id(component_type)) == component_type
+    assert unknown_component_type(None) == "unknown"
 
 
 # ---------------------------------------------------------------------------
-# _centered_slots, _port_offset, _order_rows_by_ports
+# Component metadata
 # ---------------------------------------------------------------------------
 
 
-def test_centered_slots():
-    assert _centered_slots(0) == []
-    assert _centered_slots(1) == [0.0]
-    assert _centered_slots(2) == [-0.5, 0.5]
-    assert _centered_slots(3) == [-1.0, 0.0, 1.0]
+def test_component_type_classes_wraps_a_single_class_in_a_list():
+    known_component = {"components_type_class": "propulsor"}
+
+    assert component_type_classes(known_component) == ["propulsor"]
+    # The entry itself is not changed
+    assert known_component["components_type_class"] == "propulsor"
 
 
-def test_port_offset():
-    # A single port sits on the component
-    assert _port_offset("1", 1, "source") == 0.0
-    # Source ports go from left to right
-    assert _port_offset("1", 3, "source") == -0.25
-    assert _port_offset("3", 3, "source") == 0.25
-    # Target ports go from right to left
-    assert _port_offset("1", 3, "target") == 0.25
-    assert _port_offset("3", 3, "target") == -0.25
+def test_component_type_classes_keeps_a_list_of_classes():
+    known_component = {"components_type_class": ["source", "connector"]}
+
+    assert component_type_classes(known_component) == ["source", "connector"]
+    # The entry itself is not changed
+    assert known_component["components_type_class"] == ["source", "connector"]
 
 
-def _two_row_design(n_sources: dict, n_targets: dict, edges: list) -> tuple[dict, dict]:
+def test_icon_data_url_reads_each_icon_once(monkeypatch, tmp_path):
+    icon_path = tmp_path / "icon.png"
+    icon_path.write_bytes(b"\x89PNG")
+    encoded_urls = []
+
+    def fake_url_to_base64(url):
+        encoded_urls.append(url)
+        return "data:image/png;base64,AAAA"
+
+    # Replace the real function with a fake that records the URL
+    monkeypatch.setattr(metadata, "_url_to_base64", fake_url_to_base64)
+    # Empty icon cache for this test; monkeypatch restores the real one afterwards
+    monkeypatch.setattr(metadata, "_ICON_DATA_URLS", {})
+
+    first = icon_data_url(icon_path)
+    second = icon_data_url(icon_path)
+
+    assert first == second == "data:image/png;base64,AAAA"
+    assert encoded_urls == ["file://" + str(icon_path.resolve())]
+
+
+# ---------------------------------------------------------------------------
+# Config panel formatting
+# ---------------------------------------------------------------------------
+
+
+def _round_trip(value):
+    """An option value turned into its display string, then read back."""
+    display_string = _option_values_to_strings(value)
+    assert isinstance(display_string, str)
+    return _strings_to_option_values(display_string)
+
+
+def test_option_values_round_trip_through_display_strings():
+    """Every option value survives the trip to its display string and back, type included."""
+    # "is" checks the type too: True must not come back as 1
+    assert _round_trip(True) is True
+    assert _round_trip(False) is False
+
+    integer = _round_trip(3)
+    assert integer == 3 and type(integer) is int
+
+    floating_point = _round_trip(2.5)
+    assert floating_point == 2.5 and type(floating_point) is float
+
+    assert _round_trip("percent_split") == "percent_split"
+
+
+def _is_highlighted(node_type: str, port_label: str, keywords) -> bool:
     """
-    Node and edge columns of a small design, as the reader builds them.
+    Whether a port label of the Connections panel is highlighted as the primary port.
 
-    :param n_sources: Source port count of every component, by name.
-    :param n_targets: Target port count of every component, by name.
-    :param edges: ``((name, kind, label), (name, kind, label))`` per edge.
-    :return: ``(nodes_data, edges_data)``.
+    The primary port gets exactly one stylesheet, with the highlight colour;
+    every other port keeps the default style (no stylesheet).
     """
-    names = list(n_sources)
-    nodes_data = {
-        "name": names,
-        "n_sources": [n_sources[name] for name in names],
-        "n_targets": [n_targets[name] for name in names],
-    }
-    edges_data = {
-        f"{end}_{column}": []
-        for end in ("starting", "ending")
-        for column in ("node_index", "port_kind", "port_label")
-    }
-    for edge in edges:
-        for end, (name, kind, label) in zip(("starting", "ending"), edge):
-            edges_data[f"{end}_node_index"].append(names.index(name))
-            edges_data[f"{end}_port_kind"].append(kind)
-            edges_data[f"{end}_port_label"].append(label)
-    return nodes_data, edges_data
+    stylesheets = _port_label_stylesheets(node_type, port_label, keywords)
+    is_highlighted = len(stylesheets) == 1
+    assert len(stylesheets) <= 1
+    assert (PRIMARY_PORT_LABEL_COLOR in "".join(stylesheets)) is is_highlighted
+    return is_highlighted
 
 
-def test_order_rows_by_ports_leaves_a_layout_without_crossings_unchanged():
-    # Source port 1 of "gear" (on the left) goes to "left", port 2 to "right"
-    nodes_data, edges_data = _two_row_design(
-        n_sources={"gear": 2, "left": 0, "right": 0},
-        n_targets={"gear": 0, "left": 1, "right": 1},
-        edges=[
-            (("gear", "source", "1"), ("left", "target", "1")),
-            (("gear", "source", "2"), ("right", "target", "1")),
-        ],
-    )
-    raw_positions = {"gear": (0.0, 1), "left": (-0.5, 0), "right": (0.5, 0)}
-
-    assert _order_rows_by_ports(raw_positions, nodes_data, edges_data) is raw_positions
+def test_primary_port_labels_are_highlighted():
+    # Source port 1 of a splitter or a gearbox
+    assert _is_highlighted("dc_splitter", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    assert _is_highlighted("gearbox", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    # Target port 1 of a planetary gear
+    assert _is_highlighted("planetary_gear", "1", PRIMARY_TARGET_PORT_TYPE_KEYWORDS)
 
 
-def test_order_rows_by_ports_swaps_components_whose_edges_cross_at_source_ports():
-    # Source port 1 of "gear" is on its left but leads to the component placed on the right
-    nodes_data, edges_data = _two_row_design(
-        n_sources={"gear": 2, "a": 0, "b": 0},
-        n_targets={"gear": 0, "a": 1, "b": 1},
-        edges=[
-            (("gear", "source", "1"), ("b", "target", "1")),
-            (("gear", "source", "2"), ("a", "target", "1")),
-        ],
-    )
-    raw_positions = {"gear": (0.0, 1), "a": (-0.5, 0), "b": (0.5, 0)}
-
-    assert _order_rows_by_ports(raw_positions, nodes_data, edges_data) == {
-        "gear": (0.0, 1),
-        "a": (0.5, 0),
-        "b": (-0.5, 0),
-    }
-
-
-def test_order_rows_by_ports_swaps_components_whose_edges_cross_at_target_ports():
-    # Target port 1 of "bus" is on its right but comes from the component placed on the left
-    nodes_data, edges_data = _two_row_design(
-        n_sources={"a": 1, "b": 1, "bus": 0},
-        n_targets={"a": 0, "b": 0, "bus": 2},
-        edges=[
-            (("a", "source", "1"), ("bus", "target", "1")),
-            (("b", "source", "1"), ("bus", "target", "2")),
-        ],
-    )
-    raw_positions = {"a": (-0.5, 1), "b": (0.5, 1), "bus": (0.0, 0)}
-
-    assert _order_rows_by_ports(raw_positions, nodes_data, edges_data) == {
-        "a": (0.5, 1),
-        "b": (-0.5, 1),
-        "bus": (0.0, 0),
-    }
+def test_other_port_labels_keep_the_default_style():
+    # Another port number
+    assert not _is_highlighted("dc_splitter", "2", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    # The other side
+    assert not _is_highlighted("dc_splitter", "1", PRIMARY_TARGET_PORT_TYPE_KEYWORDS)
+    assert not _is_highlighted("planetary_gear", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
+    # A component without a primary port
+    assert not _is_highlighted("pmsm", "1", PRIMARY_SOURCE_PORT_TYPE_KEYWORDS)
 
 
 # ---------------------------------------------------------------------------
-# _type_unknown_ports_from_connections
+# UI constants and triggers
 # ---------------------------------------------------------------------------
 
 
-def _unknown_components(port_types: list) -> dict:
-    """
-    Node columns of unknown components with the given port types.
+def test_dialog_style_and_trigger_helpers():
+    # Every dialog is placed by the shared position styles
+    assert DIALOG_POSITION_STYLES.items() <= DIALOG_STYLES.items()
 
-    :param port_types: ``(source port type, target port type)`` per component.
-    :return: ``nodes_data`` with the columns the port typing reads.
-    """
-    return {
-        "name": [f"unknown_{index}" for index in range(len(port_types))],
-        "icon_type": ["unknown"] * len(port_types),
-        "source_port_type": [source_type for source_type, _ in port_types],
-        "target_port_type": [target_type for _, target_type in port_types],
-    }
+    # Python flips a trigger between "0" and "1", so every flip is a change
+    trigger = bkmodel.TextInput(value="0")
+    _flip_trigger(trigger)
+    assert trigger.value == "1"
+    _flip_trigger(trigger)
+    assert trigger.value == "0"
 
-
-def test_type_unknown_ports_spreads_through_a_side_with_several_connections():
-    # 0 has a defined target side. 1's source side is connected to it and to
-    # 2's target side, so both undefined sides get its energy type
-    nodes_data = _unknown_components(
-        [("undefined", "electricity"), ("undefined", "undefined"), ("undefined", "undefined")]
+    # The JS twin does the same on the named trigger
+    assert _js_flip("browse_load_trigger") == (
+        "browse_load_trigger.value = browse_load_trigger.value === '1' ? '0' : '1';"
     )
-    endpoints = [(1, "1", 0, "1"), (1, "1", 2, "1")]
-
-    _type_unknown_ports_from_connections(nodes_data, endpoints)
-
-    assert nodes_data["source_port_type"] == ["undefined", "electricity", "undefined"]
-    assert nodes_data["target_port_type"] == ["electricity", "undefined", "electricity"]
 
 
-def test_type_unknown_ports_leaves_sides_connected_to_nothing_defined():
-    nodes_data = _unknown_components([("undefined", "undefined"), ("undefined", "undefined")])
-    endpoints = [(0, "1", 1, "1")]
-
-    _type_unknown_ports_from_connections(nodes_data, endpoints)
-
-    assert nodes_data["source_port_type"] == ["undefined", "undefined"]
-    assert nodes_data["target_port_type"] == ["undefined", "undefined"]
+# ---------------------------------------------------------------------------
+# Undo / redo history
+# ---------------------------------------------------------------------------
 
 
-def test_type_unknown_ports_uses_the_first_connection_when_types_conflict():
-    # 2's source side is connected to an electrical port first, then a mechanical one
-    nodes_data = _unknown_components(
-        [("undefined", "electricity"), ("undefined", "mechanical"), ("undefined", "undefined")]
+def test_undo_then_redo_returns_snapshots_in_order():
+    history_stack = EditHistoryStack()
+    history_stack.push_undo({"step": 1})
+    history_stack.push_undo({"step": 2})
+
+    assert history_stack.can_undo and not history_stack.can_redo
+    assert history_stack.undo() == {"step": 2}
+
+    history_stack.push_redo({"step": 3})
+    assert history_stack.can_redo
+    assert history_stack.redo() == {"step": 3}
+
+
+def test_only_a_new_edit_clears_the_redo_stack():
+    history_stack = EditHistoryStack()
+    history_stack.push_redo({"step": 2})
+
+    # Redo saves the current state for undo, keeping the other redo steps
+    history_stack.push_undo_keep_redo({"step": 1})
+    assert history_stack.can_undo and history_stack.can_redo
+
+    # A new edit makes the undone steps unreachable
+    history_stack.push_undo({"step": 3})
+    assert not history_stack.can_redo
+
+
+def test_empty_or_cleared_history_has_nothing_to_undo_or_redo():
+    history_stack = EditHistoryStack()
+    assert history_stack.undo() is None
+    assert history_stack.redo() is None
+    assert len(history_stack) == 0
+
+    history_stack.push_undo({"step": 1})
+    history_stack.push_redo({"step": 2})
+    history_stack.clear()
+
+    assert not history_stack.can_undo and not history_stack.can_redo
+
+
+def test_max_depth_drops_oldest_snapshot():
+    history_stack = EditHistoryStack(max_depth=3)
+    for step in range(5):
+        history_stack.push_undo({"step": step})
+
+    assert len(history_stack) == 3
+    remaining_steps = [history_stack.undo()["step"] for _ in range(3)]
+    assert remaining_steps == [4, 3, 2]
+
+
+def test_snapshot_is_independent_of_live_data():
+    nodes_data = {"name": ["battery_1"], "x": [1.0]}
+    state = SimpleNamespace(
+        placed_nodes_source=SimpleNamespace(data=nodes_data),
+        edge_source=SimpleNamespace(data={"xs": [[0.0, 1.0]]}),
+        placed_counter={"battery": 1},
     )
-    endpoints = [(2, "1", 0, "1"), (2, "1", 1, "1")]
 
-    _type_unknown_ports_from_connections(nodes_data, endpoints)
+    # Take a snapshot, then change the live data
+    snapshot = make_snapshot(state)
+    nodes_data["name"].append("cable_1")
+    state.edge_source.data["xs"][0].append(2.0)
+    state.placed_counter["battery"] = 5
 
-    assert nodes_data["source_port_type"][2] == "electricity"
-
-
-# ---------------------------------------------------------------------------
-# _parse_endpoint
-# ---------------------------------------------------------------------------
-
-
-def test_parse_endpoint():
-    # A plain name is port 1
-    assert _parse_endpoint("motor_1") == ("motor_1", "1")
-    # [name, N] as a YAML list, or as a quoted string
-    assert _parse_endpoint(["bus_1", 2]) == ("bus_1", "2")
-    assert _parse_endpoint("[bus_1, 3]") == ("bus_1", "3")
-
-
-def test_parse_endpoint_rejects_malformed_endpoints():
-    assert _parse_endpoint(["bus_1"]) is None
-    assert _parse_endpoint(None) is None
+    assert snapshot["nodes"]["name"] == ["battery_1"]
+    assert snapshot["edges"]["xs"] == [[0.0, 1.0]]
+    assert snapshot["placed_counter"] == {"battery": 1}

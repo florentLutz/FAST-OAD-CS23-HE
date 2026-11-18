@@ -27,7 +27,6 @@ directly; it is composed into :class:`BuilderHandler` via multiple inheritance.
 """
 
 import ast
-import json
 import logging
 
 import bokeh.models as bkmodel
@@ -42,6 +41,7 @@ from .power_train_builder_state import (
     edge_end_ports,
     has_no_port,
     is_unknown_node,
+    node_options,
     select_edges,
     BuilderState,
 )
@@ -104,7 +104,7 @@ class UnknownComponentMixin:
         self.state.unknown_position_input.value = nodes_data["position"][node_index]
         self.state.unknown_symmetry_input.value = nodes_data["symmetry_name"][node_index]
 
-        self._refresh_unknown_options_table(_saved_options(nodes_data, node_index))
+        self._refresh_unknown_options_table(node_options(nodes_data, node_index))
         self.state.options_table.visible = True
 
         # Both sides are editable, down to no port at all (e.g. a tank or a propeller)
@@ -119,14 +119,12 @@ class UnknownComponentMixin:
 
         # Filling the selects is not a user change: it must not apply anything
         self._is_populating_node_table = True
-        try:
-            for port_type_select, column in (
-                (self.state.source_port_type_select, "source_port_type"),
-                (self.state.target_port_type_select, "target_port_type"),
-            ):
-                port_type_select.value = nodes_data[column][node_index] or UNDEFINED_PORT_TYPE
-        finally:
-            self._is_populating_node_table = False
+        for port_type_select, column in (
+            (self.state.source_port_type_select, "source_port_type"),
+            (self.state.target_port_type_select, "target_port_type"),
+        ):
+            port_type_select.value = nodes_data[column][node_index] or UNDEFINED_PORT_TYPE
+        self._is_populating_node_table = False
 
         # Both spinners hold the stored counts now
         self._refresh_unknown_port_warning()
@@ -312,21 +310,6 @@ class UnknownComponentMixin:
             for starting_port, ending_port in self.state.panel_pending_connections
             if fits(tuple(_port_key(port) for port in (starting_port, ending_port)))
         ]
-
-
-def _saved_options(nodes_data: dict, node_index: int) -> dict:
-    """
-    Stored options of node *node_index*, decoded from their JSON string.
-
-    :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
-    :param node_index: Zero-based index of the node.
-    :return: ``{option_name: value}``; empty if the JSON cannot be read.
-    """
-    try:
-        options = json.loads(nodes_data["options"][node_index] or "{}")
-    except (json.JSONDecodeError, TypeError):
-        return {}
-    return options if isinstance(options, dict) else {}
 
 
 def _text_to_option_value(text: str):

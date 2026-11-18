@@ -13,6 +13,7 @@ same objects.
 ``ColumnDataSource.data`` dict before changing and reassigning it.
 """
 
+import json
 from dataclasses import dataclass, field
 
 import bokeh.models as bkmodel
@@ -363,6 +364,22 @@ def drop_entry(column_data: dict, entry_index: int) -> dict:
         column_name: [value for position, value in enumerate(values) if position != entry_index]
         for column_name, values in column_data.items()
     }
+
+
+def node_options(nodes_data: dict, node_index: int) -> dict:
+    """
+    Stored options of node *node_index*, decoded from their JSON string.
+
+    :param nodes_data: ``placed_nodes_source.data`` (or a copy of it).
+    :param node_index: Zero-based index of the node.
+    :return: ``{option_name: value}``; empty if the JSON is missing, cannot be
+        read, or is not an object.
+    """
+    try:
+        options = json.loads(nodes_data["options"][node_index] or "{}")
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    return options if isinstance(options, dict) else {}
 
 
 # ============================================================================
