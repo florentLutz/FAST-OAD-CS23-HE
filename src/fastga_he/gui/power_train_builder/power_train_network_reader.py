@@ -138,28 +138,6 @@ _DEFAULT_CANVAS_AREA = dict(
 _ENERGY_STORAGE_KEYWORDS = ("tank", "battery_pack")
 
 
-def _matching_component_types(references: tuple) -> set:
-    """
-    Component types whose type, or one of whose type classes, is in *references*.
-
-    Same matching rule as ``FASTGAHEPowerTrainConfigurator.get_component_distance``,
-    which accepts either a component type or a component type class.
-
-    :param references: Component types or component type classes to match.
-    :return: Set of matching component types.
-    """
-    matching_types = set()
-    for known_component in KNOWN_COMPONENTS:
-        if known_component["components_type"] in references or any(
-            reference in component_type_classes(known_component) for reference in references
-        ):
-            matching_types.add(known_component["components_type"])
-    return matching_types
-
-
-# Component types counted as energy storage when computing hierarchy layers
-_ENERGY_STORAGE_COMPONENT_TYPES = _matching_component_types(_ENERGY_STORAGE_KEYWORDS)
-
 # Default of the viewer's from_propulsor argument: when True, layers are always
 # counted from the propulsors instead of first trying the energy storage
 _LAYOUT_FROM_PROPULSOR = False
@@ -579,43 +557,72 @@ def _type_unknown_ports_from_connections(nodes_data: dict, endpoints: list) -> N
     Give every undefined port side of an unknown component the energy type it is connected to.
 
     A file without ``canvas_layout`` does not store the port types of its
-    unknown components, but its connections imply them. The first connection
-    to a defined port decides; repeated until nothing changes, so a chain of
-    unknown components is typed from its known end. A side connected to
-    nothing defined stays undefined, and its connections are then refused.
+    unknown components, but its connections imply them: connected ports carry
+    the same energy type. So the undefined sides joined by connections form
+    groups, and each group takes the energy type of the defined ports it is
+    connected to; if there are several, the one of the first connection in the
+    file. A group connected to nothing defined stays undefined, and its
+    connections are then refused.
 
     :param nodes_data: Node columns built by ``_build_nodes``, edited in place.
     :param endpoints: Connections from :func:`_connection_endpoints`.
     """
-    is_typing = True
-    while is_typing:
-        is_typing = False
-        for source_index, _, target_index, _ in endpoints:
-            source_color = node_port_colors(nodes_data, source_index)[0]
-            target_color = node_port_colors(nodes_data, target_index)[1]
-            is_typing |= _type_undefined_side(nodes_data, source_index, "source", target_color)
-            is_typing |= _type_undefined_side(nodes_data, target_index, "target", source_color)
+    # Every port side, (node_index, "source" / "target"), joined to the sides it
+    # is connected to. Each link remembers the first connection that made it
+    port_side_graph = nx.Graph()
+    for connection_index, (source_index, _, target_index, _) in enumerate(endpoints):
+        source_side, target_side = (source_index, "source"), (target_index, "target")
+        if not port_side_graph.has_edge(source_side, target_side):
+            port_side_graph.add_edge(source_side, target_side, connection_index=connection_index)
+
+    undefined_sides = [side for side in port_side_graph if _is_undefined_side(nodes_data, side)]
+    for group in nx.connected_components(port_side_graph.subgraph(undefined_sides)):
+        group_port_type = _connected_port_type(nodes_data, port_side_graph, group)
+        if group_port_type is None:
+            continue
+        for node_index, side in group:
+            nodes_data[f"{side}_port_type"][node_index] = group_port_type
 
 
-def _type_undefined_side(nodes_data: dict, node_index: int, side: str, far_color) -> bool:
+def _is_undefined_side(nodes_data: dict, port_side: tuple) -> bool:
     """
-    Set one undefined port side of an unknown component to the energy type of *far_color*.
+    Whether a port side belongs to an unknown component and has no energy type yet.
 
-    :param nodes_data: Node columns, edited in place.
-    :param node_index: Zero-based index of the node.
-    :param side: ``"source"`` or ``"target"``.
-    :param far_color: Colour of the port at the other end of a connection of that side.
-    :return: ``True`` if the side was typed.
+    :param nodes_data: Node columns.
+    :param port_side: ``(node_index, "source" / "target")``.
+    :return: ``True`` for an undefined side of an unknown component.
     """
-    column = f"{side}_port_type"
-    if (
-        not is_unknown_node(nodes_data, node_index)
-        or nodes_data[column][node_index] != UNDEFINED_PORT_TYPE
-        or far_color not in _PORT_TYPE_OF_COLOR
-    ):
-        return False
-    nodes_data[column][node_index] = _PORT_TYPE_OF_COLOR[far_color]
-    return True
+    node_index, side = port_side
+    return (
+        is_unknown_node(nodes_data, node_index)
+        and nodes_data[f"{side}_port_type"][node_index] == UNDEFINED_PORT_TYPE
+    )
+
+
+def _connected_port_type(nodes_data: dict, side_graph, group: set) -> str | None:
+    """
+    Energy type of the defined ports a group of undefined sides is connected to.
+
+    :param nodes_data: Node columns.
+    :param side_graph: Port sides joined by connections, each link carrying the
+        index of the first connection that made it.
+    :param group: Undefined port sides joined to each other by connections.
+    :return: The energy type of the first connection (in file order) from the
+        group to a defined port, or ``None`` if the group reaches none.
+    """
+    first_connection_index, port_type = None, None
+    for group_side in group:
+        for far_side, link in side_graph[group_side].items():
+            far_node_index, far_side_name = far_side
+            far_color = node_port_colors(nodes_data, far_node_index)[
+                0 if far_side_name == "source" else 1
+            ]
+            if far_color not in _PORT_TYPE_OF_COLOR:
+                continue
+            if first_connection_index is None or link["connection_index"] < first_connection_index:
+                first_connection_index = link["connection_index"]
+                port_type = _PORT_TYPE_OF_COLOR[far_color]
+    return port_type
 
 
 def _unknown_node_entry(component: dict, layout_entry) -> dict:
@@ -814,10 +821,11 @@ def _layers_from_energy_storage(
         from storage is not a propulsor, in which case the viewer counts the
         layers from the propulsors instead.
     """
+    energy_storage_types = _energy_storage_component_types()
     energy_storage_nodes = [
         node_name
         for node_name, node_type in node_types.items()
-        if node_type in _ENERGY_STORAGE_COMPONENT_TYPES
+        if node_type in energy_storage_types
     ]
     if not energy_storage_nodes:
         return {}, False
@@ -834,6 +842,27 @@ def _layers_from_energy_storage(
         for node_name, distance in distance_from_energy.items()
     )
     return layers, propulsors_not_on_top
+
+
+def _energy_storage_component_types() -> set:
+    """
+    Component types counted as energy storage when computing hierarchy layers.
+
+    A component type is energy storage if the type itself, or one of its type
+    classes, is in :data:`_ENERGY_STORAGE_KEYWORDS`: the same matching rule as
+    the viewer's ``FASTGAHEPowerTrainConfigurator.get_component_distance``.
+
+    :return: Set of component types.
+    """
+    energy_storage_types = set()
+    for known_component in KNOWN_COMPONENTS:
+        component_type = known_component["components_type"]
+        type_classes = component_type_classes(known_component)
+        if component_type in _ENERGY_STORAGE_KEYWORDS or any(
+            keyword in type_classes for keyword in _ENERGY_STORAGE_KEYWORDS
+        ):
+            energy_storage_types.add(component_type)
+    return energy_storage_types
 
 
 def _chosen_layers(

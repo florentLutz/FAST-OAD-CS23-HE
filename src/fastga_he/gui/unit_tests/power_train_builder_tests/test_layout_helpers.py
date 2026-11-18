@@ -18,6 +18,7 @@ from fastga_he.gui.power_train_builder.power_train_network_reader import (
     _parse_endpoint,
     _port_offset,
     _spread,
+    _type_unknown_ports_from_connections,
 )
 
 _ICON_SIZE = 50
@@ -322,6 +323,62 @@ def test_order_rows_by_ports_swaps_components_whose_edges_cross_at_target_ports(
         "b": (-0.5, 1),
         "bus": (0.0, 0),
     }
+
+
+# ---------------------------------------------------------------------------
+# _type_unknown_ports_from_connections
+# ---------------------------------------------------------------------------
+
+
+def _unknown_components(port_types: list) -> dict:
+    """
+    Node columns of unknown components with the given port types.
+
+    :param port_types: ``(source port type, target port type)`` per component.
+    :return: ``nodes_data`` with the columns the port typing reads.
+    """
+    return {
+        "name": [f"unknown_{index}" for index in range(len(port_types))],
+        "icon_type": ["unknown"] * len(port_types),
+        "source_port_type": [source_type for source_type, _ in port_types],
+        "target_port_type": [target_type for _, target_type in port_types],
+    }
+
+
+def test_type_unknown_ports_spreads_through_a_side_with_several_connections():
+    # 0 has a defined target side. 1's source side is connected to it and to
+    # 2's target side, so both undefined sides get its energy type
+    nodes_data = _unknown_components(
+        [("undefined", "electricity"), ("undefined", "undefined"), ("undefined", "undefined")]
+    )
+    endpoints = [(1, "1", 0, "1"), (1, "1", 2, "1")]
+
+    _type_unknown_ports_from_connections(nodes_data, endpoints)
+
+    assert nodes_data["source_port_type"] == ["undefined", "electricity", "undefined"]
+    assert nodes_data["target_port_type"] == ["electricity", "undefined", "electricity"]
+
+
+def test_type_unknown_ports_leaves_sides_connected_to_nothing_defined():
+    nodes_data = _unknown_components([("undefined", "undefined"), ("undefined", "undefined")])
+    endpoints = [(0, "1", 1, "1")]
+
+    _type_unknown_ports_from_connections(nodes_data, endpoints)
+
+    assert nodes_data["source_port_type"] == ["undefined", "undefined"]
+    assert nodes_data["target_port_type"] == ["undefined", "undefined"]
+
+
+def test_type_unknown_ports_uses_the_first_connection_when_types_conflict():
+    # 2's source side is connected to an electrical port first, then a mechanical one
+    nodes_data = _unknown_components(
+        [("undefined", "electricity"), ("undefined", "mechanical"), ("undefined", "undefined")]
+    )
+    endpoints = [(2, "1", 0, "1"), (2, "1", 1, "1")]
+
+    _type_unknown_ports_from_connections(nodes_data, endpoints)
+
+    assert nodes_data["source_port_type"][2] == "electricity"
 
 
 # ---------------------------------------------------------------------------
