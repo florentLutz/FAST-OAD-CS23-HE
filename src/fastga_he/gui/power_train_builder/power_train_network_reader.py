@@ -84,6 +84,13 @@ _KNOWN_COMPONENT_BY_ID = {component["id"]: component for component in KNOWN_COMP
 # Matches a "[name, N]" endpoint that was written as a quoted string
 _QUOTED_ENDPOINT_PATTERN = re.compile(r"^\s*\[\s*([^,\]]+?)\s*,\s*(\d+)\s*\]\s*$")
 
+# Port type of each defined energy colour, to type an unknown port from what it connects to
+_PORT_TYPE_OF_COLOR = {
+    color: port_type
+    for port_type, color in PORT_TYPE_COLORS.items()
+    if port_type != UNDEFINED_PORT_TYPE
+}
+
 
 class PowerTrainYAMLReader:
     """
@@ -449,14 +456,6 @@ def _connection_endpoints(connections: list, name_to_index: dict) -> list[tuple]
             (name_to_index[source_name], source_label, name_to_index[target_name], target_label)
         )
     return endpoints
-
-
-# Port type of each defined energy colour, to type an unknown port from what it connects to
-_PORT_TYPE_OF_COLOR = {
-    color: port_type
-    for port_type, color in PORT_TYPE_COLORS.items()
-    if port_type != UNDEFINED_PORT_TYPE
-}
 
 
 def _type_unknown_ports_from_connections(nodes_data: dict, endpoints: list) -> None:
