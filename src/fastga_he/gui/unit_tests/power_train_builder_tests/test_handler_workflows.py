@@ -116,16 +116,21 @@ def test_invalid_port_taps_make_no_edge(chain, canvas):
 
     # Battery port 1 is already used
     canvas.connect(("target", chain["battery"], "1"), ("source", extra_cable, "1"))
+    assert len(canvas.edges()) == num_edges_before
     # Electric source on the cable vs mechanical target on a free motor: colours differ
     canvas.connect(("source", extra_cable, "1"), ("target", free_motor, "1"))
+    assert len(canvas.edges()) == num_edges_before
     # Same kind on both ends
     canvas.connect(("source", extra_cable, "1"), ("source", chain["motor"], "1"))
+    assert len(canvas.edges()) == num_edges_before
     # The same port tapped twice cancels the pending connection
     canvas.connect(("source", extra_cable, "1"), ("source", extra_cable, "1"))
+    assert len(canvas.edges()) == num_edges_before
     # A component is never connected to itself, even when its two sides carry the
     # same energy type (cable) or accept any (unknown component's undefined ports)
     canvas.connect(("source", extra_cable, "1"), ("target", extra_cable, "1"))
     canvas.connect(("target", unknown, "1"), ("source", unknown, "1"))
+    assert len(canvas.edges()) == num_edges_before
     # not even when a connection is committed without the canvas taps (e.g. Apply)
     canvas.handler._add_edge(
         canvas.handler._live_port("source", unknown, "1"),
