@@ -61,7 +61,7 @@ def setup(app):
 # -- Project information -----------------------------------------------------
 
 project = "FAST-OAD-CS23-HE"
-copyright = "2025, ISAE-SUPAERO"
+copyright = "2026, ISAE-SUPAERO"
 
 
 # -- General configuration ---------------------------------------------------

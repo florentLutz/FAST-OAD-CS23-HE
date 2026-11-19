@@ -50,7 +50,8 @@ Pillow = "9.3"
 kaleido = "0.2.1"
 click = "8.0.4"
 debugpy = "1.5.0"
-lca-modeller = { version = "^0.1.1b0", optional=true, python="3.10" }
+python-dateutil = "^2.8.2"
+lca-modeller = { version = "^0.1.1b0, <0.1.2b0", optional=true, python="3.10" }
 jupyterlab-widgets = "3.0.15"  # Hotfix for jupyterlab-widgets. To remove once this issue is fixed: https://github.com/jupyter-widgets/ipywidgets/issues/4013
 
 [tool.poetry.group.dev.dependencies]
@@ -75,6 +76,9 @@ ruff = "0.5.4"
 
 [tool.poetry.extras]
 lca = ["lca-modeller"]
+
+[tool.poetry.scripts]
+fastga-he = "fastga_he.cmd.cli:fastga_he_cli"
 
 [tool.poetry.plugins."fastoad.plugins"]
 "cs23_he_plugin" = "fastga_he"

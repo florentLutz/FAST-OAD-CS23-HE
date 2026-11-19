@@ -6,3 +6,4 @@ SUBMODEL_CONSTRAINTS_CURRENT_DC_SSPC = "submodel.propulsion.constraints.dc_sspc.
 SUBMODEL_CONSTRAINTS_VOLTAGE_DC_SSPC = "submodel.propulsion.constraints.dc_sspc.voltage"
 
 POSSIBLE_POSITION = ["inside_the_wing", "in_the_front", "in_the_back"]
+POSSIBLE_OPTION = {"closed": [True, False], "at_bus_output": [True, False]}
