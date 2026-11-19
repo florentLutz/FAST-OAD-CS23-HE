@@ -253,8 +253,8 @@ const GROUPS = [
               S("h", "_dismiss_startup_overlay", "CanvasMode"),
               C("io", "_load_canvas_state", "IO", "", [
                 S("d", "file checks", "IO", "The file must exist and end in <code>.yml</code> or <code>.yaml</code>."),
-                S("io", "PowerTrainYAMLReader.read", "Reader", "Builds the node and edge data from the file.",
-                  ["_build_nodes", "_build_edges", "_fit_unknown_port_counts", "_place_nodes_without_layout"]),
+                S("io", "PowerTrainYAMLReader.read", "Reader", "Builds the node and edge data from the file. An unknown component's <code>id</code> is split at its last dot into <code>id_prefix</code> and type.",
+                  ["_build_nodes", "split_component_id (unknown)", "_build_edges", "_fit_unknown_port_counts", "place_nodes_without_layout"]),
                 B(
                   ["Missing, not YAML, or parse error", [S("h", "_show_status_error", "IO", "Red message in the status line; canvas unchanged.")]],
                   ["File read", [
@@ -314,8 +314,8 @@ const GROUPS = [
             ),
             S("u", "_push_undo", "IO", "Snapshot of the design before the change.", PUSH_UNDO),
             S("d", "placed_counter", "Placement", "Next number for the icon: name <code>&lt;icon_key&gt;_&lt;n&gt;</code>."),
-            S("h", "_new_component_defaults", "Placement", "Type, position, options, port counts and port types.", ["default_position", "default_options"]),
-            S("d", "append_row", "State", "Row added to <code>placed_nodes_source</code>."),
+            S("h", "_new_component_defaults", "Placement", "Type, position, options, port counts, port types and id prefix (<code>COMPONENT_ID_PREFIX</code> for an unknown component, empty for a known one).", ["default_position", "default_options"]),
+            S("d", "append_entry", "State", "Row added to <code>placed_nodes_source</code>."),
             S("h", "_rebuild_all_ports", "Ports", "The new port balls are drawn."),
             S("h", "_mark_unsaved", "IO", "Save button orange; Undo and Redo buttons refreshed."),
           ]),
@@ -339,8 +339,22 @@ const GROUPS = [
               ["Another component", [
                 S("d", "selected_node_index", "Handler", "Set to the tapped component."),
                 C("h", "_populate_node_table", "ConfigPanel", "", [
-                  S("h", "_show_unknown_widgets", "Unknown", "Selects for a known component, text fields for an unknown one."),
-                  S("h", "_populate_known_fields", "ConfigPanel", "Or <code>_populate_unknown_fields</code> for an unknown component."),
+                  S("h", "_show_unknown_widgets", "Unknown", "Selects for a known component; text fields and the id-prefix field for an unknown one. Both warnings hidden until the panel is filled."),
+                  B(
+                    ["Known component", [S("h", "_populate_known_fields", "ConfigPanel", "Type, position, options and port-count selects.")]],
+                    ["Unknown component", [
+                      C("h", "_populate_unknown_fields", "Unknown", "", [
+                        C("h", "_refresh_unknown_id_fields", "Unknown", "", [
+                          S("d", "normalize_id_prefix", "State", "Stored prefix and type shown in their fields."),
+                          S("d", "known_component_id_prefixes", "Metadata", "Suggestions: the registered prefixes, plus every prefix already used in the design."),
+                          S("h", "_refresh_unknown_type_warning", "Unknown", "Dot warning shown if the stored type contains a dot."),
+                        ]),
+                        S("h", "_refresh_unknown_options_table", "Unknown", "Editable name / value rows."),
+                        S("d", "spinners and port-type selects", "Unknown", "Filled from the stored counts and types, without applying anything."),
+                        S("h", "_refresh_unknown_port_warning", "Unknown", "No-port warning if both counts are 0."),
+                      ]),
+                    ]],
+                  ),
                   S("d", "selected_node_overlay_source", "ConfigPanel", "Gold selection ring moved to the component."),
                   S("h", "_rebuild_all_ports", "Ports", "The component's port balls become visible."),
                   S("h", "_refresh_connections_table", "ConfigPanel", "One row per port."),
@@ -370,7 +384,7 @@ const GROUPS = [
                 S("d", "ports_compatible", "State", "Same, defined energy colour."),
                 S("d", "_edge_rejection", "Ports", "Refuses self-connection, busy port, or a second edge between the same pair."),
                 S("u", "_push_undo", "IO", "", PUSH_UNDO),
-                S("h", "_add_edge", "Ports", "Edge appended to <code>edge_source</code>, from the first port clicked.", ["append_row", "_mark_unsaved"]),
+                S("h", "_add_edge", "Ports", "Edge appended to <code>edge_source</code>, from the first port clicked.", ["append_entry", "_mark_unsaved"]),
                 S("h", "_rebuild_all_ports", "Ports", "Connected flags and Connections panel updated."),
                 S("h", "_cancel_pending_connection", "Ports"),
               ]],
@@ -413,6 +427,7 @@ const GROUPS = [
       flow: [
         S("ui", "Port-count spinner", "Browser"),
         C("cb", "_on_port_count_spinner_change", "ConfigPanel", "Reads both spinners; a hidden spinner's side keeps its stored count.", [
+          S("h", "_refresh_unknown_port_warning", "Unknown", "Unknown component: the no-port warning follows the spinners."),
           C("h", "_rebuild_all_ports", "Ports", "With <code>override_counts</code> for the selected component.", [
             S("h", "_sync_edge_preview_backup", "Ports", "First tick backs up the edges; later ticks restore the backup before pruning."),
             S("h", "_draw_ports", "Ports", "Port balls recomputed.", ["_stored_port_count", "compute_ports", "node_port_colors", "_set_connected_flags"]),
@@ -437,7 +452,7 @@ const GROUPS = [
               C("h", "_clear_node_connections_and_symmetry", "ConfigPanel", "", [
                 S("h", "_clear_temp_edges", "Ports", "Picks belong to the old type's ports."),
                 S("h", "_end_edge_preview", "Ports", "Works on the real edges."),
-                S("d", "_symmetry_positions_to_clear", "ConfigPanel", "Its own link and every component pointing at it."),
+                S("d", "_symmetry_indices_to_clear", "ConfigPanel", "Its own link and every component pointing at it."),
                 B(
                   ["Nothing to remove", [S("h", "_refresh_connections_table", "ConfigPanel", "No undo step.")]],
                   ["Something to remove", [
@@ -455,27 +470,54 @@ const GROUPS = [
         ]),
       ] },
     { id: "apply", t: "Apply the panel", trig: "Click <b>Apply</b> in the configuration panel.", undo: "Yes, one step",
-      res: "Name, type, position, options, port counts, symmetry and picked connections written to the design.",
+      res: "Name, type, position, options, port counts, symmetry, picked connections and, for an unknown component, its id prefix written to the design.",
       flow: [
         S("ui", "Apply button", "Browser"),
         C("cb", "apply_node_configurations", "ConfigPanel", "Returns if nothing is selected.", [
           S("u", "_push_undo", "IO", "", PUSH_UNDO),
           C("h", "_write_node_fields", "ConfigPanel", "", [
-            S("h", "_known_panel_fields", "ConfigPanel", "Or <code>_unknown_panel_fields</code>: type, position and options from the panel.", ["_strings_to_option_values"]),
-            S("d", "_set_cell", "ConfigPanel", "Name, position, type and options (JSON) written."),
+            B(
+              ["Known component", [S("h", "_known_panel_fields", "ConfigPanel", "Type, position and options from the selects.", ["_strings_to_option_values"])]],
+              ["Unknown component", [S("h", "_unknown_panel_fields", "Unknown", "Id prefix (trailing dot added, default if empty), type as typed (<code>unknown</code> if empty), position and options.", ["normalize_id_prefix", "_text_to_option_value"])]],
+            ),
+            S("d", "_set_entry_value", "ConfigPanel", "Name, position, type and options (JSON) written; <code>id_prefix</code> too for an unknown component."),
             S("d", "n_sources / n_targets", "ConfigPanel", "Hidden source spinner: both counts reset to the type's defaults. Then each visible spinner writes its value."),
           ]),
           C("h", "_write_symmetry", "ConfigPanel", "", [
             S("d", "_padded_symmetry_columns", "ConfigPanel"),
-            S("d", "_node_position", "ConfigPanel", "Index of the chosen peer."),
-            S("d", "_positions_linked_to", "ConfigPanel", "Stale links, cleared with <code>unlink_symmetry</code>."),
+            S("d", "_find_node_index", "ConfigPanel", "Index of the chosen peer."),
+            S("d", "_node_indices_linked_to", "ConfigPanel", "Stale links, cleared with <code>unlink_symmetry</code>."),
             S("d", "_write_symmetry_entry", "ConfigPanel", "Links both ways (<code>link_symmetry</code>), keeps an unknown component's free text, or unlinks."),
           ]),
+          S("h", "_warn_if_unknown_without_port", "Unknown", "Logs a warning if an unknown component has no port at all."),
+          S("h", "_refresh_unknown_id_fields", "Unknown", "Unknown component only: the prefix and type shown as stored, and the suggestions and dot warning updated."),
           S("h", "_add_edge", "Ports", "Once per pick in <code>panel_pending_connections</code>.", ["_edge_rejection"]),
           S("h", "_clear_temp_edges", "Ports", "Picks and dashed previews cleared."),
           S("h", "_rebuild_all_ports", "Ports"),
           S("h", "_mark_unsaved", "IO"),
         ]),
+      ] },
+    { id: "unknown-id", t: "Type the id prefix or type of an unknown component", trig: "Type in the <b>FAST-OAD id prefix</b> or <b>Component Type</b> field of an unknown component.", undo: "With Apply",
+      res: "Prefix suggestions while typing, and a warning while the type contains a dot; the id <code>&lt;id_prefix&gt;&lt;type&gt;</code> is written by Apply.",
+      flow: [
+        B(
+          ["Id prefix field", [
+            S("ui", "FAST-OAD id prefix field", "Browser", "Bokeh <code>AutocompleteInput</code>: the registered prefixes and those of the design are suggested, but any text is accepted."),
+            E("No Python callback: read by Apply (<code>_unknown_panel_fields</code>)."),
+          ]],
+          ["Type field", [
+            S("ui", "Component Type field", "Browser", "Each keystroke changes <code>value_input</code>."),
+            C("cb", "_on_unknown_type_input_change", "Unknown", "Wired to <code>value_input</code>.", [
+              C("h", "_refresh_unknown_type_warning", "Unknown", "", [
+                B(
+                  ["The selected unknown component's typed type contains a dot", [S("d", "unknown_type_dot_warning_div", "Unknown", "Warning shown under the field: the package part belongs in the id prefix.")]],
+                  ["Otherwise", [S("d", "unknown_type_dot_warning_div", "Unknown", "Warning hidden.")], true],
+                ),
+              ]),
+            ]),
+            E("The type is saved as typed, dot included, by Apply."),
+          ]],
+        ),
       ] },
     { id: "unknown-port-type", t: "Set a port type of an unknown component", trig: "Choose an energy type in the source or target port-type select.", undo: "Yes, one step, at once",
       res: "That side's ports take the new colour; their connections are removed.",
@@ -529,7 +571,7 @@ const GROUPS = [
             S("h", "_find_nearest_node", "Ports", "A component is found."),
             C("h", "_delete_node", "Handler", "", [
               S("u", "_push_undo", "IO", "", PUSH_UNDO),
-              S("d", "drop_row", "State", "Node row removed."),
+              S("d", "drop_entry", "State", "Node row removed."),
               S("d", "_reindex_symmetry_after_deletion", "Handler", "Peer loses its link; later peer indices minus 1."),
               S("d", "edge_indices_not_touching_node", "State", "Then <code>select_edges</code>; node indices after it decremented."),
               S("h", "_rebuild_all_ports", "Ports"),
@@ -549,7 +591,7 @@ const GROUPS = [
             S("h", "_find_nearest_edge", "Ports", "Closest line within 12 data units.", ["_cursor_to_segment_distance"]),
             C("h", "_delete_edge", "Handler", "", [
               S("u", "_push_undo", "IO", "", PUSH_UNDO),
-              S("d", "drop_row", "State", "Edge row removed."),
+              S("d", "drop_entry", "State", "Edge row removed."),
               S("h", "_rebuild_all_ports", "Ports", "The freed ports show as free."),
               S("h", "_mark_unsaved", "IO"),
             ]),
@@ -656,8 +698,8 @@ const GROUPS = [
             C("cb", "_on_browse_save", "IO", "<code>final</code> leaves out <code>canvas_layout</code>.", [
               S("io", "_open_tkinter_dialog", "IO", "Save-file dialog, default extension <code>.yml</code>."),
               C("io", "_save_canvas_state", "IO", "An empty path (dialog cancelled) skips the save.", [
-                S("io", "PowerTrainYAMLWriter", "Writer", "Built on copies of the node and edge data.",
-                  ["set_title", "add_component (per node)", "add_connection", "set_watcher_file_path", "write", "_build_output"]),
+                S("io", "PowerTrainYAMLWriter", "Writer", "Built on copies of the node and edge data. An unknown component's <code>id</code> is <code>&lt;id_prefix&gt;&lt;type&gt;</code>, also in a final version.",
+                  ["set_title", "add_component (per node)", "join_component_id (unknown)", "add_connection", "set_watcher_file_path", "write", "_build_output"]),
                 B(
                   ["Written", [S("d", "save_button", "IO", "Set green.")]],
                   ["Error", [S("h", "_show_status_error", "IO", "Red message; button stays orange.")]],
