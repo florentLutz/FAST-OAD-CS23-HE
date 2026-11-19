@@ -352,6 +352,8 @@ def test_apply_is_a_single_undo_step(chain, canvas):
     canvas.state.name_input.value = "front_motor"
     canvas.apply()
 
+    assert canvas.node_column("name")[chain["motor"]] == "front_motor"
+
     # Undo the change
     canvas.undo()
 
