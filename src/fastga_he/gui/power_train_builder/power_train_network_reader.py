@@ -62,6 +62,7 @@ from .power_train_builder_state import (
     link_symmetry,
     node_port_colors,
     ports_compatible,
+    split_component_id,
     unknown_nodes_without_port,
 )
 from .power_train_builder_metadata import component_type_classes, icon_data_url
@@ -72,7 +73,6 @@ from .power_train_network_writer import (
     KEY_PT_CONNECTIONS,
     KEY_PT_WATCHER,
     port_side_of,
-    unknown_component_type,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -253,6 +253,8 @@ class PowerTrainYAMLReader:
             # Known components take their port colours from their icon
             "source_port_type": _EMPTY,
             "target_port_type": _EMPTY,
+            # Their id comes from KNOWN_COMPONENTS
+            "id_prefix": _EMPTY,
         }
 
     # -----------------------------------------------------------------------
@@ -535,7 +537,9 @@ def _unknown_node_entry(component: dict, layout_entry) -> dict:
     """
     Type, icon, position, options and port settings of an unknown component of the file.
 
-    Its options are kept exactly as written. Its port counts and port types
+    Its id is split at its last dot into its id prefix and its component type
+    (see :func:`~.power_train_builder_state.split_component_id`). Its options
+    are kept exactly as written. Its port counts and port types
     come from its ``canvas_layout`` entry when the file was saved for later
     edits; otherwise the port types are undefined and the port counts are left
     to :func:`_fit_unknown_port_counts` (``None`` here).
@@ -545,8 +549,10 @@ def _unknown_node_entry(component: dict, layout_entry) -> dict:
     :return: Those columns of its ``placed_nodes_source`` entry.
     """
     layout_entry = layout_entry if isinstance(layout_entry, dict) else {}
+    id_prefix, component_type = split_component_id(component.get("id"))
     return {
-        "node_type": unknown_component_type(component.get("id")),
+        "node_type": component_type,
+        "id_prefix": id_prefix,
         "icon_type": UNKNOWN_ICON_KEY,
         "position": str(component.get("position") or _EMPTY),
         "options": json.dumps(component.get("options") or {}),

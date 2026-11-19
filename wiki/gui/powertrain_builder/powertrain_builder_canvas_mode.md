@@ -1,6 +1,6 @@
 # Canvas mode
 
-[<- Powertrain builder](powertrain_builder)
+<img src="https://api.iconify.design/mdi/arrow-left.svg?color=%23888888" width="16" height="16" alt="←"> [Powertrain builder](powertrain_builder)
 
 Module `power_train_builder_handler_canvas_mode.py`, mixin `CanvasModeMixin` of [`BuilderHandler`](powertrain_builder_handler).
 

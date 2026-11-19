@@ -1,6 +1,6 @@
 # Placement
 
-[<- Powertrain builder](powertrain_builder)
+<img src="https://api.iconify.design/mdi/arrow-left.svg?color=%23888888" width="16" height="16" alt="←"> [Powertrain builder](powertrain_builder)
 
 Module `power_train_builder_handler_placement.py`, mixin `PlacementMixin` of [`BuilderHandler`](powertrain_builder_handler).
 

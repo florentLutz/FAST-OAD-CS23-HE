@@ -150,7 +150,9 @@ def copy_column_data(data: dict) -> dict:
 # symmetry peer (_EMPTY / _NO_SYMMETRY_PEER when there is none), and
 # "source_port_type" / "target_port_type" the energy type of each port side of
 # an unknown component (a PORT_TYPE_COLORS key; _EMPTY for known components,
-# whose port colours come from their icon)
+# whose port colours come from their icon), and "id_prefix" the OpenMDAO id
+# prefix of an unknown component (e.g. "fastga_he.pt_component."; _EMPTY for
+# known components, whose id comes from KNOWN_COMPONENTS)
 NODE_COLUMNS = (
     "x",
     "y",
@@ -168,6 +170,7 @@ NODE_COLUMNS = (
     "symmetry_node_index",
     "source_port_type",
     "target_port_type",
+    "id_prefix",
 )
 
 # ============================================================================
@@ -185,8 +188,65 @@ UNKNOWN_COMPONENT_TABS = ("connector", "propulsor", "load", "tank", "source")
 # Default port counts of a new unknown component (each side configurable, 0 allowed)
 UNKNOWN_DEFAULT_PORT_COUNT = 1
 
+# Default prefix of the OpenMDAO id of an unknown component. Each unknown
+# component has its own prefix ("id_prefix" column), so components of several
+# packages can co-exist in one design: its id is "<id_prefix><node_type>"
+COMPONENT_ID_PREFIX = "fastga_he.pt_component."
+
+
+def normalize_id_prefix(id_prefix) -> str:
+    """
+    Id prefix as stored: stripped, ending with a dot, the default if empty.
+
+    :param id_prefix: Prefix typed by the user or read from a file.
+    :return: E.g. ``"my_package.pt_component."`` for ``" my_package.pt_component "``.
+    """
+    id_prefix = str(id_prefix or _EMPTY).strip()
+    if not id_prefix:
+        return COMPONENT_ID_PREFIX
+    return id_prefix if id_prefix.endswith(".") else id_prefix + "."
+
+
+def split_component_id(component_id) -> tuple[str, str]:
+    """
+    Split a FAST-OAD component id into its prefix and its component type.
+
+    The id is split at its last dot. An id without a dot is a bare type and
+    gets the default prefix; a missing type is ``"unknown"``.
+
+    :param component_id: E.g. ``"my_package.pt_component.my_part"``.
+    :return: ``(id_prefix, component_type)``, e.g.
+        ``("my_package.pt_component.", "my_part")``.
+    """
+    component_id = str(component_id or _EMPTY).strip()
+    id_prefix, dot, component_type = component_id.rpartition(".")
+    if not dot:
+        return COMPONENT_ID_PREFIX, component_id or UNKNOWN_COMPONENT_TYPE
+    return id_prefix + ".", component_type or UNKNOWN_COMPONENT_TYPE
+
+
+def join_component_id(id_prefix, component_type) -> str:
+    """
+    OpenMDAO id of an unknown component: the inverse of :func:`split_component_id`.
+
+    :param id_prefix: Prefix of the component (normalized here).
+    :param component_type: Its type; ``"unknown"`` if empty.
+    :return: E.g. ``"fastga_he.pt_component.my_part"``.
+    """
+    return normalize_id_prefix(id_prefix) + (
+        str(component_type or _EMPTY).strip() or UNKNOWN_COMPONENT_TYPE
+    )
+
+
 # Warning shown in the Ports section of the config panel when an unknown
 # component would have neither a source nor a target port
+# Warning shown under the type field of an unknown component while the typed
+# type contains a dot: the package part of the id belongs in the id prefix
+UNKNOWN_TYPE_DOT_WARNING_HTML = (
+    "<span style='color:#FFA500;font-size:12pt'>&#9888; The component type should not "
+    "contain a dot.</span>"
+)
+
 UNKNOWN_NO_PORT_WARNING_HTML = (
     "<span style='color:#FFA500;font-size:12pt'>&#9888; This component has neither a "
     "source nor a target port: it cannot be connected to anything.</span>"
@@ -740,6 +800,10 @@ class BuilderState:
     # symmetry_select, shown instead of them for an unknown component (which
     # has no list of possible values); committed on Apply like the selects
     unknown_type_input: bkmodel.TextInput = field(default=None)
+    # OpenMDAO id prefix of an unknown component (free text, with the prefixes
+    # of the registered components and of the design as suggestions);
+    # committed on Apply
+    unknown_id_prefix_input: bkmodel.AutocompleteInput = field(default=None)
     unknown_position_input: bkmodel.TextInput = field(default=None)
     unknown_symmetry_input: bkmodel.TextInput = field(default=None)
 
@@ -755,6 +819,9 @@ class BuilderState:
     # Warning in the Ports section, shown while the selected unknown component
     # has (or would have, with the spinner values) no source and no target port
     unknown_no_port_warning_div: bkmodel.Div = field(default=None)
+
+    # Warning under unknown_type_input, shown while the typed type contains a dot
+    unknown_type_dot_warning_div: bkmodel.Div = field(default=None)
 
     # --- Overlays and hidden browser <-> Python triggers ---
     # The whole startup overlay column — hidden (not just its two buttons) on dismiss

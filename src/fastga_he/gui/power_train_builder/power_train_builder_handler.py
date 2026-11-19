@@ -155,8 +155,10 @@ class BuilderHandler(
         self.state.source_count_spinner.on_change("value", self._on_port_count_spinner_change)
         self.state.target_count_spinner.on_change("value", self._on_port_count_spinner_change)
 
-        # Unknown component: add an option row, and port types applied at once
+        # Unknown component: add an option row, warn live about a dot in the
+        # type, and port types applied at once
         self.state.add_option_button.on_click(self._on_add_option)
+        self.state.unknown_type_input.on_change("value_input", self._on_unknown_type_input_change)
         for side, port_type_select in (
             ("source", self.state.source_port_type_select),
             ("target", self.state.target_port_type_select),

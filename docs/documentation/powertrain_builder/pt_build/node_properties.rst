@@ -24,8 +24,8 @@ component type if needed. To apply the changes, click on the blue ``Apply`` butt
     :align: center
 
 The ``unknown`` component, representing a not-yet-defined component, has different approach to configure the component ID
-and its type. Similarly to the configuration of the component ID, the component type can be defined in the editable text box. To
-apply the changes, click on the blue ``Apply`` button at the bottom of the right panel.
+and its type. Similarly to the configuration of the component ID, the component type can be defined in the editable text
+box. To apply the changes, click on the blue ``Apply`` button at the bottom of the right panel.
 
 Port counts
 ===========
@@ -58,3 +58,14 @@ will be automatically updated. To apply the changes, click on the blue ``Apply``
 .. image:: ../../../img/symmetry_drop_menu.gif
     :width: 600px
     :align: center
+
+OpenMDAO ID Prefix
+==================
+This widget is only visible for the unknown component, which the ID prefix can be personalized for unregistered
+components. The default is set as the OpenMDAO ID prefix for registered components, ``fastga_he.pt_component.``.
+To apply the changes, click on the blue ``Apply`` button at the bottom of the right panel.
+
+.. image:: ../../../img/unknown_prefix.svg
+    :width: 400px
+    :align: center
+

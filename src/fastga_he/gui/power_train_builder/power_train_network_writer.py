@@ -31,12 +31,12 @@ from fastga_he.powertrain_builder.powertrain import (
     KEY_PT_WATCHER,
 )
 from .power_train_builder_state import (
-    UNKNOWN_COMPONENT_TYPE,
     VARIABLE_PORT_DEFAULT,
     copy_column_data,
     default_options,
     edge_end_ports,
     is_unknown_node,
+    join_component_id,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,10 +55,6 @@ TARGET_SIDE_KEYWORDS = ("_outputs", "_engines", "_power_sources")
 
 # Decimal places kept for canvas coordinates (sub-pixel precision is noise)
 _LAYOUT_DECIMALS = 1
-
-# Prefix of FAST-OAD_CS23-HE component ids. An unknown component's type is
-# written as "<prefix><type>", unless it is already a full id (has a dot)
-COMPONENT_ID_PREFIX = "fastga_he.pt_component."
 
 # Extra canvas_layout keys of an unknown component: GUI-only settings that its
 # FAST-OAD entry cannot hold, kept so that an editable file re-opens as saved
@@ -147,8 +143,9 @@ class PowerTrainYAMLWriter:
         the current port counts are written as ``number_of_*`` option keys so
         that FAST-OAD can reconstruct the correct topology.
 
-        An unknown component is written with the id built from its type (see
-        :func:`unknown_component_id`) and exactly the options typed for it.
+        An unknown component is written with the id ``<id_prefix><node_type>``
+        (see :func:`~.power_train_builder_state.join_component_id`) and exactly
+        the options typed for it.
 
         The component's canvas (x, y) is also recorded under ``canvas_layout``
         so the file can be re-opened in the builder, with an unknown
@@ -170,7 +167,9 @@ class PowerTrainYAMLWriter:
             else None
         )
         if is_unknown_node(self.node_data, node_index):
-            component_id = unknown_component_id(self.node_data["node_type"][node_index])
+            component_id = join_component_id(
+                self.node_data["id_prefix"][node_index], self.node_data["node_type"][node_index]
+            )
             options_dict = self._saved_options(node_index)
         else:
             component_id, options_dict = self._known_id_and_options(node_index)
@@ -409,32 +408,6 @@ def _variable_port_options(
         for attribute_name in component_attributes
         if port_side_of(attribute_name) is not None
     }
-
-
-def unknown_component_id(component_type: str) -> str:
-    """
-    FAST-OAD id written for an unknown component of type *component_type*.
-
-    :param component_type: Type typed in the config panel, e.g. ``"my_part"``,
-        or a full id such as ``"my_package.pt_component.my_part"``.
-    :return: ``"fastga_he.pt_component.my_part"``, or the full id unchanged.
-    """
-    component_type = component_type or UNKNOWN_COMPONENT_TYPE
-    return component_type if "." in component_type else COMPONENT_ID_PREFIX + component_type
-
-
-def unknown_component_type(component_id) -> str:
-    """
-    Type shown for an unknown component read with id *component_id*.
-
-    The inverse of :func:`unknown_component_id`: the FAST-OAD_CS23-HE prefix is
-    dropped, any other id is kept whole.
-
-    :param component_id: ``id`` of the component in the file (may be missing).
-    :return: The component type to show and edit.
-    """
-    component_id = str(component_id or UNKNOWN_COMPONENT_TYPE)
-    return component_id.removeprefix(COMPONENT_ID_PREFIX) or UNKNOWN_COMPONENT_TYPE
 
 
 def port_side_of(attribute_name: str) -> str | None:

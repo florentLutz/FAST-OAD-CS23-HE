@@ -14,7 +14,9 @@ from fastga_he.powertrain_builder.resources.registered_components import KNOWN_C
 
 from fastga_he.gui.power_train_builder.power_train_builder_metadata import (
     _get_performance_component_names,
+    known_component_id_prefixes,
 )
+from fastga_he.gui.power_train_builder.power_train_builder_state import split_component_id
 from fastga_he.gui.power_train_builder.power_train_builder_toolbox_config_table import (
     _group_icons_by_tab,
     _with_unknown_component,
@@ -115,6 +117,17 @@ def test_scanner_with_non_literal_constants_gives_empty_entries(tmp_path):
     )
 
     assert _scan_first_component(tmp_path, constants_source) == ([], {})
+
+
+def test_id_prefixes_of_the_registered_components_default_first():
+    id_prefixes = known_component_id_prefixes()
+
+    assert id_prefixes[0] == "fastga_he.pt_component."
+    # Every registered prefix, each once
+    assert len(id_prefixes) == len(set(id_prefixes))
+    assert set(id_prefixes) == {"fastga_he.pt_component."} | {
+        split_component_id(component["id"])[0] for component in KNOWN_COMPONENTS
+    }
 
 
 # ---------------------------------------------------------------------------

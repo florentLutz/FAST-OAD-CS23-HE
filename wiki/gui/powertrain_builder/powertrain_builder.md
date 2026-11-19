@@ -11,8 +11,8 @@ The GUI runs as a local [Bokeh](https://docs.bokeh.org/) server opened in the de
 From a terminal:
 
 ```bash
-powertrain-builder
-powertrain-builder --port 5008 --address localhost
+fastga-he powertrain-builder
+fastga-he powertrain-builder --port 5008 --address localhost
 ```
 
 See [Launcher](powertrain_builder_launcher#launching) for the options and the `python -m` alternative.

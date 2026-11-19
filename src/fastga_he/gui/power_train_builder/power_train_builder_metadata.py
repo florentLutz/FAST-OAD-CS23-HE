@@ -29,7 +29,11 @@ from pathlib import Path
 from fastga_he.gui.power_train_network_viewer import _url_to_base64
 from fastga_he.powertrain_builder.resources.registered_components import KNOWN_COMPONENTS
 
-from .power_train_builder_state import VARIABLE_PORT_DEFAULT
+from .power_train_builder_state import (
+    COMPONENT_ID_PREFIX,
+    VARIABLE_PORT_DEFAULT,
+    split_component_id,
+)
 
 # Data URL of every icon file already read: resolved path -> data URL. Each
 # icon file is read and encoded once per session; later calls reuse the result
@@ -59,6 +63,19 @@ def _map_possible_component_types_to_icons() -> dict:
         else:
             icon_key_to_component_type_map[icon_key].append(component_type)
     return icon_key_to_component_type_map
+
+
+def known_component_id_prefixes() -> list:
+    """
+    Id prefixes of the registered components, offered as suggestions for the
+    id prefix of an unknown component.
+
+    :return: The default :data:`COMPONENT_ID_PREFIX` first, then every other
+        prefix of a ``KNOWN_COMPONENTS`` id, sorted.
+    """
+    id_prefixes = {split_component_id(component["id"])[0] for component in KNOWN_COMPONENTS}
+    id_prefixes.discard(COMPONENT_ID_PREFIX)
+    return [COMPONENT_ID_PREFIX, *sorted(id_prefixes)]
 
 
 def component_type_classes(known_component: dict) -> list:

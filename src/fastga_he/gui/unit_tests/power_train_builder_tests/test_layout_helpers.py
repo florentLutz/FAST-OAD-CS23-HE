@@ -47,17 +47,16 @@ from fastga_he.gui.power_train_builder.power_train_builder_state import (
     edge_end_ports,
     edge_indices_not_touching_port,
     empty_columns,
+    join_component_id,
     link_symmetry,
     node_options,
+    normalize_id_prefix,
     ports_compatible,
+    split_component_id,
     unlink_symmetry,
 )
 from fastga_he.gui.power_train_builder.power_train_builder_toolbox_config_table import _js_flip
-from fastga_he.gui.power_train_builder.power_train_network_writer import (
-    port_side_of,
-    unknown_component_id,
-    unknown_component_type,
-)
+from fastga_he.gui.power_train_builder.power_train_network_writer import port_side_of
 
 
 def _edges(*end_pairs) -> dict:
@@ -176,13 +175,15 @@ def test_unknown_component_helpers():
     assert not ports_compatible(UNDEFINED_PORT_COLOR, mechanical)
     assert not ports_compatible(UNDEFINED_PORT_COLOR, UNDEFINED_PORT_COLOR)
 
-    # A typed type gets the FAST-OAD_CS23-HE prefix, a full id is kept, and reading undoes both
-    assert unknown_component_id("my_part") == "fastga_he.pt_component.my_part"
-    assert unknown_component_id("other.pt_component.part") == "other.pt_component.part"
-    assert unknown_component_id("") == "fastga_he.pt_component.unknown"
-    for component_type in ("my_part", "other.pt_component.part"):
-        assert unknown_component_type(unknown_component_id(component_type)) == component_type
-    assert unknown_component_type(None) == "unknown"
+    # The id is the prefix, with its trailing dot, followed by the type
+    assert join_component_id("other.pt_component", "part") == "other.pt_component.part"
+    assert join_component_id("", "") == "fastga_he.pt_component.unknown"
+    assert normalize_id_prefix("  other.pt_component ") == "other.pt_component."
+    # Reading splits at the last dot; a bare type or a missing id gets the defaults
+    assert split_component_id("other.pt_component.part") == ("other.pt_component.", "part")
+    assert split_component_id("my_part") == ("fastga_he.pt_component.", "my_part")
+    assert split_component_id(None) == ("fastga_he.pt_component.", "unknown")
+    assert split_component_id("other.") == ("other.", "unknown")
 
 
 # ---------------------------------------------------------------------------

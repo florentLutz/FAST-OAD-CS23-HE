@@ -25,6 +25,7 @@ from .power_train_builder_state import (
     _EMPTY,
     _NO_SYMMETRY_PEER,
     BUILDER_ICONS_CONFIG,
+    COMPONENT_ID_PREFIX,
     UNDEFINED_PORT_TYPE,
     UNKNOWN_COMPONENT_TYPE,
     UNKNOWN_DEFAULT_PORT_COUNT,
@@ -114,9 +115,9 @@ class PlacementMixin:
         Type, position, options, port counts and port types of a new component.
 
         A known component takes the first component type of its icon and that
-        type's defaults. An unknown component starts as type ``"unknown"``,
-        with no position or options, one source and one target port, both of
-        undefined energy type.
+        type's defaults. An unknown component starts as type ``"unknown"``
+        with the default id prefix, no position or options, and one source and
+        one target port, both of undefined energy type.
 
         :param icon_key: Toolbox icon of the new component.
         :return: Those columns of the new ``placed_nodes_source`` entry.
@@ -130,6 +131,7 @@ class PlacementMixin:
                 "n_targets": UNKNOWN_DEFAULT_PORT_COUNT,
                 "source_port_type": UNDEFINED_PORT_TYPE,
                 "target_port_type": UNDEFINED_PORT_TYPE,
+                "id_prefix": COMPONENT_ID_PREFIX,
             }
         component_type = self.state.icon_to_component_types.get(icon_key, [icon_key])[0]
         return {
@@ -143,6 +145,8 @@ class PlacementMixin:
             # Known components take their port colours from their icon
             "source_port_type": _EMPTY,
             "target_port_type": _EMPTY,
+            # Known components have fixed prefix
+            "id_prefix": _EMPTY,
         }
 
     # -----------------------------------------------------------------------

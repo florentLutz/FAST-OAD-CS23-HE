@@ -1,6 +1,6 @@
 # Launcher
 
-[<- Powertrain builder](powertrain_builder)
+<img src="https://api.iconify.design/mdi/arrow-left.svg?color=%23888888" width="16" height="16" alt="←"> [Powertrain builder](powertrain_builder)
 
 Modules `cli.py` and `power_train_builder_launcher.py`. They start the Bokeh server, assemble the page (toolbox, canvas, 
 configuration panel, overlays) and draw every canvas glyph. All interaction logic is wired afterwards by 

@@ -824,6 +824,9 @@ class ConfigPanelMixin:
         self._write_symmetry(placed_nodes_data, current_selected_node_index)
         self.state.placed_nodes_source.data = placed_nodes_data
         self._warn_if_unknown_without_port(placed_nodes_data, current_selected_node_index)
+        if is_unknown_node(placed_nodes_data, current_selected_node_index):
+            # Show the prefix and type as stored (e.g. the prefix with its trailing dot)
+            self._refresh_unknown_id_fields(current_selected_node_index)
 
         # Commit the connections picked in the Connections panel
         for starting_port, ending_port in list(self.state.panel_pending_connections):
@@ -835,7 +838,8 @@ class ConfigPanelMixin:
 
     def _write_node_fields(self, placed_nodes_data: dict, node_index: int):
         """
-        Write the panel's name, type, position, options and port counts into a node entry.
+        Write the panel's name, type, position, options and port counts into a
+        node entry, and the id prefix of an unknown component.
 
         If the source-count spinner is hidden, both port counts are first reset
         to the defaults of the written type, so a type change also changes the
@@ -852,6 +856,9 @@ class ConfigPanelMixin:
         new_node_type = panel_fields["node_type"]
         _set_entry_value(placed_nodes_data, "name", node_index, self.state.name_input.value)
         _set_entry_value(placed_nodes_data, "position", node_index, panel_fields["position"])
+        # Only an unknown component has an id prefix of its own
+        if "id_prefix" in panel_fields:
+            _set_entry_value(placed_nodes_data, "id_prefix", node_index, panel_fields["id_prefix"])
 
         type_is_written = _set_entry_value(
             placed_nodes_data, "node_type", node_index, new_node_type

@@ -8,19 +8,6 @@
 - [Installing and using Poetry](https://github.com/fast-aircraft-design/FAST-OAD/wiki/Installing-and-using-Poetry)
 - [Usage of Ruff](https://github.com/fast-aircraft-design/FAST-OAD/wiki/Usage-of-Ruff)
 
-## OpenMDAO model groups
-
-- [Aerodynamics](../models/aerodynamics)
-- [Geometry](../models/geometry)
-- [Weight](../models/weight)
-- [Load analysis](../models/load_analysis)
-- [Loops](../models/loops)
-- [Performance](../models/performance)
-- [propulsion](../models/propulsion)
-- [Environmental impact](../models/environmental_impact)
-- [Cost](../models/cost)
-- [RTA variables](../models/rta_variables)
-
 ## Pre-processing and post-processing services
 
 - [General analysis](../gui/general_analysis)
@@ -49,6 +36,7 @@
 
 ## Other FAST OAD projects
 
+- [FAST-OAD-core](https://github.com/fast-aircraft-design/FAST-OAD)
 - [FAST-GA](https://github.com/supaero-aircraft-design/FAST-GA) 
 - [FAST-PEDAGO](https://github.com/supaero-aircraft-design/FAST-PEDAGO)
 - [FAST-UAV](https://github.com/SizingLab/FAST-UAV)

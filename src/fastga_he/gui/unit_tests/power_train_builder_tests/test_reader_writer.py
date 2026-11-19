@@ -301,7 +301,8 @@ def test_unknown_component_round_trip(canvas, tmp_path):
     canvas.connect(("source", unknown, "2"), ("target", battery, "1"))
     expected_columns = {
         column: canvas.node_column(column)
-        for column in _ROUND_TRIP_COLUMNS + ("options", "source_port_type", "target_port_type")
+        for column in _ROUND_TRIP_COLUMNS
+        + ("options", "source_port_type", "target_port_type", "id_prefix")
     }
 
     yaml_path = tmp_path / "design.yml"
@@ -332,6 +333,29 @@ def test_unknown_component_round_trip(canvas, tmp_path):
     assert canvas.node_column("target_port_type")[unknown] == "undefined"
     assert canvas.node_column("n_sources")[unknown] == 2
     assert canvas.node_column("n_targets")[unknown] == 1
+
+
+def test_unknown_component_id_prefix_round_trip(canvas, tmp_path):
+    """
+    The id prefix of an unknown component is written into its id, so it is read
+    back from an editable file and from a final version alike.
+    """
+    unknown = canvas.place("unknown", 300, 300)
+    canvas.select(unknown)
+    canvas.state.unknown_id_prefix_input.value = "my_pkg.pt_component"
+    canvas.state.unknown_type_input.value = "my_part"
+    canvas.apply()
+
+    for final in (False, True):
+        yaml_path = tmp_path / ("final.yml" if final else "design.yml")
+        assert canvas.save(yaml_path, final=final)
+        saved = YAML(typ="safe").load(yaml_path.read_text())
+        assert saved["power_train_components"]["unknown_1"]["id"] == "my_pkg.pt_component.my_part"
+
+        canvas.new_design()
+        canvas.load(yaml_path)
+        assert canvas.node_column("id_prefix") == ["my_pkg.pt_component."], final
+        assert canvas.node_column("node_type") == ["my_part"], final
 
 
 # ---------------------------------------------------------------------------

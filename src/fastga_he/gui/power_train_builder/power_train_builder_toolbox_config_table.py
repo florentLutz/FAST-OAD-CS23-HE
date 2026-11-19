@@ -50,11 +50,13 @@ from .power_train_builder_state import (
     SAVE_MODE_FINAL,
     STATUS_IDLE_HTML,
     BUILDER_ICONS_CONFIG,
+    COMPONENT_ID_PREFIX,
     PORT_TYPE_CHOICES,
     UNDEFINED_PORT_TYPE,
     UNKNOWN_COMPONENT_TABS,
     UNKNOWN_ICON_KEY,
     UNKNOWN_NO_PORT_WARNING_HTML,
+    UNKNOWN_TYPE_DOT_WARNING_HTML,
     _EMPTY,
     empty_columns,
 )
@@ -64,6 +66,7 @@ from .power_train_builder_metadata import (
     _get_performance_component_names,
     component_type_classes,
     icon_data_url,
+    known_component_id_prefixes,
 )
 
 COMPONENTS_PATH = Path(__file__).resolve().parents[2] / "models" / "propulsion" / "components"
@@ -222,9 +225,12 @@ def _build_unknown_component_widgets() -> dict:
     Config-panel widgets used only for an unknown component.
 
     The text inputs replace the type, position and symmetry selects (an
-    unknown component has no list of possible values), the "+" button adds an
+    unknown component has no list of possible values), the id-prefix input
+    sets the prefix of its OpenMDAO id (suggesting the prefixes of the
+    registered components, though any text is accepted), the "+" button adds an
     option row, the two port-type selects set the energy type of its source
-    and target ports, and the warning tells the user it has no port at all.
+    and target ports, and the warnings tell the user its type contains a dot
+    or it has no port at all.
     All start hidden.
 
     :return: ``{BuilderState field name: widget}``.
@@ -242,6 +248,21 @@ def _build_unknown_component_widgets() -> dict:
         )
 
     return {
+        # Not "Component ID:", which is the component's name (name_input)
+        "unknown_id_prefix_input": bkmodel.AutocompleteInput(
+            title="OpenMDAO ID prefix:",
+            value=COMPONENT_ID_PREFIX,
+            placeholder=COMPONENT_ID_PREFIX,
+            completions=known_component_id_prefixes(),
+            # Suggestions only: any prefix may be typed
+            restrict=False,
+            min_characters=1,
+            search_strategy="includes",
+            case_sensitive=False,
+            width=380,
+            visible=False,
+            styles=text_style,
+        ),
         "unknown_type_input": bkmodel.TextInput(
             title="Component Type:", width=380, visible=False, styles=text_style
         ),
@@ -263,6 +284,12 @@ def _build_unknown_component_widgets() -> dict:
         ),
         "source_port_type_select": port_type_select("Source port type:"),
         "target_port_type_select": port_type_select("Target port type:"),
+        "unknown_type_dot_warning_div": bkmodel.Div(
+            text=UNKNOWN_TYPE_DOT_WARNING_HTML,
+            width=370,
+            visible=False,
+            styles={"background": BACKGROUND_COLOR_CODE, "padding": "4px 2px"},
+        ),
         "unknown_no_port_warning_div": bkmodel.Div(
             text=UNKNOWN_NO_PORT_WARNING_HTML,
             width=370,
@@ -470,7 +497,9 @@ def _build_config_panel(unknown_widgets: dict) -> dict:
         _section_heading("Component ID &amp; Type"),
         name_input,
         type_select,
+        unknown_widgets["unknown_id_prefix_input"],
         unknown_widgets["unknown_type_input"],
+        unknown_widgets["unknown_type_dot_warning_div"],
         port_count_section,
         _section_heading("Position &amp; Options"),
         position_select,

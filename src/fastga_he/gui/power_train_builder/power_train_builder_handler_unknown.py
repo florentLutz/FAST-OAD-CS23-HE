@@ -12,6 +12,10 @@ only its config panel differs, because there is no list of possible values to
 choose from:
 
 * the component type, position and symmetry peer are free text;
+* the prefix of its OpenMDAO id (``<id_prefix><type>``) is free text too, with
+  the prefixes of the registered components and of the design suggested.
+  The type field holds the type only: a warning is shown under it while the
+  typed type contains a dot;
 * every option is a pair of free-text boxes (name, value), and the
   "Add option" button adds an empty pair;
 * both port counts are editable (0 allowed); a warning is shown while both
@@ -33,6 +37,7 @@ import bokeh.models as bkmodel
 from bokeh.layouts import row
 
 from .power_train_builder_handler_config_panel import _option_values_to_strings
+from .power_train_builder_metadata import known_component_id_prefixes
 from .power_train_builder_state import (
     UNDEFINED_PORT_TYPE,
     UNKNOWN_COMPONENT_TYPE,
@@ -42,6 +47,7 @@ from .power_train_builder_state import (
     has_no_port,
     is_unknown_node,
     node_options,
+    normalize_id_prefix,
     select_edges,
     BuilderState,
 )
@@ -77,8 +83,10 @@ class UnknownComponentMixin:
         :param is_unknown: ``True`` when the selected node is an unknown component.
         """
         state = self.state
-        # Shown again by _refresh_unknown_port_warning once the panel is filled
+        # Shown again by _refresh_unknown_port_warning and
+        # _refresh_unknown_type_warning once the panel is filled
         state.unknown_no_port_warning_div.visible = False
+        state.unknown_type_dot_warning_div.visible = False
         for known_widget, unknown_widget in (
             (state.type_select, state.unknown_type_input),
             (state.position_select, state.unknown_position_input),
@@ -87,6 +95,7 @@ class UnknownComponentMixin:
             known_widget.visible = not is_unknown
             unknown_widget.visible = is_unknown
         for unknown_only_widget in (
+            state.unknown_id_prefix_input,
             state.add_option_button,
             state.source_port_type_select,
             state.target_port_type_select,
@@ -100,7 +109,7 @@ class UnknownComponentMixin:
         :param node_index: Zero-based index of an unknown component.
         """
         nodes_data = self.state.placed_nodes_source.data
-        self.state.unknown_type_input.value = nodes_data["node_type"][node_index]
+        self._refresh_unknown_id_fields(node_index)
         self.state.unknown_position_input.value = nodes_data["position"][node_index]
         self.state.unknown_symmetry_input.value = nodes_data["symmetry_name"][node_index]
 
@@ -148,6 +157,33 @@ class UnknownComponentMixin:
             )
         )
 
+    def _refresh_unknown_type_warning(self, typed_type: str):
+        """
+        Show the "dot in type" warning while the selected unknown component's
+        typed type contains a dot, and hide it otherwise.
+
+        :param typed_type: Text of the type field, as typed or as stored.
+        """
+        node_index = self.state.selected_node_index
+        nodes_data = self.state.placed_nodes_source.data
+        self.state.unknown_type_dot_warning_div.visible = (
+            node_index is not None
+            and node_index < len(nodes_data.get("name", []))
+            and is_unknown_node(nodes_data, node_index)
+            and "." in (typed_type or _EMPTY)
+        )
+
+    def _on_unknown_type_input_change(self, attr, old, new):
+        """
+        ``on_change("value_input")`` callback of the type field of an unknown
+        component: the "dot in type" warning follows each keystroke, before Apply.
+
+        :param attr: Bokeh attribute name (unused, required by protocol).
+        :param old: Previous text (unused).
+        :param new: Text currently typed in the field.
+        """
+        self._refresh_unknown_type_warning(new)
+
     def _warn_if_unknown_without_port(self, nodes_data: dict, node_index: int):
         """
         Log a warning if node *node_index* is an unknown component without any port.
@@ -164,9 +200,33 @@ class UnknownComponentMixin:
                 nodes_data["name"][node_index],
             )
 
+    def _refresh_unknown_id_fields(self, node_index: int):
+        """
+        Show the stored id prefix and type of unknown component *node_index*.
+
+        Also called after Apply, which may have normalized what was typed. The prefix suggestions
+        are those of the registered components, plus every prefix already used in the design.
+
+        :param node_index: Zero-based index of an unknown component.
+        """
+        nodes_data = self.state.placed_nodes_source.data
+        id_prefix_input = self.state.unknown_id_prefix_input
+        id_prefix_input.value = normalize_id_prefix(nodes_data["id_prefix"][node_index])
+        self.state.unknown_type_input.value = nodes_data["node_type"][node_index]
+        self._refresh_unknown_type_warning(nodes_data["node_type"][node_index])
+
+        suggestions = known_component_id_prefixes()
+        for other_node_index, id_prefix in enumerate(nodes_data["id_prefix"]):
+            if is_unknown_node(nodes_data, other_node_index):
+                id_prefix = normalize_id_prefix(id_prefix)
+                if id_prefix not in suggestions:
+                    suggestions.append(id_prefix)
+        id_prefix_input.completions = suggestions
+
     def _clear_unknown_fields(self):
         """Empty and hide the unknown-component widgets."""
         for text_input in (
+            self.state.unknown_id_prefix_input,
             self.state.unknown_type_input,
             self.state.unknown_position_input,
             self.state.unknown_symmetry_input,
@@ -230,15 +290,17 @@ class UnknownComponentMixin:
 
     def _unknown_panel_fields(self) -> dict:
         """
-        Type, position and options typed in the panel, as Apply writes them.
+        Id prefix, type, position and options typed in the panel, as Apply writes them.
 
-        An empty type falls back to ``"unknown"``. Option values are read as
-        Python literals where possible (``True``, ``3``, ``2.5``, ``[1, 2]``),
-        and kept as text otherwise.
+        An empty type falls back to ``"unknown"`` and an empty prefix to the
+        default one; a prefix gets its trailing dot. Option values are read as Python literals
+        where possible (``True``, ``3``, ``2.5``, ``[1, 2]``), and kept as text
+        otherwise.
 
-        :return: ``{"node_type": str, "position": str, "options": dict}``.
+        :return: ``{"id_prefix": str, "node_type": str, "position": str, "options": dict}``.
         """
         return {
+            "id_prefix": normalize_id_prefix(self.state.unknown_id_prefix_input.value),
             "node_type": self.state.unknown_type_input.value.strip() or UNKNOWN_COMPONENT_TYPE,
             "position": self.state.unknown_position_input.value.strip(),
             "options": {

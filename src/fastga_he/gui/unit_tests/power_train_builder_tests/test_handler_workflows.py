@@ -840,6 +840,66 @@ def test_unknown_config_panel_uses_text_boxes_committed_on_apply(canvas):
     assert not state.add_option_button.visible and not state.source_port_type_select.visible
 
 
+def test_unknown_id_prefix_is_typed_in_its_own_field(canvas):
+    battery = canvas.place("battery", 100, 100)
+    unknown = canvas.place("unknown", 300, 300)
+    state = canvas.state
+    prefix_input = state.unknown_id_prefix_input
+
+    # A new unknown component gets the default prefix; a known one has none of its own
+    assert canvas.node_column("id_prefix") == ["", "fastga_he.pt_component."]
+    canvas.select(unknown)
+    assert prefix_input.visible
+    assert prefix_input.value == "fastga_he.pt_component."
+    assert prefix_input.completions[0] == "fastga_he.pt_component."
+
+    # Committed on Apply with its trailing dot, shown as stored, and suggested from then on
+    prefix_input.value = " my_pkg.pt_component "
+    canvas.apply()
+    assert canvas.node_column("id_prefix")[unknown] == "my_pkg.pt_component."
+    assert prefix_input.value == "my_pkg.pt_component."
+    assert "my_pkg.pt_component." in prefix_input.completions
+
+    # An empty prefix goes back to the default, and Apply is one undo step
+    prefix_input.value = ""
+    canvas.apply()
+    assert canvas.node_column("id_prefix")[unknown] == "fastga_he.pt_component."
+    canvas.undo()
+    assert canvas.node_column("id_prefix")[unknown] == "my_pkg.pt_component."
+
+    # A known component has no prefix field
+    canvas.select(battery)
+    assert not prefix_input.visible
+
+
+def test_dot_in_unknown_type_shows_a_warning_but_is_kept(canvas):
+    battery = canvas.place("battery", 100, 100)
+    unknown = canvas.place("unknown", 300, 300)
+    state = canvas.state
+    warning = state.unknown_type_dot_warning_div
+    canvas.select(unknown)
+    assert not warning.visible
+
+    # The warning follows each keystroke, before Apply
+    state.unknown_type_input.value_input = "my_pkg.my_part"
+    assert warning.visible
+    state.unknown_type_input.value_input = "my_part"
+    assert not warning.visible
+
+    # Apply keeps the type as typed, without touching the prefix
+    state.unknown_type_input.value = "my_pkg.my_part"
+    canvas.apply()
+    assert canvas.node_column("node_type")[unknown] == "my_pkg.my_part"
+    assert canvas.node_column("id_prefix")[unknown] == "fastga_he.pt_component."
+    assert warning.visible
+
+    # Hidden for a known component, shown again when the unknown one is reselected
+    canvas.select(battery)
+    assert not warning.visible
+    canvas.select(unknown)
+    assert warning.visible
+
+
 def test_port_type_change_applies_at_once_and_drops_unfitting_connections(canvas):
     battery = canvas.place("battery", 100, 100)
     unknown = canvas.place("unknown", 300, 300)
