@@ -78,8 +78,7 @@ the copy is edited, and the whole `.data` is reassigned. Otherwise the browser i
 index, so edges, symmetry links and the selection are re-indexed.
 - **Source and target ports.** Every connection runs from a *source* port of one component to a *target* port of 
 another, as in the YAML (`source: propeller_1`, `target: motor_1`), i.e. from the propulsor side towards the energy 
-storage. Source ports are drawn below the icon, target ports above it. A propeller only has a source port, a battery 
-only has a target port.
+storage. Source ports are drawn below the icon, target ports above it.
 - **Port key.** A port is identified by `(kind, node_index, label)`, with `kind` in `"source"` / `"target"` and `label` 
 a string `"1"`, `"2"`, ...
 - **Energy type = colour.** Two ports may be connected only if they have the same, defined colour 
