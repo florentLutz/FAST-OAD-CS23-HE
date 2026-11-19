@@ -1,6 +1,6 @@
 # Metadata
 
-<img src="https://api.iconify.design/mdi/arrow-left.svg?color=%23888888" width="16" height="16" alt="←"> [Powertrain builder](powertrain_builder)
+[<- Powertrain builder](powertrain_builder)
 
 Module `power_train_builder_metadata.py`. It derives, once at startup, everything the builder needs to know about each 
 registered component type from `KNOWN_COMPONENTS` and from the components' own `constants.py` files: which icon it uses, 

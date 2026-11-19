@@ -1,6 +1,6 @@
 # Toolbox and panel layout
 
-<img src="https://api.iconify.design/mdi/arrow-left.svg?color=%23888888" width="16" height="16" alt="←"> [Powertrain builder](powertrain_builder)
+[<- Powertrain builder](powertrain_builder)
 
 Module `power_train_builder_toolbox_config_table.py`. This module is a pure factory: it creates every Bokeh widget and data source of the builder and packs them into a [`BuilderState`](powertrain_builder_state#builderstate). The only callbacks wired here are browser-side (`CustomJS`) ones; every Python callback is wired by [`BuilderHandler`](powertrain_builder_handler).
 

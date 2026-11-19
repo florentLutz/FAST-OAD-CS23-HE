@@ -1,6 +1,6 @@
 # State
 
-<img src="https://api.iconify.design/mdi/arrow-left.svg?color=%23888888" width="16" height="16" alt="←"> [Powertrain builder](powertrain_builder)
+[<- Powertrain builder](powertrain_builder)
 
 Module `power_train_builder_state.py`. It defines `BuilderState`, the single shared object of the builder, together with the layout constants, the column layouts of the data sources and the small helpers used to edit them.
 
