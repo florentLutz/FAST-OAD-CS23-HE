@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- action-flows-sync: branch=dev_pt_file_editor_gui commit=8e37420 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Powertrain Builder Action Flows</title>
@@ -315,7 +316,7 @@ const GROUPS = [
             S("u", "_push_undo", "IO", "Snapshot of the design before the change.", PUSH_UNDO),
             S("d", "placed_counter", "Placement", "Next number for the icon: name <code>&lt;icon_key&gt;_&lt;n&gt;</code>."),
             S("h", "_new_component_defaults", "Placement", "Type, position, options, port counts, port types and id prefix (<code>COMPONENT_ID_PREFIX</code> for an unknown component, empty for a known one).", ["default_position", "default_options"]),
-            S("d", "append_entry", "State", "Row added to <code>placed_nodes_source</code>."),
+            S("d", "append_entry", "State", "Entry added to <code>placed_nodes_source</code>."),
             S("h", "_rebuild_all_ports", "Ports", "The new port balls are drawn."),
             S("h", "_mark_unsaved", "IO", "Save button orange; Undo and Redo buttons refreshed."),
           ]),
@@ -497,12 +498,12 @@ const GROUPS = [
           S("h", "_mark_unsaved", "IO"),
         ]),
       ] },
-    { id: "unknown-id", t: "Type the id prefix or type of an unknown component", trig: "Type in the <b>FAST-OAD id prefix</b> or <b>Component Type</b> field of an unknown component.", undo: "With Apply",
+    { id: "unknown-id", t: "Type the id prefix or type of an unknown component", trig: "Type in the <b>OpenMDAO ID prefix</b> or <b>Component Type</b> field of an unknown component.", undo: "With Apply",
       res: "Prefix suggestions while typing, and a warning while the type contains a dot; the id <code>&lt;id_prefix&gt;&lt;type&gt;</code> is written by Apply.",
       flow: [
         B(
           ["Id prefix field", [
-            S("ui", "FAST-OAD id prefix field", "Browser", "Bokeh <code>AutocompleteInput</code>: the registered prefixes and those of the design are suggested, but any text is accepted."),
+            S("ui", "OpenMDAO ID prefix field", "Browser", "Bokeh <code>AutocompleteInput</code>: the registered prefixes and those of the design are suggested, but any text is accepted."),
             E("No Python callback: read by Apply (<code>_unknown_panel_fields</code>)."),
           ]],
           ["Type field", [
@@ -510,7 +511,7 @@ const GROUPS = [
             C("cb", "_on_unknown_type_input_change", "Unknown", "Wired to <code>value_input</code>.", [
               C("h", "_refresh_unknown_type_warning", "Unknown", "", [
                 B(
-                  ["The selected unknown component's typed type contains a dot", [S("d", "unknown_type_dot_warning_div", "Unknown", "Warning shown under the field: the package part belongs in the id prefix.")]],
+                  ["The selected unknown component's typed type contains a dot", [S("d", "unknown_type_dot_warning_div", "Unknown", "Warning shown under the field: <em>The component type should not contain a dot.</em>")]],
                   ["Otherwise", [S("d", "unknown_type_dot_warning_div", "Unknown", "Warning hidden.")], true],
                 ),
               ]),
@@ -571,7 +572,7 @@ const GROUPS = [
             S("h", "_find_nearest_node", "Ports", "A component is found."),
             C("h", "_delete_node", "Handler", "", [
               S("u", "_push_undo", "IO", "", PUSH_UNDO),
-              S("d", "drop_entry", "State", "Node row removed."),
+              S("d", "drop_entry", "State", "Node entry removed from <code>placed_nodes_source</code>."),
               S("d", "_reindex_symmetry_after_deletion", "Handler", "Peer loses its link; later peer indices minus 1."),
               S("d", "edge_indices_not_touching_node", "State", "Then <code>select_edges</code>; node indices after it decremented."),
               S("h", "_rebuild_all_ports", "Ports"),
@@ -591,7 +592,7 @@ const GROUPS = [
             S("h", "_find_nearest_edge", "Ports", "Closest line within 12 data units.", ["_cursor_to_segment_distance"]),
             C("h", "_delete_edge", "Handler", "", [
               S("u", "_push_undo", "IO", "", PUSH_UNDO),
-              S("d", "drop_entry", "State", "Edge row removed."),
+              S("d", "drop_entry", "State", "Edge entry removed from <code>edge_source</code>."),
               S("h", "_rebuild_all_ports", "Ports", "The freed ports show as free."),
               S("h", "_mark_unsaved", "IO"),
             ]),
