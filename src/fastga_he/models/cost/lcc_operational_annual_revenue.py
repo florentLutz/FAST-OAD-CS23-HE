@@ -18,12 +18,20 @@ class LCCOperationalAnnualRevenue(om.Group):
             default=30,
             desc="The total service life of the aircraft in years for NPV calculation.",
         )
+        self.options.declare(
+            name="trainer",
+            default=False,
+            types=bool,
+            desc="True if the aircraft is used as a trainer",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
+        trainer = self.options["trainer"]
+
         self.add_subsystem(
             "annual_revenue",
-            _OperationalAnnualRevenue(),
+            _OperationalAnnualRevenue(trainer=trainer),
             promotes=["*"],
         )
         self.add_subsystem(
@@ -100,21 +108,49 @@ class _AirfareGainFactor(om.ExplicitComponent):
 class _OperationalAnnualRevenue(om.ExplicitComponent):
     """
     Computation of the annual revenue of the aircraft. The profit margin is derived from the
-    operating margin in Industry Statistics of IATA :cite:`iata:2025`.
+    operating margin in Industry Statistics of IATA :cite:`iata:2025`. The per hour trainer cost is
+    derived from the pricing listed in
+    https://flyawaysimulation.com/ask/answers/real-world-flight-training-cost-per-hour/.
     """
 
+    def initialize(self):
+        self.options.declare(
+            name="trainer",
+            default=False,
+            types=bool,
+            desc="True if the aircraft is used as a trainer",
+        )
+
     def setup(self):
-        self.add_input(
-            "data:cost:operation:annual_cost_per_unit",
-            val=np.nan,
-            units="USD/yr",
-            desc="Annual operational cost per unit of the aircraft",
-        )
-        self.add_input(
-            "data:cost:operation:profit_margin",
-            val=0.07,
-            desc="Profit margin as a fraction of the annual revenue",
-        )
+        trainer = self.options["trainer"]
+
+        if trainer:
+            self.add_input(
+                "data:cost:operation:trainer_hourly_cost",
+                val=182.2,
+                units="USD/hr",
+                desc="Hourly operational cost of the trainer aircraft, 182.2 USD/hr without "
+                "instructor, 256.6 USD/hr with instructor",
+            )
+            self.add_input(
+                name="data:TLAR:flight_hours_per_year",
+                val=283.2,
+                units="h",
+                desc="Expected number of hours flown per year",
+            )
+
+        else:
+            self.add_input(
+                "data:cost:operation:annual_cost_per_unit",
+                val=np.nan,
+                units="USD/yr",
+                desc="Annual operational cost per unit of the aircraft",
+            )
+            self.add_input(
+                "data:cost:operation:profit_margin",
+                val=0.07,
+                desc="Profit margin as a fraction of the annual revenue",
+            )
 
         self.add_output("data:cost:operation:annual_revenue_per_unit", units="USD/yr", val=0.0)
 
@@ -122,21 +158,42 @@ class _OperationalAnnualRevenue(om.ExplicitComponent):
         self.declare_partials("*", "*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:operation:annual_revenue_per_unit"] = inputs[
-            "data:cost:operation:annual_cost_per_unit"
-        ] / (1.0 - inputs["data:cost:operation:profit_margin"])
+        trainer = self.options["trainer"]
+
+        if trainer:
+            outputs["data:cost:operation:annual_revenue_per_unit"] = (
+                inputs["data:cost:operation:trainer_hourly_cost"]
+                * inputs["data:TLAR:flight_hours_per_year"]
+            )
+
+        else:
+            outputs["data:cost:operation:annual_revenue_per_unit"] = inputs[
+                "data:cost:operation:annual_cost_per_unit"
+            ] / (1.0 - inputs["data:cost:operation:profit_margin"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        partials[
-            "data:cost:operation:annual_revenue_per_unit",
-            "data:cost:operation:annual_cost_per_unit",
-        ] = 1.0 / (1.0 - inputs["data:cost:operation:profit_margin"])
+        trainer = self.options["trainer"]
 
-        partials[
-            "data:cost:operation:annual_revenue_per_unit", "data:cost:operation:profit_margin"
-        ] = inputs["data:cost:operation:annual_cost_per_unit"] / (
-            (1.0 - inputs["data:cost:operation:profit_margin"]) ** 2.0
-        )
+        if trainer:
+            partials[
+                "data:cost:operation:annual_revenue_per_unit",
+                "data:cost:operation:trainer_hourly_cost",
+            ] = inputs["data:TLAR:flight_hours_per_year"]
+            partials[
+                "data:cost:operation:annual_revenue_per_unit", "data:TLAR:flight_hours_per_year"
+            ] = inputs["data:cost:operation:trainer_hourly_cost"]
+
+        else:
+            partials[
+                "data:cost:operation:annual_revenue_per_unit",
+                "data:cost:operation:annual_cost_per_unit",
+            ] = 1.0 / (1.0 - inputs["data:cost:operation:profit_margin"])
+
+            partials[
+                "data:cost:operation:annual_revenue_per_unit", "data:cost:operation:profit_margin"
+            ] = inputs["data:cost:operation:annual_cost_per_unit"] / (
+                (1.0 - inputs["data:cost:operation:profit_margin"]) ** 2.0
+            )
 
 
 class _OperationalAnnualRevenueProjection(om.ExplicitComponent):

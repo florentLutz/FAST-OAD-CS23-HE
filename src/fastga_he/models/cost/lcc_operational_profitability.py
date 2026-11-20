@@ -35,10 +35,17 @@ class LCCOperationalProfitability(om.Group):
             types=bool,
             desc="True if loan is taken for financing the aircraft",
         )
+        self.options.declare(
+            name="trainer",
+            default=False,
+            types=bool,
+            desc="True if the aircraft is used as a trainer",
+        )
 
     def setup(self):
         years_of_service = self.options["years_of_service"]
         loan = self.options["loan"]
+        trainer = self.options["trainer"]
 
         if loan:
             self.add_subsystem(
@@ -54,7 +61,7 @@ class LCCOperationalProfitability(om.Group):
         )
         self.add_subsystem(
             name="passenger_per_flight",
-            subsys=LCCOperationalPassengerPerFlight(),
+            subsys=LCCOperationalPassengerPerFlight(trainer=trainer),
             promotes=["*"],
         )
         self.add_subsystem(

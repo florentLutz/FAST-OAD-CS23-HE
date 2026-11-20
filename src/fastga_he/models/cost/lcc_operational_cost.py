@@ -142,21 +142,24 @@ class LCCOperationalCost(om.Group):
                 self.add_subsystem(name=component_name, subsys=local_sub_sys, promotes=["*"])
 
         if delivery_method != "flight":
-            self.add_subsystem(
-                name="fuel_cost",
-                subsys=LCCFuelCost(
-                    tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types
-                ),
-                promotes=["*"],
-            )
-            self.add_subsystem(
-                name="electricity_cost",
-                subsys=LCCElectricityCost(
-                    electricity_components_types=electricity_components_types,
-                    electricity_components_names=electricity_components_names,
-                ),
-                promotes=["*"],
-            )
+            if len(fuel_types) > 0:
+                self.add_subsystem(
+                    name="fuel_cost",
+                    subsys=LCCFuelCost(
+                        tank_types=tank_types, tank_names=tank_names, fuel_types=fuel_types
+                    ),
+                    promotes=["data:*"],
+                )
+
+            if len(electricity_components_types) > 0:
+                self.add_subsystem(
+                    name="electricity_cost",
+                    subsys=LCCElectricityCost(
+                        electricity_components_types=electricity_components_types,
+                        electricity_components_names=electricity_components_names,
+                    ),
+                    promotes=["data:*"],
+                )
 
         self.add_subsystem(
             name="annual_energy_cost",
