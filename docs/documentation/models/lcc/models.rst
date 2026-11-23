@@ -11,7 +11,7 @@ The life cycle cost of an aircraft can be broken in two main cost categories: th
 The contents of those two categories are detailed in the following descriptions.
 
 The profitability assessment derived from the production and operational cost models are also presented in the following
-sections, with using the annual net present value (NPV) and profitability index (PI) as the main metrics.
+sections, using the annual net present value (NPV) and profitability index (PI) as the main metrics.
 
 .. math::
 
@@ -212,7 +212,7 @@ Production profitability assessment
 ***********************************
 With the recurring manufacturing-related cost and non-recurring project development cost estimated from the previous
 sections, the production yearly profitability can be assessed by utilizing a cumulative development cost expenditure
-curve, a learning curve discount for the recurring cost, and an aircraft delivery scheduling surrogate model The
+curve, a learning curve discount for the recurring cost, and an aircraft delivery scheduling surrogate model. The
 aircraft listed price is derived from the sum of the recurring cost and the share of the non-recurring cost factoring
 the fixed gross profit margin target and a fixed spare part revenue factor.
 
@@ -403,16 +403,16 @@ Operational profitability assessment
 ************************************
 
 The operational profitability assessment is based on the annual operating cost and the annual revenue. The annual
-operating cost is the sum of all the annual operating cost described in the previous sections with considering the
+operating cost is the sum of all the annual operating costs described in the previous sections, considering the
 energy growth adjustments. The annual revenue is based on the gross profit margin given by the 2025 IATA report
 :cite:`iata:2025`.
 
 Revenue per Persone Kilometer (RPK)
 ===================================
 
-The annual RPK is calculated by the gross revenue defined previously divided by the product of the mission per
-year (:math:`N_{\text{mission,year}}`), design mission range (:math:`R_{\text{mission}}`), and the number of passengers
-on board (:math:`N_{\text{passenger}}`). The number of passenger on board is defined by the passenger loading factor
+The annual RPK is calculated as the gross revenue defined previously divided by the product of the number of missions per
+year (:math:`N_{\text{mission,year}}`), the design mission range (:math:`R_{\text{mission}}`), and the number of passengers
+on board (:math:`N_{\text{passenger}}`). The number of passengers on board is defined by the passenger loading factor
 (70 \%) and the design passenger capacity of the aircraft.
 
 .. math::
