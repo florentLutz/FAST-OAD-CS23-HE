@@ -7,7 +7,6 @@ import pathlib
 
 import numpy as np
 import pytest
-import os.path as pth
 import openmdao.api as om
 import fastoad.api as oad
 
@@ -562,7 +561,7 @@ def test_production_cost_hydrogen():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_production_cost_hybrid_tbm_900():
@@ -608,7 +607,7 @@ def test_production_cost_hybrid_tbm_900():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_production_cost_tbm_900():
@@ -645,7 +644,7 @@ def test_production_cost_tbm_900():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_annual_insurance_cost():
@@ -1028,7 +1027,7 @@ def test_operational_cost_hydrogen():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_operational_cost_tbm_900():
@@ -1069,7 +1068,7 @@ def test_operational_cost_tbm_900():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_operational_cost_hybrid_tbm_900():
@@ -1109,7 +1108,7 @@ def test_operational_cost_hybrid_tbm_900():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_cost_tbm_900():
@@ -1150,7 +1149,7 @@ def test_cost_tbm_900():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_cost_pipistrel():
@@ -1193,7 +1192,7 @@ def test_cost_pipistrel():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_non_recursing_project_cost():
@@ -1521,7 +1520,7 @@ def test_production_profitability():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_operation_annual_revenue():
@@ -1558,6 +1557,38 @@ def test_operation_annual_revenue():
 
     problem.check_partials(compact_print=True)
 
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+
+    problem = run_system(
+        LCCOperationalAnnualRevenue(years_of_service=TEST_PROGAM_YEARS, trainer=True),
+        ivc,
+    )
+
+    assert problem.get_val(
+        "data:cost:operation:annual_revenue_per_unit", units="USD/yr"
+    ) == pytest.approx(51599.04, rel=1e-3)
+    assert problem.get_val(
+        "data:cost:operation:annual_revenue_projection", units="USD/yr"
+    ) == pytest.approx(
+        [
+            51599.04,
+            53136.69,
+            54720.17,
+            56350.83,
+            58030.08,
+            59759.38,
+            61540.21,
+            63374.1,
+            65262.65,
+            67207.48,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
 
 def test_passenger_per_flight():
     ivc = om.IndepVarComp()
@@ -1571,6 +1602,34 @@ def test_passenger_per_flight():
     )
 
     assert problem.get_val("data:cost:operation:passenger_per_flight") == pytest.approx(3, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:TLAR:NPAX_design", val=4)
+    ivc.add_output("data:cost:operation:passenger_per_flight_baseline", val=3)
+
+    problem = run_system(
+        LCCOperationalPassengerPerFlight(trainer=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:passenger_per_flight") == pytest.approx(1, rel=1e-3)
+
+    problem.check_partials(compact_print=True)
+
+    ivc = om.IndepVarComp()
+
+    ivc.add_output("data:TLAR:NPAX_design", val=0)
+    ivc.add_output("data:cost:operation:passenger_per_flight_baseline", val=0)
+
+    problem = run_system(
+        LCCOperationalPassengerPerFlight(trainer=True),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:passenger_per_flight") == pytest.approx(1, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1816,4 +1875,4 @@ def test_lcc_with_profitability_tbm_900():
 
     problem.check_partials(compact_print=True)
 
-    om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))

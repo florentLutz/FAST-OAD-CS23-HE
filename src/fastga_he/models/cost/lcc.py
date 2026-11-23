@@ -12,6 +12,12 @@ from .lcc_production_profitability import LCCProductionProfitability
 from .lcc_operational_profitability import LCCOperationalProfitability
 
 
+def _check_positive_years(name, value):
+    """Option validator: the number of years must be strictly positive."""
+    if value <= 0:
+        raise ValueError(f"Option '{name}' must be a positive number of years. Got: {value}.")
+
+
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
 class LCC(om.Group):
     """
@@ -44,18 +50,21 @@ class LCC(om.Group):
             types=int,
             default=10,
             desc="The number of years of development for the aircraft, before the first delivery.",
+            check_valid=_check_positive_years,
         )
         self.options.declare(
             "years_of_program",
             types=int,
             default=30,
             desc="The total number of years of the aircraft program, including development and production.",
+            check_valid=_check_positive_years,
         )
         self.options.declare(
             "years_of_service",
             types=int,
             default=30,
             desc="The total service life of the aircraft in years.",
+            check_valid=_check_positive_years,
         )
         self.options.declare(
             "profitability_analysis",
@@ -87,19 +96,13 @@ class LCC(om.Group):
         if self.options["profitability_analysis"]:
             years_of_development = self.options["years_of_development"]
             years_of_program = self.options["years_of_program"]
-            years_of_service = self.options["years_of_service"]
 
+            # This check is kept here due to the values of both options are defined after
+            # initialization
             if years_of_program < years_of_development:
                 raise ValueError(
                     f"Years of program ({years_of_program}) cannot be less than years of "
                     f"development ({years_of_development})."
-                )
-
-            if years_of_program <= 0 or years_of_development <= 0 or years_of_service <= 0:
-                raise ValueError(
-                    f"Development, program, and service years must be positive. Got: development"
-                    f"={years_of_development}, program={years_of_program}, service"
-                    f"={years_of_service}."
                 )
 
             self.add_subsystem(

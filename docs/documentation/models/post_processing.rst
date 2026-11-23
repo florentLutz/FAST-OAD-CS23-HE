@@ -24,7 +24,7 @@ of file paths, or added one by one by passing an existing figure.
     from fast_oad_cs23_he.src.fastga_he.gui.financial_performance_curve import financial_performance_curve
 
     # Load the output file
-    output_file = "path/to/output_file.yml"
+    output_file = "path/to/output_file.xml"
 
     # Generate the financial performance curve
     financial_performance_curve(
@@ -153,7 +153,7 @@ below zero so that the totals are net values.
     from fast_oad_cs23_he.src.fastga_he.gui.lcc_cost import lcc_cost_bar_chart_advanced
 
     lcc_cost_bar_chart_advanced(
-        aircraft_file_paths = ["path/to/output_file_1.yml", "path/to/output_file_2.yml"], # str or list of str
+        aircraft_file_paths = ["path/to/output_file_1.xml", "path/to/output_file_2.xml"], # str or list of str
         names_aircraft = ["aircraft_1", "aircraft_2"], # str or list of str
         cost_type = "production", # "production", "operation"
         power_train_detail = "component", # "component", "type", "aggregate"

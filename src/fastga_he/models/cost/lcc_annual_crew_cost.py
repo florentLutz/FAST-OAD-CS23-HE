@@ -10,7 +10,8 @@ class LCCAnnualCrewCost(om.ExplicitComponent):
     Computation of the annual flight crew cost in operation, annual salary obtained from
     https://bizjetjobs.com/pilot-salary-survey and
     https://simpleflying.com/private-jet-flight-attendant-salary/. The default social benefits rate
-    is an average between western-european countries.
+    is an average derived from Eurostat
+    https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Wages_and_labour_costs.
     """
 
     def setup(self):
@@ -24,7 +25,7 @@ class LCCAnnualCrewCost(om.ExplicitComponent):
         )
         self.add_input(
             "data:cost:operation:social_benefits_rate",
-            val=0.3,
+            val=0.35,
             desc="Social benefits rate for the flight crew",
         )
 

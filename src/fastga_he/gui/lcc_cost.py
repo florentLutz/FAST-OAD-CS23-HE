@@ -25,9 +25,10 @@ import plotly.graph_objects as go
 
 import fastoad.api as oad
 
+from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
+
 PRODUCTION_PREFIX = "data:cost:production:"
 OPERATION_PREFIX = "data:cost:operation:"
-_POWER_TRAIN_PREFIX = "data:propulsion:he_power_train:"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -150,10 +151,10 @@ def _discover_power_train_variables(datafile: oad.DataFile, suffix: str) -> Dict
 def _split_power_train_variable(name: str, suffix: str) -> Optional[Tuple[str, str]]:
     """Splits ``...:he_power_train:<type>:<id><suffix>`` into (type, id), None if no match."""
 
-    if not (name.startswith(_POWER_TRAIN_PREFIX) and name.endswith(suffix)):
+    if not (name.startswith(PT_DATA_PREFIX) and name.endswith(suffix)):
         return None
 
-    middle = name[len(_POWER_TRAIN_PREFIX) : -len(suffix)]
+    middle = name[len(PT_DATA_PREFIX) : -len(suffix)]
     component_type, _, component_name = middle.partition(":")
 
     # Not the cost of one component
@@ -167,7 +168,7 @@ def _leaf_aliases(var_name: str, disp_label: str) -> List[str]:
     """Accepted names for an item: label ("Fuel"), variable name, name without prefix."""
 
     aliases = [disp_label, var_name]
-    for prefix in (PRODUCTION_PREFIX, OPERATION_PREFIX, _POWER_TRAIN_PREFIX):
+    for prefix in (PRODUCTION_PREFIX, OPERATION_PREFIX, PT_DATA_PREFIX):
         if var_name.startswith(prefix):
             aliases.append(var_name[len(prefix) :])
 

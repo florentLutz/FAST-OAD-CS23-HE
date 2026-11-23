@@ -128,7 +128,7 @@ class _OperationalAnnualRevenue(om.ExplicitComponent):
             self.add_input(
                 "data:cost:operation:trainer_hourly_cost",
                 val=182.2,
-                units="USD/hr",
+                units="USD/h",
                 desc="Hourly operational cost of the trainer aircraft, 182.2 USD/hr without "
                 "instructor, 256.6 USD/hr with instructor",
             )

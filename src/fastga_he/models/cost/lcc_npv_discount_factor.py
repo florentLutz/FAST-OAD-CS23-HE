@@ -25,13 +25,14 @@ class LCCNPVDiscountFactor(om.ExplicitComponent):
         self.add_input(
             "discount_rate",
             val=np.nan,
-            desc="The discount rate used to compute the NPV.",
+            desc="The NPV discount rate derived from the risk of the business, higher rate "
+            "represents higher risk.",
         )
 
         self.add_output(
             "annual_discount_factor",
             val=0.5,
-            desc="Annual net cash flow of the aircraft manufacturer",
+            desc="The annual discount factor of the NPV calculation.",
             shape=duration_in_years + 1,
         )
 

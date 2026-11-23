@@ -66,7 +66,7 @@ class LCCOperationalProfitability(om.Group):
         )
         self.add_subsystem(
             name="annual_operational_revenue",
-            subsys=LCCOperationalAnnualRevenue(years_of_service=years_of_service),
+            subsys=LCCOperationalAnnualRevenue(years_of_service=years_of_service, trainer=trainer),
             promotes=["*"],
         )
         self.add_subsystem(

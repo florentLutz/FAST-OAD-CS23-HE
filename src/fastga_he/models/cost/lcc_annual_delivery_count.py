@@ -407,7 +407,7 @@ class _CumulativeAnnualDeliveryCount(om.ExplicitComponent):
             "data:cost:production:annual_delivery_count",
             rows=rows,
             cols=cols,
-            val=np.ones(len(rows)),
+            val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
