@@ -71,7 +71,7 @@ LCC Cost Bar Chart Simple
 *************************
 
 Compares the cost items of several aircraft as grouped bars, one group per cost item. Only the positive items are
-shown, so cost reductions (e.g. the landing gear cost reduction) are hidden. The power train component costs are
+shown, so cost reductions (e.g. the landing gear cost reduction) are hidden. The powertrain component costs are
 found automatically in the output file.
 
 .. code:: python

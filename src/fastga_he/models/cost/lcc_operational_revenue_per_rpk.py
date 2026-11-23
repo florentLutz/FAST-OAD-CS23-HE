@@ -10,7 +10,7 @@ class LCCOperationalRevenuePerRPK(om.ExplicitComponent):
     """
     Computation of the revenue per Revenue Passenger Kilometers (RPK). The RPK is the number of
     paying passengers multiplied by the distance flown.This is to verify the ticket pricing against
-    the statisticcl data of SNCF from
+    the statistical data of SNCF from
     https://www.quechoisir.org/actualite-tarifs-sncf-au-kilometre-2026-le-kilometre-de-tgv
     -toujours-plus-cher-n174790/ .
     """
