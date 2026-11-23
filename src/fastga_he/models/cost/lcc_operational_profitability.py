@@ -108,7 +108,7 @@ class LCCOperationalProfitability(om.Group):
             name="operational_profitability_index",
             subsys=LCCProfitabilityIndex(duration_in_years=years_of_service),
             promotes=[
-                ("initial_investment", "data:cost:msp_per_unit"),
+                ("initial_investment", "data:cost:operation:initial_investment"),
                 ("net_present_value", "data:cost:operation:net_present_value"),
                 ("profitability_index", "data:cost:operation:profitability_index"),
             ],

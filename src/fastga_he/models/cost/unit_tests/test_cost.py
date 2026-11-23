@@ -1838,7 +1838,7 @@ def test_operational_profitability():
         rel=1e-3,
     )
     assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
-        [0.85, 0.866, 0.886, 0.91, 0.94, 0.97, 1.0047, 1.041, 1.08, 1.12, 1.16], rel=1e-3
+        [0.0, 0.104, 0.2406, 0.405, 0.594, 0.804, 1.032, 1.274, 1.529, 1.794, 2.067], rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1870,7 +1870,7 @@ def test_operational_profitability_trainer():
     )
 
     assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
-        [0.0306, 0.0546, 0.079, 0.1038, 0.1288, 0.1538, 0.1789, 0.2039, 0.2287, 0.2533, 0.2776],
+        [0.0, 0.0247, 0.05, 0.076, 0.101, 0.127, 0.153, 0.179, 0.204, 0.23, 0.255],
         rel=1e-2,
     )
     assert problem.get_val("data:cost:operation:residual_value", units="USD") == pytest.approx(
@@ -1948,7 +1948,7 @@ def test_lcc_with_profitability_tbm_900():
     )
 
     assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
-        [0.85, 0.866, 0.886, 0.91, 0.94, 0.97, 1.0047, 1.041, 1.08, 1.12, 1.16], rel=1e-2
+        [0.0, 0.104, 0.241, 0.406, 0.596, 0.807, 1.035, 1.278, 1.534, 1.799, 2.073], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)
