@@ -69,16 +69,24 @@ class _LoanPayment(om.ExplicitComponent):
             units="USD/yr",
             shape=years_of_service,
         )
+        self.add_output(
+            "data:cost:operation:average_annual_loan_cost_without_balloon",
+            val=15.0,
+            units="USD/yr",
+        )
 
     def setup_partials(self):
         years_of_service = self.options["years_of_service"]
 
         self.declare_partials(
-            "*",
+            "loan_payments_before_adding_balloon",
             "*",
             method="exact",
             rows=np.arange(years_of_service),
             cols=np.zeros(years_of_service),
+        )
+        self.declare_partials(
+            "data:cost:operation:average_annual_loan_cost_without_balloon", "*", method="exact"
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -90,6 +98,9 @@ class _LoanPayment(om.ExplicitComponent):
         outputs["loan_payments_before_adding_balloon"] = (
             principal * r_interest / (1.0 - (1.0 + r_interest) ** -years_of_service)
         ) * np.ones(years_of_service)
+        outputs["data:cost:operation:average_annual_loan_cost_without_balloon"] = (
+            principal * r_interest / (1.0 - (1.0 + r_interest) ** -years_of_service)
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         years_of_service = self.options["years_of_service"]
@@ -103,6 +114,25 @@ class _LoanPayment(om.ExplicitComponent):
 
         partials[
             "loan_payments_before_adding_balloon", "data:cost:operation:annual_interest_rate"
+        ] = (
+            principal
+            * (r_interest + 1.0) ** (years_of_service - 1.0)
+            * (
+                (r_interest + 1.0) ** (years_of_service + 1.0)
+                - (years_of_service + 1.0) * r_interest
+                - 1.0
+            )
+            / ((r_interest + 1.0) ** years_of_service - 1.0) ** 2.0
+        )
+
+        partials[
+            "data:cost:operation:average_annual_loan_cost_without_balloon",
+            "data:cost:operation:loan_principal",
+        ] = r_interest / (1.0 - (1.0 + r_interest) ** -years_of_service)
+
+        partials[
+            "data:cost:operation:average_annual_loan_cost_without_balloon",
+            "data:cost:operation:annual_interest_rate",
         ] = (
             principal
             * (r_interest + 1.0) ** (years_of_service - 1.0)

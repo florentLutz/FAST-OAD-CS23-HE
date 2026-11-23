@@ -39,7 +39,7 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
         self.add_input(
             "data:cost:production:maturity_discount",
             val=np.nan,
-            desc="The discount factor in manufacturing and tooling bsed on process maturity",
+            desc="The discount factor in manufacturing and tooling based on process maturity",
             shape=years_of_program - years_of_development + 1,
         )
         self.add_input(

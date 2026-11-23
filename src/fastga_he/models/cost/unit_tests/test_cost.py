@@ -5,6 +5,7 @@
 import os
 import pathlib
 
+# import os.path as pth
 import numpy as np
 import pytest
 import openmdao.api as om
@@ -716,7 +717,7 @@ def test_annual_crew_cost():
     )
 
     assert problem.get_val("data:cost:operation:annual_crew_cost", units="USD/yr") == pytest.approx(
-        180383.7, rel=1e-3
+        187321.6, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -776,6 +777,9 @@ def test_annual_loan_cost():
         np.array([142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0]),
         rel=1e-3,
     )
+    assert problem.get_val(
+        "data:cost:operation:average_annual_loan_cost_without_balloon", units="USD/yr"
+    ) == pytest.approx(142377.5, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -855,7 +859,7 @@ def test_fuel_cost():
     )
 
     assert problem.get_val("data:cost:hydrocarbon_fuel_cost", units="USD") == pytest.approx(
-        2257.1, rel=1e-3
+        1907.55, rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -1055,7 +1059,7 @@ def test_operational_cost_tbm_900():
     ) == pytest.approx(33177.257, rel=1e-3)
 
     assert problem.get_val("data:cost:operation:annual_fuel_cost", units="USD/yr") == pytest.approx(
-        156817.93, rel=1e-3
+        125475.48, rel=1e-3
     )
 
     assert problem.get_val("data:cost:operation:maintenance_cost", units="USD/yr") == pytest.approx(
@@ -1064,7 +1068,7 @@ def test_operational_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(487237.95, rel=1e-3)
+    ) == pytest.approx(461573.34, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1145,7 +1149,7 @@ def test_cost_tbm_900():
 
     assert problem.get_val(
         "data:cost:operation:annual_cost_per_unit", units="USD/yr"
-    ) == pytest.approx(490477.01, rel=1e-3)
+    ) == pytest.approx(464812.4, rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1526,8 +1530,11 @@ def test_production_profitability():
 def test_operation_annual_revenue():
     ivc = om.IndepVarComp()
 
-    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=464812.4)
     ivc.add_output("data:cost:operation:profit_margin", val=0.07)
+    ivc.add_output(
+        "data:cost:operation:average_annual_loan_cost_without_balloon", units="USD/yr", val=49952.43
+    )
 
     problem = run_system(
         LCCOperationalAnnualRevenue(years_of_service=TEST_PROGAM_YEARS),
@@ -1536,21 +1543,21 @@ def test_operation_annual_revenue():
 
     assert problem.get_val(
         "data:cost:operation:annual_revenue_per_unit", units="USD/yr"
-    ) == pytest.approx(495673.85, rel=1e-3)
+    ) == pytest.approx(553510.57, rel=1e-3)
     assert problem.get_val(
         "data:cost:operation:annual_revenue_projection", units="USD/yr"
     ) == pytest.approx(
         [
-            495673.85,
-            510444.93,
-            525656.19,
-            541320.74,
-            557452.10,
-            574064.17,
-            591171.29,
-            608788.19,
-            626930.08,
-            645612.6,
+            553510.57,
+            570005.19,
+            586991.34,
+            604483.68,
+            622497.3,
+            641047.71,
+            660150.94,
+            679823.43,
+            700082.17,
+            720944.62,
         ],
         rel=1e-3,
     )
@@ -1796,17 +1803,18 @@ def test_operational_profitability():
 
     ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
     ivc.add_output("data:cost:operation:loan_principal", units="USD", val=3837263.1)
-    ivc.add_output("data:cost:operation:annual_fuel_cost", units="USD/yr", val=156817.93)
+    ivc.add_output("data:cost:operation:annual_fuel_cost", units="USD/yr", val=125475.48)
     ivc.add_output(
-        "data:cost:operation:annual_hydrocarbon_fuel_cost", units="USD/yr", val=156817.93
+        "data:cost:operation:annual_hydrocarbon_fuel_cost", units="USD/yr", val=125475.48
     )
     ivc.add_output("data:cost:operation:discount_rate", val=0.08)
     ivc.add_output("data:TLAR:NPAX_design", val=4)
     ivc.add_output("data:cost:operation:passenger_per_flight_baseline", val=3)
     ivc.add_output("data:TLAR:range", units="km", val=2037)
     ivc.add_output("data:TLAR:flight_per_year", val=66)
-    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=460976.68)
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=464812.4)
     ivc.add_output("data:geometry:cabin:seats:passenger:NPAX_max", val=4)
+    ivc.add_output("data:cost:operation:pay_period", units="yr", val=10)
 
     problem = run_system(
         LCCOperationalProfitability(years_of_service=TEST_PROGAM_YEARS),
@@ -1816,24 +1824,94 @@ def test_operational_profitability():
     assert problem.get_val("data:cost:operation:net_present_value", units="USD") == pytest.approx(
         [
             -677164.08,
-            -645037.07,
-            -603356.06,
-            -553366.98,
-            -496199.59,
-            -432877.12,
-            -364325.12,
-            -291379.71,
-            -214795.04,
-            -135250.28,
-            -53355.98,
+            -606693.49,
+            -514248.98,
+            -402709.09,
+            -274681.89,
+            -132527.64,
+            21620.39,
+            185836.75,
+            358386.11,
+            537707.06,
+            722397.12,
         ],
         rel=1e-3,
     )
     assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
-        [0.85, 0.857, 0.866, 0.877, 0.89, 0.904, 0.919, 0.936, 0.952, 0.97, 0.988], rel=1e-3
+        [0.85, 0.866, 0.886, 0.91, 0.94, 0.97, 1.0047, 1.041, 1.08, 1.12, 1.16], rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
+
+
+def test_operational_profitability_trainer():
+    ivc = get_indep_var_comp(
+        list_inputs(
+            LCCOperationalProfitability(
+                trainer=True,
+                years_of_service=TEST_PROGAM_YEARS,
+            )
+        ),
+        __file__,
+        "pipistrel_source.xml",
+    )
+
+    ivc.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=33817.68)
+    ivc.add_output("data:cost:msp_per_unit", units="USD", val=587834.98)
+    ivc.add_output("data:cost:operation:pay_period", units="yr", val=10)
+
+    # Run problem and check obtained value(s) is/(are) correct
+    problem = run_system(
+        LCCOperationalProfitability(
+            trainer=True,
+            years_of_service=TEST_PROGAM_YEARS,
+        ),
+        ivc,
+    )
+
+    assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
+        [0.0306, 0.0546, 0.079, 0.1038, 0.1288, 0.1538, 0.1789, 0.2039, 0.2287, 0.2533, 0.2776],
+        rel=1e-2,
+    )
+    assert problem.get_val("data:cost:operation:residual_value", units="USD") == pytest.approx(
+        np.array(
+            [
+                587834.98,
+                572834.98,
+                557834.98,
+                542834.98,
+                527834.98,
+                512834.98,
+                497834.98,
+                482834.98,
+                467834.98,
+                452834.98,
+                437834.98,
+            ]
+        ),
+        rel=1e-3,
+    )
+    assert problem.get_val(
+        "data:cost:operation:annual_revenue_projection", units="USD/yr"
+    ) == pytest.approx(
+        [
+            51599.04,
+            53136.69,
+            54720.17,
+            56350.83,
+            58030.08,
+            59759.38,
+            61540.21,
+            63374.1,
+            65262.65,
+            67207.48,
+        ],
+        rel=1e-3,
+    )
+
+    problem.check_partials(compact_print=True)
+
+    # om.n2(problem, show_browser=False, outfile=pth.join(pth.dirname(__file__), "n2.html"))
 
 
 def test_lcc_with_profitability_tbm_900():
@@ -1870,7 +1948,7 @@ def test_lcc_with_profitability_tbm_900():
     )
 
     assert problem.get_val("data:cost:operation:profitability_index") == pytest.approx(
-        [0.85, 0.864, 0.882, 0.904, 0.93, 0.958, 0.989, 1.021, 1.056, 1.091, 1.128], rel=1e-2
+        [0.85, 0.866, 0.886, 0.91, 0.94, 0.97, 1.0047, 1.041, 1.08, 1.12, 1.16], rel=1e-2
     )
 
     problem.check_partials(compact_print=True)

@@ -147,6 +147,11 @@ class _OperationalAnnualRevenue(om.ExplicitComponent):
                 desc="Annual operational cost per unit of the aircraft",
             )
             self.add_input(
+                "data:cost:operation:average_annual_loan_cost_without_balloon",
+                val=np.nan,
+                units="USD/yr",
+            )
+            self.add_input(
                 "data:cost:operation:profit_margin",
                 val=0.07,
                 desc="Profit margin as a fraction of the annual revenue",
@@ -167,9 +172,10 @@ class _OperationalAnnualRevenue(om.ExplicitComponent):
             )
 
         else:
-            outputs["data:cost:operation:annual_revenue_per_unit"] = inputs[
-                "data:cost:operation:annual_cost_per_unit"
-            ] / (1.0 - inputs["data:cost:operation:profit_margin"])
+            outputs["data:cost:operation:annual_revenue_per_unit"] = (
+                inputs["data:cost:operation:annual_cost_per_unit"]
+                + inputs["data:cost:operation:average_annual_loan_cost_without_balloon"]
+            ) / (1.0 - inputs["data:cost:operation:profit_margin"])
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         trainer = self.options["trainer"]
@@ -190,10 +196,16 @@ class _OperationalAnnualRevenue(om.ExplicitComponent):
             ] = 1.0 / (1.0 - inputs["data:cost:operation:profit_margin"])
 
             partials[
+                "data:cost:operation:annual_revenue_per_unit",
+                "data:cost:operation:average_annual_loan_cost_without_balloon",
+            ] = 1.0 / (1.0 - inputs["data:cost:operation:profit_margin"])
+
+            partials[
                 "data:cost:operation:annual_revenue_per_unit", "data:cost:operation:profit_margin"
-            ] = inputs["data:cost:operation:annual_cost_per_unit"] / (
-                (1.0 - inputs["data:cost:operation:profit_margin"]) ** 2.0
-            )
+            ] = (
+                inputs["data:cost:operation:annual_cost_per_unit"]
+                + inputs["data:cost:operation:average_annual_loan_cost_without_balloon"]
+            ) / ((1.0 - inputs["data:cost:operation:profit_margin"]) ** 2.0)
 
 
 class _OperationalAnnualRevenueProjection(om.ExplicitComponent):
