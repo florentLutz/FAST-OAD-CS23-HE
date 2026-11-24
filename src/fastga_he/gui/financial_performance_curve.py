@@ -2,95 +2,100 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence
 
+import pathlib
 import numpy as np
-
+import plotly
 import plotly.graph_objects as go
-import plotly.colors as pc
 
 from fastoad.io import VariableIO
 
+from .lca_impact import _update_fig_axis
+
 
 def financial_performance_curve(
-    aircraft_file_path: Union[str, Sequence[str]],
-    name: Union[str, Sequence[str]] = "",
-    plot_title: str = None,
+    aircraft_file_path: str | pathlib.Path | list[str | pathlib.Path],
+    name: str | list[str] = "",
     fig=None,
     file_formatter=None,
     period: int = 20,
     zero_reference_value: Optional[float] = 0.0,
-    discipline: Union[str, Sequence[str]] = "production",
-    financial_parameter: Optional[Union[str, Sequence[str]]] = "net_present_value",
-    financial_parameter_axis_label: str = "NPV [$]",
-    y_variable: Optional[Union[str, Sequence[str]]] = None,
-    y2_axis_label: str = "",
-    fill_color: Optional[Union[str, Sequence[str]]] = None,
-    line_color: Optional[Union[str, Sequence[str]]] = None,
+    discipline: str | Sequence[str] = "production",
+    y_variable: str | Sequence[str] = "net_present_value",
+    y_axis_label: str | Sequence[str] = "NPV [$]",
+    line_color: Optional[str | list[str]] = None,
     fill: bool = True,
 ) -> go.FigureWidget:
     """
     Plots a financial performance curve against time (years), with an optional secondary
     y-axis for another quantity (e.g. aircraft delivered). The area between the main curve and
-    zero can be shaded. Several designs can be plotted at once by passing lists of file paths
-    (with matching names/colors), or added one by one by passing an existing ``fig``.
+    zero can be shaded. Several designs can be plotted at once by passing a list of file paths
+    (with matching names/colors), or added one by one by passing the returned ``fig`` back in.
 
-    The x-axis is the period array (0, 1, ..., period). At most two y variables are plotted,
-    collected in this order: ``data:cost:{discipline}:{financial_parameter}`` first, then the
-    full names in ``y_variable``. The first goes on the main (left) axis, the second on the
-    secondary (right) axis. Within each group, the user's order is kept.
+    The x-axis is the period array (0, 1, ..., period). At most two y variables are plotted, in
+    the order given in ``y_variable``: the first goes on the main (left) axis, the second on the
+    secondary (right) axis.
 
     :param aircraft_file_path: path of the data file, or list of paths for several designs
-    :param name: trace name, or list of names matching aircraft_file_path
-    :param plot_title: title of the figure
+    :param name: trace name, as one for all designs or one per design; a shorter list is padded
+    with empty names
     :param fig: existing figure to add the plot(s) to
     :param file_formatter: formatter of the data file; default format if not provided
     :param period: number of periods (years) on the x-axis
     :param zero_reference_value: y value of the horizontal reference line (e.g. break-even) on
     the main axis; None for no line
     :param discipline: life cycle cost discipline (production or operation), as one value for
-    all financial parameters or one per parameter
-    :param financial_parameter: financial parameter name(s); None to use y_variable only
-    :param financial_parameter_axis_label: label of the main y-axis
-    :param y_variable: full name(s) of extra variables to plot, e.g.
-    "data:cost:production:aircraft_delivered"
-    :param y2_axis_label: label of the secondary y-axis
-    :param fill_color: RGBA fill color, as one for all designs or one per design; defaults to
-    the Plotly qualitative palette
-    :param line_color: RGBA line and marker color, as one for all designs or one per design
-    (the secondary curve is dashed in the same color); defaults to the Plotly palette
-    :param fill: whether to shade the area between each main curve and zero
+    all y variables or one per y variable; only used for short names in y_variable
+    :param y_variable: one or two variables to plot. A short name (no ":"), e.g.
+    "net_present_value", is a financial parameter read as
+    ``data:cost:{discipline}:{name}``; a full name, e.g.
+    "data:cost:production:aircraft_delivered", is read as is
+    :param y_axis_label: y-axis label(s), in the same order as the plotted variables (main
+    axis, then secondary axis). A single string labels the main axis only; a list must have one
+    label per plotted variable
+    :param line_color: RGBA line and marker color, as one for all designs or one per design (the
+    secondary curve is dashed in the same color); designs without a color (None, or past the end
+    of a shorter list) get the next color of the Plotly palette, based on the number of designs
+    already in ``fig``
+    :param fill: whether to shade the area between each main curve and zero, in the Plotly
+    palette at 0.3 opacity
     :return: financial performance curve figure
     """
 
-    y_variable_names = _resolve_y_variables(discipline, financial_parameter, y_variable)
+    y_variable_names = _resolve_y_variables(discipline, y_variable)
     main_variable = y_variable_names[0]
     secondary_variable = y_variable_names[1] if len(y_variable_names) > 1 else None
 
-    # Normalize inputs to lists so a single file behaves like a list of one file.
-    if isinstance(aircraft_file_path, str):
-        file_paths = [aircraft_file_path]
+    secondary_axis_label = ""
+    if isinstance(y_axis_label, str):
+        main_axis_label = y_axis_label
+    elif secondary_variable is None:
+        (main_axis_label,) = y_axis_label
     else:
-        file_paths = list(aircraft_file_path)
-
-    n_curves = len(file_paths)
-
-    if isinstance(name, str):
-        names = [name] * n_curves
-    else:
-        names = list(name)
-        if len(names) != n_curves:
-            raise ValueError("Length of 'name' must match length of 'aircraft_file_path'.")
-
-    fill_colors = _resolve_colors(fill_color, n_curves, alpha=0.3)
-    line_colors = _resolve_colors(line_color, n_curves, alpha=1.0)
+        main_axis_label, secondary_axis_label = y_axis_label
 
     if fig is None:
         fig = go.Figure()
 
+    if isinstance(aircraft_file_path, (str, pathlib.Path)):
+        aircraft_file_path = [aircraft_file_path]
+    n_designs = len(aircraft_file_path)
+
+    # Lists shorter than the file list are padded: empty names, default palette colors (None)
+    names = _per_design(name, n_designs, pad_value="")
+    line_colors = _per_design(line_color, n_designs, pad_value=None)
+
     period_array = np.linspace(0, period, period + 1)
 
-    for file_path, curve_name, f_color, l_color in zip(file_paths, names, fill_colors, line_colors):
+    for file_path, design_name, design_line_color in zip(aircraft_file_path, names, line_colors):
+        # Pick the next palette color, so that each design added to the same fig gets its own
+        # color. Designs are counted by their main-axis traces.
+        design_index = sum(1 for trace in fig.data if trace.yaxis != "y2")
+        fill_color = _palette_color(design_index, alpha=0.3)
+        if design_line_color is None:
+            design_line_color = _palette_color(design_index, alpha=1.0)
+
         variables = VariableIO(file_path, file_formatter).read()
 
         main_array = _read_array(variables, main_variable, period_array, file_path)
@@ -99,18 +104,18 @@ def financial_performance_curve(
                 x=period_array,
                 y=main_array,
                 mode="lines+markers",
-                name=curve_name,
+                name=design_name,
                 showlegend=True,
                 fill="tozeroy" if fill else None,
-                fillcolor=f_color if fill else None,
-                line=dict(color=l_color),
+                fillcolor=fill_color if fill else None,
+                line=dict(color=design_line_color),
             )
         )
 
         if secondary_variable is not None:
             secondary_array = _read_array(variables, secondary_variable, period_array, file_path)
             secondary_name = (
-                " - ".join(part for part in (curve_name, y2_axis_label) if part)
+                " - ".join(part for part in (design_name, secondary_axis_label) if part)
                 or secondary_variable
             )
             fig.add_trace(
@@ -121,7 +126,7 @@ def financial_performance_curve(
                     name=secondary_name,
                     showlegend=True,
                     yaxis="y2",
-                    line=dict(color=l_color, dash="dash"),
+                    line=dict(color=design_line_color, dash="dash"),
                     marker=dict(symbol="diamond"),
                 )
             )
@@ -134,57 +139,52 @@ def financial_performance_curve(
         )
 
     fig.update_layout(
-        title_text=plot_title,
-        title_x=0.5,
         xaxis_title="Period [Years]",
-        yaxis_title=financial_parameter_axis_label,
+        yaxis_title=main_axis_label,
         legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99),
     )
 
     if secondary_variable is not None:
         fig.update_layout(
             yaxis2=dict(
-                title=y2_axis_label,
+                title=secondary_axis_label,
                 overlaying="y",
-                side="right",
                 showgrid=False,
             )
         )
+
+    _update_fig_axis(fig)
+
+    # _update_fig_axis starts every y-axis at 0 and puts it on the right. The main axis must go
+    # below 0 (NPV is negative before break-even) and stay on the left of the secondary axis.
+    fig.update_layout(yaxis=dict(range=None, side="left"))
 
     return fig
 
 
 def _resolve_y_variables(
-    discipline: Union[str, Sequence[str]],
-    financial_parameter: Optional[Union[str, Sequence[str]]],
-    y_variable: Optional[Union[str, Sequence[str]]],
+    discipline: str | Sequence[str],
+    y_variable: str | Sequence[str],
 ) -> List[str]:
     """
-    Builds the ordered list of y variable names: financial parameters first (in the order
-    given), then full-name y variables (in the order given). The first is the main-axis variable,
-    the second the secondary-axis variable.
+    Builds the ordered list of full y variable names. Short names (no ":") are financial
+    parameters, expanded to ``data:cost:{discipline}:{name}``; full names are kept as is. The
+    first is the main-axis variable, the second the secondary-axis variable.
     """
 
-    names = []
+    variables = [y_variable] if isinstance(y_variable, str) else y_variable
 
-    if financial_parameter is not None:
-        parameters = (
-            [financial_parameter]
-            if isinstance(financial_parameter, str)
-            else list(financial_parameter)
-        )
-        if isinstance(discipline, str):
-            disciplines = [discipline] * len(parameters)
-        else:
-            disciplines = list(discipline)
-            if len(disciplines) != len(parameters):
-                raise ValueError(
-                    "Length of 'discipline' must match length of 'financial_parameter'."
-                )
-        names += [f"data:cost:{d}:{p}" for d, p in zip(disciplines, parameters)]
+    if isinstance(discipline, str):
+        disciplines = [discipline] * len(variables)
+    else:
+        disciplines = discipline
+        if len(disciplines) != len(variables):
+            raise ValueError("Length of 'discipline' must match length of 'y_variable'.")
 
-    if y_variable is not None:
-        names += [y_variable] if isinstance(y_variable, str) else list(y_variable)
+    names = [
+        variable if ":" in variable else f"data:cost:{d}:{variable}"
+        for d, variable in zip(disciplines, variables)
+    ]
 
     if not names:
         raise ValueError("At least one y variable must be defined.")
@@ -206,40 +206,35 @@ def _read_array(variables, variable_name: str, period_array: np.ndarray, file_pa
     # Fill with zeros if the variable is delivery_count related, since there is no delivery
     # during development phase
     if "delivery_count" in variable_name:
-        zero_deliveries = np.zeros(period_array.shape[0] - array.shape[0])
+        zero_deliveries = np.zeros(len(period_array) - len(array))
         array = np.append(zero_deliveries, array)
 
     if len(array) != len(period_array):
         raise ValueError(
             f"Variable '{variable_name}' in '{file_path}' has {len(array)} values but the period "
-            f"array has {len(period_array)}. Check period."
+            f"array has {len(period_array)}. Please double check the period argument matches the "
+            f"length of '{variable_name}'."
         )
     return array
 
 
-def _resolve_colors(
-    color: Optional[Union[str, Sequence[str]]], n_curves: int, alpha: float
-) -> List[str]:
+def _per_design(value, n_designs: int, pad_value) -> list:
     """
-    Resolves the fill/line color argument into a list of length n_curves. If no color is
-    provided, colors are auto-assigned from the default Plotly qualitative palette (converted
-    to rgba with the given alpha). If a single color string is provided, it is reused for
-    every curve. If a list is provided, its length must match n_curves.
+    Turns a per-design argument into a list of length n_designs: a single value (or None) is
+    reused for every design, a shorter list is padded with pad_value.
     """
 
-    if color is None:
-        palette = pc.qualitative.Plotly
-        colors = []
-        for i in range(n_curves):
-            hex_color = palette[i % len(palette)]
-            r, g, b = pc.hex_to_rgb(hex_color)
-            colors.append(f"rgba({r}, {g}, {b}, {alpha})")
-        return colors
+    if value is None or isinstance(value, str):
+        return [value] * n_designs
+    return list(value) + [pad_value] * (n_designs - len(value))
 
-    if isinstance(color, str):
-        return [color] * n_curves
 
-    colors = list(color)
-    if len(colors) != n_curves:
-        raise ValueError("Length of color list must match length of 'aircraft_file_path'.")
-    return colors
+def _palette_color(index: int, alpha: float) -> str:
+    """
+    Returns the index-th color of the default Plotly qualitative palette (cycling if needed),
+    as an rgba string with the given alpha.
+    """
+
+    palette = plotly.colors.qualitative.Plotly
+    r, g, b = plotly.colors.hex_to_rgb(palette[index % len(palette)])
+    return f"rgba({r}, {g}, {b}, {alpha})"

@@ -19,6 +19,6 @@ def test_production_npv():
     financial_performance_curve(
         aircraft_file_path=[DHC_6, DHC_6_H2],
         name=["DHC6 Twin Otter", "Hydrogen Retrofit DHC6"],
-        y_variable="data:cost:production:cumulative_annual_delivery_count",
-        y2_axis_label="A/C delivered [units]",
+        y_variable=["net_present_value", "data:cost:production:cumulative_annual_delivery_count"],
+        y_axis_label=["NPV [$]", "A/C delivered [units]"],
     )

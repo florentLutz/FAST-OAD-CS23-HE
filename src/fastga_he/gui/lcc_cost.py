@@ -16,9 +16,8 @@ components are found by scanning ``data:propulsion:he_power_train:<type>:<id>:pu
 ``:operational_cost``, so any architecture works.
 """
 
-import logging
 import pathlib
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Optional
 
 import plotly
 import plotly.graph_objects as go
@@ -26,11 +25,10 @@ import plotly.graph_objects as go
 import fastoad.api as oad
 
 from fastga_he.powertrain_builder.powertrain import PT_DATA_PREFIX
+from .lca_impact import _update_fig_axis
 
 PRODUCTION_PREFIX = "data:cost:production:"
 OPERATION_PREFIX = "data:cost:operation:"
-
-_LOGGER = logging.getLogger(__name__)
 
 PURCHASE_COST_SUFFIX = ":purchase_cost"
 OPERATIONAL_COST_SUFFIX = ":operational_cost"
@@ -50,7 +48,7 @@ HASH = ["/", "x", "-", "|", "+", ".", "", "\\"]
 # - "power_train_total": leaf replaced by its components in the stacked charts.
 # - "not_stacked": leaves that aren't a share of the total (e.g. MSP), kept out of stacked charts.
 
-_PRODUCTION_SPEC = {
+_PRODUCTION_SPEC: dict = {
     "leaves": {
         # Recurring costs
         PRODUCTION_PREFIX + "manufacturing_cost_per_unit": "Manufacturing",
@@ -73,11 +71,11 @@ _PRODUCTION_SPEC = {
     "not_stacked": ["data:cost:msp_per_unit"],
 }
 
-_OPERATION_SPEC = {
+_OPERATION_SPEC: dict = {
     "leaves": {
         # annual_depreciation_cost is left out: it isn't part of annual_cost_per_unit
         OPERATION_PREFIX + "annual_insurance_cost": "Insurance",
-        OPERATION_PREFIX + "annual_loan_cost": "Loan",
+        OPERATION_PREFIX + "average_annual_loan_cost_without_balloon": "Loan",
         OPERATION_PREFIX + "additional_cost": "Additional",
         OPERATION_PREFIX + "maintenance_cost": "Maintenance",
         OPERATION_PREFIX + "miscellaneous_cost": "Miscellaneous",
@@ -97,27 +95,21 @@ _COST_TYPES = {
     "production": {
         "spec": _PRODUCTION_SPEC,
         "unit": "USD",
-        "simple_title": "production cost per unit",
         "simple_y_axis": "Cost [USD]",
-        "advanced_title": "Production cost per unit breakdown",
         "advanced_y_axis": "Production cost per unit [USD]",
-        "power_train_title": "Power train purchase cost breakdown",
         "power_train_y_axis": "Purchase cost [USD]",
     },
     "operation": {
         "spec": _OPERATION_SPEC,
         "unit": "USD/yr",
-        "simple_title": "annual operating cost",
         "simple_y_axis": "Cost [USD/yr]",
-        "advanced_title": "Annual operating cost breakdown",
         "advanced_y_axis": "Annual operating cost [USD/yr]",
-        "power_train_title": "Power train annual operational cost breakdown",
         "power_train_y_axis": "Operational cost [USD/yr]",
     },
 }
 
 
-def _get_cost_type(cost_type: str) -> Dict:
+def _get_cost_type(cost_type: str) -> dict:
     """Settings of ``cost_type``, "production" or "operation"."""
 
     if cost_type not in _COST_TYPES:
@@ -125,7 +117,7 @@ def _get_cost_type(cost_type: str) -> Dict:
     return _COST_TYPES[cost_type]
 
 
-def _get_value(datafile: oad.DataFile, name: str, default: float = 0.0) -> float:
+def _get_value(datafile, name: str, default: float = 0.0):
     """Value of a variable, or ``default`` if it isn't in the file."""
 
     try:
@@ -135,7 +127,7 @@ def _get_value(datafile: oad.DataFile, name: str, default: float = 0.0) -> float
         return default
 
 
-def _discover_power_train_variables(datafile: oad.DataFile, suffix: str) -> Dict[str, str]:
+def _discover_power_train_variables(datafile, suffix: str):
     """{variable name: "<type><br><id>"} for every power train variable ending with suffix."""
 
     discovered_vars = {}
@@ -148,23 +140,24 @@ def _discover_power_train_variables(datafile: oad.DataFile, suffix: str) -> Dict
     return discovered_vars
 
 
-def _split_power_train_variable(name: str, suffix: str) -> Optional[Tuple[str, str]]:
+def _split_power_train_variable(name: str, suffix: str):
     """Splits ``...:he_power_train:<type>:<id><suffix>`` into (type, id), None if no match."""
 
     if not (name.startswith(PT_DATA_PREFIX) and name.endswith(suffix)):
         return None
 
     middle = name[len(PT_DATA_PREFIX) : -len(suffix)]
-    component_type, _, component_name = middle.partition(":")
+    parts = middle.split(":")
 
-    # Not the cost of one component
-    if not component_type or not component_name or ":" in component_name:
+    # Not the cost of one component: exactly a non-empty type and a non-empty id expected
+    if len(parts) != 2 or not all(parts):
         return None
 
+    component_type, component_name = parts
     return component_type, component_name
 
 
-def _leaf_aliases(var_name: str, disp_label: str) -> List[str]:
+def _leaf_aliases(var_name: str, disp_label: str):
     """Accepted names for an item: label ("Fuel"), variable name, name without prefix."""
 
     aliases = [disp_label, var_name]
@@ -175,9 +168,7 @@ def _leaf_aliases(var_name: str, disp_label: str) -> List[str]:
     return aliases
 
 
-def _get_cost_dict(
-    aircraft_file_path: Union[str, pathlib.Path], spec: Dict
-) -> Tuple[Dict[str, float], Dict[str, str]]:
+def _get_cost_dict(aircraft_file_path: str | pathlib.Path, spec: dict):
     """
     Positive cost items of one aircraft, for the simple charts.
 
@@ -208,12 +199,11 @@ def _get_cost_dict(
 
 
 def lcc_cost_bar_chart_simple(
-    aircraft_file_paths: List[Union[str, pathlib.Path]],
-    names_aircraft: List[str],
+    aircraft_file_paths: list[str | pathlib.Path],
+    names_aircraft: list[str],
     cost_type: str = "production",
-    graph_title: str = None,
-    item_filter_list: list = [],
-    color_list: List[str] = [],
+    item_filter_list: list[str] = [],
+    color_list: list[str] = [],
 ) -> go.FigureWidget:
     """
     Cost items of several aircraft, as grouped bars.
@@ -221,7 +211,6 @@ def lcc_cost_bar_chart_simple(
     :param aircraft_file_paths: paths to the output files.
     :param names_aircraft: names of the aircraft.
     :param cost_type: "production" (cost per unit, USD) or "operation" (annual cost, USD/yr).
-    :param graph_title: title, a default one is built if None.
     :param item_filter_list: items to show, by label ("Fuel") or variable name
     ("annual_fuel_cost"). Everything by default.
     :param color_list: one bar color per aircraft. Plotly's cycle by default.
@@ -229,7 +218,6 @@ def lcc_cost_bar_chart_simple(
 
     settings = _get_cost_type(cost_type)
     spec = settings["spec"]
-    default_comparison_label = settings["simple_title"]
 
     fig = go.Figure()
 
@@ -255,7 +243,7 @@ def lcc_cost_bar_chart_simple(
             filtered_item_names = item_names
             filtered_item_values = item_values
 
-        marker_color = color_list[i] if i < len(color_list) else None
+        marker_color = color_list[i % len(color_list)]
 
         bar_chart = go.Bar(
             name=name_aircraft,
@@ -265,39 +253,9 @@ def lcc_cost_bar_chart_simple(
         )
         fig.add_trace(bar_chart)
 
-    if graph_title:
-        title = graph_title
-    else:
-        title = "Comparison of " + default_comparison_label + " for " + ", ".join(names_aircraft)
-
-    fig.update_layout(
-        barmode="group",
-        plot_bgcolor="white",
-        title_font=dict(size=20),
-        legend_font=dict(size=20),
-        title_x=0.5,
-        title_text=title,
-    )
-    fig.update_xaxes(
-        ticks="outside",
-        title_font=dict(size=20),
-        tickfont=dict(size=20),
-        showline=True,
-        linecolor="black",
-        linewidth=3,
-    )
-    fig.update_yaxes(
-        ticks="outside",
-        showline=True,
-        linecolor="black",
-        gridcolor="lightgrey",
-        linewidth=3,
-        tickfont=dict(size=20),
-        title=settings["simple_y_axis"],
-    )
-    fig.update_yaxes(
-        title_font=dict(size=20),
-    )
+    _update_fig_axis(fig)
+    # Set after _update_fig_axis so it isn't overwritten
+    fig.update_yaxes(title=settings["simple_y_axis"], side="left")
 
     return go.FigureWidget(fig)
 
@@ -307,7 +265,7 @@ def lcc_cost_bar_chart_simple(
 # ---------------------------------------------------------------------------------------------
 
 
-def _get_power_train_costs(datafile: oad.DataFile, suffix: str) -> List[Tuple[str, str, float]]:
+def _get_power_train_costs(datafile, suffix: str) -> list[tuple[str, str, float]]:
     """(type, id, cost) of every power train component of one file, excluded or not."""
 
     costs = []
@@ -321,11 +279,11 @@ def _get_power_train_costs(datafile: oad.DataFile, suffix: str) -> List[Tuple[st
 
 
 def _group_power_train_costs(
-    costs: List[Tuple[str, str, float]],
-    groups: Dict[str, List[str]],
+    costs: list[tuple[str, str, float]],
+    groups: dict[str, list[str]],
     group_by: str = "component",
-    exclude_list: list = [],
-) -> Dict[str, float]:
+    exclude_list: list[str] = [],
+) -> dict[str, float]:
     """
     Non-zero power train costs, by component id or by type, without the excluded components.
 
@@ -341,7 +299,7 @@ def _group_power_train_costs(
 
     exclude_set = set(exclude_list)
 
-    cost_dict = {}
+    cost_dict: dict[str, float] = {}
     for component_type, component_name, value in costs:
         # A component is referred to by its type ("PEMFC_stack") or its unique id
         names = {component_type, component_name}
@@ -361,8 +319,8 @@ def _group_power_train_costs(
 
 
 def _normalise_groups(
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
-) -> Dict[str, List[str]]:
+    aggregate_and_sort_contributor: dict[str, str | list[str]] = {},
+) -> dict[str, list[str]]:
     """{group name: list of names}, a single name being turned into a list."""
 
     return {
@@ -372,8 +330,8 @@ def _normalise_groups(
 
 
 def _get_valid_names(
-    aircraft_file_paths: List[Union[str, pathlib.Path]], suffix: str, spec: Dict = {}
-) -> Tuple[set, set]:
+    aircraft_file_paths: list[str | pathlib.Path], suffix: str, spec: dict = {}
+) -> tuple[set[str], set[str]]:
     """
     Names accepted in ``exclude_list`` and ``aggregate_and_sort_contributor``: the power train
     component types and ids found in the files and, when ``spec`` is given, the names of its
@@ -402,7 +360,9 @@ def _get_valid_names(
     return valid_names, suggestions
 
 
-def _check_names(entries: list, argument_name: str, valid_names: set, suggestions: set):
+def _check_names(
+    entries: list[str], argument_name: str, valid_names: set[str], suggestions: set[str]
+) -> None:
     """Raises a ValueError naming the entries that match nothing in any file (likely typos)."""
 
     unknown = [entry for entry in entries if entry not in valid_names]
@@ -417,12 +377,12 @@ def _check_names(entries: list, argument_name: str, valid_names: set, suggestion
 
 
 def _aggregate_and_sort_contributors(
-    contribution_on_each_aircraft: Dict[str, Dict[str, float]],
-    names_aircraft: List[str],
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
-    cutoff_criteria: float = None,
+    contribution_on_each_aircraft: dict[str, dict[str, float]],
+    names_aircraft: list[str],
+    aggregate_and_sort_contributor: dict[str, list[str]] = {},
+    cutoff_criteria: Optional[float] = None,
     sort_by_size: bool = True,
-) -> Dict[str, Dict[str, float]]:
+) -> dict[str, dict[str, float]]:
     """
     Orders {contributor: {aircraft: cost}} bottom to top: groups from
     ``aggregate_and_sort_contributor`` first, then the rest by decreasing size (given order if
@@ -493,16 +453,15 @@ def _aggregate_and_sort_contributors(
 
 
 def _stacked_cost_bar_chart(
-    ordered_contributors: Dict[str, Dict[str, float]],
-    names_aircraft: List[str],
-    title: str,
+    ordered_contributors: dict[str, dict[str, float]],
+    names_aircraft: list[str],
     y_axis_title: str,
-    kept_names: List[str] = [],
-    legend_rename: Dict[str, str] = {},
+    kept_names: list[str] = [],
+    legend_rename: dict[str, str] = {},
     show_total: bool = True,
-    reference_value: float = None,
+    reference_value: Optional[float] = None,
     reference_label: str = "Reference",
-    color_dict: Dict[str, str] = {},
+    color_dict: dict[str, str] = {},
     value_unit: str = "USD",
     share_label: str = "of the total",
 ) -> go.FigureWidget:
@@ -602,38 +561,15 @@ def _stacked_cost_bar_chart(
         max_height * 1.12 if max_height > 0.0 else 1.0,
     ]
 
+    _update_fig_axis(fig)
+    # Set after _update_fig_axis so they aren't overwritten
     fig.update_layout(
-        plot_bgcolor="white",
-        title_font=dict(size=20),
-        legend_font=dict(size=20),
-        title_x=0.5,
-        title_text=title,
         # Like "stack", but negatives go below zero
         barmode="relative",
         legend=dict(traceorder="reversed"),
     )
-    fig.update_xaxes(
-        ticks="outside",
-        title_font=dict(size=20),
-        tickfont=dict(size=20),
-        showline=True,
-        linecolor="black",
-        linewidth=3,
-    )
     fig.update_yaxes(
-        ticks="outside",
-        showline=True,
-        linecolor="black",
-        gridcolor="lightgrey",
-        linewidth=3,
-        tickfont=dict(size=20),
-        title=y_axis_title,
-        range=y_range,
-        zeroline=True,
-        zerolinecolor="black",
-    )
-    fig.update_yaxes(
-        title_font=dict(size=20),
+        title=y_axis_title, range=y_range, zeroline=True, zerolinecolor="black", side="left"
     )
 
     return go.FigureWidget(fig)
@@ -648,19 +584,18 @@ def _format_cost(value: float) -> str:
 
 
 def lcc_power_train_cost_breakdown(
-    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
-    names_aircraft: Union[str, List[str]],
+    aircraft_file_paths: str | pathlib.Path | list[str | pathlib.Path],
+    names_aircraft: str | list[str],
     cost_type: str = "production",
     group_by: str = "component",
-    exclude_list: list = [],
-    graph_title: str = None,
-    legend_rename: Dict[str, str] = {},
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
-    cutoff_criteria: float = None,
+    exclude_list: list[str] = [],
+    legend_rename: dict[str, str] = {},
+    aggregate_and_sort_contributor: dict[str, str | list[str]] = {},
+    cutoff_criteria: Optional[float] = None,
     show_total: bool = True,
-    reference_value: float = None,
+    reference_value: Optional[float] = None,
     reference_label: str = "Reference",
-    color_dict: Dict[str, str] = {},
+    color_dict: dict[str, str] = {},
 ) -> go.FigureWidget:
     """
     Power train cost, one stacked bar per aircraft, one segment per component: purchase cost
@@ -673,7 +608,6 @@ def lcc_power_train_cost_breakdown(
     same type class summed, e.g. "PMSM").
     :param exclude_list: components to leave out, by type ("PEMFC_stack") or id
     ("pemfc_stack_1"). Works with either ``group_by``. Raises a ValueError for an unknown entry.
-    :param graph_title: title, a default one is used if None.
     :param legend_rename: {legend name: new name}.
     :param aggregate_and_sort_contributor: {new name: name or list of names} to sum. Names can
     mix types and ids, whatever ``group_by`` is; a component listed in two groups
@@ -688,7 +622,6 @@ def lcc_power_train_cost_breakdown(
 
     settings = _get_cost_type(cost_type)
     suffix = settings["spec"]["discover_suffix"]
-    default_title = settings["power_train_title"]
     y_axis_title = settings["power_train_y_axis"]
     value_unit = settings["unit"]
 
@@ -696,13 +629,8 @@ def lcc_power_train_cost_breakdown(
         aircraft_file_paths = [aircraft_file_paths]
     if isinstance(names_aircraft, str):
         names_aircraft = [names_aircraft]
-    if len(aircraft_file_paths) != len(names_aircraft):
-        raise ValueError(
-            "aircraft_file_paths and names_aircraft must have the same length, got "
-            + str(len(aircraft_file_paths))
-            + " and "
-            + str(len(names_aircraft))
-        )
+    # Missing names are filled up with ""
+    names_aircraft = list(names_aircraft) + [""] * (len(aircraft_file_paths) - len(names_aircraft))
 
     groups = _normalise_groups(aggregate_and_sort_contributor)
 
@@ -718,7 +646,7 @@ def lcc_power_train_cost_breakdown(
         )
 
     # {contributor: {aircraft_name: cost}}, components already summed into their groups
-    contribution_on_each_aircraft = {}
+    contribution_on_each_aircraft: dict[str, dict[str, float]] = {}
     for aircraft_file_path, name_aircraft in zip(aircraft_file_paths, names_aircraft):
         cost_dict = _group_power_train_costs(
             _get_power_train_costs(oad.DataFile(aircraft_file_path), suffix),
@@ -740,7 +668,6 @@ def lcc_power_train_cost_breakdown(
     return _stacked_cost_bar_chart(
         ordered_contributors,
         names_aircraft,
-        title=graph_title if graph_title else default_title,
         y_axis_title=y_axis_title,
         kept_names=list(groups),
         legend_rename=legend_rename,
@@ -759,17 +686,15 @@ def lcc_power_train_cost_breakdown(
 
 _POWER_TRAIN_LABEL = "Powertrain"
 _POWER_TRAIN_DETAILS = ("component", "type", "aggregate")
-# Gap between power_train_total and the sum of its components that triggers a warning
-_RECONCILIATION_TOLERANCE = 0.01
 
 
 def _get_cost_contributions(
-    aircraft_file_path: Union[str, pathlib.Path],
-    spec: Dict,
-    groups: Dict[str, List[str]],
+    aircraft_file_path: str | pathlib.Path,
+    spec: dict,
+    groups: dict[str, list[str]],
     power_train_detail: str = "component",
-    exclude_list: list = [],
-) -> Tuple[Dict[str, float], Dict[str, str]]:
+    exclude_list: list[str] = [],
+) -> tuple[dict[str, float], dict[str, str]]:
     """
     Non-zero cost items of one aircraft, ready to stack: ``power_train_total`` is replaced by
     its components (kept as is only if the file has none), ``not_stacked`` leaves are dropped
@@ -830,21 +755,7 @@ def _get_cost_contributions(
     components_sum = sum(components.values())
     # Fall back on power_train_total only if the file has no components at all, otherwise it
     # would bring excluded costs back
-    all_components_sum = sum(value for _, _, value in all_component_costs)
     components_found = any(value != 0.0 for _, _, value in all_component_costs)
-
-    if components_found and power_train_total:
-        gap = abs(all_components_sum - power_train_total) / abs(power_train_total)
-        if gap > _RECONCILIATION_TOLERANCE:
-            _LOGGER.warning(
-                "In %s, the power train components sum up to %.2f but %s is %.2f (%.1f %% gap). "
-                "The components are plotted, the stacked total won't match the one in the file.",
-                aircraft_file_path,
-                all_components_sum,
-                power_train_total_name,
-                power_train_total,
-                gap * 100.0,
-            )
 
     power_train_aliases = [_POWER_TRAIN_LABEL]
     if power_train_total_name:
@@ -878,24 +789,23 @@ def _get_cost_contributions(
 
 
 def lcc_cost_bar_chart_advanced(
-    aircraft_file_paths: Union[Union[str, pathlib.Path], List[Union[str, pathlib.Path]]],
-    names_aircraft: Union[str, List[str]],
+    aircraft_file_paths: str | pathlib.Path | list[str | pathlib.Path],
+    names_aircraft: str | list[str],
     cost_type: str = "production",
     power_train_detail: str = "component",
-    item_filter_list: list = [],
-    exclude_list: list = [],
-    normalisation_factors: List[float] = [],
-    graph_title: str = None,
-    y_axis_title: str = None,
-    value_unit: str = None,
-    legend_rename: Dict[str, str] = {},
-    aggregate_and_sort_contributor: Dict[str, Union[str, List[str]]] = {},
-    cutoff_criteria: float = None,
+    item_filter_list: list[str] = [],
+    exclude_list: list[str] = [],
+    normalisation_factors: list[float] = [],
+    y_axis_title: Optional[str] = None,
+    value_unit: Optional[str] = None,
+    legend_rename: dict[str, str] = {},
+    aggregate_and_sort_contributor: dict[str, str | list[str]] = {},
+    cutoff_criteria: Optional[float] = None,
     sort_by_size: bool = True,
     show_total: bool = True,
-    reference_value: float = None,
+    reference_value: Optional[float] = None,
     reference_label: str = "Reference",
-    color_dict: Dict[str, str] = {},
+    color_dict: dict[str, str] = {},
 ) -> go.FigureWidget:
     """
     All cost items, one stacked bar per aircraft, one segment per item. The power train total
@@ -917,7 +827,6 @@ def lcc_cost_bar_chart_advanced(
     :param normalisation_factors: one divisor per aircraft (e.g. for a cost per seat).
     :param y_axis_title: y-axis title, a default one is used if None.
     :param value_unit: unit of the totals, hover and reference line (USD or USD/yr by default).
-    :param graph_title: title, a default one is used if None.
     :param legend_rename: {legend name: new name}.
     :param aggregate_and_sort_contributor: {new name: name or list of names} to sum. Names can
     mix cost items, component types and ids, whatever ``power_train_detail`` is;
@@ -933,7 +842,6 @@ def lcc_cost_bar_chart_advanced(
 
     settings = _get_cost_type(cost_type)
     spec = settings["spec"]
-    default_title = settings["advanced_title"]
     default_y_axis_title = settings["advanced_y_axis"]
     default_value_unit = settings["unit"]
 
@@ -943,13 +851,8 @@ def lcc_cost_bar_chart_advanced(
     if isinstance(names_aircraft, str):
         names_aircraft = [names_aircraft]
 
-    if len(aircraft_file_paths) != len(names_aircraft):
-        raise ValueError(
-            "aircraft_file_paths and names_aircraft must have the same length, got "
-            + str(len(aircraft_file_paths))
-            + " and "
-            + str(len(names_aircraft))
-        )
+    # Missing names are filled up with ""
+    names_aircraft = list(names_aircraft) + [""] * (len(aircraft_file_paths) - len(names_aircraft))
     if normalisation_factors and len(normalisation_factors) != len(names_aircraft):
         raise ValueError("normalisation_factors must give one factor per aircraft")
 
@@ -968,7 +871,7 @@ def lcc_cost_bar_chart_advanced(
             suggestions,
         )
 
-    contribution_on_each_aircraft = {}
+    contribution_on_each_aircraft: dict[str, dict[str, float]] = {}
     all_aliases = {}
 
     for idx, (aircraft_file_path, name_aircraft) in enumerate(
@@ -1009,7 +912,6 @@ def lcc_cost_bar_chart_advanced(
     return _stacked_cost_bar_chart(
         ordered_contributors,
         names_aircraft,
-        title=graph_title if graph_title else default_title,
         y_axis_title=y_axis_title if y_axis_title else default_y_axis_title,
         kept_names=list(resolved_aggregation) + [_POWER_TRAIN_LABEL],
         legend_rename=legend_rename,

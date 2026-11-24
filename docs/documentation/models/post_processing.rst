@@ -16,8 +16,8 @@ Financial Performance Curve
 ***************************
 
 Plots a financial parameter (e.g. the Net Present Value) against time in years, with an optional secondary y-axis
-for another quantity (e.g. the number of aircraft delivered). Several designs can be plotted at once by passing lists
-of file paths, or added one by one by passing an existing figure.
+for another quantity (e.g. the number of aircraft delivered). Several designs can be plotted at once by passing a list
+of file paths, or added one by one by passing the returned figure back in with ``fig``.
 
 .. code:: python
 
@@ -30,41 +30,34 @@ of file paths, or added one by one by passing an existing figure.
     financial_performance_curve(
         aircraft_file_path = output_file, # str or list of str
         name = "", # str or list of str
-        plot_title = "title_of_the_plot",
         fig = None,
         file_formatter = None,
         period = 20,
         zero_reference_value = 0.0, # float, None
-        discipline = "production", # "production", "operation"
-        financial_parameter = "net_present_value", # str, list of str, None
-        financial_parameter_axis_label = "NPV [$]",
-        y_variable = None, # str, list of str, None
-        y2_axis_label = "",
-        fill_color = None, # str, list of str, None
+        discipline = "production", # "production", "operation", or a list of them
+        y_variable = "net_present_value", # str or list of up to two str
+        y_axis_label = "NPV [$]", # str or list of str
         line_color = None, # str, list of str, None
         fill = True, # True, False
     )
 
 | ``aircraft_file_path`` : Path to the output file, or list of paths to compare several designs.
-| ``name`` : Legend name, or list of names matching ``aircraft_file_path``.
-| ``plot_title`` : Title of the figure.
+| ``name`` : Legend name, one for all designs or one per design.
 | ``fig`` : Existing figure to add the curves to, a new one is created if ``None``.
 | ``file_formatter`` : Formatter of the output file, FAST-OAD default format if ``None``.
 | ``period`` : Number of years on the x-axis (0 to ``period``), must match the length of the plotted variables.
 | ``zero_reference_value`` : Y value of the dashed reference line on the main axis (e.g. break-even), ``None`` to hide it.
-| ``discipline`` : ``production`` or ``operation``, one for all financial parameters or one per parameter.
-| ``financial_parameter`` : Plots ``data:cost:<discipline>:<financial_parameter>``, ``None`` to plot ``y_variable`` only.
-| ``financial_parameter_axis_label`` : Label of the main (left) y-axis.
-| ``y_variable`` : Full name of an extra variable, e.g. ``data:cost:production:aircraft_delivered``.
-| ``y2_axis_label`` : Label of the secondary (right) y-axis, also added to the secondary curve legend name.
-| ``fill_color`` : Fill color, one for all designs or one per design, Plotly palette if ``None``.
-| ``line_color`` : Line color, one for all designs or one per design, Plotly palette if ``None``.
-| ``fill`` : Shades the area between the main curve and zero.
+| ``discipline`` : ``production`` or ``operation``, one for all y variables or one per y variable.
+| ``y_variable`` : One or two variables to plot. The financial parameter is called with single string without prefix, other types of variables must be called with their full name (``data:cost:<discipline>:<name>``).
+| ``y_axis_label`` : Axis label(s), in the same order as ``y_variable``. A single string labels the main axis only; a list must give one label per plotted variable.
+| ``line_color`` : RGBA line and marker color. Designs without a color (``None``or past the end of a shorter list) get the next color of the Plotly palette.
+| ``fill`` : Shades the area between the main curve and zero, in the Plotly palette color at 0.3 opacity.
 
 .. note::
 
-    At most two y variables can be plotted: the financial parameter first (left axis), then ``y_variable`` (right
-    axis). Variables containing ``delivery_count`` are filled with zeros for the development years.
+    At most two y variables can be plotted: the first one on the main (left) axis, the second one on the secondary
+    (right) axis, as a dashed curve with diamond markers in the same color as the main curve. Variables containing
+    ``delivery_count`` are padded with zeros at the start for the development years.
 
 *************************
 LCC Cost Bar Chart Simple
@@ -82,15 +75,13 @@ found automatically in the output file.
         aircraft_file_paths = ["path/to/output_file_1.yml", "path/to/output_file_2.yml"],
         names_aircraft = ["aircraft_1", "aircraft_2"],
         cost_type = "production", # "production", "operation"
-        graph_title = None,
         item_filter_list = [],
-        color_list = [],
+        color_list = ["blue", "red"],
     )
 
 | ``aircraft_file_paths`` : List of paths to the output files.
 | ``names_aircraft`` : List of aircraft names, used in the legend.
 | ``cost_type`` : ``production`` (cost per unit, USD) or ``operation`` (annual cost, USD/yr).
-| ``graph_title`` : Title of the figure, built from the aircraft names if ``None``.
 | ``item_filter_list`` : Cost items to show, by label (``Fuel``) or variable name (``annual_fuel_cost``). All by default.
 | ``color_list`` : One bar color per aircraft, Plotly colors by default.
 
@@ -112,7 +103,6 @@ Plots the power train cost as one stacked bar per aircraft, with one segment per
         cost_type = "production", # "production", "operation"
         group_by = "component", # "component", "type"
         exclude_list = [],
-        graph_title = None,
         legend_rename = {},
         aggregate_and_sort_contributor = {},
         cutoff_criteria = None,
@@ -127,18 +117,16 @@ Plots the power train cost as one stacked bar per aircraft, with one segment per
 | ``cost_type`` : ``production`` (purchase cost, USD) or ``operation`` (annual operational cost, USD/yr).
 | ``group_by`` : ``component`` for one segment per id (``motor_1``), ``type`` to sum ids of a same type (``PMSM``).
 | ``exclude_list`` : Components to leave out, by type (``PEMFC_stack``) or id (``pemfc_stack_1``).
-| ``graph_title`` : Title of the figure, default title if ``None``.
 | ``legend_rename`` : ``{legend name: new name}`` to rename legend entries.
-| ``aggregate_and_sort_contributor`` : ``{group name: name or list of names}`` to sum under one segment. Groups are
-  stacked first, from the bottom, in the given order.
+| ``aggregate_and_sort_contributor`` : ``{group name: name or list of names}`` to sum under one segment. Groups are stacked first, from the bottom, in the given order.
 | ``cutoff_criteria`` : Items below this % of the total on every aircraft are merged into ``Others``.
 | ``show_total`` : Writes the total above each bar.
 | ``reference_value`` : Y value of a dashed reference line (e.g. a budget), ``None`` to hide it.
 | ``reference_label`` : Label of the reference line.
 | ``color_dict`` : ``{item: color}`` to force the color of some segments.
 
-Component types and ids can be mixed in ``exclude_list`` and ``aggregate_and_sort_contributor``; an unknown name
-raises a ``ValueError``.
+Component types and ids can be mixed in ``exclude_list`` and ``aggregate_and_sort_contributor``; an unknown name raises
+a ``ValueError``.
 
 ***************************
 LCC Cost Bar Chart Advanced
@@ -160,7 +148,6 @@ below zero so that the totals are net values.
         item_filter_list = [],
         exclude_list = [],
         normalisation_factors = [],
-        graph_title = None,
         y_axis_title = None,
         value_unit = None,
         legend_rename = {},
@@ -176,12 +163,11 @@ below zero so that the totals are net values.
 | ``aircraft_file_paths`` : Path to the output file, or list of paths.
 | ``names_aircraft`` : Aircraft name, or list of names, used as x-axis labels.
 | ``cost_type`` : ``production`` (cost per unit, USD) or ``operation`` (annual cost, USD/yr).
-| ``power_train_detail`` : ``component`` (one segment per id), ``type`` (one per type) or ``aggregate`` (a single
-  ``Powertrain`` segment).
+| ``power_train_detail`` : ``component`` (one segment per id), ``type`` (one per type) or ``aggregate`` (a
+  single ``Powertrain`` segment).
 | ``item_filter_list`` : Items to keep. All by default.
 | ``exclude_list`` : Items to leave out, ``Powertrain`` for the whole power train.
 | ``normalisation_factors`` : One divisor per aircraft (e.g. number of seats for a cost per seat).
-| ``graph_title`` : Title of the figure, default title if ``None``.
 | ``y_axis_title`` : Title of the y-axis, default title if ``None``.
 | ``value_unit`` : Unit shown in the totals, hover text and reference line, ``USD`` or ``USD/yr`` if ``None``.
 | ``legend_rename`` : ``{legend name: new name}`` to rename legend entries.
