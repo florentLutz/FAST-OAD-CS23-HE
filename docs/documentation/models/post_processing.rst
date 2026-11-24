@@ -72,7 +72,7 @@ found automatically in the output file.
     from fast_oad_cs23_he.src.fastga_he.gui.lcc_cost import lcc_cost_bar_chart_simple
 
     lcc_cost_bar_chart_simple(
-        aircraft_file_paths = ["path/to/output_file_1.yml", "path/to/output_file_2.yml"],
+        aircraft_file_paths = ["path/to/output_file_1.xml", "path/to/output_file_2.xml"],
         names_aircraft = ["aircraft_1", "aircraft_2"],
         cost_type = "production", # "production", "operation"
         item_filter_list = [],
@@ -98,7 +98,7 @@ Plots the power train cost as one stacked bar per aircraft, with one segment per
     from fast_oad_cs23_he.src.fastga_he.gui.lcc_cost import lcc_power_train_cost_breakdown
 
     lcc_power_train_cost_breakdown(
-        aircraft_file_paths = ["path/to/output_file_1.yml", "path/to/output_file_2.yml"], # str or list of str
+        aircraft_file_paths = ["path/to/output_file_1.xml", "path/to/output_file_2.xml"], # str or list of str
         names_aircraft = ["aircraft_1", "aircraft_2"], # str or list of str
         cost_type = "production", # "production", "operation"
         group_by = "component", # "component", "type"
