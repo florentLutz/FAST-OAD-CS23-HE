@@ -40,6 +40,11 @@ class LCCOperationalAnnualRevenue(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
+            "length_adjustment",
+            _LengthAdjustment(years_of_service=years_of_service),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             "annual_revenue_projection",
             _OperationalAnnualRevenueProjection(years_of_service=years_of_service),
             promotes=["*"],
@@ -70,7 +75,7 @@ class _AirfareGainFactor(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:operation:airfare_compound_annual_gain_factor",
+            "airfare_compound_annual_gain_factor",
             val=1.0,
             desc="The airfare gain factor over the service life of the aircraft.",
             shape=years_of_service,
@@ -90,7 +95,7 @@ class _AirfareGainFactor(om.ExplicitComponent):
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         years_of_service = self.options["years_of_service"]
 
-        outputs["data:cost:operation:airfare_compound_annual_gain_factor"] = (
+        outputs["airfare_compound_annual_gain_factor"] = (
             1.0 + inputs["data:cost:operation:airfare_compound_annual_gain_rate"]
         ) ** np.arange(years_of_service)
 
@@ -98,11 +103,60 @@ class _AirfareGainFactor(om.ExplicitComponent):
         years_of_service = self.options["years_of_service"]
 
         partials[
-            "data:cost:operation:airfare_compound_annual_gain_factor",
+            "airfare_compound_annual_gain_factor",
             "data:cost:operation:airfare_compound_annual_gain_rate",
         ] = np.arange(years_of_service) * (
             1.0 + inputs["data:cost:operation:airfare_compound_annual_gain_rate"]
         ) ** (np.arange(years_of_service) - 1)
+
+
+class _LengthAdjustment(om.ExplicitComponent):
+    """
+    Adjust the length of the annual airfare CAGR array to match the years of service.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "years_of_service",
+            types=int,
+            default=30,
+            desc="The total service life of the aircraft in years for NPV calculation.",
+        )
+
+    def setup(self):
+        years_of_service = self.options["years_of_service"]
+
+        self.add_input(
+            "airfare_compound_annual_gain_factor",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service,
+        )
+
+        self.add_output(
+            "data:cost:operation:airfare_compound_annual_gain_factor",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service + 1,
+            desc="The airfare gain factor over the service life of the aircraft.",
+        )
+
+    def setup_partials(self):
+        years_of_service = self.options["years_of_service"]
+
+        self.declare_partials(
+            "*",
+            "*",
+            method="exact",
+            rows=np.arange(1, years_of_service + 1),
+            cols=np.arange(years_of_service),
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        outputs["data:cost:operation:airfare_compound_annual_gain_factor"] = np.append(
+            [0.0], inputs["airfare_compound_annual_gain_factor"]
+        )
 
 
 class _OperationalAnnualRevenue(om.ExplicitComponent):
@@ -234,14 +288,14 @@ class _OperationalAnnualRevenueProjection(om.ExplicitComponent):
             "data:cost:operation:airfare_compound_annual_gain_factor",
             val=np.nan,
             desc="The airfare gain factor over the service life of the aircraft.",
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
         self.add_output(
             "data:cost:operation:annual_revenue_projection",
             units="USD/yr",
             val=0.0,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
     def setup_partials(self):
@@ -251,15 +305,15 @@ class _OperationalAnnualRevenueProjection(om.ExplicitComponent):
             of="*",
             wrt="data:cost:operation:annual_revenue_per_unit",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.zeros(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.zeros(years_of_service + 1),
         )
         self.declare_partials(
             of="*",
             wrt="data:cost:operation:airfare_compound_annual_gain_factor",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.arange(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.arange(years_of_service + 1),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -279,4 +333,4 @@ class _OperationalAnnualRevenueProjection(om.ExplicitComponent):
         partials[
             "data:cost:operation:annual_revenue_projection",
             "data:cost:operation:airfare_compound_annual_gain_factor",
-        ] = inputs["data:cost:operation:annual_revenue_per_unit"] * np.ones(years_of_service)
+        ] = inputs["data:cost:operation:annual_revenue_per_unit"] * np.ones(years_of_service + 1)

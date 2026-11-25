@@ -15,8 +15,8 @@ in a more intuitive way.
 Financial Performance Curve
 ***************************
 
-Plots a financial parameter (e.g. the Net Present Value) against time in years, with an optional secondary y-axis
-for another quantity (e.g. the number of aircraft delivered). Several designs can be plotted at once by passing a list
+Plots a financial model variable (e.g. the Net Present Value) against time in years, with an optional secondary
+y-axis for another quantity (e.g. the annual delivery count). Several designs can be plotted at once by passing a list
 of file paths, or added one by one by passing the returned figure back in with ``fig``.
 
 .. code:: python
@@ -45,10 +45,10 @@ of file paths, or added one by one by passing the returned figure back in with `
 | ``name`` : Legend name, one for all designs or one per design.
 | ``fig`` : Existing figure to add the curves to, a new one is created if ``None``.
 | ``file_formatter`` : Formatter of the output file, FAST-OAD default format if ``None``.
-| ``period`` : Number of years on the x-axis (0 to ``period``), must match the length of the plotted variables.
+| ``period`` : Number of years on the x-axis (0 to ``period``). The plotted variables must have ``period + 1`` values.
 | ``zero_reference_value`` : Y value of the dashed reference line on the main axis (e.g. break-even), ``None`` to hide it.
-| ``discipline`` : ``production`` or ``operation``, one for all y variables or one per y variable.
-| ``y_variable`` : One or two variables to plot. The financial parameter is called with single string without prefix, other types of variables must be called with their full name (``data:cost:<discipline>:<name>``).
+| ``discipline`` : ``production`` or ``operation``, one for all y variables or a list with one per y variable. Only used for short names in ``y_variable``.
+| ``y_variable`` : One or two variables to plot. A short name without ``:`` is considered as financial model variables, read as ``data:cost:<discipline>:<name>``. The full variable name is read as it is.
 | ``y_axis_label`` : Axis label(s), in the same order as ``y_variable``. A single string labels the main axis only; a list must give one label per plotted variable.
 | ``line_color`` : RGBA line and marker color. Designs without a color (``None``or past the end of a shorter list) get the next color of the Plotly palette.
 | ``fill`` : Shades the area between the main curve and zero, in the Plotly palette color at 0.3 opacity.
@@ -56,8 +56,35 @@ of file paths, or added one by one by passing the returned figure back in with `
 .. note::
 
     At most two y variables can be plotted: the first one on the main (left) axis, the second one on the secondary
-    (right) axis, as a dashed curve with diamond markers in the same color as the main curve. Variables containing
-    ``delivery_count`` are padded with zeros at the start for the development years.
+    (right) axis, as a dashed curve with diamond markers in the same color as the main curve.
+
+List of available financial model variables
+===========================================
+
+.. raw:: html
+
+   <div style="display: flex; justify-content: center;">
+
+================================================  ================================================
+Production                                          Operation
+================================================  ================================================
+annual_cash_flow                                    airfare_compound_annual_gain_factor
+net_present_value                                   annual_cash_flow
+profitability_index                                 net_present_value
+annual_delivery_count                               profitability_index
+cumulative_annual_delivery_count                    annual_revenue_projection
+annual_gross_profit                                 annual_energy_cost_projection
+maturity_discount                                   annual_hydrocarbon_fuel_cost_projection
+project_development_cost_distribution               annual_hydrogen_fuel_cost_projection
+project_development_cost_cumulative_distribution    annual_electricity_cost_projection
+\                                                   hydrocarbon_fuel_compound_annual_gain_factor
+\                                                   hydrogen_fuel_compound_annual_gain_factor
+\                                                   electricity_compound_annual_gain_factor
+================================================  ================================================
+
+.. raw:: html
+
+   </div>
 
 *************************
 LCC Cost Bar Chart Simple

@@ -36,7 +36,7 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
                 val=np.nan,
                 units="USD/yr",
                 desc="Annual loan cost for the aircraft",
-                shape=years_of_service,
+                shape=years_of_service + 1,
             )
 
         self.add_input(
@@ -65,13 +65,13 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             name="data:cost:operation:annual_energy_cost_projection",
             val=np.nan,
             units="USD/yr",
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_input(
             "data:cost:operation:annual_revenue_projection",
             units="USD/yr",
             val=np.nan,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
         self.add_output(
@@ -82,7 +82,18 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         )
 
     def setup_partials(self):
+        # Year 0 (row 0) depends only on the initial investment; recurring terms start at year 1
         years_of_service = self.options["years_of_service"]
+        loan = self.options["loan"]
+
+        annual_cost_variables = (
+            [
+                "data:cost:operation:annual_energy_cost_projection",
+                "data:cost:operation:annual_loan_cost",
+            ]
+            if loan
+            else "data:cost:operation:annual_energy_cost_projection"
+        )
 
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
@@ -94,12 +105,9 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         )
         self.declare_partials(
             "data:cost:operation:annual_cash_flow",
-            [
-                "data:cost:operation:annual_energy_cost_projection",
-                "data:cost:operation:annual_loan_cost",
-            ],
+            annual_cost_variables,
             rows=np.arange(1, years_of_service + 1),
-            cols=np.arange(years_of_service),
+            cols=np.arange(1, years_of_service + 1),
             method="exact",
             val=-1.0,
         )
@@ -107,7 +115,7 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             "data:cost:operation:annual_cash_flow",
             "data:cost:operation:annual_revenue_projection",
             rows=np.arange(1, years_of_service + 1),
-            cols=np.arange(years_of_service),
+            cols=np.arange(1, years_of_service + 1),
             method="exact",
             val=1.0,
         )
@@ -132,12 +140,13 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        loan = self.options["loan"]
         annual_cost = inputs["data:cost:operation:annual_cost_per_unit"]
         annual_fuel_cost = inputs["data:cost:operation:annual_fuel_cost"]
         annual_electricity_cost = inputs["data:cost:operation:annual_electricity_cost"]
         annual_energy_cost_projection = inputs["data:cost:operation:annual_energy_cost_projection"]
         annual_revenue = inputs["data:cost:operation:annual_revenue_projection"]
-        annual_loan_cost = inputs["data:cost:operation:annual_loan_cost"]
+        annual_loan_cost = inputs["data:cost:operation:annual_loan_cost"] if loan else 0.0
 
         first_payment = inputs["data:cost:operation:initial_investment"]
 
@@ -150,6 +159,7 @@ class LCCOperationAnnualCashFlow(om.ExplicitComponent):
             - annual_loan_cost
         )
 
-        outputs["data:cost:operation:annual_cash_flow"] = np.insert(
-            recurring_part, 0, -first_payment
-        )
+        # Year 0 only holds the initial investment, so recurring terms have no effect on it
+        recurring_part[0] = -first_payment[0]
+
+        outputs["data:cost:operation:annual_cash_flow"] = recurring_part

@@ -410,19 +410,18 @@ def test_learning_curve_discount():
     ivc = om.IndepVarComp()
     ivc.add_output("data:cost:production:learning_curve_percentage", units="percent", val=95.0)
     ivc.add_output(
-        "data:cost:production:cumulative_annual_delivery_count", val=[1, 30, 60, 100, 120, 150]
+        "data:cost:production:cumulative_annual_delivery_count",
+        val=[0, 0, 0, 0, 0, 1, 30, 60, 100, 120, 150],
     )
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(
-        LCCLearningCurveDiscount(
-            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
-        ),
+        LCCLearningCurveDiscount(years_of_program=TEST_PROGAM_YEARS),
         ivc,
     )
 
     assert problem.get_val("data:cost:production:maturity_discount") == pytest.approx(
-        [1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902], rel=1e-3
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902], rel=1e-3
     )
 
     problem.check_partials(compact_print=True)
@@ -774,7 +773,7 @@ def test_annual_loan_cost():
     )
 
     assert problem.get_val("data:cost:operation:annual_loan_cost", units="USD/yr") == pytest.approx(
-        np.array([142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0]),
+        np.array([0.0, 142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0]),
         rel=1e-3,
     )
     assert problem.get_val(
@@ -1253,7 +1252,9 @@ def test_project_cost_distribution():
     ivc.add_output("data:cost:production:total_non_recursing_project_cost", units="USD", val=10000)
 
     problem = run_system(
-        LCCProjectDevelopmentCostDistribution(years_of_development=TEST_DEVELOPMENT_YEARS),
+        LCCProjectDevelopmentCostDistribution(
+            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
+        ),
         ivc,
     )
 
@@ -1261,12 +1262,16 @@ def test_project_cost_distribution():
     expected = ((1.0 - np.exp(-3.52 * progression_percentage**2.0)) / 0.97) * 10000
 
     assert problem.get_val(
-        "data:cost:project_development_cost_cumulative_distribution", units="USD"
-    ) == pytest.approx(expected, rel=1e-3)
+        "data:cost:production:project_development_cost_cumulative_distribution", units="USD"
+    ) == pytest.approx(
+        np.append(expected, np.zeros(TEST_PROGAM_YEARS - TEST_DEVELOPMENT_YEARS)), rel=1e-3
+    )
 
     assert problem.get_val(
-        "data:cost:project_development_cost_distribution", units="USD"
-    ) == pytest.approx([0.0, 1354.0, 3085.3, 2966.7, 1819.7, 778.4], rel=1e-3)
+        "data:cost:production:project_development_cost_distribution", units="USD"
+    ) == pytest.approx(
+        [0.0, 1354.0, 3085.3, 2966.7, 1819.7, 778.4, 0.0, 0.0, 0.0, 0.0, 0.0], rel=1e-3
+    )
 
     problem.check_partials(compact_print=True)
 
@@ -1277,21 +1282,35 @@ def test_annual_sales_gross_profit():
     ivc.add_output("data:cost:msp_per_unit", units="USD", val=4514427.18)
     ivc.add_output("data:cost:production:recursing_cost_per_unit", units="USD", val=1793666.08)
     ivc.add_output(
-        "data:cost:production:maturity_discount", val=[1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902]
+        "data:cost:production:maturity_discount",
+        val=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.7775, 0.7386, 0.7112, 0.7017, 0.6902],
     )
-    ivc.add_output("data:cost:production:annual_delivery_count", val=[3, 13, 19, 23, 26, 27])
+    ivc.add_output(
+        "data:cost:production:annual_delivery_count", val=[0, 0, 0, 0, 0, 3, 13, 19, 23, 26, 27]
+    )
 
     problem = run_system(
-        LCCAnnualSalesGrossProfit(
-            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
-        ),
+        LCCAnnualSalesGrossProfit(years_of_program=TEST_PROGAM_YEARS),
         ivc,
     )
 
     assert problem.get_val(
         "data:cost:production:annual_gross_profit", units="USD"
     ) == pytest.approx(
-        [8162283.3, 40558073.4, 60602882.9, 74491752.9, 84651104.0, 88463849.0], rel=1e-3
+        [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            8162283.3,
+            40558073.4,
+            60602882.9,
+            74491752.9,
+            84651104.0,
+            88463849.0,
+        ],
+        rel=1e-3,
     )
 
     problem.check_partials(compact_print=True)
@@ -1311,11 +1330,11 @@ def test_annual_delivery_count():
     )
 
     assert problem.get_val("data:cost:production:annual_delivery_count") == pytest.approx(
-        [3, 17, 23, 27, 28, 29], rel=1e-3
+        [0, 0, 0, 0, 0, 3, 17, 23, 27, 28, 29], rel=1e-3
     )
     assert problem.get_val(
         "data:cost:production:cumulative_annual_delivery_count"
-    ) == pytest.approx([3, 20, 43, 70, 98, 127], rel=1e-3)
+    ) == pytest.approx([0, 0, 0, 0, 0, 3, 20, 43, 70, 98, 127], rel=1e-3)
 
     problem.check_partials(compact_print=True)
 
@@ -1325,18 +1344,40 @@ def test_production_annual_cash_flow():
     ivc.add_output(
         "data:cost:production:annual_gross_profit",
         units="USD",
-        val=[8162283.3, 40558073.4, 60602882.9, 74491752.9, 84651104.0, 88463849.0],
+        val=[
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            8162283.3,
+            40558073.4,
+            60602882.9,
+            74491752.9,
+            84651104.0,
+            88463849.0,
+        ],
     )
     ivc.add_output(
-        "data:cost:project_development_cost_distribution",
+        "data:cost:production:project_development_cost_distribution",
         units="USD",
-        val=[0.0, 22480757.3, 51225908.8, 49256767.1, 30212876.0, 12923945.0],
+        val=[
+            0.0,
+            22480757.3,
+            51225908.8,
+            49256767.1,
+            30212876.0,
+            12923945.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
     )
 
     problem = run_system(
-        LCCProductionAnnualCashFlow(
-            years_of_development=TEST_DEVELOPMENT_YEARS, years_of_program=TEST_PROGAM_YEARS
-        ),
+        LCCProductionAnnualCashFlow(years_of_program=TEST_PROGAM_YEARS),
         ivc,
     )
 
@@ -1548,6 +1589,7 @@ def test_operation_annual_revenue():
         "data:cost:operation:annual_revenue_projection", units="USD/yr"
     ) == pytest.approx(
         [
+            0.0,
             553510.57,
             570005.19,
             586991.34,
@@ -1580,6 +1622,7 @@ def test_operation_annual_revenue():
         "data:cost:operation:annual_revenue_projection", units="USD/yr"
     ) == pytest.approx(
         [
+            0.0,
             51599.04,
             53136.69,
             54720.17,
@@ -1679,6 +1722,7 @@ def test_energy_cost_projection():
         "data:cost:operation:annual_energy_cost_projection", units="USD/yr"
     ) == pytest.approx(
         [
+            0.0,
             156817.93,
             157669.45,
             158525.6,
@@ -1739,6 +1783,7 @@ def test_operational_annual_cash_flow():
         "data:cost:operation:annual_energy_cost_projection",
         units="USD/yr",
         val=[
+            0.0,
             156817.93,
             157669.45,
             158525.6,
@@ -1755,6 +1800,7 @@ def test_operational_annual_cash_flow():
         "data:cost:operation:annual_revenue_projection",
         units="USD/yr",
         val=[
+            0.0,
             495673.85,
             510444.93,
             525656.19,
@@ -1770,7 +1816,7 @@ def test_operational_annual_cash_flow():
     ivc.add_output(
         "data:cost:operation:annual_loan_cost",
         units="USD/yr",
-        val=[142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0],
+        val=[0.0, 142377.5, 142377.5, 142377.5, 142377.5, 1544929.2, 0.0, 0.0, 0.0, 0.0, 0.0],
     )
 
     problem = run_system(
@@ -1895,6 +1941,7 @@ def test_operational_profitability_trainer():
         "data:cost:operation:annual_revenue_projection", units="USD/yr"
     ) == pytest.approx(
         [
+            0.0,
             51599.04,
             53136.69,
             54720.17,

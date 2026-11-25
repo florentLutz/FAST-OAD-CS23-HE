@@ -31,7 +31,7 @@ def financial_performance_curve(
     Plots a financial performance curve against time (years), with an optional secondary
     y-axis for another quantity (e.g. aircraft delivered). The area between the main curve and
     zero can be shaded. Several designs can be plotted at once by passing a list of file paths
-    (with matching names/colors), or added one by one by passing the returned ``fig`` back in.
+    (with matching names/colors), or added one-by-one by passing the returned ``fig`` back in.
 
     The x-axis is the period array (0, 1, ..., period). At most two y variables are plotted, in
     the order given in ``y_variable``: the first goes on the main (left) axis, the second on the
@@ -47,10 +47,8 @@ def financial_performance_curve(
     the main axis; None for no line
     :param discipline: life cycle cost discipline (production or operation), as one value for
     all y variables or one per y variable; only used for short names in y_variable
-    :param y_variable: one or two variables to plot. A short name (no ":"), e.g.
-    "net_present_value", is a financial parameter read as
-    ``data:cost:{discipline}:{name}``; a full name, e.g.
-    "data:cost:production:aircraft_delivered", is read as is
+    :param y_variable: one or two variables to plot. A short name (no ":")is a financial model
+    variable read as ``data:cost:{discipline}:{name}``; a full name is read as is
     :param y_axis_label: y-axis label(s), in the same order as the plotted variables (main
     axis, then secondary axis). A single string labels the main axis only; a list must have one
     label per plotted variable
@@ -116,7 +114,7 @@ def financial_performance_curve(
             secondary_array = _read_array(variables, secondary_variable, period_array, file_path)
             secondary_name = (
                 " - ".join(part for part in (design_name, secondary_axis_label) if part)
-                or secondary_variable
+                or secondary_variable.rsplit(":", 1)[-1]
             )
             fig.add_trace(
                 go.Scatter(
@@ -167,8 +165,11 @@ def _resolve_y_variables(
     y_variable: str | Sequence[str],
 ) -> List[str]:
     """
-    Builds the ordered list of full y variable names. Short names (no ":") are financial
-    parameters, expanded to ``data:cost:{discipline}:{name}``; full names are kept as is. The
+    Builds the ordered list of full y variable names. Short names with no ":" are financial
+    model variables (e.g. net present value, annual delivery count) read as
+    ``data:cost:{discipline}:{name}``. For variables from different
+    disciplines, either pass ``discipline`` as a list with one discipline per variable, or give
+    the full variable names (e.g. ``data:cost:operation:cash_flow``), which are read as is. The
     first is the main-axis variable, the second the secondary-axis variable.
     """
 
@@ -202,12 +203,6 @@ def _read_array(variables, variable_name: str, period_array: np.ndarray, file_pa
     """
 
     array = np.asarray(variables[variable_name].value, dtype=float).flatten()
-
-    # Fill with zeros if the variable is delivery_count related, since there is no delivery
-    # during development phase
-    if "delivery_count" in variable_name:
-        zero_deliveries = np.zeros(len(period_array) - len(array))
-        array = np.append(zero_deliveries, array)
 
     if len(array) != len(period_array):
         raise ValueError(

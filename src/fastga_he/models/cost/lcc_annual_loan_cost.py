@@ -34,6 +34,11 @@ class LCCAnnualLoanCost(om.Group):
             subsys=_LoanPaymentWithBalloon(years_of_service=years_of_service),
             promotes=["*"],
         )
+        self.add_subsystem(
+            name="length_adjustment",
+            subsys=_LengthAdjustment(years_of_service=years_of_service),
+            promotes=["*"],
+        )
 
 
 class _LoanPayment(om.ExplicitComponent):
@@ -185,7 +190,7 @@ class _LoanPaymentWithBalloon(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:operation:annual_loan_cost",
+            "annual_loan_cost",
             val=15.0,
             units="USD/yr",
             shape=years_of_service,
@@ -234,7 +239,7 @@ class _LoanPaymentWithBalloon(om.ExplicitComponent):
         loan_payments[period:] = 0.0
         loan_payments[period - 1] += balloon_payment[0]
 
-        outputs["data:cost:operation:annual_loan_cost"] = loan_payments
+        outputs["annual_loan_cost"] = loan_payments
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         years_of_service = self.options["years_of_service"]
@@ -248,29 +253,73 @@ class _LoanPaymentWithBalloon(om.ExplicitComponent):
         a_p = one_plus_r**period
 
         # Indices 0 .. period + 1 are passed through, the rest are set to 0
-        partials["data:cost:operation:annual_loan_cost", "loan_payments_before_adding_balloon"] = (
-            np.concatenate((np.ones(period), np.zeros(years_of_service - period)))
+        partials["annual_loan_cost", "loan_payments_before_adding_balloon"] = np.concatenate(
+            (np.ones(period), np.zeros(years_of_service - period))
         )
 
         # The balloon only appears at index period + 1. Assign into a zero array rather than
         # np.insert, which would make the array one element longer than the sparsity pattern.
         d_balloon_d_principal = np.zeros(years_of_service)
         d_balloon_d_principal[period - 1] = ((a_n - a_p) / (a_p - 1.0))[0]
-        partials["data:cost:operation:annual_loan_cost", "data:cost:operation:loan_principal"] = (
-            d_balloon_d_principal
-        )
+        partials["annual_loan_cost", "data:cost:operation:loan_principal"] = d_balloon_d_principal
 
         d_balloon_d_interest = np.zeros(years_of_service)
         d_balloon_d_interest[period - 1] = (
             principal * (years_of_service * a_n - period * a_p) / one_plus_r / (a_p - 1.0)
             - principal * (a_n - a_p) * period * a_p / one_plus_r / (a_p - 1.0) ** 2.0
         )[0]
-        partials[
-            "data:cost:operation:annual_loan_cost", "data:cost:operation:annual_interest_rate"
-        ] = d_balloon_d_interest
+        partials["annual_loan_cost", "data:cost:operation:annual_interest_rate"] = (
+            d_balloon_d_interest
+        )
 
         # compute() truncates pay_period to an integer, so the outputs are piecewise constant in
         # pay_period and their exact derivative is 0 almost everywhere.
-        partials["data:cost:operation:annual_loan_cost", "data:cost:operation:pay_period"] = (
-            np.zeros(years_of_service)
+        partials["annual_loan_cost", "data:cost:operation:pay_period"] = np.zeros(years_of_service)
+
+
+class _LengthAdjustment(om.ExplicitComponent):
+    """
+    Adjust the length of the annual loan cost array to match the years of service.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "years_of_service",
+            types=int,
+            default=30,
+            desc="The total service life of the aircraft in years for NPV calculation.",
+        )
+
+    def setup(self):
+        years_of_service = self.options["years_of_service"]
+
+        self.add_input(
+            "annual_loan_cost",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service,
+        )
+
+        self.add_output(
+            "data:cost:operation:annual_loan_cost",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service + 1,
+        )
+
+    def setup_partials(self):
+        years_of_service = self.options["years_of_service"]
+
+        self.declare_partials(
+            "*",
+            "*",
+            method="exact",
+            rows=np.arange(1, years_of_service + 1),
+            cols=np.arange(years_of_service),
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        outputs["data:cost:operation:annual_loan_cost"] = np.append(
+            [0.0], inputs["annual_loan_cost"]
         )

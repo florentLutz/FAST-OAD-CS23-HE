@@ -46,28 +46,24 @@ class LCCProductionProfitability(om.Group):
         )
         self.add_subsystem(
             name="learning_curve_discount",
-            subsys=LCCLearningCurveDiscount(
-                years_of_development=years_of_development, years_of_program=years_of_program
-            ),
+            subsys=LCCLearningCurveDiscount(years_of_program=years_of_program),
             promotes=["*"],
         )
         self.add_subsystem(
             name="project_development_cost_distribution",
-            subsys=LCCProjectDevelopmentCostDistribution(years_of_development=years_of_development),
-            promotes=["*"],
+            subsys=LCCProjectDevelopmentCostDistribution(
+                years_of_development=years_of_development, years_of_program=years_of_program
+            ),
+            promotes=["data:*"],
         )
         self.add_subsystem(
             name="annual_sales_gross_profit",
-            subsys=LCCAnnualSalesGrossProfit(
-                years_of_development=years_of_development, years_of_program=years_of_program
-            ),
+            subsys=LCCAnnualSalesGrossProfit(years_of_program=years_of_program),
             promotes=["*"],
         )
         self.add_subsystem(
             name="production_annual_cash_flow",
-            subsys=LCCProductionAnnualCashFlow(
-                years_of_development=years_of_development, years_of_program=years_of_program
-            ),
+            subsys=LCCProductionAnnualCashFlow(years_of_program=years_of_program),
             promotes=["*"],
         )
         self.add_subsystem(

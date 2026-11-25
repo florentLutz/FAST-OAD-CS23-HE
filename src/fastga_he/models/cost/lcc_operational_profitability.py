@@ -67,7 +67,7 @@ class LCCOperationalProfitability(om.Group):
         self.add_subsystem(
             name="annual_operational_revenue",
             subsys=LCCOperationalAnnualRevenue(years_of_service=years_of_service, trainer=trainer),
-            promotes=["*"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             name="revenue_per_rpk",
@@ -77,7 +77,7 @@ class LCCOperationalProfitability(om.Group):
         self.add_subsystem(
             name="annual_energy_cost_projection",
             subsys=LCCOperationalAnnualEnergyCostProjection(years_of_service=years_of_service),
-            promotes=["*"],
+            promotes=["data:*"],
         )
         self.add_subsystem(
             name="initial_investment",

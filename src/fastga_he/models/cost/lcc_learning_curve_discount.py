@@ -16,12 +16,6 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "years_of_development",
-            types=int,
-            default=10,
-            desc="The number of years of development for the aircraft, before the first delivery.",
-        )
-        self.options.declare(
             "years_of_program",
             types=int,
             default=30,
@@ -29,7 +23,6 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
         )
 
     def setup(self):
-        years_of_development = self.options["years_of_development"]
         years_of_program = self.options["years_of_program"]
 
         self.add_input(
@@ -42,39 +35,41 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
             "data:cost:production:cumulative_annual_delivery_count",
             val=np.nan,
             desc="The cumulative number of similar aircraft produced over the production",
-            shape=years_of_program - years_of_development + 1,
+            shape=years_of_program + 1,
         )
 
         self.add_output(
             "data:cost:production:maturity_discount",
             val=1.0,
             desc="The discount factor in manufacturing and tooling bsed on process maturity",
-            shape=years_of_program - years_of_development + 1,
+            shape=years_of_program + 1,
         )
 
     def setup_partials(self):
-        years_of_development = self.options["years_of_development"]
         years_of_program = self.options["years_of_program"]
 
         self.declare_partials(
             of="*",
             wrt="data:cost:production:cumulative_annual_delivery_count",
             method="exact",
-            rows=np.arange(years_of_program - years_of_development + 1),
-            cols=np.arange(years_of_program - years_of_development + 1),
+            rows=np.arange(years_of_program + 1),
+            cols=np.arange(years_of_program + 1),
         )
         self.declare_partials(
             of="*",
             wrt="data:cost:production:learning_curve_percentage",
             method="exact",
-            rows=np.arange(years_of_program - years_of_development + 1),
-            cols=np.zeros(years_of_program - years_of_development + 1),
+            rows=np.arange(years_of_program + 1),
+            cols=np.zeros(years_of_program + 1),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:production:maturity_discount"] = (
-            inputs["data:cost:production:cumulative_annual_delivery_count"]
-        ) ** (np.log2(0.02 * inputs["data:cost:production:learning_curve_percentage"]) - 1.0)
+        outputs["data:cost:production:maturity_discount"] = np.clip(
+            (inputs["data:cost:production:cumulative_annual_delivery_count"])
+            ** (np.log2(0.02 * inputs["data:cost:production:learning_curve_percentage"]) - 1.0),
+            0.0,
+            1.0,
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         aircraft_made = inputs["data:cost:production:cumulative_annual_delivery_count"]
@@ -83,13 +78,17 @@ class LCCLearningCurveDiscount(om.ExplicitComponent):
         partials[
             "data:cost:production:maturity_discount",
             "data:cost:production:cumulative_annual_delivery_count",
-        ] = (factor - 1.0) * aircraft_made ** (factor - 1.0) / aircraft_made
+        ] = np.where(
+            aircraft_made > 0, (factor - 1.0) * aircraft_made ** (factor - 1.0) / aircraft_made, 0.0
+        )
 
         partials[
             "data:cost:production:maturity_discount",
             "data:cost:production:learning_curve_percentage",
-        ] = (
+        ] = np.where(
+            aircraft_made > 0,
             aircraft_made ** (factor - 1.0)
             * np.log(aircraft_made)
-            / (inputs["data:cost:production:learning_curve_percentage"] * np.log(2.0))
+            / (inputs["data:cost:production:learning_curve_percentage"] * np.log(2.0)),
+            0.0,
         )

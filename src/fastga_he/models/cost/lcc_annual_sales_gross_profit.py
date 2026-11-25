@@ -13,12 +13,6 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "years_of_development",
-            types=int,
-            default=10,
-            desc="The number of years of development for the aircraft, before the first delivery.",
-        )
-        self.options.declare(
             "years_of_program",
             types=int,
             default=30,
@@ -26,7 +20,6 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
         )
 
     def setup(self):
-        years_of_development = self.options["years_of_development"]
         years_of_program = self.options["years_of_program"]
 
         self.add_input(
@@ -40,12 +33,12 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
             "data:cost:production:maturity_discount",
             val=np.nan,
             desc="The discount factor in manufacturing and tooling based on process maturity",
-            shape=years_of_program - years_of_development + 1,
+            shape=years_of_program + 1,
         )
         self.add_input(
             "data:cost:production:annual_delivery_count",
             val=np.nan,
-            shape=years_of_program - years_of_development + 1,
+            shape=years_of_program + 1,
             desc="The annual delivery count of aircraft over the program duration.",
         )
 
@@ -54,11 +47,10 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
             val=1.0e5,
             units="USD",
             desc="Gross profit per unit sales of the aircraft manufacturer",
-            shape=years_of_program - years_of_development + 1,
+            shape=years_of_program + 1,
         )
 
     def setup_partials(self):
-        years_of_development = self.options["years_of_development"]
         years_of_program = self.options["years_of_program"]
 
         self.declare_partials(
@@ -68,8 +60,8 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
                 "data:cost:production:maturity_discount",
             ],
             method="exact",
-            rows=np.arange(years_of_program - years_of_development + 1),
-            cols=np.arange(years_of_program - years_of_development + 1),
+            rows=np.arange(years_of_program + 1),
+            cols=np.arange(years_of_program + 1),
         )
         self.declare_partials(
             of="*",
@@ -78,8 +70,8 @@ class LCCAnnualSalesGrossProfit(om.ExplicitComponent):
                 "data:cost:production:recursing_cost_per_unit",
             ],
             method="exact",
-            rows=np.arange(years_of_program - years_of_development + 1),
-            cols=np.zeros(years_of_program - years_of_development + 1),
+            rows=np.arange(years_of_program + 1),
+            cols=np.zeros(years_of_program + 1),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):

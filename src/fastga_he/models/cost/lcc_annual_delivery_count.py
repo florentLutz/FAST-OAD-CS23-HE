@@ -64,6 +64,14 @@ class LCCAnnualDeliveryCount(om.Group):
             ),
             promotes=["*"],
         )
+        self.add_subsystem(
+            name="length_adjustment",
+            subsys=_LengthAdjustment(
+                years_of_development=years_of_development,
+                years_of_program=years_of_program,
+            ),
+            promotes=["*"],
+        )
 
 
 class _ProductionFractionFactor(om.ExplicitComponent):
@@ -337,7 +345,7 @@ class _RoundDown(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:production:annual_delivery_count",
+            "annual_delivery_count",
             val=1,
             shape=years_of_program - years_of_development + 1,
         )
@@ -354,7 +362,7 @@ class _RoundDown(om.ExplicitComponent):
         # After the window: round each year independently, never below the last window year.
         annual_delivery_count_after = np.round(original_annual_delivery_count[5:])
 
-        outputs["data:cost:production:annual_delivery_count"] = np.concatenate(
+        outputs["annual_delivery_count"] = np.concatenate(
             (annual_delivery_growing_count, annual_delivery_count_after)
         )
 
@@ -383,14 +391,14 @@ class _CumulativeAnnualDeliveryCount(om.ExplicitComponent):
         years_of_program = self.options["years_of_program"]
 
         self.add_input(
-            "data:cost:production:annual_delivery_count",
+            "annual_delivery_count",
             val=np.nan,
             shape=years_of_program - years_of_development + 1,
             desc="The annual delivery count of aircraft over the program duration.",
         )
 
         self.add_output(
-            "data:cost:production:cumulative_annual_delivery_count",
+            "cumulative_annual_delivery_count",
             val=np.nan,
             shape=years_of_program - years_of_development + 1,
             desc="The cumulative annual delivery count of aircraft over the program duration.",
@@ -403,14 +411,105 @@ class _CumulativeAnnualDeliveryCount(om.ExplicitComponent):
         rows, cols = np.tril_indices(years_of_program - years_of_development + 1)
 
         self.declare_partials(
-            "data:cost:production:cumulative_annual_delivery_count",
-            "data:cost:production:annual_delivery_count",
+            "cumulative_annual_delivery_count",
+            "annual_delivery_count",
             rows=rows,
             cols=cols,
             val=1.0,
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        outputs["data:cost:production:cumulative_annual_delivery_count"] = np.cumsum(
-            inputs["data:cost:production:annual_delivery_count"]
+        outputs["cumulative_annual_delivery_count"] = np.cumsum(inputs["annual_delivery_count"])
+
+
+class _LengthAdjustment(om.ExplicitComponent):
+    """
+    Adjust the length of the annual delivery count array to match the years of program.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "years_of_development",
+            types=int,
+            default=10,
+            desc="The number of years of development for the aircraft, before the first delivery.",
+        )
+        self.options.declare(
+            "years_of_program",
+            types=int,
+            default=30,
+            desc="The total number of years of the aircraft program, including development and production.",
+        )
+
+    def setup(self):
+        years_of_development = self.options["years_of_development"]
+        years_of_program = self.options["years_of_program"]
+
+        self.add_input(
+            "annual_delivery_count",
+            val=np.nan,
+            shape=years_of_program - years_of_development + 1,
+            desc="The annual delivery count of aircraft over the program duration.",
+        )
+        self.add_input(
+            "cumulative_annual_delivery_count",
+            val=np.nan,
+            shape=years_of_program - years_of_development + 1,
+            desc="The cumulative annual delivery count of aircraft over the program duration.",
+        )
+
+        self.add_output(
+            "data:cost:production:annual_delivery_count",
+            val=np.nan,
+            shape=years_of_program + 1,
+            desc="The annual delivery count of aircraft over the program duration.",
+        )
+        self.add_output(
+            "data:cost:production:cumulative_annual_delivery_count",
+            val=np.nan,
+            shape=years_of_program + 1,
+            desc="The cumulative annual delivery count of aircraft over the program duration.",
+        )
+
+    def setup_partials(self):
+        years_of_development = self.options["years_of_development"]
+        years_of_program = self.options["years_of_program"]
+
+        self.declare_partials(
+            of="data:cost:production:annual_delivery_count",
+            wrt="annual_delivery_count",
+            method="exact",
+            rows=np.arange(years_of_development, years_of_program + 1),
+            cols=np.arange(years_of_program - years_of_development + 1),
+            val=1.0,
+        )
+        self.declare_partials(
+            of="data:cost:production:cumulative_annual_delivery_count",
+            wrt="cumulative_annual_delivery_count",
+            method="exact",
+            rows=np.arange(years_of_development, years_of_program + 1),
+            cols=np.arange(years_of_program - years_of_development + 1),
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        years_of_development = self.options["years_of_development"]
+        years_of_program = self.options["years_of_program"]
+
+        annual_delivery_count = inputs["annual_delivery_count"]
+        cumulative_annual_delivery_count = inputs["cumulative_annual_delivery_count"]
+
+        # Create arrays of zeros for the full program duration
+        full_annual_delivery_count = np.zeros(years_of_program + 1)
+        full_cumulative_annual_delivery_count = np.zeros(years_of_program + 1)
+
+        # Fill in the values from the computed arrays, starting from the year of development
+        full_annual_delivery_count[years_of_development:] = annual_delivery_count
+        full_cumulative_annual_delivery_count[years_of_development:] = (
+            cumulative_annual_delivery_count
+        )
+
+        outputs["data:cost:production:annual_delivery_count"] = full_annual_delivery_count
+        outputs["data:cost:production:cumulative_annual_delivery_count"] = (
+            full_cumulative_annual_delivery_count
         )

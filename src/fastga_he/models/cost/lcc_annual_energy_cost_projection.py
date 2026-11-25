@@ -29,6 +29,11 @@ class LCCOperationalAnnualEnergyCostProjection(om.Group):
             promotes=["*"],
         )
         self.add_subsystem(
+            "length_adjustment",
+            _LengthAdjustment(years_of_service=years_of_service),
+            promotes=["*"],
+        )
+        self.add_subsystem(
             "annual_energy_cost_projection",
             _AnnualEnergyCostProjection(years_of_service=years_of_service),
             promotes=["*"],
@@ -78,17 +83,17 @@ class _CompoundAnnualGainFactor(om.ExplicitComponent):
         )
 
         self.add_output(
-            "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
+            "hydrocarbon_fuel_compound_annual_gain_factor",
             val=1.0,
             shape=years_of_service,
         )
         self.add_output(
-            "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
+            "hydrogen_fuel_compound_annual_gain_factor",
             val=1.0,
             shape=years_of_service,
         )
         self.add_output(
-            "data:cost:operation:electricity_compound_annual_gain_factor",
+            "electricity_compound_annual_gain_factor",
             val=1.0,
             shape=years_of_service,
         )
@@ -97,7 +102,7 @@ class _CompoundAnnualGainFactor(om.ExplicitComponent):
         years_of_service = self.options["years_of_service"]
 
         self.declare_partials(
-            "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
+            "hydrocarbon_fuel_compound_annual_gain_factor",
             "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_rate",
             method="exact",
             rows=np.arange(years_of_service),
@@ -105,7 +110,7 @@ class _CompoundAnnualGainFactor(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
+            "hydrogen_fuel_compound_annual_gain_factor",
             "data:cost:operation:hydrogen_fuel_compound_annual_gain_rate",
             method="exact",
             rows=np.arange(years_of_service),
@@ -113,7 +118,7 @@ class _CompoundAnnualGainFactor(om.ExplicitComponent):
         )
 
         self.declare_partials(
-            "data:cost:operation:electricity_compound_annual_gain_factor",
+            "electricity_compound_annual_gain_factor",
             "data:cost:operation:electricity_compound_annual_gain_rate",
             method="exact",
             rows=np.arange(years_of_service),
@@ -129,15 +134,15 @@ class _CompoundAnnualGainFactor(om.ExplicitComponent):
         hydrogen_fuel_cagr = inputs["data:cost:operation:hydrogen_fuel_compound_annual_gain_rate"]
         electricity_cagr = inputs["data:cost:operation:electricity_compound_annual_gain_rate"]
 
-        outputs["data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor"] = (
+        outputs["hydrocarbon_fuel_compound_annual_gain_factor"] = (
             1.0 + hydrocarbon_fuel_cagr
         ) ** np.arange(years_of_service)
-        outputs["data:cost:operation:hydrogen_fuel_compound_annual_gain_factor"] = (
+        outputs["hydrogen_fuel_compound_annual_gain_factor"] = (
             1.0 + hydrogen_fuel_cagr
         ) ** np.arange(years_of_service)
-        outputs["data:cost:operation:electricity_compound_annual_gain_factor"] = (
-            1.0 + electricity_cagr
-        ) ** np.arange(years_of_service)
+        outputs["electricity_compound_annual_gain_factor"] = (1.0 + electricity_cagr) ** np.arange(
+            years_of_service
+        )
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         years_of_service = self.options["years_of_service"]
@@ -149,24 +154,115 @@ class _CompoundAnnualGainFactor(om.ExplicitComponent):
         electricity_cagr = inputs["data:cost:operation:electricity_compound_annual_gain_rate"]
 
         partials[
-            "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
+            "hydrocarbon_fuel_compound_annual_gain_factor",
             "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_rate",
         ] = np.arange(years_of_service) * (1.0 + hydrocarbon_fuel_cagr) ** (
             np.arange(years_of_service) - 1
         )
 
         partials[
-            "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
+            "hydrogen_fuel_compound_annual_gain_factor",
             "data:cost:operation:hydrogen_fuel_compound_annual_gain_rate",
         ] = np.arange(years_of_service) * (1.0 + hydrogen_fuel_cagr) ** (
             np.arange(years_of_service) - 1
         )
 
         partials[
-            "data:cost:operation:electricity_compound_annual_gain_factor",
+            "electricity_compound_annual_gain_factor",
             "data:cost:operation:electricity_compound_annual_gain_rate",
         ] = np.arange(years_of_service) * (1.0 + electricity_cagr) ** (
             np.arange(years_of_service) - 1
+        )
+
+
+class _LengthAdjustment(om.ExplicitComponent):
+    """
+    Adjust the length of the annual energy cost CAGR array to match the years of service.
+    """
+
+    def initialize(self):
+        self.options.declare(
+            "years_of_service",
+            types=int,
+            default=30,
+            desc="The total service life of the aircraft in years for NPV calculation.",
+        )
+
+    def setup(self):
+        years_of_service = self.options["years_of_service"]
+
+        self.add_input(
+            "hydrocarbon_fuel_compound_annual_gain_factor",
+            val=1.0,
+            shape=years_of_service,
+        )
+        self.add_input(
+            "hydrogen_fuel_compound_annual_gain_factor",
+            val=1.0,
+            shape=years_of_service,
+        )
+        self.add_input(
+            "electricity_compound_annual_gain_factor",
+            val=1.0,
+            shape=years_of_service,
+        )
+
+        self.add_output(
+            "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service + 1,
+        )
+        self.add_output(
+            "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service + 1,
+        )
+        self.add_output(
+            "data:cost:operation:electricity_compound_annual_gain_factor",
+            val=np.nan,
+            units="USD/yr",
+            shape=years_of_service + 1,
+        )
+
+    def setup_partials(self):
+        years_of_service = self.options["years_of_service"]
+
+        self.declare_partials(
+            "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
+            "hydrocarbon_fuel_compound_annual_gain_factor",
+            method="exact",
+            rows=np.arange(1, years_of_service + 1),
+            cols=np.arange(years_of_service),
+            val=1.0,
+        )
+        self.declare_partials(
+            "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
+            "hydrogen_fuel_compound_annual_gain_factor",
+            method="exact",
+            rows=np.arange(1, years_of_service + 1),
+            cols=np.arange(years_of_service),
+            val=1.0,
+        )
+        self.declare_partials(
+            "data:cost:operation:electricity_compound_annual_gain_factor",
+            "electricity_compound_annual_gain_factor",
+            method="exact",
+            rows=np.arange(1, years_of_service + 1),
+            cols=np.arange(years_of_service),
+            val=1.0,
+        )
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        outputs["data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor"] = np.append(
+            [0.0], inputs["hydrocarbon_fuel_compound_annual_gain_factor"]
+        )
+        outputs["data:cost:operation:hydrogen_fuel_compound_annual_gain_factor"] = np.append(
+            [0.0], inputs["hydrogen_fuel_compound_annual_gain_factor"]
+        )
+        outputs["data:cost:operation:electricity_compound_annual_gain_factor"] = np.append(
+            [0.0], inputs["electricity_compound_annual_gain_factor"]
         )
 
 
@@ -206,36 +302,36 @@ class _AnnualEnergyCostProjection(om.ExplicitComponent):
         self.add_input(
             name="data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
             val=np.nan,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_input(
             name="data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
             val=np.nan,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_input(
             name="data:cost:operation:electricity_compound_annual_gain_factor",
             val=np.nan,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
         self.add_output(
             "data:cost:operation:annual_hydrocarbon_fuel_cost_projection",
             units="USD/yr",
             val=0.0,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_output(
             "data:cost:operation:annual_hydrogen_fuel_cost_projection",
             units="USD/yr",
             val=0.0,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_output(
             "data:cost:operation:annual_electricity_cost_projection",
             units="USD/yr",
             val=0.0,
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
     def setup_partials(self):
@@ -245,43 +341,43 @@ class _AnnualEnergyCostProjection(om.ExplicitComponent):
             "data:cost:operation:annual_hydrocarbon_fuel_cost_projection",
             "data:cost:operation:annual_hydrocarbon_fuel_cost",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.zeros(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.zeros(years_of_service + 1),
         )
         self.declare_partials(
             "data:cost:operation:annual_hydrogen_fuel_cost_projection",
             "data:cost:operation:annual_hydrogen_fuel_cost",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.zeros(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.zeros(years_of_service + 1),
         )
         self.declare_partials(
             "data:cost:operation:annual_electricity_cost_projection",
             "data:cost:operation:annual_electricity_cost",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.zeros(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.zeros(years_of_service + 1),
         )
         self.declare_partials(
             "data:cost:operation:annual_hydrocarbon_fuel_cost_projection",
             "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.arange(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.arange(years_of_service + 1),
         )
         self.declare_partials(
             "data:cost:operation:annual_hydrogen_fuel_cost_projection",
             "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.arange(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.arange(years_of_service + 1),
         )
         self.declare_partials(
             "data:cost:operation:annual_electricity_cost_projection",
             "data:cost:operation:electricity_compound_annual_gain_factor",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.arange(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.arange(years_of_service + 1),
         )
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
@@ -319,17 +415,19 @@ class _AnnualEnergyCostProjection(om.ExplicitComponent):
         partials[
             "data:cost:operation:annual_hydrocarbon_fuel_cost_projection",
             "data:cost:operation:hydrocarbon_fuel_compound_annual_gain_factor",
-        ] = inputs["data:cost:operation:annual_hydrocarbon_fuel_cost"] * np.ones(years_of_service)
+        ] = inputs["data:cost:operation:annual_hydrocarbon_fuel_cost"] * np.ones(
+            years_of_service + 1
+        )
 
         partials[
             "data:cost:operation:annual_hydrogen_fuel_cost_projection",
             "data:cost:operation:hydrogen_fuel_compound_annual_gain_factor",
-        ] = inputs["data:cost:operation:annual_hydrogen_fuel_cost"] * np.ones(years_of_service)
+        ] = inputs["data:cost:operation:annual_hydrogen_fuel_cost"] * np.ones(years_of_service + 1)
 
         partials[
             "data:cost:operation:annual_electricity_cost_projection",
             "data:cost:operation:electricity_compound_annual_gain_factor",
-        ] = inputs["data:cost:operation:annual_electricity_cost"] * np.ones(years_of_service)
+        ] = inputs["data:cost:operation:annual_electricity_cost"] * np.ones(years_of_service + 1)
 
 
 class _EnergyCostProjectionSum(om.ExplicitComponent):
@@ -353,26 +451,26 @@ class _EnergyCostProjectionSum(om.ExplicitComponent):
             name="data:cost:operation:annual_hydrocarbon_fuel_cost_projection",
             val=np.nan,
             units="USD/yr",
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_input(
             name="data:cost:operation:annual_hydrogen_fuel_cost_projection",
             val=np.nan,
             units="USD/yr",
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
         self.add_input(
             name="data:cost:operation:annual_electricity_cost_projection",
             val=np.nan,
             units="USD/yr",
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
         self.add_output(
             name="data:cost:operation:annual_energy_cost_projection",
             val=0.0,
             units="USD/yr",
-            shape=years_of_service,
+            shape=years_of_service + 1,
         )
 
     def setup_partials(self):
@@ -382,8 +480,8 @@ class _EnergyCostProjectionSum(om.ExplicitComponent):
             "*",
             "*",
             method="exact",
-            rows=np.arange(years_of_service),
-            cols=np.arange(years_of_service),
+            rows=np.arange(years_of_service + 1),
+            cols=np.arange(years_of_service + 1),
             val=1.0,
         )
 
