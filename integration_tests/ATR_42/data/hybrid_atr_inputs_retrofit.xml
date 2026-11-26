@@ -701,7 +701,9 @@
       <aircraft>
         <MFW units="kg" is_input="True">7403.958757175414<!--maximum fuel weight--></MFW>
         <MTOW units="kg" is_input="True">18400.527645272872<!--maximum takeoff weight--></MTOW>
+        <MZFW units="kg" is_input="False">16973.349022318627<!--maximum zero fuel weight--></MZFW>
         <max_payload units="kg" is_input="True">5500.0<!--max payload weight--></max_payload>
+        <target_max_payload units="kg" is_input="True">5500.0<!--max payload weight--></target_max_payload>
         <target_MTOW units="kg" is_input="True">18400.527645272872<!--maximum takeoff weight--></target_MTOW>
       </aircraft>
       <propulsion>

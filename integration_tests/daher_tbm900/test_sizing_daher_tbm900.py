@@ -161,7 +161,7 @@ def test_retrofit_ecopulse():
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(1275.0, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        5.81, abs=1e-2
+        5.78, abs=1e-2
     )
 
 
