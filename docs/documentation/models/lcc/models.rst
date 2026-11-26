@@ -21,7 +21,7 @@ sections, using the annual net present value (NPV) and profitability index (PI) 
 :math:`C_t` is the total cost at year :math:`t`, :math:`R_t` is the total revenue at year :math:`t`, :math:`r` is the
 discount rate, and :math:`T` is the total number of years in the project. The initial investment cost is represented
 by :math:`C_0`. The discount rate :math:`r` can also be replace with WACC (Weighted Average Cost of Capital), which is
-wildly applied in the aircraft industry.
+widely applied in the aircraft industry.
 
 
 .. contents::
