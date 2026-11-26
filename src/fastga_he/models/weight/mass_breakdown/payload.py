@@ -19,8 +19,7 @@ oad.RegisterSubmodel.active_models[SERVICE_PAYLOAD_MASS] = (
 class ComputePayloadForRetrofit(om.Group):
     """
     This group computes the payload and checks if the maximum payload is higher than the target
-    maximum payload. It is used in the case of a retrofit while the MTOW and MZFW is set to
-    constant values.
+    maximum payload. It is used in the case of a retrofit while the MTOW is set to constant values.
     """
 
     def setup(self):
@@ -43,7 +42,7 @@ class _CheckMaxPayload(om.ExplicitComponent):
     """
 
     def setup(self):
-        self.add_input("data:weight:aircraft:MZFW", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:target_MTOW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:target_max_payload", val=np.nan, units="kg")
 
@@ -53,16 +52,20 @@ class _CheckMaxPayload(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", method="exact")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        max_payload = inputs["data:weight:aircraft:MZFW"] - inputs["data:weight:aircraft:OWE"]
+        max_payload = (
+            inputs["data:weight:aircraft:target_MTOW"] - inputs["data:weight:aircraft:OWE"]
+        )
         target_max_payload = inputs["data:weight:aircraft:target_max_payload"]
 
         outputs["data:weight:aircraft:max_payload"] = np.clip(max_payload, 0.0, target_max_payload)
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
-        max_payload = inputs["data:weight:aircraft:MZFW"] - inputs["data:weight:aircraft:OWE"]
+        max_payload = (
+            inputs["data:weight:aircraft:target_MTOW"] - inputs["data:weight:aircraft:OWE"]
+        )
         target_max_payload = inputs["data:weight:aircraft:target_max_payload"]
 
-        partials["data:weight:aircraft:max_payload", "data:weight:aircraft:MZFW"] = np.where(
+        partials["data:weight:aircraft:max_payload", "data:weight:aircraft:target_MTOW"] = np.where(
             (max_payload < target_max_payload) & (max_payload > 0.0),
             1.0,
             0.0,

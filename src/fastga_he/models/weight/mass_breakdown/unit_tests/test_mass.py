@@ -40,7 +40,6 @@ def test_payload_mass():
 
     inputs_list = [
         "data:weight:aircraft:target_MTOW",
-        "data:weight:aircraft:MZFW",
         "data:weight:aircraft:OWE",
         "data:mission:sizing:fuel",
         "data:weight:aircraft:target_max_payload",
@@ -52,6 +51,6 @@ def test_payload_mass():
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(ComputePayloadForRetrofit(), ivc)
     weight_b = problem.get_val("data:weight:aircraft:payload", units="kg")
-    assert weight_b == pytest.approx(481.7, abs=1e-2)
+    assert weight_b == pytest.approx(619.00, abs=1e-2)
 
     problem.check_partials(compact_print=True)

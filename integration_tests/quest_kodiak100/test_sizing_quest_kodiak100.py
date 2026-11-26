@@ -626,7 +626,7 @@ def test_retrofit_hybrid_kodiak():
         "data:environmental_impact:sizing:emissions", units="kg"
     ) == pytest.approx(805.00, abs=1.0)
     assert problem.get_val("data:environmental_impact:sizing:emission_factor") == pytest.approx(
-        2.345, abs=1e-2
+        1.924, abs=1e-2
     )
 
 
