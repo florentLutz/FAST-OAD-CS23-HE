@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-from typing import List, Optional, Sequence
+from typing import List, Sequence
 
 import pathlib
 import numpy as np
@@ -20,11 +20,11 @@ def financial_performance_curve(
     fig=None,
     file_formatter=None,
     period: int = 20,
-    zero_reference_value: Optional[float] = 0.0,
+    zero_reference_value: float | None = 0.0,
     discipline: str | Sequence[str] = "production",
     y_variable: str | Sequence[str] = "net_present_value",
     y_axis_label: str | Sequence[str] = "NPV [$]",
-    line_color: Optional[str | list[str]] = None,
+    line_color: str | list[str] | None = None,
     fill: bool = True,
 ) -> go.FigureWidget:
     """

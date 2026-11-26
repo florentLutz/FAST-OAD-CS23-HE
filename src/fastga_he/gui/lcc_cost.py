@@ -17,7 +17,6 @@ components are found by scanning ``data:propulsion:he_power_train:<type>:<id>:pu
 """
 
 import pathlib
-from typing import Optional
 
 import plotly
 import plotly.graph_objects as go
@@ -380,7 +379,7 @@ def _aggregate_and_sort_contributors(
     contribution_on_each_aircraft: dict[str, dict[str, float]],
     names_aircraft: list[str],
     aggregate_and_sort_contributor: dict[str, list[str]] = {},
-    cutoff_criteria: Optional[float] = None,
+    cutoff_criteria: float | None = None,
     sort_by_size: bool = True,
 ) -> dict[str, dict[str, float]]:
     """
@@ -459,7 +458,7 @@ def _stacked_cost_bar_chart(
     kept_names: list[str] = [],
     legend_rename: dict[str, str] = {},
     show_total: bool = True,
-    reference_value: Optional[float] = None,
+    reference_value: float | None = None,
     reference_label: str = "Reference",
     color_dict: dict[str, str] = {},
     value_unit: str = "USD",
@@ -591,9 +590,9 @@ def lcc_power_train_cost_breakdown(
     exclude_list: list[str] = [],
     legend_rename: dict[str, str] = {},
     aggregate_and_sort_contributor: dict[str, str | list[str]] = {},
-    cutoff_criteria: Optional[float] = None,
+    cutoff_criteria: float | None = None,
     show_total: bool = True,
-    reference_value: Optional[float] = None,
+    reference_value: float | None = None,
     reference_label: str = "Reference",
     color_dict: dict[str, str] = {},
 ) -> go.FigureWidget:
@@ -796,14 +795,14 @@ def lcc_cost_bar_chart_advanced(
     item_filter_list: list[str] = [],
     exclude_list: list[str] = [],
     normalisation_factors: list[float] = [],
-    y_axis_title: Optional[str] = None,
-    value_unit: Optional[str] = None,
+    y_axis_title: str | None = None,
+    value_unit: str | None = None,
     legend_rename: dict[str, str] = {},
     aggregate_and_sort_contributor: dict[str, str | list[str]] = {},
-    cutoff_criteria: Optional[float] = None,
+    cutoff_criteria: float | None = None,
     sort_by_size: bool = True,
     show_total: bool = True,
-    reference_value: Optional[float] = None,
+    reference_value: float | None = None,
     reference_label: str = "Reference",
     color_dict: dict[str, str] = {},
 ) -> go.FigureWidget:
