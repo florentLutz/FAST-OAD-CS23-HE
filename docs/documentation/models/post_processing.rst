@@ -27,7 +27,7 @@ of file paths, or added one by one by passing the returned figure back in with `
     output_file = "path/to/output_file.xml"
 
     # Generate the financial performance curve
-    financial_performance_curve(
+    fig = financial_performance_curve(
         aircraft_file_path = output_file, # str or list of str
         name = "", # str or list of str
         fig = None,
@@ -40,6 +40,8 @@ of file paths, or added one by one by passing the returned figure back in with `
         line_color = None, # str, list of str, None
         fill = True, # True, False
     )
+
+    fig.show()
 
 | ``aircraft_file_path`` : Path to the output file, or list of paths to compare several designs.
 | ``name`` : Legend name, one for all designs or one per design.
@@ -98,13 +100,15 @@ found automatically in the output file.
 
     from fast_oad_cs23_he.src.fastga_he.gui.lcc_cost import lcc_cost_bar_chart_simple
 
-    lcc_cost_bar_chart_simple(
+    fig = lcc_cost_bar_chart_simple(
         aircraft_file_paths = ["path/to/output_file_1.xml", "path/to/output_file_2.xml"],
         names_aircraft = ["aircraft_1", "aircraft_2"],
         cost_type = "production", # "production", "operation"
         item_filter_list = [],
         color_list = ["blue", "red"],
     )
+
+    fig.show()
 
 | ``aircraft_file_paths`` : List of paths to the output files.
 | ``names_aircraft`` : List of aircraft names, used in the legend.
@@ -124,7 +128,7 @@ Plots the power train cost as one stacked bar per aircraft, with one segment per
 
     from fast_oad_cs23_he.src.fastga_he.gui.lcc_cost import lcc_power_train_cost_breakdown
 
-    lcc_power_train_cost_breakdown(
+    fig = lcc_power_train_cost_breakdown(
         aircraft_file_paths = ["path/to/output_file_1.xml", "path/to/output_file_2.xml"], # str or list of str
         names_aircraft = ["aircraft_1", "aircraft_2"], # str or list of str
         cost_type = "production", # "production", "operation"
@@ -138,6 +142,8 @@ Plots the power train cost as one stacked bar per aircraft, with one segment per
         reference_label = "Reference",
         color_dict = {},
     )
+
+    fig.show()
 
 | ``aircraft_file_paths`` : Path to the output file, or list of paths.
 | ``names_aircraft`` : Aircraft name, or list of names, used as x-axis labels.
@@ -167,7 +173,7 @@ below zero so that the totals are net values.
 
     from fast_oad_cs23_he.src.fastga_he.gui.lcc_cost import lcc_cost_bar_chart_advanced
 
-    lcc_cost_bar_chart_advanced(
+    fig = lcc_cost_bar_chart_advanced(
         aircraft_file_paths = ["path/to/output_file_1.xml", "path/to/output_file_2.xml"], # str or list of str
         names_aircraft = ["aircraft_1", "aircraft_2"], # str or list of str
         cost_type = "production", # "production", "operation"
@@ -186,6 +192,8 @@ below zero so that the totals are net values.
         reference_label = "Reference",
         color_dict = {},
     )
+
+    fig.show()
 
 | ``aircraft_file_paths`` : Path to the output file, or list of paths.
 | ``names_aircraft`` : Aircraft name, or list of names, used as x-axis labels.
