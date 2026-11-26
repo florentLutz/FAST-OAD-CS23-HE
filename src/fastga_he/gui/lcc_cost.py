@@ -317,7 +317,7 @@ def _group_power_train_costs(
     return cost_dict
 
 
-def _normalise_groups(
+def _groups_as_lists(
     aggregate_and_sort_contributor: dict[str, str | list[str]] = {},
 ) -> dict[str, list[str]]:
     """{group name: list of names}, a single name being turned into a list."""
@@ -631,7 +631,7 @@ def lcc_power_train_cost_breakdown(
     # Missing names are filled up with ""
     names_aircraft = list(names_aircraft) + [""] * (len(aircraft_file_paths) - len(names_aircraft))
 
-    groups = _normalise_groups(aggregate_and_sort_contributor)
+    groups = _groups_as_lists(aggregate_and_sort_contributor)
 
     # Check the names before any chart work
     if exclude_list or groups:
@@ -855,7 +855,7 @@ def lcc_cost_bar_chart_advanced(
     if normalisation_factors and len(normalisation_factors) != len(names_aircraft):
         raise ValueError("normalisation_factors must give one factor per aircraft")
 
-    groups = _normalise_groups(aggregate_and_sort_contributor)
+    groups = _groups_as_lists(aggregate_and_sort_contributor)
 
     # Check the names before any chart work
     if exclude_list or groups:
