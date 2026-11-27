@@ -1,6 +1,6 @@
 # This file is part of FAST-OAD_CS23-HE : A framework for rapid Overall Aircraft Design of Hybrid
 # Electric Aircraft.
-# Copyright (C) 2025 ISAE-SUPAERO
+# Copyright (C) 2026 ISAE-SUPAERO
 
 import openmdao.api as om
 import fastoad.api as oad
@@ -8,6 +8,14 @@ from fastoad.module_management.constants import ModelDomain
 
 from .lcc_production_cost import LCCProductionCost
 from .lcc_operational_cost import LCCOperationalCost
+from .lcc_production_profitability import LCCProductionProfitability
+from .lcc_operational_profitability import LCCOperationalProfitability
+
+
+def _check_positive_years(name, value):
+    """Option validator: the number of years must be strictly positive."""
+    if value <= 0:
+        raise ValueError(f"Option '{name}' must be a positive number of years. Got: {value}.")
 
 
 @oad.RegisterOpenMDAOSystem("fastga_he.lcc.legacy", domain=ModelDomain.OTHER)
@@ -32,17 +40,37 @@ class LCC(om.Group):
             allow_none=False,
         )
         self.options.declare(
-            name="learning_curve",
-            default=False,
-            types=bool,
-            desc="Learning curve for providing the discount rate of the manufacturing and tooling "
-            "man hours.",
-        )
-        self.options.declare(
             name="loan",
             default=True,
             types=bool,
             desc="True if loan is taken for financing the aircraft",
+        )
+        self.options.declare(
+            "years_of_development",
+            types=int,
+            default=10,
+            desc="The number of years of development for the aircraft, before the first delivery.",
+            check_valid=_check_positive_years,
+        )
+        self.options.declare(
+            "years_of_program",
+            types=int,
+            default=30,
+            desc="The total number of years of the aircraft program, including development and production.",
+            check_valid=_check_positive_years,
+        )
+        self.options.declare(
+            "years_of_service",
+            types=int,
+            default=30,
+            desc="The total service life of the aircraft in years.",
+            check_valid=_check_positive_years,
+        )
+        self.options.declare(
+            "profitability_analysis",
+            types=bool,
+            default=False,
+            desc="True if the profitability analysis is required, False if only the cost analysis is required.",
         )
 
     def setup(self):
@@ -51,15 +79,45 @@ class LCC(om.Group):
             subsys=LCCProductionCost(
                 power_train_file_path=self.options["power_train_file_path"],
                 delivery_method=self.options["delivery_method"],
-                learning_curve=self.options["learning_curve"],
             ),
             promotes=["*"],
         )
+
         self.add_subsystem(
             name="operational_cost",
             subsys=LCCOperationalCost(
                 power_train_file_path=self.options["power_train_file_path"],
+                delivery_method=self.options["delivery_method"],
                 loan=self.options["loan"],
             ),
             promotes=["*"],
         )
+
+        if self.options["profitability_analysis"]:
+            years_of_development = self.options["years_of_development"]
+            years_of_program = self.options["years_of_program"]
+
+            # This check is kept here due to the values of both options are defined after
+            # initialization
+            if years_of_program < years_of_development:
+                raise ValueError(
+                    f"Years of program ({years_of_program}) cannot be less than years of "
+                    f"development ({years_of_development})."
+                )
+
+            self.add_subsystem(
+                name="production_profitability",
+                subsys=LCCProductionProfitability(
+                    years_of_development=self.options["years_of_development"],
+                    years_of_program=self.options["years_of_program"],
+                ),
+                promotes=["*"],
+            )
+
+            self.add_subsystem(
+                name="operational_profitability",
+                subsys=LCCOperationalProfitability(
+                    years_of_service=self.options["years_of_service"], loan=self.options["loan"]
+                ),
+                promotes=["*"],
+            )

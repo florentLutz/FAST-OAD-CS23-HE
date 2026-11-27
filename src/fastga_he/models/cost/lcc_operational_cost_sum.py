@@ -38,12 +38,6 @@ class LCCSumOperationalCost(om.ExplicitComponent):
             desc="Annual insurance cost of the aircraft",
         )
         self.add_input(
-            "data:cost:operation:annual_loan_cost",
-            val=0.0,
-            units="USD/yr",
-            desc="Annual loan cost of the aircraft",
-        )
-        self.add_input(
             "data:cost:operation:miscellaneous_cost",
             val=np.nan,
             units="USD/yr",
@@ -83,7 +77,12 @@ class LCCSumOperationalCost(om.ExplicitComponent):
                 val=np.nan,
             )
 
-        self.add_output("data:cost:operation:annual_cost_per_unit", units="USD/yr", val=0.0)
+        self.add_output(
+            "data:cost:operation:annual_cost_per_unit",
+            units="USD/yr",
+            val=0.0,
+            desc="Annual operational cost per aircraft, loan and depreciation not included",
+        )
 
         self.declare_partials("*", "*", val=1.0)
 
