@@ -42,7 +42,7 @@ class _CheckMaxPayload(om.ExplicitComponent):
     """
 
     def setup(self):
-        self.add_input("data:weight:aircraft:target_MTOW", val=np.nan, units="kg")
+        self.add_input("data:weight:aircraft:MTOW", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:OWE", val=np.nan, units="kg")
         self.add_input("data:weight:aircraft:target_max_payload", val=np.nan, units="kg")
 
@@ -53,7 +53,7 @@ class _CheckMaxPayload(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         max_payload_ceiling = (
-            inputs["data:weight:aircraft:target_MTOW"] - inputs["data:weight:aircraft:OWE"]
+            inputs["data:weight:aircraft:MTOW"] - inputs["data:weight:aircraft:OWE"]
         )
         target_max_payload = inputs["data:weight:aircraft:target_max_payload"]
 
@@ -63,11 +63,11 @@ class _CheckMaxPayload(om.ExplicitComponent):
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
         max_payload_ceiling = (
-            inputs["data:weight:aircraft:target_MTOW"] - inputs["data:weight:aircraft:OWE"]
+            inputs["data:weight:aircraft:MTOW"] - inputs["data:weight:aircraft:OWE"]
         )
         target_max_payload = inputs["data:weight:aircraft:target_max_payload"]
 
-        partials["data:weight:aircraft:max_payload", "data:weight:aircraft:target_MTOW"] = np.where(
+        partials["data:weight:aircraft:max_payload", "data:weight:aircraft:MTOW"] = np.where(
             target_max_payload >= max_payload_ceiling,
             1.0,
             0.0,

@@ -39,6 +39,7 @@ def test_payload_mass():
     """Tests propulsion weight computation from sample XML data."""
 
     inputs_list = [
+        "data:weight:aircraft:MTOW",
         "data:weight:aircraft:target_MTOW",
         "data:weight:aircraft:OWE",
         "data:mission:sizing:fuel",
