@@ -91,7 +91,7 @@
                 <MTOW units="kg" is_input="True">1769.0<!--maximum takeoff weight--></MTOW>
                 <target_MTOW units="kg" is_input="True">1769.0<!--maximum takeoff weight--></target_MTOW>
                 <MZFW units="kg" is_input="True">1381.7<!--maximum zero fuel weight--></MZFW>
-                <target_max_payload units="kg" is_input="True">800.0<!--maximum zero fuel weight--></target_max_payload>
+                <max_payload_ceiling units="kg" is_input="True">800.0<!--maximum zero fuel weight--></max_payload_ceiling>
             </aircraft>
             <airframe>
                 <wing>
