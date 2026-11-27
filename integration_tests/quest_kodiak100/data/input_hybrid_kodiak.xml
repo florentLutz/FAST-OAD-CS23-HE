@@ -403,6 +403,7 @@
         <MTOW units="kg" is_input="True">3280.3834256571254<!--maximum takeoff weight of the aircraft--></MTOW>
         <target_MTOW units="kg" is_input="True">3280.3834256571254<!--maximum takeoff weight of the aircraft--></target_MTOW>
         <max_payload units="kg" is_input="True">1140.0<!--max payload weight--></max_payload>
+        <target_max_payload units="kg" is_input="True">1140.0<!--max payload weight--></target_max_payload>
         <payload units="kg" is_input="True">620.0<!--design payload weight--></payload>
         <CG>
           <aft>

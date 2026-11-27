@@ -1046,6 +1046,7 @@
         <MTOW units="kg" is_input="True">3378.6334646306163<!--maximum takeoff weight of the aircraft--></MTOW>
         <target_MTOW units="kg" is_input="True">3378.6334646306163<!--maximum takeoff weight of the aircraft--></target_MTOW>
         <max_payload units="kg" is_input="True">650.0<!--max payload weight--></max_payload>
+        <target_max_payload units="kg" is_input="True">650.0<!--max payload weight--></target_max_payload>
         <CG>
           <aft>
             <MAC_limit is_input="True">0.13<!--position of the aft limit of the Weight and balance envelop as a percent of MAC--></MAC_limit>
