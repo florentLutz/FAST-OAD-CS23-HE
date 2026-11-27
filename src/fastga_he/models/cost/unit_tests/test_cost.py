@@ -5,7 +5,6 @@
 import os
 import pathlib
 
-# import os.path as pth
 import numpy as np
 import pytest
 import openmdao.api as om

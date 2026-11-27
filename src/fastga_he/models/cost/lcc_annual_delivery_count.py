@@ -144,8 +144,10 @@ def _solve_decay_ratio(production_fraction_factor):
     5 * launch_aircraft_count < number_aircraft_5_years
     < launch_aircraft_count + 4 * annual_delivery_target.
 
-    The equation is the quartic q^4 + q^3 + q^2 + q + (1 - 5 * f) = 0. By Descartes' rule of
-    signs it has exactly one positive real root, which is the one in (0, 1).
+    The equation is the quartic q^4 + q^3 + q^2 + q + (1 - 5 * f) = 0. For 0.2 < f < 1 its
+    roots are the wanted root in (0, 1), a real root below -1 and a complex-conjugate pair,
+    so the real root closest to the interval is the wanted one. It is clipped to [0, 1] to
+    absorb round-off when f is very close to 0.2 or 1.
     """
     f = production_fraction_factor.item()
     target = 5.0 * f
@@ -158,16 +160,12 @@ def _solve_decay_ratio(production_fraction_factor):
         )
 
     roots = np.roots([1.0, 1.0, 1.0, 1.0, 1.0 - target])
+    # The 1e-10 is the tolerance of the real part of the roots
     real_roots = roots[np.abs(roots.imag) <= 1e-10].real
-    q = real_roots[(real_roots > 0.0) & (real_roots < 1.0)]
+    # 0.5 is the midpoint of the interval (0, 1)
+    q = real_roots[np.argmin(np.abs(real_roots - 0.5))]
 
-    if q.size != 1:
-        raise om.AnalysisError(
-            "Expected exactly one root of the decay-ratio quartic in (0, 1), found %d "
-            "(production_fraction_factor = %g)." % (q.size, f)
-        )
-
-    return float(q[0])
+    return float(np.clip(q, 0.0, 1.0))
 
 
 class _ProductionGrowthFactor(om.ExplicitComponent):
@@ -363,7 +361,7 @@ class _RoundDown(om.ExplicitComponent):
         original_annual_delivery_count = inputs["original_annual_delivery_count"]
 
         # production growing window: adjust the first five years to whole aircraft
-        annual_delivery_growing_count = np.floor(original_annual_delivery_count[:5] + 1e-9)
+        annual_delivery_growing_count = np.floor(original_annual_delivery_count[:5])
 
         # After the window: round each year independently, never below the last window year.
         annual_delivery_count_after = np.round(original_annual_delivery_count[5:])
