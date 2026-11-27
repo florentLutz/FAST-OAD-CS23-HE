@@ -914,7 +914,7 @@
         <OWE units="kg" is_input="False">2130.4359589468095<!--Mass of aircraft--></OWE>
         <ZFW units="kg" is_input="False">2970.4359589468095<!--aircraft mass with payload, without fuel--></ZFW>
         <max_payload units="kg" is_input="True">1150.0<!--max payload weight--></max_payload>
-        <max_payload_ceiling units="kg" is_input="True">1150.0<!--max payload weight--></max_payload_ceiling>
+        <target_max_payload units="kg" is_input="True">1150.0<!--max payload weight--></target_max_payload>
         <payload units="kg" is_input="True">840.0<!--design payload weight--></payload>
         <CG>
           <aft>

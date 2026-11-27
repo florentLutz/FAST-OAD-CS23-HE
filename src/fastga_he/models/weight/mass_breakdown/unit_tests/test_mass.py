@@ -42,7 +42,7 @@ def test_payload_mass():
         "data:weight:aircraft:target_MTOW",
         "data:weight:aircraft:OWE",
         "data:mission:sizing:fuel",
-        "data:weight:aircraft:max_payload_ceiling",
+        "data:weight:aircraft:target_max_payload",
     ]
 
     # Research independent input value in .xml file
