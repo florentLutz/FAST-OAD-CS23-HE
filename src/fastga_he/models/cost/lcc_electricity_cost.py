@@ -73,23 +73,7 @@ class _ElectricityConsumptionSum(om.ExplicitComponent):
         self.declare_partials(of="*", wrt="*", val=1.0)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
-        electricity_components_types = self.options["electricity_components_types"]
-        electricity_components_names = self.options["electricity_components_names"]
-
-        electricity_consumption = 0.0
-
-        for electricity_storage_type, electricity_storage_id in zip(
-            electricity_components_types, electricity_components_names
-        ):
-            electricity_consumption += inputs[
-                "data:propulsion:he_power_train:"
-                + electricity_storage_type
-                + ":"
-                + electricity_storage_id
-                + ":energy_consumed_main_route"
-            ]
-
-        outputs["electricity_consumption_per_mission"] = electricity_consumption
+        outputs["electricity_consumption_per_mission"] = np.sum(inputs.values())
 
 
 class _ElectricityCostPerMission(om.ExplicitComponent):
