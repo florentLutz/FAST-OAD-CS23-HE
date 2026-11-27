@@ -242,7 +242,10 @@ def lcc_cost_bar_chart_simple(
             filtered_item_names = item_names
             filtered_item_values = item_values
 
-        marker_color = color_list[i % len(color_list)]
+        if color_list:
+            marker_color = color_list[i % len(color_list)]
+        else:
+            marker_color = COLS[i % len(COLS)]
 
         bar_chart = go.Bar(
             name=name_aircraft,
@@ -474,14 +477,11 @@ def _stacked_cost_bar_chart(
 
     totals = dict.fromkeys(names_aircraft, 0.0)
     positive_heights = dict.fromkeys(names_aircraft, 0.0)
-    negative_heights = dict.fromkeys(names_aircraft, 0.0)
     for contribution in ordered_contributors.values():
         for aircraft, cost in contribution.items():
             totals[aircraft] += cost
             if cost > 0.0:
                 positive_heights[aircraft] += cost
-            else:
-                negative_heights[aircraft] += cost
 
     fig = go.Figure()
 
@@ -536,6 +536,8 @@ def _stacked_cost_bar_chart(
                 mode="text",
                 textposition="top center",
                 textfont=dict(size=18),
+                # Labels may go past the top of the plot area instead of being cut off
+                cliponaxis=False,
                 showlegend=False,
                 hoverinfo="skip",
             )
@@ -552,14 +554,6 @@ def _stacked_cost_bar_chart(
             annotation_bgcolor="rgba(255,255,255,0.85)",
         )
 
-    # Headroom for the totals
-    max_height = max(list(positive_heights.values()) + [reference_value or 0.0, 0.0])
-    min_height = min(list(negative_heights.values()) + [reference_value or 0.0, 0.0])
-    y_range = [
-        min_height * 1.12,
-        max_height * 1.12 if max_height > 0.0 else 1.0,
-    ]
-
     _update_fig_axis(fig)
     # Set after _update_fig_axis so they aren't overwritten
     fig.update_layout(
@@ -568,7 +562,12 @@ def _stacked_cost_bar_chart(
         legend=dict(traceorder="reversed"),
     )
     fig.update_yaxes(
-        title=y_axis_title, range=y_range, zeroline=True, zerolinecolor="black", side="left"
+        title=y_axis_title,
+        range=None,
+        autorange=True,
+        zeroline=True,
+        zerolinecolor="black",
+        side="left",
     )
 
     return go.FigureWidget(fig)
