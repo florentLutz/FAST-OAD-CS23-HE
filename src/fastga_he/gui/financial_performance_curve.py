@@ -2,7 +2,7 @@
 # Electric Aircraft.
 # Copyright (C) 2026 ISAE-SUPAERO
 
-from typing import List, Sequence
+from typing import Sequence
 
 import pathlib
 import numpy as np
