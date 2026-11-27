@@ -4,7 +4,6 @@
 
 import numpy as np
 import openmdao.api as om
-from scipy.optimize import brentq
 
 
 class LCCAnnualDeliveryCount(om.Group):
@@ -144,6 +143,9 @@ def _solve_decay_ratio(production_fraction_factor):
     (q = 1), so a unique root exists if and only if 0.2 < f < 1, i.e.
     5 * launch_aircraft_count < number_aircraft_5_years
     < launch_aircraft_count + 4 * annual_delivery_target.
+
+    The equation is the quartic q^4 + q^3 + q^2 + q + (1 - 5 * f) = 0. By Descartes' rule of
+    signs it has exactly one positive real root, which is the one in (0, 1).
     """
     f = production_fraction_factor.item()
     target = 5.0 * f
@@ -155,13 +157,17 @@ def _solve_decay_ratio(production_fraction_factor):
             "4 * annual_delivery_target (production_fraction_factor = %g, must be in (0.2, 1))." % f
         )
 
-    return brentq(
-        lambda q: 1.0 + q + q**2.0 + q**3.0 + q**4.0 - target,
-        0.0,
-        1.0,
-        xtol=1e-14,
-        rtol=1e-14,
-    )
+    roots = np.roots([1.0, 1.0, 1.0, 1.0, 1.0 - target])
+    real_roots = roots[np.abs(roots.imag) <= 1e-10].real
+    q = real_roots[(real_roots > 0.0) & (real_roots < 1.0)]
+
+    if q.size != 1:
+        raise om.AnalysisError(
+            "Expected exactly one root of the decay-ratio quartic in (0, 1), found %d "
+            "(production_fraction_factor = %g)." % (q.size, f)
+        )
+
+    return float(q[0])
 
 
 class _ProductionGrowthFactor(om.ExplicitComponent):
