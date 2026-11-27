@@ -163,7 +163,7 @@ def financial_performance_curve(
 def _resolve_y_variables(
     discipline: str | Sequence[str],
     y_variable: str | Sequence[str],
-) -> List[str]:
+) -> list[str]:
     """
     Builds the ordered list of full y variable names. Short names with no ":" are financial
     model variables (e.g. net present value, annual delivery count) read as
